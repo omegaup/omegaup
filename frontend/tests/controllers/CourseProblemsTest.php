@@ -76,4 +76,68 @@ class CourseProblemsTest extends OmegaupTestCase {
             $this->assertNotEquals($problems['problems'][$i]['alias'], $originalOrder[$i]['alias']);
         }
     }
+
+    public function testCourseProblemUsers() {
+        $admin = UserFactory::createUser();
+        $student = UserFactory::createUser();
+
+        // Create a course with an assignment
+        $adminLogin = self::login($admin);
+        $courseData = CoursesFactory::createCourseWithOneAssignment($admin, $adminLogin);
+        CoursesFactory::addStudentToCourse($courseData, $student, $adminLogin);
+        $course = $courseData['course'];
+        $assignment = $courseData['assignment'];
+
+        $problemData = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problemData[] = ProblemsFactory::createProblem(new ProblemParams([
+                'visibility' => 1,
+                'author' => $admin,
+            ]), $adminLogin);
+        }
+        CoursesFactory::addProblemsToAssignment($adminLogin, $course->alias, $assignment->alias, $problemData);
+
+        // Send runs to problem 1 (PA) and 2 (AC).
+        $login = self::login($student);
+        {
+            $response = RunController::apiCreate(new Request([
+                'auth_token' => $login->auth_token,
+                'problemset_id' => $assignment->problemset_id,
+                'problem_alias' => $problemData[0]['problem']->alias,
+                'language' => 'c',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]));
+            RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', null, $response['guid']);
+        }
+        {
+            $response = RunController::apiCreate(new Request([
+                'auth_token' => $login->auth_token,
+                'problemset_id' => $assignment->problemset_id,
+                'problem_alias' => $problemData[1]['problem']->alias,
+                'language' => 'c',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]));
+            RunsFactory::gradeRun(null /*runData*/, 1.0, 'AC', null, $response['guid']);
+        }
+
+        // Ensure that the student has attempted problems 1 and 2.
+        $response = CourseController::apiGetProblemUsers(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $course->alias,
+            'problem_alias' => $problemData[0]['problem']->alias,
+        ]));
+        $this->assertEquals([$student->username], $response['identities']);
+        $response = CourseController::apiGetProblemUsers(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $course->alias,
+            'problem_alias' => $problemData[1]['problem']->alias,
+        ]));
+        $this->assertEquals([$student->username], $response['identities']);
+        $response = CourseController::apiGetProblemUsers(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $course->alias,
+            'problem_alias' => $problemData[2]['problem']->alias,
+        ]));
+        $this->assertEquals([], $response['identities']);
+    }
 }

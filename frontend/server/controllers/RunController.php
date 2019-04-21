@@ -425,50 +425,6 @@ class RunController extends Controller {
     }
 
     /**
-     * Validate request of admin details
-     *
-     * @param Request $r
-     * @throws InvalidDatabaseOperationException
-     * @throws NotFoundException
-     * @throws ForbiddenAccessException
-     */
-    private static function validateAdminDetailsRequest(Request $r) {
-        Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
-
-        try {
-            $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (is_null($r['submission'])) {
-            throw new NotFoundException('runNotFound');
-        }
-
-        try {
-            $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (is_null($r['run'])) {
-            throw new NotFoundException('runNotFound');
-        }
-
-        try {
-            $r['problem'] = ProblemsDAO::getByPK($r['run']->problem_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
-        }
-
-        if (!(Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']))) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
-    }
-
-    /**
      * Get basic details of a run
      *
      * @param Request $r
@@ -713,14 +669,51 @@ class RunController extends Controller {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
-        self::validateAdminDetailsRequest($r);
-
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        if (!self::getGraderResource($r['run'], 'files.zip', /*passthru=*/ true)) {
+        Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
+        if (!downloadSubmission($r['run_alias'], $r['current_identity_id'], /*passthru=*/true)) {
             http_response_code(404);
         }
         exit;
+    }
+
+    public static function downloadSubmission(string $guid, int $identityId, bool $passthru) {
+        try {
+            $submission = SubmissionsDAO::getByGuid($guid);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($submission)) {
+            throw new NotFoundException('runNotFound');
+        }
+
+        try {
+            $run = RunsDAO::getByPK($submission->current_run_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($run)) {
+            throw new NotFoundException('runNotFound');
+        }
+
+        try {
+            $problem = ProblemsDAO::getByPK($submission->problem_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        if (!(Authorization::isProblemAdmin($identityId, $problem))) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        if ($passthru) {
+            header('Content-Type: application/zip');
+            header("Content-Disposition: attachment; filename={$submission->guid}.zip");
+        }
+        return self::getGraderResource($run, 'files.zip', $passthru);
     }
 
     private static function getGraderResource(
