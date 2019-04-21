@@ -432,7 +432,17 @@ class NoOpGrader extends Grader {
     private $runCount = 0;
 
     public function grade(Runs $run, string $source) {
-        $this->submissions[$run->guid] = $source;
+        global $conn;
+        $sql = '
+            SELECT
+                s.guid
+            FROM
+                Submissions s
+            WHERE
+                s.submission_id = ?;
+        ';
+        $guid = $conn->GetOne($sql, [$run->submission_id]);
+        $this->submissions[$guid] = $source;
         $this->runCount += 1;
     }
 

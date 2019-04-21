@@ -54,13 +54,16 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           FROM
             (
               SELECT DISTINCT
-                r.identity_id, r.problem_id
+                s.identity_id, s.problem_id
               FROM
+                Submissions s
+              INNER JOIN
                 Runs r
+              ON
+                r.run_id = s.current_run_id
               WHERE
-                r.verdict = 'AC' AND r.type= 'normal' AND
-                r.time >= ? AND
-                r.time <= ?
+                r.verdict = 'AC' AND s.type= 'normal' AND
+                s.time >= ? AND s.time <= ?
             ) AS up
           INNER JOIN
             Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1

@@ -669,7 +669,7 @@ class ProblemController extends Controller {
         // Call Grader
         $runs = [];
         try {
-            $runs = RunsDAO::getByKeys($r['problem']->problem_id);
+            $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
 
             foreach ($runs as $run) {
                 $run->status = 'new';
@@ -1288,22 +1288,15 @@ class ProblemController extends Controller {
             unset($response['source']);
         }
 
-        $problemset_id = !is_null($problem['problemset']) ? $problem['problemset']->problemset_id : null;
+        $problemset_id = !is_null($problem['problemset']) ? (int)$problem['problemset']->problemset_id : null;
 
         if (!is_null($r['current_user_id'])) {
-            // Create array of relevant columns for list of runs
-            $relevant_columns = ['guid', 'language', 'status', 'verdict',
-                'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-                'submit_delay'];
-
-            // Search the relevant runs from the DB
-
             // Get all the available runs done by the current_user
             try {
-                $runsArray = RunsDAO::getByKeys(
-                    $problem['problem']->problem_id,
+                $runsArray = RunsDAO::getForProblemDetails(
+                    (int)$problem['problem']->problem_id,
                     $problemset_id,
-                    $r['current_identity_id']
+                    (int)$r['current_identity_id']
                 );
             } catch (Exception $e) {
                 // Operation failed in the data layer
@@ -1311,17 +1304,14 @@ class ProblemController extends Controller {
             }
 
             // Add each filtered run to an array
-            $runs_filtered_array = [];
+            $response['runs'] = [];
             foreach ($runsArray as $run) {
-                $filtered = $run->asFilteredArray($relevant_columns);
-                $filtered['alias'] = $problem['problem']->alias;
-                $filtered['username'] = $r['current_user']->username;
-                $filtered['time'] = strtotime($filtered['time']);
-                $filtered['contest_score'] = (float)$filtered['contest_score'];
-                array_push($runs_filtered_array, $filtered);
+                $run['alias'] = $problem['problem']->alias;
+                $run['username'] = $r['current_user']->username;
+                $run['time'] = (int)$run['time'];
+                $run['contest_score'] = (float)$run['contest_score'];
+                array_push($response['runs'], $run);
             }
-
-            $response['runs'] = $runs_filtered_array;
         }
 
         if (!is_null($problemset_id)) {
@@ -1362,7 +1352,7 @@ class ProblemController extends Controller {
                 }
             }
         } elseif (isset($r['show_solvers']) && $r['show_solvers']) {
-            $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($problem['problem']->problem_id);
+            $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem((int)$problem['problem']->problem_id);
         }
 
         if (!is_null($r['current_identity_id'])) {
@@ -1437,7 +1427,7 @@ class ProblemController extends Controller {
                 }
             }
             try {
-                $runs = RunsDAO::GetAllRuns(
+                $runs = RunsDAO::getAllRuns(
                     null,
                     $r['status'],
                     $r['verdict'],
@@ -1467,23 +1457,21 @@ class ProblemController extends Controller {
         } else {
             // Get all the available runs
             try {
-                $runs_array = RunsDAO::getByKeys($r['problem']->problem_id, null, $r['current_identity_id']);
-
-                // Create array of relevant columns for list of runs
-                $relevant_columns = ['guid', 'language', 'status', 'verdict',
-                    'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-                    'submit_delay'];
+                $runsArray = RunsDAO::getForProblemDetails(
+                    (int)$r['problem']->problem_id,
+                    null,
+                    (int)$r['current_identity_id']
+                );
 
                 // Add each filtered run to an array
                 $response['runs'] = [];
-                if (count($runs_array) >= 0) {
-                    $runs_filtered_array = [];
-                    foreach ($runs_array as $run) {
-                        $filtered = $run->asFilteredArray($relevant_columns);
-                        $filtered['time'] = strtotime($filtered['time']);
-                        $filtered['username'] = $r['current_user']->username;
-                        $filtered['alias'] = $r['problem']->alias;
-                        array_push($response['runs'], $filtered);
+                if (!empty($runsArray)) {
+                    foreach ($runsArray as $run) {
+                        $run['time'] = (int)$run['time'];
+                        $run['contest_score'] = (float)$run['contest_score'];
+                        $run['username'] = $r['current_user']->username;
+                        $run['alias'] = $r['problem']->alias;
+                        array_push($response['runs'], $run);
                     }
                 }
             } catch (Exception $e) {
@@ -1557,16 +1545,23 @@ class ProblemController extends Controller {
 
         try {
             // Array of GUIDs of pending runs
-            $pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem($r['problem']->problem_id);
+            $pendingRunsGuids = RunsDAO::getPendingRunsOfProblem(
+                (int)$r['problem']->problem_id
+            );
 
             // Count of pending runs (int)
-            $totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r['problem']->problem_id);
+            $totalRunsCount = SubmissionsDAO::countTotalSubmissionsOfProblem(
+                (int)$r['problem']->problem_id
+            );
 
             // List of verdicts
             $verdict_counts = [];
 
             foreach (self::$verdicts as $verdict) {
-                $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfProblemByVerdict($r['problem']->problem_id, $verdict);
+                $verdict_counts[$verdict] = RunsDAO::countTotalRunsOfProblemByVerdict(
+                    (int)$r['problem']->problem_id,
+                    $verdict
+                );
             }
 
             // Array to count AC stats per case.
@@ -1578,14 +1573,15 @@ class ProblemController extends Controller {
                 $casesStats = [];
                 $casesStats['counts'] = [];
 
-                // We need to save the last_id that we processed, so next time we do not repeat this
-                $casesStats['last_id'] = 0;
+                // We need to save the last_submission_id that we processed, so next time we do not repeat this
+                $casesStats['last_submission_id'] = 0;
             }
 
             // Get all runs of this problem after the last id we had
-            $runs = RunsDAO::searchRunIdGreaterThan(new Runs([
-                'problem_id' => $r['problem']->problem_id
-            ]), $casesStats['last_id'], 'run_id');
+            $runs = RunsDAO::searchWithRunIdGreaterThan(
+                (int)$r['problem']->problem_id,
+                (int)$casesStats['last_submission_id']
+            );
 
             // For each run we got
             foreach ($runs as $run) {
@@ -1625,7 +1621,7 @@ class ProblemController extends Controller {
 
         // Save the last id we saw in case we saw something
         if (!is_null($runs) && count($runs) > 0) {
-            $casesStats['last_id'] = $runs[count($runs) - 1]->run_id;
+            $casesStats['last_submission_id'] = $runs[count($runs) - 1]->submission_id;
         }
 
         // Save in cache what we got
@@ -1903,33 +1899,34 @@ class ProblemController extends Controller {
         $contestAlias,
         $currentLoggedIdentityId,
         Identities $identity = null
-    ) {
+    ) : float {
         $currentIdentityId = (is_null($identity) ? $currentLoggedIdentityId : $identity->identity_id);
 
         if (is_null($currentIdentityId)) {
-            return 0;
+            return 0.0;
         }
 
-        $score = 0;
+        $score = 0.0;
         try {
             // Add best score info
             $problemset = self::validateProblemset($problem, $problemsetId, $contestAlias);
             if (is_null($problemset['problemset'])) {
-                $score = RunsDAO::GetBestScore($problem->problem_id, $currentIdentityId);
-            } else {
-                $bestRun = RunsDAO::GetBestRun(
-                    $problemset['problemset']->problemset_id,
-                    $problem->problem_id,
-                    $currentIdentityId,
-                    false /*showAllRuns*/
+                $score = (float)RunsDAO::getBestProblemScore(
+                    (int)$problem->problem_id,
+                    (int)$currentIdentityId
                 );
-                $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;
+            } else {
+                $score = (float)RunsDAO::getBestProblemScoreInProblemset(
+                    (int)$problemset['problemset']->problemset_id,
+                    (int)$problem->problem_id,
+                    (int)$currentIdentityId
+                );
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return $score;
+        return round($score, 2);
     }
 
     /**

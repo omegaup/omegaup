@@ -59,24 +59,16 @@ class Authorization {
     // Group identities creators.
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
-    public static function canViewRun($identity_id, Runs $run) {
-        if (is_null($run) || !is_a($run, 'Runs')) {
-            return false;
-        }
-
+    public static function canViewSubmission($identity_id, Submissions $submission) {
         return (
-            $run->identity_id === $identity_id ||
-            Authorization::canEditRun($identity_id, $run)
+            $submission->identity_id === $identity_id ||
+            Authorization::canEditSubmission($identity_id, $submission)
         );
     }
 
-    public static function canEditRun($identity_id, Runs $run) {
-        if (is_null($run) || !is_a($run, 'Runs')) {
-            return false;
-        }
-
+    public static function canEditSubmission($identity_id, Submissions $submission) {
         try {
-            $problem = ProblemsDAO::getByPK($run->problem_id);
+            $problem = ProblemsDAO::getByPK($submission->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -89,7 +81,7 @@ class Authorization {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        $problemset = ProblemsetsDAO::getByPK($run->problemset_id);
+        $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
         if (!is_null($problemset) && Authorization::isAdmin($identity_id, $problemset)) {
             return true;
         }

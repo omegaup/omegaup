@@ -110,17 +110,19 @@ class CoursesDAO extends CoursesDAOBase {
                 LEFT JOIN (
                     SELECT bpr.alias, bpr.identity_id, sum(best_score_of_problem) as assignment_score
                     FROM (
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, s.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemsets ps
                             ON a.problemset_id = ps.problemset_id
                         INNER JOIN Problemset_Problems psp
                             ON psp.problemset_id = ps.problemset_id
+                        INNER JOIN Submissions s
+                            ON s.problem_id = psp.problem_id
+                            AND s.problemset_id = a.problemset_id
                         INNER JOIN Runs r
-                            ON r.problem_id = psp.problem_id
-                            AND r.problemset_id = a.problemset_id
+                            ON r.run_id = s.current_run_id
                         WHERE a.course_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
+                        GROUP BY a.assignment_id, psp.problem_id, s.identity_id
                     ) bpr
                     GROUP BY bpr.assignment_id, bpr.identity_id
                 ) pr
@@ -167,15 +169,17 @@ class CoursesDAO extends CoursesDAOBase {
                     SELECT bpr.alias, bpr.assignment_id, sum(best_score_of_problem) as total_score
                     FROM (
                         -- get all runs belonging to an identity and get the best score
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, s.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemset_Problems psp
                             ON a.problemset_id = psp.problemset_id
+                        INNER JOIN Submissions s
+                            ON s.problem_id = psp.problem_id
+                            AND s.problemset_id = a.problemset_id
                         INNER JOIN Runs r
-                            ON r.problem_id = psp.problem_id
-                            AND r.problemset_id = a.problemset_id
-                        WHERE a.course_id = ? AND r.identity_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
+                            ON r.run_id = s.current_run_id
+                        WHERE a.course_id = ? AND s.identity_id = ?
+                        GROUP BY a.assignment_id, psp.problem_id, s.identity_id
                     ) bpr
                     GROUP BY bpr.assignment_id
                 ) pr
