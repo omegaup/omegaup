@@ -27,10 +27,10 @@ class RunsDAO extends RunsDAOBase {
     ) : array {
         $sql = '
             SELECT
-                i.username, r.language, r.runtime, r.memory, UNIX_TIMESTAMP(r.time) time
+                i.username, s.language, r.runtime, r.memory, UNIX_TIMESTAMP(s.time) time
             FROM
                 (SELECT
-                    MIN(r.submission_id) submission_id, s.identity_id, r.runtime
+                    MIN(s.submission_id) submission_id, s.identity_id, r.runtime
                 FROM
                     Submissions s
                 INNER JOIN
