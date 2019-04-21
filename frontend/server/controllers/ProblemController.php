@@ -206,7 +206,11 @@ class ProblemController extends Controller {
             // Add tags
             if (!empty($r['selected_tags'])) {
                 foreach ($r['selected_tags'] as $tag) {
-                    self::addTag($tag->tagname, $tag->public, $problem);
+                    $tagName = TagController::normalize($tag->tagname);
+                    if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
+                        continue;
+                    }
+                    self::addTag($tagName, $tag->public, $problem);
                 }
             }
             ProblemController::setRestrictedTags($problem);
@@ -380,7 +384,12 @@ class ProblemController extends Controller {
         return ['status' => 'ok', 'name' => $r['name']];
     }
 
-    private static function addTag(string $tagName, bool $isPublic, Problems $problem, bool $allowRestricted = false) {
+    private static function addTag(
+        string $tagName,
+        bool $isPublic,
+        Problems $problem,
+        bool $allowRestricted = false
+    ) : void {
         // Normalize name.
         $tagName = TagController::normalize($tagName);
 
