@@ -252,4 +252,38 @@ class UserProfileTest extends OmegaupTestCase {
         $user_in_db = UsersDAO::FindByEmail('new@email.com');
         $this->assertEquals($user->user_id, $user_in_db->user_id);
     }
+
+    /**
+     * Test update main email api
+     */
+    public function testStats() {
+        $user = UserFactory::createUser();
+        $problem = ProblemsFactory::createProblem();
+
+        $login = self::login($user);
+        {
+            $run = RunsFactory::createRunToProblem($problem, $user, $login);
+            RunsFactory::gradeRun($run, 0.0, 'CE');
+        }
+        {
+            $run = RunsFactory::createRunToProblem($problem, $user, $login);
+            RunsFactory::gradeRun($run, 0.5, 'PA');
+        }
+        {
+            $run = RunsFactory::createRunToProblem($problem, $user, $login);
+            RunsFactory::gradeRun($run);
+        }
+
+        $response = UserController::apiStats(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        foreach (['CE', 'PA', 'AC'] as $verdict) {
+            $this->assertEquals(
+                1,
+                $this->findByPredicate($response['runs'], function ($run) use ($verdict) {
+                    return $run['verdict'] == $verdict;
+                })['runs']
+            );
+        }
+    }
 }

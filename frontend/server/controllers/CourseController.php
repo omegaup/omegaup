@@ -947,7 +947,10 @@ class CourseController extends Controller {
             );
         }
 
-        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
+        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
+            $r['assignment_alias'],
+            $r['course']->course_id
+        );
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
