@@ -1177,7 +1177,9 @@ class ContestController extends Controller {
                 $runCount = 0;
 
                 try {
-                    $runCount = RunsDAO::CountTotalRunsOfProblemset($r['contest']->problemset_id);
+                    $runCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+                        (int)$r['contest']->problemset_id
+                    );
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
@@ -1417,7 +1419,10 @@ class ContestController extends Controller {
         }
 
         // Disallow removing problem from contest if it already has runs within the contest
-        if (RunsDAO::CountTotalRunsOfProblemInProblemset($problem->problem_id, $contest->problemset_id) > 0 &&
+        if (SubmissionsDAO::countTotalRunsOfProblemInProblemset(
+            (int)$problem->problem_id,
+            (int)$contest->problemset_id
+        ) > 0 &&
             !Authorization::isSystemAdmin($r['current_identity_id'])) {
             throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
@@ -2395,7 +2400,7 @@ class ContestController extends Controller {
 
         // Get our runs
         try {
-            $runs = RunsDAO::GetAllRuns(
+            $runs = RunsDAO::getAllRuns(
                 $r['contest']->problemset_id,
                 $r['status'],
                 $r['verdict'],
@@ -2464,20 +2469,24 @@ class ContestController extends Controller {
         self::validateStats($r);
 
         try {
-            // Array of GUIDs of pending runs
-            $pendingRunsGuids = RunsDAO::GetPendingRunsOfProblemset($r['contest']->problemset_id);
+            $pendingRunGuids = RunsDAO::getPendingRunGuidsOfProblemset((int)$r['contest']->problemset_id);
 
             // Count of pending runs (int)
-            $totalRunsCount = (int)RunsDAO::CountTotalRunsOfProblemset($r['contest']->problemset_id);
+            $totalRunsCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+                (int)$r['contest']->problemset_id
+            );
 
             // Wait time
-            $waitTimeArray = RunsDAO::GetLargestWaitTimeOfProblemset($r['contest']->problemset_id);
+            $waitTimeArray = RunsDAO::getLargestWaitTimeOfProblemset((int)$r['contest']->problemset_id);
 
             // List of verdicts
             $verdictCounts = [];
 
             foreach (self::$verdicts as $verdict) {
-                $verdictCounts[$verdict] = (int)RunsDAO::CountTotalRunsOfProblemsetByVerdict($r['contest']->problemset_id, $verdict);
+                $verdictCounts[$verdict] = (int)RunsDAO::countTotalRunsOfProblemsetByVerdict(
+                    (int)$r['contest']->problemset_id,
+                    $verdict
+                );
             }
 
             // Get max points posible for contest
@@ -2501,9 +2510,9 @@ class ContestController extends Controller {
 
         return [
             'total_runs' => $totalRunsCount,
-            'pending_runs' => $pendingRunsGuids,
-            'max_wait_time' => empty($waitTimeArray) ? 0 : $waitTimeArray[1],
-            'max_wait_time_guid' => empty($waitTimeArray) ? 0 : $waitTimeArray[0]->guid,
+            'pending_runs' => $pendingRunGuids,
+            'max_wait_time' => empty($waitTimeArray) ? 0 : $waitTimeArray['time'],
+            'max_wait_time_guid' => empty($waitTimeArray) ? 0 : $waitTimeArray['guid'],
             'verdict_counts' => $verdictCounts,
             'distribution' => $distribution,
             'size_of_bucket' => $sizeOfBucket,

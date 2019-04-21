@@ -448,7 +448,9 @@ class CourseController extends Controller {
             $runCount = 0;
 
             try {
-                $runCount = RunsDAO::CountTotalRunsOfProblemset($r['assignment']->problemset_id);
+                $runCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+                    (int)$r['assignment']->problemset_id
+                );
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -758,7 +760,9 @@ class CourseController extends Controller {
         $time = Time::get();
         foreach ($assignments as $assignment) {
             try {
-                $assignment['has_runs'] = RunsDAO::CountTotalRunsOfProblemset($assignment['problemset_id']) > 0;
+                $assignment['has_runs'] = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+                    (int)$assignment['problemset_id']
+                ) > 0;
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
@@ -947,7 +951,10 @@ class CourseController extends Controller {
             );
         }
 
-        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse($r['assignment'], $r['course']->course_id);
+        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
+            $r['assignment_alias'],
+            $r['course']->course_id
+        );
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
@@ -955,27 +962,23 @@ class CourseController extends Controller {
 
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
         $letter = 0;
-        $relevant_run_columns = ['guid', 'language', 'status', 'verdict',
-            'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-            'submit_delay'];
         foreach ($problems as &$problem) {
-            $runs_array = RunsDAO::getByKeys(
-                $problem['problem_id'],
-                $r['assignment']->problemset_id,
-                $r['identity']->identity_id
+            $runsArray = RunsDAO::getForProblemDetails(
+                (int)$problem['problem_id'],
+                (int)$r['assignment']->problemset_id,
+                (int)$r['identity']->identity_id
             );
-            $runs_filtered_array = [];
-            foreach ($runs_array as $run) {
-                $run->toUnixTime();
-                $filtered_run = $run->asFilteredArray($relevant_run_columns);
+            $problem['runs'] = [];
+            foreach ($runsArray as $run) {
+                $run['time'] = (int)$run['time'];
+                $run['contest_score'] = (float)$run['contest_score'];
                 try {
-                    $filtered_run['source'] = RunController::getRunSource($run);
+                    $run['source'] = SubmissionController::getSource($run['guid']);
                 } catch (Exception $e) {
-                    self::$log->error('Error fetching source for {$run->guid}: ' . $e);
+                    self::$log->error("Error fetching source for {$run['guid']}", $e);
                 }
-                $runs_filtered_array[] = $filtered_run;
+                array_push($problem['runs'], $run);
             }
-            $problem['runs'] = $runs_filtered_array;
             unset($problem['problem_id']);
             $problem['letter'] = ContestController::columnName($letter++);
         }
@@ -1591,7 +1594,7 @@ class CourseController extends Controller {
 
         // Get our runs
         try {
-            $runs = RunsDAO::GetAllRuns(
+            $runs = RunsDAO::getAllRuns(
                 $r['assignment']->problemset_id,
                 $r['status'],
                 $r['verdict'],

@@ -26,11 +26,15 @@ def update_user_rank(cur):
         SET
             p.accepted = (
                 SELECT
-                    COUNT(DISTINCT r.identity_id)
+                    COUNT(DISTINCT s.identity_id)
                 FROM
+                    Submissions s
+                INNER JOIN
                     Runs r
+                ON
+                    r.run_id = s.current_run_id
                 WHERE
-                    r.problem_id = p.problem_id AND r.verdict = 'AC'
+                    s.problem_id = p.problem_id AND r.verdict = 'AC'
             );
     ''')
     logging.info('Updating user rank...')
@@ -48,12 +52,16 @@ def update_user_rank(cur):
         FROM
         (
             SELECT DISTINCT
-              r.identity_id,
-              r.problem_id
+              s.identity_id,
+              s.problem_id
             FROM
-              Runs r
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
             WHERE
-              r.verdict = 'AC' AND r.type = 'normal'
+              r.verdict = 'AC' AND s.type = 'normal'
         ) AS up
         INNER JOIN
             Problems ps ON ps.problem_id = up.problem_id AND ps.visibility > 0

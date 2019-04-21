@@ -21,18 +21,19 @@ class Grader {
     /**
      * Call /run/new/ endpoint with run id as parameter.
      *
-     * @param string $guid   the GUID of the run to be graded.
+     * @param Runs   $run    the run to be graded.
      * @param string $source the source of the submission.
      *
      * @throws Exception
      */
-    public function grade(string $guid, string $source) {
+    public function grade(Runs $run, string $source) {
         if (OMEGAUP_GRADER_FAKE) {
-            file_put_contents("/tmp/{$guid}", $source);
+            $submission = SubmissionsDAO::getByPK($run->submission_id);
+            file_put_contents("/tmp/{$submission->guid}", $source);
             return;
         }
         return $this->curlRequest(
-            OMEGAUP_GRADER_URL . "/run/new/{$guid}/",
+            OMEGAUP_GRADER_URL . "/run/new/{$run->run_id}/",
             self::REQUEST_MODE_RAW,
             $source
         );
@@ -41,12 +42,12 @@ class Grader {
     /**
      * Call /run/grade/ endpoint in rejudge mode.
      *
-     * @param array $runGuids the array of runs to be grader.
-     * @param bool  $debug    whether this is a debug-rejudge.
+     * @param array $runs  the array of runs to be graded.
+     * @param bool  $debug whether this is a debug-rejudge.
      *
      * @throws Exception
      */
-    public function rejudge(array $runGuids, bool $debug) {
+    public function rejudge(array $runs, bool $debug) {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
@@ -54,7 +55,9 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/grade/',
             self::REQUEST_MODE_JSON,
             [
-                'id' => $runGuids,
+                'run_ids' => array_map(function (Runs $r) {
+                    return (int)$r->run_id;
+                }, $runs),
                 'rejudge' => true,
                 'debug' => false, // TODO(lhchavez): Reenable with ACLs.
             ]
@@ -62,9 +65,9 @@ class Grader {
     }
 
     /**
-     * Call /run/source/ endpoint with run guid as parameter
+     * Call /submission/source/ endpoint with submission guid as parameter
      *
-     * @param string $guids the guid of the run.
+     * @param string $guid the submission guid.
      *
      * @throws Exception
      */
@@ -73,7 +76,7 @@ class Grader {
             return file_get_contents("/tmp/{$guid}");
         }
         return $this->curlRequest(
-            OMEGAUP_GRADER_URL . "/run/source/{$guid}/",
+            OMEGAUP_GRADER_URL . "/submission/source/{$guid}/",
             self::REQUEST_MODE_RAW
         );
     }
@@ -135,7 +138,7 @@ class Grader {
     }
 
     public function getGraderResource(
-        string $guid,
+        Runs $run,
         string $filename,
         bool $passthru = false,
         bool $missingOk = false
@@ -147,7 +150,7 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/resource/',
             $passthru ? self::REQUEST_MODE_PASSTHRU : self::REQUEST_MODE_RAW,
             [
-                'id' => $guid,
+                'run_id' => (int)$run->run_id,
                 'filename' => $filename,
             ],
             $missingOk
@@ -210,14 +213,14 @@ class Grader {
 
             // Execute call
             $response = curl_exec($curl);
+            $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-            if ($response === false || curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
-                if (curl_getinfo($curl, CURLINFO_HTTP_CODE) == 404 && $missingOk) {
+            if ($response === false || $httpStatus != 200) {
+                if ($httpStatus == 404 && $missingOk) {
                     return null;
                 }
                 $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
-                    curl_errno($curl) . ' HTTP ' .
-                    curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                    curl_errno($curl) . " HTTP {$httpStatus}";
                 throw new Exception($message);
             }
 

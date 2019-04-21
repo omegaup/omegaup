@@ -485,10 +485,18 @@ class CreateProblemTest extends OmegaupTestCase {
         // Login user
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
-        $r['selected_tags'] = json_encode([
+        $expectedTags = [
             ['tagname' => 'math', 'public' => true],
             ['tagname' => 'geometry', 'public' => false],
-        ]);
+        ];
+
+        $r['selected_tags'] = json_encode(
+            $expectedTags + [
+                // The following tags will be ignored:
+                ['tagname' => 'karel', 'public' => true],
+                ['tagname' => 'solo-salida', 'public' => false],
+            ]
+        );
 
         // Get File Uploader Mock and tell Omegaup API to use it
         FileHandler::SetFileUploader($this->createFileUploaderMock());
@@ -501,9 +509,9 @@ class CreateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
         ]))['tags'];
 
-        foreach ($r['selected_tags'] as $selectedTag) {
+        foreach ($expectedTags as $selectedTag) {
             $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-                return $tag['name'] == $selectedTag->tagname;
+                return $tag['name'] == $selectedTag['tagname'];
             });
         }
         $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {

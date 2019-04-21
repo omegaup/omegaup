@@ -38,7 +38,7 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         $response = json_decode($browser->exec(), JSON_OBJECT_AS_ARRAY);
-        if (!array_key_exists('entries', $response)) {
+        if (!is_array($response) || !array_key_exists('entries', $response)) {
             $this->log->error(
                 "Failed to get entries of {$path} for problem {$this->alias} at commit {$this->commit}"
             );

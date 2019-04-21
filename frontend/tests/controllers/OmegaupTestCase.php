@@ -431,13 +431,23 @@ class NoOpGrader extends Grader {
     private $submissions = [];
     private $runCount = 0;
 
-    public function grade(string $guid, string $source) {
+    public function grade(Runs $run, string $source) {
+        global $conn;
+        $sql = '
+            SELECT
+                s.guid
+            FROM
+                Submissions s
+            WHERE
+                s.submission_id = ?;
+        ';
+        $guid = $conn->GetOne($sql, [$run->submission_id]);
         $this->submissions[$guid] = $source;
         $this->runCount += 1;
     }
 
-    public function rejudge(array $runGuids, bool $debug) {
-        $this->runCount += count($runGuids);
+    public function rejudge(array $runs, bool $debug) {
+        $this->runCount += count($runs);
     }
 
     public function getSource(string $guid) {
@@ -471,7 +481,7 @@ class NoOpGrader extends Grader {
     }
 
     public function getGraderResource(
-        string $guid,
+        Runs $run,
         string $filename,
         bool $passthru = false,
         bool $missingOk = false
@@ -479,7 +489,7 @@ class NoOpGrader extends Grader {
         if ($passthru) {
             throw new UnimplementedException();
         }
-        $path = "{$guid}/{$filename}";
+        $path = "{$run->run_id}/{$filename}";
         if (!array_key_exists($path, $this->resources)) {
             if (!$missingOk) {
                 throw new Exception("Resource {$path} not found");
@@ -491,11 +501,11 @@ class NoOpGrader extends Grader {
     }
 
     public function setGraderResourceForTesting(
-        string $guid,
+        Runs $run,
         string $filename,
         string $contents
     ) {
-        $path = "{$guid}/{$filename}";
+        $path = "{$run->run_id}/{$filename}";
         $this->resources[$path] = $contents;
     }
 

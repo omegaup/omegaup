@@ -19,105 +19,122 @@ require_once('base/Runs.vo.base.php');
  *
  */
 class RunsDAO extends RunsDAOBase {
-    /*
+    /**
      * Gets an array of the guids of the pending runs
      */
-
-    final public static function GetPendingRuns($showAllRuns = false) {
-        // Build SQL statement.
-        $sql = "SELECT guid, UNIX_TIMESTAMP(time) AS time FROM Runs WHERE status != 'ready'";
-
-        if (!$showAllRuns) {
-            $sql .= ' AND `type` = \'normal\'';
-        }
-
-        $sql .= ' ORDER BY run_id;';
-
-        global $conn;
-        $rs = $conn->Execute($sql);
-
-        $ar = [];
-        foreach ($rs as $row) {
-            array_push($ar, ['guid' => $row['guid'], 'time' => intval($row['time'])]);
-        }
-
-        return $ar;
-    }
-
-    /*
-     * Gets an array of the guids of the pending runs
-     */
-
-    final public static function GetBestSolvingRunsForProblem($problem_id) {
+    final public static function getBestSolvingRunsForProblem(
+        int $problemId
+    ) : array {
         $sql = '
-			SELECT i.username, r.language, r.runtime, r.memory, UNIX_TIMESTAMP(r.time) time FROM
-				(SELECT
-					MIN(r.run_id) run_id, r.identity_id, r.runtime
-				FROM
-					Runs r
-				INNER JOIN
-					(
-						SELECT
-							rr.identity_id, MIN(rr.runtime) AS runtime
-						FROM
-							Runs rr
-						WHERE
-							rr.problem_id = ? AND rr.verdict = \'AC\' AND rr.type = \'normal\' GROUP BY rr.identity_id
-					) AS sr ON sr.identity_id = r.identity_id AND sr.runtime = r.runtime
-				WHERE
-					r.problem_id = ? AND r.verdict = \'AC\' AND r.type= \'normal\'
-				GROUP BY
-					r.identity_id, r.runtime
-				ORDER
-					BY r.runtime, run_id
-				LIMIT 0, 10) as runs
-			INNER JOIN
-				Identities i ON i.identity_id = runs.identity_id
-			INNER JOIN
-				Runs r ON r.run_id = runs.run_id;';
-        $val = [$problem_id, $problem_id];
+            SELECT
+                i.username, r.language, r.runtime, r.memory, UNIX_TIMESTAMP(r.time) time
+            FROM
+                (SELECT
+                    MIN(r.submission_id) submission_id, s.identity_id, r.runtime
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Runs r
+                ON
+                    r.run_id = s.current_run_id
+                INNER JOIN
+                    (
+                        SELECT
+                            ss.identity_id, MIN(rr.runtime) AS runtime
+                        FROM
+                            Submissions ss
+                        INNER JOIN
+                            Runs rr
+                        ON
+                            rr.run_id = ss.current_run_id
+                        WHERE
+                            ss.problem_id = ? AND rr.status = "ready" AND rr.verdict = "AC" AND ss.type = "normal"
+                        GROUP BY
+                            ss.identity_id
+                    ) AS sr ON sr.identity_id = s.identity_id AND sr.runtime = r.runtime
+                WHERE
+                    s.problem_id = ? AND r.status = "ready" AND r.verdict = "AC" AND s.type= "normal"
+                GROUP BY
+                    s.identity_id, r.runtime
+                ORDER BY
+                    r.runtime, submission_id
+                LIMIT 0, 10) as runs
+            INNER JOIN
+                Identities i ON i.identity_id = runs.identity_id
+            INNER JOIN
+                Submissions s ON s.submission_id = runs.submission_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id;';
+        $val = [$problemId, $problemId];
 
         global $conn;
         return $conn->GetAll($sql, $val);
     }
 
-    /*
+    /**
      * Gets an array of the guids of the pending runs
      */
-
-    final public static function GetPendingRunsOfProblemset($problemset_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = "SELECT guid FROM Runs WHERE problemset_id = ? AND status != 'ready'";
-        $val = [$problemset_id];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND `type` = \'normal\'';
-        }
+    final public static function getPendingRunGuidsOfProblemset(
+        int $problemsetId
+    ) : array {
+        $sql = '
+            SELECT
+                s.guid
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problemset_id = ? AND r.status != "ready" AND s.type = "normal";
+        ';
+        $val = [$problemsetId];
 
         global $conn;
-        $rs = $conn->Execute($sql, $val);
 
-        $ar = [];
-        foreach ($rs as $foo) {
-            array_push($ar, $foo['guid']);
+        $result = [];
+        foreach ($conn->Execute($sql, $val) as $row) {
+            $result[] = $row['guid'];
         }
-
-        return $ar;
+        return $result;
     }
 
-    final public static function GetAllRuns($problemset_id, $status, $verdict, $problem_id, $language, $identity_id, $offset, $rowcount) {
-        $sql = 'SELECT r.run_id, r.guid, r.language, r.status, r.verdict, r.runtime, r.penalty, ' .
-                'r.memory, r.score, r.contest_score, r.judged_by, UNIX_TIMESTAMP(r.time) AS time, ' .
-                'r.submit_delay, r.type, i.username, p.alias, i.country_id, c.alias AS contest_alias ' .
-                'FROM Runs r USE INDEX(PRIMARY) ' .
-                'INNER JOIN Problems p ON p.problem_id = r.problem_id ' .
-                'INNER JOIN Identities i ON i.identity_id = r.identity_id ' .
-                'LEFT JOIN Contests c ON c.problemset_id = r.problemset_id ';
+    final public static function getAllRuns(
+        ?int $problemset_id,
+        ?string $status,
+        ?string $verdict,
+        ?int $problem_id,
+        ?string $language,
+        ?int $identity_id,
+        ?int $offset,
+        ?int $rowcount
+    ) : array {
+        $sql = '
+            SELECT
+                r.run_id, s.guid, s.language, r.status, r.verdict, r.runtime,
+                r.penalty, r.memory, r.score, r.contest_score, r.judged_by,
+                UNIX_TIMESTAMP(s.time) AS time, s.submit_delay, s.type, i.username, p.alias,
+                i.country_id, c.alias AS contest_alias
+            FROM
+                Submissions s
+            USE INDEX(PRIMARY)
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Contests c ON c.problemset_id = s.problemset_id
+        ';
         $where = [];
         $val = [];
 
         if (!is_null($problemset_id)) {
-            $where[] = 'r.problemset_id = ?';
+            $where[] = 's.problemset_id = ?';
             $val[] = $problemset_id;
         }
 
@@ -130,22 +147,22 @@ class RunsDAO extends RunsDAOBase {
             $val[] = $verdict;
         }
         if (!is_null($problem_id)) {
-            $where[] = 'r.problem_id = ?';
+            $where[] = 's.problem_id = ?';
             $val[] = $problem_id;
         }
         if (!is_null($language)) {
-            $where[] = 'r.language = ?';
+            $where[] = 's.language = ?';
             $val[] = $language;
         }
         if (!is_null($identity_id)) {
-            $where[] = 'r.identity_id = ?';
+            $where[] = 's.identity_id = ?';
             $val[] = $identity_id;
         }
         if (!empty($where)) {
             $sql .= 'WHERE ' . implode(' AND ', $where) . ' ';
         }
 
-        $sql .= 'ORDER BY run_id DESC ';
+        $sql .= 'ORDER BY s.submission_id DESC ';
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
             $val[] = (int) $offset;
@@ -159,179 +176,156 @@ class RunsDAO extends RunsDAOBase {
     /*
      * Gets an array of the guids of the pending runs
      */
-
-    final public static function GetPendingRunsOfProblem($problem_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = "SELECT guid FROM Runs WHERE problem_id = ? AND status != 'ready'";
-        $val = [$problem_id];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND `type` = \'normal\'';
-        }
-
-        global $conn;
-        $rs = $conn->Execute($sql, $val);
-
-        $ar = [];
-        foreach ($rs as $foo) {
-            array_push($ar, $foo['guid']);
-        }
-
-        return $ar;
-    }
-
-    /*
-     * Gets the count of total runs sent to a given problemset
-     */
-    final public static function CountTotalRunsOfProblemset($problemset_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problemset_id = ? ';
-        $val = [$problemset_id];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND `type` = \'normal\'';
-        }
+    final public static function getPendingRunsOfProblem(
+        int $problemId
+    ) : array {
+        $sql = '
+            SELECT
+                s.guid
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ? AND r.status != "ready" AND s.`type` = "normal";';
+        $val = [$problemId];
 
         global $conn;
-        return $conn->GetOne($sql, $val);
+        $result = [];
+        foreach ($conn->Execute($sql, $val) as $row) {
+            $result[] = $row['guid'];
+        }
+        return $result;
     }
 
-    /*
-     * Gets the count of total runs sent to a given problem
+    /**
+     * Gets the count of total runs sent to a given contest by verdict
      */
-
-    final public static function CountTotalRunsOfProblem($problem_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? ';
-        $val = [$problem_id];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND `type` = \'normal\'';
-        }
+    final public static function countTotalRunsOfProblemsetByVerdict(
+        int $problemsetId,
+        string $verdict
+    ) : int {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problemset_id = ? AND r.verdict = ? AND r.status = "ready" AND s.`type` = "normal";
+        ';
+        $val = [$problemsetId, $verdict];
 
         global $conn;
         return $conn->GetOne($sql, $val);
     }
 
     /**
-     * Get the count of runs of a problem in a given problemset
-     *
-     * @param int $problem_id
-     * @param int $problemset_id
-     */
-    final public static function CountTotalRunsOfProblemInProblemset($problem_id, $problemset_id) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND problemset_id = ? AND `type` = \'normal\'';
-        $val = [$problem_id, $problemset_id];
-
-        global $conn;
-        return $conn->GetOne($sql, $val);
-    }
-
-    /*
      * Gets the count of total runs sent to a given contest by verdict
      */
-
-    final public static function CountTotalRunsOfProblemsetByVerdict($problemset_id, $verdict, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problemset_id = ? AND verdict = ? ';
-        $val = [$problemset_id, $verdict];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND `type` = \'normal\'';
-        }
-
-        global $conn;
-        return $conn->GetOne($sql, $val);
-    }
-
-    /*
-     * Gets the count of total runs sent to a given contest by verdict
-     */
-
-    final public static function CountTotalRunsOfProblemByVerdict($problem_id, $verdict, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = 'SELECT COUNT(*) FROM Runs WHERE problem_id = ? AND verdict = ? ';
-        $val = [$problem_id, $verdict];
-
-        if (!$showAllRuns) {
-            $sql .= ' AND `type` = \'normal\'';
-        }
+    final public static function countTotalRunsOfProblemByVerdict(
+        int $problemId,
+        string $verdict
+    ) : int {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                s.current_run_id = r.run_id
+            WHERE
+                s.problem_id = ? AND r.status = "ready" AND r.verdict = ? AND s.`type` = "normal";
+        ';
+        $val = [$problemId, $verdict];
 
         global $conn;
         return $conn->GetOne($sql, $val);
     }
 
-    /*
+    /**
      * Gets the count of total runs sent to a given contest by verdict and by period of time
      */
-    final public static function CountRunsOfIdentityPerDatePerVerdict($identity_id) {
-        // Build SQL statement.
+    final public static function countRunsOfIdentityPerDatePerVerdict(
+        int $identityId
+    ) {
         $sql = '
-                SELECT
-                    r.date,
-                    r.verdict,
-                    COUNT(1) runs
-                FROM (
-                    SELECT
-                        DATE(time) AS date,
-                        verdict
-                    FROM
-                        Runs
-                    WHERE
-                        identity_id = ? AND status = \'ready\'
-                ) AS r
-                GROUP BY
-                    r.date, r.verdict
-                ORDER BY
-                  date ASC;';
-
-        $val = [$identity_id];
+            SELECT
+                DATE(s.time) AS date,
+                r.verdict AS verdict,
+                COUNT(*) AS runs
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.identity_id = ? AND r.status = "ready" AND s.`type` = "normal"
+            GROUP BY
+                date, verdict
+            ORDER BY
+                date ASC;
+        ';
+        $val = [$identityId];
 
         global $conn;
-        $rs = $conn->Execute($sql, $val);
-
-        $ar = [];
-        foreach ($rs as $row) {
-            array_push($ar, [
-                'date' => $row['date'],
-                'verdict' => $row['verdict'],
-                'runs' => $row['runs']
-            ]);
-        }
-
-        return $ar;
+        return $conn->GetAll($sql, $val);
     }
 
-    /*
-     * Gets the largest queued time of a run in ms
+    /**
+     * Gets the largest queued time of a run in seconds.
      */
-    final public static function GetLargestWaitTimeOfProblemset($problemset_id, $showAllRuns = false) {
-        // Build SQL statement.
-        $sql = "SELECT * FROM Runs WHERE problemset_id = ? AND status != 'ready' ORDER BY run_id ASC LIMIT 1";
-        $val = [$problemset_id];
+    final public static function getLargestWaitTimeOfProblemset(
+        int $problemsetId
+    ) : ?array {
+        $sql = '
+            SELECT
+                s.guid, UNIX_TIMESTAMP(s.time) AS time
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problemset_id = ? AND r.status != "ready" AND s.`type` = "normal"
+            ORDER BY
+                s.submission_id ASC
+            LIMIT 1;
+        ';
+        $val = [$problemsetId];
 
         global $conn;
-        $rs = $conn->GetRow($sql, $val);
-
-        if (count($rs) === 0) {
+        $row = $conn->GetRow($sql, $val);
+        if (empty($row)) {
             return null;
         }
-
-        $run = new Runs($rs);
-        return [$run, Time::get() - strtotime($run->time)];
+        return $row;
     }
 
-    /*
-     *  getAllRelevantIdentities
-     *
+    /**
+     *  Get all relevant identities for a problemset.
      */
-
-    final public static function getAllRelevantIdentities($problemset_id, $acl_id, $showAllRuns = false, $filterUsersBy = null, $group_id = null, $excludeAdmin = true) {
+    final public static function getAllRelevantIdentities(
+        int $problemsetId,
+        int $aclId,
+        bool $showAllRuns = false,
+        ?string $filterUsersBy = null,
+        ?int $groupId = null,
+        ?bool $excludeAdmin = true
+    ) : array {
         // Build SQL statement
         $log = Logger::getLogger('Scoreboard');
         if ($showAllRuns) {
-            if (is_null($group_id)) {
+            if (is_null($groupId)) {
                 $sql = '
                     SELECT
                         i.identity_id, i.username, i.name, i.country_id, pi.is_invited
@@ -343,14 +337,14 @@ class RunsDAO extends RunsDAOBase {
                         pi.problemset_id = ? AND
                         i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)';
                 $val = [
-                    $problemset_id,
-                    $acl_id,
+                    $problemsetId,
+                    $aclId,
                     Authorization::SYSTEM_ACL,
                     Authorization::ADMIN_ROLE,
                 ];
                 if ($excludeAdmin) {
                     $sql = $sql . ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
-                    $val[] =  $acl_id;
+                    $val[] =  $aclId;
                 }
                 $sql = $sql . ';';
             } else {
@@ -366,9 +360,9 @@ class RunsDAO extends RunsDAOBase {
                         i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
                         i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
                 $val = [
-                    $group_id,
-                    $acl_id,
-                    $acl_id,
+                    $groupId,
+                    $aclId,
+                    $aclId,
                     Authorization::SYSTEM_ACL,
                     Authorization::ADMIN_ROLE,
                 ];
@@ -381,15 +375,20 @@ class RunsDAO extends RunsDAOBase {
                     Identities i
                 INNER JOIN
                     (SELECT DISTINCT
-                        r.identity_id
+                        s.identity_id
                     FROM
+                        Submissions s
+                    INNER JOIN
                         Runs r
+                    ON
+                        r.run_id = s.current_run_id
                     WHERE
                         r.verdict NOT IN (\'CE\', \'JE\') AND
-                        r.problemset_id = ? AND
+                        s.problemset_id = ? AND
                         r.status = \'ready\' AND
-                        r.type = \'normal\') rc ON i.identity_id = rc.identity_id';
-            $val = [$problemset_id];
+                        s.type = \'normal\'
+                    ) rc ON i.identity_id = rc.identity_id';
+            $val = [$problemsetId];
             if (!is_null($filterUsersBy)) {
                 $sql .= ' WHERE i.username LIKE ?';
                 $val[] = $filterUsersBy . '%';
@@ -408,223 +407,203 @@ class RunsDAO extends RunsDAOBase {
         return $ar;
     }
 
-    final public static function getProblemsetRuns(Problemsets $problemset, $onlyAC = false) {
-        $sql =    'SELECT '
-                    . 'r.score, r.penalty, r.contest_score, r.problem_id, r.identity_id, r.type, r.time, r.submit_delay, r.guid '
-                . 'FROM '
-                    . 'Runs r '
-                . 'INNER JOIN '
-                    . 'Problemset_Problems pp '
-                . 'ON '
-                    . 'r.problem_id = pp.problem_id '
-                    . 'AND r.problemset_id = pp.problemset_id '
-                . 'WHERE '
-                    . 'pp.problemset_id = ? '
-                    . "AND r.status = 'ready' "
-                    . "AND r.type = 'normal' " .
-                    (($onlyAC === false) ?
-                        "AND r.verdict NOT IN ('CE', 'JE') " :
-                        "AND r.verdict IN ('AC') ")
-                . 'ORDER BY r.run_id;';
-
-        $val = [$problemset->problemset_id];
-
-        global $conn;
-        $rs = $conn->Execute($sql, $val);
-
-        $ar = [];
-        foreach ($rs as $foo) {
-            array_push($ar, new Runs($foo));
-        }
-
-        return $ar;
-    }
-
-    /*
-     *
-     * Get last run of a user
-     *
-     */
-    final public static function GetLastRun($problemset_id, $problem_id, $identity_id) {
-        //Build SQL statement
-        if (is_null($problemset_id)) {
-            $sql = 'SELECT * from Runs where identity_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
-            $val = [$identity_id, $problem_id];
-        } else {
-            $sql = 'SELECT * from Runs where identity_id = ? and problemset_id = ? and problem_id = ? ORDER BY time DESC LIMIT 1';
-            $val = [$identity_id, $problemset_id, $problem_id];
-        }
-
-        global $conn;
-        $rs = $conn->GetRow($sql, $val);
-
-        if (count($rs) === 0) {
-            return null;
-        }
-        $bar = new Runs($rs);
-
-        return $bar;
-    }
-
-    /*
-     *
-     * Get best run of a user
-     *
-     */
-
-    final public static function GetBestRun($problemset_id, $problem_id, $identity_id, $showAllRuns) {
-        $filterTest = $showAllRuns ? '' : ' AND `type` = \'normal\'';
-        $sql = "
+    final public static function getProblemsetRuns(
+        Problemsets $problemset,
+        bool $onlyAC = false
+    ) : array {
+        $sql = '
             SELECT
-                contest_score, penalty, submit_delay, guid, run_id
+                r.score, r.penalty, r.contest_score, s.problem_id,
+                s.identity_id, s.type, UNIX_TIMESTAMP(s.time) AS time,
+                s.submit_delay, s.guid
             FROM
-                Runs
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                s.current_run_id = r.run_id
             WHERE
-                identity_id = ? AND problemset_id = ? AND problem_id = ? AND
-                status = 'ready'
-                $filterTest
-            ORDER BY
-                contest_score DESC, penalty ASC
-            LIMIT 1;";
-        $val = [$identity_id, $problemset_id, $problem_id];
-        global $conn;
-        $rs = $conn->GetRow($sql, $val);
+                s.problemset_id = ? AND
+                r.status = \'ready\' AND
+                s.type = \'normal\' AND ' .
+                ($onlyAC ?
+                    "r.verdict IN ('AC') " :
+                    "r.verdict NOT IN ('CE', 'JE') "
+                ) .
+            ' ORDER BY s.submission_id;';
 
-        return new Runs($rs);
+        $result = [];
+        global $conn;
+        foreach ($conn->Execute($sql, [$problemset->problemset_id]) as $row) {
+            array_push($result, $row);
+        }
+        return $result;
+    }
+
+    /**
+     * Get best contest score of a user for a problem in a problemset.
+     */
+    final public static function getBestProblemScoreInProblemset(
+        int $problemsetId,
+        int $problemId,
+        int $identityId
+    ) : ?float {
+        $sql = '
+            SELECT
+                r.contest_score
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                s.current_run_id = r.run_id
+            WHERE
+                s.identity_id = ? AND s.problemset_id = ? AND s.problem_id = ? AND
+                r.status = "ready" AND s.`type` = "normal"
+            ORDER BY
+                r.contest_score DESC, r.penalty ASC
+            LIMIT 1;
+        ';
+        $val = [$identityId, $problemsetId, $problemId];
+        global $conn;
+        return $conn->GetOne($sql, $val);
     }
 
     /**
      * Returns best score for the given identity and problem, between 0 and 100
-     *
-     * @global type $conn
-     * @param type $problem_id
-     * @param type $identity_id
-     * @return int
      */
-    final public static function GetBestScore($problem_id, $identity_id) {
-        //Build SQL statement
-        $sql = "SELECT score from Runs where identity_id = ? and problem_id = ? and status = 'ready' ORDER BY score DESC, penalty ASC  LIMIT 1";
-        $val = [$identity_id, $problem_id];
-
-        global $conn;
-        $rs = $conn->GetRow($sql, $val);
-
-        if (count($rs) === 0) {
-            return 0;
-        } else {
-            return number_format($rs['score'] * 100, 2);
-        }
-    }
-
-    /*
-     * Get runs of an identity with verdict eq AC
-     */
-    final public static function GetRunsByUser($identity_id) {
-        // SQL sentence
-        $sql = "SELECT DISTINCT * FROM Runs WHERE identity_id = ? AND verdict = 'AC'";
-        $val = [$identity_id];
-
-        global $conn;
-        //Get the rows
-        $rs = $conn->Execute($sql, $val);
-
-        $ar = [];
-        //Wrap every row in a Runs object
-        foreach ($rs as $iter) {
-            $run = new Runs($iter);
-            array_push($ar, $run);
-        }
-        return $ar;
-    }
-
-    final public static function getByProblemset($problemset_id) {
+    final public static function getBestProblemScore(
+        int $problemId,
+        int $identityId
+    ) : ?float {
         $sql = '
             SELECT
-                guid,
-                language,
-                verdict,
-                contest_score,
+                r.score * 100
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                s.current_run_id = r.run_id
+            WHERE
+                s.identity_id = ? AND s.problem_id = ? AND
+                r.status = "ready" AND s.`type` = "normal"
+            ORDER BY
+                r.score DESC, r.penalty ASC
+            LIMIT 1;
+        ';
+        $val = [$identityId, $problemId];
+        global $conn;
+        return $conn->GetOne($sql, $val);
+    }
+
+    final public static function getByProblemset(int $problemsetId) : array {
+        $sql = '
+            SELECT
+                s.guid,
+                s.language,
+                r.verdict,
+                r.contest_score,
                 i.username,
                 p.alias
             FROM
+                Submissions s
+            INNER JOIN
                 Runs r
+            ON
+                s.current_run_id = r.run_id
             INNER JOIN
                 Problems p
             ON
-                p.problem_id = r.problem_id
-            INNER JOIN
-                Problemset_Problems pp
-            ON
-                pp.problemset_id = r.problemset_id AND
-                pp.version = r.version
+                p.problem_id = s.problem_id
             INNER JOIN
                 Identities i
             ON
-                i.identity_id = r.identity_id
+                i.identity_id = s.identity_id
             WHERE
-                r.problemset_id = ?
+                s.problemset_id = ?
             ORDER BY
-                r.`time` DESC;
+                s.`time` DESC;
         ';
 
         global $conn;
-        $runs = [];
-        foreach ($conn->Execute($sql, [$problemset_id]) as $row) {
-            array_push($runs, $row);
-        }
-        return $runs;
+        return $conn->GetAll($sql, [$problemsetId]);
     }
 
-    final public static function getByKeys($problem_id, $problemset_id = null, $identity_id = null) {
-        $sql = 'SELECT
-                    *
-                FROM
-                    Runs r
-                WHERE
-                    problem_id = ?';
-        $params = [$problem_id];
-        if (!is_null($problemset_id)) {
-            $sql .= ' AND problemset_id = ?';
-            $params[] = $problemset_id;
-        }
-        if (!is_null($identity_id)) {
-            $sql .= ' AND identity_id = ?';
-            $params[] = $identity_id;
-        }
+    final public static function getByProblem(
+        int $problemId
+    ) : array {
+        $sql = '
+            SELECT
+                *
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ?;
+        ';
+        $params = [$problemId];
         global $conn;
         $rs = $conn->Execute($sql, $params);
-
         $runs = [];
         foreach ($rs as $row) {
             array_push($runs, new Runs($row));
         }
-
         return $runs;
     }
 
-    final public static function IsRunInsideSubmissionGap(
-        $problemset_id,
-        $contest,
-        $problem_id,
-        $identity_id
-    ) {
-        // Get last run
-        $lastrun = self::GetLastRun($problemset_id, $problem_id, $identity_id);
+    final public static function getForProblemDetails(
+        int $problemId,
+        ?int $problemsetId,
+        int $identityId
+    ) : array {
+        $sql = '
+            SELECT
+                s.guid, s.language, r.status, r.verdict, r.runtime, r.penalty,
+                r.memory, r.score, r.contest_score, UNIX_TIMESTAMP(s.time) AS time,
+                s.submit_delay
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ? AND s.identity_id = ?
+        ';
+        $params = [$problemId, $identityId];
+        if (!is_null($problemsetId)) {
+            $sql .= ' AND s.problemset_id = ?';
+            $params[] = $problemsetId;
+        }
+        global $conn;
+        return $conn->GetAll($sql, $params);
+    }
 
-        if (is_null($lastrun)) {
+    final public static function isRunInsideSubmissionGap(
+        ?int $problemsetId,
+        ?Contests $contest,
+        int $problemId,
+        int $identityId
+    ) : bool {
+        $lastRunTime = SubmissionsDAO::getLastSubmissionTime($identityId, $problemId, $problemsetId);
+        if (is_null($lastRunTime)) {
             return true;
         }
 
-        $submission_gap = RunController::$defaultSubmissionGap;
+        $submissionGap = RunController::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
-            $submission_gap = max(
-                $submission_gap,
+            $submissionGap = max(
+                $submissionGap,
                 (int)$contest->submissions_gap
             );
         }
 
-        return Time::get() >= (strtotime($lastrun->time) + $submission_gap);
+        return Time::get() >= ($lastRunTime + $submissionGap);
     }
 
     /**
@@ -642,154 +621,49 @@ class RunsDAO extends RunsDAOBase {
         return (Time::get() + $submission_gap);
     }
 
-    public static function GetRunCountsToDate($date) {
-        $sql = 'select count(*) as total from Runs where time <= ?';
-        $val = [$date];
+    final public static function searchWithRunIdGreaterThan(
+        int $problemId,
+        int $submissionId
+    ) : array {
+        $sql = '
+            SELECT
+                r.*
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ? AND s.submission_id >= ?
+            ORDER BY
+                s.submission_id ASC;
+        ';
 
         global $conn;
-        $rs = $conn->GetRow($sql, $val);
-
-        return $rs['total'];
-    }
-
-    public static function GetAcRunCountsToDate($date) {
-        $sql = "select count(*) as total from Runs where verdict = 'AC' and time <= ?";
-        $val = [$date];
-
-        global $conn;
-        $rs = $conn->GetRow($sql, $val);
-
-        return $rs['total'];
-    }
-
-    final public static function searchRunIdGreaterThan($Runs, $greaterThan, $orderBy = null, $orden = 'ASC', $columnas = null, $offset = 0, $rowcount = null) {
-        // Implode array of columns to a coma-separated string
-        $columns_str = is_null($columnas) ? '*' : implode(',', $columnas);
-
-        $sql = 'SELECT ' . $columns_str . '  from Runs ';
-
-        if ($columnas != null) {
-            if (in_array('Identities.username', $columnas)) {
-                $sql .= 'INNER JOIN Identities ON Identities.identity_id = Runs.identity_id ';
-            }
-            if (in_array('Problems.alias', $columnas)) {
-                $sql .= 'INNER JOIN Problems ON Problems.problem_id = Runs.problem_id ';
-            }
+        $result = [];
+        foreach ($conn->Execute($sql, [$problemId, $submissionId]) as $row) {
+            array_push($result, new Runs($row));
         }
-        $sql .= 'WHERE (';
-        $val = [];
-        if ($Runs->run_id != null) {
-            $sql .= ' run_id = ? AND';
-            array_push($val, $Runs->run_id);
-        }
-
-        if ($Runs->identity_id != null) {
-            $sql .= ' identity_id = ? AND';
-            array_push($val, $Runs->identity_id);
-        }
-
-        if ($Runs->problem_id != null) {
-            $sql .= ' Runs.problem_id = ? AND';
-            array_push($val, $Runs->problem_id);
-        }
-
-        if ($Runs->problemset_id != null) {
-            $sql .= ' Runs.problemset_id = ? AND';
-            array_push($val, $Runs->problemset_id);
-        }
-
-        if ($Runs->guid != null) {
-            $sql .= ' guid = ? AND';
-            array_push($val, $Runs->guid);
-        }
-
-        if ($Runs->language != null) {
-            $sql .= ' language = ? AND';
-            array_push($val, $Runs->language);
-        }
-
-        if ($Runs->status != null) {
-            $sql .= ' status = ? AND';
-            array_push($val, $Runs->status);
-        }
-
-        if ($Runs->verdict != null) {
-            if ($Runs->verdict == 'NO-AC') {
-                $sql .= ' verdict != ? AND';
-                array_push($val, 'AC');
-            } else {
-                $sql .= ' verdict = ? AND';
-                array_push($val, $Runs->verdict);
-            }
-        }
-
-        if ($Runs->runtime != null) {
-            $sql .= ' runtime = ? AND';
-            array_push($val, $Runs->runtime);
-        }
-
-        if ($Runs->memory != null) {
-            $sql .= ' memory = ? AND';
-            array_push($val, $Runs->memory);
-        }
-
-        if ($Runs->score != null) {
-            $sql .= ' score = ? AND';
-            array_push($val, $Runs->score);
-        }
-
-        if ($Runs->contest_score != null) {
-            $sql .= ' contest_score = ? AND';
-            array_push($val, $Runs->contest_score);
-        }
-
-        if ($Runs->time != null) {
-            $sql .= ' time = ? AND';
-            array_push($val, $Runs->time);
-        }
-
-        if ($Runs->type !== null) {
-            $sql .= ' `type` = ?  AND';
-            array_push($val, $Runs->type);
-        }
-
-        $sql .= ' run_id > ?  AND';
-        array_push($val, $greaterThan);
-
-        if (sizeof($val) == 0) {
-            return [];
-        }
-        $sql = substr($sql, 0, -3) . ' )';
-        if ($orderBy !== null) {
-            $sql .= ' order by ' . $orderBy . ' ' . $orden;
-        }
-
-        // Add LIMIT offset, rowcount if rowcount is set
-        if (!is_null($rowcount)) {
-            $sql .= ' LIMIT ' . $offset . ',' . $rowcount;
-        }
-
-        global $conn;
-        $rs = $conn->Execute($sql, $val);
-        $ar = [];
-        foreach ($rs as $foo) {
-            $bar = new Runs($foo);
-            array_push($ar, $bar);
-        }
-        return $ar;
+        return $result;
     }
 
     /**
      * Recalculate the contest_score of all problemset and problem Runs
      */
     public static function recalculateScore($problemset_id, $problem_id, $current_points, $original_points) {
-        $sql = 'UPDATE
-                  `Runs`
-                SET
-                  `contest_score` = `score` * ?
-                WHERE
-                  `problemset_id` = ?
-                  AND `problem_id` = ?;';
+        $sql = '
+            UPDATE
+              Runs r
+            INNER JOIN
+              Submissions s
+              ON s.submission_id = r.submission_id
+            SET
+              r.contest_score = r.score * ?
+            WHERE
+              s.problemset_id = ? AND
+              s.problem_id = ?;
+        ';
 
         $params = [
             $current_points,
@@ -815,49 +689,59 @@ class RunsDAO extends RunsDAOBase {
     public static function recalculatePenaltyForContest(Contests $contest) {
         $penalty_type = $contest->penalty_type;
         if ($penalty_type == 'none') {
-            $sql = 'UPDATE
-                        `Runs`
-                    SET
-                        `penalty` = 0
-                    WHERE
-                        `problemset_id` = ?;';
+            $sql = '
+                UPDATE
+                    Runs r
+                INNER JOIN
+                    Submissions s
+                    ON s.submission_id = r.submission_id
+                SET
+                    r.penalty = 0
+                WHERE
+                    s.problemset_id = ?;
+            ';
         } elseif ($penalty_type == 'runtime') {
-            $sql = 'UPDATE
-                        `Runs`
-                    SET
-                        `penalty` = `runtime`
-                    WHERE
-                        `problemset_id` = ?;';
+            $sql = '
+                UPDATE
+                    Runs r
+                INNER JOIN
+                    Submissions s
+                    ON s.submission_id = r.submission_id
+                SET
+                    r.penalty = r.runtime
+                WHERE
+                    s.problemset_id = ?;
+            ';
         } elseif ($penalty_type == 'contest_start') {
-            $sql = 'UPDATE
-                        `Runs` r
-                    INNER JOIN
-                        `Problemset_Problem_Opened` ppo
-                        ON (ppo.problemset_id = r.problemset_id
-                            AND r.problem_id = ppo.problem_id)
-                    INNER JOIN
-                        `Identities` i
-                        ON (i.identity_id = ppo.identity_id AND r.identity_id = i.identity_id)
-                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
-                    SET
-                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, c.start_time))/60)
-                    WHERE
-                        r.problemset_id = ?;';
+            $sql = '
+                UPDATE
+                    `Runs` r
+                INNER JOIN
+                    `Submissions` s
+                    ON s.submission_id = r.run_id
+                INNER JOIN `Contests` c ON (c.problemset_id = s.problemset_id)
+                SET
+                    r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(s.time, c.start_time))/60)
+                WHERE
+                    s.problemset_id = ?;
+            ';
         } elseif ($penalty_type == 'problem_open') {
-            $sql = 'UPDATE
-                        `Runs` r
-                    INNER JOIN
-                        `Problemset_Problem_Opened` ppo
-                        ON (ppo.problemset_id = r.problemset_id
-                            AND r.problem_id = ppo.problem_id)
-                    INNER JOIN
-                        `Identities` i
-                        ON (i.identity_id = ppo.identity_id AND r.identity_id = i.identity_id)
-                    INNER JOIN `Contests` c ON (c.problemset_id = r.problemset_id)
-                    SET
-                        r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(r.time, ppo.open_time))/60)
-                    WHERE
-                        r.problemset_id = ?;';
+            $sql = '
+                UPDATE
+                    `Runs` r
+                INNER JOIN
+                    `Submissions` s
+                    ON s.submission_id = r.run_id
+                INNER JOIN
+                    `Problemset_Problem_Opened` ppo
+                    ON (ppo.problemset_id = s.problemset_id
+                        AND ppo.problem_id = s.problem_id
+                        AND ppo.identity_id = s.identity_id)
+                SET
+                    r.penalty = ROUND(TIME_TO_SEC(TIMEDIFF(s.time, ppo.open_time))/60)
+                WHERE
+                    s.problemset_id = ?;
+            ';
         } else {
             return 0;
         }
@@ -874,12 +758,18 @@ class RunsDAO extends RunsDAOBase {
      * @return integer the number of affected rows.
      */
     final public static function updateVersionToCurrent(Problems $problem) {
-        $sql = 'UPDATE
-                    Runs
-                SET
-                    version = ?
-                WHERE
-                    problem_id = ?;';
+        $sql = '
+            UPDATE
+                Runs r
+            INNER JOIN
+                Submissions s
+            ON
+                s.submission_id = r.submission_id
+            SET
+                r.version = ?
+            WHERE
+                s.problem_id = ?;
+        ';
         global $conn;
         $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
         return $conn->Affected_Rows();

@@ -54,7 +54,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Create a run
         $runData[0] = RunsFactory::createRun($problemData, $contestData, $contestant);
         Time::setTimeForTesting(Time::get() + 60);
-        $runData[1] = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData[1] = RunsFactory::createRunToProblem($problemData, $contestant);
 
         // Grade the run
         RunsFactory::gradeRun($runData[0]);

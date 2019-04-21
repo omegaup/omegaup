@@ -180,14 +180,16 @@ class RunsFactory {
         $run->judged_by = 'J1';
 
         if (!is_null($submitDelay)) {
+            $submission->submit_delay = $submitDelay;
             $run->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
         }
 
         RunsDAO::save($run);
+        SubmissionsDAO::save($submission);
 
         Grader::getInstance()->setGraderResourceForTesting(
-            $run->guid,
+            $run,
             'details.json',
             json_encode([
                 'verdict' => $verdict,
@@ -198,10 +200,17 @@ class RunsFactory {
         );
         // An empty gzip file.
         Grader::getInstance()->setGraderResourceForTesting(
-            $run->guid,
+            $run,
             'logs.txt.gz',
             "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
             "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        );
+        // An empty zip file.
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'files.zip',
+            "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
+            "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         );
     }
 }
