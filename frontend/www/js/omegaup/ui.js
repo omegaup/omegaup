@@ -9,6 +9,20 @@ let UI = {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   },
 
+  buildURLQuery: function(queryParameters) {
+    return Object.entries(queryParameters)
+        .map(([key, value]) => {
+          const encodedKey = encodeURIComponent(key);
+          if (Array.isArray(value)) {
+            return value.map(entry =>
+                                 `${encodedKey}[]=` + encodeURIComponent(entry))
+                .join('&');
+          }
+          return `${encodedKey}=` + encodeURIComponent(value);
+        })
+        .join('&');
+  },
+
   formatDelta: function(delta) {
     let days = Math.floor(delta / (24 * 60 * 60 * 1000));
     delta -= days * (24 * 60 * 60 * 1000);

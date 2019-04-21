@@ -120,12 +120,7 @@ export default {
       } else {
         delete queryParameters['filter'];
       }
-      var url = Object.keys(queryParameters)
-                    .map(function(k) {
-                      return encodeURIComponent(k) + '=' +
-                             encodeURIComponent(queryParameters[k])
-                    })
-                    .join('&');
+      const url = UI.buildURLQuery(queryParameters);
       window.location.search = url;
     },
     flagURL(rank) {
