@@ -27,10 +27,10 @@ class AuthTokens extends VO {
             return;
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['token'])) {
             $this->token = $data['token'];

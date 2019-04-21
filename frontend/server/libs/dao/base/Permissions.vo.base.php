@@ -27,7 +27,7 @@ class Permissions extends VO {
             return;
         }
         if (isset($data['permission_id'])) {
-            $this->permission_id = $data['permission_id'];
+            $this->permission_id = (int)$data['permission_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];

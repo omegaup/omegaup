@@ -27,16 +27,16 @@ class UserRank extends VO {
             return;
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['rank'])) {
-            $this->rank = $data['rank'];
+            $this->rank = (int)$data['rank'];
         }
         if (isset($data['problems_solved_count'])) {
-            $this->problems_solved_count = $data['problems_solved_count'];
+            $this->problems_solved_count = (int)$data['problems_solved_count'];
         }
         if (isset($data['score'])) {
-            $this->score = $data['score'];
+            $this->score = (float)$data['score'];
         }
         if (isset($data['username'])) {
             $this->username = $data['username'];
@@ -51,7 +51,7 @@ class UserRank extends VO {
             $this->state_id = $data['state_id'];
         }
         if (isset($data['school_id'])) {
-            $this->school_id = $data['school_id'];
+            $this->school_id = (int)$data['school_id'];
         }
     }
 

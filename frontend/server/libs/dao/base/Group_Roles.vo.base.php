@@ -27,13 +27,13 @@ class GroupRoles extends VO {
             return;
         }
         if (isset($data['group_id'])) {
-            $this->group_id = $data['group_id'];
+            $this->group_id = (int)$data['group_id'];
         }
         if (isset($data['role_id'])) {
-            $this->role_id = $data['role_id'];
+            $this->role_id = (int)$data['role_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
     }
 

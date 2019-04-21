@@ -30,10 +30,10 @@ class RunCounts extends VO {
             $this->date = $data['date'];
         }
         if (isset($data['total'])) {
-            $this->total = $data['total'];
+            $this->total = (int)$data['total'];
         }
         if (isset($data['ac_count'])) {
-            $this->ac_count = $data['ac_count'];
+            $this->ac_count = (int)$data['ac_count'];
         }
     }
 

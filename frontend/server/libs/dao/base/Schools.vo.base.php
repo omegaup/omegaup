@@ -27,7 +27,7 @@ class Schools extends VO {
             return;
         }
         if (isset($data['school_id'])) {
-            $this->school_id = $data['school_id'];
+            $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];

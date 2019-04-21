@@ -27,13 +27,13 @@ class ProblemsetProblemOpened extends VO {
             return;
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['open_time'])) {
             $this->open_time = $data['open_time'];

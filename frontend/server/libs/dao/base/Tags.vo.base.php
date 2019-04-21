@@ -27,7 +27,7 @@ class Tags extends VO {
             return;
         }
         if (isset($data['tag_id'])) {
-            $this->tag_id = $data['tag_id'];
+            $this->tag_id = (int)$data['tag_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];

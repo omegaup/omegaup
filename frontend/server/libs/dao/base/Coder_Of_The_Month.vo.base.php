@@ -27,10 +27,10 @@ class CoderOfTheMonth extends VO {
             return;
         }
         if (isset($data['coder_of_the_month_id'])) {
-            $this->coder_of_the_month_id = $data['coder_of_the_month_id'];
+            $this->coder_of_the_month_id = (int)$data['coder_of_the_month_id'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['description'])) {
             $this->description = $data['description'];
@@ -42,10 +42,10 @@ class CoderOfTheMonth extends VO {
             $this->interview_url = $data['interview_url'];
         }
         if (isset($data['rank'])) {
-            $this->rank = $data['rank'];
+            $this->rank = (int)$data['rank'];
         }
         if (isset($data['selected_by'])) {
-            $this->selected_by = $data['selected_by'];
+            $this->selected_by = (int)$data['selected_by'];
         }
     }
 

@@ -27,10 +27,10 @@ class ProblemsBadges extends VO {
             return;
         }
         if (isset($data['badge_id'])) {
-            $this->badge_id = $data['badge_id'];
+            $this->badge_id = (int)$data['badge_id'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
     }
 

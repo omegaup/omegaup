@@ -27,22 +27,22 @@ class ProblemsetIdentityRequestHistory extends VO {
             return;
         }
         if (isset($data['history_id'])) {
-            $this->history_id = $data['history_id'];
+            $this->history_id = (int)$data['history_id'];
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'];
+            $this->accepted = $data['accepted'] == '1';
         }
         if (isset($data['admin_id'])) {
-            $this->admin_id = $data['admin_id'];
+            $this->admin_id = (int)$data['admin_id'];
         }
     }
 
