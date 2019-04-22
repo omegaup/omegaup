@@ -36,7 +36,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             if ($add_identity_id) {
                 $args[] = $identity_id;
             }
-        } elseif (is_array($tag)) {
+        } elseif (is_array($tag) && !empty($tag)) {
             // Look for problems matching ALL tags or not
             $having_clause = $require_all_tags ? 'HAVING (COUNT(pt.tag_id) = ?)':'';
             $placeholders = array_fill(0, count($tag), '?');
