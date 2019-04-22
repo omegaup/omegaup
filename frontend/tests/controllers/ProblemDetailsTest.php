@@ -280,4 +280,42 @@ class ProblemDetailsTest extends OmegaupTestCase {
             $response['runs'][0]['guid']
         );
     }
+
+    /**
+     * Solvers are returned only outside of a contests.
+     */
+    public function testShowSolvers() {
+        // Create problem and contest
+        $problemData = ProblemsFactory::createProblem();
+        $contestData = ContestsFactory::createContest();
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Create contestant
+        $contestant = UserFactory::createUser();
+
+        // Create an accepted run.
+        $runDataInsideContest = RunsFactory::createRun($problemData, $contestData, $contestant);
+        RunsFactory::gradeRun($runDataInsideContest);
+
+        // Call API
+        $login = self::login($contestant);
+        {
+            $response = ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'contest_alias' => $contestData['request']['alias'],
+                'show_solvers' => true,
+            ]));
+            $this->assertArrayNotHasKey('solvers', $response);
+        }
+        {
+            $response = ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'show_solvers' => true,
+            ]));
+            $this->assertCount(1, $response['solvers']);
+            $this->assertEquals($contestant->username, $response['solvers'][0]['username']);
+        }
+    }
 }

@@ -36,7 +36,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             if ($add_identity_id) {
                 $args[] = $identity_id;
             }
-        } elseif (is_array($tag)) {
+        } elseif (is_array($tag) && !empty($tag)) {
             // Look for problems matching ALL tags or not
             $having_clause = $require_all_tags ? 'HAVING (COUNT(pt.tag_id) = ?)':'';
             $placeholders = array_fill(0, count($tag), '?');
@@ -136,9 +136,12 @@ class ProblemsDAO extends ProblemsDAOBase {
                     FROM
                         Problems
                     INNER JOIN
-                        Runs ON Runs.problem_id = Problems.problem_id
+                        Submissions ON Submissions.problem_id = Problems.problem_id
                     INNER JOIN
-                        Identities ON Identities.identity_id = ? AND Runs.identity_id = Identities.identity_id
+                        Runs ON Runs.run_id = Submissions.current_run_id
+                    INNER JOIN
+                        Identities ON Identities.identity_id = ? AND
+                        Submissions.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
                     ) ps ON ps.problem_id = p.problem_id' . $language_join;
@@ -178,14 +181,16 @@ class ProblemsDAO extends ProblemsDAOBase {
                 LEFT JOIN (
                     SELECT
                         pi.problem_id,
-                        r.identity_id,
+                        s.identity_id,
                         MAX(r.score) AS score
                     FROM
                         Problems pi
                     INNER JOIN
-                        Runs r ON r.problem_id = pi.problem_id
+                        Submissions s ON s.problem_id = pi.problem_id
                     INNER JOIN
-                        Identities i ON i.identity_id = ? AND r.identity_id = i.identity_id
+                        Runs r ON r.run_id = s.current_run_id
+                    INNER JOIN
+                        Identities i ON i.identity_id = ? AND s.identity_id = i.identity_id
                     GROUP BY
                         pi.problem_id
                 ) ps ON ps.problem_id = p.problem_id
@@ -367,16 +372,26 @@ class ProblemsDAO extends ProblemsDAOBase {
     final public static function getProblemsSolved($identity_id) {
         global $conn;
 
-        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.type = 'normal' and `Runs`.identity_id = ? ORDER BY `Problems`.problem_id DESC";
+        $sql = '
+            SELECT DISTINCT
+                p.*
+            FROM
+                Problems p
+            INNER JOIN
+                Submissions s ON s.problem_id = p.problem_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            WHERE
+                r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+            ORDER BY
+                p.problem_id DESC;
+        ';
         $val = [$identity_id];
-        $rs = $conn->Execute($sql, $val);
 
         $result = [];
-
-        foreach ($rs as $r) {
-            array_push($result, new Problems($r));
+        foreach ($conn->Execute($sql, $val) as $row) {
+            array_push($result, new Problems($row));
         }
-
         return $result;
     }
 
@@ -389,24 +404,22 @@ class ProblemsDAO extends ProblemsDAOBase {
             FROM
                 Identities i
             INNER JOIN
-                Runs r
-            ON
-                r.identity_id = i.identity_id
+                Submissions s ON s.identity_id = i.identity_id
             INNER JOIN
-                Problems p
-            ON
-                p.problem_id = r.problem_id
+                Problems p ON p.problem_id = s.problem_id
             WHERE
                 i.identity_id = ?
             AND
                 (SELECT
                     COUNT(*)
                  FROM
-                    Runs r2
+                    Submissions ss
+                 INNER JOIN
+                    Runs r ON r.run_id = ss.current_run_id
                  WHERE
-                    r2.identity_id = i.identity_id AND
-                    r2.problem_id = p.problem_id AND
-                    r2.verdict = 'AC'
+                    ss.identity_id = i.identity_id AND
+                    ss.problem_id = p.problem_id AND
+                    r.verdict = 'AC'
                 ) = 0";
 
         $params = [$identity_id];
@@ -445,18 +458,22 @@ class ProblemsDAO extends ProblemsDAOBase {
                     p.problem_id,
                     p.alias,
                     p.title,
-                    r.identity_id
+                    s.identity_id
                 FROM
+                    Submissions s
+                INNER JOIN
                     Runs r
+                ON
+                    r.run_id = s.current_run_id
                 INNER JOIN
                     Problems p
                 ON
-                    p.problem_id = r.problem_id
+                    p.problem_id = s.problem_id
                 WHERE
                     r.verdict = 'AC'
                     AND p.visibility = ?
                 GROUP BY
-                    p.problem_id, r.identity_id
+                    p.problem_id, s.identity_id
                 ) rp
             ON
                 rp.identity_id = i.identity_id
@@ -492,18 +509,22 @@ class ProblemsDAO extends ProblemsDAOBase {
                     pp.problem_id,
                     pp.alias,
                     pp.title,
-                    r.identity_id,
+                    s.identity_id,
                     MAX(r.score) AS max_score
                 FROM
+                    Submissions s
+                INNER JOIN
                     Runs r
+                ON
+                    r.run_id = s.current_run_id
                 INNER JOIN
                     Problems pp
                 ON
-                    pp.problem_id = r.problem_id
+                    pp.problem_id = s.problem_id
                 WHERE
                     pp.visibility = ?
                 GROUP BY
-                    pp.problem_id, r.identity_id
+                    pp.problem_id, s.identity_id
                 HAVING
                     max_score < 1
                 ) rp
@@ -525,15 +546,21 @@ class ProblemsDAO extends ProblemsDAOBase {
     }
 
     final public static function isProblemSolved(Problems $problem, $identity_id) {
-        $sql = 'SELECT
-            COUNT(r.run_id) as solved
-        FROM
-            Runs AS r
-        WHERE
-            r.problem_id = ? AND r.identity_id = ? AND r.verdict = "AC";';
+        $sql = '
+            SELECT
+                COUNT(r.run_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ? AND s.identity_id = ? AND r.verdict = "AC";
+        ';
 
         global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $identity_id])['solved'] > 0;
+        return $conn->GetOne($sql, [$problem->problem_id, $identity_id]) > 0;
     }
 
     public static function getPrivateCount(Users $user) {
@@ -753,17 +780,19 @@ class ProblemsDAO extends ProblemsDAOBase {
                 Identities i
             WHERE
                 i.identity_id
-            IN (SELECT DISTINCT
-                gi.identity_id
-            FROM
-                Runs r
-            INNER JOIN
-                Groups_Identities gi
-            ON
-                r.identity_id = gi.identity_id
-            WHERE
-                gi.group_id = ?
-                AND r.problem_id = ?)';
+            IN (
+                SELECT DISTINCT
+                    gi.identity_id
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Groups_Identities gi
+                ON
+                    s.identity_id = gi.identity_id
+                WHERE
+                    gi.group_id = ?
+                    AND s.problem_id = ?
+            );';
         $params = [$group_id, $problem_id];
 
         global $conn;
@@ -799,14 +828,15 @@ class ProblemsDAO extends ProblemsDAOBase {
     public static function hasBeenUsedInCoursesOrContests(Problems $problem) {
         global $conn;
 
-        $sql = 'SELECT
-                    COUNT(1)
-                FROM
-                    `Runs`
-                WHERE
-                    `problemset_id` IS NOT NULL
-                    AND `problem_id` = ?';
-
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            WHERE
+                s.problemset_id IS NOT NULL
+                AND s.problem_id = ?;
+        ';
         return $conn->GetOne($sql, $problem->problem_id);
     }
 

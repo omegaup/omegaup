@@ -121,7 +121,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertNotNull($submission->guid);
 
         // Validate file created
-        $fileContent = SubmissionController::getSource($submission);
+        $fileContent = SubmissionController::getSource($submission->guid);
         $this->assertEquals($r['source'], $fileContent);
 
         // Validate defaults
@@ -142,7 +142,12 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
-            $this->assertEquals((Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60, $submission->penalty, '', 0.5);
+            $this->assertEquals(
+                (Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60,
+                $run->penalty,
+                '',
+                0.5
+            );
         }
 
         $this->assertEquals('JE', $run->verdict);

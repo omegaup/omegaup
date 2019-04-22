@@ -109,11 +109,11 @@ class RunController extends Controller {
                 if (ProblemsDAO::isVisible($r['problem']) ||
                       Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']) ||
                       Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
-                    if (!RunsDAO::IsRunInsideSubmissionGap(
+                    if (!RunsDAO::isRunInsideSubmissionGap(
                         null,
                         null,
-                        $r['problem']->problem_id,
-                        $r['current_identity_id']
+                        (int)$r['problem']->problem_id,
+                        (int)$r['current_identity_id']
                     )
                             && !Authorization::isSystemAdmin($r['current_identity_id'])) {
                             throw new NotAllowedToSubmitException('runWaitGap');
@@ -176,10 +176,10 @@ class RunController extends Controller {
 
                 // Validate if the user is allowed to submit given the submissions_gap
                 if (!RunsDAO::IsRunInsideSubmissionGap(
-                    $problemset_id,
-                    isset($r['contest']) ? $r['contest'] : null,
-                    $r['problem']->problem_id,
-                    $r['current_identity_id']
+                    (int)$problemset_id,
+                    $r['contest'],
+                    (int)$r['problem']->problem_id,
+                    (int)$r['current_identity_id']
                 )) {
                     throw new NotAllowedToSubmitException('runWaitGap');
                 }
@@ -224,7 +224,7 @@ class RunController extends Controller {
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
-            $problemset_id = $r['problemset']->problemset_id;
+            $problemset_id = (int)$r['problemset']->problemset_id;
             if (isset($r['contest'])) {
                 $penalty_type = $r['contest']->penalty_type;
 
@@ -325,7 +325,7 @@ class RunController extends Controller {
 
             // Call Grader
             try {
-                Grader::getInstance()->grade($run->guid, trim($r['source']));
+                Grader::getInstance()->grade($run, trim($r['source']));
             } catch (Exception $e) {
                 // Welp, it failed. We cannot make this a real transaction
                 // because the Run row would not be visible from the Grader
@@ -384,7 +384,7 @@ class RunController extends Controller {
         $response['nextSubmissionTimestamp'] = RunsDAO::nextSubmissionTimestamp(
             isset($r['contest']) ? $r['contest'] : null
         );
-        $response['guid'] = $run->guid;
+        $response['guid'] = $submission->guid;
         $response['status'] = 'ok';
 
         // Expire rank cache
@@ -425,50 +425,6 @@ class RunController extends Controller {
     }
 
     /**
-     * Validate request of admin details
-     *
-     * @param Request $r
-     * @throws InvalidDatabaseOperationException
-     * @throws NotFoundException
-     * @throws ForbiddenAccessException
-     */
-    private static function validateAdminDetailsRequest(Request $r) {
-        Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
-
-        try {
-            $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (is_null($r['submission'])) {
-            throw new NotFoundException('runNotFound');
-        }
-
-        try {
-            $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-        if (is_null($r['run'])) {
-            throw new NotFoundException('runNotFound');
-        }
-
-        try {
-            $r['problem'] = ProblemsDAO::getByPK($r['run']->problem_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
-        }
-
-        if (!(Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']))) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
-    }
-
-    /**
      * Get basic details of a run
      *
      * @param Request $r
@@ -481,15 +437,19 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
+        if (!(Authorization::canViewSubmission($r['current_identity_id'], $r['submission']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
         // Fill response
-        $relevant_columns = ['guid', 'language', 'status', 'verdict',
-            'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-            'submit_delay'];
-        $filtered = $r['run']->asFilteredArray($relevant_columns);
+        $filtered = (
+            $r['submission']->asFilteredArray([
+                'guid', 'language', 'time', 'submit_delay',
+            ]) +
+            $r['run']->asFilteredArray([
+                'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
+            ])
+        );
         $filtered['time'] = strtotime($filtered['time']);
         $filtered['score'] = round((float) $filtered['score'], 4);
         $filtered['runtime'] = (int)$filtered['runtime'];
@@ -499,13 +459,10 @@ class RunController extends Controller {
         if ($filtered['contest_score'] != null) {
             $filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
         }
-        if ($r['run']->identity_id == $r['current_identity_id']) {
+        if ($r['submission']->identity_id == $r['current_identity_id']) {
             $filtered['username'] = $r['current_identity']->username;
         }
-
-        $response = $filtered;
-
-        return $response;
+        return $filtered;
     }
 
     /**
@@ -522,7 +479,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canEditRun($r['current_identity_id'], $r['run']))) {
+        if (!(Authorization::canEditSubmission($r['current_identity_id'], $r['submission']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -538,7 +495,7 @@ class RunController extends Controller {
         RunsDAO::save($r['run']);
 
         try {
-            Grader::getInstance()->rejudge([$r['run']->guid], $r['debug'] || false);
+            Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);
         } catch (Exception $e) {
             self::$log->error("Call to Grader::rejudge() failed: {$e}");
         }
@@ -566,12 +523,11 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canEditRun($r['current_identity_id'], $r['run'])) {
+        if (!Authorization::canEditSubmission($r['current_identity_id'], $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        $r['run']->type = 'disqualified';
-        RunsDAO::save($r['run']);
+        SubmissionsDAO::disqualify($r['submission']->guid);
 
         // Expire ranks
         UserController::deleteProblemsSolvedRankCacheList();
@@ -583,15 +539,20 @@ class RunController extends Controller {
     /**
      * Invalidates relevant caches on run rejudge
      *
-     * @param RunsDAO $run
+     * @param Runs $run
      */
-    public static function invalidateCacheOnRejudge(Runs $run) {
+    public static function invalidateCacheOnRejudge(Runs $run) : void {
         try {
             // Expire details of the run
             Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
 
+            $submission = SubmissionsDAO::getByPK($run->submission_id);
+            if (is_null($submission)) {
+                return;
+            }
+
             // Now we need to invalidate problem stats
-            $problem = ProblemsDAO::getByPK($run->problem_id);
+            $problem = ProblemsDAO::getByPK($submission->problem_id);
 
             if (!is_null($problem)) {
                 // Invalidar cache stats
@@ -617,7 +578,7 @@ class RunController extends Controller {
         self::validateDetailsRequest($r);
 
         try {
-            $r['problem'] = ProblemsDAO::getByPK($r['run']->problem_id);
+            $r['problem'] = ProblemsDAO::getByPK($r['submission']->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -626,7 +587,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
+        if (!(Authorization::canViewSubmission($r['current_identity_id'], $r['submission']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -634,14 +595,14 @@ class RunController extends Controller {
         $response = [
             'status' => 'ok',
             'admin' => Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']),
-            'guid' => $r['run']->guid,
-            'language' => $r['run']->language,
+            'guid' => $r['submission']->guid,
+            'language' => $r['submission']->language,
         ];
         $showDetails = $response['admin'] ||
             ProblemsDAO::isProblemSolved($r['problem'], $r['current_identity_id']);
 
         // Get the details, compile error, logs, etc.
-        RunController::populateRunDetails($r['run'], $showDetails, $response);
+        RunController::populateRunDetails($r['submission'], $r['run'], $showDetails, $response);
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
             $gzippedLogs = self::getGraderResource($r['run'], 'logs.txt.gz');
             if (is_string($gzippedLogs)) {
@@ -667,26 +628,27 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewRun($r['current_identity_id'], $r['run']))) {
+        if (!(Authorization::canViewSubmission($r['current_identity_id'], $r['submission']))) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
         $response = [
             'status' => 'ok',
         ];
-        RunController::populateRunDetails($r['run'], false, $response);
+        RunController::populateRunDetails($r['submission'], $r['run'], false, $response);
         return $response;
     }
 
-    public static function getRunSource(string $guid) {
-        return Grader::GetInstance()->getSource($guid);
-    }
-
-    private static function populateRunDetails(Runs $run, $showDetails, &$response) {
+    private static function populateRunDetails(
+        Submissions $submission,
+        Runs $run,
+        bool $showDetails,
+        &$response
+    ) {
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
-            $response['source'] = RunController::getRunSource($run->guid);
+            $response['source'] = SubmissionController::getSource($submission->guid);
         }
         if (!$showDetails && $run->verdict != 'CE') {
             return;
@@ -717,14 +679,51 @@ class RunController extends Controller {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
-        self::validateAdminDetailsRequest($r);
-
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename=' . $r['run']->guid . '.zip');
-        if (!self::getGraderResource($r['run'], 'files.zip', /*passthru=*/ true)) {
+        Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
+        if (!downloadSubmission($r['run_alias'], $r['current_identity_id'], /*passthru=*/true)) {
             http_response_code(404);
         }
         exit;
+    }
+
+    public static function downloadSubmission(string $guid, int $identityId, bool $passthru) {
+        try {
+            $submission = SubmissionsDAO::getByGuid($guid);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($submission)) {
+            throw new NotFoundException('runNotFound');
+        }
+
+        try {
+            $run = RunsDAO::getByPK($submission->current_run_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($run)) {
+            throw new NotFoundException('runNotFound');
+        }
+
+        try {
+            $problem = ProblemsDAO::getByPK($submission->problem_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        if (!(Authorization::isProblemAdmin($identityId, $problem))) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+
+        if ($passthru) {
+            header('Content-Type: application/zip');
+            header("Content-Disposition: attachment; filename={$submission->guid}.zip");
+        }
+        return self::getGraderResource($run, 'files.zip', $passthru);
     }
 
     private static function getGraderResource(
@@ -735,9 +734,6 @@ class RunController extends Controller {
         $result = Grader::getInstance()->getGraderResource($run, $filename, $passthru, /*missingOk=*/true);
         if (is_null($result)) {
             $result = self::downloadResourceFromS3("{$run->run_id}/{$filename}", $passthru);
-        }
-        if (is_null($result)) {
-            $result = self::downloadResourceFromS3("{$run->guid}/{$filename}", $passthru);
         }
         return $result;
     }
@@ -901,7 +897,7 @@ class RunController extends Controller {
         self::validateList($r);
 
         try {
-            $runs = RunsDAO::GetAllRuns(
+            $runs = RunsDAO::getAllRuns(
                 null,
                 $r['status'],
                 $r['verdict'],

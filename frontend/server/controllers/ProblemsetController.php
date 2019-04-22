@@ -213,7 +213,7 @@ class ProblemsetController extends Controller {
         foreach ($runs as $run) {
             $zip->add_file(
                 "runs/{$run['guid']}.{$run['language']}",
-                RunController::getRunSource($run['guid'])
+                SubmissionController::getSource($run['guid'])
             );
             $table[] = "{$run['guid']},{$run['username']},{$run['alias']},{$run['verdict']},{$run['contest_score']}";
         }

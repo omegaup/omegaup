@@ -1720,7 +1720,7 @@ class UserController extends Controller {
         }
 
         try {
-            $runsPerDatePerVerdict = RunsDAO::CountRunsOfIdentityPerDatePerVerdict($identity->identity_id);
+            $runsPerDatePerVerdict = RunsDAO::countRunsOfIdentityPerDatePerVerdict((int)$identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

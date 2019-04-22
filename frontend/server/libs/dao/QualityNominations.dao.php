@@ -44,13 +44,17 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             FROM
                 Problems p
             INNER JOIN
+                Submissions s
+            ON
+                s.problem_id = p.problem_id
+            INNER JOIN
                 Runs r
             ON
-                r.problem_id = p.problem_id AND r.verdict = "AC"
+                r.run_id = s.current_run_id AND r.verdict = "AC"
             LEFT JOIN
                 Identities i
             ON
-                r.identity_id = i.identity_id
+                s.identity_id = i.identity_id
             WHERE
                 p.problem_id = ? AND i.identity_id = ?;
         ';
