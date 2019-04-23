@@ -294,13 +294,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             SELECT
                 MAX(`r`.`run_id`)
             FROM
-                `Runs` AS `r`
+                `Submissions` AS `s`
+            INNER JOIN
+                `Runs` AS `r` ON
+                `r`.`run_id` = `s`.`current_run_id`
             INNER JOIN
                 `Problems` AS `p` ON
-                `p`.`problem_id` = `r`.`problem_id`
+                `p`.`problem_id` = `s`.`problem_id`
             INNER JOIN
                 `Problemsets` AS `ps` ON
-                `ps`.`problemset_id` = `r`.`problemset_id`
+                `ps`.`problemset_id` = `s`.`problemset_id`
             INNER JOIN
                 `Assignments` AS `a` ON `a`.`acl_id` = `ps`.`acl_id`
             WHERE
@@ -319,13 +322,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             SELECT
                 MAX(`r`.`run_id`)
             FROM
-                `Runs` AS `r`
+                `Submissions` AS `s`
+            INNER JOIN
+                `Runs` AS `r` ON
+                `r`.`run_id` = `s`.`current_run_id`
             INNER JOIN
                 `Problems` AS `p` ON
-                `p`.`problem_id` = `r`.`problem_id`
+                `p`.`problem_id` = `s`.`problem_id`
             INNER JOIN
                 `Problemsets` AS `ps` ON
-                `ps`.`problemset_id` = `r`.`problemset_id`
+                `ps`.`problemset_id` = `s`.`problemset_id`
             INNER JOIN
                 `Contests` AS `c` ON `c`.`acl_id` = `ps`.`acl_id`
             WHERE

@@ -170,7 +170,7 @@ class Problems extends VO {
     public $alias;
 
     /**
-      * La versión actual del problema.
+      * El hash SHA1 del árbol de la rama private.
       * @access public
       * @var char(40)
       */

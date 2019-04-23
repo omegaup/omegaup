@@ -755,9 +755,8 @@ class RunsDAO extends RunsDAOBase {
      * Update the version of the runs of a problem to the current version.
      *
      * @param Problems $problem the problem.
-     * @return integer the number of affected rows.
      */
-    final public static function updateVersionToCurrent(Problems $problem) {
+    final public static function updateVersionToCurrent(Problems $problem) : void {
         $sql = '
             UPDATE
                 Runs r
@@ -772,6 +771,5 @@ class RunsDAO extends RunsDAOBase {
         ';
         global $conn;
         $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
-        return $conn->Affected_Rows();
     }
 }
