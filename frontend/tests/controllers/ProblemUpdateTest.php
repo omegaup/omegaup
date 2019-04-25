@@ -698,4 +698,178 @@ class UpdateProblemTest extends OmegaupTestCase {
             $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenPromoted');
         }
     }
+
+    /**
+     * Tests problem version update.
+     */
+    public function testProblemVersionUpdate() {
+        $problemData = ProblemsFactory::createProblem();
+        $problem = $problemData['problem'];
+        $contestant = UserFactory::createUser();
+        RunsFactory::gradeRun(RunsFactory::createRunToProblem($problemData, $contestant));
+
+        $login = self::login($problemData['author']);
+        $originalVersionData = ProblemController::apiVersions(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+        ]));
+        $originalDetails = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+        ]));
+
+        // Update Problem calls grader to rejudge, we need to detour grader calls
+        // We will submit 2 runs to the problem, a call to grader to rejudge them
+        $detourGrader = new ScopedGraderDetour();
+
+        // Change the problem to something completely different.
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'mrkareltastic.zip';
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'message' => 'Changed to mrkareltastic',
+            'validator' => 'token',
+            'time_limit' => 1000,
+            'overall_wall_time_limit' => 30000,
+            'validator_time_limit' => 0,
+            'extra_wall_time' => 1000,
+            'memory_limit' => 64000,
+            'output_limit' => 20480,
+        ]));
+        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+
+        $modifiedVersionData = ProblemController::apiVersions(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+        ]));
+        $this->assertNotEquals(
+            $originalVersionData['published'],
+            $modifiedVersionData['published']
+        );
+        $this->assertNotEquals(
+            $originalVersionData['current_version'],
+            $modifiedVersionData['current_version']
+        );
+        $modifiedDetails = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+        ]));
+        $this->assertNotEquals(
+            $originalDetails['statement'],
+            $modifiedDetails['statement']
+        );
+
+        // Change it back to the original problem. Should not cause any new
+        // rejudges, but current_version should go back to the original.
+        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
+        ProblemController::apiUpdate(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'message' => 'Changed back',
+            'validator' => 'token',
+            'time_limit' => 5000,
+            'overall_wall_time_limit' => 60000,
+            'validator_time_limit' => 30000,
+            'extra_wall_time' => 0,
+            'memory_limit' => 32000,
+            'output_limit' => 10240,
+        ]));
+        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+
+        $restoredVersionData = ProblemController::apiVersions(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+        ]));
+        $this->assertNotEquals(
+            $originalVersionData['published'],
+            $restoredVersionData['published']
+        );
+        $this->assertEquals(
+            $originalVersionData['current_version'],
+            $restoredVersionData['current_version']
+        );
+        $restoredDetails = ProblemController::apiDetails(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+        ]));
+        $this->assertEquals(
+            $originalDetails['statement'],
+            $restoredDetails['statement']
+        );
+
+        // Now that the problem is set up, we'll attempt to change the version.
+        ProblemController::apiSelectVersion(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'commit' => $originalVersionData['published'],
+        ]));
+        $this->assertEquals(
+            $originalDetails,
+            ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ]))
+        );
+        $this->assertEquals(
+            $originalVersionData['published'],
+            ProblemController::apiVersions(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ]))['published']
+        );
+        $this->assertEquals(
+            $originalVersionData['current_version'],
+            ProblemsDAO::getByAlias($problem->alias)->current_version
+        );
+
+        // Change it to the second version.
+        ProblemController::apiSelectVersion(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'commit' => $modifiedVersionData['published'],
+        ]));
+        $this->assertEquals(
+            $modifiedDetails,
+            ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ]))
+        );
+        $this->assertEquals(
+            $modifiedVersionData['published'],
+            ProblemController::apiVersions(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ]))['published']
+        );
+        $this->assertEquals(
+            $modifiedVersionData['current_version'],
+            ProblemsDAO::getByAlias($problem->alias)->current_version
+        );
+
+        // Change it back to the restored version.
+        ProblemController::apiSelectVersion(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problem->alias,
+            'commit' => $restoredVersionData['published'],
+        ]));
+        $this->assertEquals(
+            $restoredDetails,
+            ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ]))
+        );
+        $this->assertEquals(
+            $restoredVersionData['published'],
+            ProblemController::apiVersions(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ]))['published']
+        );
+        $this->assertEquals(
+            $restoredVersionData['current_version'],
+            ProblemsDAO::getByAlias($problem->alias)->current_version
+        );
+    }
 }
