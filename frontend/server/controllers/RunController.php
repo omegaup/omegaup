@@ -668,7 +668,7 @@ class RunController extends Controller {
         self::authenticateRequest($r);
 
         Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
-        if (!downloadSubmission($r['run_alias'], $r['current_identity_id'], /*passthru=*/true)) {
+        if (!RunController::downloadSubmission($r['run_alias'], $r['current_identity_id'], /*passthru=*/true)) {
             http_response_code(404);
         }
         exit;
