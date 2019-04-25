@@ -771,12 +771,14 @@ class ProblemController extends Controller {
                 $operation,
                 $problemSettings
             );
-            $response['rejudged'] = $problemDeployer->requiresRejudge;
-            if ($problemDeployer->requiresRejudge) {
+            $response['rejudged'] = false;
+            if (!is_null($problemDeployer->privateTreeHash) &&
+                $problem->current_version != $problemDeployer->privateTreeHash
+            ) {
                 $problem->current_version = $problemDeployer->privateTreeHash;
-                // TODO(lhchavez): Stop updating the problemsets and runs.
-                ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+                $response['rejudged'] = true;
                 RunsDAO::updateVersionToCurrent($problem);
+                ProblemsetProblemsDAO::updateVersionToCurrent($problem);
             }
             $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
 
@@ -803,7 +805,14 @@ class ProblemController extends Controller {
         if ($response['rejudged'] && OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
-                self::apiRejudge($r);
+                $runs = RunsDAO::getNewRunsForVersion($problem);
+                Grader::getInstance()->rejudge($runs, false);
+
+                // Expire details of the runs
+                foreach ($runs as $run) {
+                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                }
+                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
             } catch (Exception $e) {
                 self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
             }
@@ -1380,6 +1389,141 @@ class ProblemController extends Controller {
         $response['status'] = 'ok';
         $response['exists'] = true;
         return $response;
+    }
+
+    /**
+     * Entry point for Problem Versions API
+     *
+     * @param Request $r
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiVersions(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        return [
+            'status' => 'ok',
+            'published' => (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
+            'current_version' => $problem->current_version,
+            'master' => (new ProblemArtifacts($problem->alias, 'master'))->log(),
+            'private' => (new ProblemArtifacts($problem->alias, 'private'))->log(),
+        ];
+    }
+
+    /**
+     * Entry point for Problem select version API
+     *
+     * @param Request $r
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiSelectVersion(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+        if ($problem->current_version == $r['version']) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+
+        $log = (new ProblemArtifacts($problem->alias, 'master'))->log();
+        $masterCommit = null;
+        foreach ($log as $logEntry) {
+            if (count($log['commit']['parents']) < 3) {
+                // Master commits always have 3 or 4 parents. If they have
+                // fewer, it's one of the commits in the merged branches.
+                continue;
+            }
+            if ($logEntry['commit'] == $r['commit']) {
+                $masterCommit = $logEntry;
+                break;
+            }
+        }
+        if (is_null($masterCommit)) {
+            throw new NotFoundException('problemVersionNotFound');
+        }
+
+        // The private branch is always the last parent.
+        $privateCommitHash = $masterCommit['parents'][count($masterCommit['parents']) - 1];
+        $privateCommit = (new ProblemArtifacts($problem->alias, $privateCommitHash))->commit();
+
+        $problem->current_version = $privateCommit['tree'];
+        $problemDeployer = new ProblemDeployer($problem->alias);
+        try {
+            // Begin transaction
+            DAO::transBegin();
+            $problemDeployer->updatePublished(
+                (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
+                $masterCommit['commit'],
+                $r['current_user']
+            );
+            ProblemsDAO::update($problem);
+            RunsDAO::updateVersionToCurrent($problem);
+            ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+
+            DAO::transEnd();
+        } catch (ApiException $e) {
+            // Operation failed in the data layer, rollback transaction
+            DAO::transRollback();
+
+            throw $e;
+        } catch (Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            DAO::transRollback();
+            self::$log->error('Failed to update problem: ', $e);
+
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
+            self::$log->info('Calling ProblemController::apiRejudge');
+            try {
+                $runs = RunsDAO::getNewRunsForVersion($problem);
+                Grader::getInstance()->rejudge($runs, false);
+
+                // Expire details of the runs
+                foreach ($runs as $run) {
+                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                }
+                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
+            } catch (Exception $e) {
+                self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
+            }
+        }
+        Cache::deleteFromCache(Cache::PROBLEM_SETTINGS_DISTRIB, $problem->alias);
+
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**

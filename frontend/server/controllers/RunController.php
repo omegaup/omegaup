@@ -479,12 +479,7 @@ class RunController extends Controller {
         self::$log->info('Run being rejudged!!');
 
         // Reset fields.
-        $r['run']->verdict = 'JE';
         $r['run']->status = 'new';
-        $r['run']->runtime = 0;
-        $r['run']->memory = 0;
-        $r['run']->score = 0;
-        $r['run']->contest_score = 0;
         RunsDAO::save($r['run']);
 
         try {

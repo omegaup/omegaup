@@ -202,17 +202,43 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      * version.
      *
      * @param Problems $problem the problem.
-     * @return integer the number of affected rows.
      */
-    final public static function updateVersionToCurrent(Problems $problem) {
-        $sql = 'UPDATE
-                    Problemset_Problems
-                SET
-                    version = ?
-                WHERE
-                    problem_id = ?;';
+    final public static function updateVersionToCurrent(Problems $problem) : void {
         global $conn;
+
+        $sql = '
+            UPDATE
+                Problemset_Problems pp
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = pp.problemset_id
+            SET
+                pp.version = ?
+            WHERE
+                pp.problem_id = ?;
+        ';
         $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
-        return $conn->Affected_Rows();
+
+        $sql = '
+            UPDATE
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.submission_id = s.submission_id
+            INNER JOIN
+                Problemset_Problems pp
+            ON
+                pp.problemset_id = s.problemset_id AND
+                pp.problem_id = s.problem_id AND
+                pp.version = r.version
+            SET
+                s.current_run_id = r.run_id
+            WHERE
+                r.version = ? AND
+                s.problem_id = ?;
+        ';
+        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 }
