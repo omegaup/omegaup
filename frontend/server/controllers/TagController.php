@@ -20,8 +20,6 @@ class TagController extends Controller {
      * @param Request $r
      */
     public static function apiList(Request $r) {
-        self::authenticateRequest($r);
-
         $param = '';
         if (!is_null($r['term'])) {
             $param = 'term';
