@@ -1458,7 +1458,7 @@ class ProblemController extends Controller {
         $log = (new ProblemArtifacts($problem->alias, 'master'))->log();
         $masterCommit = null;
         foreach ($log as $logEntry) {
-            if (count($log['commit']['parents']) < 3) {
+            if (count($logEntry['parents']) < 3) {
                 // Master commits always have 3 or 4 parents. If they have
                 // fewer, it's one of the commits in the merged branches.
                 continue;
@@ -1474,9 +1474,17 @@ class ProblemController extends Controller {
 
         // The private branch is always the last parent.
         $privateCommitHash = $masterCommit['parents'][count($masterCommit['parents']) - 1];
-        $privateCommit = (new ProblemArtifacts($problem->alias, $privateCommitHash))->commit();
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $privateCommitHash);
+        $privateCommit = $problemArtifacts->commit();
 
+        // Update problem fields.
         $problem->current_version = $privateCommit['tree'];
+        $problemSettings = json_decode(
+            $problemArtifacts->get('settings.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
+        ProblemController::updateProblemSettings($problem, $problemSettings);
+
         $problemDeployer = new ProblemDeployer($problem->alias);
         try {
             // Begin transaction
@@ -1519,7 +1527,16 @@ class ProblemController extends Controller {
                 self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
             }
         }
-        Cache::deleteFromCache(Cache::PROBLEM_SETTINGS_DISTRIB, $problem->alias);
+        $updatedStatementLanguages = [];
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        foreach ($problemArtifacts->lsTree('statements') as $file) {
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if ($extension != 'markdown') {
+                continue;
+            }
+            $updatedStatementLanguages[] = pathinfo($file['name'], PATHINFO_FILENAME);
+        }
+        self::invalidateCache($problem, $updatedStatementLanguages);
 
         return [
             'status' => 'ok',
@@ -2148,5 +2165,67 @@ class ProblemController extends Controller {
         ];
 
         return $problemSettings;
+    }
+
+    /**
+     * Updates the Problems object with the data in settings.json.
+     *
+     * @param Problems $problem the problem
+     * @param array $problemSettings the contents of settings.json.
+     */
+    private static function updateProblemSettings(
+        Problems $problem,
+        array $problemSettings
+    ) : void {
+        $problem->extra_wall_time = self::parseDuration(
+            $problemSettings['Limits']['ExtraWallTime']
+        );
+        $problem->memory_limit  = $problemSettings['Limits']['MemoryLimit'] / 1024;
+        $problem->output_limit = $problemSettings['Limits']['OutputLimit'];
+        $problem->overall_wall_time_limit = self::parseDuration(
+            $problemSettings['Limits']['OverallWallTimeLimit']
+        );
+        $problem->time_limit = self::parseDuration($problemSettings['Limits']['TimeLimit']);
+        $problem->validator = $problemSettings['Validator']['Name'];
+        $problem->tolerance = $problemSettings['Validator']['Tolerance'];
+        $problem->validator_time_limit = self::parseDuration(
+            $problemSettings['Validator']['Limits']['TimeLimit']
+        );
+    }
+
+    /**
+     * Parses a duration and returns the number of milliseconds.
+     *
+     * @param string $timeDuration A string representation of the duration.
+     * @return int The number of milliseconds in the duration.
+     */
+    private static function parseDuration(string $timeDuration) : int {
+        $duration = 0.0;
+        $matches = [];
+        if (!preg_match_all('/(\\d+(?:\\.\\d+)?)([[:alpha:]]+)/', $timeDuration, $matches, PREG_SET_ORDER)) {
+            return $duration;
+        }
+        $suffixes = [
+            'μs' => 0.001,
+            'us' => 0.001,
+            'ms' => 1.0,
+            's' => 1000.0,
+            'm' => 60000.0,
+            'h' => 3600000.0,
+        ];
+        foreach ($matches as $match) {
+            $foundFactor = null;
+            foreach ($suffixes as $suffix => $factor) {
+                if ($suffix == $match[2]) {
+                    $foundFactor = $factor;
+                }
+            }
+            if (is_null($foundFactor)) {
+                // Assume seconds.
+                $foundFactor = 1000.0;
+            }
+            $duration += floatval($match[1]) * $foundFactor;
+        }
+        return $duration;
     }
 }
