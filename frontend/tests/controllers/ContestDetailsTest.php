@@ -64,9 +64,6 @@ class ContestDetailsTest extends OmegaupTestCase {
             // Assert data in DB
             $this->assertEquals($problem->title, $problem_array['title']);
             $this->assertEquals($problem->alias, $problem_array['alias']);
-            $this->assertEquals($problem->validator, $problem_array['validator']);
-            $this->assertEquals($problem->time_limit, $problem_array['time_limit']);
-            $this->assertEquals($problem->memory_limit, $problem_array['memory_limit']);
             $this->assertEquals($problem->visits, $problem_array['visits']);
             $this->assertEquals($problem->submissions, $problem_array['submissions']);
             $this->assertEquals($problem->accepted, $problem_array['accepted']);
