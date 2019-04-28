@@ -66,6 +66,60 @@
                       rows="5"
                       v-model="description"></textarea></label>
           </div>
+        </div><!-- Problem list editor -->
+        <div class="panel-footer"
+             v-show="!update">
+          <form>
+            <div class="row">
+              <div class="row">
+                <div class="form-group col-md-12">
+                  <label>{{ T.wordsProblem }} <input autocomplete="off"
+                         class="typeahead form-control problems-dropdown"
+                         v-model="currentProblem.alias"></label>
+                  <p class="help-block">{{ T.courseAddProblemsAssignmentsDesc }}</p>
+                </div>
+              </div>
+              <div class="form-group pull-right">
+                <button class="btn btn-primary"
+                     type="submit"
+                     v-bind:disabled="currentProblem.alias.length == 0"
+                     v-on:click.prevent="onAddProblem">{{ T.courseEditAddProblems }}</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="row">
+          <div class="table-body"
+               v-if="assignmentProblems.length == 0">
+            <div class="empty-category">
+              {{ T.courseAssignmentProblemsEmpty }}
+            </div>
+          </div>
+          <table class="table table-striped"
+                 v-else="">
+            <thead>
+              <tr>
+                <th>{{ T.contestAddproblemProblemOrder }}</th>
+                <th>{{ T.contestAddproblemProblemName }}</th>
+                <th>{{ T.contestAddproblemProblemRemove }}</th>
+              </tr>
+            </thead>
+            <tbody v-sortable="{ onUpdate: sort }">
+              <tr v-bind:key="problem.letter"
+                  v-for="problem in assignmentProblems">
+                <td>
+                  <a v-bind:title="T.courseAssignmentProblemReorder"><span aria-hidden="true"
+                        class="glyphicon glyphicon-move handle"></span></a>
+                </td>
+                <td>{{ problem.title }}</td>
+                <td class="button-column">
+                  <a v-bind:title="T.courseAssignmentProblemRemove"
+                      v-on:click="onProblemRemove(problem)"><span aria-hidden="true"
+                        class="glyphicon glyphicon-remove"></span></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary submit"
@@ -86,12 +140,14 @@
 
 <script>
 import DateTimePicker from '../DateTimePicker.vue';
+import UI from '../../ui.js';
 
 export default {
   props: {
     T: Object,
     update: Boolean,
     assignment: Object,
+    assignmentProblems: Array,
     show: {
       type: Boolean,
       'default': false,
@@ -105,10 +161,19 @@ export default {
       finishTime: this.assignment.finish_time || new Date(),
       name: this.assignment.name,
       startTime: this.assignment.start_time || new Date(),
+      currentProblem: {alias: '', title: ''},
     };
   },
   watch: {
-    assignment: function(val) { this.reset();},
+    assignment: function(val) {
+      this.reset();
+      this.$emit('assignment', val);
+    },
+  },
+  mounted: function() {
+    var self = this;
+    UI.problemTypeahead($('input.problems-dropdown', $(this.$el)),
+                        function(event, item) { self.currentProblem = item; });
   },
   methods: {
     reset: function() {
@@ -118,12 +183,23 @@ export default {
       this.finishTime = this.assignment.finish_time || new Date();
       this.name = this.assignment.name;
       this.startTime = this.assignment.start_time || new Date();
+      this.currentProblem = {alias: '', title: ''};
     },
     onSubmit: function() { this.$emit('submit', this);},
     onCancel: function() {
       this.reset();
       this.$emit('cancel');
     },
+    sort: function(event) {
+      this.assignmentProblems.splice(
+          event.newIndex, 0,
+          this.assignmentProblems.splice(event.oldIndex, 1)[0]);
+      this.$emit('sort', this.assignment, this.assignmentProblems);
+    },
+    onProblemRemove: function(problem) {
+      this.$emit('problemRemove', this.assignment, problem);
+    },
+    onAddProblem: function() { this.$emit('addProblem', this.currentProblem);}
   },
   components: {
     'omegaup-datetimepicker': DateTimePicker,

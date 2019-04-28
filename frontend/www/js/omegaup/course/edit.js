@@ -229,7 +229,8 @@ OmegaUp.on('ready', function() {
           T: T,
           show: this.show,
           update: this.update,
-          assignment: this.assignment
+          assignment: this.assignment,
+          assignmentProblems: this.assignmentProblems,
         },
         on: {
           submit: function(ev) {
@@ -260,6 +261,8 @@ OmegaUp.on('ready', function() {
                                   finish_time: ev.finishTime.getTime() / 1000,
                                   alias: ev.alias,
                                   assignment_type: ev.assignmentType,
+                                  problems:
+                                      JSON.stringify(ev.assignmentProblems),
                                 })
                   .then(function(data) {
                     omegaup.UI.success(omegaup.T.courseAssignmentAdded);
@@ -277,6 +280,33 @@ OmegaUp.on('ready', function() {
             assignmentDetails.show = false;
             updateNewAssignmentButtonVisibility(true);
           },
+          assignment: function(assignment) {
+            if (assignmentDetails.update) {
+              refreshProblemList(assignment);
+            }
+          },
+          problemRemove: function(assignment, problem) {
+            removeProblem(assignment, problem);
+          },
+          addProblem: function(problem) {
+            assignmentDetails.assignmentProblems.push(problem);
+          },
+          sort: function(assignment, assignmentProblems) {
+            if (assignmentDetails.update) {
+              let index = 1;
+              for (let problem of assignmentProblems) {
+                problem.order = index;
+                index++;
+              }
+              omegaup.API.Course.updateProblemsOrder({
+                                  course_alias: courseAlias,
+                                  assignment_alias: assignment.alias,
+                                  problems: assignmentProblems,
+                                })
+                  .then(function(response) {})
+                  .fail(omegaup.UI.apiError);
+            }
+          },
         },
       });
     },
@@ -287,6 +317,7 @@ OmegaUp.on('ready', function() {
         start_time: defaultStartTime,
         finish_time: defaultFinishTime,
       },
+      assignmentProblems: [],
     },
     components: {
       'omegaup-course-assignmentdetails': course_AssignmentDetails,
@@ -347,6 +378,20 @@ OmegaUp.on('ready', function() {
           cancel: function(ev) {
             window.location = '/course/' + courseAlias + '/';
           },
+          'sort': function(assignment, assignmentProblems) {
+            let index = 1;
+            for (let problem of assignmentProblems) {
+              problem.order = index;
+              index++;
+            }
+            omegaup.API.Course.updateProblemsOrder({
+                                course_alias: courseAlias,
+                                assignment_alias: assignment.alias,
+                                problems: assignmentProblems,
+                              })
+                .then(function(response) {})
+                .fail(omegaup.UI.apiError);
+          },
         },
       });
     },
@@ -384,22 +429,7 @@ OmegaUp.on('ready', function() {
           },
           assignment: function(assignment) { refreshProblemList(assignment); },
           remove: function(assignment, problem) {
-            if (!window.confirm(
-                    UI.formatString(T.courseAssignmentProblemConfirmRemove, {
-                      problem: problem.title,
-                    }))) {
-              return;
-            }
-            omegaup.API.Course.removeProblem({
-                                course_alias: courseAlias,
-                                problem_alias: problem.alias,
-                                assignment_alias: assignment.alias,
-                              })
-                .then(function(response) {
-                  omegaup.UI.success(T.courseAssignmentProblemRemoved);
-                  refreshProblemList(assignment);
-                })
-                .fail(omegaup.UI.apiError);
+            removeProblem(assignment, problem);
           },
           'sort': function(assignment, assignmentProblems) {
             let index = 1;
@@ -565,6 +595,7 @@ OmegaUp.on('ready', function() {
     omegaup.API.Course.getAssignment(
                           {assignment: assignment.alias, course: courseAlias})
         .then(function(response) {
+          assignmentDetails.assignmentProblems = response.problems;
           problemList.assignmentProblems = response.problems;
         })
         .fail(omegaup.UI.apiError);
@@ -577,6 +608,25 @@ OmegaUp.on('ready', function() {
           administrators.groupadmins = data.group_admins;
         })
         .fail(UI.apiError);
+  }
+
+  function removeProblem(assignment, problem) {
+    if (!window.confirm(
+            UI.formatString(T.courseAssignmentProblemConfirmRemove, {
+              problem: problem.title,
+            }))) {
+      return;
+    }
+    omegaup.API.Course.removeProblem({
+                        course_alias: courseAlias,
+                        problem_alias: problem.alias,
+                        assignment_alias: assignment.alias,
+                      })
+        .then(function(response) {
+          omegaup.UI.success(T.courseAssignmentProblemRemoved);
+          refreshProblemList(assignment);
+        })
+        .fail(omegaup.UI.apiError);
   }
 
   refreshStudentList();
