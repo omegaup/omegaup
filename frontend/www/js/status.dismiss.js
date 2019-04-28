@@ -5,6 +5,10 @@ $('#email-verification-alert-close')
                                   .slideUp(); });
 
 function isBrowserSupported() {
+  if (navigator.userAgent.indexOf('Safari') !== -1 &&
+      navigator.userAgent.indexOf('Chrome') === -1) {
+    return false;
+  }
   if (typeof(window.history.replaceState) !== 'function') {
     return false;
   }
