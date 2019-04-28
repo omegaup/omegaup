@@ -5,7 +5,8 @@ $('#email-verification-alert-close')
                                   .slideUp(); });
 
 function isBrowserSupported() {
-  // From https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent#Browser_Name
+  // From
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent#Browser_Name
   if (navigator.userAgent.indexOf('Safari/') !== -1 &&
       navigator.userAgent.indexOf('Chrome/') === -1) {
     return false;
