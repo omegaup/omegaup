@@ -139,28 +139,37 @@ class ApiCaller {
         if (self::isAssociativeArray($response)) {
             $response['_id'] = Request::requestId();
         }
+        $jsonEncodeFlags = 0;
+        // If this request is being explicitly made from the browser,
+        // pretty-print the response.
+        if ($r['prettyprint'] == 'true') {
+            $jsonEncodeFlags = JSON_PRETTY_PRINT;
+        }
         static::setHttpHeaders($response);
-        $json_result = json_encode($response);
+        $jsonResult = json_encode($response, $jsonEncodeFlags);
 
-        if ($json_result === false) {
+        if ($jsonResult === false) {
             self::$log->warn('json_encode failed for: '. print_r($response, true));
             if (json_last_error() == JSON_ERROR_UTF8) {
                 // Attempt to recover gracefully, removing any unencodeable
                 // elements from the response. This should at least prevent
                 // completely and premanently breaking some scenarios, like
                 // trying to fix a problem with illegal UTF-8 codepoints.
-                $json_result = json_encode($response, JSON_PARTIAL_OUTPUT_ON_ERROR);
+                $jsonResult = json_encode(
+                    $response,
+                    $jsonEncodeFlags|JSON_PARTIAL_OUTPUT_ON_ERROR
+                );
             }
-            if ($json_result === false) {
+            if ($jsonResult === false) {
                 $apiException = new InternalServerErrorException();
-                $json_result = json_encode($apiException->asResponseArray());
+                $jsonResult = json_encode($apiException->asResponseArray());
             }
         }
 
         // Print the result using late static binding semantics
         // Return needed for testability purposes, for production it
         // returns void.
-        return static::printResult($json_result);
+        return static::printResult($jsonResult);
     }
 
     /**
