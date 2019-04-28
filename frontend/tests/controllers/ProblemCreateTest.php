@@ -305,9 +305,6 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify DB data
         $this->assertEquals($r['title'], $problem->title);
         $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
-        $this->assertEquals($r['validator'], $problem->validator);
-        $this->assertEquals($r['time_limit'], $problem->time_limit);
-        $this->assertEquals($r['memory_limit'], $problem->memory_limit);
         $this->assertEquals($r['order'], $problem->order);
         $this->assertEquals($r['source'], $problem->source);
 
@@ -644,9 +641,6 @@ class CreateProblemTest extends OmegaupTestCase {
         // Verify DB data
         $this->assertEquals($r['title'], $problem->title);
         $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
-        $this->assertEquals($r['validator'], $problem->validator);
-        $this->assertEquals($r['time_limit'], $problem->time_limit);
-        $this->assertEquals($r['memory_limit'], $problem->memory_limit);
         $this->assertEquals($r['order'], $problem->order);
         $this->assertEquals($r['source'], $problem->source);
 

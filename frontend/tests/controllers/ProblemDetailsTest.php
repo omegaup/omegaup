@@ -50,9 +50,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response['title'], $problemDAO->title);
         $this->assertEquals($response['alias'], $problemDAO->alias);
         $this->assertEquals($response['points'], 100);
-        $this->assertEquals($response['validator'], $problemDAO->validator);
-        $this->assertEquals($response['time_limit'], $problemDAO->time_limit);
-        $this->assertEquals($response['memory_limit'], $problemDAO->memory_limit);
         $this->assertEquals($response['problemsetter']['username'], $author->username);
         $this->assertEquals($response['problemsetter']['name'], $author->name);
         $this->assertEquals($response['source'], $problemDAO->source);
