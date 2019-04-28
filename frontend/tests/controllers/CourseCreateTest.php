@@ -142,6 +142,66 @@ class CourseCreateTest extends OmegaupTestCase {
         $this->assertEquals($points, $problems[0]->points);
     }
 
+    public function testCreateSchoolAssignmentWithProblems() {
+        // Create a test course
+        $user = UserFactory::createUser();
+        $courseAlias = Utils::CreateRandomString();
+        $login = self::login($user);
+        $r = new Request([
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => $courseAlias,
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+        ]);
+
+        // Call api
+        $response = CourseController::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+
+        // Create 3 problems
+        $nProblems = 3;
+        $pointsTotal = 0;
+        $problemsData = array();
+        for ($i = 1; $i <= $nProblems; $i++) {
+            $problem = ProblemsFactory::createProblem(new ProblemParams([
+                'visibility' => 1,
+                'user' => $user
+            ]), $login); 
+
+            $problemsData[$i]['alias'] = $problem['request']['problem_alias'];
+            $problemsData[$i]['points'] = $i;
+            $pointsTotal += $i;
+        }
+        
+        // Create the assignment
+        $login = self::login($user);
+        $assignmentAlias = Utils::CreateRandomString();
+        $response = CourseController::apiCreateAssignment(new Request([
+            'auth_token' => $login->auth_token,
+            'name' => Utils::CreateRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => Utils::CreateRandomString(),
+            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'course_alias' => $courseAlias,
+            'assignment_type' => 'homework',
+            'problems' => json_encode($problemsData)
+        ]));
+        $this->assertEquals('ok', $response['status']);
+
+        // There should exist 1 assignment with this alias
+        $course = CoursesDAO::getByAlias($courseAlias);
+        $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
+        $this->assertNotNull($assignment);
+        
+        // Check problems were added to the underlying problemset
+        $problems = ProblemsetProblemsDAO::getByProblemset($assignment->problemset_id);
+        $this->assertEquals($nProblems, count($problems));
+        $this->assertEquals($pointsTotal, $assignment->max_points);
+    }
+
     /**
      * Tests course/apiListAssignments
      */

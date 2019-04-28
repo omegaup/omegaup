@@ -88,6 +88,25 @@ class CourseController extends Controller {
 
         Validators::isInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
         Validators::isValidAlias($r['alias'], 'alias', $is_required);
+
+        $r['problems'] = json_decode($r['problems']);
+        if (!empty($r['problems'])) {
+            $problemsHasErrors = false;
+            foreach ($r['problems'] as $problemData) {
+                if (!isset($problemData->alias)) {
+                    throw new InvalidParameterException('parameterEmpty', 'problems');
+                }
+
+                $problem = ProblemsDAO::getByAlias($problemData->alias);
+                if (is_null($problem)) {
+                    throw new NotFoundException('problemNotFound');
+                }
+
+                if (!Validators::isNumber($problemData->points, 'points')) {
+                    throw new InvalidParameterException('parameterEmpty', 'problems');
+                }
+            }
+        }
     }
 
     /**
@@ -385,6 +404,21 @@ class CourseController extends Controller {
             $problemset->assignment_id = $assignment->assignment_id;
             ProblemsetsDAO::save($problemset);
 
+            // Add problems
+            if (!empty($r['problems'])) {
+                foreach ($r['problems'] as $problemData) {
+                    $problem = ProblemsDAO::getByAlias($problemData->alias);
+
+                    self::addProblemToAssignmentProblemset(
+                        $r['current_identity_id'],
+                        $r['alias'],
+                        $r['course'],
+                        $problemset,
+                        $problem,
+                        $problemData->points
+                    );
+                }
+            }
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
@@ -483,6 +517,43 @@ class CourseController extends Controller {
     }
 
     /**
+     * Common logic for adding a problem to an assignment
+     *
+     * @param $current_identity_id
+     * @param $assignment_alias
+     * @param Couse $course
+     * @param Problemsets $problemSet
+     * @param Problems $problem
+     * @param Int $points
+     *
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function addProblemToAssignmentProblemset(
+        $current_identity_id,
+        $assignment_alias,
+        Courses $course,
+        Problemsets $problemSet,
+        Problems $problem,
+        $points
+    ) {
+        ProblemsetController::addProblem(
+            $problemSet->problemset_id,
+            $problem,
+            $current_identity_id,
+            $points
+        );
+
+        try {
+            CoursesDAO::updateAssignmentMaxPoints(
+                $course,
+                $assignment_alias
+            );
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
+
+    /**
      * Adds a problem to an assignment
      *
      * @param Request $r
@@ -521,22 +592,7 @@ class CourseController extends Controller {
             $points = (int)$r['points'];
         }
 
-        ProblemsetController::addProblem(
-            $problemSet->problemset_id,
-            $problem,
-            $r['current_identity_id'],
-            $points
-        );
-
-        try {
-            CoursesDAO::updateAssignmentMaxPoints(
-                $r['course'],
-                $r['assignment_alias']
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        self::addProblemToAssignmentProblemset($r['current_identity_id'], $r['assignment_alias'], $r['course'], $problemSet, $problem, $points);
         return ['status' => 'ok'];
     }
 
