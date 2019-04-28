@@ -17,10 +17,9 @@ $smarty->assign('source', $result['source']);
 $smarty->assign('problemsetter', $result['problemsetter']);
 $smarty->assign('title', $result['title']);
 $smarty->assign('points', $result['points']);
-$smarty->assign('time_limit', $result['time_limit'] / 1000 . 's');
-$smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 . 's');
-$smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
-$smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
+$smarty->assign('time_limit', $result['settings']['limits']['TimeLimit']);
+$smarty->assign('overall_wall_time_limit', $result['settings']['limits']['OverallWallTimeLimit']);
+$smarty->assign('memory_limit', ($result['settings']['limits']['MemoryLimit'] / 1024 / 1024) . ' MiB');
 
 $smarty->assign('payload', $result);
 
