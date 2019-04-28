@@ -32,6 +32,9 @@ class ProblemsetProblems extends VO {
         if (isset($data['problem_id'])) {
             $this->problem_id = $data['problem_id'];
         }
+        if (isset($data['commit'])) {
+            $this->commit = $data['commit'];
+        }
         if (isset($data['version'])) {
             $this->version = $data['version'];
         }
@@ -69,6 +72,13 @@ class ProblemsetProblems extends VO {
       * @var int(11)
       */
     public $problem_id;
+
+    /**
+      * El hash SHA1 del commit en la rama master del problema.
+      * @access public
+      * @var char(40)
+      */
+    public $commit;
 
     /**
       * El hash SHA1 del árbol de la rama private.

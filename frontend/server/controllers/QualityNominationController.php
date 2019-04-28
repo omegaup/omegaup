@@ -530,7 +530,8 @@ class QualityNominationController extends Controller {
             // Pull original problem statements in every language the nominator is trying to override.
             foreach ($response['contents']['statements'] as $language => $_) {
                 $response['original_contents']['statements'][$language] = ProblemController::getProblemStatement(
-                    $problem->alias,
+                    $problem,
+                    'published',
                     $language
                 );
             }

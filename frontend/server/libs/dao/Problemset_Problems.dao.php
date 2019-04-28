@@ -205,7 +205,9 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      *
      * @param Problems $problem the problem.
      */
-    final public static function updateVersionToCurrent(Problems $problem) : void {
+    final public static function updateVersionToCurrent(
+        Problems $problem
+    ) : void {
         global $conn;
 
         $sql = '
@@ -216,11 +218,11 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             ON
                 p.problemset_id = pp.problemset_id
             SET
-                pp.version = ?
+                pp.commit = ?, pp.version = ?
             WHERE
                 pp.problem_id = ?;
         ';
-        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        $conn->Execute($sql, [$problem->commit, $problem->current_version, $problem->problem_id]);
 
         $sql = '
             UPDATE
@@ -242,5 +244,33 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 s.problem_id = ?;
         ';
         $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+    }
+
+    /**
+     * Update the commit of the problem across all problemsets to the current
+     * version.
+     *
+     * @param Problems $problem the problem.
+     * @param string   $commit  the SHA1 hash of the current commit.
+     */
+    final public static function updateCommit(
+        Problems $problem,
+        string $commit
+    ) : void {
+        global $conn;
+
+        $sql = '
+            UPDATE
+                Problemset_Problems pp
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = pp.problemset_id
+            SET
+                pp.commit = ?
+            WHERE
+                pp.problem_id = ?;
+        ';
+        $conn->Execute($sql, [$commit, $problem->problem_id]);
     }
 }

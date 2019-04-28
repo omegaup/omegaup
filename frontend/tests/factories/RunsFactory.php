@@ -163,15 +163,30 @@ class RunsFactory {
     }
 
     /**
-     * Given a run id, set a score to a given run
+     * Given a run, set a score to a given run
      *
-     * @param type $runData
-     * @param int $points
-     * @param string $verdict
+     * @param ?array  $runData     The run.
+     * @param float   $points      The score of the run
+     * @param string  $verdict     The verdict of the run.
+     * @param ?int    $submitDelay The number of minutes worth of penalty.
+     * @param ?string $runGuid     The GUID of the submission.
+     * @param ?int    $runID       The ID of the run.
      */
-    public static function gradeRun($runData, $points = 1, $verdict = 'AC', $submitDelay = null, $runGuid = null) {
-        $submission = SubmissionsDAO::getByGuid($runGuid === null ? $runData['response']['guid'] : $runGuid);
-        $run = RunsDAO::getByPK($submission->current_run_id);
+    public static function gradeRun(
+        ?array $runData,
+        float $points = 1,
+        string $verdict = 'AC',
+        ?int $submitDelay = null,
+        ?string $runGuid = null,
+        ?int $runId = null
+    ) : void {
+        if (!is_null($runId)) {
+            $run = RunsDAO::getByPK($runId);
+            $submission = SubmissionsDAO::getByPK($run->submission_id);
+        } else {
+            $submission = SubmissionsDAO::getByGuid($runGuid === null ? $runData['response']['guid'] : $runGuid);
+            $run = RunsDAO::getByPK($submission->current_run_id);
+        }
 
         $run->verdict = $verdict;
         $run->score = $points;
@@ -181,12 +196,12 @@ class RunsFactory {
 
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
+            SubmissionsDAO::save($submission);
             $run->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
         }
 
         RunsDAO::save($run);
-        SubmissionsDAO::save($submission);
 
         Grader::getInstance()->setGraderResourceForTesting(
             $run,

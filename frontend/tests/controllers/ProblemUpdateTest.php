@@ -792,25 +792,27 @@ class UpdateProblemTest extends OmegaupTestCase {
             'problem_alias' => $problem->alias,
         ]));
 
-        // Update Problem calls grader to rejudge, we need to detour grader calls
-        // We will submit 2 runs to the problem, a call to grader to rejudge them
-        $detourGrader = new ScopedGraderDetour();
-
         // Change the problem to something completely different.
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'mrkareltastic.zip';
-        ProblemController::apiUpdate(new Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problem->alias,
-            'message' => 'Changed to mrkareltastic',
-            'validator' => 'token',
-            'time_limit' => 1000,
-            'overall_wall_time_limit' => 30000,
-            'validator_time_limit' => 0,
-            'extra_wall_time' => 1000,
-            'memory_limit' => 64000,
-            'output_limit' => 20480,
-        ]));
-        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'mrkareltastic.zip';
+            $detourGrader = new ScopedGraderDetour();
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'message' => 'Changed to mrkareltastic',
+                'validator' => 'token',
+                'time_limit' => 1000,
+                'overall_wall_time_limit' => 30000,
+                'validator_time_limit' => 0,
+                'extra_wall_time' => 1000,
+                'memory_limit' => 64000,
+                'output_limit' => 20480,
+            ]));
+            $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        foreach ($detourGrader->getRuns() as $run) {
+            RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+        }
+        }
 
         $modifiedVersionData = ProblemController::apiVersions(new Request([
             'auth_token' => $login->auth_token,
@@ -835,20 +837,23 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Change it back to the original problem. Should not cause any new
         // rejudges, but current_version should go back to the original.
-        $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
-        ProblemController::apiUpdate(new Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problem->alias,
-            'message' => 'Changed back',
-            'validator' => 'token',
-            'time_limit' => 5000,
-            'overall_wall_time_limit' => 60000,
-            'validator_time_limit' => 30000,
-            'extra_wall_time' => 0,
-            'memory_limit' => 32000,
-            'output_limit' => 10240,
-        ]));
-        $this->assertEquals(1, $detourGrader->getGraderCallCount());
+        {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'testproblem.zip';
+            $detourGrader = new ScopedGraderDetour();
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'message' => 'Changed back',
+                'validator' => 'token',
+                'time_limit' => 5000,
+                'overall_wall_time_limit' => 60000,
+                'validator_time_limit' => 30000,
+                'extra_wall_time' => 0,
+                'memory_limit' => 32000,
+                'output_limit' => 10240,
+            ]));
+            $this->assertEquals(0, $detourGrader->getGraderCallCount());
+        }
 
         $restoredVersionData = ProblemController::apiVersions(new Request([
             'auth_token' => $login->auth_token,
@@ -944,6 +949,77 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(
             $restoredVersionData['current_version'],
             ProblemsDAO::getByAlias($problem->alias)->current_version
+        );
+    }
+
+    /**
+     * Tests problem version update in a problemset context.
+     */
+    public function testProblemInProblemsetVersionUpdate() {
+        $problemData = ProblemsFactory::createProblem();
+        $problem = $problemData['problem'];
+        $contestant = UserFactory::createUser();
+
+        $originalTime = Time::get();
+        Time::setTimeForTesting($originalTime - 30 * 60);
+
+        // Create a contest in the past with one run.
+        $pastContestData = ContestsFactory::createContest(new ContestParams([
+            'start_time' => $originalTime - 60 * 60,
+            'finish_time' => $originalTime - 5 * 60,
+        ]));
+        ContestsFactory::addProblemToContest($problemData, $pastContestData);
+        ContestsFactory::addUser($pastContestData, $contestant);
+        $pastRunData = RunsFactory::createRun($problemData, $pastContestData, $contestant);
+        RunsFactory::gradeRun($pastRunData);
+
+        // Now create one in the present with one more run.
+        $presentContestData = ContestsFactory::createContest(new ContestParams([
+            'start_time' => $originalTime - 60 * 60,
+            'finish_time' => $originalTime + 60 * 60,
+        ]));
+        ContestsFactory::addProblemToContest($problemData, $presentContestData);
+        ContestsFactory::addUser($presentContestData, $contestant);
+        $presentRunData = RunsFactory::createRun($problemData, $presentContestData, $contestant);
+        RunsFactory::gradeRun($presentRunData);
+
+        Time::setTimeForTesting($originalTime + 5 * 60);
+
+        $login = self::login($problemData['author']);
+        // Change the problem to something completely different.
+        {
+            $_FILES['problem_contents']['tmp_name'] = OMEGAUP_RESOURCES_ROOT.'mrkareltastic.zip';
+            $detourGrader = new ScopedGraderDetour();
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+                'message' => 'Changed to mrkareltastic',
+                'validator' => 'token',
+                'time_limit' => 1000,
+                'overall_wall_time_limit' => 30000,
+                'validator_time_limit' => 0,
+                'extra_wall_time' => 1000,
+                'memory_limit' => 64000,
+                'output_limit' => 20480,
+            ]));
+            $this->assertEquals(2, $detourGrader->getGraderCallCount());
+        foreach ($detourGrader->getRuns() as $run) {
+            RunsFactory::gradeRun(null, 0, 'WA', null, null, $run->run_id);
+        }
+        }
+
+        // Both runs should be updated.
+        $this->assertEquals(
+            'WA',
+            RunsDAO::getByPK(
+                SubmissionsDAO::getByGuid($pastRunData['response']['guid'])->current_run_id
+            )->verdict
+        );
+        $this->assertEquals(
+            'WA',
+            RunsDAO::getByPK(
+                SubmissionsDAO::getByGuid($presentRunData['response']['guid'])->current_run_id
+            )->verdict
         );
     }
 }

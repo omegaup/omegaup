@@ -147,7 +147,6 @@ class ContestController extends Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'start_time', 'finish_time', 'admission_mode', 'scoreboard_url', 'scoreboard_url_admin'];
         $contests = null;
         try {
             if (Authorization::isSystemAdmin($r['current_identity_id'])) {
@@ -190,19 +189,6 @@ class ContestController extends Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
         $query = $r['query'];
-        // Create array of relevant columns
-        $relevant_columns = [
-            'title',
-            'problemset_id',
-            'alias',
-            'start_time',
-            'finish_time',
-            'problemset_id',
-            'admission_mode',
-            'scoreboard_url',
-            'scoreboard_url_admin',
-            'rerun_id'
-        ];
         $contests = null;
         $identity_id = $callback_user_function == 'ContestsDAO::getContestsParticipating'
           ? $r['current_identity_id'] : $r['current_user_id'];
@@ -473,8 +459,8 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
-        // Create array of relevant columns
-        $relevant_columns = [
+        // Initialize response to be the contest information
+        $result = $r['contest']->asFilteredArray([
             'title',
             'description',
             'start_time',
@@ -493,10 +479,7 @@ class ContestController extends Controller {
             'show_scoreboard_after',
             'rerun_id',
             'admission_mode',
-        ];
-
-        // Initialize response to be the contest information
-        $result = $r['contest']->asFilteredArray($relevant_columns);
+        ]);
 
         $current_ses = SessionController::getCurrentSession($r);
 
@@ -603,8 +586,8 @@ class ContestController extends Controller {
      */
     private static function getCachedDetails(Request $r, &$result) {
         Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $r['contest_alias'], $r, function (Request $r) {
-            // Create array of relevant columns
-            $relevant_columns = [
+            // Initialize response to be the contest information
+            $result = $r['contest']->asFilteredArray([
                 'title',
                 'description',
                 'start_time',
@@ -625,10 +608,8 @@ class ContestController extends Controller {
                 'admission_mode',
                 'languages',
                 'problemset_id',
-                'rerun_id'];
-
-            // Initialize response to be the contest information
-            $result = $r['contest']->asFilteredArray($relevant_columns);
+                'rerun_id',
+            ]);
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
@@ -1272,9 +1253,16 @@ class ContestController extends Controller {
             throw new PreconditionFailedException('contestAddproblemTooManyProblems');
         }
 
+        [$masterCommit, $currentVersion] = ProblemController::resolveCommit(
+            $params['problem'],
+            $r['commit']
+        );
+
         ProblemsetController::addProblem(
             $params['contest']->problemset_id,
             $params['problem'],
+            $masterCommit,
+            $currentVersion,
             $r['current_identity_id'],
             $r['points'],
             is_null($r['order_in_contest']) ? 1 : $r['order_in_contest']
@@ -1341,7 +1329,8 @@ class ContestController extends Controller {
 
         return [
             'contest' => $contest,
-            'problem' => $problem];
+            'problem' => $problem,
+        ];
     }
 
     /**

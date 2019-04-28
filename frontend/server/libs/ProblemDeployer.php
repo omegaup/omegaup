@@ -14,6 +14,7 @@ class ProblemDeployer {
     private $alias;
     private $zipPath = null;
     public $privateTreeHash = null;
+    public $publishedCommit = null;
     private $updatedStatementLanguages = [];
     private $acceptsSubmissions = true;
 
@@ -66,11 +67,11 @@ class ProblemDeployer {
     }
 
     /**
-     * Generate all possible libinteractive templates.
+     * Process the result of the git operation.
      *
-     * This sets the privateTreeHash field. It also sets the list of updated
-     * statement languages, as well as updating the libinteractive template
-     * files if needed.
+     * This sets the privateTreeHash and publishedCommit fields. It also sets
+     * the list of updated statement languages, as well as updating the
+     * libinteractive template files if needed.
      *
      * @param array $result the JSON from omegaup-gitserver.
      *
@@ -81,6 +82,9 @@ class ProblemDeployer {
             foreach ($result['updated_refs'] as $ref) {
                 if ($ref['name'] == 'refs/heads/private') {
                     $this->privateTreeHash = $ref['to_tree'];
+                }
+                if ($ref['name'] == 'refs/heads/published') {
+                    $this->publishedCommit = $ref['to'];
                 }
             }
         }
@@ -106,9 +110,7 @@ class ProblemDeployer {
                 }
             }
         }
-        if ($updatedExamples || $updatedInteractiveFiles) {
-            $this->generateLibinteractiveTemplates();
-        }
+        $this->generateLibinteractiveTemplates();
     }
 
     /**
@@ -120,7 +122,10 @@ class ProblemDeployer {
      * @return void
      */
     private function generateLibinteractiveTemplates() {
-        $problemArtifacts = new ProblemArtifacts($this->alias);
+        if (is_null($this->publishedCommit)) {
+            return;
+        }
+        $problemArtifacts = new ProblemArtifacts($this->alias, $this->publishedCommit);
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
             JSON_OBJECT_AS_ARRAY
@@ -151,8 +156,8 @@ class ProblemDeployer {
                     $problemArtifacts->get("examples/{$filename}.in")
                 );
             }
-            $target = TEMPLATES_PATH . "/{$this->alias}";
-            @mkdir($target);
+            $target = TEMPLATES_PATH . "/{$this->alias}/{$this->publishedCommit}";
+            @mkdir($target, 0755, true);
             $args = ['/usr/bin/java', '-Xmx64M', '-jar',
                 '/usr/share/java/libinteractive.jar', 'generate-all', $idlPath,
                 '--package-directory', $target, '--package-prefix',

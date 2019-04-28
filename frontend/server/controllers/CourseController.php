@@ -521,9 +521,16 @@ class CourseController extends Controller {
             $points = (int)$r['points'];
         }
 
+        [$masterCommit, $currentVersion] = ProblemController::resolveCommit(
+            $problem,
+            $r['commit']
+        );
+
         ProblemsetController::addProblem(
             $problemSet->problemset_id,
             $problem,
+            $masterCommit,
+            $currentVersion,
             $r['current_identity_id'],
             $points
         );
