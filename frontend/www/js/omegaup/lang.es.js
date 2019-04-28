@@ -1005,6 +1005,7 @@ const translations = {
 	wordsNominator: "Nominador",
 	wordsNumHomeworks: "N\u00famero de tareas",
 	wordsNumTests: "N\u00famero de ex\u00e1menes",
+	wordsOn: "en",
 	wordsOnly: "S\u00f3lo",
 	wordsOptional: "Opcional",
 	wordsOrderBy: "Ordenar por",
