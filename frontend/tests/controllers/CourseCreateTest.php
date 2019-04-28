@@ -163,18 +163,18 @@ class CourseCreateTest extends OmegaupTestCase {
         // Create 3 problems
         $nProblems = 3;
         $pointsTotal = 0;
-        $problemsData = array();
+        $problemsData = [];
         for ($i = 1; $i <= $nProblems; $i++) {
             $problem = ProblemsFactory::createProblem(new ProblemParams([
                 'visibility' => 1,
                 'user' => $user
-            ]), $login); 
+            ]), $login);
 
             $problemsData[$i]['alias'] = $problem['request']['problem_alias'];
             $problemsData[$i]['points'] = $i;
             $pointsTotal += $i;
         }
-        
+
         // Create the assignment
         $login = self::login($user);
         $assignmentAlias = Utils::CreateRandomString();
@@ -195,7 +195,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $course = CoursesDAO::getByAlias($courseAlias);
         $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         $this->assertNotNull($assignment);
-        
+
         // Check problems were added to the underlying problemset
         $problems = ProblemsetProblemsDAO::getByProblemset($assignment->problemset_id);
         $this->assertEquals($nProblems, count($problems));
