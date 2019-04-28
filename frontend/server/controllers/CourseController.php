@@ -102,8 +102,8 @@ class CourseController extends Controller {
                     throw new NotFoundException('problemNotFound');
                 }
 
-                if (!Validators::isNumber($problemData->points, 'points')) {
-                    throw new InvalidParameterException('parameterEmpty', 'problems');
+                if (isset($problemData->points) && !is_numeric($problemData->points)) {
+                    throw new InvalidParameterException('parameterNotANumber', 'points');
                 }
             }
         }
@@ -415,7 +415,7 @@ class CourseController extends Controller {
                         $r['course'],
                         $problemset,
                         $problem,
-                        $problemData->points
+                        isset($problemData->points) ? $problemData->points : null
                     );
                 }
             }
@@ -535,7 +535,11 @@ class CourseController extends Controller {
         Problemsets $problemSet,
         Problems $problem,
         $points
-    ) {
+    ) {        
+        if (!is_numeric($points)) {
+            $points = 100;
+        }
+
         ProblemsetController::addProblem(
             $problemSet->problemset_id,
             $problem,
@@ -587,12 +591,13 @@ class CourseController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        $points = 100;
-        if (is_numeric($r['points'])) {
-            $points = (int)$r['points'];
-        }
-
-        self::addProblemToAssignmentProblemset($r['current_identity_id'], $r['assignment_alias'], $r['course'], $problemSet, $problem, $points);
+        self::addProblemToAssignmentProblemset(
+            $r['current_identity_id'], 
+            $r['assignment_alias'], 
+            $r['course'], 
+            $problemSet, 
+            $problem, 
+            $r['points']);
         return ['status' => 'ok'];
     }
 

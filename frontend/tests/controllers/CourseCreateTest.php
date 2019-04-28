@@ -142,7 +142,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $this->assertEquals($points, $problems[0]->points);
     }
 
-    public function testCreateSchoolAssignmentWithProblems() {
+    private function createSchoolAssignmentWithProblems($usePoints = true) {
         // Create a test course
         $user = UserFactory::createUser();
         $courseAlias = Utils::CreateRandomString();
@@ -171,8 +171,13 @@ class CourseCreateTest extends OmegaupTestCase {
             ]), $login);
 
             $problemsData[$i]['alias'] = $problem['request']['problem_alias'];
-            $problemsData[$i]['points'] = $i;
-            $pointsTotal += $i;
+                
+            if ($usePoints) {
+                $problemsData[$i]['points'] = $i;
+                $pointsTotal += $i;
+            } else {
+                $pointsTotal += 100;
+            }
         }
 
         // Create the assignment
@@ -200,6 +205,14 @@ class CourseCreateTest extends OmegaupTestCase {
         $problems = ProblemsetProblemsDAO::getByProblemset($assignment->problemset_id);
         $this->assertEquals($nProblems, count($problems));
         $this->assertEquals($pointsTotal, $assignment->max_points);
+    }
+
+    public function testCreateSchoolAssignmentWithProblemsNoPoints() {
+        $this->createSchoolAssignmentWithProblems(false /* usePoints */);
+    } 
+    
+    public function testCreateSchoolAssignmentWithProblems() {
+        $this->createSchoolAssignmentWithProblems();
     }
 
     /**
