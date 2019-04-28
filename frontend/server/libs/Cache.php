@@ -127,7 +127,7 @@ class Cache {
     const CONTESTANT_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-';
     const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-';
     const CONTEST_INFO = 'contest-info-';
-    const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-';
+    const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
     const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
