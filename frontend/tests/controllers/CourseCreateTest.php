@@ -171,7 +171,7 @@ class CourseCreateTest extends OmegaupTestCase {
             ]), $login);
 
             $problemsData[$i]['alias'] = $problem['request']['problem_alias'];
-                
+
             if ($usePoints) {
                 $problemsData[$i]['points'] = $i;
                 $pointsTotal += $i;
@@ -209,8 +209,8 @@ class CourseCreateTest extends OmegaupTestCase {
 
     public function testCreateSchoolAssignmentWithProblemsNoPoints() {
         $this->createSchoolAssignmentWithProblems(false /* usePoints */);
-    } 
-    
+    }
+
     public function testCreateSchoolAssignmentWithProblems() {
         $this->createSchoolAssignmentWithProblems();
     }

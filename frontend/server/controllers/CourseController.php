@@ -535,7 +535,7 @@ class CourseController extends Controller {
         Problemsets $problemSet,
         Problems $problem,
         $points
-    ) {        
+    ) {
         if (!is_numeric($points)) {
             $points = 100;
         }
@@ -592,12 +592,13 @@ class CourseController extends Controller {
         }
 
         self::addProblemToAssignmentProblemset(
-            $r['current_identity_id'], 
-            $r['assignment_alias'], 
-            $r['course'], 
-            $problemSet, 
-            $problem, 
-            $r['points']);
+            $r['current_identity_id'],
+            $r['assignment_alias'],
+            $r['course'],
+            $problemSet,
+            $problem,
+            $r['points']
+        );
         return ['status' => 'ok'];
     }
 
