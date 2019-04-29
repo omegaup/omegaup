@@ -155,15 +155,8 @@ class ProblemController extends Controller {
         $problem = new Problems([
             'visibility' => $r['visibility'], /* private by default */
             'title' => $r['title'],
-            'validator' => $r['validator'],
-            'time_limit' => $r['time_limit'],
-            'validator_time_limit' => $r['validator_time_limit'],
-            'overall_wall_time_limit' => $r['overall_wall_time_limit'],
-            'extra_wall_time' => $r['extra_wall_time'],
-            'memory_limit' => $r['memory_limit'],
-            'output_limit' => $r['output_limit'],
-            'input_limit' => $r['input_limit'],
             'visits' => 0,
+            'input_limit' => $r['input_limit'],
             'submissions' => 0,
             'accepted' => 0,
             'difficulty' => 0,
@@ -172,10 +165,10 @@ class ProblemController extends Controller {
             'alias' => $r['problem_alias'],
             'languages' => $r['languages'],
             'email_clarifications' => $r['email_clarifications'],
-            'tolerance' => 1e-9,
         ]);
 
-        $problemSettings = self::getProblemSettings($problem);
+        $problemSettings = self::getDefaultProblemSettings();
+        self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $r['languages'] !== '';
 
         $acl = new ACLs();
@@ -725,14 +718,7 @@ class ProblemController extends Controller {
         $valueProperties = [
             'visibility',
             'title',
-            'validator'     => ['important' => true], // requires rejudge
-            'time_limit'    => ['important' => true], // requires rejudge
-            'validator_time_limit'    => ['important' => true], // requires rejudge
-            'overall_wall_time_limit' => ['important' => true], // requires rejudge
-            'extra_wall_time' => ['important' => true], // requires rejudge
-            'memory_limit'  => ['important' => true], // requires rejudge
-            'output_limit'  => ['important' => true], // requires rejudge
-            'input_limit'  => ['important' => true], // requires rejudge
+            'input_limit',
             'email_clarifications',
             'source',
             'order',
@@ -746,7 +732,10 @@ class ProblemController extends Controller {
             'rejudged' => false
         ];
 
-        $problemSettings = self::getProblemSettings($problem);
+        $problemSettings = self::getProblemSettingsDistrib($problem);
+        unset($problemSettings['cases']);
+        unset($problemSettings['slow']);
+        self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $problem->languages !== '';
         $updatedStatementLanguages = [];
 
@@ -771,12 +760,14 @@ class ProblemController extends Controller {
                 $operation,
                 $problemSettings
             );
-            $response['rejudged'] = $problemDeployer->requiresRejudge;
-            if ($problemDeployer->requiresRejudge) {
+            $response['rejudged'] = false;
+            if (!is_null($problemDeployer->privateTreeHash) &&
+                $problem->current_version != $problemDeployer->privateTreeHash
+            ) {
                 $problem->current_version = $problemDeployer->privateTreeHash;
-                // TODO(lhchavez): Stop updating the problemsets and runs.
-                ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+                $response['rejudged'] = true;
                 RunsDAO::updateVersionToCurrent($problem);
+                ProblemsetProblemsDAO::updateVersionToCurrent($problem);
             }
             $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
 
@@ -803,7 +794,14 @@ class ProblemController extends Controller {
         if ($response['rejudged'] && OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
-                self::apiRejudge($r);
+                $runs = RunsDAO::getNewRunsForVersion($problem);
+                Grader::getInstance()->rejudge($runs, false);
+
+                // Expire details of the runs
+                foreach ($runs as $run) {
+                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                }
+                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
             } catch (Exception $e) {
                 self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
             }
@@ -1079,14 +1077,36 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Gets the distributable problem settings for the problem, using the cache
+     * if needed.
+     *
+     * @param Problems $problem the problem.
+     * @return array the problem settings.
+     */
+    private static function getProblemSettingsDistrib(Problems $problem) : array {
+        $problemSettingsDistrib = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SETTINGS_DISTRIB,
+            $problem->alias,
+            $problem,
+            'ProblemController::getProblemSettingsDistribImpl',
+            $problemSettingsDistrib,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+        return $problemSettingsDistrib;
+    }
+
+    /**
      * Gets the distributable problem settings for the problem.
      *
      * @param Problems $problem
-     * @throws InvalidFilesystemOperationException
+     * @return array the problem settings.
      */
-    public static function getProblemSettingsDistrib(Problems $problem) {
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
-        return $problemArtifacts->get('settings.distrib.json');
+    public static function getProblemSettingsDistribImpl(Problems $problem) : array {
+        return json_decode(
+            (new ProblemArtifacts($problem->alias))->get('settings.distrib.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
     }
 
     /**
@@ -1234,31 +1254,15 @@ class ProblemController extends Controller {
         $response = [];
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
-            'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
-            'memory_limit', 'output_limit', 'input_limit', 'visits', 'submissions',
-            'accepted','difficulty', 'creation_date', 'source', 'order', 'points',
-            'visibility','languages', 'slow', 'email_clarifications'];
+        $relevant_columns = ['title', 'alias', 'input_limit', 'visits', 'submissions',
+            'accepted', 'difficulty', 'creation_date', 'source', 'order', 'points',
+            'visibility', 'languages', 'email_clarifications'];
 
         $response['statement'] = ProblemController::getProblemStatement(
             $problem['problem']->alias,
             $r['lang']
         );
-
-        // Add the problem distributable settings.
-        $problemSettingsDistrib = null;
-        Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SETTINGS_DISTRIB,
-            $problem['problem']->alias,
-            $problem['problem'],
-            'ProblemController::getProblemSettingsDistrib',
-            $problemSettingsDistrib,
-            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
-        );
-        $response['settings'] = json_decode(
-            $problemSettingsDistrib,
-            JSON_OBJECT_AS_ARRAY
-        );
+        $response['settings'] = ProblemController::getProblemSettingsDistrib($problem['problem']);
 
         // Add preferred language of the user.
         $user_data = [];
@@ -1380,6 +1384,157 @@ class ProblemController extends Controller {
         $response['status'] = 'ok';
         $response['exists'] = true;
         return $response;
+    }
+
+    /**
+     * Entry point for Problem Versions API
+     *
+     * @param Request $r
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiVersions(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        return [
+            'status' => 'ok',
+            'published' => (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
+            'current_version' => $problem->current_version,
+            'master' => (new ProblemArtifacts($problem->alias, 'master'))->log(),
+            'private' => (new ProblemArtifacts($problem->alias, 'private'))->log(),
+        ];
+    }
+
+    /**
+     * Entry point for Problem select version API
+     *
+     * @param Request $r
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiSelectVersion(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+        if ($problem->current_version == $r['version']) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+
+        $log = (new ProblemArtifacts($problem->alias, 'master'))->log();
+        $masterCommit = null;
+        foreach ($log as $logEntry) {
+            if (count($logEntry['parents']) < 3) {
+                // Master commits always have 3 or 4 parents. If they have
+                // fewer, it's one of the commits in the merged branches.
+                continue;
+            }
+            if ($logEntry['commit'] == $r['commit']) {
+                $masterCommit = $logEntry;
+                break;
+            }
+        }
+        if (is_null($masterCommit)) {
+            throw new NotFoundException('problemVersionNotFound');
+        }
+
+        // The private branch is always the last parent.
+        $privateCommitHash = $masterCommit['parents'][count($masterCommit['parents']) - 1];
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $privateCommitHash);
+        $privateCommit = $problemArtifacts->commit();
+
+        // Update problem fields.
+        $problem->current_version = $privateCommit['tree'];
+        $problemSettings = json_decode(
+            $problemArtifacts->get('settings.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
+
+        $problemDeployer = new ProblemDeployer($problem->alias);
+        try {
+            // Begin transaction
+            DAO::transBegin();
+            $problemDeployer->updatePublished(
+                (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
+                $masterCommit['commit'],
+                $r['current_user']
+            );
+            ProblemsDAO::update($problem);
+            RunsDAO::updateVersionToCurrent($problem);
+            ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+
+            DAO::transEnd();
+        } catch (ApiException $e) {
+            // Operation failed in the data layer, rollback transaction
+            DAO::transRollback();
+
+            throw $e;
+        } catch (Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            DAO::transRollback();
+            self::$log->error('Failed to update problem: ', $e);
+
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
+            self::$log->info('Calling ProblemController::apiRejudge');
+            try {
+                $runs = RunsDAO::getNewRunsForVersion($problem);
+                Grader::getInstance()->rejudge($runs, false);
+
+                // Expire details of the runs
+                foreach ($runs as $run) {
+                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                }
+                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
+            } catch (Exception $e) {
+                self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
+            }
+        }
+        $updatedStatementLanguages = [];
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        foreach ($problemArtifacts->lsTree('statements') as $file) {
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if ($extension != 'markdown') {
+                continue;
+            }
+            $updatedStatementLanguages[] = pathinfo($file['name'], PATHINFO_FILENAME);
+        }
+        self::invalidateCache($problem, $updatedStatementLanguages);
+
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**
@@ -1971,38 +2126,64 @@ class ProblemController extends Controller {
         }
     }
 
-    /**
-     * Converts the Problem's settings into something that
-     * omegaup-gitserver can use.
-     *
-     * @param Problems $problem the problem
-     * @return Array an array that can be serialized into the JSON form of
-     *               quark's common.ProblemSettings.
-     */
-    private static function getProblemSettings(Problems $problem) {
-        $problemSettings = [
-            'Limits' => [
-                'ExtraWallTime' => (int)$problem->extra_wall_time . 'ms',
-                'MemoryLimit' => (int)$problem->memory_limit * 1024,
-                'OutputLimit' => (int)$problem->output_limit,
-                'OverallWallTimeLimit' => (
-                    (int)$problem->overall_wall_time_limit . 'ms'
-                ),
-                'TimeLimit' => (int)$problem->time_limit . 'ms',
+    private static function getDefaultProblemSettings() : array {
+        return [
+            'limits' => [
+                'ExtraWallTime' => '0s',
+                'MemoryLimit' => '64MiB',
+                'OutputLimit' => '10240KiB',
+                'OverallWallTimeLimit' => '30s',
+                'TimeLimit' => '1s',
             ],
-            'Validator' => [
-                'Name' => $problem->validator,
-                'Tolerance' => (float)$problem->tolerance,
-                'Limits' => [
-                    'ExtraWallTime' => '0s',
-                    'MemoryLimit' => 256 * 1024 * 1024,
-                    'OutputLimit' => 10 * 1024,
-                    'OverallWallTimeLimit' => '5s',
-                    'TimeLimit' => (int)$problem->validator_time_limit . 'ms',
-                ],
+            'validator' => [
+                'name' => 'token-caseless',
+                'tolerance' => 1e-9,
             ],
         ];
+    }
 
-        return $problemSettings;
+    /**
+     * Updates the Problem's settings with the values from the request.
+     *
+     * @param array $problemSettings the original problem settings.
+     * @param Request $r the request
+     */
+    private static function updateProblemSettings(array &$problemSettings, Request $r) : void {
+        if (!is_null($r['extra_wall_time'])) {
+            $problemSettings['limits']['ExtraWallTime'] = (int)$r['extra_wall_time'] . 'ms';
+        }
+        if (!is_null($r['memory_limit'])) {
+            $problemSettings['limits']['MemoryLimit'] = (int)$r['memory_limit'] . 'KiB';
+        }
+        if (!is_null($r['output_limit'])) {
+            $problemSettings['limits']['OutputLimit'] = (int)$r['output_limit'];
+        }
+        if (!is_null($r['overall_wall_time_limit'])) {
+            $problemSettings['limits']['OverallWallTimeLimit'] = (
+                (int)$r['overall_wall_time_limit'] . 'ms'
+            );
+        }
+        if (!is_null($r['time_limit'])) {
+            $problemSettings['limits']['TimeLimit'] = (int)$r['time_limit'] . 'ms';
+        }
+        if (!is_null($r['validator'])) {
+            $problemSettings['validator']['name'] = $r['validator'];
+        }
+        if ($problemSettings['validator']['name'] == 'custom') {
+            if (is_null($problemSettings['validator']['limits'])) {
+                $problemSettings['validator']['limits'] = [
+                    'ExtraWallTime' => '0s',
+                    'MemoryLimit' => '256MiB',
+                    'OutputLimit' => '10KiB',
+                    'OverallWallTimeLimit' => '5s',
+                    'TimeLimit' => '30s',
+                ];
+            }
+            if (!is_null($r['validator_time_limit'])) {
+                $problemSettings['validator']['limits']['TimeLimit'] = (int)$r['validator_time_limit'] . 'ms';
+            }
+        } else {
+            unset($problemSettings['validator']['limits']);
+        }
     }
 }

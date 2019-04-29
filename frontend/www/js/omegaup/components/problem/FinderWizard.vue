@@ -164,7 +164,7 @@ export default {
   },
   data: function() {
     return {
-      T, karel: true, selectedTags:[], difficultyRange:[0, 4],
+      T, karel: false, selectedTags:[], difficultyRange:[0, 4],
           sliderMarks:
               {
                 '0': T.qualityFormDifficultyVeryEasy,

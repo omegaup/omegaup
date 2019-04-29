@@ -376,13 +376,23 @@ omegaup.OmegaUp.on('ready', function() {
               omegaup.T.problemEditGoToProblem + '</a>');
     $('input[name=title]').val(problem.title);
     $('#statement-preview .title').html(omegaup.UI.escape(problem.title));
-    $('input[name=time_limit]').val(problem.time_limit);
-    $('input[name=validator_time_limit]').val(problem.validator_time_limit);
+    $('input[name=time_limit]')
+        .val(omegaup.UI.parseDuration(problem.settings.limits.TimeLimit));
+    if (problem.settings.validator.limits) {
+      $('input[name=validator_time_limit]')
+          .val(omegaup.UI.parseDuration(
+              problem.settings.validator.limits.TimeLimit));
+    } else {
+      $('input[name=validator_time_limit]').val(0);
+    }
     $('input[name=overall_wall_time_limit]')
-        .val(problem.overall_wall_time_limit);
-    $('input[name=extra_wall_time]').val(problem.extra_wall_time);
-    $('input[name=memory_limit]').val(problem.memory_limit);
-    $('input[name=output_limit]').val(problem.output_limit);
+        .val(omegaup.UI.parseDuration(
+            problem.settings.limits.OverallWallTimeLimit));
+    $('input[name=extra_wall_time]')
+        .val(omegaup.UI.parseDuration(problem.settings.limits.ExtraWallTime));
+    $('input[name=memory_limit]')
+        .val(problem.settings.limits.MemoryLimit / 1024);
+    $('input[name=output_limit]').val(problem.settings.limits.OutputLimit);
     $('input[name=input_limit]').val(problem.input_limit);
     $('input[name=source]').val(problem.source);
     $('#statement-preview .source').html(omegaup.UI.escape(problem.source));
@@ -392,7 +402,7 @@ omegaup.OmegaUp.on('ready', function() {
     $('input[name=email_clarifications][value=' + problem.email_clarifications +
       ']')
         .attr('checked', 1);
-    $('select[name=validator]').val(problem.validator);
+    $('select[name=validator]').val(problem.settings.validator.name);
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {

@@ -11,11 +11,11 @@ export default {
   },
   props: {
     stats: Object,
-    contestAlias: String,
+    title: String,
   },
   mounted: function() {
     this.distributionChart =
-        oGraph.distributionChart(this.$el, this.contestAlias, this.stats);
+        oGraph.distributionChart(this.$el, this.title, this.stats);
   },
   watch: {
     stats: function() {

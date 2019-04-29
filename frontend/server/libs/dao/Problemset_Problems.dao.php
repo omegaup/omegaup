@@ -12,12 +12,19 @@ include('base/Problemset_Problems.vo.base.php');
 class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     final public static function getProblems($problemset_id) {
         // Build SQL statement
-        $sql = 'SELECT p.problem_id, p.title, p.alias, p.time_limit, p.overall_wall_time_limit, '.
-               'p.memory_limit, p.languages, pp.points, pp.order, pp.version ' .
-               'FROM Problems p ' .
-               'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
-               'WHERE pp.problemset_id = ? ' .
-               'ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
+        $sql = '
+            SELECT
+                p.problem_id, p.title, p.alias, p.languages, pp.points,
+                pp.order, pp.version
+            FROM
+                Problems p
+            INNER JOIN
+                Problemset_Problems pp ON pp.problem_id = p.problem_id
+            WHERE
+                pp.problemset_id = ?
+            ORDER BY
+                pp.`order`, `pp`.`problem_id` ASC;
+        ';
         $val = [$problemset_id];
 
         global $conn;
@@ -147,11 +154,6 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         $sql = 'SELECT
                     p.title,
                     p.alias,
-                    p.validator,
-                    p.time_limit,
-                    p.overall_wall_time_limit,
-                    p.extra_wall_time,
-                    p.memory_limit,
                     p.visits,
                     p.submissions,
                     p.accepted,
@@ -202,17 +204,43 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      * version.
      *
      * @param Problems $problem the problem.
-     * @return integer the number of affected rows.
      */
-    final public static function updateVersionToCurrent(Problems $problem) {
-        $sql = 'UPDATE
-                    Problemset_Problems
-                SET
-                    version = ?
-                WHERE
-                    problem_id = ?;';
+    final public static function updateVersionToCurrent(Problems $problem) : void {
         global $conn;
+
+        $sql = '
+            UPDATE
+                Problemset_Problems pp
+            INNER JOIN
+                Problemsets p
+            ON
+                p.problemset_id = pp.problemset_id
+            SET
+                pp.version = ?
+            WHERE
+                pp.problem_id = ?;
+        ';
         $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
-        return $conn->Affected_Rows();
+
+        $sql = '
+            UPDATE
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.submission_id = s.submission_id
+            INNER JOIN
+                Problemset_Problems pp
+            ON
+                pp.problemset_id = s.problemset_id AND
+                pp.problem_id = s.problem_id AND
+                pp.version = r.version
+            SET
+                s.current_run_id = r.run_id
+            WHERE
+                r.version = ? AND
+                s.problem_id = ?;
+        ';
+        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 }

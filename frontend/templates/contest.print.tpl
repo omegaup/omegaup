@@ -28,13 +28,13 @@
             <td>{#wordsPoints#}</td>
             <td class="points">{$problem.points}</div>
             <td>{#arenaCommonMemoryLimit#}</td>
-            <td class="memory_limit">{$problem.memory_limit / 1024} MiB</td>
+            <td class="memory_limit">{$problem.payload.settings.limits.MemoryLimit / 1024 / 1024} MiB</td>
           </tr>
           <tr>
             <td>{#arenaCommonTimeLimit#}</td>
-            <td class="time_limit">{$problem.time_limit / 1000} s</td>
+            <td class="time_limit">{$problem.payload.settings.limits.TimeLimit|escape}</td>
             <td>{#arenaCommonOverallWallTimeLimit#}</td>
-            <td class="time_limit">{$problem.overall_wall_time_limit / 1000} s</td>
+            <td class="time_limit">{$problem.payload.settings.limits.OverallWallTimeLimit|escape}</td>
           </tr>
         </table>
       </div>

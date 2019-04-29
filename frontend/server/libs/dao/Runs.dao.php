@@ -755,23 +755,71 @@ class RunsDAO extends RunsDAOBase {
      * Update the version of the runs of a problem to the current version.
      *
      * @param Problems $problem the problem.
-     * @return integer the number of affected rows.
      */
-    final public static function updateVersionToCurrent(Problems $problem) {
+    final public static function updateVersionToCurrent(Problems $problem) : void {
+        global $conn;
+
+        $sql = '
+            INSERT IGNORE INTO
+                Runs (
+                    submission_id, version, verdict
+                )
+            SELECT
+                s.submission_id, ?, "JE"
+            FROM
+                Submissions s
+            WHERE
+                s.problem_id = ?
+            ORDER BY
+                s.submission_id;
+        ';
+        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+
         $sql = '
             UPDATE
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.submission_id = s.submission_id
+            SET
+                s.current_run_id = r.run_id
+            WHERE
+                s.problemset_id IS NULL AND
+                r.version = ? AND
+                s.problem_id = ?;
+        ';
+        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+    }
+
+    /**
+     * Gets the runs that were inserted due to a version change.
+     *
+     * @param Problems $problem the problem.
+     */
+    final public static function getNewRunsForVersion(Problems $problem) : array {
+        global $conn;
+
+        $sql = '
+            SELECT
+                r.run_id
+            FROM
                 Runs r
             INNER JOIN
                 Submissions s
             ON
                 s.submission_id = r.submission_id
-            SET
-                r.version = ?
             WHERE
+                r.status = "new" AND
+                r.version = ? AND
                 s.problem_id = ?;
         ';
-        global $conn;
-        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
-        return $conn->Affected_Rows();
+        $params = [$problem->current_version, $problem->problem_id];
+
+        $result = [];
+        foreach ($conn->Execute($sql, $params) as $row) {
+            $result[] = new Runs($row);
+        }
+        return $result;
     }
 }

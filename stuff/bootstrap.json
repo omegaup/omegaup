@@ -219,6 +219,14 @@
 			{
 				"api": "/user/create",
 				"params": {
+					"username": "test_user_5",
+					"email": "test_user_5@localhost.localdomain",
+					"password": "test_user_5"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
 					"username": "course_test_user_0",
 					"email": "course_test_user_0@localhost.localdomain",
 					"password": "course_test_user_0"
@@ -388,6 +396,30 @@
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
+					"language": "py",
+					"source": "syntax error"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_4",
+		"password": "test_user_4",
+		"requests": [
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos",
 					"language": "py",
 					"source": "syntax error"
 				}

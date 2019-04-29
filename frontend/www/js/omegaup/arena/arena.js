@@ -1329,10 +1329,11 @@ export class Arena {
         $('#problem > .title')
             .text(problem.letter + '. ' + UI.escape(problem.title));
         $('#problem .data .points').text(problem.points);
-        $('#problem .memory_limit').text(problem.memory_limit / 1024 + 'MB');
-        $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
+        $('#problem .memory_limit')
+            .text((problem.settings.limits.MemoryLimit / 1024 / 1024) + ' MiB');
+        $('#problem .time_limit').text(problem.settings.limits.TimeLimit);
         $('#problem .overall_wall_time_limit')
-            .text(problem.overall_wall_time_limit / 1000 + 's');
+            .text(problem.settings.limits.OverallWallTimeLimit);
         $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
         self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));

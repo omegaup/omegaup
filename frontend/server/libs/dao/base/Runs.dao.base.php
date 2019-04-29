@@ -48,15 +48,10 @@ abstract class RunsDAOBase {
      * @param Runs [$Runs] El objeto de tipo Runs a actualizar.
      */
     final public static function update(Runs $Runs) {
-        $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `submit_delay` = ?, `judged_by` = ?, `type` = ? WHERE `run_id` = ?;';
+        $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `judged_by` = ? WHERE `run_id` = ?;';
         $params = [
             $Runs->submission_id,
             $Runs->version,
-            $Runs->identity_id,
-            $Runs->problem_id,
-            $Runs->problemset_id,
-            $Runs->guid,
-            $Runs->language,
             $Runs->status,
             $Runs->verdict,
             $Runs->runtime,
@@ -65,9 +60,7 @@ abstract class RunsDAOBase {
             $Runs->score,
             $Runs->contest_score,
             $Runs->time,
-            $Runs->submit_delay,
             $Runs->judged_by,
-            $Runs->type,
             $Runs->run_id,
         ];
         global $conn;
@@ -88,7 +81,7 @@ abstract class RunsDAOBase {
         if (is_null($run_id)) {
             return null;
         }
-        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`identity_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`judged_by`, `Runs`.`type` FROM Runs WHERE (run_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
         $params = [$run_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
@@ -143,7 +136,7 @@ abstract class RunsDAOBase {
      * @return Array Un arreglo que contiene objetos del tipo {@link Runs}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`identity_id`, `Runs`.`problem_id`, `Runs`.`problemset_id`, `Runs`.`guid`, `Runs`.`language`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`submit_delay`, `Runs`.`judged_by`, `Runs`.`type` from Runs';
+        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` from Runs';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -188,21 +181,10 @@ abstract class RunsDAOBase {
         if (is_null($Runs->time)) {
             $Runs->time = gmdate('Y-m-d H:i:s');
         }
-        if (is_null($Runs->submit_delay)) {
-            $Runs->submit_delay = '0';
-        }
-        if (is_null($Runs->type)) {
-            $Runs->type = 'normal';
-        }
-        $sql = 'INSERT INTO Runs (`submission_id`, `version`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `submit_delay`, `judged_by`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Runs->submission_id,
             $Runs->version,
-            $Runs->identity_id,
-            $Runs->problem_id,
-            $Runs->problemset_id,
-            $Runs->guid,
-            $Runs->language,
             $Runs->status,
             $Runs->verdict,
             $Runs->runtime,
@@ -211,9 +193,7 @@ abstract class RunsDAOBase {
             $Runs->score,
             $Runs->contest_score,
             $Runs->time,
-            $Runs->submit_delay,
             $Runs->judged_by,
-            $Runs->type,
         ];
         global $conn;
         $conn->Execute($sql, $params);

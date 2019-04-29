@@ -6,7 +6,7 @@
  * @author lhchavez
  */
 class ProblemArtifacts {
-    public function __construct(string $alias, string $commit = 'HEAD') {
+    public function __construct(string $alias, string $commit = 'published') {
         $this->log = Logger::getLogger('ProblemArtifacts');
         $this->alias = $alias;
         $this->commit = $commit;
@@ -54,6 +54,45 @@ class ProblemArtifacts {
         return $entries;
     }
 
+    public function commit() : array {
+        $browser = new GitServerBrowser(
+            $this->alias,
+            GitServerBrowser::buildShowCommitURL($this->alias, $this->commit)
+        );
+        $browser->headers[] = 'Accept: application/json';
+        $response = json_decode($browser->exec(), JSON_OBJECT_AS_ARRAY);
+        if (!is_iterable($response)) {
+            $this->log->error(
+                "Invalid commit for problem {$this->alias} at commit {$this->commit}"
+            );
+            return [];
+        }
+        return $response;
+    }
+
+    public function log() : array {
+        $browser = new GitServerBrowser(
+            $this->alias,
+            GitServerBrowser::buildLogURL($this->alias, $this->commit)
+        );
+        $browser->headers[] = 'Accept: application/json';
+        $response = json_decode($browser->exec(), JSON_OBJECT_AS_ARRAY);
+        if (!array_key_exists('log', $response)) {
+            $this->log->error(
+                "Failed to get log for problem {$this->alias} at commit {$this->commit}"
+            );
+            return [];
+        }
+        $logEntries = $response['log'];
+        if (!is_iterable($logEntries)) {
+            $this->log->error(
+                "Invalid log for problem {$this->alias} at commit {$this->commit}"
+            );
+            return [];
+        }
+        return $logEntries;
+    }
+
     public function download() {
         $browser = new GitServerBrowser(
             $this->alias,
@@ -91,11 +130,25 @@ class GitServerBrowser {
         return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$commit}/{$path}";
     }
 
+    public static function buildShowCommitURL(
+        string $alias,
+        string $commit
+    ) {
+        return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$commit}";
+    }
+
     public static function buildArchiveURL(
         string $alias,
         string $commit
     ) {
         return OMEGAUP_GITSERVER_URL . "/{$alias}/+archive/{$commit}.zip";
+    }
+
+    public static function buildLogURL(
+        string $alias,
+        string $commit
+    ) {
+        return OMEGAUP_GITSERVER_URL . "/{$alias}/+log/{$commit}";
     }
 
     public function __destruct() {

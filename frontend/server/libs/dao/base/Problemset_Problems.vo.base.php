@@ -71,7 +71,7 @@ class ProblemsetProblems extends VO {
     public $problem_id;
 
     /**
-      * La versión del problema.
+      * El hash SHA1 del árbol de la rama private.
       * @access public
       * @var char(40)
       */
