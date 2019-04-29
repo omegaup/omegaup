@@ -100,7 +100,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                     Problems_Languages ON Problems_Languages.problem_id = p.problem_id
                 INNER JOIN
                     Languages ON Problems_Languages.language_id = Languages.language_id
-                    AND Languages.name = \'' . $language . '\'';
+                    AND Languages.name = \'' . $language . '\'
+            ';
         }
 
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
@@ -125,7 +126,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
                     accepted / GREATEST(1, submissions)     AS ratio,
                     ROUND(100 * COALESCE(ps.score, 0))      AS score,
-                    p.*';
+                    p.*
+            ';
             $sql = '
                 FROM
                     Problems p
@@ -144,7 +146,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                         Submissions.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
-                    ) ps ON ps.problem_id = p.problem_id' . $language_join;
+                    ) ps ON ps.problem_id = p.problem_id ' . $language_join;
 
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
             if (is_array($programming_languages)) {
@@ -170,7 +172,8 @@ class ProblemsDAO extends ProblemsDAOBase {
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
                     ROUND(100 * COALESCE(ps.score, 0), 2)   AS score,
-                    p.*';
+                    p.*
+            ';
             $sql = '
                 FROM
                     Problems p
@@ -206,7 +209,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gi.group_id
                     WHERE gi.identity_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id' . $language_join;
+                ) gr ON p.acl_id = gr.acl_id ' . $language_join;
             $args[] = $identity_id;
             $args[] = $user_id;
             $args[] = Authorization::ADMIN_ROLE;
@@ -224,13 +227,14 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $args = array_merge($args, $difficulty_range);
             }
             $sql .= '
-                (p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?';
+                (p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?
+            ';
             $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
             $args[] = $identity_id;
             $args[] = ProblemController::VISIBILITY_DELETED;
 
             if (!is_null($query)) {
-                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
+                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%')) ";
                 $args[] = $query;
                 $args[] = $query;
             }
@@ -239,11 +243,11 @@ class ProblemsDAO extends ProblemsDAOBase {
                     SELECT
                         0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
-                        accepted / GREATEST(1, p.submissions)   AS ratio,
-                        p.*';
+                        accepted / GREATEST(1, p.submissions)  AS ratio,
+                        p.* ';
             $sql = '
                     FROM
-                        Problems p' . $language_join;
+                        Problems p ' . $language_join;
 
             self::addTagFilter($identity_type, $identity_id, $tag, $require_all_tags, $sql, $args);
             $sql .= ' p.visibility >= ? ';
@@ -257,7 +261,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 $args = array_merge($args, $difficulty_range);
             }
             if (!is_null($query)) {
-                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
+                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%')) ";
                 $args[] = $query;
                 $args[] = $query;
             }
@@ -271,13 +275,13 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
 
         if ($order == 'problem_id') {
-            $sql .= " ORDER BY p.problem_id $collation $mode";
+            $sql .= " ORDER BY p.problem_id $collation $mode ";
         } elseif ($order == 'points' && $mode == 'desc') {
-            $sql .= ' ORDER BY `points` DESC, `accepted` ASC, `submissions` DESC';
+            $sql .= ' ORDER BY `points` DESC, `accepted` ASC, `submissions` DESC ';
         } else {
-            $sql .= " ORDER BY `$order` $collation $mode";
+            $sql .= " ORDER BY `$order` $collation $mode ";
         }
-        $sql .= ' LIMIT ?, ?';
+        $sql .= ' LIMIT ?, ? ';
         $args[] = $offset;
         $args[] = $rowcount;
         $result = $conn->Execute("$select $sql", $args);

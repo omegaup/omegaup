@@ -144,7 +144,7 @@ class ProblemDeployer {
                     "interactive/Main.distrib.{$distribSettings['interactive']['language']}"
                 )
             );
-            mkdir("{$tmpDir}/examples");
+            @mkdir("{$tmpDir}/examples");
             foreach ($distribSettings['cases'] as $filename => $data) {
                 file_put_contents(
                     "{$tmpDir}/examples/{$filename}.in",
@@ -152,7 +152,7 @@ class ProblemDeployer {
                 );
             }
             $target = TEMPLATES_PATH . "/{$this->alias}";
-            mkdir($target);
+            @mkdir($target);
             $args = ['/usr/bin/java', '-Xmx64M', '-jar',
                 '/usr/share/java/libinteractive.jar', 'generate-all', $idlPath,
                 '--package-directory', $target, '--package-prefix',
