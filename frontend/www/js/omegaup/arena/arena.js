@@ -1167,7 +1167,7 @@ export class Arena {
       {language: 'lua', name: 'Lua'},
       {language: 'kp', name: 'Karel (Pascal)'},
       {language: 'kj', name: 'Karel (Java)'},
-      {language: 'cat', name: T.wordJustOutput},
+      {language: 'cat', name: T.wordsJustOutput},
     ];
 
     let self = this;
