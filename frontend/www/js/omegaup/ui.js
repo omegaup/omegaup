@@ -369,9 +369,7 @@ let UI = {
            '.png" width="16" height="11" title="' + country + '" />';
   },
 
-  formatDateTime: function(date) {
-    return date.toLocaleString(T.locale);
-  },
+  formatDateTime: function(date) { return date.toLocaleString(T.locale); },
 
   formatDate: function(date) { return date.toLocaleDateString(T.locale); },
 
