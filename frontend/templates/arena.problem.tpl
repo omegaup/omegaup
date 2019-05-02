@@ -47,7 +47,8 @@
 					<div class="source">{#wordsSource#}: <span class="source-data">{$source|escape}</span></div>
 {/if}
 {if $problemsetter}
-					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a> {#wordsOn#} {$problemsetter.creation_date|date_format:"%Y/%m/%d"}</div>
+					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
+					<div id="problem-creation-date"></div>
 {/if}
 {if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
 					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
