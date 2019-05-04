@@ -1032,8 +1032,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'OMIROOD1-19' => 60,
-                'OMIROOD2-19' => 60,
+                'OMIROO-Pri-20' => 100,
+                'OMIROO-Sec-20' => 100,
+                'OMIROO-Pre-20' => 300,
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'
