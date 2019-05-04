@@ -7,11 +7,6 @@ omegaup.OmegaUp.on('ready', function() {
 
   function onlyProblemLoaded(problem) {
     arena.renderProblem(problem);
-    $('#problem-creation-date')
-        .text(omegaup.UI.formatString(omegaup.T.wordsUploadedOn, {
-          date: omegaup.UI.formatDate(
-              new Date(problem.problemsetter.creation_date))
-        }));
     arena.myRuns.filter_problem(problem.alias);
     arena.myRuns.attach($('#problem .runs'));
 
