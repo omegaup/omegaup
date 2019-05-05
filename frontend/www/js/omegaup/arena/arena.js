@@ -1469,6 +1469,15 @@ export class Arena {
     let statement = document.querySelector('#problem div.statement');
     statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
         problem.statement.markdown, problem.statement.images);
+    const creationDate =
+        document.querySelector('#problem .problem-creation-date');
+    if (problem.problemsetter && creationDate) {
+      creationDate.innerText =
+          omegaup.UI.formatString(omegaup.T.wordsUploadedOn, {
+            date: omegaup.UI.formatDate(
+                new Date(problem.problemsetter.creation_date * 1000))
+          });
+    }
 
     UI.renderSampleToClipboardButton();
 

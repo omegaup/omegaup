@@ -1295,7 +1295,8 @@ class ProblemController extends Controller {
                 'username' => $problemsetter->username,
                 'name' => is_null($problemsetter->name) ?
                           $problemsetter->username :
-                          $problemsetter->name
+                          $problemsetter->name,
+                'creation_date' => strtotime($response['creation_date']),
             ];
         } else {
             unset($response['source']);
