@@ -686,22 +686,21 @@ class CourseController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        // Construct the relationship entity between the problemset and the problem
-        $problemsetProblem = new ProblemsetProblems([
-            'problemset_id' => $problemSet->problemset_id,
-            'problem_id' => $problem->problem_id,
-        ]);
-
+        // Delete the entry from the database.
         $problemsetProblem = ProblemsetProblemsDAO::getByPK(
-            $problemsetProblem->problemset_id,
-            $problemsetProblem->problem_id
+            $problemSet->problemset_id,
+            $problem->problem_id
         );
-
         if (is_null($problemsetProblem)) {
             throw new NotFoundException('problemNotPartOfAssignment');
         }
-
-        // Delete the entry from the database
+        if (SubmissionsDAO::countTotalRunsOfProblemInProblemset(
+            (int)$problem->problem_id,
+            (int)$problemSet->problemset_id
+        ) > 0 &&
+            !Authorization::isSystemAdmin($r['current_identity_id'])) {
+            throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
+        }
         ProblemsetProblemsDAO::delete($problemsetProblem);
 
         try {

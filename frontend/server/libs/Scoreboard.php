@@ -137,32 +137,30 @@ class Scoreboard {
      * @param  string  $filterUsersBy
      * @return array
      */
-    public function generate($withRunDetails = false, $sortByName = false, $filterUsersBy = null) {
-        $result = null;
-
-        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $this->params['problemset_id']);
-        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $this->params['problemset_id']);
-
-        $canUseContestantCache = !$this->params['admin'] &&
-            !$sortByName &&
-            is_null($filterUsersBy) &&
-            !$this->params['only_ac'];
-
-        $canUseAdminCache = $this->params['admin'] &&
-            !$sortByName &&
-            is_null($filterUsersBy) &&
-            !$this->params['only_ac'];
-
-        // If cache is turned on and we're not looking for admin-only runs
-        if ($canUseContestantCache) {
-            $result = $contestantScoreboardCache->get();
-        } elseif ($canUseAdminCache) {
-            $result = $adminScoreboardCache->get();
-        }
-
-        if (!is_null($result)) {
-            Scoreboard::setIsLastRunFromCacheForTesting(true);
-            return $result;
+    public function generate(
+        bool $withRunDetails = false,
+        bool $sortByName = false,
+        ?string $filterUsersBy = null
+    ) : array {
+        $cache = null;
+        // A few scoreboard options are not cacheable.
+        if (!$sortByName && is_null($filterUsersBy) && !$this->params['only_ac']) {
+            if ($this->params['admin']) {
+                $cache = new Cache(
+                    Cache::ADMIN_SCOREBOARD_PREFIX,
+                    $this->params['problemset_id']
+                );
+            } else {
+                $cache = new Cache(
+                    Cache::CONTESTANT_SCOREBOARD_PREFIX,
+                    $this->params['problemset_id']
+                );
+            }
+            $result = $cache->get();
+            if (!is_null($result)) {
+                Scoreboard::setIsLastRunFromCacheForTesting(true);
+                return $result;
+            }
         }
 
         try {
@@ -217,11 +215,9 @@ class Scoreboard {
             $this->params['auth_token']
         );
 
-        $timeout = max(0, $this->params['finish_time'] - Time::get());
-        if ($canUseContestantCache) {
-            $contestantScoreboardCache->set($result, $timeout);
-        } elseif ($canUseAdminCache) {
-            $adminScoreboardCache->set($result, $timeout);
+        if (!is_null($cache)) {
+            $timeout = max(0, $this->params['finish_time'] - Time::get());
+            $cache->set($result, $timeout);
         }
 
         return $result;
@@ -611,10 +607,10 @@ class Scoreboard {
             if (!$showAllRuns && $testOnly[$identityId] && !$noRuns[$identityId]) {
                 continue;
             }
-            $info = $identitiesInfo[$identityId];
-            if ($info == null) {
+            if (!array_key_exists($identityId, $identitiesInfo)) {
                 continue;
             }
+            $info = $identitiesInfo[$identityId];
             $info[self::TOTAL_COLUMN] = Scoreboard::getTotalScore($info['problems'], $contestPenaltyCalcPolicy);
             array_push($result, $info);
         }
