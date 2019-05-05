@@ -520,10 +520,11 @@ class ProblemController extends Controller {
 
         // Check whether problem exists
         Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::isStringNonEmpty($r['name'], 'name');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-            $tag = TagsDAO::getByName($tagName);
+            $tag = TagsDAO::getByName($r['name']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -538,7 +539,7 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        if (in_array($tag->name, self::RESTRICTED_TAG_NAMES) && !$allowRestricted) {
+        if (in_array($tag->name, self::RESTRICTED_TAG_NAMES)) {
             throw new InvalidParameterException('tagRestricted', 'name');
         }
 
