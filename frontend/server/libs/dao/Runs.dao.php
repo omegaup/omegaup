@@ -417,13 +417,18 @@ class RunsDAO extends RunsDAOBase {
                 s.identity_id, s.type, UNIX_TIMESTAMP(s.time) AS time,
                 s.submit_delay, s.guid
             FROM
+                Problemset_Problems pp
+            INNER JOIN
                 Submissions s
+            ON
+                s.problemset_id = pp.problemset_id AND
+                s.problem_id = pp.problem_id
             INNER JOIN
                 Runs r
             ON
                 s.current_run_id = r.run_id
             WHERE
-                s.problemset_id = ? AND
+                pp.problemset_id = ? AND
                 r.status = \'ready\' AND
                 s.type = \'normal\' AND ' .
                 ($onlyAC ?
