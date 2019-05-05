@@ -5,9 +5,9 @@
       <div>
         {{ totalRuns }}
       </div><omegaup-verdict-chart v-bind:stats="stats"
-           v-bind:title="contestAlias"></omegaup-verdict-chart>
+           v-bind:title="problemAlias"></omegaup-verdict-chart>
            <omegaup-distribution-chart v-bind:stats="stats"
-           v-bind:title="contestAlias"></omegaup-distribution-chart>
+           v-bind:title="problemAlias"></omegaup-distribution-chart>
       <div class="pending-runs-chart"></div>
     </div>
   </div>
@@ -21,7 +21,7 @@ import distribution_chart from '../DistributionChart.vue';
 export default {
   props: {
     stats: Object,
-    contestAlias: String,
+    problemAlias: String,
   },
   computed: {
     totalRuns: function() {

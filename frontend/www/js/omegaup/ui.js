@@ -373,6 +373,34 @@ let UI = {
 
   formatDate: function(date) { return date.toLocaleDateString(T.locale); },
 
+  parseDuration: function(str) {
+    let duration = 0;
+    const durationRegexp =
+        new RegExp('(\\d+(?:\\.\\d+)?)(ns|us|µs|ms|s|m|h)?', 'g');
+    const factor = {
+      'h': 3600000.0,
+      'm': 60000.0,
+      's': 1000.0,
+      'ms': 1.0,
+      'us': 0.001,
+      'µs': 0.001,
+      'ns': 0.000001,
+    };
+    let lastIndex = 0;
+    let match = null;
+    while ((match = durationRegexp.exec(str)) !== null) {
+      if (match.index != lastIndex) {
+        return null;
+      }
+      lastIndex += match[0].length;
+      duration += parseFloat(match[1]) * factor[match[2] || 's'];
+    }
+    if (lastIndex != str.length) {
+      return null;
+    }
+    return Math.round(duration);
+  },
+
   copyToClipboard: function(value) {
     let tempInput = document.createElement('textarea');
 

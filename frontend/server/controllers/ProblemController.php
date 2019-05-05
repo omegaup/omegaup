@@ -155,15 +155,8 @@ class ProblemController extends Controller {
         $problem = new Problems([
             'visibility' => $r['visibility'], /* private by default */
             'title' => $r['title'],
-            'validator' => $r['validator'],
-            'time_limit' => $r['time_limit'],
-            'validator_time_limit' => $r['validator_time_limit'],
-            'overall_wall_time_limit' => $r['overall_wall_time_limit'],
-            'extra_wall_time' => $r['extra_wall_time'],
-            'memory_limit' => $r['memory_limit'],
-            'output_limit' => $r['output_limit'],
-            'input_limit' => $r['input_limit'],
             'visits' => 0,
+            'input_limit' => $r['input_limit'],
             'submissions' => 0,
             'accepted' => 0,
             'difficulty' => 0,
@@ -172,10 +165,10 @@ class ProblemController extends Controller {
             'alias' => $r['problem_alias'],
             'languages' => $r['languages'],
             'email_clarifications' => $r['email_clarifications'],
-            'tolerance' => 1e-9,
         ]);
 
-        $problemSettings = self::getProblemSettings($problem);
+        $problemSettings = self::getDefaultProblemSettings();
+        self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $r['languages'] !== '';
 
         $acl = new ACLs();
@@ -725,14 +718,7 @@ class ProblemController extends Controller {
         $valueProperties = [
             'visibility',
             'title',
-            'validator'     => ['important' => true], // requires rejudge
-            'time_limit'    => ['important' => true], // requires rejudge
-            'validator_time_limit'    => ['important' => true], // requires rejudge
-            'overall_wall_time_limit' => ['important' => true], // requires rejudge
-            'extra_wall_time' => ['important' => true], // requires rejudge
-            'memory_limit'  => ['important' => true], // requires rejudge
-            'output_limit'  => ['important' => true], // requires rejudge
-            'input_limit'  => ['important' => true], // requires rejudge
+            'input_limit',
             'email_clarifications',
             'source',
             'order',
@@ -746,7 +732,10 @@ class ProblemController extends Controller {
             'rejudged' => false
         ];
 
-        $problemSettings = self::getProblemSettings($problem);
+        $problemSettings = self::getProblemSettingsDistrib($problem);
+        unset($problemSettings['cases']);
+        unset($problemSettings['slow']);
+        self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $problem->languages !== '';
         $updatedStatementLanguages = [];
 
@@ -1088,14 +1077,36 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Gets the distributable problem settings for the problem, using the cache
+     * if needed.
+     *
+     * @param Problems $problem the problem.
+     * @return array the problem settings.
+     */
+    private static function getProblemSettingsDistrib(Problems $problem) : array {
+        $problemSettingsDistrib = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SETTINGS_DISTRIB,
+            $problem->alias,
+            $problem,
+            'ProblemController::getProblemSettingsDistribImpl',
+            $problemSettingsDistrib,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+        return $problemSettingsDistrib;
+    }
+
+    /**
      * Gets the distributable problem settings for the problem.
      *
      * @param Problems $problem
-     * @throws InvalidFilesystemOperationException
+     * @return array the problem settings.
      */
-    public static function getProblemSettingsDistrib(Problems $problem) {
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
-        return $problemArtifacts->get('settings.distrib.json');
+    public static function getProblemSettingsDistribImpl(Problems $problem) : array {
+        return json_decode(
+            (new ProblemArtifacts($problem->alias))->get('settings.distrib.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
     }
 
     /**
@@ -1243,31 +1254,15 @@ class ProblemController extends Controller {
         $response = [];
 
         // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
-            'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
-            'memory_limit', 'output_limit', 'input_limit', 'visits', 'submissions',
-            'accepted','difficulty', 'creation_date', 'source', 'order', 'points',
-            'visibility','languages', 'slow', 'email_clarifications'];
+        $relevant_columns = ['title', 'alias', 'input_limit', 'visits', 'submissions',
+            'accepted', 'difficulty', 'creation_date', 'source', 'order', 'points',
+            'visibility', 'languages', 'email_clarifications'];
 
         $response['statement'] = ProblemController::getProblemStatement(
             $problem['problem']->alias,
             $r['lang']
         );
-
-        // Add the problem distributable settings.
-        $problemSettingsDistrib = null;
-        Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SETTINGS_DISTRIB,
-            $problem['problem']->alias,
-            $problem['problem'],
-            'ProblemController::getProblemSettingsDistrib',
-            $problemSettingsDistrib,
-            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
-        );
-        $response['settings'] = json_decode(
-            $problemSettingsDistrib,
-            JSON_OBJECT_AS_ARRAY
-        );
+        $response['settings'] = ProblemController::getProblemSettingsDistrib($problem['problem']);
 
         // Add preferred language of the user.
         $user_data = [];
@@ -1484,7 +1479,6 @@ class ProblemController extends Controller {
             $problemArtifacts->get('settings.json'),
             JSON_OBJECT_AS_ARRAY
         );
-        ProblemController::updateProblemSettings($problem, $problemSettings);
 
         $problemDeployer = new ProblemDeployer($problem->alias);
         try {
@@ -2133,100 +2127,64 @@ class ProblemController extends Controller {
         }
     }
 
-    /**
-     * Converts the Problem's settings into something that
-     * omegaup-gitserver can use.
-     *
-     * @param Problems $problem the problem
-     * @return Array an array that can be serialized into the JSON form of
-     *               quark's common.ProblemSettings.
-     */
-    private static function getProblemSettings(Problems $problem) {
-        $problemSettings = [
-            'Limits' => [
-                'ExtraWallTime' => (int)$problem->extra_wall_time . 'ms',
-                'MemoryLimit' => (int)$problem->memory_limit * 1024,
-                'OutputLimit' => (int)$problem->output_limit,
-                'OverallWallTimeLimit' => (
-                    (int)$problem->overall_wall_time_limit . 'ms'
-                ),
-                'TimeLimit' => (int)$problem->time_limit . 'ms',
+    private static function getDefaultProblemSettings() : array {
+        return [
+            'limits' => [
+                'ExtraWallTime' => '0s',
+                'MemoryLimit' => '64MiB',
+                'OutputLimit' => '10240KiB',
+                'OverallWallTimeLimit' => '30s',
+                'TimeLimit' => '1s',
             ],
-            'Validator' => [
-                'Name' => $problem->validator,
-                'Tolerance' => (float)$problem->tolerance,
-                'Limits' => [
+            'validator' => [
+                'name' => 'token-caseless',
+                'tolerance' => 1e-9,
+            ],
+        ];
+    }
+
+    /**
+     * Updates the Problem's settings with the values from the request.
+     *
+     * @param array $problemSettings the original problem settings.
+     * @param Request $r the request
+     */
+    private static function updateProblemSettings(array &$problemSettings, Request $r) : void {
+        if (!is_null($r['extra_wall_time'])) {
+            $problemSettings['limits']['ExtraWallTime'] = (int)$r['extra_wall_time'] . 'ms';
+        }
+        if (!is_null($r['memory_limit'])) {
+            $problemSettings['limits']['MemoryLimit'] = (int)$r['memory_limit'] . 'KiB';
+        }
+        if (!is_null($r['output_limit'])) {
+            $problemSettings['limits']['OutputLimit'] = (int)$r['output_limit'];
+        }
+        if (!is_null($r['overall_wall_time_limit'])) {
+            $problemSettings['limits']['OverallWallTimeLimit'] = (
+                (int)$r['overall_wall_time_limit'] . 'ms'
+            );
+        }
+        if (!is_null($r['time_limit'])) {
+            $problemSettings['limits']['TimeLimit'] = (int)$r['time_limit'] . 'ms';
+        }
+        if (!is_null($r['validator'])) {
+            $problemSettings['validator']['name'] = $r['validator'];
+        }
+        if ($problemSettings['validator']['name'] == 'custom') {
+            if (is_null($problemSettings['validator']['limits'])) {
+                $problemSettings['validator']['limits'] = [
                     'ExtraWallTime' => '0s',
-                    'MemoryLimit' => 256 * 1024 * 1024,
-                    'OutputLimit' => 10 * 1024,
+                    'MemoryLimit' => '256MiB',
+                    'OutputLimit' => '10KiB',
                     'OverallWallTimeLimit' => '5s',
-                    'TimeLimit' => (int)$problem->validator_time_limit . 'ms',
-                ],
-            ],
-        ];
-
-        return $problemSettings;
-    }
-
-    /**
-     * Updates the Problems object with the data in settings.json.
-     *
-     * @param Problems $problem the problem
-     * @param array $problemSettings the contents of settings.json.
-     */
-    private static function updateProblemSettings(
-        Problems $problem,
-        array $problemSettings
-    ) : void {
-        $problem->extra_wall_time = self::parseDuration(
-            $problemSettings['Limits']['ExtraWallTime']
-        );
-        $problem->memory_limit  = $problemSettings['Limits']['MemoryLimit'] / 1024;
-        $problem->output_limit = $problemSettings['Limits']['OutputLimit'];
-        $problem->overall_wall_time_limit = self::parseDuration(
-            $problemSettings['Limits']['OverallWallTimeLimit']
-        );
-        $problem->time_limit = self::parseDuration($problemSettings['Limits']['TimeLimit']);
-        $problem->validator = $problemSettings['Validator']['Name'];
-        $problem->tolerance = $problemSettings['Validator']['Tolerance'];
-        $problem->validator_time_limit = self::parseDuration(
-            $problemSettings['Validator']['Limits']['TimeLimit']
-        );
-    }
-
-    /**
-     * Parses a duration and returns the number of milliseconds.
-     *
-     * @param string $timeDuration A string representation of the duration.
-     * @return int The number of milliseconds in the duration.
-     */
-    private static function parseDuration(string $timeDuration) : int {
-        $duration = 0.0;
-        $matches = [];
-        if (!preg_match_all('/(\\d+(?:\\.\\d+)?)([[:alpha:]]+)/', $timeDuration, $matches, PREG_SET_ORDER)) {
-            return $duration;
-        }
-        $suffixes = [
-            'μs' => 0.001,
-            'us' => 0.001,
-            'ms' => 1.0,
-            's' => 1000.0,
-            'm' => 60000.0,
-            'h' => 3600000.0,
-        ];
-        foreach ($matches as $match) {
-            $foundFactor = null;
-            foreach ($suffixes as $suffix => $factor) {
-                if ($suffix == $match[2]) {
-                    $foundFactor = $factor;
-                }
+                    'TimeLimit' => '30s',
+                ];
             }
-            if (is_null($foundFactor)) {
-                // Assume seconds.
-                $foundFactor = 1000.0;
+            if (!is_null($r['validator_time_limit'])) {
+                $problemSettings['validator']['limits']['TimeLimit'] = (int)$r['validator_time_limit'] . 'ms';
             }
-            $duration += floatval($match[1]) * $foundFactor;
+        } else {
+            unset($problemSettings['validator']['limits']);
         }
-        return $duration;
     }
 }
