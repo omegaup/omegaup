@@ -7,6 +7,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   function onlyProblemLoaded(problem) {
     arena.renderProblem(problem);
+
     arena.myRuns.filter_problem(problem.alias);
     arena.myRuns.attach($('#problem .runs'));
 
