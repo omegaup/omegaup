@@ -1073,6 +1073,7 @@ const translations = {
 	wordsTotal: "Total",
 	wordsTotalVotes: "total votes",
 	wordsUnimplemented: "This feature has not been implemented yet :(",
+	wordsUploadedOn: "Problem uploaded on: %(date)",
 	wordsUser: "User",
 	wordsUsersFeedback: "Users Feedback",
 	wordsValidator: "Validator",

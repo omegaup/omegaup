@@ -700,6 +700,80 @@ class UpdateProblemTest extends OmegaupTestCase {
     }
 
     /**
+     * Tests tag operations.
+     */
+    public function testTags() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        $this->assertEquals(
+            [
+                [
+                    'name' => 'lenguaje',
+                    'public' => '1',
+                ],
+            ],
+            ProblemController::apiTags(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ]))['tags']
+        );
+
+        ProblemController::apiAddTag(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'name' => 'foo',
+            'public' => 'true',
+        ]));
+        $this->assertEquals(
+            [
+                [
+                    'name' => 'lenguaje',
+                    'public' => '1',
+                ],
+                [
+                    'name' => 'foo',
+                    'public' => '1',
+                ],
+            ],
+            ProblemController::apiTags(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ]))['tags']
+        );
+
+        ProblemController::apiRemoveTag(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'name' => 'foo',
+            'public' => 'true',
+        ]));
+        $this->assertEquals(
+            [
+                [
+                    'name' => 'lenguaje',
+                    'public' => '1',
+                ],
+            ],
+            ProblemController::apiTags(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+            ]))['tags']
+        );
+
+        try {
+            ProblemController::apiRemoveTag(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+                'name' => 'lenguaje',
+                'public' => 'true',
+            ]));
+            $this->fail('Should not have been able to remove restricted tag');
+        } catch (InvalidParameterException $e) {
+            $this->assertEquals('tagRestricted', $e->getMessage());
+        }
+    }
+
+    /**
      * Tests problem version update.
      */
     public function testProblemVersionUpdate() {

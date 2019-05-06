@@ -369,11 +369,9 @@ let UI = {
            '.png" width="16" height="11" title="' + country + '" />';
   },
 
-  formatDateTime: function(date) {
-    return date.format('{MM}/{dd}/{yyyy} {HH}:{mm}');
-  },
+  formatDateTime: function(date) { return date.toLocaleString(T.locale); },
 
-  formatDate: function(date) { return date.format('{MM}/{dd}/{yyyy}'); },
+  formatDate: function(date) { return date.toLocaleDateString(T.locale); },
 
   parseDuration: function(str) {
     let duration = 0;

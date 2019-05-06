@@ -19,7 +19,7 @@
     "file-loader": "^1.1.11",
     "highcharts": "^6.1.0",
     "jasmine": "^3.1.0",
-    "jquery": "3.2.1",
+    "jquery": "^3.4",
     "jsdom": "^11.11.0",
     "node-sass": "^4.9.0",
     "remove-source-webpack-plugin": "^0.1.1",
