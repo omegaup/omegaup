@@ -587,7 +587,7 @@ class RunController extends Controller {
             'language' => $r['submission']->language,
         ];
         $showDetails = $response['admin'] ||
-            ProblemsDAO::isProblemSolved($r['problem'], $r['current_identity_id']);
+            ProblemsDAO::isProblemSolved($r['problem'], (int)$r['current_identity_id']);
 
         // Get the details, compile error, logs, etc.
         RunController::populateRunDetails($r['submission'], $r['run'], $showDetails, $response);
