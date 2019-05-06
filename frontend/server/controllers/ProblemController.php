@@ -1849,32 +1849,32 @@ class ProblemController extends Controller {
         }
 
         // Sort results
-        $order = 'problem_id'; // Order by problem_id by default.
+        $orderBy = 'problem_id'; // Order by problem_id by default.
         $sorting_options = ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'problem_id'];
         // "order_by" may be one of the allowed options, otherwise the default ordering will be used.
         if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
-            $order = $r['order_by'];
+            $orderBy = $r['order_by'];
         }
 
-        // "mode" may be a valid one, for compatibility reasons 'descending' is the mode by default.
+        // "mode" may be a valid one, for compatibility reasons 'descending' is the order by default.
         if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
-            $mode = $r['mode'];
+            $order = $r['mode'];
         } else {
-            $mode = 'desc';
+            $order = 'desc';
         }
 
         $response = [];
         $response['results'] = [];
-        $author_identity_id = null;
-        $author_user_id = null;
+        $authorIdentityId = null;
+        $authorUserId = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
-        $identity_type = IDENTITY_ANONYMOUS;
+        $identityType = IDENTITY_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
-            $author_identity_id = intval($r['current_identity_id']);
-            $author_user_id = intval($r['current_user_id']);
+            $authorIdentityId = intval($r['current_identity_id']);
+            $authorUserId = intval($r['current_user_id']);
             if (Authorization::isSystemAdmin($r['current_identity_id']) ||
                 Authorization::hasRole(
                     $r['current_identity_id'],
@@ -1882,9 +1882,9 @@ class ProblemController extends Controller {
                     Authorization::REVIEWER_ROLE
                 )
             ) {
-                $identity_type = IDENTITY_ADMIN;
+                $identityType = IDENTITY_ADMIN;
             } else {
-                $identity_type = IDENTITY_NORMAL;
+                $identityType = IDENTITY_NORMAL;
             }
         }
 
@@ -1905,15 +1905,15 @@ class ProblemController extends Controller {
 
         $total = 0;
         $response['results'] = ProblemsDAO::byIdentityType(
-            $identity_type,
+            $identityType,
             $language,
+            $orderBy,
             $order,
-            $mode,
             $offset,
             $rowcount,
             $query,
-            $author_identity_id,
-            $author_user_id,
+            $authorIdentityId,
+            $authorUserId,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             is_null($r['require_all_tags']) ? true : !!$r['require_all_tags'],
