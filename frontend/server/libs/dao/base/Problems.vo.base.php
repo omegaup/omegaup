@@ -41,6 +41,9 @@ class Problems extends VO {
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
         }
+        if (isset($data['commit'])) {
+            $this->commit = $data['commit'];
+        }
         if (isset($data['current_version'])) {
             $this->current_version = $data['current_version'];
         }
@@ -135,6 +138,13 @@ class Problems extends VO {
       * @var varchar(32)
       */
     public $alias;
+
+    /**
+      * El hash SHA1 del commit en la rama master del problema.
+      * @access public
+      * @var char(40)
+      */
+    public $commit;
 
     /**
       * El hash SHA1 del árbol de la rama private.

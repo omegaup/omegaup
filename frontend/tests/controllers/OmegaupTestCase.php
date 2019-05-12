@@ -427,9 +427,9 @@ class ScopedEmailSender {
  * Grader::grade(), without executing the contents.
  */
 class NoOpGrader extends Grader {
-    private $resources = [];
-    private $submissions = [];
-    private $runCount = 0;
+    private $_resources = [];
+    private $_submissions = [];
+    private $_runs = [];
 
     public function grade(Runs $run, string $source) {
         global $conn;
@@ -442,16 +442,16 @@ class NoOpGrader extends Grader {
                 s.submission_id = ?;
         ';
         $guid = $conn->GetOne($sql, [$run->submission_id]);
-        $this->submissions[$guid] = $source;
-        $this->runCount += 1;
+        $this->_submissions[$guid] = $source;
+        array_push($this->_runs, $run);
     }
 
     public function rejudge(array $runs, bool $debug) {
-        $this->runCount += count($runs);
+        $this->_runs += $runs;
     }
 
     public function getSource(string $guid) {
-        return $this->submissions[$guid];
+        return $this->_submissions[$guid];
     }
 
     public function status() {
@@ -490,14 +490,14 @@ class NoOpGrader extends Grader {
             throw new UnimplementedException();
         }
         $path = "{$run->run_id}/{$filename}";
-        if (!array_key_exists($path, $this->resources)) {
+        if (!array_key_exists($path, $this->_resources)) {
             if (!$missingOk) {
                 throw new Exception("Resource {$path} not found");
             }
             return null;
         }
 
-        return $this->resources[$path];
+        return $this->_resources[$path];
     }
 
     public function setGraderResourceForTesting(
@@ -506,11 +506,11 @@ class NoOpGrader extends Grader {
         string $contents
     ) {
         $path = "{$run->run_id}/{$filename}";
-        $this->resources[$path] = $contents;
+        $this->_resources[$path] = $contents;
     }
 
-    public function getGraderCallCount() {
-        return $this->runCount;
+    public function getRuns() : array {
+        return $this->_runs;
     }
 }
 
@@ -531,7 +531,11 @@ class ScopedGraderDetour {
         Grader::setInstanceForTesting($this->_originalInstance);
     }
 
-    public function getGraderCallCount() {
-        return $this->_instance->getGraderCallCount();
+    public function getGraderCallCount() : int {
+        return count($this->_instance->getRuns());
+    }
+
+    public function getRuns() : array {
+        return $this->_instance->getRuns();
     }
 }

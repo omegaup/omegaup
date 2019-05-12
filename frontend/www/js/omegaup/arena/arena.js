@@ -353,13 +353,14 @@ export class Arena {
           let form = $(e.target);
           e.preventDefault();
           let alias = self.currentProblem.alias;
+          let commit = self.currentProblem.commit;
           let os = form.find('.download-os').val();
           let lang = form.find('.download-lang').val();
           let extension = (os == 'unix' ? '.tar.bz2' : '.zip');
 
-          UI.navigateTo(window.location.protocol + '//' + window.location.host +
-                        '/templates/' + alias + '/' + alias + '_' + os + '_' +
-                        lang + extension);
+          UI.navigateTo(
+              window.location.protocol + '//' + window.location.host +
+              `/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`);
 
           return false;
         });

@@ -450,6 +450,7 @@ CREATE TABLE `Problems` (
   `visibility` tinyint(1) NOT NULL DEFAULT '1' COMMENT '-1 banned, 0 private, 1 public, 2 recommended',
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
+  `commit` char(40) NOT NULL DEFAULT 'published' COMMENT 'El hash SHA1 del commit en la rama master del problema.',
   `current_version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
   `languages` set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') NOT NULL DEFAULT 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua',
   `input_limit` int(11) NOT NULL DEFAULT '10240',
@@ -596,6 +597,7 @@ CREATE TABLE `Problemset_Problem_Opened` (
 CREATE TABLE `Problemset_Problems` (
   `problemset_id` int(11) NOT NULL,
   `problem_id` int(11) NOT NULL,
+  `commit` char(40) NOT NULL DEFAULT 'published' COMMENT 'El hash SHA1 del commit en la rama master del problema.',
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
   `points` double NOT NULL DEFAULT '1',
   `order` int(11) NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
