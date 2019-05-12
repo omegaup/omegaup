@@ -19,6 +19,17 @@ class ProblemController extends Controller {
     const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
 
+    // Do not update the published branch.
+    const UPDATE_PUBLISHED_NONE = 'none';
+    // Update only non-problemset runs.
+    const UPDATE_PUBLISHED_NON_PROBLEMSET = 'non-problemset';
+    // Update non-problemset runs and running problemsets that are owned by the
+    // author.
+    const UPDATE_PUBLISHED_OWNED_PROBLEMSETS = 'owned-problemsets';
+    // Update non-problemset runs and running problemsets that the author has
+    // edit privileges.
+    const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
+
     /**
      * Validates a Create or Update Problem API request
      *
@@ -83,6 +94,17 @@ class ProblemController extends Controller {
                     );
                 }
             }
+            Validators::isInEnum(
+                $r['update_published'],
+                'update_published',
+                [
+                    ProblemController::UPDATE_PUBLISHED_NONE,
+                    ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                    ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                    ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                ],
+                false
+            );
         } else {
             Validators::isValidAlias($r['problem_alias'], 'problem_alias');
             Validators::isInEnum(
@@ -729,7 +751,6 @@ class ProblemController extends Controller {
         ];
         $problem = $r['problem'];
         self::updateValueProperties($r, $problem, $valueProperties);
-        $r['problem'] = $problem;
 
         $response = [
             'rejudged' => false
@@ -740,6 +761,10 @@ class ProblemController extends Controller {
         unset($problemSettings['slow']);
         self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $problem->languages !== '';
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
         $updatedStatementLanguages = [];
 
         // Insert new problem
@@ -755,7 +780,8 @@ class ProblemController extends Controller {
             }
             $problemDeployer = new ProblemDeployer(
                 $problem->alias,
-                $acceptsSubmissions
+                $acceptsSubmissions,
+                $updatePublished != ProblemController::UPDATE_PUBLISHED_NONE
             );
             $problemDeployer->commit(
                 $r['message'],
@@ -765,27 +791,30 @@ class ProblemController extends Controller {
             );
 
             $response['rejudged'] = false;
-            $oldCommit = $problem->commit;
-            $oldVersion = $problem->current_version;
-
-            [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
-                $problem,
-                $problemDeployer->publishedCommit
-            );
-            if ($oldVersion != $problem->current_version) {
-                $response['rejudged'] = true;
-                RunsDAO::updateVersionToCurrent($problem);
-                ProblemsetProblemsDAO::updateVersionToCurrent(
+            $needsUpdate = false;
+            if (!is_null($problemDeployer->publishedCommit)) {
+                $oldCommit = $problem->commit;
+                $oldVersion = $problem->current_version;
+                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
                     $problem,
                     $problemDeployer->publishedCommit
                 );
-            } elseif ($oldCommit != $problem->commit) {
-                ProblemsetProblemsDAO::updateCommit(
-                    $problem,
-                    $problemDeployer->publishedCommit
-                );
+                $response['rejudged'] = ($oldVersion != $problem->current_version);
+                $needsUpdate = $response['rejudged'] || ($oldCommit != $problem->commit);
             }
-            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
+
+            if ($needsUpdate) {
+                RunsDAO::createRunsForVersion($problem);
+                RunsDAO::updateVersionToCurrent($problem);
+                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                        $problem,
+                        $r['current_user'],
+                        $updatePublished
+                    );
+                }
+                $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
+            }
 
             // Save the contest object with data sent by user to the database
             ProblemsDAO::update($problem);
@@ -894,6 +923,11 @@ class ProblemController extends Controller {
         if (is_null($r['lang'])) {
             $r['lang'] = UserController::getPreferredLanguage($r);
         }
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
+        $updatedStatementLanguages = [];
 
         $updatedStatementLanguages = [];
         try {
@@ -905,13 +939,20 @@ class ProblemController extends Controller {
                     "statements/{$r['lang']}.markdown" => $r['statement'],
                 ]
             );
-
-            [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
-                $problem,
-                $problemDeployer->publishedCommit
-            );
-            ProblemsDAO::update($problem);
-
+            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
+                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+                    $problem,
+                    $problemDeployer->publishedCommit
+                );
+                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                        $problem,
+                        $r['current_user'],
+                        $updatePublished
+                    );
+                }
+                ProblemsDAO::update($problem);
+            }
             $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
         } catch (ApiException $e) {
             throw $e;
@@ -1478,17 +1519,35 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
+        $privateTreeMapping = [];
+        foreach ((new ProblemArtifacts($problem->alias, 'private'))->log() as $logEntry) {
+            $privateTreeMapping[$logEntry['commit']] = $logEntry['tree'];
+        }
+
+        $masterLog = [];
+        foreach ((new ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
+            if (count($logEntry['parents']) < 3) {
+                // Master commits always have 3 or 4 parents. If they have
+                // fewer, it's one of the commits in the merged branches.
+                continue;
+            }
+            $logEntry['version'] = $privateTreeMapping[$logEntry['parents'][count($logEntry['parents']) - 1]];
+            $logEntry['tree'] = [];
+            foreach ((new ProblemArtifacts($problem->alias, $logEntry['commit']))->lsTreeRecursive() as $treeEntry) {
+                $logEntry['tree'][$treeEntry['path']] = $treeEntry['id'];
+            }
+            array_push($masterLog, $logEntry);
+        }
+
         return [
             'status' => 'ok',
             'published' => (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
-            'current_version' => $problem->current_version,
-            'master' => (new ProblemArtifacts($problem->alias, 'master'))->log(),
-            'private' => (new ProblemArtifacts($problem->alias, 'private'))->log(),
+            'log' => $masterLog,
         ];
     }
 
     /**
-     * Entry point for Problem select version API
+     * Change the version of the problem.
      *
      * @param Request $r
      * @throws ForbiddenAccessException
@@ -1500,6 +1559,23 @@ class ProblemController extends Controller {
 
         Validators::isValidAlias($r['problem_alias'], 'problem_alias');
         Validators::isStringNonEmpty($r['commit'], 'commit');
+        // ProblemController::UPDATE_PUBLISHED_NONE is not allowed here because
+        // it would not make any sense!
+        Validators::isInEnum(
+            $r['update_published'],
+            'update_published',
+            [
+                ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            ],
+            false
+        );
+
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1544,9 +1620,18 @@ class ProblemController extends Controller {
                 $problem->commit,
                 $r['current_user']
             );
-            ProblemsDAO::update($problem);
+
+            RunsDAO::createRunsForVersion($problem);
             RunsDAO::updateVersionToCurrent($problem);
-            ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                ProblemsetProblemsDAO::updateVersionToCurrent(
+                    $problem,
+                    $r['current_user'],
+                    $updatePublished
+                );
+            }
+
+            ProblemsDAO::update($problem);
 
             DAO::transEnd();
         } catch (ApiException $e) {
@@ -2227,6 +2312,11 @@ class ProblemController extends Controller {
         }
     }
 
+    /**
+     * Gets a Problem settings object with default values.
+     *
+     * @return array The Problem settings object.
+     */
     private static function getDefaultProblemSettings() : array {
         return [
             'limits' => [
@@ -2239,6 +2329,13 @@ class ProblemController extends Controller {
             'validator' => [
                 'name' => 'token-caseless',
                 'tolerance' => 1e-9,
+                'limits' => [
+                    'ExtraWallTime' => '0s',
+                    'MemoryLimit' => '256MiB',
+                    'OutputLimit' => '10KiB',
+                    'OverallWallTimeLimit' => '5s',
+                    'TimeLimit' => '30s',
+                ],
             ],
         ];
     }
@@ -2270,8 +2367,8 @@ class ProblemController extends Controller {
         if (!is_null($r['validator'])) {
             $problemSettings['validator']['name'] = $r['validator'];
         }
-        if ($problemSettings['validator']['name'] == 'custom') {
-            if (is_null($problemSettings['validator']['limits'])) {
+        if (!is_null($r['validator_time_limit'])) {
+            if (empty($problemSettings['validator']['limits'])) {
                 $problemSettings['validator']['limits'] = [
                     'ExtraWallTime' => '0s',
                     'MemoryLimit' => '256MiB',
@@ -2280,11 +2377,9 @@ class ProblemController extends Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            if (!is_null($r['validator_time_limit'])) {
-                $problemSettings['validator']['limits']['TimeLimit'] = (int)$r['validator_time_limit'] . 'ms';
-            }
-        } else {
-            unset($problemSettings['validator']['limits']);
+            $problemSettings['validator']['limits']['TimeLimit'] = (
+                (int)$r['validator_time_limit'] . 'ms'
+            );
         }
     }
 }

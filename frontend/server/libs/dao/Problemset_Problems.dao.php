@@ -203,26 +203,157 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      * Update the version of the problem across all problemsets to the current
      * version.
      *
-     * @param Problems $problem the problem.
+     * @param Problems $problem         the problem.
+     * @param Users    $user            the user that is making the change.
+     * @param string   $updatePublished the way to update the problemset runs.
      */
     final public static function updateVersionToCurrent(
-        Problems $problem
+        Problems $problem,
+        Users $user,
+        string $updatePublished
     ) : void {
         global $conn;
+        $now = Time::get();
 
-        $sql = '
-            UPDATE
-                Problemset_Problems pp
-            INNER JOIN
-                Problemsets p
-            ON
-                p.problemset_id = pp.problemset_id
-            SET
-                pp.commit = ?, pp.version = ?
-            WHERE
-                pp.problem_id = ?;
-        ';
-        $conn->Execute($sql, [$problem->commit, $problem->current_version, $problem->problem_id]);
+        if ($updatePublished == ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
+            $sql = '
+                UPDATE
+                    Problemset_Problems pp
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = pp.problemset_id
+                INNER JOIN
+                    ACLs acl
+                ON
+                    acl.acl_id = p.acl_id
+                INNER JOIN
+                    Contests c
+                ON
+                    c.contest_id = p.contest_id
+                SET
+                    pp.commit = ?, pp.version = ?
+                WHERE
+                    UNIX_TIMESTAMP(c.finish_time) >= ? AND
+                    pp.problem_id = ? AND
+                    acl.owner_id = ?;
+            ';
+            $conn->Execute($sql, [
+                $problem->commit,
+                $problem->current_version,
+                $now,
+                $problem->problem_id,
+                $user->user_id,
+            ]);
+
+            $sql = '
+                UPDATE
+                    Problemset_Problems pp
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = pp.problemset_id
+                INNER JOIN
+                    ACLs acl
+                ON
+                    acl.acl_id = p.acl_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.assignment_id = p.assignment_id
+                SET
+                    pp.commit = ?, pp.version = ?
+                WHERE
+                    UNIX_TIMESTAMP(a.finish_time) >= ? AND
+                    pp.problem_id = ? AND
+                    acl.owner_id = ?;
+            ';
+            $conn->Execute($sql, [
+                $problem->commit,
+                $problem->current_version,
+                $now,
+                $problem->problem_id,
+                $user->user_id,
+            ]);
+        } elseif ($updatePublished == ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS) {
+            $problemsets = [];
+
+            $sql = '
+                SELECT
+                    p.problemset_id, p.acl_id
+                FROM
+                    Problemset_Problems pp
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = pp.problemset_id
+                INNER JOIN
+                    Contests c
+                ON
+                    c.contest_id = p.contest_id
+                WHERE
+                    UNIX_TIMESTAMP(c.finish_time) >= ? AND
+                    pp.problem_id = ?;
+            ';
+            $rs = $conn->Execute($sql, [
+                $now,
+                $problem->problem_id,
+            ]);
+            foreach ($rs as $row) {
+                array_push($problemsets, new Problemsets($row));
+            }
+
+            $sql = '
+                SELECT
+                    p.problemset_id, p.acl_id
+                FROM
+                    Problemset_Problems pp
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = pp.problemset_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.assignment_id = p.assignment_id
+                WHERE
+                    UNIX_TIMESTAMP(a.finish_time) >= ? AND
+                    pp.problem_id = ?;
+            ';
+            $rs = $conn->Execute($sql, [
+                $now,
+                $problem->problem_id,
+            ]);
+            foreach ($rs as $row) {
+                array_push($problemsets, new Problemsets($row));
+            }
+
+            $problemsets = array_filter($problemsets, function (Problemsets $p) use ($user) {
+                return Authorization::isAdmin($user->main_identity_id, $p);
+            });
+
+            if (!empty($problemsets)) {
+                $problemsetIds = array_map(function (Problemsets $p) {
+                    return (int)$p->problemset_id;
+                }, $problemsets);
+                $problemsetPlaceholders = implode(', ', array_fill(0, count($problemsetIds), '?'));
+
+                $sql = "
+                    UPDATE
+                        Problemset_Problems pp
+                    SET
+                        pp.commit = ?, pp.version = ?
+                    WHERE
+                        pp.problem_id = ? AND
+                        pp.problemset_id IN ($problemsetPlaceholders);
+                ";
+                $conn->Execute($sql, array_merge([
+                    $problem->commit,
+                    $problem->current_version,
+                    $problem->problem_id,
+                ], $problemsetIds));
+            }
+        }
 
         $sql = '
             UPDATE
@@ -240,37 +371,9 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             SET
                 s.current_run_id = r.run_id
             WHERE
-                r.version = ? AND
-                s.problem_id = ?;
-        ';
-        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
-    }
-
-    /**
-     * Update the commit of the problem across all problemsets to the current
-     * version.
-     *
-     * @param Problems $problem the problem.
-     * @param string   $commit  the SHA1 hash of the current commit.
-     */
-    final public static function updateCommit(
-        Problems $problem,
-        string $commit
-    ) : void {
-        global $conn;
-
-        $sql = '
-            UPDATE
-                Problemset_Problems pp
-            INNER JOIN
-                Problemsets p
-            ON
-                p.problemset_id = pp.problemset_id
-            SET
-                pp.commit = ?
-            WHERE
+                pp.version = ? AND
                 pp.problem_id = ?;
         ';
-        $conn->Execute($sql, [$commit, $problem->problem_id]);
+        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 }

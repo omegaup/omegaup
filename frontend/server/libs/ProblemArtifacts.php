@@ -31,7 +31,13 @@ class ProblemArtifacts {
         return $browser->exec() !== false && curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200;
     }
 
-    public function lsTree($path) : array {
+    /**
+     * Returns a list of tree entries.
+     *
+     * @param string $path The path to display.
+     * @return array The list of direct entries in $path.
+     */
+    public function lsTree(string $path) : array {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->commit, "{$path}/")
@@ -51,6 +57,42 @@ class ProblemArtifacts {
             );
             return [];
         }
+        return $entries;
+    }
+
+    /**
+     * Returns the list of files that are transitively reachable from $path.
+     *
+     * @param string $path The path to display.
+     * @return array The list of files that are transitively reachable from $path.
+     */
+    public function lsTreeRecursive(string $path = '.') : array {
+        $entries = [];
+        $queue = [$path];
+        while (!empty($queue)) {
+            $path = array_shift($queue);
+            foreach (self::lsTree($path) as $entry) {
+                if ($path == '.') {
+                    $entry['path'] = $entry['name'];
+                } else {
+                    $entry['path'] = "{$path}/{$entry['name']}";
+                }
+                unset($entry['name']);
+                if ($entry['type'] == 'tree') {
+                    array_push($queue, $entry['path']);
+                    continue;
+                }
+
+                array_push($entries, $entry);
+            }
+        }
+        usort($entries, function (array $lhs, array $rhs) : int {
+            if ($lhs['path'] == $rhs['path']) {
+                return 0;
+            }
+            return ($lhs['path'] < $rhs['path']) ? -1 : 1;
+        });
+
         return $entries;
     }
 

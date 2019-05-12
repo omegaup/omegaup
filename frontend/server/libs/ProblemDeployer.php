@@ -17,8 +17,13 @@ class ProblemDeployer {
     public $publishedCommit = null;
     private $updatedStatementLanguages = [];
     private $acceptsSubmissions = true;
+    private $updatePublished = true;
 
-    public function __construct($alias, $acceptsSubmissions = true) {
+    public function __construct(
+        string $alias,
+        bool $acceptsSubmissions = true,
+        bool $updatePublished = true
+    ) {
         $this->log = Logger::getLogger('ProblemDeployer');
         $this->alias = $alias;
 
@@ -31,12 +36,18 @@ class ProblemDeployer {
         }
 
         $this->acceptsSubmissions = $acceptsSubmissions;
+        $this->updatePublished = $updatePublished;
     }
 
     public function __destruct() {
     }
 
-    public function commit(string $message, Users $user, int $operation, array $problemSettings) {
+    public function commit(
+        string $message,
+        Users $user,
+        int $operation,
+        array $problemSettings
+    ) : void {
         $mergeStrategy = 'ours';
 
         switch ($operation) {
@@ -61,7 +72,8 @@ class ProblemDeployer {
             null,
             $mergeStrategy,
             $operation == ProblemDeployer::CREATE,
-            $this->acceptsSubmissions
+            $this->acceptsSubmissions,
+            $this->updatePublished
         );
         $this->processResult($result);
     }
@@ -207,7 +219,8 @@ class ProblemDeployer {
                 $blobUpdate,
                 'recursive-theirs',
                 false,
-                $this->acceptsSubmissions
+                $this->acceptsSubmissions,
+                $this->updatePublished
             );
             $this->processResult($result);
         } finally {
@@ -277,7 +290,8 @@ class ProblemDeployer {
         $blobUpdate,
         string $mergeStrategy,
         bool $create,
-        bool $acceptsSubmissions
+        bool $acceptsSubmissions,
+        bool $updatePublished
     ) {
         $curl = curl_init();
         $zipFile = fopen($zipPath, 'r');
@@ -286,6 +300,7 @@ class ProblemDeployer {
             $queryParams = [
                 'message' => $commitMessage,
                 'acceptsSubmissions' => $acceptsSubmissions ? 'true' : 'false',
+                'updatePublished' => $updatePublished ? 'true' : 'false',
                 'mergeStrategy' => $mergeStrategy,
             ];
             if ($create) {
