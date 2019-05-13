@@ -1297,6 +1297,16 @@ function onHashChanged() {
             Util.parseDuration(request.input.limits.OverallWallTimeLimit);
         request.input.limits.TimeLimit =
             Util.parseDuration(request.input.limits.TimeLimit);
+        if (!request.input.cases.sample) {
+          // When the run was made programatically, it does not always contain
+          // a sample case. In order to display those runs without crashing,
+          // just create a fake entry with no weight.
+          request.input.cases.sample = {
+            'in': '',
+            out: '',
+            weight: 0,
+          };
+        }
         store.commit('request', request);
         fetch(`run/${token}/details.json`)
             .then(response => {

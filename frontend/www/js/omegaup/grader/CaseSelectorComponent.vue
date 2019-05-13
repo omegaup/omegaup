@@ -19,7 +19,7 @@
                    v-bind:title="verdictTooltip(groupResult(group.name))">{{
                    verdictLabel(groupResult(group.name)) }}<span class="score">{{
                    score(groupResult(group.name)) }}</span></span> <span v-bind:title=
-                   "item.name">{{ group.name }}</span>
+                   "group.name">{{ group.name }}</span>
             </div>
           </div><button class=
           "list-group-item list-group-item-action d-flex justify-content-between align-items-center"

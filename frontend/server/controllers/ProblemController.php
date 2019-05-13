@@ -17,6 +17,18 @@ class ProblemController extends Controller {
     const VISIBILITY_PROMOTED = 2;
 
     const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
+    const VALID_LANGUAGES = ['en', 'es', 'pt'];
+
+    // Do not update the published branch.
+    const UPDATE_PUBLISHED_NONE = 'none';
+    // Update only non-problemset runs.
+    const UPDATE_PUBLISHED_NON_PROBLEMSET = 'non-problemset';
+    // Update non-problemset runs and running problemsets that are owned by the
+    // author.
+    const UPDATE_PUBLISHED_OWNED_PROBLEMSETS = 'owned-problemsets';
+    // Update non-problemset runs and running problemsets that the author has
+    // edit privileges.
+    const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
 
     /**
      * Validates a Create or Update Problem API request
@@ -82,6 +94,17 @@ class ProblemController extends Controller {
                     );
                 }
             }
+            Validators::isInEnum(
+                $r['update_published'],
+                'update_published',
+                [
+                    ProblemController::UPDATE_PUBLISHED_NONE,
+                    ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                    ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                    ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                ],
+                false
+            );
         } else {
             Validators::isValidAlias($r['problem_alias'], 'problem_alias');
             Validators::isInEnum(
@@ -189,6 +212,7 @@ class ProblemController extends Controller {
                 ProblemDeployer::CREATE,
                 $problemSettings
             );
+            $problem->commit = $problemDeployer->publishedCommit;
             $problem->current_version = $problemDeployer->privateTreeHash;
 
             // Save the contest object with data sent by user to the database
@@ -727,17 +751,20 @@ class ProblemController extends Controller {
         ];
         $problem = $r['problem'];
         self::updateValueProperties($r, $problem, $valueProperties);
-        $r['problem'] = $problem;
 
         $response = [
             'rejudged' => false
         ];
 
-        $problemSettings = self::getProblemSettingsDistrib($problem);
+        $problemSettings = self::getProblemSettingsDistrib($problem, $problem->commit);
         unset($problemSettings['cases']);
         unset($problemSettings['slow']);
         self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $problem->languages !== '';
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
         $updatedStatementLanguages = [];
 
         // Insert new problem
@@ -753,7 +780,8 @@ class ProblemController extends Controller {
             }
             $problemDeployer = new ProblemDeployer(
                 $problem->alias,
-                $acceptsSubmissions
+                $acceptsSubmissions,
+                $updatePublished != ProblemController::UPDATE_PUBLISHED_NONE
             );
             $problemDeployer->commit(
                 $r['message'],
@@ -761,16 +789,32 @@ class ProblemController extends Controller {
                 $operation,
                 $problemSettings
             );
+
             $response['rejudged'] = false;
-            if (!is_null($problemDeployer->privateTreeHash) &&
-                $problem->current_version != $problemDeployer->privateTreeHash
-            ) {
-                $problem->current_version = $problemDeployer->privateTreeHash;
-                $response['rejudged'] = true;
-                RunsDAO::updateVersionToCurrent($problem);
-                ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+            $needsUpdate = false;
+            if (!is_null($problemDeployer->publishedCommit)) {
+                $oldCommit = $problem->commit;
+                $oldVersion = $problem->current_version;
+                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+                    $problem,
+                    $problemDeployer->publishedCommit
+                );
+                $response['rejudged'] = ($oldVersion != $problem->current_version);
+                $needsUpdate = $response['rejudged'] || ($oldCommit != $problem->commit);
             }
-            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
+
+            if ($needsUpdate) {
+                RunsDAO::createRunsForVersion($problem);
+                RunsDAO::updateVersionToCurrent($problem);
+                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                        $problem,
+                        $r['current_user'],
+                        $updatePublished
+                    );
+                }
+                $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
+            }
 
             // Save the contest object with data sent by user to the database
             ProblemsDAO::update($problem);
@@ -852,6 +896,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         self::validateCreateOrUpdate($r, true);
+        $problem = $r['problem'];
 
         // Validate statement
         Validators::isStringNonEmpty($r['statement'], 'statement');
@@ -878,6 +923,11 @@ class ProblemController extends Controller {
         if (is_null($r['lang'])) {
             $r['lang'] = UserController::getPreferredLanguage($r);
         }
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
+        $updatedStatementLanguages = [];
 
         $updatedStatementLanguages = [];
         try {
@@ -889,6 +939,20 @@ class ProblemController extends Controller {
                     "statements/{$r['lang']}.markdown" => $r['statement'],
                 ]
             );
+            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
+                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+                    $problem,
+                    $problemDeployer->publishedCommit
+                );
+                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                        $problem,
+                        $r['current_user'],
+                        $updatePublished
+                    );
+                }
+                ProblemsDAO::update($problem);
+            }
             $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
         } catch (ApiException $e) {
             throw $e;
@@ -896,7 +960,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::invalidateCache($r['problem'], $updatedStatementLanguages);
+        self::invalidateCache($problem, $updatedStatementLanguages);
 
         // All clear
         $response['status'] = 'ok';
@@ -918,9 +982,15 @@ class ProblemController extends Controller {
 
         // Invalidate problem statement cache
         foreach ($updatedStatementLanguages as $lang) {
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, "{$problem->alias}-{$lang}-markdown");
+            Cache::deleteFromCache(
+                Cache::PROBLEM_STATEMENT,
+                "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
+            );
         }
-        Cache::deleteFromCache(Cache::PROBLEM_SETTINGS_DISTRIB, $problem->alias);
+        Cache::deleteFromCache(
+            Cache::PROBLEM_SETTINGS_DISTRIB,
+            "{$problem->alias}-{$problem->commit}"
+        );
     }
 
     /**
@@ -1002,26 +1072,26 @@ class ProblemController extends Controller {
     /**
      * Gets the problem statement from the filesystem.
      *
-     * @param string $sourcePath The filesystem path for the problem statement.
+     * @param array $params The problem, commit, and language for the problem
+     *                      statement.
      *
-     * @return The contents of the file.
+     * @return array The contents of the file, plus some metadata.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemStatementImpl($params) {
-        list($problemAlias, $language) = $params;
-        $problemArtifacts = new ProblemArtifacts($problemAlias);
-        $sourcePath = "statements/{$language}.markdown";
+    public static function getProblemStatementImpl(array $params) : array {
+        $problemArtifacts = new ProblemArtifacts($params['alias'], $params['commit']);
+        $sourcePath = "statements/{$params['language']}.markdown";
 
         // Read the file that contains the source
         if (!$problemArtifacts->exists($sourcePath)) {
             // If there is no language file for the problem, return the Spanish
             // version.
-            $language = 'es';
-            $sourcePath = "statements/{$language}.markdown";
+            $params['language'] = 'es';
+            $sourcePath = "statements/{$params['language']}.markdown";
         }
 
         $result = [
-            'language' => $language,
+            'language' => $params['language'],
             'images' => [],
         ];
         try {
@@ -1039,10 +1109,14 @@ class ProblemController extends Controller {
             if (!in_array($extension, $imageExtensions)) {
                 continue;
             }
-            $result['images'][$file['name']] = IMAGES_URL_PATH . "{$problemAlias}/{$file['id']}.{$extension}";
-            $imagePath = IMAGES_PATH . "{$problemAlias}/{$file['id']}.{$extension}";
+            $result['images'][$file['name']] = (
+                IMAGES_URL_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+            );
+            $imagePath = (
+                IMAGES_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+            );
             if (!@file_exists($imagePath)) {
-                @mkdir(IMAGES_PATH . $problemAlias, 0755, true);
+                @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
                 file_put_contents($imagePath, $problemArtifacts->get("statements/{$file['name']}"));
             }
         }
@@ -1053,22 +1127,28 @@ class ProblemController extends Controller {
     /**
      * Gets the problem statement from the filesystem.
      *
-     * @param string $problemAlias    The alias of the problem.
-     * @param string $language        The language of the problem. Will default
-     *                                to Spanish if not found.
+     * @param Problems $problem  The problem.
+     * @param string   $commit   The git commit at which to get the statement.
+     * @param string   $language The language of the problem. Will default to
+     *                           Spanish if not found.
      *
-     * @return The contents of the file.
+     * @return string The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
-        $problemAlias,
-        $language
-    ) {
+        Problems $problem,
+        string $commit,
+        string $language
+    ) : array {
         $problemStatement = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
-            "{$problemAlias}-{$language}-markdown",
-            [$problemAlias, $language],
+            "{$problem->alias}-{$commit}-{$language}-markdown",
+            [
+                'alias' => $problem->alias,
+                'commit' => $commit,
+                'language' => $language,
+            ],
             'ProblemController::getProblemStatementImpl',
             $problemStatement,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
@@ -1084,12 +1164,18 @@ class ProblemController extends Controller {
      * @param Problems $problem the problem.
      * @return array the problem settings.
      */
-    private static function getProblemSettingsDistrib(Problems $problem) : array {
+    private static function getProblemSettingsDistrib(
+        Problems $problem,
+        string $commit
+    ) : array {
         $problemSettingsDistrib = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_SETTINGS_DISTRIB,
-            $problem->alias,
-            $problem,
+            "{$problem->alias}-{$problem->commit}",
+            [
+                'alias' => $problem->alias,
+                'commit' => $problem->commit,
+            ],
             'ProblemController::getProblemSettingsDistribImpl',
             $problemSettingsDistrib,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
@@ -1100,12 +1186,12 @@ class ProblemController extends Controller {
     /**
      * Gets the distributable problem settings for the problem.
      *
-     * @param Problems $problem
+     * @param array $params the payload with the problem and commit.
      * @return array the problem settings.
      */
-    public static function getProblemSettingsDistribImpl(Problems $problem) : array {
+    public static function getProblemSettingsDistribImpl(array $params) : array {
         return json_decode(
-            (new ProblemArtifacts($problem->alias))->get('settings.distrib.json'),
+            (new ProblemArtifacts($params['alias'], $params['commit']))->get('settings.distrib.json'),
             JSON_OBJECT_AS_ARRAY
         );
     }
@@ -1254,16 +1340,31 @@ class ProblemController extends Controller {
         }
         $response = [];
 
-        // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'input_limit', 'visits', 'submissions',
-            'accepted', 'difficulty', 'creation_date', 'source', 'order', 'points',
-            'visibility', 'languages', 'email_clarifications'];
+        // Get the expected commit version.
+        $commit = $problem['problem']->commit;
+        if (!empty($problem['problemset'])) {
+            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+                $problem['problemset']->problemset_id,
+                $problem['problem']->problem_id
+            );
+            if (is_null($problemsetProblem)) {
+                return [
+                    'status' => 'ok',
+                    'exists' => false,
+                ];
+            }
+            $commit = $problemsetProblem->commit;
+        }
 
         $response['statement'] = ProblemController::getProblemStatement(
-            $problem['problem']->alias,
+            $problem['problem'],
+            $commit,
             $r['lang']
         );
-        $response['settings'] = ProblemController::getProblemSettingsDistrib($problem['problem']);
+        $response['settings'] = ProblemController::getProblemSettingsDistrib(
+            $problem['problem'],
+            $commit
+        );
 
         // Add preferred language of the user.
         $user_data = [];
@@ -1284,7 +1385,12 @@ class ProblemController extends Controller {
         }
 
         // Add the problem the response
-        $response = array_merge($response, $problem['problem']->asFilteredArray($relevant_columns));
+        $response = array_merge($response, $problem['problem']->asFilteredArray([
+            'title', 'alias', 'commit', 'current_version', 'input_limit',
+            'visits', 'submissions', 'accepted', 'difficulty', 'creation_date',
+            'source', 'order', 'points', 'visibility', 'languages',
+            'email_clarifications',
+        ]));
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
@@ -1413,17 +1519,35 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
+        $privateTreeMapping = [];
+        foreach ((new ProblemArtifacts($problem->alias, 'private'))->log() as $logEntry) {
+            $privateTreeMapping[$logEntry['commit']] = $logEntry['tree'];
+        }
+
+        $masterLog = [];
+        foreach ((new ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
+            if (count($logEntry['parents']) < 3) {
+                // Master commits always have 3 or 4 parents. If they have
+                // fewer, it's one of the commits in the merged branches.
+                continue;
+            }
+            $logEntry['version'] = $privateTreeMapping[$logEntry['parents'][count($logEntry['parents']) - 1]];
+            $logEntry['tree'] = [];
+            foreach ((new ProblemArtifacts($problem->alias, $logEntry['commit']))->lsTreeRecursive() as $treeEntry) {
+                $logEntry['tree'][$treeEntry['path']] = $treeEntry['id'];
+            }
+            array_push($masterLog, $logEntry);
+        }
+
         return [
             'status' => 'ok',
             'published' => (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
-            'current_version' => $problem->current_version,
-            'master' => (new ProblemArtifacts($problem->alias, 'master'))->log(),
-            'private' => (new ProblemArtifacts($problem->alias, 'private'))->log(),
+            'log' => $masterLog,
         ];
     }
 
     /**
-     * Entry point for Problem select version API
+     * Change the version of the problem.
      *
      * @param Request $r
      * @throws ForbiddenAccessException
@@ -1434,6 +1558,24 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::isStringNonEmpty($r['commit'], 'commit');
+        // ProblemController::UPDATE_PUBLISHED_NONE is not allowed here because
+        // it would not make any sense!
+        Validators::isInEnum(
+            $r['update_published'],
+            'update_published',
+            [
+                ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            ],
+            false
+        );
+
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1446,36 +1588,24 @@ class ProblemController extends Controller {
         if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
-        if ($problem->current_version == $r['version']) {
+
+        $oldVersion = $problem->current_version;
+        $oldCommit = $problem->commit;
+
+        [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+            $problem,
+            $r['commit']
+        );
+
+        if ($oldCommit == $problem->commit && $oldVersion == $problem->current_version) {
             return [
                 'status' => 'ok',
             ];
         }
 
-        $log = (new ProblemArtifacts($problem->alias, 'master'))->log();
-        $masterCommit = null;
-        foreach ($log as $logEntry) {
-            if (count($logEntry['parents']) < 3) {
-                // Master commits always have 3 or 4 parents. If they have
-                // fewer, it's one of the commits in the merged branches.
-                continue;
-            }
-            if ($logEntry['commit'] == $r['commit']) {
-                $masterCommit = $logEntry;
-                break;
-            }
-        }
-        if (is_null($masterCommit)) {
-            throw new NotFoundException('problemVersionNotFound');
-        }
-
-        // The private branch is always the last parent.
-        $privateCommitHash = $masterCommit['parents'][count($masterCommit['parents']) - 1];
-        $problemArtifacts = new ProblemArtifacts($problem->alias, $privateCommitHash);
-        $privateCommit = $problemArtifacts->commit();
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
 
         // Update problem fields.
-        $problem->current_version = $privateCommit['tree'];
         $problemSettings = json_decode(
             $problemArtifacts->get('settings.json'),
             JSON_OBJECT_AS_ARRAY
@@ -1486,13 +1616,22 @@ class ProblemController extends Controller {
             // Begin transaction
             DAO::transBegin();
             $problemDeployer->updatePublished(
-                (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
-                $masterCommit['commit'],
+                ((new ProblemArtifacts($problem->alias, 'published'))->commit())['commit'],
+                $problem->commit,
                 $r['current_user']
             );
-            ProblemsDAO::update($problem);
+
+            RunsDAO::createRunsForVersion($problem);
             RunsDAO::updateVersionToCurrent($problem);
-            ProblemsetProblemsDAO::updateVersionToCurrent($problem);
+            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                ProblemsetProblemsDAO::updateVersionToCurrent(
+                    $problem,
+                    $r['current_user'],
+                    $updatePublished
+                );
+            }
+
+            ProblemsDAO::update($problem);
 
             DAO::transEnd();
         } catch (ApiException $e) {
@@ -1524,7 +1663,6 @@ class ProblemController extends Controller {
             }
         }
         $updatedStatementLanguages = [];
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
         foreach ($problemArtifacts->lsTree('statements') as $file) {
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
             if ($extension != 'markdown') {
@@ -1532,11 +1670,58 @@ class ProblemController extends Controller {
             }
             $updatedStatementLanguages[] = pathinfo($file['name'], PATHINFO_FILENAME);
         }
-        self::invalidateCache($problem, $updatedStatementLanguages);
+        self::invalidateCache(
+            $problem,
+            array_merge($updatedStatementLanguages, ProblemController::VALID_LANGUAGES)
+        );
 
         return [
             'status' => 'ok',
         ];
+    }
+
+    /**
+     * Resolve a commit from the problem's master branch.
+     *
+     * @param Problems $problem the problem.
+     * @param ?string  $commit  the optional explicit commit hash.
+     *
+     * @return the SHA1 of a commit in the problem's master branch, plus
+     *         the SHA1 of the private branch tree associated with that commit.
+     * @throws NotFoundException
+     */
+    public static function resolveCommit(
+        Problems $problem,
+        ?string $commit
+    ) : array {
+        $masterCommit = null;
+        if (is_null($commit)) {
+            $masterCommit = (new ProblemArtifacts($problem->alias, 'published'))->commit();
+        } else {
+            foreach ((new ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
+                if (count($logEntry['parents']) < 3) {
+                    // Master commits always have 3 or 4 parents. If they have
+                    // fewer, it's one of the commits in the merged branches.
+                    continue;
+                }
+                if ($logEntry['commit'] == $commit) {
+                    $masterCommit = $logEntry;
+                    break;
+                }
+            }
+        }
+
+        if ($masterCommit == null) {
+            throw new NotFoundException('problemVersionNotFound');
+        }
+
+        // The private branch is always the last parent.
+        $privateCommitHash = $masterCommit['parents'][count($masterCommit['parents']) - 1];
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $privateCommitHash);
+        $privateCommit = $problemArtifacts->commit();
+
+        // Update problem fields.
+        return [$masterCommit['commit'], $privateCommit['tree']];
     }
 
     /**
@@ -1842,39 +2027,38 @@ class ProblemController extends Controller {
 
         // Filter results
         $language = null; // Filter by language, all by default.
-        $valid_languages = ['en', 'es', 'pt'];
         // "language" may be one of the allowed options, otherwise the default filter will be used.
-        if (!is_null($r['language']) && in_array($r['language'], $valid_languages)) {
+        if (!is_null($r['language']) && in_array($r['language'], ProblemController::VALID_LANGUAGES)) {
             $language = $r['language'];
         }
 
         // Sort results
-        $order = 'problem_id'; // Order by problem_id by default.
+        $orderBy = 'problem_id'; // Order by problem_id by default.
         $sorting_options = ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'problem_id'];
         // "order_by" may be one of the allowed options, otherwise the default ordering will be used.
         if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
-            $order = $r['order_by'];
+            $orderBy = $r['order_by'];
         }
 
-        // "mode" may be a valid one, for compatibility reasons 'descending' is the mode by default.
+        // "mode" may be a valid one, for compatibility reasons 'descending' is the order by default.
         if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
-            $mode = $r['mode'];
+            $order = $r['mode'];
         } else {
-            $mode = 'desc';
+            $order = 'desc';
         }
 
         $response = [];
         $response['results'] = [];
-        $author_identity_id = null;
-        $author_user_id = null;
+        $authorIdentityId = null;
+        $authorUserId = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
-        $identity_type = IDENTITY_ANONYMOUS;
+        $identityType = IDENTITY_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
-            $author_identity_id = intval($r['current_identity_id']);
-            $author_user_id = intval($r['current_user_id']);
+            $authorIdentityId = intval($r['current_identity_id']);
+            $authorUserId = intval($r['current_user_id']);
             if (Authorization::isSystemAdmin($r['current_identity_id']) ||
                 Authorization::hasRole(
                     $r['current_identity_id'],
@@ -1882,9 +2066,9 @@ class ProblemController extends Controller {
                     Authorization::REVIEWER_ROLE
                 )
             ) {
-                $identity_type = IDENTITY_ADMIN;
+                $identityType = IDENTITY_ADMIN;
             } else {
-                $identity_type = IDENTITY_NORMAL;
+                $identityType = IDENTITY_NORMAL;
             }
         }
 
@@ -1905,15 +2089,15 @@ class ProblemController extends Controller {
 
         $total = 0;
         $response['results'] = ProblemsDAO::byIdentityType(
-            $identity_type,
+            $identityType,
             $language,
+            $orderBy,
             $order,
-            $mode,
             $offset,
             $rowcount,
             $query,
-            $author_identity_id,
-            $author_user_id,
+            $authorIdentityId,
+            $authorUserId,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             is_null($r['require_all_tags']) ? true : !!$r['require_all_tags'],
@@ -2128,6 +2312,11 @@ class ProblemController extends Controller {
         }
     }
 
+    /**
+     * Gets a Problem settings object with default values.
+     *
+     * @return array The Problem settings object.
+     */
     private static function getDefaultProblemSettings() : array {
         return [
             'limits' => [
@@ -2140,6 +2329,13 @@ class ProblemController extends Controller {
             'validator' => [
                 'name' => 'token-caseless',
                 'tolerance' => 1e-9,
+                'limits' => [
+                    'ExtraWallTime' => '0s',
+                    'MemoryLimit' => '256MiB',
+                    'OutputLimit' => '10KiB',
+                    'OverallWallTimeLimit' => '5s',
+                    'TimeLimit' => '30s',
+                ],
             ],
         ];
     }
@@ -2171,8 +2367,8 @@ class ProblemController extends Controller {
         if (!is_null($r['validator'])) {
             $problemSettings['validator']['name'] = $r['validator'];
         }
-        if ($problemSettings['validator']['name'] == 'custom') {
-            if (is_null($problemSettings['validator']['limits'])) {
+        if (!is_null($r['validator_time_limit'])) {
+            if (empty($problemSettings['validator']['limits'])) {
                 $problemSettings['validator']['limits'] = [
                     'ExtraWallTime' => '0s',
                     'MemoryLimit' => '256MiB',
@@ -2181,11 +2377,9 @@ class ProblemController extends Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            if (!is_null($r['validator_time_limit'])) {
-                $problemSettings['validator']['limits']['TimeLimit'] = (int)$r['validator_time_limit'] . 'ms';
-            }
-        } else {
-            unset($problemSettings['validator']['limits']);
+            $problemSettings['validator']['limits']['TimeLimit'] = (
+                (int)$r['validator_time_limit'] . 'ms'
+            );
         }
     }
 }

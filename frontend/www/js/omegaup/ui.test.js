@@ -41,4 +41,154 @@ describe('omegaup.ui', function() {
       expect(omegaup.UI.parseDuration('.s')).toBe(null);
     });
   });
+
+  describe('markdownConverter',
+           function() {
+             let converter = omegaup.UI.markdownConverter();
+
+             it('Should handle trivial inputs', function() {
+               expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');
+             });
+
+             it('Should handle sample I/O tables', function() {
+               expect(converter.makeHtml(`# Ejemplo
+
+||input
+1
+2
+||output
+Case #1: 3
+||description
+Explicación
+||input
+5
+10
+||output
+Case #2: 15
+||end`)).toEqual(`<h1>Ejemplo</h1>
+
+<table class="sample_io">
+<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead><tbody><tr><td><pre>1
+2</pre></td><td><pre>Case #1: 3</pre></td><td><p>Explicación</p></td></tr><tr><td><pre>5
+10</pre></td><td><pre>Case #2: 15</pre></td><td></td></tr></tbody>
+</table>`);
+             });
+
+             it('Should handle GitHub-flavored Markdown tables', function() {
+               expect(converter.makeHtml(`| foo | bar |
+| --- | --- |
+| baz | bim |`)).toEqual(`<table>
+<thead>
+<tr>
+<th>foo</th>
+<th>bar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>baz</td>
+<td>bim</td>
+</tr>
+</tbody>
+</table>`);
+
+               expect(converter.makeHtml(`| abc | defghi |
+| :-: | -----------: |
+| bar | baz |`)).toEqual(`<table>
+<thead>
+<tr>
+<th align="center">abc</th>
+<th align="right">defghi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">bar</td>
+<td align="right">baz</td>
+</tr>
+</tbody>
+</table>`);
+
+               expect(converter.makeHtml('| f\\|oo  |\n' +
+                                         '| ------ |\n' +
+                                         '| b ` \\| ` az |\n' +
+                                         '| b **\\|** im |'))
+                   .toEqual(`<table>
+<thead>
+<tr>
+<th>f|oo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>b <code>|</code> az</td>
+</tr>
+<tr>
+<td>b <strong>|</strong> im</td>
+</tr>
+</tbody>
+</table>`);
+
+               expect(converter.makeHtml(`| abc | def |
+| --- | --- |
+| bar | baz |
+> bar`)).toEqual(`<table>
+<thead>
+<tr>
+<th>abc</th>
+<th>def</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bar</td>
+<td>baz</td>
+</tr>
+</tbody>
+</table>
+
+<blockquote>
+  <p>bar</p>
+</blockquote>`);
+
+               expect(converter.makeHtml(`| abc | def |
+| --- |
+| bar |`)).toEqual(`<p>| abc | def |
+| --- |
+| bar |</p>`);
+
+               expect(converter.makeHtml(`| abc | def |
+| --- | --- |
+| bar |
+| bar | baz | boo |`))
+                   .toEqual(`<table>
+<thead>
+<tr>
+<th>abc</th>
+<th>def</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bar</td>
+<td></td>
+</tr>
+<tr>
+<td>bar</td>
+<td>baz</td>
+</tr>
+</tbody>
+</table>`);
+
+               expect(converter.makeHtml(`| abc | def |
+| --- | --- |`)).toEqual(`<table>
+<thead>
+<tr>
+<th>abc</th>
+<th>def</th>
+</tr>
+</thead>
+</table>`);
+             });
+           });
 });

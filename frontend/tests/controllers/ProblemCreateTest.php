@@ -672,10 +672,10 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Verify that the templates were generated.
         $this->assertTrue(
-            file_exists(TEMPLATES_PATH . "/{$problem->alias}/{$problem->alias}_unix_cpp.tar.bz2")
+            file_exists(TEMPLATES_PATH . "/{$problem->alias}/{$problem->commit}/{$problem->alias}_unix_cpp.tar.bz2")
         );
         $this->assertTrue(
-            file_exists(TEMPLATES_PATH . "/{$problem->alias}/{$problem->alias}_windows_cpp.zip")
+            file_exists(TEMPLATES_PATH . "/{$problem->alias}/{$problem->commit}/{$problem->alias}_windows_cpp.zip")
         );
     }
 }

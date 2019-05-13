@@ -87,7 +87,7 @@ class QualityNominationController extends Controller {
         if ($r['nomination'] != 'demotion') {
             // All nominations types, except demotions, are only allowed for
             // uses who have already solved the problem.
-            if (!ProblemsDAO::isProblemSolved($problem, $r['current_identity_id'])) {
+            if (!ProblemsDAO::isProblemSolved($problem, (int)$r['current_identity_id'])) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
         }
@@ -530,7 +530,8 @@ class QualityNominationController extends Controller {
             // Pull original problem statements in every language the nominator is trying to override.
             foreach ($response['contents']['statements'] as $language => $_) {
                 $response['original_contents']['statements'][$language] = ProblemController::getProblemStatement(
-                    $problem->alias,
+                    $problem,
+                    'published',
                     $language
                 );
             }

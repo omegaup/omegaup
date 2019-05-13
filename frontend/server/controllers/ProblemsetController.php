@@ -23,6 +23,8 @@ class ProblemsetController extends Controller {
     public static function addProblem(
         $problemset_id,
         Problems $problem,
+        string $commit,
+        string $currentVersion,
         $current_identity_id,
         $points,
         $order_in_contest = 1
@@ -37,7 +39,8 @@ class ProblemsetController extends Controller {
             self::updateProblemsetProblem(new ProblemsetProblems([
                 'problemset_id' => $problemset_id,
                 'problem_id' => $problem->problem_id,
-                'version' => $problem->current_version,
+                'commit' => $commit,
+                'version' => $currentVersion,
                 'points' => $points,
                 'order' => $order_in_contest,
             ]));

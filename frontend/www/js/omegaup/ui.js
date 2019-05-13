@@ -498,7 +498,7 @@ let UI = {
     }
 
     let converter = Markdown.getSanitizingConverter();
-    let whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|figure|figcaption|code|i|table|tbody|thead|tr|th|td|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
+    let whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
     let imageWhitelist = new RegExp('^<img\\ssrc="data:image\/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$', 'i');
 
     converter.hooks.chain('isValidTag', function(tag) {
@@ -534,7 +534,7 @@ let UI = {
           });
       return text;
     });
-    converter.hooks.chain('preBlockGamut', function(text, hashBlock) {
+    converter.hooks.chain('preBlockGamut', function(text, blockGamut) {
       // Sample I/O table.
       return text.replace(
           /^( {0,3}\|\| *input *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
@@ -561,7 +561,7 @@ let UI = {
             result += '<tbody>';
             for (var i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
-                result += '<td>' + hashBlock(matches[i + 1]) + '</td>';
+                result += '<td>' + blockGamut(matches[i + 1]) + '</td>';
                 columns++;
               } else {
                 if (matches[i] == 'input') {
@@ -587,10 +587,91 @@ let UI = {
             }
             result += '</tr></tbody>';
 
-            return hashBlock('<table class="sample_io">\n' + result +
-                             '\n</table>');
+            return '<table class="sample_io">\n' + result + '\n</table>\n';
           });
     });
+    converter.hooks.chain(
+        'preBlockGamut', function(text, blockGamut, spanGamut) {
+          // GitHub-flavored Markdown table.
+          return text.replace(
+              /^ {0,3}\|[^\n]*\|[ \t]*(\n {0,3}\|[^\n]*\|[ \t]*)+$/gm,
+              function(whole, inner) {
+                var cells = whole.trim().split('\n').map(function(line) {
+                  return line.match(/(\\\||[^|])+/g)
+                      .map(function(value) {
+                        return value.trim().replace(/\\\|/g, '|');
+                      });
+                });
+
+                // The header row must match the delimiter row in the number of
+                // cells. If not, a table will not be recognized.
+                if (cells.length < 2) {
+                  return whole;
+                }
+
+                var header = cells[0];
+                var delimiter = cells[1];
+                var alignment = [];
+                if (header.length != delimiter.length) {
+                  return whole;
+                }
+                cells = cells.slice(2);
+
+                // The delimiter row consists of cells whose only content are
+                // hyphens (-), and optionally, a leading or trailing colon (:),
+                // or
+                // both, to indicate left, right, or center alignment
+                // respectively.
+                for (var i = 0; i < delimiter.length; i++) {
+                  if (!delimiter[i].match(/^:?-+:?$/)) {
+                    return whole;
+                  }
+                  if (delimiter[i][0] == ':' &&
+                      delimiter[i][delimiter[i].length - 1] == ':') {
+                    alignment.push('center');
+                  } else if (delimiter[i][delimiter[i].length - 1] == ':') {
+                    alignment.push('right');
+                  } else {
+                    alignment.push('');
+                  }
+                }
+
+                function alignedTag(tagName, align) {
+                  return '<' + tagName +
+                         (align ? ' align="' + align + '"' : '') + '>';
+                }
+
+                var text = '<table>\n';
+                text += '<thead>\n';
+                text += '<tr>\n';
+                for (var i = 0; i < header.length; i++) {
+                  text += alignedTag('th', alignment[i]) +
+                          spanGamut(header[i]) + '</th>\n';
+                }
+                text += '</tr>\n';
+                text += '</thead>\n';
+                if (cells.length) {
+                  text += '<tbody>\n';
+                  for (var i = 0; i < cells.length; i++) {
+                    text += '<tr>\n';
+                    var row = cells[i];
+                    for (var j = 0; j < Math.min(alignment.length, row.length);
+                         j++) {
+                      text += alignedTag('td', alignment[j]) +
+                              spanGamut(row[j]) + '</td>\n';
+                    }
+                    for (var j = row.length; j < alignment.length; j++) {
+                      text += alignedTag('td', alignment[j]) + '</td>\n';
+                    }
+                    text += '</tr>\n';
+                  }
+                  text += '</tbody>\n';
+                }
+                text += '</table>\n';
+
+                return text;
+              });
+        });
 
     converter.makeHtmlWithImages = function(markdown, imageMapping) {
       try {
