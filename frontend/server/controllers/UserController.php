@@ -356,23 +356,17 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiLogin(Request $r) {
-        // Create a SessionController to perform login
         $sessionController = new SessionController();
 
-        // Require the auth_token back
         $r['returnAuthToken'] = true;
-
-        // Get auth_token
         $auth_token = $sessionController->NativeLogin($r);
-
-        // If user was correctly logged in
-        if ($auth_token !== false) {
-            return [
-                'status' => 'ok',
-                'auth_token' => $auth_token];
-        } else {
+        if ($auth_token === false) {
             throw new InvalidCredentialsException();
         }
+        return [
+            'status' => 'ok',
+            'auth_token' => $auth_token,
+        ];
     }
 
     /**

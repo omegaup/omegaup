@@ -2488,9 +2488,11 @@ class ContestController extends Controller {
             }
 
             $sizeOfBucket = $totalPoints / 100;
-            $scoreboardResponse = self::apiScoreboard($r);
-            foreach ($scoreboardResponse['ranking'] as $results) {
-                $distribution[(int)($results['total']['points'] / $sizeOfBucket)]++;
+            if ($sizeOfBucket > 0) {
+                $scoreboardResponse = self::apiScoreboard($r);
+                foreach ($scoreboardResponse['ranking'] as $results) {
+                    $distribution[(int)($results['total']['points'] / $sizeOfBucket)]++;
+                }
             }
         } catch (Exception $e) {
             // Operation failed in the data layer
