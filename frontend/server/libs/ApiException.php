@@ -35,7 +35,7 @@ abstract class ApiException extends Exception {
      *
      * @return string
      */
-    public function getHeader() {
+    final public function getHeader() : string {
         return $this->header;
     }
 
@@ -45,7 +45,7 @@ abstract class ApiException extends Exception {
      * @param string $key
      * @param type $value
      */
-    public function addCustomMessageToArray($key, $value) {
+    final public function addCustomMessageToArray($key, $value) : void {
         $this->customMessage[$key] = $value;
     }
 
@@ -53,17 +53,18 @@ abstract class ApiException extends Exception {
      *
      * @return array
      */
-    public function asArray() {
-        $arrayToReturn =  [
-            'status' => 'error',
-            'error' => $this->getErrorMessage(),
-            'errorcode' => $this->code,
-            'header' => $this->header,
-            'cause' => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : null,
-            'trace' => $this->getTraceAsString(),
-        ];
-
-        return array_merge($arrayToReturn, $this->customMessage);
+    final public function asArray() : array {
+        return array_merge(
+            [
+                'status' => 'error',
+                'error' => $this->getErrorMessage(),
+                'errorcode' => $this->code,
+                'header' => $this->header,
+                'cause' => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : null,
+                'trace' => $this->getTraceAsString(),
+            ],
+            $this->customMessage
+        );
     }
 
     /**
@@ -71,16 +72,17 @@ abstract class ApiException extends Exception {
      *
      * @return array
      */
-    public function asResponseArray() {
-        $arrayToReturn =  [
-            'status' => 'error',
-            'error' => $this->getErrorMessage(),
-            'errorname' => $this->message,
-            'errorcode' => $this->code,
-            'header' => $this->header
-        ];
-
-        return array_merge($arrayToReturn, $this->customMessage);
+    final public function asResponseArray() : array {
+        return array_merge(
+            [
+                'status' => 'error',
+                'error' => $this->getErrorMessage(),
+                'errorname' => $this->message,
+                'errorcode' => $this->code,
+                'header' => $this->header,
+            ],
+            $this->customMessage
+        );
     }
 
     protected function getErrorMessage() : string {
