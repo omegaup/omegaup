@@ -18,13 +18,6 @@ class Request extends ArrayObject {
     private $parent = null;
 
     /**
-     * The format in which the request will be rendered.
-     */
-    const JSON_FORMAT = 0;
-    const HTML_FORMAT = 1;
-    public $renderFormat = Request::JSON_FORMAT;
-
-    /**
      * The object of the user currently logged in.
      */
     public $user = null;
@@ -66,7 +59,6 @@ class Request extends ArrayObject {
         $req = new Request($contents);
         $req->parent = $this;
         $req->user = $this->user;
-        $req->renderFormat = $this->renderFormat;
         return $req;
     }
 
