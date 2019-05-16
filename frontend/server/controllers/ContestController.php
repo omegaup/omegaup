@@ -544,7 +544,7 @@ class ContestController extends Controller {
 
         DAO::transBegin();
         try {
-            ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
+            ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r['current_identity_id'],
                 $r['contest']->problemset_id,
                 true,
@@ -689,7 +689,7 @@ class ContestController extends Controller {
             // want this to get generally cached for everybody
             // Save the time of the first access
             try {
-                $problemset_user = ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
+                $problemset_user = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                     $r['current_identity_id'],
                     $r['contest']->problemset_id
                 );
@@ -722,6 +722,7 @@ class ContestController extends Controller {
         }
 
         $result['status'] = 'ok';
+        $result['opened'] = true;
         return $result;
     }
 
@@ -744,6 +745,10 @@ class ContestController extends Controller {
         $result = [];
         self::getCachedDetails($r, $result);
 
+        $result['opened'] = ProblemsetIdentitiesDAO::checkProblemsetOpened(
+            (int)$r['current_identity_id'],
+            (int)$r['contest']->problemset_id
+        );
         $result['available_languages'] = RunController::$kSupportedLanguages;
         $result['status'] = 'ok';
         $result['admin'] = true;

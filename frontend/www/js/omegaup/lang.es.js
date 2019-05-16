@@ -18,6 +18,7 @@ const translations = {
 	arenaCommonPasteTheCode: "Pega el c\u00f3digo de tu programa:",
 	arenaCommonTimeLimit: "L\u00edmite de tiempo (caso)",
 	arenaContestEndedUsePractice: "Este concurso ha terminado. Para continuar enviando soluciones usa nuestro Modo Pr\u00e1ctica haciendo click aqu\u00ed.",
+	arenaContestNotOpened: "Necesitas abrir el concurso como no-administrador para hacer env\u00edos.",
 	arenaContestOrganizer: "Organiza",
 	arenaContestWindowLength: "Tiempo para resolver los problemas",
 	arenaCurrentContests: "Concursos actuales",
