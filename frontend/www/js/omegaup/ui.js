@@ -47,7 +47,7 @@ let UI = {
     return clock;
   },
 
-  isVirtual: function(contest) { return contest.rerun_id != 0; },
+  isVirtual: function(contest) { return contest.rerun_id > 0; },
 
   contestTitle: function(contest) {
     if (UI.isVirtual(contest)) {
