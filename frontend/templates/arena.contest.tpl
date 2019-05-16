@@ -101,7 +101,6 @@
 					<form enctype="multipart/form-data" action="/api/problem/update" method="post" id="update-problem">
 						<fieldset>
 							<legend>Administrar problema</legend>
-							<button id="rejudge-problem" value="Rejuecear">Rejuecear</button>
 							<input name="problem_alias" type="hidden" />
 							<input name="problem_contents" type="file" />
 							<button type="submit">Actualizar casos/redacci&oacute;n</button>

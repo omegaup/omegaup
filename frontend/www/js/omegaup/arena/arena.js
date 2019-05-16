@@ -110,7 +110,7 @@ class EventsSocket {
         self.arena.updateClarification(data.clarification);
       }
     } else if (data.message == '/scoreboard/update/') {
-      if (self.arena.contestAdmin && data.scoreboard_type != 'admin') {
+      if (self.arena.problemsetAdmin && data.scoreboard_type != 'admin') {
         if (self.arena.options.originalContestAlias == null) return;
         self.arena.virtualRankingChange(data.scoreboard);
         return;
@@ -248,7 +248,8 @@ export class Arena {
     self.currentProblem = null;
 
     // If we have admin powers in self contest.
-    self.contestAdmin = false;
+    self.problemsetAdmin = false;
+    self.problemsetOpened = true;
     self.answeredClarifications = 0;
     self.clarificationsOffset = 0;
     self.clarificationsRowcount = 20;
@@ -433,9 +434,10 @@ export class Arena {
 
   initProblemsetId(problemset) {
     let self = this;
-    if (problemset.hasOwnProperty('problemset_id')) {
-      self.options.problemsetId = problemset.problemset_id;
+    if (!problemset.hasOwnProperty('problemset_id')) {
+      return;
     }
+    self.options.problemsetId = problemset.problemset_id;
   }
 
   initClock(start, finish, deadline) {
@@ -545,7 +547,14 @@ export class Arena {
   initProblems(problemset) {
     let self = this;
     self.currentProblemset = problemset;
-    self.contestAdmin = problemset.admin;
+    self.problemsetAdmin = problemset.admin;
+    self.problemsetOpened =
+        !problemset.hasOwnProperty('opened') || problemset.opened;
+    if (!self.problemsetOpened) {
+      $('#new-run a')
+          .attr('href', `/arena/${self.options.contestAlias}/`)
+          .text(T.arenaContestNotOpened);
+    }
     let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
@@ -636,8 +645,8 @@ export class Arena {
               self.rankingChange(response);
           })
           .fail(UI.ignoreError);
-    } else if (self.options.contestAdmin || self.options.contestAlias != null ||
-               self.contestAdmin ||
+    } else if (self.options.problemsetAdmin ||
+               self.options.contestAlias != null || self.problemsetAdmin ||
                (self.options.courseAlias && self.options.assignmentAlias)) {
       API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
           .then(self.rankingChange.bind(self))
@@ -1031,7 +1040,7 @@ export class Arena {
               .removeClass('template')
               .addClass('inserted');
 
-      if (self.contestAdmin) {
+      if (self.problemsetAdmin) {
         (function(id, answerNode) {
           let responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
@@ -1067,7 +1076,7 @@ export class Arena {
                 .then(function() {
                   $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
-                  if (self.contestAdmin) {
+                  if (self.problemsetAdmin) {
                     self.notifications.resolve({
                       id: 'clarification-' + clarification.clarification_id
                     });
@@ -1086,7 +1095,7 @@ export class Arena {
     $('.anchor', r).attr('name', anchor);
     $('.contest', r).html(clarification.contest_alias);
     $('.problem', r).html(clarification.problem_alias);
-    if (self.contestAdmin) $('.author', r).html(clarification.author);
+    if (self.problemsetAdmin) $('.author', r).html(clarification.author);
     $('.time', r)
         .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
                                     clarification.time.getTime()));
@@ -1096,7 +1105,7 @@ export class Arena {
       self.answeredClarifications++;
     }
 
-    if (self.contestAdmin != !!clarification.answer) {
+    if (self.problemsetAdmin != !!clarification.answer) {
       self.notifications.notify({
         id: 'clarification-' + clarification.clarification_id,
         author: clarification.author,
@@ -1373,8 +1382,10 @@ export class Arena {
         } else {
           $('#problem .problemsetter').hide();
         }
-        $('#problem .runs tfoot td a')
-            .attr('href', '#problems/' + problem.alias + '/new-run');
+        if (self.problemsetOpened) {
+          $('#problem .runs tfoot td a')
+              .attr('href', '#problems/' + problem.alias + '/new-run');
+        }
 
         $('#problem tbody.added').remove();
 
@@ -1403,8 +1414,13 @@ export class Arena {
           update(problem);
         } else {
           let problemset = self.computeProblemsetArg();
-          API.Problem.details(
-                         $.extend(problemset, {problem_alias: problem.alias}))
+          API.Problem.details($.extend(problemset,
+                                       {
+                                         problem_alias: problem.alias,
+                                         prevent_problemset_open:
+                                             self.problemsetAdmin &&
+                                                 !self.problemsetOpened
+                                       }))
               .then(function(problem_ext) {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
