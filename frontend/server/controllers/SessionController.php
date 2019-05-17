@@ -292,8 +292,7 @@ class SessionController extends Controller {
         try {
             $loginTicket = $client->verifyIdToken($r['storeToken']);
         } catch (Google_Auth_Exception $ge) {
-            self::$log->error($ge->getMessage());
-            throw new InternalServerErrorException($ge);
+            throw new UnauthorizedException('loginRequired', $ge);
         }
 
         $payload = $loginTicket->getAttributes()['payload'];

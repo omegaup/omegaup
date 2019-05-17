@@ -18,6 +18,7 @@ const translations = {
 	arenaCommonPasteTheCode: "Paste the source code here:",
 	arenaCommonTimeLimit: "Time limit (case)",
 	arenaContestEndedUsePractice: "This contest has ended. To continue sending solutions please use our Practice Mode by clicking here.",
+	arenaContestNotOpened: "You need to open the problemset in non-admin mode to make submissions.",
 	arenaContestOrganizer: "Organizer",
 	arenaContestWindowLength: "Time to solve all problems",
 	arenaCurrentContests: "Current contests",

@@ -284,6 +284,7 @@ class ContestsDAO extends ContestsDAOBase {
                 UNIX_TIMESTAMP (c.start_time) as start_time,
                 UNIX_TIMESTAMP (c.finish_time) as finish_time,
                 c.admission_mode,
+                c.rerun_id,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
             FROM
@@ -343,6 +344,7 @@ class ContestsDAO extends ContestsDAOBase {
                 UNIX_TIMESTAMP (c.start_time) as start_time,
                 UNIX_TIMESTAMP (c.finish_time) as finish_time,
                 c.admission_mode,
+                c.rerun_id,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
             FROM

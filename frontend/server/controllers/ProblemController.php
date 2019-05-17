@@ -1409,14 +1409,15 @@ class ProblemController extends Controller {
             unset($response['source']);
         }
 
-        $problemset_id = !is_null($problem['problemset']) ? (int)$problem['problemset']->problemset_id : null;
+        $problemset = $problem['problemset'];
+        $problemsetId = !is_null($problemset) ? (int)$problemset->problemset_id : null;
 
         if (!is_null($r['current_user_id'])) {
             // Get all the available runs done by the current_user
             try {
                 $runsArray = RunsDAO::getForProblemDetails(
                     (int)$problem['problem']->problem_id,
-                    $problemset_id,
+                    $problemsetId,
                     (int)$r['current_identity_id']
                 );
             } catch (Exception $e) {
@@ -1435,34 +1436,37 @@ class ProblemController extends Controller {
             }
         }
 
-        if (!is_null($problemset_id)) {
-            // At this point, contestant_user relationship should be established.
-            try {
-                ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
-                    $r['current_identity_id'],
-                    $problemset_id,
-                    Authorization::canSubmitToProblemset(
+        if (!is_null($problemset)) {
+            $result['admin'] = Authorization::isAdmin($r['current_identity_id'], $problemset);
+            if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
+                // At this point, contestant_user relationship should be established.
+                try {
+                    ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                         $r['current_identity_id'],
-                        $problem['problemset']
-                    )
-                );
-            } catch (ApiException $e) {
-                throw $e;
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
+                        $problemset->problemset_id,
+                        Authorization::canSubmitToProblemset(
+                            $r['current_identity_id'],
+                            $problem['problemset']
+                        )
+                    );
+                } catch (ApiException $e) {
+                    throw $e;
+                } catch (Exception $e) {
+                    // Operation failed in the data layer
+                    throw new InvalidDatabaseOperationException($e);
+                }
             }
 
             // As last step, register the problem as opened
             if (!ProblemsetProblemOpenedDAO::getByPK(
-                $problemset_id,
+                $problemsetId,
                 $problem['problem']->problem_id,
                 $r['current_identity_id']
             )) {
                 try {
                     // Save object in the DB
                     ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
-                        'problemset_id' => $problemset_id,
+                        'problemset_id' => $problemset->problemset_id,
                         'problem_id' => $problem['problem']->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
                         'identity_id' => $r['current_identity_id']
@@ -1488,7 +1492,12 @@ class ProblemController extends Controller {
         $response['languages'] = array_filter(explode(',', $response['languages']));
 
         $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2)), 2);
-        $response['score'] = self::bestScore($problem['problem'], $r['problemset_id'], $r['contest_alias'], $r['current_identity_id']);
+        $response['score'] = self::bestScore(
+            $problem['problem'],
+            $problemsetId,
+            $r['contest_alias'],
+            $r['current_identity_id']
+        );
         $response['status'] = 'ok';
         $response['exists'] = true;
         return $response;
