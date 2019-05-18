@@ -506,6 +506,33 @@ let UI = {
     });
 
     converter.hooks.chain('postSpanGamut', function(text) {
+      // These two functions are adapted from Markdown.Converter.js. They are
+      // needed to support images with some special characters in their name.
+      function escapeCharacters(text, charsToEscape, afterBackslash) {
+        // First we have to escape the escape characters so that
+        // we can build a character class out of them
+        const regexString =
+            `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
+
+        if (afterBackslash) {
+          regexString = `\\\\${regexString}`;
+        }
+
+        const regex = new RegExp(regexString, 'g');
+        return text.replace(/~/g, '~T')
+            .replace(/\$/g, '~D')
+            .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`)
+      }
+      function unescapeCharacters(text) {
+        //
+        // Swap back in all the special characters we've hidden.
+        //
+        return text.replace(/~E(\d+)E/g, function(wholeMatch, m1) {
+                     const charCodeToReplace = parseInt(m1);
+                     return String.fromCharCode(charCodeToReplace);
+                   }).replace(/~D/g, '$').replace(/~T/g, '~');
+      }
+
       // Templates.
       text = text.replace(
           /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g, function(wholematch, m1) {
@@ -517,14 +544,15 @@ let UI = {
           });
       // Images.
       let imageMapping = converter._imageMapping || options.imageMapping || {};
-      text = text.replace(
-          /<img src="([^"]+)" ([^>]+)>/g,
-          function(wholeMatch, url, attributes) {
-            if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
-              return wholeMatch;
-            }
-            return `<img src="${imageMapping[url]}" ${attributes}>`;
-          });
+      text = text.replace(/<img src="([^"]+)"\s*([^>]+)>/g, function(
+                                                                wholeMatch, url,
+                                                                attributes) {
+        url = unescapeCharacters(url);
+        if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
+          return wholeMatch;
+        }
+        return `<img src="${escapeCharacters(imageMapping[url], '*_')}" ${attributes}>`;
+      });
       // Figures.
       text = text.replace(
           /^\s*<img src="([^"]+)"\s*([^>]+)\s+title="([^"]+)"\s*\/>\s*$/g,
