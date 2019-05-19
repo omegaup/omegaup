@@ -232,7 +232,7 @@ class ClarificationController extends Controller {
                 $r['contest'] = ContestsDAO::getByProblemset($r['clarification']->problemset_id);
             }
             if (is_null($r['user'])) {
-                $r['user'] = UsersDAO::GetByPK($r['clarification']->author_id);
+                $r['user'] = IdentitiesDAO::GetByPK($r['clarification']->author_id);
             }
         } catch (Exception $e) {
             self::$log->error('Failed to broadcast clarification: ' . $e);
