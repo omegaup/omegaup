@@ -967,6 +967,10 @@ class UpdateProblemTest extends OmegaupTestCase {
 
             Time::setTimeForTesting($originalTime - 30 * 60);
 
+            // Create a standalone run.
+            $pastStandaloneRunData = RunsFactory::createRunToProblem($problemData, $contestant);
+            RunsFactory::gradeRun($pastStandaloneRunData);
+
             // Create a contest in the past with one run.
             $pastContestData = ContestsFactory::createContest(new ContestParams([
                 'start_time' => $originalTime - 60 * 60,
@@ -1016,7 +1020,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             ]));
             // Runs are only added when the publishing mode is not none.
             $this->assertEquals(
-                $updatePublished == ProblemController::UPDATE_PUBLISHED_NONE ? 0 : 2,
+                $updatePublished == ProblemController::UPDATE_PUBLISHED_NONE ? 0 : 3,
                 $detourGrader->getGraderCallCount()
             );
             foreach ($detourGrader->getRuns() as $run) {
@@ -1026,7 +1030,8 @@ class UpdateProblemTest extends OmegaupTestCase {
             return [
                 'pastRunData' => $pastRunData,
                 'presentRunData' => $presentRunData,
-                'problemData' => $problemData,
+                'pastStandaloneRunData' => $pastStandaloneRunData,
+                'pastProblemData' => $problemData,
                 'pastContestData' => $pastContestData,
                 'presentContestData' => $presentContestData,
             ];
@@ -1113,6 +1118,21 @@ class UpdateProblemTest extends OmegaupTestCase {
                 SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
+
+        // Ensure that rolling back the version change would make a difference.
+        $login = self::login($result['pastProblemData']['author']);
+        $diffResult = ProblemController::apiRunsDiff(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $result['pastProblemData']['problem']->alias,
+            'version' => $result['pastProblemData']['problem']->current_version,
+        ]));
+        $this->assertEquals(1, count($diffResult['diff']));
+        $this->assertEquals(
+            $result['pastStandaloneRunData']['response']['guid'],
+            $diffResult['diff'][0]['guid']
+        );
+        $this->assertEquals('WA', $diffResult['diff'][0]['old_verdict']);
+        $this->assertEquals('AC', $diffResult['diff'][0]['new_verdict']);
     }
 
     /**
@@ -1156,12 +1176,46 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        // Now explicitly change the version of the problemset.
-        $login = self::login($result['problemData']['author']);
+        // Ensure that the version change would make a difference.
+        $login = self::login($result['pastProblemData']['author']);
+        $presentProblem = ProblemsDAO::getByAlias($result['pastProblemData']['problem']->alias);
+        $diffResult = ContestController::apiRunsDiff(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $result['pastProblemData']['problem']->alias,
+            'contest_alias' => $result['pastContestData']['contest']->alias,
+            'version' => $presentProblem->current_version,
+        ]));
+        $this->assertEquals(1, count($diffResult['diff']));
+        $this->assertEquals(
+            $result['pastRunData']['response']['guid'],
+            $diffResult['diff'][0]['guid']
+        );
+        $this->assertEquals('AC', $diffResult['diff'][0]['old_verdict']);
+        $this->assertEquals('WA', $diffResult['diff'][0]['new_verdict']);
+
+        // Changing the version of the problemset to whatever it is currently
+        // should not have any visible effect.
         ContestController::apiAddProblem(new Request([
             'auth_token' => $login->auth_token,
-            'problem_alias' => $result['problemData']['problem']->alias,
+            'problem_alias' => $result['pastProblemData']['problem']->alias,
             'contest_alias' => $result['pastContestData']['contest']->alias,
+            'commit' => $result['pastProblemData']['problem']->commit,
+            'points' => 100,
+            'order_in_contest' => 1,
+        ]));
+        $this->assertEquals(
+            'AC',
+            RunsDAO::getByPK(
+                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            )->verdict
+        );
+
+        // Now explicitly change the version of the problemset.
+        ContestController::apiAddProblem(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $result['pastProblemData']['problem']->alias,
+            'contest_alias' => $result['pastContestData']['contest']->alias,
+            'commit' => $presentProblem->commit,
             'points' => 100,
             'order_in_contest' => 1,
         ]));
