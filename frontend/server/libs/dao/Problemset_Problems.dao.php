@@ -378,8 +378,10 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     }
 
     public static function updateProblemsetProblemSubmissions(
-        ProblemsetProblem $problemsetProblem
+        ProblemsetProblems $problemsetProblem
     ) : void {
+        global $conn;
+
         $sql = '
             INSERT IGNORE INTO
                 Runs (
@@ -390,7 +392,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             FROM
                 Submissions s
             WHERE
-                s.problemset_id = ?
+                s.problemset_id = ? AND
                 s.problem_id = ?
             ORDER BY
                 s.submission_id;
