@@ -376,4 +376,53 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         ';
         $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
+
+    public static function updateProblemsetProblemSubmissions(
+        ProblemsetProblem $problemsetProblem
+    ) : void {
+        $sql = '
+            INSERT IGNORE INTO
+                Runs (
+                    submission_id, version, verdict
+                )
+            SELECT
+                s.submission_id, ?, "JE"
+            FROM
+                Submissions s
+            WHERE
+                s.problemset_id = ?
+                s.problem_id = ?
+            ORDER BY
+                s.submission_id;
+        ';
+        $conn->Execute($sql, [
+            $problemsetProblem->version,
+            $problemsetProblem->problemset_id,
+            $problemsetProblem->problem_id,
+        ]);
+
+        $sql = '
+            UPDATE
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.submission_id = s.submission_id
+            INNER JOIN
+                Problemset_Problems pp
+            ON
+                pp.problemset_id = s.problemset_id AND
+                pp.problem_id = s.problem_id AND
+                pp.version = r.version
+            SET
+                s.current_run_id = r.run_id
+            WHERE
+                pp.problemset_id = ? AND
+                pp.problem_id = ?;
+        ';
+        $conn->Execute($sql, [
+            $problemsetProblem->problemset_id,
+            $problemsetProblem->problem_id,
+        ]);
+    }
 }
