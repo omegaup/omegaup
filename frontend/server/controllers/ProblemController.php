@@ -1690,6 +1690,38 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Return a report of which runs would change due to a version change.
+     */
+    public static function apiRunsDiff(Request $r) : array {
+        self::authenticateRequest($r);
+
+        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::isStringNonEmpty($r['version'], 'version');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        return [
+            'status' => 'ok',
+            'diff' => RunsDAO::getRunsDiffsForVersion(
+                $problem,
+                null,
+                $problem->current_version,
+                $r['version']
+            ),
+        ];
+    }
+
+    /**
      * Resolve a commit from the problem's master branch.
      *
      * @param Problems $problem the problem.

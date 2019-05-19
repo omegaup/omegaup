@@ -840,4 +840,69 @@ class RunsDAO extends RunsDAOBase {
         }
         return $result;
     }
+
+    /**
+     * Gets a report of the runs that could have score changes due to a version
+     * change.
+     *
+     * @param Problems $problem      the problem.
+     * @param ?int     $problemsetId the optional problemset.
+     * @param string   $oldVersion   the old version.
+     * @param string   $newVersion   the new version.
+     */
+    final public static function getRunsDiffsForVersion(
+        Problems $problem,
+        ?int $problemsetId,
+        string $oldVersion,
+        string $newVersion
+    ) : array {
+        global $conn;
+        $sql = '
+            SELECT
+                i.username,
+                s.guid,
+                s.problemset_id,
+                old_runs.status AS old_status,
+                old_runs.verdict AS old_verdict,
+                old_runs.score AS old_score,
+                new_runs.status AS new_status,
+                new_runs.verdict AS new_verdict,
+                new_runs.score AS new_score
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            LEFT JOIN
+                Runs old_runs
+            ON
+                old_runs.submission_id = s.submission_id AND
+                old_runs.version = ?
+            LEFT JOIN
+                Runs new_runs
+            ON
+                new_runs.submission_id = s.submission_id AND
+                new_runs.version = ?
+        ';
+        $params = [$oldVersion, $newVersion];
+
+        $clauses = ['s.problem_id = ?'];
+        $params[] = $problem->problem_id;
+
+        if (is_null($problemsetId)) {
+            $clauses[] = 's.problemset_id IS NULL';
+        } else {
+            $clauses[] = 's.problemset_id = ?';
+            $params[] = $problemsetId;
+        }
+
+        $sql .= ' WHERE ' . implode(' AND ', $clauses) . ' ';
+        $sql .= '
+            ORDER BY
+                s.submission_id
+            LIMIT 0, 1000;
+        ';
+        return $conn->GetAll($sql, $params);
+    }
 }
