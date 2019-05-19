@@ -1026,6 +1026,9 @@ class UpdateProblemTest extends OmegaupTestCase {
             return [
                 'pastRunData' => $pastRunData,
                 'presentRunData' => $presentRunData,
+                'problemData' => $problemData,
+                'pastContestData' => $pastContestData,
+                'presentContestData' => $presentContestData,
             ];
         } finally {
             Time::setTimeForTesting($originalTime);
@@ -1150,6 +1153,22 @@ class UpdateProblemTest extends OmegaupTestCase {
             'WA',
             RunsDAO::getByPK(
                 SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            )->verdict
+        );
+
+        // Now explicitly change the version of the problemset.
+        $login = self::login($result['problemData']['author']);
+        ContestController::apiAddProblem(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $result['problemData']['problem']->alias,
+            'contest_alias' => $result['pastContestData']['contest']->alias,
+            'points' => 100,
+            'order_in_contest' => 1,
+        ]));
+        $this->assertEquals(
+            'WA',
+            RunsDAO::getByPK(
+                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
     }
