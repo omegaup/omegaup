@@ -1432,7 +1432,58 @@ class ContestController extends Controller {
 
         return [
             'contest' => $contest,
-            'problem' => $problem];
+            'problem' => $problem,
+        ];
+    }
+
+    /**
+     * Return a report of which runs would change due to a version change.
+     */
+    public static function apiRunsDiff(Request $r) : array {
+        self::authenticateRequest($r);
+
+        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::isStringNonEmpty($r['version'], 'version');
+
+        try {
+            $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+        if (!Authorization::isContestAdmin($r['current_identity_id'], $contest)) {
+            throw new ForbiddenAccessException();
+        }
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+            (int)$contest->problemset_id,
+            (int)$problem->problem_id
+        );
+        if (is_null($problemsetProblem)) {
+            throw new NotFoundException('recordNotFound');
+        }
+
+        return [
+            'status' => 'ok',
+            'diff' => RunsDAO::getRunsDiffsForVersion(
+                $problem,
+                (int)$contest->problemset_id,
+                $problemsetProblem->version,
+                $r['version']
+            ),
+        ];
     }
 
     /**
