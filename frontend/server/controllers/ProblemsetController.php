@@ -53,20 +53,33 @@ class ProblemsetController extends Controller {
      * When problem is already in the problemset, it must recalculate
      * the contest_score for all the problemset and problem runs
      */
-    public static function updateProblemsetProblem(ProblemsetProblems $updatedProblemsetProblem) {
-        $problem = ProblemsetProblemsDAOBase::getByPK(
+    private static function updateProblemsetProblem(
+        ProblemsetProblems $updatedProblemsetProblem
+    ) {
+        $oldProblemsetProblem = ProblemsetProblemsDAOBase::getByPK(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id
         );
-        ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
-        if (is_null($problem) || $problem->points == $updatedProblemsetProblem->points) {
+        if (is_null($oldProblemsetProblem)) {
+            ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
             return;
+        }
+        ProblemsetProblemsDAOBase::update($updatedProblemsetProblem);
+        if ($oldProblemsetProblem->points == $updatedProblemsetProblem->points &&
+            $oldProblemsetProblem->version == $updatedProblemsetProblem->version
+        ) {
+            return;
+        }
+        if ($oldProblemsetProblem->version != $updatedProblemsetProblem->version) {
+            ProblemsetProblemsDAO::updateProblemsetProblemSubmissions(
+                $updatedProblemsetProblem
+            );
         }
         RunsDAO::recalculateScore(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id,
             $updatedProblemsetProblem->points,
-            $problem->points
+            $oldProblemsetProblem->points
         );
     }
 
