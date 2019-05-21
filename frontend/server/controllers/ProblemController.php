@@ -1342,6 +1342,7 @@ class ProblemController extends Controller {
 
         // Get the expected commit version.
         $commit = $problem['problem']->commit;
+        $version = $problem['problem']->current_version;
         if (!empty($problem['problemset'])) {
             $problemsetProblem = ProblemsetProblemsDAO::getByPK(
                 $problem['problemset']->problemset_id,
@@ -1354,6 +1355,7 @@ class ProblemController extends Controller {
                 ];
             }
             $commit = $problemsetProblem->commit;
+            $version = $problemsetProblem->version;
         }
 
         $response['statement'] = ProblemController::getProblemStatement(
@@ -1386,11 +1388,12 @@ class ProblemController extends Controller {
 
         // Add the problem the response
         $response = array_merge($response, $problem['problem']->asFilteredArray([
-            'title', 'alias', 'commit', 'current_version', 'input_limit',
-            'visits', 'submissions', 'accepted', 'difficulty', 'creation_date',
-            'source', 'order', 'points', 'visibility', 'languages',
-            'email_clarifications',
+            'title', 'alias', 'input_limit', 'visits', 'submissions',
+            'accepted', 'difficulty', 'creation_date', 'source', 'order',
+            'points', 'visibility', 'languages', 'email_clarifications',
         ]));
+        $response['version'] = $version;
+        $response['commit'] = $commit;
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.

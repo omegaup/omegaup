@@ -137,6 +137,8 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ]));
 
         $this->assertEquals($response['alias'], $problemData['request']['problem_alias']);
+        $this->assertEquals($response['commit'], $problemData['problem']->commit);
+        $this->assertEquals($response['version'], $problemData['problem']->current_version);
     }
 
     /**

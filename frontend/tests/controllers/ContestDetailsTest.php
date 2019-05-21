@@ -72,6 +72,8 @@ class ContestDetailsTest extends OmegaupTestCase {
             // Get points of problem from Contest-Problem relationship
             $problemInContest = ProblemsetProblemsDAO::getByPK($contest->problemset_id, $problem->problem_id);
             $this->assertEquals($problemInContest->points, $problem_array['points']);
+            $this->assertEquals($problemInContest->commit, $problem_array['commit']);
+            $this->assertEquals($problemInContest->version, $problem_array['version']);
 
             $i++;
         }
