@@ -579,10 +579,10 @@ let UI = {
               }
             }
             result += '<thead><tr>';
-            result += '<th>Entrada</th>';
-            result += '<th>Salida</th>';
+            result += `<th>${T.wordsInput}</th>`;
+            result += `<th>${T.wordsOutput}</th>`;
             if (description_column) {
-              result += '<th>Descripción</th>';
+              result += `<th>${T.wordsDescription}</th>`;
             }
             result += '</tr></thead>';
             var first_row = true;
