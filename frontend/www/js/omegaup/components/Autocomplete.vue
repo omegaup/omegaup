@@ -16,5 +16,8 @@ export default {
   methods: {
     updateInput() { this.$emit('input', this.$refs.input.value);},
   },
+  watch: {
+    value: function(newValue, oldValue) { this.$el.value = newValue;},
+  },
 };
 </script>
