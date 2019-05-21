@@ -1485,7 +1485,7 @@ export class Arena {
     self.currentProblem = problem;
     let statement = document.querySelector('#problem div.statement');
     statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
-        problem.statement.markdown, problem.statement.images);
+        problem.statement.markdown, problem.statement.images, problem.settings);
     const creationDate =
         document.querySelector('#problem .problem-creation-date');
     if (problem.problemsetter && creationDate) {

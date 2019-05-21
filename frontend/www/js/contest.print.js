@@ -8,7 +8,7 @@
     var payload = JSON.parse(problem.querySelector('script.payload').innerText);
 
     output.innerHTML = markdownConverter.makeHtmlWithImages(
-        payload.statement.markdown, payload.statement.images);
+        payload.statement.markdown, payload.statement.images, payload.settings);
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, output]);
   }
 })();

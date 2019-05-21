@@ -564,11 +564,12 @@ let UI = {
     });
     converter.hooks.chain('preBlockGamut', function(text, blockGamut) {
       // Sample I/O table.
+      let settings = converter._settings || options.settings || {cases: {}};
       return text.replace(
-          /^( {0,3}\|\| *input *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
+          /^( {0,3}\|\| *(?:input|examplefile) *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
           function(whole, inner) {
-            var matches =
-                inner.split(/ {0,3}\|\| *(input|output|description) *\n/);
+            var matches = inner.split(
+                / {0,3}\|\| *(examplefile|input|output|description) *\n/);
             var result = '';
             var description_column = false;
             for (var i = 1; i < matches.length; i += 2) {
@@ -592,7 +593,7 @@ let UI = {
                 result += '<td>' + blockGamut(matches[i + 1]) + '</td>';
                 columns++;
               } else {
-                if (matches[i] == 'input') {
+                if (matches[i] == 'input' || matches[i] == 'examplefile') {
                   if (!first_row) {
                     while (columns < (description_column ? 3 : 2)) {
                       result += '<td></td>';
@@ -604,9 +605,26 @@ let UI = {
                   result += '<tr>';
                   columns = 0;
                 }
-                result += '<td><pre>' + matches[i + 1].replace(/\s+$/, '') +
-                          '</pre></td>';
-                columns++;
+
+                if (matches[i] == 'examplefile') {
+                  let exampleFilename = matches[i + 1].trim();
+                  let exampleFile = {
+                    'in': `{{examples/${exampleFilename}.in}}`,
+                    out: `{{examples/${exampleFilename}.out}}`,
+                  };
+                  if (settings.cases.hasOwnProperty(exampleFilename)) {
+                    exampleFile = settings.cases[exampleFilename];
+                  }
+                  result +=
+                      `<td><pre>${exampleFile['in'].replace(/\s+$/, '')}</pre></td>`;
+                  result +=
+                      `<td><pre>${exampleFile.out.replace(/\s+$/, '')}</pre></td>`;
+                  columns += 2;
+                } else {
+                  result +=
+                      `<td><pre>${matches[i + 1].replace(/\s+$/, '')}</pre></td>`;
+                  columns++;
+                }
               }
             }
             while (columns < (description_column ? 3 : 2)) {
@@ -701,12 +719,14 @@ let UI = {
               });
         });
 
-    converter.makeHtmlWithImages = function(markdown, imageMapping) {
+    converter.makeHtmlWithImages = function(markdown, imageMapping, settings) {
       try {
         converter._imageMapping = imageMapping;
+        converter._settings = settings;
         return converter.makeHtml(markdown);
       } finally {
         delete converter._imageMapping;
+        delete converter._settings;
       }
     };
 
