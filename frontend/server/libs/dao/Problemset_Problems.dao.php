@@ -161,6 +161,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     p.order,
                     p.languages,
                     pp.points,
+                    pp.commit,
                     pp.version
                 FROM
                     Problems p
