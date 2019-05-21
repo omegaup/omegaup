@@ -49,7 +49,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      */
     final public static function getProblemsetProblems(Problemsets $problemset) {
         // Build SQL statement
-        $sql = 'SELECT p.problem_id, p.alias, pp.points, pp.order, pp.version ' .
+        $sql = 'SELECT p.problem_id, p.alias, pp.points, pp.order, pp.commit, pp.version ' .
                'FROM Problems p ' .
                'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
                'WHERE pp.problemset_id = ? ' .
@@ -161,6 +161,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     p.order,
                     p.languages,
                     pp.points,
+                    pp.commit,
                     pp.version
                 FROM
                     Problems p

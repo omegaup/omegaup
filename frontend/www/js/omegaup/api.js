@@ -172,6 +172,8 @@ export default {
 
     runs: _call('/api/contest/runs/', _convertRuntimes),
 
+    runsDiff: _call('/api/contest/runsDiff/'),
+
     scoreboard: _call('/api/contest/scoreboard/'),
 
     scoreboardMerge: _call('/api/contest/scoreboardmerge/'),
@@ -421,6 +423,10 @@ export default {
 
     runs: _call('/api/problem/runs/', _convertRuntimes),
 
+    runsDiff: _call('/api/problem/runsDiff/'),
+
+    selectVersion: _call('/api/problem/selectVersion/'),
+
     stats: _call('/api/problem/stats/'),
 
     tags: _call('/api/problem/tags/'),
@@ -428,6 +434,8 @@ export default {
     update: _call('/api/problem/update/'),
 
     updateStatement: _call('/api/problem/updateStatement/'),
+
+    versions: _call('/api/problem/versions/'),
   },
 
   Problemset: {

@@ -1,7 +1,7 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle="{#omegaupTitleProblemEdit#}"}
 
-<script src="{version_hash src="/js/problem.edit.js"}" type="text/javascript"></script>
+<script src="{version_hash src="/js/dist/problem_edit.js"}" type="text/javascript"></script>
 
 <div class="alert alert-warning slow-warning" style="display: none;">{#problemEditSlowWarning#}</div>
 
@@ -13,8 +13,8 @@
 <ul class="nav nav-tabs nav-justified" id="sections">
 	<li class="active"><a href="#edit" data-toggle="tab">{#problemEditEditProblem#}</a></li>
 	<li><a href="#markdown" data-toggle="tab">{#problemEditEditMarkdown#}</a></li>
+	<li><a href="#version" data-toggle="tab">{#problemEditChooseVersion#}</a></li>
 	<li><a href="#admins" data-toggle="tab">{#problemEditAddAdmin#}</a></li>
-	<li><a href="#group-admins" data-toggle="tab">{#problemEditAddGroupAdmin#}</a></li>
 	<li><a href="#tags" data-toggle="tab">{#problemEditAddTags#}</a></li>
 	<li><a href="#download" data-toggle="tab">{#wordsDownload#}</a></li>
 	<li><a href="#delete" data-toggle="tab">{#wordsDelete#}</a></li>
@@ -112,9 +112,7 @@
 				<tbody id="problem-admins"></tbody>
 			</table>
 		</div>
-	</div>
 
-	<div class="tab-pane" id="group-admins">
 		<div class="panel panel-primary">
 			<div class="panel-body">
 				<form class="form" id="add-group-admin-form">
@@ -139,6 +137,12 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="tab-pane" id="version">
+    <div class="panel panel-default">
+      <div></div>
+    </div>
+  </div>
 
 	<div class="tab-pane" id="tags">
 		<div class="panel panel-primary">

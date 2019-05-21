@@ -903,6 +903,12 @@ class RunsDAO extends RunsDAOBase {
                 s.submission_id
             LIMIT 0, 1000;
         ';
-        return $conn->GetAll($sql, $params);
+
+        $result = $conn->GetAll($sql, $params);
+        foreach ($result as &$row) {
+            $row['old_score'] = floatval($row['old_score']);
+            $row['new_score'] = floatval($row['new_score']);
+        }
+        return $result;
     }
 }
