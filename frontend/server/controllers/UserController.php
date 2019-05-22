@@ -1171,7 +1171,7 @@ class UserController extends Controller {
         return 'es';
     }
 
-    private static function convertToSupportedLanguage($lang) {
+    public static function convertToSupportedLanguage($lang) {
         switch ($lang) {
             case 'en':
             case 'en-us':
