@@ -15,7 +15,7 @@ OmegaUp.on('ready', function() {
           countries: this.countries,
         },
         on: {
-          'add-member': function(username) {
+          'add-member': function(groupMembersInstance, username) {
             API.Group.addUser({
                        group_alias: groupAlias,
                        usernameOrEmail: username,
@@ -23,7 +23,7 @@ OmegaUp.on('ready', function() {
                 .then(function(data) {
                   refreshMemberList();
                   UI.success(T.groupEditMemberAdded);
-                  groupMembers.$children[0].reset();
+                  groupMembersInstance.reset();
                 })
                 .fail(UI.apiError);
           },

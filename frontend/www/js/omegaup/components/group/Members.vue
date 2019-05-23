@@ -22,9 +22,9 @@
       </thead>
       <tbody>
         <tr v-for="identity in identities">
-          <td>
-            <a v-bind:href="memberProfileUrl(identity.username)">{{ identity.username }}</a>
-          </td>
+          <td><omegaup-user-username v-bind:classname="identity.classname"
+                                 v-bind:linkify="true"
+                                 v-bind:username="identity.username"></omegaup-user-username></td>
           <td>
             <a class="glyphicon glyphicon-remove"
                 href="#"
@@ -37,8 +37,15 @@
   </div>
 </template>
 
+<style>
+label {
+  display: inline;
+}
+</style>
+
 <script>
 import {T, UI} from '../../omegaup.js';
+import user_Username from '../user/Username.vue';
 export default {
   props: {
     identities: Array,
@@ -68,7 +75,7 @@ export default {
       } else {
         this.memberUsername = $('input.typeahead.tt-input', this.$el).val();
       }
-      this.$emit('add-member', this.memberUsername);
+      this.$emit('add-member', this, this.memberUsername);
     },
     onRemove: function(username) { this.$emit('remove', username);},
     reset: function() {
@@ -77,13 +84,9 @@ export default {
       inputElem.typeahead('close');
       inputElem.val('');
     },
-    memberProfileUrl: function(member) { return '/profile/' + member + '/';},
+  },
+  components: {
+    'omegaup-user-username': user_Username,
   },
 };
 </script>
-
-<style>
-label {
-  display: inline;
-}
-</style>
