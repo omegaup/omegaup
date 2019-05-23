@@ -7,14 +7,16 @@ Using this library consists of two parts:
 - Getting a DB connection using arguments from the command line.
 '''
 
+import argparse
 import configparser
 import getpass
 import os
 
 import MySQLdb
+import MySQLdb.connections
 
 
-def configure_parser(parser):
+def configure_parser(parser: argparse.ArgumentParser):
     '''Add DB-related arguments to `parser`'''
     db_args = parser.add_argument_group('DB Access')
     db_args.add_argument('--mysql-config-file',
@@ -29,7 +31,7 @@ def configure_parser(parser):
                          default='omegaup')
 
 
-def connect(args):
+def connect(args: argparse.Namespace) -> MySQLdb.connections.Connection:
     '''Connects to MySQL with the arguments provided.
 
     Returns a MySQLdb connection.

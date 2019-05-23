@@ -7,10 +7,11 @@ Using this library consists of two parts:
 - Getting a DB connection using arguments from the command line.
 '''
 
+import argparse
 import logging
 
 
-def configure_parser(parser):
+def configure_parser(parser: argparse.ArgumentParser):
     '''Add Logging-related arguments to `parser`'''
     logging_args = parser.add_argument_group('Logging')
     logging_args.add_argument('--quiet', '-q', action='store_true',
@@ -21,7 +22,7 @@ def configure_parser(parser):
                               help='Enables logging to a file')
 
 
-def init(program, args):
+def init(program: str, args: argparse.Namespace):
     '''Initializes the logging module using arguments from the command line
 
     Args:
