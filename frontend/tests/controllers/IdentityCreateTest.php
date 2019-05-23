@@ -268,16 +268,23 @@ class IdentityCreateTest extends OmegaupTestCase {
         $this->assertEquals(0, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
 
         // Call the API
-        $response = UserController::apiLogin(new Request([
+        $loginResponse = UserController::apiLogin(new Request([
             'usernameOrEmail' => $identity->username,
             'password' => $identityPassword
         ]));
 
-        $this->assertEquals('ok', $response['status']);
-        $this->assertLogin($identity, $response['auth_token']);
+        $this->assertEquals('ok', $loginResponse['status']);
+        $this->assertLogin($identity, $loginResponse['auth_token']);
 
         // Assert the log is not empty.
         $this->assertEquals(1, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
+
+        $profileResponse = UserController::apiProfile(new Request([
+            'auth_token' => $loginResponse['auth_token'],
+        ]));
+
+        $this->assertEquals("{$group['group']->alias}:{$identityName}", $profileResponse['userinfo']['username']);
+        $this->assertEquals($identityName, $profileResponse['userinfo']['name']);
     }
 
     /**
