@@ -450,22 +450,22 @@ OmegaUp.on('ready', function() {
             if (ev.participants !== '')
               participants = ev.participants.split(',');
             if (ev.participant !== '') participants.push(ev.participant);
-            if (participants.length > 0) {
-              let promises = participants.map(function(participant) {
-                return API.Course.addStudent({
-                  course_alias: courseAlias,
-                  usernameOrEmail: participant.trim()
-                });
-              });
-              $.when.apply($, promises)
-                  .then(function() {
-                    refreshStudentList();
-                    UI.success(T.courseStudentAdded);
-                  })
-                  .fail(function() { UI.error(T.bulkUserAddError); });
-            } else {
+            if (participants.length == 0) {
               UI.error(T.wordsEmptyAddStudentInput);
+              return;
             }
+            let promises = participants.map(function(participant) {
+              return API.Course.addStudent({
+                course_alias: courseAlias,
+                usernameOrEmail: participant.trim()
+              });
+            });
+            $.when.apply($, promises)
+                .then(function() {
+                  refreshStudentList();
+                  UI.success(T.courseStudentAdded);
+                })
+                .fail(function() { UI.error(T.bulkUserAddError); });
           },
           'remove-student': function(student) {
             API.Course.removeStudent({
