@@ -353,6 +353,7 @@ const translations = {
 	invalidContestType: "Tipo do concurso inv\u00e1lido",
 	invalidCsrfToken: "Token CSRF inv\u00e1lido",
 	invalidLanguage: "Idioma inv\u00e1lido",
+	invalidOrDuplicatedIdentity: "A identidade que voc\u00ea est\u00e1 tentando adicionar n\u00e3o existe ou voc\u00ea j\u00e1 tem uma identidade desse grupo.",
 	invalidParameters: "Par\u00e2metros inv\u00e1lidos.",
 	invalidResetToken: "Token inv\u00e1lido.",
 	invalidScoreboardUrl: "Url do painel de avalia\u00e7\u00e3o inv\u00e1lido.",

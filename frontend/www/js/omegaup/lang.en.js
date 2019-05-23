@@ -353,6 +353,7 @@ const translations = {
 	invalidContestType: "Invalid contest_type.",
 	invalidCsrfToken: "Invalid CSRF token",
 	invalidLanguage: "Invalid language",
+	invalidOrDuplicatedIdentity: "The identity you are trying add does not exist or you already have one identity of this group.",
 	invalidParameters: "Invalid parameters.",
 	invalidResetToken: "Invalid reset token.",
 	invalidScoreboardUrl: "Invalid scoreboard url.",

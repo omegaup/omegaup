@@ -2553,10 +2553,10 @@ class UserController extends Controller {
         Validators::isStringNonEmpty($r['username'], 'username');
         Validators::isStringNonEmpty($r['password'], 'password');
 
-        $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
+        $identity = IdentitiesDAO::getUnassociatedIdentity($r['username'], $r['current_user_id']);
 
         if (empty($identity)) {
-            throw new InvalidParameterException('parameterInvalid', 'username');
+            throw new InvalidParameterException('invalidOrDuplicatedIdentity');
         }
 
         $passwordCheck = SecurityTools::compareHashedStrings(

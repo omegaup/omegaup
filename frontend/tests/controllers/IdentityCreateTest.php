@@ -171,7 +171,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Call api using identity creator group member
         $response = IdentityController::apiBulkCreate(new Request([
             'auth_token' => $creatorLogin->auth_token,
-            'identities' => self::getCsvData('identities.csv', $group['group']->alias),
+            'identities' => UserFactory::getCsvData('identities.csv', $group['group']->alias),
             'group_alias' => $group['group']->alias,
         ]));
 
@@ -197,7 +197,7 @@ class IdentityCreateTest extends OmegaupTestCase {
             // Call api using identity creator group member
             $response = IdentityController::apiBulkCreate(new Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => self::getCsvData('duplicated_identities.csv', $group['group']->alias),
+                'identities' => UserFactory::getCsvData('duplicated_identities.csv', $group['group']->alias),
                 'group_alias' => $group['group']->alias,
             ]));
         } catch (DuplicatedEntryInDatabaseException $e) {
@@ -219,7 +219,7 @@ class IdentityCreateTest extends OmegaupTestCase {
             // Call api using identity creator group team member
             $response = IdentityController::apiBulkCreate(new Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => self::getCsvData('identities_wrong_country_id.csv', $group['group']->alias),
+                'identities' => UserFactory::getCsvData('identities_wrong_country_id.csv', $group['group']->alias),
                 'group_alias' => $group['group']->alias,
             ]));
         } catch (InvalidDatabaseOperationException $e) {
@@ -278,32 +278,5 @@ class IdentityCreateTest extends OmegaupTestCase {
 
         // Assert the log is not empty.
         $this->assertEquals(1, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
-    }
-
-    /**
-     * @param $file
-     * @return $csv_data
-     */
-    private static function getCsvData($file, $group_alias) {
-        $row = 0;
-        $identities = [];
-        $path_file = OMEGAUP_RESOURCES_ROOT . $file;
-        if (($handle = fopen($path_file, 'r')) == false) {
-            throw new InvalidParameterException('parameterInvalid', 'identities');
-        }
-        $headers = fgetcsv($handle, 1000, ',');
-        while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-            array_push($identities, [
-                'username' => "{$group_alias}:{$data[0]}",
-                'name' => $data[1],
-                'country_id' => $data[2],
-                'state_id' => $data[3],
-                'gender' => $data[4],
-                'school_name' => $data[5],
-                'password' => Utils::CreateRandomString(),
-            ]);
-        }
-        fclose($handle);
-        return $identities;
     }
 }
