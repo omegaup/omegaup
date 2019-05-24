@@ -43,10 +43,23 @@
 							{else}
 								<li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}><a href='/problem/'>{#wordsProblems#}</a></li>
 							{/if} <!-- LOGGED_IN -->
+							{if $LOGGED_IN eq '1' and $CURRENT_USER_IS_MENTOR eq '1'}
+								<li class="dropdown" id="nav-contests"{if isset($navbarSection) && $navbarSection == 'mentors'} class="active"{/if}>
+									<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsMentor#}</span><span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a href="/mentor/codersofthemonth/">{#codersOfTheMonth#}</a></li>
+									</ul>
+								</li>
+							{/if}
 							<li class="{if isset($navbarSection) && $navbarSection == "rank"} active{/if}" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
 							<li class="{if isset($navbarSection) && $navbarSection == "schools"} active{/if}" id="nav-schools"><a href='/schools/'>{#navSchools#}</a></li>
-							<li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
-							<li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
+							<li class="dropdown" id="nav-more">
+								<a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsMore#}</span><span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li><a href='http://blog.omegaup.com/' target="_blank">{#navBlog#}</a></li>
+									<li><a href='https://omegaup.com/preguntas/' target="_blank">{#navQuestions#}</a></li>
+								</ul>
+							</li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 						{if $LOGGED_IN eq '1'}
