@@ -958,6 +958,7 @@ const translations = {
 	wordsEasy: "Easy",
 	wordsEdit: "Edit",
 	wordsEditCourse: "Edit course",
+	wordsEmptyAddStudentInput: "The input field is empty, please type a username",
 	wordsEnable: "Enable",
 	wordsEndTime: "End",
 	wordsEnglish: "English",
