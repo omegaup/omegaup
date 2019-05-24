@@ -109,7 +109,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $this->fail('Identity should not be associated because identity username does not match');
         } catch (InvalidParameterException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'invalidOrDuplicatedIdentity');
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
         }
     }
 
@@ -167,7 +167,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         // Call api using identity creator group member
         IdentityController::apiBulkCreate(new Request([
             'auth_token' => $creatorLogin->auth_token,
-            'identities' => UserFactory::getCsvData('identities.csv', $group['group']->alias, $password),
+            'identities' => IdentityFactory::getCsvData('identities.csv', $group['group']->alias, $password),
             'group_alias' => $group['group']->alias,
         ]));
 
@@ -196,9 +196,9 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
                 'password' => $password,
             ]));
             $this->fail('Identity should not be associated because user has already another identity of the same group');
-        } catch (InvalidParameterException $e) {
+        } catch (DuplicatedEntryInDatabaseException $e) {
             // Exception expected
-            $this->assertEquals($e->getMessage(), 'invalidOrDuplicatedIdentity');
+            $this->assertEquals($e->getMessage(), 'identityAlreadyAssociated');
         }
     }
 }

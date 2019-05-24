@@ -173,31 +173,45 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return $rs;
     }
 
-    public static function getUnassociatedIdentity($username, $userId) {
+    public static function isUserAssociatedWithIdentityOfGroup($userId, $identityId) {
         global  $conn;
         $sql = '
             SELECT
-                i.*,
-                IF(LOCATE(\':\', i.username) <> 0,  SUBSTRING_INDEX(i.username, \':\', 1), NULL) AS group_alias
+                COUNT(*) = 1 AS associated
+            FROM
+                Groups_Identities gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                i.user_id = ? AND
+                gi.group_id IN (
+                    SELECT
+                        group_id
+                    FROM
+                        Groups_Identities
+                    WHERE
+                        identity_id = ?
+                )
+            LIMIT 1;';
+        $args = [$userId, $identityId];
+
+        $rs = $conn->GetRow($sql, $args);
+
+        return $rs['associated'] == '1';
+    }
+
+    public static function getUnassociatedIdentity($username) {
+        global  $conn;
+        $sql = '
+            SELECT
+                i.*
             FROM
                 Identities i
             WHERE
                 i.username = ?
                 AND user_id IS NULL
-            HAVING
-                group_alias NOT IN (
-                    SELECT
-                        alias
-                    FROM
-                        Groups g
-                    INNER JOIN
-                        Groups_Identities gi ON g.group_id = gi.group_id
-                    INNER JOIN
-                        Identities i ON gi.identity_id = i.identity_id
-                    WHERE
-                        user_id = ?)
             LIMIT 1;';
-        $args = [$username, $userId];
+        $args = [$username];
 
         $rs = $conn->GetRow($sql, $args);
         if (count($rs) == 0) {
