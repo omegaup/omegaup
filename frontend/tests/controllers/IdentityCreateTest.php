@@ -171,7 +171,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Call api using identity creator group member
         $response = IdentityController::apiBulkCreate(new Request([
             'auth_token' => $creatorLogin->auth_token,
-            'identities' => UserFactory::getCsvData('identities.csv', $group['group']->alias),
+            'identities' => IdentityFactory::getCsvData('identities.csv', $group['group']->alias),
             'group_alias' => $group['group']->alias,
         ]));
 
@@ -197,7 +197,7 @@ class IdentityCreateTest extends OmegaupTestCase {
             // Call api using identity creator group member
             $response = IdentityController::apiBulkCreate(new Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => UserFactory::getCsvData('duplicated_identities.csv', $group['group']->alias),
+                'identities' => IdentityFactory::getCsvData('duplicated_identities.csv', $group['group']->alias),
                 'group_alias' => $group['group']->alias,
             ]));
         } catch (DuplicatedEntryInDatabaseException $e) {
@@ -219,7 +219,7 @@ class IdentityCreateTest extends OmegaupTestCase {
             // Call api using identity creator group team member
             $response = IdentityController::apiBulkCreate(new Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => UserFactory::getCsvData('identities_wrong_country_id.csv', $group['group']->alias),
+                'identities' => IdentityFactory::getCsvData('identities_wrong_country_id.csv', $group['group']->alias),
                 'group_alias' => $group['group']->alias,
             ]));
         } catch (InvalidDatabaseOperationException $e) {
