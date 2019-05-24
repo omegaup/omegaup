@@ -27,19 +27,19 @@ class Submissions extends VO {
             return;
         }
         if (isset($data['submission_id'])) {
-            $this->submission_id = $data['submission_id'];
+            $this->submission_id = (int)$data['submission_id'];
         }
         if (isset($data['current_run_id'])) {
-            $this->current_run_id = $data['current_run_id'];
+            $this->current_run_id = (int)$data['current_run_id'];
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['guid'])) {
             $this->guid = $data['guid'];
@@ -51,7 +51,7 @@ class Submissions extends VO {
             $this->time = $data['time'];
         }
         if (isset($data['submit_delay'])) {
-            $this->submit_delay = $data['submit_delay'];
+            $this->submit_delay = (int)$data['submit_delay'];
         }
         if (isset($data['type'])) {
             $this->type = $data['type'];

@@ -27,10 +27,10 @@ class Problemsets extends VO {
             return;
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['access_mode'])) {
             $this->access_mode = $data['access_mode'];
@@ -39,7 +39,7 @@ class Problemsets extends VO {
             $this->languages = $data['languages'];
         }
         if (isset($data['needs_basic_information'])) {
-            $this->needs_basic_information = $data['needs_basic_information'];
+            $this->needs_basic_information = $data['needs_basic_information'] == '1';
         }
         if (isset($data['requests_user_information'])) {
             $this->requests_user_information = $data['requests_user_information'];
@@ -54,13 +54,13 @@ class Problemsets extends VO {
             $this->type = $data['type'];
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+            $this->contest_id = (int)$data['contest_id'];
         }
         if (isset($data['assignment_id'])) {
-            $this->assignment_id = $data['assignment_id'];
+            $this->assignment_id = (int)$data['assignment_id'];
         }
         if (isset($data['interview_id'])) {
-            $this->interview_id = $data['interview_id'];
+            $this->interview_id = (int)$data['interview_id'];
         }
     }
 

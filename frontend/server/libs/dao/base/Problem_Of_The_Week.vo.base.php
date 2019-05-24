@@ -27,10 +27,10 @@ class ProblemOfTheWeek extends VO {
             return;
         }
         if (isset($data['problem_of_the_week_id'])) {
-            $this->problem_of_the_week_id = $data['problem_of_the_week_id'];
+            $this->problem_of_the_week_id = (int)$data['problem_of_the_week_id'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];

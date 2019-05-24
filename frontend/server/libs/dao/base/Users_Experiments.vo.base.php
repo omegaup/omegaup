@@ -27,7 +27,7 @@ class UsersExperiments extends VO {
             return;
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['experiment'])) {
             $this->experiment = $data['experiment'];

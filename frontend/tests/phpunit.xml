@@ -16,6 +16,7 @@
 				<file>../server/libs/PasswordHashCmd.php</file>
 				<file>../server/libs/ExperimentHashCmd.php</file>
 				<directory>../server/libs/third_party/</directory>
+				<directory>../server/libs/dao/base/</directory>
 			</exclude>
 		</whitelist>
 	</filter>

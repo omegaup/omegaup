@@ -27,10 +27,10 @@ class UserRankCutoffs extends VO {
             return;
         }
         if (isset($data['score'])) {
-            $this->score = $data['score'];
+            $this->score = (float)$data['score'];
         }
         if (isset($data['percentile'])) {
-            $this->percentile = $data['percentile'];
+            $this->percentile = (float)$data['percentile'];
         }
         if (isset($data['classname'])) {
             $this->classname = $data['classname'];

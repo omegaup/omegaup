@@ -27,10 +27,10 @@ class Favorites extends VO {
             return;
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
     }
 
