@@ -339,6 +339,7 @@ const translations = {
 	groupsIdentityWarning: "Guarda las contrase\u00f1as en un lugar seguro, porque una vez que crees las identidades, no habr\u00e1 forma de recuperar las contrase\u00f1as.",
 	groupsInvalidCsv: "Favor de cargar un archivo CSV v\u00e1lido.",
 	groupsUploadCsvFile: "Carga el archivo CSV",
+	identityAlreadyAssociated: "Ya cuentas con una identidad asociada con el mimso grupo.",
 	incompatibleArgs: "Parametros no se pueden utilizar al mismo tiempo",
 	index: "Coder del mes",
 	interviewCreateNew: "Crear nueva entrevista",

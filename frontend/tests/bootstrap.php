@@ -30,6 +30,7 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/factories/ContestsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/ClarificationsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/UserFactory.php');
+    require_once(OMEGAUP_ROOT . '/tests/factories/IdentityFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/CoursesFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/RunsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');

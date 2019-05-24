@@ -337,6 +337,7 @@ groupsIdentitiesSuccessfullyCreated = "The identities have been created and link
 groupsIdentityWarning = "Save the passwords in a safe place, because once you create the identities there will be no way of recovering the passwords."
 groupsInvalidCsv = "Please upload a valid CSV file."
 groupsUploadCsvFile = "Upload CSV file"
+identityAlreadyAssociated = "You already have one identity associated with the same group."
 incompatibleArgs = "Arguments can't be set simultaneously"
 index = "Coder of the month"
 interviewCreateNew = "Create a new interview"

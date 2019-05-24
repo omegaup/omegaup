@@ -339,6 +339,7 @@ const translations = {
 	groupsIdentityWarning: "(Sav3 7h3 pa55w0rd5 in a 5af3 p1ac3, b3cau53 0nc3 y0u cr3a73 7h3 id3n7i7i35 7h3r3 wi11 b3 n0 way 0f r3c0v3ring 7h3 pa55w0rd5.)",
 	groupsInvalidCsv: "(P13a53 up10ad a va1id CSV fi13.)",
 	groupsUploadCsvFile: "(Up10ad CSV fi13)",
+	identityAlreadyAssociated: "(Y0u a1r3ady hav3 0n3 id3n7i7y a550cia73d wi7h 7h3 5am3 gr0up.)",
 	incompatibleArgs: "(Argum3n75 can'7 b3 537 5imu17an30u51y)",
 	index: "(C0d3r 0f 7h3 m0n7h)",
 	interviewCreateNew: "(Cr3a73 a n3w in73rvi3w)",

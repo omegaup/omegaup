@@ -339,6 +339,7 @@ const translations = {
 	groupsIdentityWarning: "Salve as senhas em um local seguro, porque depois de criar as identidades, n\u00e3o haver\u00e1 maneira de recuperar as senhas.",
 	groupsInvalidCsv: "Fa\u00e7a o upload de um arquivo CSV v\u00e1lido.",
 	groupsUploadCsvFile: "Subir CSV arquivo",
+	identityAlreadyAssociated: "Voc\u00ea j\u00e1 tem uma identidade associada ao mesmo grupo.",
 	incompatibleArgs: "Argumentos n\u00e3o podem ser definidos simultaneamente",
 	index: "Programador do m\u00eas",
 	interviewCreateNew: "Criar uma nova entrevista",

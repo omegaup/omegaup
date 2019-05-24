@@ -337,6 +337,7 @@ groupsIdentitiesSuccessfullyCreated = "As identidades foram criadas e ligadas ao
 groupsIdentityWarning = "Salve as senhas em um local seguro, porque depois de criar as identidades, não haverá maneira de recuperar as senhas."
 groupsInvalidCsv = "Faça o upload de um arquivo CSV válido."
 groupsUploadCsvFile = "Subir CSV arquivo"
+identityAlreadyAssociated = "Você já tem uma identidade associada ao mesmo grupo."
 incompatibleArgs = "Argumentos não podem ser definidos simultaneamente"
 index = "Programador do mês"
 interviewCreateNew = "Criar uma nova entrevista"

@@ -2521,6 +2521,7 @@ class UserController extends Controller {
      * @param Request $r
      * @throws InvalidParameterException
      * @throws InvalidDatabaseOperationException
+     * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiAssociateIdentity(Request $r) {
         global $experiments;
@@ -2534,6 +2535,10 @@ class UserController extends Controller {
 
         if (empty($identity)) {
             throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+
+        if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r['current_user_id'], (int)$identity->identity_id)) {
+            throw new DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 
         $passwordCheck = SecurityTools::compareHashedStrings(
