@@ -27,10 +27,10 @@ class GroupsScoreboards extends VO {
             return;
         }
         if (isset($data['group_scoreboard_id'])) {
-            $this->group_scoreboard_id = $data['group_scoreboard_id'];
+            $this->group_scoreboard_id = (int)$data['group_scoreboard_id'];
         }
         if (isset($data['group_id'])) {
-            $this->group_id = $data['group_id'];
+            $this->group_id = (int)$data['group_id'];
         }
         if (isset($data['create_time'])) {
             $this->create_time = $data['create_time'];

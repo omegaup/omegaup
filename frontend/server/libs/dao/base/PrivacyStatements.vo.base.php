@@ -27,7 +27,7 @@ class PrivacyStatements extends VO {
             return;
         }
         if (isset($data['privacystatement_id'])) {
-            $this->privacystatement_id = $data['privacystatement_id'];
+            $this->privacystatement_id = (int)$data['privacystatement_id'];
         }
         if (isset($data['git_object_id'])) {
             $this->git_object_id = $data['git_object_id'];

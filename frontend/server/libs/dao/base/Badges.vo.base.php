@@ -27,7 +27,7 @@ class Badges extends VO {
             return;
         }
         if (isset($data['badge_id'])) {
-            $this->badge_id = $data['badge_id'];
+            $this->badge_id = (int)$data['badge_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];

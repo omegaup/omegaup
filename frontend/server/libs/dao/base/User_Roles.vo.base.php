@@ -27,13 +27,13 @@ class UserRoles extends VO {
             return;
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['role_id'])) {
-            $this->role_id = $data['role_id'];
+            $this->role_id = (int)$data['role_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
     }
 

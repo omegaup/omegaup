@@ -27,7 +27,7 @@ class Courses extends VO {
             return;
         }
         if (isset($data['course_id'])) {
-            $this->course_id = $data['course_id'];
+            $this->course_id = (int)$data['course_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];
@@ -39,10 +39,10 @@ class Courses extends VO {
             $this->alias = $data['alias'];
         }
         if (isset($data['group_id'])) {
-            $this->group_id = $data['group_id'];
+            $this->group_id = (int)$data['group_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['start_time'])) {
             $this->start_time = $data['start_time'];
@@ -51,19 +51,19 @@ class Courses extends VO {
             $this->finish_time = $data['finish_time'];
         }
         if (isset($data['public'])) {
-            $this->public = $data['public'];
+            $this->public = $data['public'] == '1';
         }
         if (isset($data['school_id'])) {
-            $this->school_id = $data['school_id'];
+            $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['needs_basic_information'])) {
-            $this->needs_basic_information = $data['needs_basic_information'];
+            $this->needs_basic_information = $data['needs_basic_information'] == '1';
         }
         if (isset($data['requests_user_information'])) {
             $this->requests_user_information = $data['requests_user_information'];
         }
         if (isset($data['show_scoreboard'])) {
-            $this->show_scoreboard = $data['show_scoreboard'];
+            $this->show_scoreboard = $data['show_scoreboard'] == '1';
         }
     }
 

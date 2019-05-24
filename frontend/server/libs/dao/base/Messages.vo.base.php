@@ -27,16 +27,16 @@ class Messages extends VO {
             return;
         }
         if (isset($data['message_id'])) {
-            $this->message_id = $data['message_id'];
+            $this->message_id = (int)$data['message_id'];
         }
         if (isset($data['read'])) {
-            $this->read = $data['read'];
+            $this->read = $data['read'] == '1';
         }
         if (isset($data['sender_id'])) {
-            $this->sender_id = $data['sender_id'];
+            $this->sender_id = (int)$data['sender_id'];
         }
         if (isset($data['recipient_id'])) {
-            $this->recipient_id = $data['recipient_id'];
+            $this->recipient_id = (int)$data['recipient_id'];
         }
         if (isset($data['message'])) {
             $this->message = $data['message'];

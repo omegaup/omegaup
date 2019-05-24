@@ -27,10 +27,10 @@ class IdentityLoginLog extends VO {
             return;
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['ip'])) {
-            $this->ip = $data['ip'];
+            $this->ip = (int)$data['ip'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];

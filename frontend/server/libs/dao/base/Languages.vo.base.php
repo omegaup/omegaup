@@ -27,7 +27,7 @@ class Languages extends VO {
             return;
         }
         if (isset($data['language_id'])) {
-            $this->language_id = $data['language_id'];
+            $this->language_id = (int)$data['language_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];

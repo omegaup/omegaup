@@ -28,7 +28,15 @@ class {{ table.class_name }} extends VO {
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {
+{%- if 'tinyint' in column.type %}
+            $this->{{ column.name }} = $data['{{ column.name }}'] == '1';
+{%- elif 'int' in column.type %}
+            $this->{{ column.name }} = (int)$data['{{ column.name }}'];
+{%- elif 'double' in column.type %}
+            $this->{{ column.name }} = (float)$data['{{ column.name }}'];
+{%- else %}
             $this->{{ column.name }} = $data['{{ column.name }}'];
+{%- endif %}
         }
 {%- endfor %}
     }

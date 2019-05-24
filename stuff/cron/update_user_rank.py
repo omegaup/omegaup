@@ -4,12 +4,12 @@
 
 import argparse
 import collections
-import configparser
-import getpass
 import logging
-import os
 
 import MySQLdb
+
+import lib.db
+import lib.logs
 
 
 Cutoff = collections.namedtuple('Cutoff', ['percentile', 'classname'])
@@ -123,66 +123,18 @@ def update_user_rank_cutoffs(cur, scores):
                      cutoff.percentile, cutoff.classname))
 
 
-def mysql_connect(args):
-    '''Connects to MySQL with the arguments provided.
-
-    Returns a MySQLdb connection.'''
-
-    host = args.host
-    user = args.user
-    password = args.password
-    if user is None and os.path.isfile(args.mysql_config_file):
-        config = configparser.ConfigParser()
-        config.read(args.mysql_config_file)
-        # Puppet quotes some configuration entries.
-        host = config['client']['host'].strip("'")
-        user = config['client']['user'].strip("'")
-        password = config['client']['password'].strip("'")
-    if password is None:
-        password = getpass.getpass()
-
-    assert user is not None, 'Missing --user parameter'
-    assert host is not None, 'Missing --host parameter'
-    assert password is not None, 'Missing --password parameter'
-
-    return MySQLdb.connect(
-        host=host,
-        user=user,
-        passwd=password,
-        db=args.database,
-    )
-
-
 def main():
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--mysql-config-file',
-                        default=os.path.join(os.getenv('HOME') or '.',
-                                             '.my.cnf'),
-                        help='.my.cnf file that stores credentials')
-    parser.add_argument('--quiet', '-q', action='store_true',
-                        help='Disables logging')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                        help='Enables verbose logging')
-    parser.add_argument('--logfile', type=str, default=None,
-                        help='Enables logging to a file')
-    parser.add_argument('--host', type=str, help='MySQL host',
-                        default='localhost')
-    parser.add_argument('--user', type=str, help='MySQL username')
-    parser.add_argument('--password', type=str, help='MySQL password')
-    parser.add_argument('--database', type=str, help='MySQL database',
-                        default='omegaup')
+    lib.db.configure_parser(parser)
+    lib.logs.configure_parser(parser)
 
     args = parser.parse_args()
-    logging.basicConfig(filename=args.logfile,
-                        format='%%(asctime)s:%s:%%(message)s' % parser.prog,
-                        level=(logging.DEBUG if args.verbose else
-                               logging.INFO if not args.quiet else
-                               logging.ERROR))
+    lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = mysql_connect(args)
+    dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             scores = update_user_rank(cur)

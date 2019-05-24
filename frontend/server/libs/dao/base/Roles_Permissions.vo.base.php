@@ -27,10 +27,10 @@ class RolesPermissions extends VO {
             return;
         }
         if (isset($data['role_id'])) {
-            $this->role_id = $data['role_id'];
+            $this->role_id = (int)$data['role_id'];
         }
         if (isset($data['permission_id'])) {
-            $this->permission_id = $data['permission_id'];
+            $this->permission_id = (int)$data['permission_id'];
         }
     }
 

@@ -27,13 +27,13 @@ class Contests extends VO {
             return;
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+            $this->contest_id = (int)$data['contest_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['title'])) {
             $this->title = $data['title'];
@@ -51,10 +51,10 @@ class Contests extends VO {
             $this->last_updated = $data['last_updated'];
         }
         if (isset($data['window_length'])) {
-            $this->window_length = $data['window_length'];
+            $this->window_length = (int)$data['window_length'];
         }
         if (isset($data['rerun_id'])) {
-            $this->rerun_id = $data['rerun_id'];
+            $this->rerun_id = (int)$data['rerun_id'];
         }
         if (isset($data['admission_mode'])) {
             $this->admission_mode = $data['admission_mode'];
@@ -63,22 +63,22 @@ class Contests extends VO {
             $this->alias = $data['alias'];
         }
         if (isset($data['scoreboard'])) {
-            $this->scoreboard = $data['scoreboard'];
+            $this->scoreboard = (int)$data['scoreboard'];
         }
         if (isset($data['points_decay_factor'])) {
-            $this->points_decay_factor = $data['points_decay_factor'];
+            $this->points_decay_factor = (float)$data['points_decay_factor'];
         }
         if (isset($data['partial_score'])) {
-            $this->partial_score = $data['partial_score'];
+            $this->partial_score = $data['partial_score'] == '1';
         }
         if (isset($data['submissions_gap'])) {
-            $this->submissions_gap = $data['submissions_gap'];
+            $this->submissions_gap = (int)$data['submissions_gap'];
         }
         if (isset($data['feedback'])) {
             $this->feedback = $data['feedback'];
         }
         if (isset($data['penalty'])) {
-            $this->penalty = $data['penalty'];
+            $this->penalty = (int)$data['penalty'];
         }
         if (isset($data['penalty_type'])) {
             $this->penalty_type = $data['penalty_type'];
@@ -87,16 +87,16 @@ class Contests extends VO {
             $this->penalty_calc_policy = $data['penalty_calc_policy'];
         }
         if (isset($data['show_scoreboard_after'])) {
-            $this->show_scoreboard_after = $data['show_scoreboard_after'];
+            $this->show_scoreboard_after = $data['show_scoreboard_after'] == '1';
         }
         if (isset($data['urgent'])) {
-            $this->urgent = $data['urgent'];
+            $this->urgent = $data['urgent'] == '1';
         }
         if (isset($data['languages'])) {
             $this->languages = $data['languages'];
         }
         if (isset($data['recommended'])) {
-            $this->recommended = $data['recommended'];
+            $this->recommended = $data['recommended'] == '1';
         }
     }
 

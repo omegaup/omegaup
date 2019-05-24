@@ -27,16 +27,16 @@ class GroupsScoreboardsProblemsets extends VO {
             return;
         }
         if (isset($data['group_scoreboard_id'])) {
-            $this->group_scoreboard_id = $data['group_scoreboard_id'];
+            $this->group_scoreboard_id = (int)$data['group_scoreboard_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['only_ac'])) {
-            $this->only_ac = $data['only_ac'];
+            $this->only_ac = $data['only_ac'] == '1';
         }
         if (isset($data['weight'])) {
-            $this->weight = $data['weight'];
+            $this->weight = (int)$data['weight'];
         }
     }
 

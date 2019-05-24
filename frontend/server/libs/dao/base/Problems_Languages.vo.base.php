@@ -27,10 +27,10 @@ class ProblemsLanguages extends VO {
             return;
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['language_id'])) {
-            $this->language_id = $data['language_id'];
+            $this->language_id = (int)$data['language_id'];
         }
     }
 

@@ -27,7 +27,7 @@ class Roles extends VO {
             return;
         }
         if (isset($data['role_id'])) {
-            $this->role_id = $data['role_id'];
+            $this->role_id = (int)$data['role_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];

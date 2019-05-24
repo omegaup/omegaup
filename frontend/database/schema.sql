@@ -447,7 +447,7 @@ CREATE TABLE `Problem_Viewed` (
 CREATE TABLE `Problems` (
   `problem_id` int(11) NOT NULL AUTO_INCREMENT,
   `acl_id` int(11) NOT NULL,
-  `visibility` tinyint(1) NOT NULL DEFAULT '1' COMMENT '-1 banned, 0 private, 1 public, 2 recommended',
+  `visibility` int(1) NOT NULL DEFAULT '1' COMMENT '-1 banned, 0 private, 1 public, 2 recommended',
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
   `commit` char(40) NOT NULL DEFAULT 'published' COMMENT 'El hash SHA1 del commit en la rama master del problema.',
@@ -643,7 +643,7 @@ CREATE TABLE `QualityNomination_Comments` (
   `qualitynomination_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL COMMENT 'El usuario que emitió el comentario',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creacion de este comentario',
-  `vote` tinyint(1) NOT NULL COMMENT 'El voto emitido en este comentario. En el rango de [-2, +2]',
+  `vote` int(1) NOT NULL COMMENT 'El voto emitido en este comentario. En el rango de [-2, +2]',
   `contents` text NOT NULL COMMENT 'El contenido de el comentario',
   PRIMARY KEY (`qualitynomination_comment_id`),
   KEY `user_id` (`user_id`),

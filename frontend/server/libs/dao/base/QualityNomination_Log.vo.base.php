@@ -27,16 +27,16 @@ class QualityNominationLog extends VO {
             return;
         }
         if (isset($data['qualitynomination_log_id'])) {
-            $this->qualitynomination_log_id = $data['qualitynomination_log_id'];
+            $this->qualitynomination_log_id = (int)$data['qualitynomination_log_id'];
         }
         if (isset($data['qualitynomination_id'])) {
-            $this->qualitynomination_id = $data['qualitynomination_id'];
+            $this->qualitynomination_id = (int)$data['qualitynomination_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['from_status'])) {
             $this->from_status = $data['from_status'];

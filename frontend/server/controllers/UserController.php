@@ -1113,7 +1113,7 @@ class UserController extends Controller {
     public static function getPreferredLanguage(Request $r = null) {
         // for quick debugging
         if (isset($_GET['lang'])) {
-            return UserController::convertToSupportedLanguage($_GET['lang']);
+            return IdentityController::convertToSupportedLanguage($_GET['lang']);
         }
 
         try {
@@ -1123,7 +1123,7 @@ class UserController extends Controller {
                 if (is_null($result)) {
                     self::$log->warn('Invalid language id for user');
                 } else {
-                    return UserController::convertToSupportedLanguage($result->name);
+                    return IdentityController::convertToSupportedLanguage($result->name);
                 }
             }
         } catch (NotFoundException $ex) {
@@ -1171,29 +1171,6 @@ class UserController extends Controller {
         return 'es';
     }
 
-    private static function convertToSupportedLanguage($lang) {
-        switch ($lang) {
-            case 'en':
-            case 'en-us':
-                return 'en';
-
-            case 'es':
-            case 'es-mx':
-                return 'es';
-
-            case 'pt':
-            case 'pt-pt':
-            case 'pt-br':
-                return 'pt';
-
-            case 'pseudo':
-                return 'pseudo';
-        }
-
-        // Fallback to spanish.
-        return 'es';
-    }
-
     /**
      * Returns the profile of the user given
      *
@@ -1222,7 +1199,7 @@ class UserController extends Controller {
             $query = LanguagesDAO::getByPK($user->language_id);
             if (!is_null($query)) {
                 $response['userinfo']['locale'] =
-                    UserController::convertToSupportedLanguage($query->name);
+                    IdentityController::convertToSupportedLanguage($query->name);
             }
         }
 
@@ -1238,7 +1215,7 @@ class UserController extends Controller {
             $response['userinfo']['school_id'] = $user->school_id;
 
             if (!is_null($user->language_id)) {
-                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($user_db['locale']);
+                $response['userinfo']['locale'] = IdentityController::convertToSupportedLanguage($user_db['locale']);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
