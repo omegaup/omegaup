@@ -2560,7 +2560,7 @@ class UserController extends Controller {
             throw new InvalidParameterException('parameterInvalid', 'username');
         }
 
-        if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup($r['current_user_id'], $identity->identity_id)) {
+        if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r['current_user_id'], (int)$identity->identity_id)) {
             throw new DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 

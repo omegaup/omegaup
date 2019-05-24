@@ -173,7 +173,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return $rs;
     }
 
-    public static function isUserAssociatedWithIdentityOfGroup($userId, $identityId) {
+    public static function isUserAssociatedWithIdentityOfGroup(int $userId, int $identityId) {
         global  $conn;
         $sql = '
             SELECT
