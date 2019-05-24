@@ -964,6 +964,7 @@ const translations = {
 	wordsEasy: "(Ea5y)",
 	wordsEdit: "(Edi7)",
 	wordsEditCourse: "(Edi7 c0ur53)",
+	wordsEmptyAddStudentInput: "(Th3 inpu7 fi31d i5 3mp7y, p13a53 7yp3 a u53rnam3)",
 	wordsEnable: "(Enab13)",
 	wordsEndTime: "(End)",
 	wordsEnglish: "(Eng1i5h)",

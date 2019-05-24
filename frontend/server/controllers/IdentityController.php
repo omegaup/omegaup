@@ -413,11 +413,34 @@ class IdentityController extends Controller {
                     'school' => $extendedProfile['school'],
                     'school_id' => $identity->school_id,
                     'is_private' => true,
-                    'locale' => UserController::convertToSupportedLanguage($extendedProfile['locale']),
+                    'locale' => IdentityController::convertToSupportedLanguage($extendedProfile['locale']),
                 ]
             ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    public static function convertToSupportedLanguage($lang) {
+        switch ($lang) {
+            case 'en':
+            case 'en-us':
+                return 'en';
+
+            case 'es':
+            case 'es-mx':
+                return 'es';
+
+            case 'pt':
+            case 'pt-pt':
+            case 'pt-br':
+                return 'pt';
+
+            case 'pseudo':
+                return 'pseudo';
+        }
+
+        // Fallback to spanish.
+        return 'es';
     }
 }
