@@ -12,6 +12,7 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-group-members', {
         props: {
           identities: this.identities,
+          identitiesCsv: this.identitiesCsv,
           countries: this.countries,
         },
         on: {
@@ -23,6 +24,45 @@ OmegaUp.on('ready', function() {
                 .then(function(data) {
                   refreshMemberList();
                   UI.success(T.groupEditMemberAdded);
+                  groupMembersInstance.reset();
+                })
+                .fail(UI.apiError);
+          },
+          'edit-identity-member': function(groupMembersInstance, identity,
+                                           username, name, selectedCountry,
+                                           selectedState, school) {
+            API.Identity.update({
+                          username: username,
+                          name: name,
+                          country_id: selectedCountry,
+                          state_id: selectedState,
+                          school_name: school,
+                          group_alias: groupAlias,
+                          original_identity: identity,
+                        })
+                .then(function(data) {
+                  refreshMemberList();
+                  UI.success(T.groupEditMemberUpdated);
+                  groupMembersInstance.reset();
+                })
+                .fail(UI.apiError);
+          },
+          'change-password-identity-member': function(
+              groupMembersInstance, username, newPassword, newPasswordRepeat) {
+            if (newPassword !== newPasswordRepeat) {
+              $('.modal').modal('hide');
+              UI.error(T.userPasswordMustBeSame);
+              return;
+            }
+
+            API.Identity.changePassword({
+                          group_alias: groupAlias,
+                          password: newPassword,
+                          username: username,
+                        })
+                .then(function(data) {
+                  refreshMemberList();
+                  UI.success(T.groupEditMemberPasswordUpdated);
                   groupMembersInstance.reset();
                 })
                 .fail(UI.apiError);
@@ -41,6 +81,7 @@ OmegaUp.on('ready', function() {
     },
     data: {
       identities: [],
+      identitiesCsv: [],
       countries: payload.countries,
     },
     components: {
@@ -49,6 +90,7 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshMemberList() {
+    $('.modal').modal('hide');
     API.Group.members({group_alias: groupAlias})
         .then(function(data) {
           groupMembers.identities = [];

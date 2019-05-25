@@ -213,7 +213,7 @@ class IdentityController extends Controller {
         global $experiments;
         $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
-        $original_identity = self::resolveIdentity($r['username']);
+        $originalIdentity = self::resolveIdentity($r['original_identity']['username']);
 
         // Prepare DAOs
         $identity = self::updateIdentity(
@@ -224,10 +224,10 @@ class IdentityController extends Controller {
             $r['gender'],
             $r['school_name'],
             $r['group_alias'],
-            $original_identity
+            $originalIdentity
         );
 
-        $identity->identity_id = $original_identity->identity_id;
+        $identity->identity_id = $originalIdentity->identity_id;
 
         // Save in DB
         IdentitiesDAO::save($identity);
