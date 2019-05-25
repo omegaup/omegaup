@@ -76,7 +76,7 @@ class SchoolController extends Controller {
         $school_id = 0;
         try {
             $existing = SchoolsDAO::findByName($name);
-            if (count($existing) > 0) {
+            if (!empty($existing)) {
                 return $existing[0]->school_id;
             }
             // Save in db

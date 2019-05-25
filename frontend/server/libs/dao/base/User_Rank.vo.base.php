@@ -59,11 +59,11 @@ class UserRank extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

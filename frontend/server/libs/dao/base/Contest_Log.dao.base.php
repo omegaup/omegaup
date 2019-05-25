@@ -79,7 +79,7 @@ abstract class ContestLogDAOBase {
         $params = [$public_contest_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new ContestLog($rs);

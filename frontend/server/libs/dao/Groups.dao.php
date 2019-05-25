@@ -23,7 +23,7 @@ class GroupsDAO extends GroupsDAOBase {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new Groups($rs);
@@ -47,7 +47,7 @@ class GroupsDAO extends GroupsDAOBase {
         $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
 
         $rs = $conn->GetRow($sql, [$name]);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new Groups($rs);

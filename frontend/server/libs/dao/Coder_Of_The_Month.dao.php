@@ -95,7 +95,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         global $conn;
         $results = $conn->getAll($sql, $val);
-        if (count($results) == 0) {
+        if (empty($results)) {
             return null;
         }
         return $results;
@@ -182,7 +182,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, []);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return false;
         }
         return $username == $rs['username'];

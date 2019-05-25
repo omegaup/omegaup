@@ -34,7 +34,7 @@ class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase {
         $sql = 'SELECT * FROM Groups_Scoreboards WHERE alias = ? LIMIT 1;';
         global $conn;
         $rs = $conn->GetRow($sql, [$alias]);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
 

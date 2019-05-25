@@ -51,7 +51,7 @@ class Utils {
         $sql = 'SELECT NOW() n';
         $rs = $conn->GetRow($sql);
 
-        if (count($rs) === 0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -66,7 +66,7 @@ class Utils {
         $params = [$time];
         $rs = $conn->GetRow($sql, $params);
 
-        if (count($rs) === 0) {
+        if (empty($rs)) {
             return null;
         }
 

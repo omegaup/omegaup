@@ -104,11 +104,11 @@ class Contests extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['start_time', 'finish_time', 'last_updated']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**
