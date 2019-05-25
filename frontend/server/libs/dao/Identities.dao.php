@@ -167,7 +167,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         $params = [$identity_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return $rs;
@@ -214,7 +214,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         $args = [$username];
 
         $rs = $conn->GetRow($sql, $args);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new Identities($rs);

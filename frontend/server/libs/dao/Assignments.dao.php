@@ -31,7 +31,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         $params[] = $assignmentAlias;
 
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
 

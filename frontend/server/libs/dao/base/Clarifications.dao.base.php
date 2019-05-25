@@ -82,7 +82,7 @@ abstract class ClarificationsDAOBase {
         $params = [$clarification_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new Clarifications($rs);

@@ -173,7 +173,7 @@ class GroupScoreboardController extends Controller {
         $response['scoreboard'] = $scoreboard->asArray();
 
         // If we have contests, calculate merged&filtered scoreboard
-        if (count($response['contests']) > 0) {
+        if (!empty($response['contests'])) {
             // Get merged scoreboard
             $r['contest_aliases'] = '';
             foreach ($response['contests'] as $contest) {

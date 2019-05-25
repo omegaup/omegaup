@@ -2658,7 +2658,7 @@ class ContestController extends Controller {
             foreach ($userData['problems'] as $key => $problemData) {
                 // If the user don't have these details then he didn't submit,
                 // we need to fill the report with 0s for completeness
-                if (!isset($problemData['run_details']['cases']) || count($problemData['run_details']['cases']) === 0) {
+                if (!isset($problemData['run_details']['cases']) || empty($problemData['run_details']['cases'])) {
                     for ($i = 0; $i < count($problemStats[$key]['cases_stats']); $i++) {
                         $csvRow[] = '0';
                     }

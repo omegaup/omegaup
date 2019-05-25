@@ -80,7 +80,7 @@ abstract class QualityNominationLogDAOBase {
         $params = [$qualitynomination_log_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new QualityNominationLog($rs);

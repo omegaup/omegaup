@@ -81,7 +81,7 @@ abstract class {{ table.class_name }}DAOBase {
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new {{ table.class_name }}($rs);

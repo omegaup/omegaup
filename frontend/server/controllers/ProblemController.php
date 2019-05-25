@@ -2015,7 +2015,7 @@ class ProblemController extends Controller {
         }
 
         // Save the last id we saw in case we saw something
-        if (!is_null($runs) && count($runs) > 0) {
+        if (!empty($runs)) {
             $casesStats['last_submission_id'] = $runs[count($runs) - 1]->submission_id;
         }
 

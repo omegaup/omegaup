@@ -261,7 +261,7 @@ class Validators {
                     $bad_elements[] = $element;
                 }
             }
-            if (count($bad_elements) > 0) {
+            if (!empty($bad_elements)) {
                 throw new InvalidParameterException(
                     'parameterNotInExpectedSet',
                     $parameterName,

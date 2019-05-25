@@ -79,7 +79,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
         $params = [$identity_id, $problemset_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new ProblemsetIdentityRequest($rs);

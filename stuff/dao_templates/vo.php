@@ -45,11 +45,11 @@ class {{ table.class_name }} extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([{{ table.columns|selectattr('type', 'equalto', ('timestamp',))|map(attribute='name')|listformat("'{}'")|join(', ') }}]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 {%- for column in table.columns %}
 

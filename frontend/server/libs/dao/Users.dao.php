@@ -18,7 +18,7 @@ class UsersDAO extends UsersDAOBase {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return new Users($rs);
@@ -28,7 +28,7 @@ class UsersDAO extends UsersDAOBase {
         global  $conn;
         $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1';
         $rs = $conn->GetRow($sql, [$username]);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return new Users($rs);
@@ -135,7 +135,7 @@ class UsersDAO extends UsersDAOBase {
         $params = [$user_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return $rs;

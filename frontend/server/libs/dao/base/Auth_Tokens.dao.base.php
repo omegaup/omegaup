@@ -77,7 +77,7 @@ abstract class AuthTokensDAOBase {
         $params = [$token];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new AuthTokens($rs);

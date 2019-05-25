@@ -77,7 +77,7 @@ abstract class ProblemsTagsDAOBase {
         $params = [$problem_id, $tag_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new ProblemsTags($rs);
