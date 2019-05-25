@@ -47,26 +47,6 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
-          'change-password-identity-member': function(
-              groupMembersInstance, username, newPassword, newPasswordRepeat) {
-            if (newPassword !== newPasswordRepeat) {
-              $('.modal').modal('hide');
-              UI.error(T.userPasswordMustBeSame);
-              return;
-            }
-
-            API.Identity.changePassword({
-                          group_alias: groupAlias,
-                          password: newPassword,
-                          username: username,
-                        })
-                .then(function(data) {
-                  refreshMemberList();
-                  UI.success(T.groupEditMemberPasswordUpdated);
-                  groupMembersInstance.reset();
-                })
-                .fail(UI.apiError);
-          },
           remove: function(username) {
             API.Group.removeUser(
                          {group_alias: groupAlias, usernameOrEmail: username})

@@ -58,11 +58,7 @@
             <a class="glyphicon glyphicon-edit"
                 href="#"
                 v-bind:title="T.groupEditMembersEdit"
-                v-on:click="onEdit(identity)"></a> <a class="glyphicon glyphicon-lock"
-                href="#"
-                v-bind:title="T.groupEditMembersChangePassword"
-                v-on:click="onChangePass(identity.username)"></a> <a class=
-                "glyphicon glyphicon-remove"
+                v-on:click="onEdit(identity)"></a> <a class="glyphicon glyphicon-remove"
                 href="#"
                 v-bind:title="T.groupEditMembersRemove"
                 v-on:click="onRemove(identity.username)"></a>
@@ -164,67 +160,6 @@
           </form>
         </div>
       </div>
-    </div><!-- Modal Change Password-->
-    <div class="modal fade modal-change-password"
-         role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form class="form-horizontal"
-                role="form"
-                v-on:submit.prevent="onChangePasswordMember">
-            <div class="modal-header">
-              <button class="close"
-                   data-dismiss="modal"
-                   type="button">×</button>
-              <h4 class="modal-title">{{ T.userEditChangePassword }}</h4>
-            </div>
-            <div class="modal-body">
-              <div class="panel-body">
-                <div class="form-group">
-                  <label class="col-md-4 col-sm-4 control-label"
-                       for="username">{{ T.username }}</label>
-                  <div class="col-md-7 col-sm-7">
-                    <input class="form-control"
-                         disabled="disabled"
-                         name="username"
-                         size="30"
-                         type="text"
-                         v-bind:value="username">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 col-sm-4 control-label"
-                       for="new-password-1">{{ T.userEditChangePasswordNewPassword }}</label>
-                  <div class="col-md-7 col-sm-7">
-                    <input class="form-control"
-                         name="new-password-1"
-                         size="30"
-                         type="password"
-                         v-model="newPassword">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 col-sm-4 control-label"
-                       for="new-password-2">{{ T.userEditChangePasswordRepeatNewPassword }}</label>
-                  <div class="col-md-7 col-sm-7">
-                    <input class="form-control"
-                         name="new-password-2"
-                         size="30"
-                         type="password"
-                         v-model="newPasswordRepeat">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-default"
-                   data-dismiss="modal"
-                   type="button">{{ T.wordsCancel }}</button> <button class="btn btn-primary"
-                   type="submit">{{ T.wordsSaveChanges }}</button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -259,8 +194,6 @@ export default {
       state: '',
       school: '',
       schoolId: '',
-      newPassword: '',
-      newPasswordRepeat: '',
     };
   },
   mounted: function() {
@@ -303,14 +236,6 @@ export default {
       this.$emit('edit-identity-member', this, this.selectedIdentity,
                  this.username, this.name, this.selectedCountry,
                  this.selectedState, this.school);
-    },
-    onChangePass: function(username) {
-      this.username = username;
-      $('.modal-change-password').modal();
-    },
-    onChangePasswordMember: function() {
-      this.$emit('change-password-identity-member', this, this.username,
-                 this.newPassword, this.newPasswordRepeat);
     },
     onRemove: function(username) { this.$emit('remove', username);},
     onSelectCountry: function() { this.updateStates();},
