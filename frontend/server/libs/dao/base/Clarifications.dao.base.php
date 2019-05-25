@@ -50,15 +50,15 @@ abstract class ClarificationsDAOBase {
     final public static function update(Clarifications $Clarifications) {
         $sql = 'UPDATE `Clarifications` SET `author_id` = ?, `receiver_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `problemset_id` = ?, `public` = ? WHERE `clarification_id` = ?;';
         $params = [
-            $Clarifications->author_id,
-            $Clarifications->receiver_id,
+            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
+            is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
             $Clarifications->time,
-            $Clarifications->problem_id,
-            $Clarifications->problemset_id,
-            $Clarifications->public,
-            $Clarifications->clarification_id,
+            is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
+            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
+            is_null($Clarifications->public) ? null : (int)$Clarifications->public,
+            is_null($Clarifications->clarification_id) ? null : (int)$Clarifications->clarification_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -81,11 +81,11 @@ abstract class ClarificationsDAOBase {
         $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` FROM Clarifications WHERE (clarification_id = ?) LIMIT 1;';
         $params = [$clarification_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Clarifications($rs);
+        return new Clarifications($row);
     }
 
     /**
@@ -136,14 +136,13 @@ abstract class ClarificationsDAOBase {
         $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` from Clarifications';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Clarifications($row);
         }
         return $allData;
@@ -164,18 +163,18 @@ abstract class ClarificationsDAOBase {
             $Clarifications->time = gmdate('Y-m-d H:i:s');
         }
         if (is_null($Clarifications->public)) {
-            $Clarifications->public = '0';
+            $Clarifications->public = false;
         }
         $sql = 'INSERT INTO Clarifications (`author_id`, `receiver_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Clarifications->author_id,
-            $Clarifications->receiver_id,
+            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
+            is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
             $Clarifications->time,
-            $Clarifications->problem_id,
-            $Clarifications->problemset_id,
-            $Clarifications->public,
+            is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
+            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
+            is_null($Clarifications->public) ? null : (int)$Clarifications->public,
         ];
         global $conn;
         $conn->Execute($sql, $params);

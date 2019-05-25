@@ -51,13 +51,13 @@ abstract class ProblemsetIdentitiesDAOBase {
         $sql = 'UPDATE `Problemset_Identities` SET `access_time` = ?, `score` = ?, `time` = ?, `share_user_information` = ?, `privacystatement_consent_id` = ?, `is_invited` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
             $Problemset_Identities->access_time,
-            $Problemset_Identities->score,
-            $Problemset_Identities->time,
-            $Problemset_Identities->share_user_information,
-            $Problemset_Identities->privacystatement_consent_id,
-            $Problemset_Identities->is_invited,
-            $Problemset_Identities->identity_id,
-            $Problemset_Identities->problemset_id,
+            is_null($Problemset_Identities->score) ? null : (int)$Problemset_Identities->score,
+            is_null($Problemset_Identities->time) ? null : (int)$Problemset_Identities->time,
+            is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
+            is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
+            is_null($Problemset_Identities->is_invited) ? null : (int)$Problemset_Identities->is_invited,
+            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
+            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -80,11 +80,11 @@ abstract class ProblemsetIdentitiesDAOBase {
         $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ProblemsetIdentities($rs);
+        return new ProblemsetIdentities($row);
     }
 
     /**
@@ -135,14 +135,13 @@ abstract class ProblemsetIdentitiesDAOBase {
         $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` from Problemset_Identities';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemsetIdentities($row);
         }
         return $allData;
@@ -160,24 +159,24 @@ abstract class ProblemsetIdentitiesDAOBase {
      */
     final public static function create(ProblemsetIdentities $Problemset_Identities) {
         if (is_null($Problemset_Identities->score)) {
-            $Problemset_Identities->score = '1';
+            $Problemset_Identities->score = 1;
         }
         if (is_null($Problemset_Identities->time)) {
-            $Problemset_Identities->time = '1';
+            $Problemset_Identities->time = 1;
         }
         if (is_null($Problemset_Identities->is_invited)) {
-            $Problemset_Identities->is_invited = '0';
+            $Problemset_Identities->is_invited = false;
         }
         $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Problemset_Identities->identity_id,
-            $Problemset_Identities->problemset_id,
+            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
+            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
             $Problemset_Identities->access_time,
-            $Problemset_Identities->score,
-            $Problemset_Identities->time,
-            $Problemset_Identities->share_user_information,
-            $Problemset_Identities->privacystatement_consent_id,
-            $Problemset_Identities->is_invited,
+            is_null($Problemset_Identities->score) ? null : (int)$Problemset_Identities->score,
+            is_null($Problemset_Identities->time) ? null : (int)$Problemset_Identities->time,
+            is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
+            is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
+            is_null($Problemset_Identities->is_invited) ? null : (int)$Problemset_Identities->is_invited,
         ];
         global $conn;
         $conn->Execute($sql, $params);

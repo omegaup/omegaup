@@ -194,7 +194,7 @@ class IdentityController extends Controller {
                 'identity_id' => $identity->identity_id,
             ]));
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);

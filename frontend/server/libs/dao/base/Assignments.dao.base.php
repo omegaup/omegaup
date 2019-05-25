@@ -50,19 +50,19 @@ abstract class AssignmentsDAOBase {
     final public static function update(Assignments $Assignments) {
         $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ?, `max_points` = ?, `order` = ? WHERE `assignment_id` = ?;';
         $params = [
-            $Assignments->course_id,
-            $Assignments->problemset_id,
-            $Assignments->acl_id,
+            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
+            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
+            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,
-            $Assignments->publish_time_delay,
+            is_null($Assignments->publish_time_delay) ? null : (int)$Assignments->publish_time_delay,
             $Assignments->assignment_type,
             $Assignments->start_time,
             $Assignments->finish_time,
-            $Assignments->max_points,
-            $Assignments->order,
-            $Assignments->assignment_id,
+            is_null($Assignments->max_points) ? null : (float)$Assignments->max_points,
+            is_null($Assignments->order) ? null : (int)$Assignments->order,
+            is_null($Assignments->assignment_id) ? null : (int)$Assignments->assignment_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -85,11 +85,11 @@ abstract class AssignmentsDAOBase {
         $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM Assignments WHERE (assignment_id = ?) LIMIT 1;';
         $params = [$assignment_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Assignments($rs);
+        return new Assignments($row);
     }
 
     /**
@@ -140,14 +140,13 @@ abstract class AssignmentsDAOBase {
         $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` from Assignments';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Assignments($row);
         }
         return $allData;
@@ -171,25 +170,25 @@ abstract class AssignmentsDAOBase {
             $Assignments->finish_time = '2000-01-01 06:00:00';
         }
         if (is_null($Assignments->max_points)) {
-            $Assignments->max_points = '0';
+            $Assignments->max_points = (float)0;
         }
         if (is_null($Assignments->order)) {
-            $Assignments->order = '1';
+            $Assignments->order = 1;
         }
         $sql = 'INSERT INTO Assignments (`course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Assignments->course_id,
-            $Assignments->problemset_id,
-            $Assignments->acl_id,
+            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
+            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
+            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,
-            $Assignments->publish_time_delay,
+            is_null($Assignments->publish_time_delay) ? null : (int)$Assignments->publish_time_delay,
             $Assignments->assignment_type,
             $Assignments->start_time,
             $Assignments->finish_time,
-            $Assignments->max_points,
-            $Assignments->order,
+            is_null($Assignments->max_points) ? null : (float)$Assignments->max_points,
+            is_null($Assignments->order) ? null : (int)$Assignments->order,
         ];
         global $conn;
         $conn->Execute($sql, $params);

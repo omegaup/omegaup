@@ -79,7 +79,7 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                     identity_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$problemsetId, $identityId]);
+        $rs = $conn->GetAll($sql, [$problemsetId, $identityId]);
 
         $problemsetAccessLog = [];
         foreach ($rs as $row) {

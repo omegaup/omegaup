@@ -50,10 +50,10 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
     final public static function update(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) {
         $sql = 'UPDATE `Groups_Scoreboards_Problemsets` SET `only_ac` = ?, `weight` = ? WHERE `group_scoreboard_id` = ? AND `problemset_id` = ?;';
         $params = [
-            $Groups_Scoreboards_Problemsets->only_ac,
-            $Groups_Scoreboards_Problemsets->weight,
-            $Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            $Groups_Scoreboards_Problemsets->problemset_id,
+            is_null($Groups_Scoreboards_Problemsets->only_ac) ? null : (int)$Groups_Scoreboards_Problemsets->only_ac,
+            is_null($Groups_Scoreboards_Problemsets->weight) ? null : (int)$Groups_Scoreboards_Problemsets->weight,
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -76,11 +76,11 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` FROM Groups_Scoreboards_Problemsets WHERE (group_scoreboard_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id, $problemset_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new GroupsScoreboardsProblemsets($rs);
+        return new GroupsScoreboardsProblemsets($row);
     }
 
     /**
@@ -131,14 +131,13 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` from Groups_Scoreboards_Problemsets';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new GroupsScoreboardsProblemsets($row);
         }
         return $allData;
@@ -156,17 +155,17 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      */
     final public static function create(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) {
         if (is_null($Groups_Scoreboards_Problemsets->only_ac)) {
-            $Groups_Scoreboards_Problemsets->only_ac = '0';
+            $Groups_Scoreboards_Problemsets->only_ac = false;
         }
         if (is_null($Groups_Scoreboards_Problemsets->weight)) {
-            $Groups_Scoreboards_Problemsets->weight = '1';
+            $Groups_Scoreboards_Problemsets->weight = 1;
         }
         $sql = 'INSERT INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
         $params = [
-            $Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            $Groups_Scoreboards_Problemsets->problemset_id,
-            $Groups_Scoreboards_Problemsets->only_ac,
-            $Groups_Scoreboards_Problemsets->weight,
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            is_null($Groups_Scoreboards_Problemsets->only_ac) ? null : (int)$Groups_Scoreboards_Problemsets->only_ac,
+            is_null($Groups_Scoreboards_Problemsets->weight) ? null : (int)$Groups_Scoreboards_Problemsets->weight,
         ];
         global $conn;
         $conn->Execute($sql, $params);

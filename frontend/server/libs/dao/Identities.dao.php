@@ -237,7 +237,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 i.user_id = ?
                 ';
 
-        $rs = $conn->Execute($sql, [$userId]);
+        $rs = $conn->GetAll($sql, [$userId]);
         $result = [];
         foreach ($rs as $identity) {
             array_push($result, [

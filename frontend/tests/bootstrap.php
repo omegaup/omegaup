@@ -86,9 +86,9 @@ namespace {
     QualityNominationFactory::initTags();
 
     // Mock time
-    $current_time = time();
-    Time::setTimeForTesting($current_time);
-    $conn->EXECUTE('SET TIMESTAMP = ' . $current_time);
+    $currentTime = time();
+    Time::setTimeForTesting($currentTime);
+    $conn->Execute("SET TIMESTAMP = {$currentTime};");
 
     Grader::setInstanceForTesting(new NoOpGrader());
 }

@@ -51,7 +51,7 @@ abstract class TagsDAOBase {
         $sql = 'UPDATE `Tags` SET `name` = ? WHERE `tag_id` = ?;';
         $params = [
             $Tags->name,
-            $Tags->tag_id,
+            is_null($Tags->tag_id) ? null : (int)$Tags->tag_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -74,11 +74,11 @@ abstract class TagsDAOBase {
         $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` FROM Tags WHERE (tag_id = ?) LIMIT 1;';
         $params = [$tag_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Tags($rs);
+        return new Tags($row);
     }
 
     /**
@@ -129,14 +129,13 @@ abstract class TagsDAOBase {
         $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` from Tags';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Tags($row);
         }
         return $allData;

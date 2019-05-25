@@ -74,7 +74,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     `order`, `problem_id` ASC;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$problemset_id]);
+        $rs = $conn->GetAll($sql, [$problemset_id]);
 
         $problemsetProblems = [];
         foreach ($rs as $row) {
@@ -102,7 +102,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         $val = [$problemset->problemset_id];
         global $conn;
         $result = [];
-        foreach ($conn->Execute($sql, $val) as $row) {
+        foreach ($conn->GetAll($sql, $val) as $row) {
             $result[] = new Problems($row);
         }
         return $result;
@@ -175,7 +175,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     pp.order, pp.problem_id ASC;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$problemset_id]);
+        $rs = $conn->GetAll($sql, [$problemset_id]);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -296,7 +296,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     UNIX_TIMESTAMP(c.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
-            $rs = $conn->Execute($sql, [
+            $rs = $conn->GetAll($sql, [
                 $now,
                 $problem->problem_id,
             ]);
@@ -321,7 +321,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     UNIX_TIMESTAMP(a.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
-            $rs = $conn->Execute($sql, [
+            $rs = $conn->GetAll($sql, [
                 $now,
                 $problem->problem_id,
             ]);

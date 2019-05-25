@@ -53,10 +53,26 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'UPDATE `{{ table.name }}` SET {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(', ') }} WHERE {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND ') }};';
         $params = [
 {%- for column in table.columns|rejectattr('primary_key') %}
+{%- if 'tinyint' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+{%- elif 'int' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+{%- elif 'double' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+{%- else %}
             ${{ table.name }}->{{ column.name }},
+{%- endif %}
 {%- endfor %}
 {%- for column in table.columns|selectattr('primary_key') %}
+{%- if 'tinyint' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+{%- elif 'int' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+{%- elif 'double' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+{%- else %}
             ${{ table.name }}->{{ column.name }},
+{%- endif %}
 {%- endfor %}
         ];
         global $conn;
@@ -80,11 +96,11 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'SELECT {{ table.fieldnames }} FROM {{ table.name }} WHERE ({{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }}) LIMIT 1;';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new {{ table.class_name }}($rs);
+        return new {{ table.class_name }}($row);
     }
 
     /**
@@ -135,14 +151,13 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'SELECT {{ table.fieldnames }} from {{ table.name }}';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new {{ table.class_name }}($row);
         }
         return $allData;
@@ -168,6 +183,12 @@ abstract class {{ table.class_name }}DAOBase {
         if (is_null(${{ table.name }}->{{ column.name }})) {
 {%- if column.default == 'CURRENT_TIMESTAMP' %}
             ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s');
+{%- elif 'tinyint' in column.type %}
+            ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
+{%- elif 'int' in column.type %}
+            ${{ table.name }}->{{ column.name }} = {{ column.default }};
+{%- elif 'double' in column.type %}
+            ${{ table.name }}->{{ column.name }} = (float){{ column.default }};
 {%- else %}
             ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
 {%- endif %}
@@ -176,7 +197,15 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(', ') }});';
         $params = [
 {%- for column in table.columns|rejectattr('auto_increment') %}
-            ${{ table.name }}->{{column.name}},
+{%- if 'tinyint' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+{%- elif 'int' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+{%- elif 'double' in column.type %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+{%- else %}
+            ${{ table.name }}->{{ column.name }},
+{%- endif %}
 {%- endfor %}
         ];
         global $conn;

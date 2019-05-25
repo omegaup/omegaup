@@ -26,7 +26,7 @@ class UsersDAO extends UsersDAOBase {
 
     public static function FindByUsername($username) {
         global  $conn;
-        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1';
+        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
         $rs = $conn->GetRow($sql, [$username]);
         if (empty($rs)) {
             return null;
@@ -67,7 +67,7 @@ class UsersDAO extends UsersDAOBase {
             LIMIT 10";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
-        $rs = $conn->Execute($sql, $args);
+        $rs = $conn->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $user_data) {
             array_push($result, new Users($user_data));
@@ -195,7 +195,7 @@ class UsersDAO extends UsersDAOBase {
                     verification_id = ?';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$verification_id]);
+        $rs = $conn->GetAll($sql, [$verification_id]);
 
         $users = [];
         foreach ($rs as $row) {
@@ -215,7 +215,7 @@ class UsersDAO extends UsersDAOBase {
                     in_mailing_list = ?';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$verified, $in_mailing_list]);
+        $rs = $conn->GetAll($sql, [$verified, $in_mailing_list]);
 
         $users = [];
         foreach ($rs as $row) {

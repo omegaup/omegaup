@@ -94,7 +94,7 @@ class RunsDAO extends RunsDAOBase {
         global $conn;
 
         $result = [];
-        foreach ($conn->Execute($sql, $val) as $row) {
+        foreach ($conn->GetAll($sql, $val) as $row) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -194,7 +194,7 @@ class RunsDAO extends RunsDAOBase {
 
         global $conn;
         $result = [];
-        foreach ($conn->Execute($sql, $val) as $row) {
+        foreach ($conn->GetAll($sql, $val) as $row) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -397,7 +397,7 @@ class RunsDAO extends RunsDAOBase {
         }
 
         global $conn;
-        $rs = $conn->Execute($sql, $val);
+        $rs = $conn->GetAll($sql, $val);
 
         $ar = [];
         foreach ($rs as $row) {
@@ -439,7 +439,7 @@ class RunsDAO extends RunsDAOBase {
 
         $result = [];
         global $conn;
-        foreach ($conn->Execute($sql, [$problemset->problemset_id]) as $row) {
+        foreach ($conn->GetAll($sql, [$problemset->problemset_id]) as $row) {
             array_push($result, $row);
         }
         return $result;
@@ -552,7 +552,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $params = [$problemId];
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
         $runs = [];
         foreach ($rs as $row) {
             array_push($runs, new Runs($row));
@@ -647,7 +647,7 @@ class RunsDAO extends RunsDAOBase {
 
         global $conn;
         $result = [];
-        foreach ($conn->Execute($sql, [$problemId, $submissionId]) as $row) {
+        foreach ($conn->GetAll($sql, [$problemId, $submissionId]) as $row) {
             array_push($result, new Runs($row));
         }
         return $result;
@@ -835,7 +835,7 @@ class RunsDAO extends RunsDAOBase {
         $params = [$problem->current_version, $problem->problem_id];
 
         $result = [];
-        foreach ($conn->Execute($sql, $params) as $row) {
+        foreach ($conn->GetAll($sql, $params) as $row) {
             $result[] = new Runs($row);
         }
         return $result;

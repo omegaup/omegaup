@@ -19,7 +19,7 @@ class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
                     difficulty = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$difficulty]);
+        $rs = $conn->GetAll($sql, [$difficulty]);
 
         $problemsOfTheWeek = [];
         foreach ($rs as $row) {

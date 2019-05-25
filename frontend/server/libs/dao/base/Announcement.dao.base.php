@@ -50,10 +50,10 @@ abstract class AnnouncementDAOBase {
     final public static function update(Announcement $Announcement) {
         $sql = 'UPDATE `Announcement` SET `user_id` = ?, `time` = ?, `description` = ? WHERE `announcement_id` = ?;';
         $params = [
-            $Announcement->user_id,
+            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
             $Announcement->time,
             $Announcement->description,
-            $Announcement->announcement_id,
+            is_null($Announcement->announcement_id) ? null : (int)$Announcement->announcement_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -76,11 +76,11 @@ abstract class AnnouncementDAOBase {
         $sql = 'SELECT `Announcement`.`announcement_id`, `Announcement`.`user_id`, `Announcement`.`time`, `Announcement`.`description` FROM Announcement WHERE (announcement_id = ?) LIMIT 1;';
         $params = [$announcement_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Announcement($rs);
+        return new Announcement($row);
     }
 
     /**
@@ -131,14 +131,13 @@ abstract class AnnouncementDAOBase {
         $sql = 'SELECT `Announcement`.`announcement_id`, `Announcement`.`user_id`, `Announcement`.`time`, `Announcement`.`description` from Announcement';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Announcement($row);
         }
         return $allData;
@@ -160,7 +159,7 @@ abstract class AnnouncementDAOBase {
         }
         $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [
-            $Announcement->user_id,
+            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
             $Announcement->time,
             $Announcement->description,
         ];

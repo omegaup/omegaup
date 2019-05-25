@@ -52,7 +52,7 @@ abstract class PermissionsDAOBase {
         $params = [
             $Permissions->name,
             $Permissions->description,
-            $Permissions->permission_id,
+            is_null($Permissions->permission_id) ? null : (int)$Permissions->permission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,11 +75,11 @@ abstract class PermissionsDAOBase {
         $sql = 'SELECT `Permissions`.`permission_id`, `Permissions`.`name`, `Permissions`.`description` FROM Permissions WHERE (permission_id = ?) LIMIT 1;';
         $params = [$permission_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Permissions($rs);
+        return new Permissions($row);
     }
 
     /**
@@ -130,14 +130,13 @@ abstract class PermissionsDAOBase {
         $sql = 'SELECT `Permissions`.`permission_id`, `Permissions`.`name`, `Permissions`.`description` from Permissions';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Permissions($row);
         }
         return $allData;

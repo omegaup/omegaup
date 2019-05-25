@@ -39,14 +39,13 @@ abstract class UsersExperimentsDAOBase {
         $sql = 'SELECT `Users_Experiments`.`user_id`, `Users_Experiments`.`experiment` from Users_Experiments';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new UsersExperiments($row);
         }
         return $allData;
@@ -65,7 +64,7 @@ abstract class UsersExperimentsDAOBase {
     final public static function create(UsersExperiments $Users_Experiments) {
         $sql = 'INSERT INTO Users_Experiments (`user_id`, `experiment`) VALUES (?, ?);';
         $params = [
-            $Users_Experiments->user_id,
+            is_null($Users_Experiments->user_id) ? null : (int)$Users_Experiments->user_id,
             $Users_Experiments->experiment,
         ];
         global $conn;

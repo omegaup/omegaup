@@ -50,8 +50,8 @@ abstract class ACLsDAOBase {
     final public static function update(ACLs $ACLs) {
         $sql = 'UPDATE `ACLs` SET `owner_id` = ? WHERE `acl_id` = ?;';
         $params = [
-            $ACLs->owner_id,
-            $ACLs->acl_id,
+            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
+            is_null($ACLs->acl_id) ? null : (int)$ACLs->acl_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -74,11 +74,11 @@ abstract class ACLsDAOBase {
         $sql = 'SELECT `ACLs`.`acl_id`, `ACLs`.`owner_id` FROM ACLs WHERE (acl_id = ?) LIMIT 1;';
         $params = [$acl_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ACLs($rs);
+        return new ACLs($row);
     }
 
     /**
@@ -129,14 +129,13 @@ abstract class ACLsDAOBase {
         $sql = 'SELECT `ACLs`.`acl_id`, `ACLs`.`owner_id` from ACLs';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ACLs($row);
         }
         return $allData;
@@ -155,7 +154,7 @@ abstract class ACLsDAOBase {
     final public static function create(ACLs $ACLs) {
         $sql = 'INSERT INTO ACLs (`owner_id`) VALUES (?);';
         $params = [
-            $ACLs->owner_id,
+            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -173,17 +173,17 @@ class UserController extends Controller {
         try {
             DAO::transBegin();
 
-            UsersDAO::save($user);
+            UsersDAO::create($user);
 
             $email->user_id = $user->user_id;
-            EmailsDAO::save($email);
+            EmailsDAO::create($email);
 
             $identity->user_id = $user->user_id;
-            IdentitiesDAO::save($identity);
+            IdentitiesDAO::create($identity);
 
             $user->main_email_id = $email->email_id;
             $user->main_identity_id = $identity->identity_id;
-            UsersDAO::save($user);
+            UsersDAO::update($user);
 
             $r['user'] = $user;
             if ($user->verified) {
@@ -2063,8 +2063,7 @@ class UserController extends Controller {
                 }
             }
         } catch (Exception $e) {
-            // If duplicate in DB
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('mailInUse');
             } else {
                 throw new InvalidDatabaseOperationException($e);

@@ -50,13 +50,13 @@ abstract class QualityNominationsDAOBase {
     final public static function update(QualityNominations $QualityNominations) {
         $sql = 'UPDATE `QualityNominations` SET `user_id` = ?, `problem_id` = ?, `nomination` = ?, `contents` = ?, `time` = ?, `status` = ? WHERE `qualitynomination_id` = ?;';
         $params = [
-            $QualityNominations->user_id,
-            $QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
+            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
             $QualityNominations->time,
             $QualityNominations->status,
-            $QualityNominations->qualitynomination_id,
+            is_null($QualityNominations->qualitynomination_id) ? null : (int)$QualityNominations->qualitynomination_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -79,11 +79,11 @@ abstract class QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`qualitynomination_id`, `QualityNominations`.`user_id`, `QualityNominations`.`problem_id`, `QualityNominations`.`nomination`, `QualityNominations`.`contents`, `QualityNominations`.`time`, `QualityNominations`.`status` FROM QualityNominations WHERE (qualitynomination_id = ?) LIMIT 1;';
         $params = [$qualitynomination_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new QualityNominations($rs);
+        return new QualityNominations($row);
     }
 
     /**
@@ -134,14 +134,13 @@ abstract class QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`qualitynomination_id`, `QualityNominations`.`user_id`, `QualityNominations`.`problem_id`, `QualityNominations`.`nomination`, `QualityNominations`.`contents`, `QualityNominations`.`time`, `QualityNominations`.`status` from QualityNominations';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new QualityNominations($row);
         }
         return $allData;
@@ -169,8 +168,8 @@ abstract class QualityNominationsDAOBase {
         }
         $sql = 'INSERT INTO QualityNominations (`user_id`, `problem_id`, `nomination`, `contents`, `time`, `status`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $QualityNominations->user_id,
-            $QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
+            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
             $QualityNominations->time,

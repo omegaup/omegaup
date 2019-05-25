@@ -50,18 +50,18 @@ abstract class RunsDAOBase {
     final public static function update(Runs $Runs) {
         $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `judged_by` = ? WHERE `run_id` = ?;';
         $params = [
-            $Runs->submission_id,
+            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
-            $Runs->runtime,
-            $Runs->penalty,
-            $Runs->memory,
-            $Runs->score,
-            $Runs->contest_score,
+            is_null($Runs->runtime) ? null : (int)$Runs->runtime,
+            is_null($Runs->penalty) ? null : (int)$Runs->penalty,
+            is_null($Runs->memory) ? null : (int)$Runs->memory,
+            is_null($Runs->score) ? null : (float)$Runs->score,
+            is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
             $Runs->time,
             $Runs->judged_by,
-            $Runs->run_id,
+            is_null($Runs->run_id) ? null : (int)$Runs->run_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -84,11 +84,11 @@ abstract class RunsDAOBase {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
         $params = [$run_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Runs($rs);
+        return new Runs($row);
     }
 
     /**
@@ -139,14 +139,13 @@ abstract class RunsDAOBase {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` from Runs';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Runs($row);
         }
         return $allData;
@@ -167,31 +166,31 @@ abstract class RunsDAOBase {
             $Runs->status = 'new';
         }
         if (is_null($Runs->runtime)) {
-            $Runs->runtime = '0';
+            $Runs->runtime = 0;
         }
         if (is_null($Runs->penalty)) {
-            $Runs->penalty = '0';
+            $Runs->penalty = 0;
         }
         if (is_null($Runs->memory)) {
-            $Runs->memory = '0';
+            $Runs->memory = 0;
         }
         if (is_null($Runs->score)) {
-            $Runs->score = '0';
+            $Runs->score = (float)0;
         }
         if (is_null($Runs->time)) {
             $Runs->time = gmdate('Y-m-d H:i:s');
         }
         $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Runs->submission_id,
+            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
-            $Runs->runtime,
-            $Runs->penalty,
-            $Runs->memory,
-            $Runs->score,
-            $Runs->contest_score,
+            is_null($Runs->runtime) ? null : (int)$Runs->runtime,
+            is_null($Runs->penalty) ? null : (int)$Runs->penalty,
+            is_null($Runs->memory) ? null : (int)$Runs->memory,
+            is_null($Runs->score) ? null : (float)$Runs->score,
+            is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
             $Runs->time,
             $Runs->judged_by,
         ];

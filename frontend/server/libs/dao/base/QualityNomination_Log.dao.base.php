@@ -50,13 +50,13 @@ abstract class QualityNominationLogDAOBase {
     final public static function update(QualityNominationLog $QualityNomination_Log) {
         $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
         $params = [
-            $QualityNomination_Log->qualitynomination_id,
+            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
             $QualityNomination_Log->time,
-            $QualityNomination_Log->user_id,
+            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,
-            $QualityNomination_Log->qualitynomination_log_id,
+            is_null($QualityNomination_Log->qualitynomination_log_id) ? null : (int)$QualityNomination_Log->qualitynomination_log_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -79,11 +79,11 @@ abstract class QualityNominationLogDAOBase {
         $sql = 'SELECT `QualityNomination_Log`.`qualitynomination_log_id`, `QualityNomination_Log`.`qualitynomination_id`, `QualityNomination_Log`.`time`, `QualityNomination_Log`.`user_id`, `QualityNomination_Log`.`from_status`, `QualityNomination_Log`.`to_status`, `QualityNomination_Log`.`rationale` FROM QualityNomination_Log WHERE (qualitynomination_log_id = ?) LIMIT 1;';
         $params = [$qualitynomination_log_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new QualityNominationLog($rs);
+        return new QualityNominationLog($row);
     }
 
     /**
@@ -134,14 +134,13 @@ abstract class QualityNominationLogDAOBase {
         $sql = 'SELECT `QualityNomination_Log`.`qualitynomination_log_id`, `QualityNomination_Log`.`qualitynomination_id`, `QualityNomination_Log`.`time`, `QualityNomination_Log`.`user_id`, `QualityNomination_Log`.`from_status`, `QualityNomination_Log`.`to_status`, `QualityNomination_Log`.`rationale` from QualityNomination_Log';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new QualityNominationLog($row);
         }
         return $allData;
@@ -169,9 +168,9 @@ abstract class QualityNominationLogDAOBase {
         }
         $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $QualityNomination_Log->qualitynomination_id,
+            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
             $QualityNomination_Log->time,
-            $QualityNomination_Log->user_id,
+            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,

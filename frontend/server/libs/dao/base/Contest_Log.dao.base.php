@@ -50,12 +50,12 @@ abstract class ContestLogDAOBase {
     final public static function update(ContestLog $Contest_Log) {
         $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_admission_mode` = ?, `to_admission_mode` = ?, `time` = ? WHERE `public_contest_id` = ?;';
         $params = [
-            $Contest_Log->contest_id,
-            $Contest_Log->user_id,
+            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
+            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             $Contest_Log->time,
-            $Contest_Log->public_contest_id,
+            is_null($Contest_Log->public_contest_id) ? null : (int)$Contest_Log->public_contest_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class ContestLogDAOBase {
         $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` FROM Contest_Log WHERE (public_contest_id = ?) LIMIT 1;';
         $params = [$public_contest_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ContestLog($rs);
+        return new ContestLog($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class ContestLogDAOBase {
         $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` from Contest_Log';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ContestLog($row);
         }
         return $allData;
@@ -162,8 +161,8 @@ abstract class ContestLogDAOBase {
         }
         $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Contest_Log->contest_id,
-            $Contest_Log->user_id,
+            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
+            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             $Contest_Log->time,
