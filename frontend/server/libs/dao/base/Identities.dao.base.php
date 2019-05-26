@@ -53,13 +53,13 @@ abstract class IdentitiesDAOBase {
             $Identities->username,
             $Identities->password,
             $Identities->name,
-            $Identities->user_id,
-            $Identities->language_id,
+            is_null($Identities->user_id) ? null : (int)$Identities->user_id,
+            is_null($Identities->language_id) ? null : (int)$Identities->language_id,
             $Identities->country_id,
             $Identities->state_id,
-            $Identities->school_id,
+            is_null($Identities->school_id) ? null : (int)$Identities->school_id,
             $Identities->gender,
-            $Identities->identity_id,
+            is_null($Identities->identity_id) ? null : (int)$Identities->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -82,11 +82,11 @@ abstract class IdentitiesDAOBase {
         $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` FROM Identities WHERE (identity_id = ?) LIMIT 1;';
         $params = [$identity_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Identities($rs);
+        return new Identities($row);
     }
 
     /**
@@ -137,14 +137,13 @@ abstract class IdentitiesDAOBase {
         $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` from Identities';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Identities($row);
         }
         return $allData;
@@ -166,11 +165,11 @@ abstract class IdentitiesDAOBase {
             $Identities->username,
             $Identities->password,
             $Identities->name,
-            $Identities->user_id,
-            $Identities->language_id,
+            is_null($Identities->user_id) ? null : (int)$Identities->user_id,
+            is_null($Identities->language_id) ? null : (int)$Identities->language_id,
             $Identities->country_id,
             $Identities->state_id,
-            $Identities->school_id,
+            is_null($Identities->school_id) ? null : (int)$Identities->school_id,
             $Identities->gender,
         ];
         global $conn;

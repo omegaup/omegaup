@@ -52,7 +52,7 @@ abstract class RolesDAOBase {
         $params = [
             $Roles->name,
             $Roles->description,
-            $Roles->role_id,
+            is_null($Roles->role_id) ? null : (int)$Roles->role_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,11 +75,11 @@ abstract class RolesDAOBase {
         $sql = 'SELECT `Roles`.`role_id`, `Roles`.`name`, `Roles`.`description` FROM Roles WHERE (role_id = ?) LIMIT 1;';
         $params = [$role_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Roles($rs);
+        return new Roles($row);
     }
 
     /**
@@ -130,14 +130,13 @@ abstract class RolesDAOBase {
         $sql = 'SELECT `Roles`.`role_id`, `Roles`.`name`, `Roles`.`description` from Roles';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Roles($row);
         }
         return $allData;

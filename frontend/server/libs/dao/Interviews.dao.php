@@ -42,7 +42,7 @@ class InterviewsDAO extends InterviewsDAOBase {
         $params = [$user_id, $user_id, Authorization::ADMIN_ROLE];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $result = [];
 

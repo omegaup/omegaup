@@ -124,7 +124,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         ';
 
         global $conn;
-        $rs = $conn->Execute($sql);
+        $rs = $conn->GetAll($sql);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = $row;
@@ -199,7 +199,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 AND
                     `selected_by` ' . $clause . ';';
         global $conn;
-        $rs = $conn->Execute($sql, [$time]);
+        $rs = $conn->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -217,7 +217,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                     `time` = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$time]);
+        $rs = $conn->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {

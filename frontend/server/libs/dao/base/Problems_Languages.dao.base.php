@@ -34,11 +34,11 @@ abstract class ProblemsLanguagesDAOBase {
         $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` FROM Problems_Languages WHERE (problem_id = ? AND language_id = ?) LIMIT 1;';
         $params = [$problem_id, $language_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ProblemsLanguages($rs);
+        return new ProblemsLanguages($row);
     }
 
     /**
@@ -89,14 +89,13 @@ abstract class ProblemsLanguagesDAOBase {
         $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` from Problems_Languages';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemsLanguages($row);
         }
         return $allData;
@@ -115,8 +114,8 @@ abstract class ProblemsLanguagesDAOBase {
     final public static function create(ProblemsLanguages $Problems_Languages) {
         $sql = 'INSERT INTO Problems_Languages (`problem_id`, `language_id`) VALUES (?, ?);';
         $params = [
-            $Problems_Languages->problem_id,
-            $Problems_Languages->language_id,
+            is_null($Problems_Languages->problem_id) ? null : (int)$Problems_Languages->problem_id,
+            is_null($Problems_Languages->language_id) ? null : (int)$Problems_Languages->language_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

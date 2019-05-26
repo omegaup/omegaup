@@ -61,8 +61,7 @@ class InterviewController extends Controller {
             // Operation failed in the data layer, rollback transaction
             DAO::transRollback();
 
-            // Alias may be duplicated, 1062 error indicates that
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);

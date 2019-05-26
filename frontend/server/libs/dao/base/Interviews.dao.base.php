@@ -50,13 +50,13 @@ abstract class InterviewsDAOBase {
     final public static function update(Interviews $Interviews) {
         $sql = 'UPDATE `Interviews` SET `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE `interview_id` = ?;';
         $params = [
-            $Interviews->problemset_id,
-            $Interviews->acl_id,
+            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
+            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            $Interviews->window_length,
-            $Interviews->interview_id,
+            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
+            is_null($Interviews->interview_id) ? null : (int)$Interviews->interview_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -79,11 +79,11 @@ abstract class InterviewsDAOBase {
         $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` FROM Interviews WHERE (interview_id = ?) LIMIT 1;';
         $params = [$interview_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Interviews($rs);
+        return new Interviews($row);
     }
 
     /**
@@ -134,14 +134,13 @@ abstract class InterviewsDAOBase {
         $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` from Interviews';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Interviews($row);
         }
         return $allData;
@@ -160,12 +159,12 @@ abstract class InterviewsDAOBase {
     final public static function create(Interviews $Interviews) {
         $sql = 'INSERT INTO Interviews (`problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Interviews->problemset_id,
-            $Interviews->acl_id,
+            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
+            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            $Interviews->window_length,
+            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
         ];
         global $conn;
         $conn->Execute($sql, $params);

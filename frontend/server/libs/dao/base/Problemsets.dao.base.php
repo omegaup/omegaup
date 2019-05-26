@@ -50,18 +50,18 @@ abstract class ProblemsetsDAOBase {
     final public static function update(Problemsets $Problemsets) {
         $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `type` = ?, `contest_id` = ?, `assignment_id` = ?, `interview_id` = ? WHERE `problemset_id` = ?;';
         $params = [
-            $Problemsets->acl_id,
+            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
-            $Problemsets->needs_basic_information,
+            is_null($Problemsets->needs_basic_information) ? null : (int)$Problemsets->needs_basic_information,
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
-            $Problemsets->contest_id,
-            $Problemsets->assignment_id,
-            $Problemsets->interview_id,
-            $Problemsets->problemset_id,
+            is_null($Problemsets->contest_id) ? null : (int)$Problemsets->contest_id,
+            is_null($Problemsets->assignment_id) ? null : (int)$Problemsets->assignment_id,
+            is_null($Problemsets->interview_id) ? null : (int)$Problemsets->interview_id,
+            is_null($Problemsets->problemset_id) ? null : (int)$Problemsets->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -84,11 +84,11 @@ abstract class ProblemsetsDAOBase {
         $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`scoreboard_url`, `Problemsets`.`scoreboard_url_admin`, `Problemsets`.`type`, `Problemsets`.`contest_id`, `Problemsets`.`assignment_id`, `Problemsets`.`interview_id` FROM Problemsets WHERE (problemset_id = ?) LIMIT 1;';
         $params = [$problemset_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Problemsets($rs);
+        return new Problemsets($row);
     }
 
     /**
@@ -139,14 +139,13 @@ abstract class ProblemsetsDAOBase {
         $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`scoreboard_url`, `Problemsets`.`scoreboard_url_admin`, `Problemsets`.`type`, `Problemsets`.`contest_id`, `Problemsets`.`assignment_id`, `Problemsets`.`interview_id` from Problemsets';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Problemsets($row);
         }
         return $allData;
@@ -167,7 +166,7 @@ abstract class ProblemsetsDAOBase {
             $Problemsets->access_mode = 'public';
         }
         if (is_null($Problemsets->needs_basic_information)) {
-            $Problemsets->needs_basic_information = '0';
+            $Problemsets->needs_basic_information = false;
         }
         if (is_null($Problemsets->requests_user_information)) {
             $Problemsets->requests_user_information = 'no';
@@ -177,17 +176,17 @@ abstract class ProblemsetsDAOBase {
         }
         $sql = 'INSERT INTO Problemsets (`acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `scoreboard_url`, `scoreboard_url_admin`, `type`, `contest_id`, `assignment_id`, `interview_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Problemsets->acl_id,
+            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
-            $Problemsets->needs_basic_information,
+            is_null($Problemsets->needs_basic_information) ? null : (int)$Problemsets->needs_basic_information,
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
-            $Problemsets->contest_id,
-            $Problemsets->assignment_id,
-            $Problemsets->interview_id,
+            is_null($Problemsets->contest_id) ? null : (int)$Problemsets->contest_id,
+            is_null($Problemsets->assignment_id) ? null : (int)$Problemsets->assignment_id,
+            is_null($Problemsets->interview_id) ? null : (int)$Problemsets->interview_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

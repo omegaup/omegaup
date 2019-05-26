@@ -52,10 +52,10 @@ abstract class ProblemsetIdentityRequestDAOBase {
         $params = [
             $Problemset_Identity_Request->request_time,
             $Problemset_Identity_Request->last_update,
-            $Problemset_Identity_Request->accepted,
+            is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
-            $Problemset_Identity_Request->identity_id,
-            $Problemset_Identity_Request->problemset_id,
+            is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
+            is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class ProblemsetIdentityRequestDAOBase {
         $sql = 'SELECT `Problemset_Identity_Request`.`identity_id`, `Problemset_Identity_Request`.`problemset_id`, `Problemset_Identity_Request`.`request_time`, `Problemset_Identity_Request`.`last_update`, `Problemset_Identity_Request`.`accepted`, `Problemset_Identity_Request`.`extra_note` FROM Problemset_Identity_Request WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ProblemsetIdentityRequest($rs);
+        return new ProblemsetIdentityRequest($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class ProblemsetIdentityRequestDAOBase {
         $sql = 'SELECT `Problemset_Identity_Request`.`identity_id`, `Problemset_Identity_Request`.`problemset_id`, `Problemset_Identity_Request`.`request_time`, `Problemset_Identity_Request`.`last_update`, `Problemset_Identity_Request`.`accepted`, `Problemset_Identity_Request`.`extra_note` from Problemset_Identity_Request';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemsetIdentityRequest($row);
         }
         return $allData;
@@ -162,11 +161,11 @@ abstract class ProblemsetIdentityRequestDAOBase {
         }
         $sql = 'INSERT INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Problemset_Identity_Request->identity_id,
-            $Problemset_Identity_Request->problemset_id,
+            is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
+            is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
             $Problemset_Identity_Request->request_time,
             $Problemset_Identity_Request->last_update,
-            $Problemset_Identity_Request->accepted,
+            is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
         ];
         global $conn;

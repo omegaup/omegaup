@@ -1,13 +1,5 @@
 <?php
 
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
-
 /** Table Data Access Object.
  *
  * Esta clase comprende metodos comunes para manejar transacciones.
@@ -15,19 +7,26 @@
  * @abstract
  */
 final class DAO {
-    public static function transBegin() {
+    final public static function transBegin() : void {
         global $conn;
         $conn->StartTrans();
     }
 
-    public static function transEnd() {
+    final public static function transEnd() : void {
         global $conn;
         $conn->CompleteTrans();
     }
 
-    public static function transRollback() {
+    final public static function transRollback() : void {
         global $conn;
         $conn->FailTrans();
+    }
+
+    public static function isDuplicateEntryException(Exception $e) : bool {
+        if (!($e instanceof ADODB_Exception)) {
+            return false;
+        }
+        return $e->getCode() == 1062;
     }
 }
 

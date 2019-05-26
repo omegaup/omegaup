@@ -51,9 +51,9 @@ abstract class UsersBadgesDAOBase {
         $sql = 'UPDATE `Users_Badges` SET `time` = ?, `last_problem_id` = ? WHERE `badge_id` = ? AND `user_id` = ?;';
         $params = [
             $Users_Badges->time,
-            $Users_Badges->last_problem_id,
-            $Users_Badges->badge_id,
-            $Users_Badges->user_id,
+            is_null($Users_Badges->last_problem_id) ? null : (int)$Users_Badges->last_problem_id,
+            is_null($Users_Badges->badge_id) ? null : (int)$Users_Badges->badge_id,
+            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -76,11 +76,11 @@ abstract class UsersBadgesDAOBase {
         $sql = 'SELECT `Users_Badges`.`badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`time`, `Users_Badges`.`last_problem_id` FROM Users_Badges WHERE (badge_id = ? AND user_id = ?) LIMIT 1;';
         $params = [$badge_id, $user_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new UsersBadges($rs);
+        return new UsersBadges($row);
     }
 
     /**
@@ -131,14 +131,13 @@ abstract class UsersBadgesDAOBase {
         $sql = 'SELECT `Users_Badges`.`badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`time`, `Users_Badges`.`last_problem_id` from Users_Badges';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new UsersBadges($row);
         }
         return $allData;
@@ -160,10 +159,10 @@ abstract class UsersBadgesDAOBase {
         }
         $sql = 'INSERT INTO Users_Badges (`badge_id`, `user_id`, `time`, `last_problem_id`) VALUES (?, ?, ?, ?);';
         $params = [
-            $Users_Badges->badge_id,
-            $Users_Badges->user_id,
+            is_null($Users_Badges->badge_id) ? null : (int)$Users_Badges->badge_id,
+            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
             $Users_Badges->time,
-            $Users_Badges->last_problem_id,
+            is_null($Users_Badges->last_problem_id) ? null : (int)$Users_Badges->last_problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -50,12 +50,12 @@ abstract class GroupsDAOBase {
     final public static function update(Groups $Groups) {
         $sql = 'UPDATE `Groups` SET `acl_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
         $params = [
-            $Groups->acl_id,
+            is_null($Groups->acl_id) ? null : (int)$Groups->acl_id,
             $Groups->create_time,
             $Groups->alias,
             $Groups->name,
             $Groups->description,
-            $Groups->group_id,
+            is_null($Groups->group_id) ? null : (int)$Groups->group_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class GroupsDAOBase {
         $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` FROM Groups WHERE (group_id = ?) LIMIT 1;';
         $params = [$group_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Groups($rs);
+        return new Groups($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class GroupsDAOBase {
         $sql = 'SELECT `Groups`.`group_id`, `Groups`.`acl_id`, `Groups`.`create_time`, `Groups`.`alias`, `Groups`.`name`, `Groups`.`description` from Groups';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Groups($row);
         }
         return $allData;
@@ -162,7 +161,7 @@ abstract class GroupsDAOBase {
         }
         $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Groups->acl_id,
+            is_null($Groups->acl_id) ? null : (int)$Groups->acl_id,
             $Groups->create_time,
             $Groups->alias,
             $Groups->name,

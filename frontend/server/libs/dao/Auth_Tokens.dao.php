@@ -75,7 +75,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     `Auth_Tokens` at
                 WHERE
                     at.identity_id = ?;';
-        $rs = $conn->Execute($sql, [$identityId]);
+        $rs = $conn->GetAll($sql, [$identityId]);
 
         $authTokens = [];
         foreach ($rs as $row) {

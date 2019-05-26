@@ -51,8 +51,8 @@ abstract class EmailsDAOBase {
         $sql = 'UPDATE `Emails` SET `email` = ?, `user_id` = ? WHERE `email_id` = ?;';
         $params = [
             $Emails->email,
-            $Emails->user_id,
-            $Emails->email_id,
+            is_null($Emails->user_id) ? null : (int)$Emails->user_id,
+            is_null($Emails->email_id) ? null : (int)$Emails->email_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,11 +75,11 @@ abstract class EmailsDAOBase {
         $sql = 'SELECT `Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id` FROM Emails WHERE (email_id = ?) LIMIT 1;';
         $params = [$email_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Emails($rs);
+        return new Emails($row);
     }
 
     /**
@@ -130,14 +130,13 @@ abstract class EmailsDAOBase {
         $sql = 'SELECT `Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id` from Emails';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Emails($row);
         }
         return $allData;
@@ -157,7 +156,7 @@ abstract class EmailsDAOBase {
         $sql = 'INSERT INTO Emails (`email`, `user_id`) VALUES (?, ?);';
         $params = [
             $Emails->email,
-            $Emails->user_id,
+            is_null($Emails->user_id) ? null : (int)$Emails->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

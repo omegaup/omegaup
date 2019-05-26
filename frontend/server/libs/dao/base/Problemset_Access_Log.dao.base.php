@@ -39,14 +39,13 @@ abstract class ProblemsetAccessLogDAOBase {
         $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` from Problemset_Access_Log';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemsetAccessLog($row);
         }
         return $allData;
@@ -68,9 +67,9 @@ abstract class ProblemsetAccessLogDAOBase {
         }
         $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
         $params = [
-            $Problemset_Access_Log->problemset_id,
-            $Problemset_Access_Log->identity_id,
-            $Problemset_Access_Log->ip,
+            is_null($Problemset_Access_Log->problemset_id) ? null : (int)$Problemset_Access_Log->problemset_id,
+            is_null($Problemset_Access_Log->identity_id) ? null : (int)$Problemset_Access_Log->identity_id,
+            is_null($Problemset_Access_Log->ip) ? null : (int)$Problemset_Access_Log->ip,
             $Problemset_Access_Log->time,
         ];
         global $conn;

@@ -34,7 +34,7 @@ class GroupsDAO extends GroupsDAOBase {
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 
-        $rs = $conn->Execute($sql, $args);
+        $rs = $conn->GetAll($sql, $args);
         $ar = [];
         foreach ($rs as $row) {
             array_push($ar, new Groups($row));
@@ -85,7 +85,7 @@ class GroupsDAO extends GroupsDAOBase {
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $groups = [];
         foreach ($rs as $row) {
@@ -114,7 +114,7 @@ class GroupsDAO extends GroupsDAOBase {
         global $conn;
 
         $identities = [];
-        foreach ($conn->Execute($sql, [$group->group_id, $n]) as $row) {
+        foreach ($conn->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
             $identities[] = new Identities($row);
         }
         return $identities;

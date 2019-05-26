@@ -50,12 +50,12 @@ abstract class MessagesDAOBase {
     final public static function update(Messages $Messages) {
         $sql = 'UPDATE `Messages` SET `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE `message_id` = ?;';
         $params = [
-            $Messages->read,
-            $Messages->sender_id,
-            $Messages->recipient_id,
+            is_null($Messages->read) ? null : (int)$Messages->read,
+            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
+            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
             $Messages->date,
-            $Messages->message_id,
+            is_null($Messages->message_id) ? null : (int)$Messages->message_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class MessagesDAOBase {
         $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` FROM Messages WHERE (message_id = ?) LIMIT 1;';
         $params = [$message_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Messages($rs);
+        return new Messages($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class MessagesDAOBase {
         $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` from Messages';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Messages($row);
         }
         return $allData;
@@ -158,16 +157,16 @@ abstract class MessagesDAOBase {
      */
     final public static function create(Messages $Messages) {
         if (is_null($Messages->read)) {
-            $Messages->read = '0';
+            $Messages->read = false;
         }
         if (is_null($Messages->date)) {
             $Messages->date = gmdate('Y-m-d H:i:s');
         }
         $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Messages->read,
-            $Messages->sender_id,
-            $Messages->recipient_id,
+            is_null($Messages->read) ? null : (int)$Messages->read,
+            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
+            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
             $Messages->date,
         ];

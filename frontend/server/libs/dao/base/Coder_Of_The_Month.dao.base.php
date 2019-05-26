@@ -50,13 +50,13 @@ abstract class CoderOfTheMonthDAOBase {
     final public static function update(CoderOfTheMonth $Coder_Of_The_Month) {
         $sql = 'UPDATE `Coder_Of_The_Month` SET `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ?, `rank` = ?, `selected_by` = ? WHERE `coder_of_the_month_id` = ?;';
         $params = [
-            $Coder_Of_The_Month->user_id,
+            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            $Coder_Of_The_Month->rank,
-            $Coder_Of_The_Month->selected_by,
-            $Coder_Of_The_Month->coder_of_the_month_id,
+            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
+            is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
+            is_null($Coder_Of_The_Month->coder_of_the_month_id) ? null : (int)$Coder_Of_The_Month->coder_of_the_month_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -79,11 +79,11 @@ abstract class CoderOfTheMonthDAOBase {
         $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` FROM Coder_Of_The_Month WHERE (coder_of_the_month_id = ?) LIMIT 1;';
         $params = [$coder_of_the_month_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new CoderOfTheMonth($rs);
+        return new CoderOfTheMonth($row);
     }
 
     /**
@@ -134,14 +134,13 @@ abstract class CoderOfTheMonthDAOBase {
         $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` from Coder_Of_The_Month';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new CoderOfTheMonth($row);
         }
         return $allData;
@@ -163,12 +162,12 @@ abstract class CoderOfTheMonthDAOBase {
         }
         $sql = 'INSERT INTO Coder_Of_The_Month (`user_id`, `description`, `time`, `interview_url`, `rank`, `selected_by`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Coder_Of_The_Month->user_id,
+            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            $Coder_Of_The_Month->rank,
-            $Coder_Of_The_Month->selected_by,
+            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
+            is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
         ];
         global $conn;
         $conn->Execute($sql, $params);

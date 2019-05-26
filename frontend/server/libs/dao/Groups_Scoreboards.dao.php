@@ -21,7 +21,7 @@ class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase {
     public static function getByGroup($group_id) {
         $sql = 'SELECT * FROM Groups_Scoreboards WHERE group_id = ?;';
         global $conn;
-        $rs = $conn->Execute($sql, [$group_id]);
+        $rs = $conn->GetAll($sql, [$group_id]);
 
         $groupsScoreboards = [];
         foreach ($rs as $row) {

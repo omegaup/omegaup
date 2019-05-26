@@ -327,7 +327,7 @@ class CourseController extends Controller {
         } catch (Exception $e) {
             DAO::transRollback();
 
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);
@@ -388,7 +388,7 @@ class CourseController extends Controller {
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);

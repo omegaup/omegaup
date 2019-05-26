@@ -50,12 +50,12 @@ abstract class SubmissionLogDAOBase {
     final public static function update(SubmissionLog $Submission_Log) {
         $sql = 'UPDATE `Submission_Log` SET `problemset_id` = ?, `user_id` = ?, `identity_id` = ?, `ip` = ?, `time` = ? WHERE `submission_id` = ?;';
         $params = [
-            $Submission_Log->problemset_id,
-            $Submission_Log->user_id,
-            $Submission_Log->identity_id,
-            $Submission_Log->ip,
+            is_null($Submission_Log->problemset_id) ? null : (int)$Submission_Log->problemset_id,
+            is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
+            is_null($Submission_Log->identity_id) ? null : (int)$Submission_Log->identity_id,
+            is_null($Submission_Log->ip) ? null : (int)$Submission_Log->ip,
             $Submission_Log->time,
-            $Submission_Log->submission_id,
+            is_null($Submission_Log->submission_id) ? null : (int)$Submission_Log->submission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class SubmissionLogDAOBase {
         $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM Submission_Log WHERE (submission_id = ?) LIMIT 1;';
         $params = [$submission_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new SubmissionLog($rs);
+        return new SubmissionLog($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class SubmissionLogDAOBase {
         $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` from Submission_Log';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new SubmissionLog($row);
         }
         return $allData;
@@ -162,11 +161,11 @@ abstract class SubmissionLogDAOBase {
         }
         $sql = 'INSERT INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Submission_Log->problemset_id,
-            $Submission_Log->submission_id,
-            $Submission_Log->user_id,
-            $Submission_Log->identity_id,
-            $Submission_Log->ip,
+            is_null($Submission_Log->problemset_id) ? null : (int)$Submission_Log->problemset_id,
+            is_null($Submission_Log->submission_id) ? null : (int)$Submission_Log->submission_id,
+            is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
+            is_null($Submission_Log->identity_id) ? null : (int)$Submission_Log->identity_id,
+            is_null($Submission_Log->ip) ? null : (int)$Submission_Log->ip,
             $Submission_Log->time,
         ];
         global $conn;

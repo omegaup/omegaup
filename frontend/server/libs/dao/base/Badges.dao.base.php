@@ -54,7 +54,7 @@ abstract class BadgesDAOBase {
             $Badges->image_url,
             $Badges->description,
             $Badges->hint,
-            $Badges->badge_id,
+            is_null($Badges->badge_id) ? null : (int)$Badges->badge_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -77,11 +77,11 @@ abstract class BadgesDAOBase {
         $sql = 'SELECT `Badges`.`badge_id`, `Badges`.`name`, `Badges`.`image_url`, `Badges`.`description`, `Badges`.`hint` FROM Badges WHERE (badge_id = ?) LIMIT 1;';
         $params = [$badge_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Badges($rs);
+        return new Badges($row);
     }
 
     /**
@@ -132,14 +132,13 @@ abstract class BadgesDAOBase {
         $sql = 'SELECT `Badges`.`badge_id`, `Badges`.`name`, `Badges`.`image_url`, `Badges`.`description`, `Badges`.`hint` from Badges';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Badges($row);
         }
         return $allData;
