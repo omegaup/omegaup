@@ -418,7 +418,7 @@ class ContestListTest extends OmegaupTestCase {
         $this->assertArrayContainsInKey(
             $response['results'],
             'contest_id',
-            (string)$currentContestData['contest']->contest_id
+            $currentContestData['contest']->contest_id
         );
         $this->assertArrayNotContainsInKey(
             $response['results'],
