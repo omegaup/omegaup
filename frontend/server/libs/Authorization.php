@@ -132,12 +132,24 @@ class Authorization {
      * reviewers can do so.
      */
     public static function canEditProblem($identity_id, Problems $problem) {
-        if (is_null($problem) || !is_a($problem, 'Problems')) {
-            return false;
-        }
         return self::isProblemAdmin($identity_id, $problem) ||
             self::isQualityReviewer($identity_id) ||
             self::hasRole($identity_id, $problem->acl_id, Authorization::REVIEWER_ROLE);
+    }
+
+    /**
+     * Returns whether the identity can view the problem solution. Only problem
+     * admins and identities that have solved the problem can do so.
+     */
+    public static function canViewProblemSolution(
+        ?int $identityId,
+        Problems $problem
+    ) : bool {
+        if (is_null($identityId)) {
+            return false;
+        }
+        return Authorization::canEditProblem($identityId, $problem) ||
+            ProblemsDAO::isProblemSolved($problem, $identityId);
     }
 
     public static function canViewEmail($identity_id) {

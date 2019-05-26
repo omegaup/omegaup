@@ -1061,24 +1061,24 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the problem statement from the filesystem.
+     * Gets the problem resource (statement/solution) from the gitserver.
      *
      * @param array $params The problem, commit, and language for the problem
      *                      statement.
      *
-     * @return array The contents of the file, plus some metadata.
+     * @return array The contents of the resource, plus some metadata.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemStatementImpl(array $params) : array {
+    public static function getProblemResourceImpl(array $params) : array {
         $problemArtifacts = new ProblemArtifacts($params['alias'], $params['commit']);
-        $sourcePath = "statements/{$params['language']}.markdown";
+        $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
 
         // Read the file that contains the source
         if (!$problemArtifacts->exists($sourcePath)) {
             // If there is no language file for the problem, return the Spanish
             // version.
             $params['language'] = 'es';
-            $sourcePath = "statements/{$params['language']}.markdown";
+            $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
         }
 
         $result = [
@@ -1092,7 +1092,7 @@ class ProblemController extends Controller {
         }
 
         // Get all the images' mappings.
-        $statementFiles = $problemArtifacts->lsTree('statements');
+        $statementFiles = $problemArtifacts->lsTree($params['directory']);
         $imageExtensions = ['bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png',
                             'svg', 'svgz', 'tif', 'tiff'];
         foreach ($statementFiles as $file) {
@@ -1108,7 +1108,9 @@ class ProblemController extends Controller {
             );
             if (!@file_exists($imagePath)) {
                 @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
-                file_put_contents($imagePath, $problemArtifacts->get("statements/{$file['name']}"));
+                file_put_contents($imagePath, $problemArtifacts->get(
+                    "{$params['directory']}/{$file['name']}"
+                ));
             }
         }
 
@@ -1116,14 +1118,14 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the problem statement from the filesystem.
+     * Gets the problem statement from the gitserver.
      *
      * @param Problems $problem  The problem.
      * @param string   $commit   The git commit at which to get the statement.
      * @param string   $language The language of the problem. Will default to
      *                           Spanish if not found.
      *
-     * @return string The contents of the file.
+     * @return array The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
@@ -1136,16 +1138,51 @@ class ProblemController extends Controller {
             Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
             [
+                'directory' => 'statements',
                 'alias' => $problem->alias,
                 'commit' => $commit,
                 'language' => $language,
             ],
-            'ProblemController::getProblemStatementImpl',
+            'ProblemController::getProblemResourceImpl',
             $problemStatement,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
 
         return $problemStatement;
+    }
+
+    /**
+     * Gets the problem solution from the gitserver.
+     *
+     * @param Problems $problem  The problem.
+     * @param string   $commit   The git commit at which to get the statement.
+     * @param string   $language The language of the problem. Will default to
+     *                           Spanish if not found.
+     *
+     * @return array The contents of the file.
+     * @throws InvalidFilesystemOperationException
+     */
+    public static function getProblemSolution(
+        Problems $problem,
+        string $commit,
+        string $language
+    ) : array {
+        $problemSolution = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SOLUTION,
+            "{$problem->alias}-{$commit}-{$language}-markdown",
+            [
+                'directory' => 'solutions',
+                'alias' => $problem->alias,
+                'commit' => $commit,
+                'language' => $language,
+            ],
+            'ProblemController::getProblemResourceImpl',
+            $problemSolution,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+
+        return $problemSolution;
     }
 
     /**
@@ -1311,7 +1348,7 @@ class ProblemController extends Controller {
      */
     public static function apiDetails(Request $r) {
         // Get user.
-        // Allow unauthenticated requests if we are not openning a problem
+        // Allow unauthenticated requests if we are not opening a problem
         // inside a contest.
         try {
             self::authenticateRequest($r);
@@ -1495,6 +1532,60 @@ class ProblemController extends Controller {
         $response['status'] = 'ok';
         $response['exists'] = true;
         return $response;
+    }
+
+    /**
+     * Entry point for Problem Solution API.
+     *
+     * @param Request $r
+     * @throws InvalidFilesystemOperationException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiSolution(Request $r) {
+        self::authenticateRequest($r);
+
+        // Validate request
+        $problem = self::validateDetails($r);
+        if (is_null($problem)) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
+        $problemset = $problem['problemset'];
+        $problem = $problem['problem'];
+
+        if (!Authorization::canViewProblemSolution($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException('problemSolutionNotVisible');
+        }
+
+        // Get the expected commit version.
+        $commit = $problem->commit;
+        $version = $problem->current_version;
+        if (!empty($problemset)) {
+            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+                $problemset->problemset_id,
+                $problem->problem_id
+            );
+            if (is_null($problemsetProblem)) {
+                return [
+                    'status' => 'ok',
+                    'exists' => false,
+                ];
+            }
+            $commit = $problemsetProblem->commit;
+            $version = $problemsetProblem->version;
+        }
+
+        return [
+            'status' => 'ok',
+            'exists' => true,
+            'solution' => ProblemController::getProblemSolution(
+                $problem,
+                $commit,
+                $r['lang']
+            ),
+        ];
     }
 
     /**
