@@ -96,10 +96,10 @@ class SchoolController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
-        Validators::validateNumber($r['offset'], 'offset', false);
-        Validators::validateNumberInRange($r['rowcount'], 'rowcount', 100, 100, false);
-        Validators::validateNumber($r['start_time'], 'start_time', false); // Unix timestamp
-        Validators::validateNumber($r['finish_time'], 'finish_time', false); // Unix timestamp
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', 100, 100, false);
+        $r->ensureInt('start_time', null, null, false);
+        $r->ensureInt('finish_time', null, null, false);
 
         try {
             self::authenticateRequest($r);

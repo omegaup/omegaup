@@ -1857,13 +1857,8 @@ class UserController extends Controller {
             $r['current_user']->language_id = $language->language_id;
         }
 
-        if (!is_null($r['is_private'])) {
-            Validators::validateNumber($r['is_private'], 'is_private', true);
-        }
-
-        if (!is_null($r['hide_problem_tags'])) {
-            Validators::validateNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
-        }
+        $r->ensureBool('is_private', false);
+        $r->ensureBool('hide_problem_tags', false);
 
         if (!is_null($r['gender'])) {
             Validators::validateInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
@@ -1922,8 +1917,8 @@ class UserController extends Controller {
      */
 
     public static function apiRankByProblemsSolved(Request $r) {
-        Validators::validateNumber($r['offset'], 'offset', false);
-        Validators::validateNumber($r['rowcount'], 'rowcount', false);
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
 
         $r['user'] = null;
         if (!is_null($r['username'])) {

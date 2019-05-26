@@ -89,6 +89,69 @@ class Request extends ArrayObject {
     public static function requestId() {
         return Request::$_requestId;
     }
+
+    /**
+     * Ensures that the value associated with the key is a bool.
+     */
+    public function ensureBool(
+        string $key,
+        bool $required = true
+    ) {
+        $val = self::offsetGet($key);
+        if (is_int($val)) {
+            $this[$key] = $val == 1;
+        } elseif (is_bool($val)) {
+            $this[$key] = $val;
+        } else {
+            if (empty($val)) {
+                if (!$required) {
+                    return;
+                }
+                throw new InvalidParameterException('parameterEmpty', $key);
+            }
+            $this[$key] = $val == '1' || $val == 'true';
+        }
+    }
+
+    /**
+     * Ensures that the value associated with the key is an int.
+     */
+    public function ensureInt(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null,
+        bool $required = true
+    ) {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new InvalidParameterException('parameterEmpty', $key);
+        }
+        $val = self::offsetGet($key);
+        Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        $this[$key] = (int)$val;
+    }
+
+    /**
+     * Ensures that the value associated with the key is a float.
+     */
+    public function ensureFloat(
+        string $key,
+        ?float $lowerBound = null,
+        ?float $upperBound = null,
+        bool $required = true
+    ) {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new InvalidParameterException('parameterEmpty', $key);
+        }
+        $val = self::offsetGet($key);
+        Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        $this[$key] = (float)$val;
+    }
 }
 
 Request::$_requestId = str_replace('.', '', uniqid('', true));

@@ -365,8 +365,8 @@ class QualityNominationController extends Controller {
      * @return array The response.
      */
     private static function getListImpl(Request $r, $nominator, $assignee) {
-        Validators::validateNumber($r['page'], 'page', false);
-        Validators::validateNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -493,7 +493,7 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
 
-        Validators::validateNumber($r['qualitynomination_id'], 'qualitynomination_id');
+        $r->ensureInt('qualitynomination_id');
         $response = QualityNominationsDAO::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
             throw new NotFoundException('qualityNominationNotFound');

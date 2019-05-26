@@ -64,27 +64,22 @@ class CourseController extends Controller {
         Validators::validateStringNonEmpty($r['name'], 'name', $is_required);
         Validators::validateStringNonEmpty($r['description'], 'description', $is_required);
 
-        Validators::validateNumber($r['start_time'], 'start_time', $is_required);
-        Validators::validateNumber($r['finish_time'], 'finish_time', $is_required);
-
-        if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
-        }
-
-        Validators::validateNumberInRange(
-            $r['start_time'],
+        $r->ensureInt(
             'start_time',
             $course_start_time,
             $course_finish_time,
             $is_required
         );
-        Validators::validateNumberInRange(
-            $r['finish_time'],
+        $r->ensureInt(
             'finish_time',
             $course_start_time,
             $course_finish_time,
             $is_required
         );
+
+        if ($r['start_time'] > $r['finish_time']) {
+            throw new InvalidParameterException('courseInvalidStartTime');
+        }
 
         Validators::validateInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
         Validators::validateValidAlias($r['alias'], 'alias', $is_required);
@@ -101,15 +96,14 @@ class CourseController extends Controller {
         Validators::validateStringNonEmpty($r['name'], 'name', $is_required);
         Validators::validateStringNonEmpty($r['description'], 'description', $is_required);
 
-        Validators::validateNumber($r['start_time'], 'start_time', !$is_update);
-        Validators::validateNumber($r['finish_time'], 'finish_time', !$is_update);
+        $r->ensureInt('start_time', null, null, !$is_update);
+        $r->ensureInt('finish_time', null, null, !$is_update);
 
         Validators::validateValidAlias($r['alias'], 'alias', $is_required);
 
         // Show scoreboard is always optional
-        Validators::validateInEnum($r['show_scoreboard'], 'show_scoreboard', ['false', 'true'], false /*is_required*/);
-
-        Validators::validateInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
+        $r->ensureBool('show_scoreboard', false /*is_required*/);
+        $r->ensureBool('public', false /*is_required*/);
 
         if (empty($r['school_id'])) {
             $r['school'] = null;
@@ -419,8 +413,7 @@ class CourseController extends Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $r['assignment']->start_time;
         } else {
-            Validators::validateNumberInRange(
-                $r['start_time'],
+            $r->ensureInt(
                 'start_time',
                 $r['course']->start_time,
                 $r['course']->finish_time,
@@ -430,8 +423,7 @@ class CourseController extends Controller {
         if (is_null($r['start_time'])) {
             $r['finish_time'] = $r['assignment']->finish_time;
         } else {
-            Validators::validateNumberInRange(
-                $r['finish_time'],
+            $r->ensureInt(
                 'finish_time',
                 $r['course']->start_time,
                 $r['course']->finish_time,
@@ -847,8 +839,8 @@ class CourseController extends Controller {
 
         self::authenticateRequest($r);
 
-        Validators::validateNumber($r['page'], 'page', false);
-        Validators::validateNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -1678,8 +1670,8 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        Validators::validateNumber($r['offset'], 'offset', false);
-        Validators::validateNumber($r['rowcount'], 'rowcount', false);
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
         Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
         Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
@@ -1909,9 +1901,12 @@ class CourseController extends Controller {
      * @param Courses $course
      * @param Groups $group
      */
-    public static function shouldShowScoreboard($identity_id, Courses $course, Groups $group) {
-        Validators::validateNumber($identity_id, 'identity_id', true);
-        return Authorization::canViewCourse($identity_id, $course, $group) &&
+    public static function shouldShowScoreboard(
+        int $identityId,
+        Courses $course,
+        Groups $group
+    ) : bool {
+        return Authorization::canViewCourse($identityId, $course, $group) &&
             $course->show_scoreboard;
     }
 }

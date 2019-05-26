@@ -70,27 +70,36 @@ class GroupScoreboardController extends Controller {
      */
     public static function apiAddContest(Request $r) {
         self::authenticateRequest($r);
-        $contestScoreboard = self::validateGroupScoreboardAndContest($r['group_alias'], $r['current_identity_id'], $r['scoreboard_alias'], $r['contest_alias']);
+        $contestScoreboard = self::validateGroupScoreboardAndContest(
+            $r['group_alias'],
+            $r['current_identity_id'],
+            $r['scoreboard_alias'],
+            $r['contest_alias']
+        );
 
-        Validators::validateInEnum($r['only_ac'], 'only_ac', [0,1]);
-        Validators::validateNumber($r['weight'], 'weight');
+        $r->ensureBool('only_ac');
+        $r->ensureFloat('weight');
 
         try {
             $groupScoreboardProblemset = new GroupsScoreboardsProblemsets([
                 'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
                 'problemset_id' => $contestScoreboard['contest']->problemset_id,
                 'only_ac' => $r['only_ac'],
-                'weight' => $r['weight']
+                'weight' => $r['weight'],
             ]);
 
             GroupsScoreboardsProblemsetsDAO::save($groupScoreboardProblemset);
 
-            self::$log->info('Contest ' . $r['contest_alias'] . 'added to scoreboard ' . $r['scoreboard_alias']);
+            self::$log->info(
+                "Contest {$r['contest_alias']} added to scoreboard {$r['scoreboard_alias']}"
+            );
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        return ['status' => 'ok'];
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**

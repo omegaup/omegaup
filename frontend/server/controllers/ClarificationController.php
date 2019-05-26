@@ -68,8 +68,6 @@ class ClarificationController extends Controller {
         // Validate request
         self::validateCreate($r);
 
-        $response = [];
-
         $time = Time::get();
         $receiver_id = $r['identity'] ? $r['identity']->identity_id : null;
         $r['clarification'] = new Clarifications([
@@ -94,10 +92,10 @@ class ClarificationController extends Controller {
         $r['user'] = $r['current_user'];
         self::clarificationUpdated($r, $time);
 
-        $response['clarification_id'] = $r['clarification']->clarification_id;
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'clarification_id' => $r['clarification']->clarification_id,
+        ];
     }
 
     /**
@@ -109,7 +107,7 @@ class ClarificationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDetails(Request $r) {
-        Validators::validateNumber($r['clarification_id'], 'clarification_id');
+        $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists
         try {
@@ -161,9 +159,9 @@ class ClarificationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateUpdate(Request $r) {
-        Validators::validateNumber($r['clarification_id'], 'clarificaion_id');
+        $r->ensureInt('clarification_id');
+        $r->ensureBool('public', false /* not required */);
         Validators::validateStringNonEmpty($r['answer'], 'answer', false /* not required */);
-        Validators::validateInEnum($r['public'], 'public', ['0', '1'], false /* not required */);
         Validators::validateStringNonEmpty($r['message'], 'message', false /* not required */);
 
         // Check that clarification exists

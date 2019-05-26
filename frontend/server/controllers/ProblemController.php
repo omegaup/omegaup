@@ -130,13 +130,13 @@ class ProblemController extends Controller {
             ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
             $is_required
         );
-        Validators::validateNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
-        Validators::validateNumberInRange($r['validator_time_limit'], 'validator_time_limit', 0, INF, $is_required);
-        Validators::validateNumberInRange($r['overall_wall_time_limit'], 'overall_wall_time_limit', 0, 60000, $is_required);
-        Validators::validateNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
-        Validators::validateNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
-        Validators::validateNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
-        Validators::validateNumberInRange($r['input_limit'], 'input_limit', 0, INF, $is_required);
+        $r->ensureInt('time_limit', 0, null, $is_required);
+        $r->ensureInt('validator_time_limit', 0, null, $is_required);
+        $r->ensureInt('overall_wall_time_limit', 0, 60000, $is_required);
+        $r->ensureInt('extra_wall_time', 0, 5000, $is_required);
+        $r->ensureInt('memory_limit', 0, null, $is_required);
+        $r->ensureInt('output_limit', 0, null, $is_required);
+        $r->ensureInt('input_limit', 0, null, $is_required);
 
         // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
         // on it already, so I'll just leave this here for now...
@@ -2028,8 +2028,8 @@ class ProblemController extends Controller {
      * @param Request $r
      */
     private static function validateList(Request $r) {
-        Validators::validateNumber($r['offset'], 'offset', false);
-        Validators::validateNumber($r['rowcount'], 'rowcount', false);
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
 
         // Defaults for offset and rowcount
         if (!isset($r['page'])) {
@@ -2157,8 +2157,8 @@ class ProblemController extends Controller {
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateNumber($r['page'], 'page', false);
-        Validators::validateNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -2206,8 +2206,8 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateList($r);
 
-        Validators::validateNumber($r['page'], 'page', false);
-        Validators::validateNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
