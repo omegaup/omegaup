@@ -12,17 +12,19 @@ class Validators {
      * @param string $email
      * @param string $parameterName Name of parameter that will appear en error message
      * @param boolean $required If $required is TRUE and the parameter is not present, check fails.
-     * @return boolean
      * @throws InvalidArgumentException
      */
-    public static function isEmail($parameter, $parameterName, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-
-        if ($isPresent && !filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
+    public static function validateEmail(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        if (!filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidParameterException('parameterInvalid', $parameterName);
         }
-
-        return true;
     }
 
     /**
@@ -31,61 +33,55 @@ class Validators {
      * @param string $parameter
      * @param string $parameterName Name of parameter that will appear en error message
      * @param boolean $required If $required is TRUE and the parameter is not present, check fails.
-     * @return boolean
      * @throws InvalidArgumentException
      */
-    public static function isStringNonEmpty($parameter, $parameterName, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+    public static function validateStringNonEmpty(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
 
         // Validate data is string
-        if ($isPresent && (!is_string($parameter) || strlen($parameter) < 1)) {
+        if (!is_string($parameter) || empty($parameter)) {
             throw new InvalidParameterException('parameterEmpty', $parameterName);
         }
-
-        // Validation passed
-        return true;
     }
 
     /**
-     *
-     * @param string $parameter
+     * @param mixed  $parameter
      * @param string $parameterName
-     * @param int $maxLength
-     * @param boolean $required
+     * @param ?int   $minLength
+     * @param ?int   $maxLength
+     * @param bool   $required
      */
-    public static function isStringOfMaxLength($parameter, $parameterName, $maxLength, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-
-        if ($isPresent && !(is_string($parameter) && strlen($parameter) <= $maxLength)) {
-            throw new InvalidParameterException(
-                'parameterStringTooLong',
-                $parameterName,
-                ['max_length' => $maxLength]
-            );
+    public static function validateStringOfLengthInRange(
+        $parameter,
+        string $parameterName,
+        ?int $minLength,
+        ?int $maxLength,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
         }
 
-        return true;
-    }
-
-    /**
-     *
-     * @param string $parameter
-     * @param string $parameterName
-     * @param int $minLength
-     * @param boolean $required
-     */
-    public static function isStringOfMinLength($parameter, $parameterName, $minLength, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-
-        if ($isPresent && !(is_string($parameter) && strlen($parameter) >= $minLength)) {
+        if (!is_null($minLength) && strlen($parameter) < $minLength) {
             throw new InvalidParameterException(
                 'parameterStringTooShort',
                 $parameterName,
                 ['min_length' => $minLength]
             );
         }
-
-        return true;
+        if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
+            throw new InvalidParameterException(
+                'parameterStringTooLong',
+                $parameterName,
+                ['max_length' => $maxLength]
+            );
+        }
     }
 
     /**
@@ -94,18 +90,22 @@ class Validators {
      * @param string $parameterName
      * @param boolean $required
      */
-    public static function isValidAlias($parameter, $parameterName, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-
-        if ($isPresent &&
-                !(is_string($parameter) &&
-                strlen($parameter) > 0 &&
-                strlen($parameter) <= 32 &&
-                preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) === 1)) {
-                    throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+    public static function validateValidAlias(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
         }
 
-        return true;
+        if (!is_string($parameter) ||
+            empty($parameter) ||
+            strlen($parameter) > 32 ||
+            preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) !== 1
+        ) {
+            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+        }
     }
 
     /**
@@ -116,14 +116,19 @@ class Validators {
      * @param boolean $required
      * @throws InvalidParameterException
      */
-    public static function isValidUsername($parameter, $parameterName, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+    public static function validateValidUsername(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, $required);
 
-        if ($isPresent && preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
+        if (preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
             throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
-
-        Validators::isStringOfMinLength($parameter, $parameterName, 2);
     }
 
     /**
@@ -134,14 +139,19 @@ class Validators {
      * @param boolean $required
      * @throws InvalidParameterException
      */
-    public static function isValidUsernameIdentity($parameter, $parameterName, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+    public static function validateValidUsernameIdentity(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, $required);
 
-        if ($isPresent && !preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
+        if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
             throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
-
-        Validators::isStringOfMinLength($parameter, $parameterName, 2);
     }
 
     /**
@@ -149,73 +159,82 @@ class Validators {
      * @param date $parameter
      * @param string $parameterName
      * @param boolean $required
-     * @return boolean
      * @throws InvalidParameterException
      */
-    public static function isDate($parameter, $parameterName, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+    public static function validateDate(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
 
         // Validate that we are working with a date
         // @TODO This strtotime() allows nice strings like "next Thursday".
-        if ($isPresent && strtotime($parameter) === false) {
+        if (strtotime($parameter) === false) {
             throw new InvalidParameterException('parameterInvalid', $parameterName);
         }
-
-        return true;
     }
 
     /**
      *
-     * @param string $parameter
-     * @param string $parameterName
-     * @param int $lowerBound
-     * @param int $upperBound
-     * @param boolean $required
-     * @return boolean
+     * @param mixed     $parameter
+     * @param string    $parameterName
+     * @param int|float $lowerBound
+     * @param int|float $upperBound
+     * @param boolean   $required
      * @throws InvalidParameterException
      */
-    public static function isNumberInRange($parameter, $parameterName, $lowerBound, $upperBound, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-
-        self::isNumber($parameter, $parameterName, $required);
-
-        // Validate that is target number is inside the range
-        if ($isPresent) {
-            if ($parameter < $lowerBound) {
-                throw new InvalidParameterException(
-                    'parameterNumberTooSmall',
-                    $parameterName,
-                    ['lower_bound' => $lowerBound]
-                );
-            } elseif ($parameter > $upperBound) {
-                throw new InvalidParameterException(
-                    'parameterNumberTooLarge',
-                    $parameterName,
-                    ['upper_bound' => $upperBound]
-                );
-            }
+    public static function validateNumberInRange(
+        $parameter,
+        string $parameterName,
+        $lowerBound,
+        $upperBound,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
         }
-
-        return true;
-    }
-
-    /**
-     *
-     * @param int $parameter
-     * @param string $parameterName
-     * @param bool $required
-     * @return boolean
-     * @throws InvalidParameterException
-     */
-    public static function isNumber($parameter, $parameterName, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-
-        // Validate that we are working with a number
-        if ($isPresent && !is_numeric($parameter)) {
+        if (!is_numeric($parameter)) {
             throw new InvalidParameterException('parameterNotANumber', $parameterName);
         }
+        // Coerce $parameter into a numeric value.
+        $parameter = $parameter + 0;
+        if (!is_null($lowerBound) && $parameter < $lowerBound) {
+            throw new InvalidParameterException(
+                'parameterNumberTooSmall',
+                $parameterName,
+                ['lower_bound' => $lowerBound]
+            );
+        }
+        if (!is_null($upperBound) && $parameter > $upperBound) {
+            throw new InvalidParameterException(
+                'parameterNumberTooLarge',
+                $parameterName,
+                ['upper_bound' => $upperBound]
+            );
+        }
+    }
 
-        return true;
+    /**
+     *
+     * @param mixed  $parameter
+     * @param string $parameterName
+     * @param bool   $required
+     * @throws InvalidParameterException
+     */
+    public static function validateNumber(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        if (!is_numeric($parameter)) {
+            throw new InvalidParameterException('parameterNotANumber', $parameterName);
+        }
     }
 
     /**
@@ -224,21 +243,25 @@ class Validators {
      * @param string $parameterName
      * @param array $enum
      * @param type $required
-     * @return boolean
      * @throws InvalidParameterException
      */
-    public static function isInEnum($parameter, $parameterName, array $enum, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
+    public static function validateInEnum(
+        $parameter,
+        string $parameterName,
+        array $enum,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
 
-        if ($isPresent && !in_array($parameter, $enum)) {
+        if (!in_array($parameter, $enum)) {
             throw new InvalidParameterException(
                 'parameterNotInExpectedSet',
                 $parameterName,
                 ['bad_elements' => $parameter, 'expected_set' => implode(', ', $enum)]
             );
         }
-
-        return true;
     }
 
     /**
@@ -247,30 +270,32 @@ class Validators {
      * @param string $parameterName
      * @param array $enum
      * @param type $required
-     * @return boolean
      * @throws InvalidParameterException
      */
-    public static function isValidSubset($parameter, $parameterName, array $enum, $required = true) {
-        $isPresent = self::throwIfNotPresent($parameter, $parameterName, $required);
-
-        if ($isPresent) {
-            $bad_elements = [];
-            $elements = array_filter(explode(',', $parameter));
-            foreach ($elements as $element) {
-                if (!in_array($element, $enum)) {
-                    $bad_elements[] = $element;
-                }
-            }
-            if (!empty($bad_elements)) {
-                throw new InvalidParameterException(
-                    'parameterNotInExpectedSet',
-                    $parameterName,
-                    ['bad_elements' => implode(',', $bad_elements), 'expected_set' => implode(', ', $enum)]
-                );
-            }
+    public static function validateValidSubset(
+        $parameter,
+        string $parameterName,
+        array $enum,
+        bool $required = true
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
         }
 
-        return true;
+        $badElements = [];
+        $elements = array_filter(explode(',', $parameter));
+        foreach ($elements as $element) {
+            if (!in_array($element, $enum)) {
+                $badElements[] = $element;
+            }
+        }
+        if (!empty($badElements)) {
+            throw new InvalidParameterException(
+                'parameterNotInExpectedSet',
+                $parameterName,
+                ['bad_elements' => implode(',', $badElements), 'expected_set' => implode(', ', $enum)]
+            );
+        }
     }
 
     /**
@@ -278,16 +303,19 @@ class Validators {
      * @param type $parameter
      * @param type $parameterName
      * @param boolean $required
-     * @return boolean
      * @throws InvalidParameterException
      */
-    private static function throwIfNotPresent($parameter, $parameterName, $required = true) {
-        $isPresent = !is_null($parameter);
-
-        if ($required && !$isPresent) {
+    private static function isPresent(
+        $parameter,
+        string $parameterName,
+        bool $required = true
+    ) : bool {
+        if (!is_null($parameter)) {
+            return true;
+        }
+        if ($required) {
             throw new InvalidParameterException('parameterEmpty', $parameterName);
         }
-
-        return $isPresent;
+        return false;
     }
 }

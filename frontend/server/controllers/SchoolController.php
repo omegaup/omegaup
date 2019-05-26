@@ -48,7 +48,7 @@ class SchoolController extends Controller {
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['name'], 'name');
+        Validators::validateStringNonEmpty($r['name'], 'name');
 
         $state = self::getStateIdFromCountryAndState($r['country_id'], $r['state_id']);
 
@@ -96,10 +96,10 @@ class SchoolController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumberInRange($r['rowcount'], 'rowcount', 100, 100, false);
-        Validators::isNumber($r['start_time'], 'start_time', false); // Unix timestamp
-        Validators::isNumber($r['finish_time'], 'finish_time', false); // Unix timestamp
+        Validators::validateNumber($r['offset'], 'offset', false);
+        Validators::validateNumberInRange($r['rowcount'], 'rowcount', 100, 100, false);
+        Validators::validateNumber($r['start_time'], 'start_time', false); // Unix timestamp
+        Validators::validateNumber($r['finish_time'], 'finish_time', false); // Unix timestamp
 
         try {
             self::authenticateRequest($r);

@@ -29,7 +29,7 @@ class IdentityController extends Controller {
      * @throws ApiException
      */
     public static function resolveIdentity($userOrEmail) {
-        Validators::isStringNonEmpty($userOrEmail, 'usernameOrEmail');
+        Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
         try {
             $identity = IdentitiesDAO::FindByEmail($userOrEmail);
             if (!is_null($identity)) {
@@ -293,19 +293,19 @@ class IdentityController extends Controller {
             throw new InvalidParameterException('parameterInvalid', 'group_alias');
         }
         // Validate request
-        Validators::isValidUsernameIdentity($username, 'username');
+        Validators::validateValidUsernameIdentity($username, 'username');
 
         if (!is_null($name)) {
             $name = trim($name);
-            Validators::isStringNonEmpty($name, 'name', true);
-            Validators::isStringOfMaxLength($name, 'name', 50);
+            Validators::validateStringNonEmpty($name, 'name', true);
+            Validators::validateStringOfLengthInRange($name, 'name', null, 50);
         }
 
         if (!is_null($gender)) {
             $gender = trim($gender);
         }
         if (!empty($gender)) {
-            Validators::isInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
+            Validators::validateInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
         }
     }
 

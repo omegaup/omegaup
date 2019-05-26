@@ -61,24 +61,24 @@ class CourseController extends Controller {
         $course_start_time = strtotime($course->start_time);
         $course_finish_time = strtotime($course->finish_time);
 
-        Validators::isStringNonEmpty($r['name'], 'name', $is_required);
-        Validators::isStringNonEmpty($r['description'], 'description', $is_required);
+        Validators::validateStringNonEmpty($r['name'], 'name', $is_required);
+        Validators::validateStringNonEmpty($r['description'], 'description', $is_required);
 
-        Validators::isNumber($r['start_time'], 'start_time', $is_required);
-        Validators::isNumber($r['finish_time'], 'finish_time', $is_required);
+        Validators::validateNumber($r['start_time'], 'start_time', $is_required);
+        Validators::validateNumber($r['finish_time'], 'finish_time', $is_required);
 
         if ($r['start_time'] > $r['finish_time']) {
             throw new InvalidParameterException('courseInvalidStartTime');
         }
 
-        Validators::isNumberInRange(
+        Validators::validateNumberInRange(
             $r['start_time'],
             'start_time',
             $course_start_time,
             $course_finish_time,
             $is_required
         );
-        Validators::isNumberInRange(
+        Validators::validateNumberInRange(
             $r['finish_time'],
             'finish_time',
             $course_start_time,
@@ -86,8 +86,8 @@ class CourseController extends Controller {
             $is_required
         );
 
-        Validators::isInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
-        Validators::isValidAlias($r['alias'], 'alias', $is_required);
+        Validators::validateInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $is_required);
+        Validators::validateValidAlias($r['alias'], 'alias', $is_required);
     }
 
     /**
@@ -98,18 +98,18 @@ class CourseController extends Controller {
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = true;
 
-        Validators::isStringNonEmpty($r['name'], 'name', $is_required);
-        Validators::isStringNonEmpty($r['description'], 'description', $is_required);
+        Validators::validateStringNonEmpty($r['name'], 'name', $is_required);
+        Validators::validateStringNonEmpty($r['description'], 'description', $is_required);
 
-        Validators::isNumber($r['start_time'], 'start_time', !$is_update);
-        Validators::isNumber($r['finish_time'], 'finish_time', !$is_update);
+        Validators::validateNumber($r['start_time'], 'start_time', !$is_update);
+        Validators::validateNumber($r['finish_time'], 'finish_time', !$is_update);
 
-        Validators::isValidAlias($r['alias'], 'alias', $is_required);
+        Validators::validateValidAlias($r['alias'], 'alias', $is_required);
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard'], 'show_scoreboard', ['false', 'true'], false /*is_required*/);
+        Validators::validateInEnum($r['show_scoreboard'], 'show_scoreboard', ['false', 'true'], false /*is_required*/);
 
-        Validators::isInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
+        Validators::validateInEnum($r['public'], 'public', ['0', '1'], false /*is_required*/);
 
         if (empty($r['school_id'])) {
             $r['school'] = null;
@@ -156,7 +156,7 @@ class CourseController extends Controller {
      * @throws NotFoundException
      */
     private static function validateCourseExists(Request $r, $column_name) {
-        Validators::isStringNonEmpty($r[$column_name], $column_name, true /*is_required*/);
+        Validators::validateStringNonEmpty($r[$column_name], $column_name, true /*is_required*/);
         $r['course'] = CoursesDAO::getByAlias($r[$column_name]);
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
@@ -419,7 +419,7 @@ class CourseController extends Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $r['assignment']->start_time;
         } else {
-            Validators::isNumberInRange(
+            Validators::validateNumberInRange(
                 $r['start_time'],
                 'start_time',
                 $r['course']->start_time,
@@ -430,7 +430,7 @@ class CourseController extends Controller {
         if (is_null($r['start_time'])) {
             $r['finish_time'] = $r['assignment']->finish_time;
         } else {
-            Validators::isNumberInRange(
+            Validators::validateNumberInRange(
                 $r['finish_time'],
                 'finish_time',
                 $r['course']->start_time,
@@ -847,8 +847,8 @@ class CourseController extends Controller {
 
         self::authenticateRequest($r);
 
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        Validators::validateNumber($r['page'], 'page', false);
+        Validators::validateNumber($r['page_size'], 'page_size', false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -1168,7 +1168,7 @@ class CourseController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         try {
             $course = CoursesDAO::getByAlias($r['course_alias']);
@@ -1204,7 +1204,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -1238,7 +1238,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -1281,7 +1281,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -1319,7 +1319,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
+        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -1509,8 +1509,8 @@ class CourseController extends Controller {
     }
 
     private static function validateAssignmentDetails(Request $r) {
-        Validators::isStringNonEmpty($r['course'], 'course', true /* is_required */);
-        Validators::isStringNonEmpty($r['assignment'], 'assignment', true /* is_required */);
+        Validators::validateStringNonEmpty($r['course'], 'course', true /* is_required */);
+        Validators::validateStringNonEmpty($r['assignment'], 'assignment', true /* is_required */);
         $r['course'] = CoursesDAO::getByAlias($r['course']);
         if (is_null($r['course'])) {
             throw new NotFoundException('courseNotFound');
@@ -1648,8 +1648,8 @@ class CourseController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        Validators::isStringNonEmpty($r['course_alias'], 'course_alias');
-        Validators::isStringNonEmpty($r['assignment_alias'], 'assignment_alias');
+        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
+        Validators::validateStringNonEmpty($r['assignment_alias'], 'assignment_alias');
 
         try {
             $r['course'] = CoursesDAO::getByAlias($r['course_alias']);
@@ -1678,14 +1678,14 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumber($r['rowcount'], 'rowcount', false);
-        Validators::isInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
-        Validators::isInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+        Validators::validateNumber($r['offset'], 'offset', false);
+        Validators::validateNumber($r['rowcount'], 'rowcount', false);
+        Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
-            Validators::isStringNonEmpty($r['problem_alias'], 'problem');
+            Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
             try {
                 $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1699,7 +1699,7 @@ class CourseController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
+        Validators::validateInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
@@ -1910,7 +1910,7 @@ class CourseController extends Controller {
      * @param Groups $group
      */
     public static function shouldShowScoreboard($identity_id, Courses $course, Groups $group) {
-        Validators::isNumber($identity_id, 'identity_id', true);
+        Validators::validateNumber($identity_id, 'identity_id', true);
         return Authorization::canViewCourse($identity_id, $course, $group) &&
             $course->show_scoreboard;
     }
