@@ -30,8 +30,8 @@ class ContestController extends Controller {
 
         try {
             $contests = [];
-            Validators::validateNumber($r['page'], 'page', false);
-            Validators::validateNumber($r['page_size'], 'page_size', false);
+            $r->ensureInt('page', null, null, false);
+            $r->ensureInt('page_size', null, null, false);
 
             $page = (isset($r['page']) ? intval($r['page']) : 1);
             $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
@@ -140,8 +140,8 @@ class ContestController extends Controller {
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateNumber($r['page'], 'page', false);
-        Validators::validateNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -183,8 +183,8 @@ class ContestController extends Controller {
     public static function getContestListInternal(Request $r, $callback_user_function) {
         self::authenticateRequest($r);
 
-        Validators::validateNumber($r['page'], 'page', false);
-        Validators::validateNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -613,7 +613,7 @@ class ContestController extends Controller {
 
             $result['start_time'] = strtotime($result['start_time']);
             $result['finish_time'] = strtotime($result['finish_time']);
-            $result['show_scoreboard_after'] = $result['show_scoreboard_after'] == '1';
+            $result['show_scoreboard_after'] = (bool)$result['show_scoreboard_after'];
             $result['original_contest_alias'] = null;
             $result['original_problemset_id'] = null;
             if ($result['rerun_id'] != 0) {
@@ -893,7 +893,7 @@ class ContestController extends Controller {
 
         $contestLength = $finishTime - $startTime;
 
-        Validators::validateNumber($r['start_time'], 'start_time', false);
+        $r->ensureInt('start_time', null, null, false);
         $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : Time::get();
 
         // Initialize contest
@@ -1009,19 +1009,14 @@ class ContestController extends Controller {
         $contest->alias = $r['alias'];
         $contest->scoreboard = $r['scoreboard'];
         $contest->points_decay_factor = $r['points_decay_factor'];
-        $contest->partial_score = is_null($r['partial_score']) ? '1' : $r['partial_score'];
+        $contest->partial_score = $r['partial_score'] ?? true;
         $contest->submissions_gap = $r['submissions_gap'];
         $contest->feedback = $r['feedback'];
         $contest->penalty = max(0, intval($r['penalty']));
         $contest->penalty_type = $r['penalty_type'];
         $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
-        $contest->languages = empty($r['languages']) ? null :  join(',', $r['languages']);
-
-        if (!is_null($r['show_scoreboard_after'])) {
-            $contest->show_scoreboard_after = $r['show_scoreboard_after'] == 'true';
-        } else {
-            $contest->show_scoreboard_after = '1';
-        }
+        $contest->languages = empty($r['languages']) ? null : join(',', $r['languages']);
+        $contest->show_scoreboard_after = $r['show_scoreboard_after'] ?? true;
 
         if ($contest->admission_mode != 'private') {
             throw new InvalidParameterException('contestMustBeCreatedInPrivateMode');
@@ -1074,8 +1069,8 @@ class ContestController extends Controller {
         Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
         Validators::validateStringNonEmpty($r['description'], 'description', $is_required);
 
-        Validators::validateNumber($r['start_time'], 'start_time', $is_required);
-        Validators::validateNumber($r['finish_time'], 'finish_time', $is_required);
+        $r->ensureInt('start_time', null, null, $is_required);
+        $r->ensureInt('finish_time', null, null, $is_required);
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
@@ -1097,11 +1092,10 @@ class ContestController extends Controller {
 
         // Window_length is optional
         if (!empty($r['window_length'])) {
-            Validators::validateNumberInRange(
-                $r['window_length'],
+            $r->ensureInt(
                 'window_length',
                 0,
-                floor($contest_length) / 60,
+                intval($contest_length / 60),
                 false
             );
         }
@@ -1112,10 +1106,19 @@ class ContestController extends Controller {
             'registration'
         ], false);
         Validators::validateValidAlias($r['alias'], 'alias', $is_required);
-        Validators::validateNumberInRange($r['scoreboard'], 'scoreboard', 0, 100, $is_required);
-        Validators::validateNumberInRange($r['points_decay_factor'], 'points_decay_factor', 0, 1, $is_required);
-        Validators::validateInEnum($r['partial_score'], 'partial_score', ['0', '1'], false);
-        Validators::validateNumberInRange($r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60), 'submissions_gap', 1, floor($contest_length / 60), $is_required);
+        $r->ensureFloat('scoreboard', 0, 100, $is_required);
+        $r->ensureFloat('points_decay_factor', 0, 1, $is_required);
+        $r->ensureBool('partial_score', false);
+        $r->ensureInt('submissions_gap', 0, null, $is_required);
+        // Validate the submission_gap in minutes so that the error message
+        // matches what is displayed in the UI.
+        Validators::validateNumberInRange(
+            $r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60),
+            'submissions_gap',
+            1,
+            floor($contest_length / 60),
+            $is_required
+        );
 
         Validators::validateInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $is_required);
         Validators::validateInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $is_required);
@@ -1147,7 +1150,7 @@ class ContestController extends Controller {
         }
 
         // Show scoreboard is always optional
-        Validators::validateInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['false', 'true'], false);
+        $r->ensureBool('show_scoreboard_after', false);
 
         // languages is always optional
         if (!empty($r['languages'])) {
@@ -1328,8 +1331,8 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
 
-        Validators::validateNumberInRange($r['points'], 'points', 0, INF);
-        Validators::validateNumberInRange($r['order_in_contest'], 'order_in_contest', 0, INF, false);
+        $r->ensureFloat('points', 0, INF);
+        $r->ensureInt('order_in_contest', 0, null, false);
 
         return [
             'contest' => $contest,
@@ -1760,8 +1763,8 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
-        Validators::validateNumber($r['offset'], 'offset', false /* optional */);
-        Validators::validateNumber($r['rowcount'], 'rowcount', false /* optional */);
+        $r->ensureInt('offset', null, null, false /* optional */);
+        $r->ensureInt('rowcount', null, null, false /* optional */);
     }
 
     /**
@@ -2397,8 +2400,8 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        Validators::validateNumber($r['offset'], 'offset', false);
-        Validators::validateNumber($r['rowcount'], 'rowcount', false);
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
         Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
         Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
@@ -2789,7 +2792,7 @@ class ContestController extends Controller {
         }
 
         // Validate value param
-        Validators::validateInEnum($r['value'], 'value', ['0', '1']);
+        $r->ensureBool('value');
 
         $r['contest']->recommended = $r['value'];
 

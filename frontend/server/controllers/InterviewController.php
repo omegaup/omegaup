@@ -13,7 +13,7 @@ class InterviewController extends Controller {
 
         Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
         Validators::validateStringNonEmpty($r['description'], 'description', false);
-        Validators::validateNumberInRange($r['duration'], 'duration', 60, 60 * 5, false);
+        $r->ensureInt('duration', 60, 60 * 5, false);
         Validators::validateValidAlias($r['alias'], 'alias', $is_required);
     }
 
