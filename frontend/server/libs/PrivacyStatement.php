@@ -9,7 +9,7 @@ class PrivacyStatement {
         if ($requests_user_information == 'no') {
             return null;
         }
-        Validators::isInEnum(
+        Validators::validateInEnum(
             $requests_user_information,
             'requests_user_information',
             ['required', 'optional']
@@ -23,7 +23,7 @@ class PrivacyStatement {
     }
 
     public static function getForConsent($language_id, $type) {
-        Validators::isStringNonEmpty($type, 'type', true);
+        Validators::validateStringNonEmpty($type, 'type', true);
         $language = self::getLanguage($language_id);
 
         return file_get_contents(

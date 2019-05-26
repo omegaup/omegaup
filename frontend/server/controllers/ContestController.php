@@ -30,8 +30,8 @@ class ContestController extends Controller {
 
         try {
             $contests = [];
-            Validators::isNumber($r['page'], 'page', false);
-            Validators::isNumber($r['page_size'], 'page_size', false);
+            Validators::validateNumber($r['page'], 'page', false);
+            Validators::validateNumber($r['page_size'], 'page_size', false);
 
             $page = (isset($r['page']) ? intval($r['page']) : 1);
             $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
@@ -40,16 +40,16 @@ class ContestController extends Controller {
                 : ActiveStatus::ALL;
             // If the parameter was not set, the default should be ALL which is
             // a number and should pass this check.
-            Validators::isNumber($active_contests, 'active', true /* required */);
+            Validators::validateNumber($active_contests, 'active', true /* required */);
             $recommended = isset($r['recommended'])
                 ? RecommendedStatus::getIntValue($r['recommended'])
                 : RecommendedStatus::ALL;
             // Same as above.
-            Validators::isNumber($recommended, 'recommended', true /* required */);
+            Validators::validateNumber($recommended, 'recommended', true /* required */);
             $participating = isset($r['participating'])
                 ? ParticipatingStatus::getIntValue($r['participating'])
                 : ParticipatingStatus::NO;
-            Validators::isInEnum($r['admission_mode'], 'admission_mode', [
+            Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
                 'public',
                 'private',
                 'registration'
@@ -62,7 +62,7 @@ class ContestController extends Controller {
                 throw new InvalidParameterException('parameterInvalid', 'participating');
             }
             $query = $r['query'];
-            Validators::isStringOfMaxLength($query, 'query', 255, false /* not required */);
+            Validators::validateStringOfLengthInRange($query, 'query', null, 255, false /* not required */);
             $cache_key = "$active_contests-$recommended-$page-$page_size";
             if ($r['current_user_id'] === null) {
                 // Get all public contests
@@ -140,8 +140,8 @@ class ContestController extends Controller {
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        Validators::validateNumber($r['page'], 'page', false);
+        Validators::validateNumber($r['page_size'], 'page_size', false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -183,8 +183,8 @@ class ContestController extends Controller {
     public static function getContestListInternal(Request $r, $callback_user_function) {
         self::authenticateRequest($r);
 
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        Validators::validateNumber($r['page'], 'page', false);
+        Validators::validateNumber($r['page_size'], 'page_size', false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -298,7 +298,7 @@ class ContestController extends Controller {
      *
      */
     private static function validateBasicDetails(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
         // If the contest is private, verify that our user is invited
         try {
             $contest_problemset = ContestsDAO::getByAliasWithExtraInformation($r['contest_alias']);
@@ -444,7 +444,7 @@ class ContestController extends Controller {
     }
 
     public static function apiPublicDetails(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $result = [];
 
@@ -893,7 +893,7 @@ class ContestController extends Controller {
 
         $contestLength = $finishTime - $startTime;
 
-        Validators::isNumber($r['start_time'], 'start_time', false);
+        Validators::validateNumber($r['start_time'], 'start_time', false);
         $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : Time::get();
 
         // Initialize contest
@@ -1071,11 +1071,11 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::isStringNonEmpty($r['title'], 'title', $is_required);
-        Validators::isStringNonEmpty($r['description'], 'description', $is_required);
+        Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
+        Validators::validateStringNonEmpty($r['description'], 'description', $is_required);
 
-        Validators::isNumber($r['start_time'], 'start_time', $is_required);
-        Validators::isNumber($r['finish_time'], 'finish_time', $is_required);
+        Validators::validateNumber($r['start_time'], 'start_time', $is_required);
+        Validators::validateNumber($r['finish_time'], 'finish_time', $is_required);
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
@@ -1097,7 +1097,7 @@ class ContestController extends Controller {
 
         // Window_length is optional
         if (!empty($r['window_length'])) {
-            Validators::isNumberInRange(
+            Validators::validateNumberInRange(
                 $r['window_length'],
                 'window_length',
                 0,
@@ -1106,20 +1106,20 @@ class ContestController extends Controller {
             );
         }
 
-        Validators::isInEnum($r['admission_mode'], 'admission_mode', [
+        Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
             'public',
             'private',
             'registration'
         ], false);
-        Validators::isValidAlias($r['alias'], 'alias', $is_required);
-        Validators::isNumberInRange($r['scoreboard'], 'scoreboard', 0, 100, $is_required);
-        Validators::isNumberInRange($r['points_decay_factor'], 'points_decay_factor', 0, 1, $is_required);
-        Validators::isInEnum($r['partial_score'], 'partial_score', ['0', '1'], false);
-        Validators::isNumberInRange($r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60), 'submissions_gap', 1, floor($contest_length / 60), $is_required);
+        Validators::validateValidAlias($r['alias'], 'alias', $is_required);
+        Validators::validateNumberInRange($r['scoreboard'], 'scoreboard', 0, 100, $is_required);
+        Validators::validateNumberInRange($r['points_decay_factor'], 'points_decay_factor', 0, 1, $is_required);
+        Validators::validateInEnum($r['partial_score'], 'partial_score', ['0', '1'], false);
+        Validators::validateNumberInRange($r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60), 'submissions_gap', 1, floor($contest_length / 60), $is_required);
 
-        Validators::isInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $is_required);
-        Validators::isInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $is_required);
-        Validators::isInEnum($r['penalty_calc_policy'], 'penalty_calc_policy', ['sum', 'max'], false);
+        Validators::validateInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $is_required);
+        Validators::validateInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $is_required);
+        Validators::validateInEnum($r['penalty_calc_policy'], 'penalty_calc_policy', ['sum', 'max'], false);
 
         // Problems is optional
         if (!is_null($r['problems'])) {
@@ -1147,12 +1147,12 @@ class ContestController extends Controller {
         }
 
         // Show scoreboard is always optional
-        Validators::isInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['false', 'true'], false);
+        Validators::validateInEnum($r['show_scoreboard_after'], 'show_scoreboard_after', ['false', 'true'], false);
 
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                Validators::isInEnum($language, 'languages', array_keys(RunController::$kSupportedLanguages), false);
+                Validators::validateInEnum($language, 'languages', array_keys(RunController::$kSupportedLanguages), false);
             }
         }
 
@@ -1200,7 +1200,7 @@ class ContestController extends Controller {
         // Authenticate user
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         // Only director is allowed to create problems in contest
         try {
@@ -1288,7 +1288,7 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateAddToContestRequest(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         // Only director is allowed to create problems in contest
         try {
@@ -1307,7 +1307,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('cannotAddProb');
         }
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1328,8 +1328,8 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
 
-        Validators::isNumberInRange($r['points'], 'points', 0, INF);
-        Validators::isNumberInRange($r['order_in_contest'], 'order_in_contest', 0, INF, false);
+        Validators::validateNumberInRange($r['points'], 'points', 0, INF);
+        Validators::validateNumberInRange($r['order_in_contest'], 'order_in_contest', 0, INF, false);
 
         return [
             'contest' => $contest,
@@ -1380,7 +1380,7 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateRemoveFromContestRequest(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -1398,7 +1398,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1441,9 +1441,9 @@ class ContestController extends Controller {
     public static function apiRunsDiff(Request $r) : array {
         self::authenticateRequest($r);
 
-        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
-        Validators::isStringNonEmpty($r['version'], 'version');
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['version'], 'version');
 
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -1497,7 +1497,7 @@ class ContestController extends Controller {
         $r['user'] = null;
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -1552,8 +1552,6 @@ class ContestController extends Controller {
                 'is_invited' => '1',
             ]));
         } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to create new ContestUser: ' . $e->getMessage());
             throw new InvalidDatabaseOperationException($e);
         }
 
@@ -1601,7 +1599,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -1635,7 +1633,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -1678,7 +1676,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -1716,7 +1714,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -1749,7 +1747,7 @@ class ContestController extends Controller {
      */
     private static function validateClarifications(Request $r) {
         // Check contest_alias
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
@@ -1762,8 +1760,8 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
-        Validators::isNumber($r['offset'], 'offset', false /* optional */);
-        Validators::isNumber($r['rowcount'], 'rowcount', false /* optional */);
+        Validators::validateNumber($r['offset'], 'offset', false /* optional */);
+        Validators::validateNumber($r['rowcount'], 'rowcount', false /* optional */);
     }
 
     /**
@@ -1885,10 +1883,10 @@ class ContestController extends Controller {
         // Get the current user
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['contest_aliases'], 'contest_aliases');
+        Validators::validateStringNonEmpty($r['contest_aliases'], 'contest_aliases');
         $contest_aliases = explode(',', $r['contest_aliases']);
 
-        Validators::isStringNonEmpty($r['usernames_filter'], 'usernames_filter', false);
+        Validators::validateStringNonEmpty($r['usernames_filter'], 'usernames_filter', false);
 
         $usernames_filter = [];
         if (isset($r['usernames_filter'])) {
@@ -2012,7 +2010,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -2093,7 +2091,7 @@ class ContestController extends Controller {
     public static function apiArbitrateRequest(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         if (is_null($r['resolution'])) {
             throw new InvalidParameterException('invalidParameters');
@@ -2159,7 +2157,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -2201,7 +2199,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -2382,7 +2380,7 @@ class ContestController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
@@ -2399,14 +2397,14 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumber($r['rowcount'], 'rowcount', false);
-        Validators::isInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
-        Validators::isInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+        Validators::validateNumber($r['offset'], 'offset', false);
+        Validators::validateNumber($r['rowcount'], 'rowcount', false);
+        Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
-            Validators::isStringNonEmpty($r['problem_alias'], 'problem');
+            Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
             try {
                 $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -2420,7 +2418,7 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::isInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
+        Validators::validateInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
@@ -2483,7 +2481,7 @@ class ContestController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateStats(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
@@ -2584,7 +2582,7 @@ class ContestController extends Controller {
         $scoreboard = new Scoreboard($params);
 
         // Check the filter if we have one
-        Validators::isStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);
+        Validators::validateStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);
 
         $contestReport = $scoreboard->generate(
             true, // with run details for reporting
@@ -2791,7 +2789,7 @@ class ContestController extends Controller {
         }
 
         // Validate value param
-        Validators::isInEnum($r['value'], 'value', ['0', '1']);
+        Validators::validateInEnum($r['value'], 'value', ['0', '1']);
 
         $r['contest']->recommended = $r['value'];
 

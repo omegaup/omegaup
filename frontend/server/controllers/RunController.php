@@ -46,7 +46,7 @@ class RunController extends Controller {
 
         $allowedLanguages = array_keys(RunController::$kSupportedLanguages);
         try {
-            Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+            Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
             // Check that problem exists
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -63,12 +63,12 @@ class RunController extends Controller {
                 $allowedLanguages,
                 explode(',', $r['problem']->languages)
             );
-            Validators::isInEnum(
+            Validators::validateInEnum(
                 $r['language'],
                 'language',
                 $allowedLanguages
             );
-            Validators::isStringNonEmpty($r['source'], 'source');
+            Validators::validateStringNonEmpty($r['source'], 'source');
 
             // Can't set both problemset_id and contest_alias at the same time.
             if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
@@ -86,7 +86,7 @@ class RunController extends Controller {
             } elseif (!empty($r['contest_alias'])) {
                 // Got a contest alias, need to fetch the problemset id.
                 // Validate contest
-                Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
+                Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
                 $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
 
                 if ($r['contest'] == null) {
@@ -138,7 +138,7 @@ class RunController extends Controller {
                     explode(',', $r['problemset']->languages)
                 );
             }
-            Validators::isInEnum(
+            Validators::validateInEnum(
                 $r['language'],
                 'language',
                 $allowedLanguages
@@ -395,7 +395,7 @@ class RunController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDetailsRequest(Request $r) {
-        Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
+        Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
 
         // If user is not judge, must be the run's owner.
         try {
@@ -667,7 +667,7 @@ class RunController extends Controller {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['run_alias'], 'run_alias');
+        Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
         if (!RunController::downloadSubmission($r['run_alias'], $r['current_identity_id'], /*passthru=*/true)) {
             http_response_code(404);
         }
@@ -832,14 +832,14 @@ class RunController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumber($r['rowcount'], 'rowcount', false);
-        Validators::isInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
-        Validators::isInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+        Validators::validateNumber($r['offset'], 'offset', false);
+        Validators::validateNumber($r['rowcount'], 'rowcount', false);
+        Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
-            Validators::isStringNonEmpty($r['problem_alias'], 'problem');
+            Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
             try {
                 $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -853,7 +853,7 @@ class RunController extends Controller {
             }
         }
 
-        Validators::isInEnum(
+        Validators::validateInEnum(
             $r['language'],
             'language',
             array_keys(RunController::$kSupportedLanguages),

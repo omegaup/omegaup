@@ -17,7 +17,7 @@ class GroupScoreboardController extends Controller {
     private static function validateGroupScoreboard($groupAlias, $identityId, $scoreboardAlias) {
         GroupController::validateGroup($groupAlias, $identityId);
 
-        Validators::isValidAlias($scoreboardAlias, 'scoreboard_alias');
+        Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
         try {
             $scoreboard = GroupsScoreboardsDAO::getByAlias($scoreboardAlias);
         } catch (Exception $ex) {
@@ -43,7 +43,7 @@ class GroupScoreboardController extends Controller {
     private static function validateGroupScoreboardAndContest($groupAlias, $identityId, $scoreboardAlias, $contestAlias) {
         $scoreboard = self::validateGroupScoreboard($groupAlias, $identityId, $scoreboardAlias);
 
-        Validators::isValidAlias($contestAlias, 'contest_alias');
+        Validators::validateValidAlias($contestAlias, 'contest_alias');
         try {
             $contest = ContestsDAO::getByAlias($contestAlias);
         } catch (Exception $ex) {
@@ -72,8 +72,8 @@ class GroupScoreboardController extends Controller {
         self::authenticateRequest($r);
         $contestScoreboard = self::validateGroupScoreboardAndContest($r['group_alias'], $r['current_identity_id'], $r['scoreboard_alias'], $r['contest_alias']);
 
-        Validators::isInEnum($r['only_ac'], 'only_ac', [0,1]);
-        Validators::isNumber($r['weight'], 'weight');
+        Validators::validateInEnum($r['only_ac'], 'only_ac', [0,1]);
+        Validators::validateNumber($r['weight'], 'weight');
 
         try {
             $groupScoreboardProblemset = new GroupsScoreboardsProblemsets([
