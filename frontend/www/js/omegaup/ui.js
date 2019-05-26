@@ -505,34 +505,33 @@ let UI = {
       return tag.match(whitelist) || tag.match(imageWhitelist);
     });
 
+    // These two functions are adapted from Markdown.Converter.js. They are
+    // needed to support images with some special characters in their name.
+    function escapeCharacters(text, charsToEscape, afterBackslash) {
+      // First we have to escape the escape characters so that
+      // we can build a character class out of them
+      const regexString = `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
+
+      if (afterBackslash) {
+        regexString = `\\\\${regexString}`;
+      }
+
+      const regex = new RegExp(regexString, 'g');
+      return text.replace(/~/g, '~T')
+          .replace(/\$/g, '~D')
+          .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`)
+    }
+    function unescapeCharacters(text) {
+      //
+      // Swap back in all the special characters we've hidden.
+      //
+      return text.replace(/~E(\d+)E/g, function(wholeMatch, m1) {
+                   const charCodeToReplace = parseInt(m1);
+                   return String.fromCharCode(charCodeToReplace);
+                 }).replace(/~D/g, '$').replace(/~T/g, '~');
+    }
+
     converter.hooks.chain('postSpanGamut', function(text) {
-      // These two functions are adapted from Markdown.Converter.js. They are
-      // needed to support images with some special characters in their name.
-      function escapeCharacters(text, charsToEscape, afterBackslash) {
-        // First we have to escape the escape characters so that
-        // we can build a character class out of them
-        const regexString =
-            `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
-
-        if (afterBackslash) {
-          regexString = `\\\\${regexString}`;
-        }
-
-        const regex = new RegExp(regexString, 'g');
-        return text.replace(/~/g, '~T')
-            .replace(/\$/g, '~D')
-            .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`)
-      }
-      function unescapeCharacters(text) {
-        //
-        // Swap back in all the special characters we've hidden.
-        //
-        return text.replace(/~E(\d+)E/g, function(wholeMatch, m1) {
-                     const charCodeToReplace = parseInt(m1);
-                     return String.fromCharCode(charCodeToReplace);
-                   }).replace(/~D/g, '$').replace(/~T/g, '~');
-      }
-
       // Templates.
       text = text.replace(
           /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g, function(wholematch, m1) {
@@ -561,6 +560,35 @@ let UI = {
                    `<figcaption>${title}</figcaption></figure>`;
           });
       return text;
+    });
+    converter.hooks.chain('preBlockGamut', function(text, blockGamut,
+                                                    spanGamut) {
+      // GitHub-flavored fenced code blocks
+      function fencedCodeBlock(whole, indentation, fence, infoString,
+                               contents) {
+        contents = contents.replace(/&/g, '&amp;');
+        contents = contents.replace(/</g, '&lt;');
+        contents = contents.replace(/>/g, '&gt;');
+        if (indentation != '') {
+          let lines = [];
+          let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+          for (let line of contents.split('\n')) {
+            lines.push(line.replace(stripPrefix, ''));
+          }
+          contents = lines.join('\n');
+        }
+        let className = '';
+        infoString = infoString.trim();
+        if (infoString != '') {
+          className = ` class="language-${infoString.split(/\s+/)[0]}"`;
+        }
+        return `<pre><code${className}>${contents}</code></pre>`;
+      }
+      text = text.replace(/^( {0,3})(`{3,})([^`\n]*)\n(.*?\n|) {0,3}\2`* *$/gsm,
+                          fencedCodeBlock);
+      return text.replace(
+          /^( {0,3})((?:~T){3,})(?!~)([^\n]*)\n(.*?\n|) {0,3}\2(?:~T)* *$/gsm,
+          fencedCodeBlock);
     });
     converter.hooks.chain('preBlockGamut', function(text, blockGamut) {
       // Sample I/O table.
