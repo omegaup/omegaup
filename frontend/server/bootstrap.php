@@ -201,6 +201,7 @@ $conn = null;
 try {
     $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
     $conn->debug = OMEGAUP_DB_DEBUG;
+    array_push($conn->optionFlags, [MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true]);
     $conn->SetFetchMode(ADODB_FETCH_ASSOC);
     $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 } catch (Exception $databaseConectionException) {
