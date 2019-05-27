@@ -45,7 +45,10 @@ OmegaUp.on('ready', function() {
                   UI.success(T.groupEditMemberUpdated);
                   groupMembersInstance.reset();
                 })
-                .fail(UI.apiError);
+                .fail(function(response) {
+                  $('.modal').modal('hide');
+                  UI.apiError(response);
+                });
           },
           'change-password-identity-member': function(
               groupMembersInstance, username, newPassword, newPasswordRepeat) {
