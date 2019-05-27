@@ -38,7 +38,7 @@ OmegaUp.on('ready', function() {
                           state_id: selectedState,
                           school_name: school,
                           group_alias: groupAlias,
-                          original_identity: identity,
+                          originalIdentityUsername: identity['username'],
                         })
                 .then(function(data) {
                   refreshMemberList();
