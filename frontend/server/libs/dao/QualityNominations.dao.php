@@ -108,7 +108,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         global $conn;
 
         $votes = [];
-        foreach ($conn->Execute($sql, [$qualitynomination_id]) as $vote) {
+        foreach ($conn->GetAll($sql, [$qualitynomination_id]) as $vote) {
             if (is_string($vote['time'])) {
                 $vote['time'] = (int)$vote['time'];
             }
@@ -225,9 +225,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
         if (!empty($types)) {
             global $conn;
-            $connectionID = $conn->_connectionID;
-            $escapeFunc = function ($type) use ($connectionID) {
-                return mysqli_real_escape_string($connectionID, $type);
+            $escapeFunc = function ($type) use ($conn) {
+                return $conn->escape($type);
             };
             $conditions[] =
                 ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
@@ -241,12 +240,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
 
         $sql .= ' LIMIT ?, ?;';
-        $params[] = $page * $pageSize;
-        $params[] = ($page + 1) * $pageSize;
+        $params[] = (int)($page * $pageSize);
+        $params[] = (int)(($page + 1) * $pageSize);
 
         global $conn;
         $nominations = [];
-        foreach ($conn->Execute($sql, $params) as $nomination) {
+        foreach ($conn->GetAll($sql, $params) as $nomination) {
             $nominations[] = self::processNomination($nomination);
         }
 
@@ -303,7 +302,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
 
         global $conn;
-        return $conn->Execute($sql);
+        return $conn->GetAll($sql);
     }
 
     /**
@@ -338,7 +337,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             . 'FROM `QualityNominations` '
             . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
         global $conn;
-        return $conn->Execute($sql);
+        return $conn->GetAll($sql);
     }
 
     /**
@@ -396,7 +395,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
             . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
         global $conn;
-        foreach ($conn->Execute($sql) as $nomination) {
+        foreach ($conn->GetAll($sql) as $nomination) {
             $problemId = $nomination['problem_id'];
             $contents = self::getAllSuggestionsPerProblem($problemId);
             $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
@@ -477,7 +476,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                     status = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$userId, $problemId, $nomination, $contents, $status]);
+        $rs = $conn->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
 
         $qualityNominations = [];
         foreach ($rs as $row) {

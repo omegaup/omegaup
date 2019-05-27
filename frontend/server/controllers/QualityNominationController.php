@@ -72,9 +72,9 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
-        Validators::isStringNonEmpty($r['contents'], 'contents');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
+        Validators::validateStringNonEmpty($r['contents'], 'contents');
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)) {
             throw new InvalidParameterException('parameterInvalid', 'contents');
@@ -229,8 +229,8 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
-        Validators::isStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
+        Validators::validateInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
+        Validators::validateStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
 
         // Validate request
         self::authenticateRequest($r);
@@ -365,8 +365,8 @@ class QualityNominationController extends Controller {
      * @return array The response.
      */
     private static function getListImpl(Request $r, $nominator, $assignee) {
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -493,7 +493,7 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
 
-        Validators::isNumber($r['qualitynomination_id'], 'qualitynomination_id');
+        $r->ensureInt('qualitynomination_id');
         $response = QualityNominationsDAO::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
             throw new NotFoundException('qualityNominationNotFound');

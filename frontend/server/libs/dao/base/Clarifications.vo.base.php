@@ -27,13 +27,13 @@ class Clarifications extends VO {
             return;
         }
         if (isset($data['clarification_id'])) {
-            $this->clarification_id = $data['clarification_id'];
+            $this->clarification_id = (int)$data['clarification_id'];
         }
         if (isset($data['author_id'])) {
-            $this->author_id = $data['author_id'];
+            $this->author_id = (int)$data['author_id'];
         }
         if (isset($data['receiver_id'])) {
-            $this->receiver_id = $data['receiver_id'];
+            $this->receiver_id = (int)$data['receiver_id'];
         }
         if (isset($data['message'])) {
             $this->message = $data['message'];
@@ -45,13 +45,13 @@ class Clarifications extends VO {
             $this->time = $data['time'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['public'])) {
-            $this->public = $data['public'];
+            $this->public = $data['public'] == '1';
         }
     }
 
@@ -59,11 +59,11 @@ class Clarifications extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

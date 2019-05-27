@@ -226,7 +226,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     INNER JOIN
                         Identities i ON i.identity_id = ? AND s.identity_id = i.identity_id
                     GROUP BY
-                        pi.problem_id
+                        pi.problem_id, s.identity_id
                 ) ps ON ps.problem_id = p.problem_id
                 LEFT JOIN
                     User_Roles ur ON ur.user_id = ? AND p.acl_id = ur.acl_id AND ur.role_id = ?
@@ -328,9 +328,9 @@ class ProblemsDAO extends ProblemsDAOBase {
             $sql .= " ORDER BY `{$orderBy}` {$collation} {$order} ";
         }
         $sql .= ' LIMIT ?, ? ';
-        $args[] = $offset;
-        $args[] = $rowcount;
-        $result = $conn->Execute("{$select} {$sql};", $args);
+        $args[] = (int)$offset;
+        $args[] = (int)$rowcount;
+        $result = $conn->GetAll("{$select} {$sql};", $args);
         if (is_null($result)) {
             return [];
         }
@@ -360,11 +360,11 @@ class ProblemsDAO extends ProblemsDAOBase {
 
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
-        $params = [  $alias ];
+        $params = [$alias];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
                 return null;
         }
 
@@ -380,7 +380,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
 
         $sql = "SELECT * FROM Problems WHERE (alias LIKE '%$quoted%' OR title LIKE '%$quoted%') LIMIT 0,10;";
-        $rs = $conn->Execute($sql);
+        $rs = $conn->GetAll($sql);
 
         $result = [];
 
@@ -408,7 +408,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
         $sql .= ';';
 
-        $rs = $conn->Execute($sql, $problem->problem_id);
+        $rs = $conn->GetAll($sql, [$problem->problem_id]);
         $result = [];
 
         foreach ($rs as $r) {
@@ -422,7 +422,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         global $conn;
 
         $sql = 'SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Problemset_Problems pp USING(problemset_id) WHERE pp.problem_id = ?';
-        return $conn->GetOne($sql, $id);
+        return $conn->GetOne($sql, [$id]);
     }
 
     final public static function getProblemsSolved($identityId) {
@@ -445,7 +445,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $val = [$identityId];
 
         $result = [];
-        foreach ($conn->Execute($sql, $val) as $row) {
+        foreach ($conn->GetAll($sql, $val) as $row) {
             array_push($result, new Problems($row));
         }
         return $result;
@@ -481,7 +481,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $params = [$identityId];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $r) {
@@ -667,7 +667,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         ';
 
         $params = [$problem->problem_id];
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $result = [];
         foreach ($rs as $r) {
@@ -754,12 +754,12 @@ class ProblemsDAO extends ProblemsDAOBase {
             Authorization::ADMIN_ROLE,
             $identity_id,
             ProblemController::VISIBILITY_DELETED,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -794,12 +794,12 @@ class ProblemsDAO extends ProblemsDAOBase {
         $params = [
             $user_id,
             ProblemController::VISIBILITY_DELETED,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -815,12 +815,12 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql = 'SELECT * from Problems where `visibility` > ? ';
         global $conn;
         if (!is_null($order)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
             $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
         }
-        $rs = $conn->Execute($sql, [ProblemController::VISIBILITY_DELETED]);
+        $rs = $conn->GetAll($sql, [ProblemController::VISIBILITY_DELETED]);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = new Problems($row);
@@ -855,7 +855,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $params = [$group_id, $problem_id];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $identities = [];
         foreach ($rs as $row) {
@@ -896,7 +896,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 s.problemset_id IS NOT NULL
                 AND s.problem_id = ?;
         ';
-        return $conn->GetOne($sql, $problem->problem_id);
+        return $conn->GetOne($sql, [$problem->problem_id]);
     }
 
     final public static function getByContest($contest_id) {
@@ -916,7 +916,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     c.contest_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$contest_id]);
+        $rs = $conn->GetAll($sql, [$contest_id]);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -934,7 +934,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     title = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$title]);
+        $rs = $conn->GetAll($sql, [$title]);
 
         $problems = [];
         foreach ($rs as $row) {

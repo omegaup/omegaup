@@ -27,13 +27,13 @@ class Problems extends VO {
             return;
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['visibility'])) {
-            $this->visibility = $data['visibility'];
+            $this->visibility = (int)$data['visibility'];
         }
         if (isset($data['title'])) {
             $this->title = $data['title'];
@@ -51,19 +51,19 @@ class Problems extends VO {
             $this->languages = $data['languages'];
         }
         if (isset($data['input_limit'])) {
-            $this->input_limit = $data['input_limit'];
+            $this->input_limit = (int)$data['input_limit'];
         }
         if (isset($data['visits'])) {
-            $this->visits = $data['visits'];
+            $this->visits = (int)$data['visits'];
         }
         if (isset($data['submissions'])) {
-            $this->submissions = $data['submissions'];
+            $this->submissions = (int)$data['submissions'];
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'];
+            $this->accepted = (int)$data['accepted'];
         }
         if (isset($data['difficulty'])) {
-            $this->difficulty = $data['difficulty'];
+            $this->difficulty = (float)$data['difficulty'];
         }
         if (isset($data['creation_date'])) {
             $this->creation_date = $data['creation_date'];
@@ -75,13 +75,13 @@ class Problems extends VO {
             $this->order = $data['order'];
         }
         if (isset($data['deprecated'])) {
-            $this->deprecated = $data['deprecated'];
+            $this->deprecated = $data['deprecated'] == '1';
         }
         if (isset($data['email_clarifications'])) {
-            $this->email_clarifications = $data['email_clarifications'];
+            $this->email_clarifications = $data['email_clarifications'] == '1';
         }
         if (isset($data['quality'])) {
-            $this->quality = $data['quality'];
+            $this->quality = (float)$data['quality'];
         }
         if (isset($data['quality_histogram'])) {
             $this->quality_histogram = $data['quality_histogram'];
@@ -95,11 +95,11 @@ class Problems extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['creation_date']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**
@@ -121,7 +121,7 @@ class Problems extends VO {
     /**
       * -1 banned, 0 private, 1 public, 2 recommended
       * @access public
-      * @var tinyint(1)
+      * @var int(1)
       */
     public $visibility;
 

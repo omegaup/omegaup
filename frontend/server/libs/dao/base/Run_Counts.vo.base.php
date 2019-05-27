@@ -30,10 +30,10 @@ class RunCounts extends VO {
             $this->date = $data['date'];
         }
         if (isset($data['total'])) {
-            $this->total = $data['total'];
+            $this->total = (int)$data['total'];
         }
         if (isset($data['ac_count'])) {
-            $this->ac_count = $data['ac_count'];
+            $this->ac_count = (int)$data['ac_count'];
         }
     }
 
@@ -41,11 +41,11 @@ class RunCounts extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

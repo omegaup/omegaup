@@ -1184,7 +1184,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // current problem of the week.
         $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
         global $conn;
-        $conn->Execute('UPDATE `QualityNominations` SET `time` = ?', $dateOneWeekAgo);
+        $conn->Execute('UPDATE `QualityNominations` SET `time` = ?', [$dateOneWeekAgo]);
 
         return $problemData;
     }

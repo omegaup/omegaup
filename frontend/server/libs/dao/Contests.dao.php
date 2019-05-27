@@ -149,7 +149,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -162,7 +162,7 @@ class ContestsDAO extends ContestsDAOBase {
         $sql = 'SELECT * FROM Contests WHERE title = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$title]);
+        $rs = $conn->GetAll($sql, [$title]);
 
         $contests = [];
         foreach ($rs as $row) {
@@ -188,7 +188,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return $rs;
@@ -198,7 +198,7 @@ class ContestsDAO extends ContestsDAOBase {
         $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
         global $conn;
         $row = $conn->GetRow($sql, [$problemset_id]);
-        if (count($row) == 0) {
+        if (empty($row)) {
             return null;
         }
 
@@ -354,7 +354,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         global $conn;
         if (!is_null($order)) {
-            $sql .= ' ORDER BY `c`.`' . mysqli_real_escape_string($conn->_connectionID, $order) . '` ' .
+            $sql .= ' ORDER BY `c`.`' . $conn->escape($order) . '` ' .
                     ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
@@ -391,8 +391,8 @@ class ContestsDAO extends ContestsDAOBase {
             LIMIT ?, ?;';
         $params = [
             $user_id,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
@@ -445,8 +445,8 @@ class ContestsDAO extends ContestsDAOBase {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = $offset;
-        $params[] = $pageSize;
+        $params[] = (int)$offset;
+        $params[] = (int)$pageSize;
 
         return $conn->GetAll($sql, $params);
     }
@@ -489,8 +489,8 @@ class ContestsDAO extends ContestsDAOBase {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = $offset;
-        $params[] = $pageSize;
+        $params[] = (int)$offset;
+        $params[] = (int)$pageSize;
 
         return $conn->GetAll($sql, $params);
     }
@@ -669,8 +669,8 @@ class ContestsDAO extends ContestsDAOBase {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = $offset;
-        $params[] = $renglones_por_pagina;
+        $params[] = (int)$offset;
+        $params[] = (int)$renglones_por_pagina;
         global $conn;
         return $conn->GetAll($sql, $params);
     }
@@ -714,8 +714,8 @@ class ContestsDAO extends ContestsDAOBase {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = $offset;
-        $params[] = $renglones_por_pagina;
+        $params[] = (int)$offset;
+        $params[] = (int)$renglones_por_pagina;
         return $conn->GetAll($sql, $params);
     }
 
@@ -754,8 +754,8 @@ class ContestsDAO extends ContestsDAOBase {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = $offset;
-        $params[] = $renglones_por_pagina;
+        $params[] = (int)$offset;
+        $params[] = (int)$renglones_por_pagina;
         return $conn->GetAll($sql, $params);
     }
 
@@ -792,7 +792,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params = [$problemset_id];
 
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             throw new NotFoundException('problemsetNotFound');
         }
         return [

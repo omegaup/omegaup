@@ -27,13 +27,13 @@ class Interviews extends VO {
             return;
         }
         if (isset($data['interview_id'])) {
-            $this->interview_id = $data['interview_id'];
+            $this->interview_id = (int)$data['interview_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
@@ -45,7 +45,7 @@ class Interviews extends VO {
             $this->description = $data['description'];
         }
         if (isset($data['window_length'])) {
-            $this->window_length = $data['window_length'];
+            $this->window_length = (int)$data['window_length'];
         }
     }
 
@@ -53,11 +53,11 @@ class Interviews extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

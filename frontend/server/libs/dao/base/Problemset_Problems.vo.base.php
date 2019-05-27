@@ -27,10 +27,10 @@ class ProblemsetProblems extends VO {
             return;
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['commit'])) {
             $this->commit = $data['commit'];
@@ -39,10 +39,10 @@ class ProblemsetProblems extends VO {
             $this->version = $data['version'];
         }
         if (isset($data['points'])) {
-            $this->points = $data['points'];
+            $this->points = (float)$data['points'];
         }
         if (isset($data['order'])) {
-            $this->order = $data['order'];
+            $this->order = (int)$data['order'];
         }
     }
 
@@ -50,11 +50,11 @@ class ProblemsetProblems extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

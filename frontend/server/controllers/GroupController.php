@@ -34,7 +34,7 @@ class GroupController extends Controller {
         } catch (Exception $e) {
             DAO::transRollback();
 
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);
@@ -52,9 +52,9 @@ class GroupController extends Controller {
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isValidAlias($r['alias'], 'alias', true);
-        Validators::isStringNonEmpty($r['name'], 'name', true);
-        Validators::isStringNonEmpty($r['description'], 'description', false);
+        Validators::validateValidAlias($r['alias'], 'alias', true);
+        Validators::validateStringNonEmpty($r['name'], 'name', true);
+        Validators::validateStringNonEmpty($r['description'], 'description', false);
 
         self::createGroup(
             $r['alias'],
@@ -76,7 +76,7 @@ class GroupController extends Controller {
      * @throws ForbiddenAccessException
      */
     public static function validateGroup($groupAlias, $identityId) {
-        Validators::isStringNonEmpty($groupAlias, 'group_alias');
+        Validators::validateStringNonEmpty($groupAlias, 'group_alias');
         try {
             $group = GroupsDAO::FindByAlias($groupAlias);
 
@@ -282,9 +282,9 @@ class GroupController extends Controller {
         self::authenticateRequest($r);
         $group = self::validateGroup($r['group_alias'], $r['current_identity_id']);
 
-        Validators::isValidAlias($r['alias'], 'alias', true);
-        Validators::isStringNonEmpty($r['name'], 'name', true);
-        Validators::isStringNonEmpty($r['description'], 'description', false);
+        Validators::validateValidAlias($r['alias'], 'alias', true);
+        Validators::validateStringNonEmpty($r['name'], 'name', true);
+        Validators::validateStringNonEmpty($r['description'], 'description', false);
 
         try {
             $groupScoreboard = new GroupsScoreboards([

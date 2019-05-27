@@ -50,27 +50,27 @@ abstract class ProblemsDAOBase {
     final public static function update(Problems $Problems) {
         $sql = 'UPDATE `Problems` SET `acl_id` = ?, `visibility` = ?, `title` = ?, `alias` = ?, `commit` = ?, `current_version` = ?, `languages` = ?, `input_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `deprecated` = ?, `email_clarifications` = ?, `quality` = ?, `quality_histogram` = ?, `difficulty_histogram` = ? WHERE `problem_id` = ?;';
         $params = [
-            $Problems->acl_id,
-            $Problems->visibility,
+            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
+            is_null($Problems->visibility) ? null : (int)$Problems->visibility,
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
             $Problems->current_version,
             $Problems->languages,
-            $Problems->input_limit,
-            $Problems->visits,
-            $Problems->submissions,
-            $Problems->accepted,
-            $Problems->difficulty,
+            is_null($Problems->input_limit) ? null : (int)$Problems->input_limit,
+            is_null($Problems->visits) ? null : (int)$Problems->visits,
+            is_null($Problems->submissions) ? null : (int)$Problems->submissions,
+            is_null($Problems->accepted) ? null : (int)$Problems->accepted,
+            is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
             $Problems->creation_date,
             $Problems->source,
             $Problems->order,
-            $Problems->deprecated,
-            $Problems->email_clarifications,
-            $Problems->quality,
+            is_null($Problems->deprecated) ? null : (int)$Problems->deprecated,
+            is_null($Problems->email_clarifications) ? null : (int)$Problems->email_clarifications,
+            is_null($Problems->quality) ? null : (float)$Problems->quality,
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
-            $Problems->problem_id,
+            is_null($Problems->problem_id) ? null : (int)$Problems->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -93,11 +93,11 @@ abstract class ProblemsDAOBase {
         $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`commit`, `Problems`.`current_version`, `Problems`.`languages`, `Problems`.`input_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality`, `Problems`.`quality_histogram`, `Problems`.`difficulty_histogram` FROM Problems WHERE (problem_id = ?) LIMIT 1;';
         $params = [$problem_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Problems($rs);
+        return new Problems($row);
     }
 
     /**
@@ -148,14 +148,13 @@ abstract class ProblemsDAOBase {
         $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`commit`, `Problems`.`current_version`, `Problems`.`languages`, `Problems`.`input_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality`, `Problems`.`quality_histogram`, `Problems`.`difficulty_histogram` from Problems';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Problems($row);
         }
         return $allData;
@@ -173,7 +172,7 @@ abstract class ProblemsDAOBase {
      */
     final public static function create(Problems $Problems) {
         if (is_null($Problems->visibility)) {
-            $Problems->visibility = '1';
+            $Problems->visibility = 1;
         }
         if (is_null($Problems->commit)) {
             $Problems->commit = 'published';
@@ -182,16 +181,16 @@ abstract class ProblemsDAOBase {
             $Problems->languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua';
         }
         if (is_null($Problems->input_limit)) {
-            $Problems->input_limit = '10240';
+            $Problems->input_limit = 10240;
         }
         if (is_null($Problems->visits)) {
-            $Problems->visits = '0';
+            $Problems->visits = 0;
         }
         if (is_null($Problems->submissions)) {
-            $Problems->submissions = '0';
+            $Problems->submissions = 0;
         }
         if (is_null($Problems->accepted)) {
-            $Problems->accepted = '0';
+            $Problems->accepted = 0;
         }
         if (is_null($Problems->creation_date)) {
             $Problems->creation_date = gmdate('Y-m-d H:i:s');
@@ -200,31 +199,31 @@ abstract class ProblemsDAOBase {
             $Problems->order = 'normal';
         }
         if (is_null($Problems->deprecated)) {
-            $Problems->deprecated = '0';
+            $Problems->deprecated = false;
         }
         if (is_null($Problems->email_clarifications)) {
-            $Problems->email_clarifications = '0';
+            $Problems->email_clarifications = false;
         }
         $sql = 'INSERT INTO Problems (`acl_id`, `visibility`, `title`, `alias`, `commit`, `current_version`, `languages`, `input_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `deprecated`, `email_clarifications`, `quality`, `quality_histogram`, `difficulty_histogram`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Problems->acl_id,
-            $Problems->visibility,
+            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
+            is_null($Problems->visibility) ? null : (int)$Problems->visibility,
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
             $Problems->current_version,
             $Problems->languages,
-            $Problems->input_limit,
-            $Problems->visits,
-            $Problems->submissions,
-            $Problems->accepted,
-            $Problems->difficulty,
+            is_null($Problems->input_limit) ? null : (int)$Problems->input_limit,
+            is_null($Problems->visits) ? null : (int)$Problems->visits,
+            is_null($Problems->submissions) ? null : (int)$Problems->submissions,
+            is_null($Problems->accepted) ? null : (int)$Problems->accepted,
+            is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
             $Problems->creation_date,
             $Problems->source,
             $Problems->order,
-            $Problems->deprecated,
-            $Problems->email_clarifications,
-            $Problems->quality,
+            is_null($Problems->deprecated) ? null : (int)$Problems->deprecated,
+            is_null($Problems->email_clarifications) ? null : (int)$Problems->email_clarifications,
+            is_null($Problems->quality) ? null : (float)$Problems->quality,
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
         ];

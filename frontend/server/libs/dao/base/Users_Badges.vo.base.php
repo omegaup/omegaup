@@ -27,16 +27,16 @@ class UsersBadges extends VO {
             return;
         }
         if (isset($data['badge_id'])) {
-            $this->badge_id = $data['badge_id'];
+            $this->badge_id = (int)$data['badge_id'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
         if (isset($data['last_problem_id'])) {
-            $this->last_problem_id = $data['last_problem_id'];
+            $this->last_problem_id = (int)$data['last_problem_id'];
         }
     }
 
@@ -44,11 +44,11 @@ class UsersBadges extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

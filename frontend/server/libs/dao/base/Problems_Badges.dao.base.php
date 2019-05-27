@@ -34,11 +34,11 @@ abstract class ProblemsBadgesDAOBase {
         $sql = 'SELECT `Problems_Badges`.`badge_id`, `Problems_Badges`.`problem_id` FROM Problems_Badges WHERE (badge_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$badge_id, $problem_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ProblemsBadges($rs);
+        return new ProblemsBadges($row);
     }
 
     /**
@@ -89,14 +89,13 @@ abstract class ProblemsBadgesDAOBase {
         $sql = 'SELECT `Problems_Badges`.`badge_id`, `Problems_Badges`.`problem_id` from Problems_Badges';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemsBadges($row);
         }
         return $allData;
@@ -115,8 +114,8 @@ abstract class ProblemsBadgesDAOBase {
     final public static function create(ProblemsBadges $Problems_Badges) {
         $sql = 'INSERT INTO Problems_Badges (`badge_id`, `problem_id`) VALUES (?, ?);';
         $params = [
-            $Problems_Badges->badge_id,
-            $Problems_Badges->problem_id,
+            is_null($Problems_Badges->badge_id) ? null : (int)$Problems_Badges->badge_id,
+            is_null($Problems_Badges->problem_id) ? null : (int)$Problems_Badges->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

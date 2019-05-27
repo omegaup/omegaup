@@ -27,10 +27,10 @@ class ProblemsLanguages extends VO {
             return;
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['language_id'])) {
-            $this->language_id = $data['language_id'];
+            $this->language_id = (int)$data['language_id'];
         }
     }
 
@@ -38,11 +38,11 @@ class ProblemsLanguages extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

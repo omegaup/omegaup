@@ -42,7 +42,7 @@ class Pager {
         }
 
         $query = '';
-        if (count($params) > 0) {
+        if (!empty($params)) {
             $query = '&' . self::buildQueryString($params);
         }
 

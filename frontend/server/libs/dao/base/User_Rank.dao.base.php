@@ -50,15 +50,15 @@ abstract class UserRankDAOBase {
     final public static function update(UserRank $User_Rank) {
         $sql = 'UPDATE `User_Rank` SET `rank` = ?, `problems_solved_count` = ?, `score` = ?, `username` = ?, `name` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ? WHERE `user_id` = ?;';
         $params = [
-            $User_Rank->rank,
-            $User_Rank->problems_solved_count,
-            $User_Rank->score,
+            is_null($User_Rank->rank) ? null : (int)$User_Rank->rank,
+            is_null($User_Rank->problems_solved_count) ? null : (int)$User_Rank->problems_solved_count,
+            is_null($User_Rank->score) ? null : (float)$User_Rank->score,
             $User_Rank->username,
             $User_Rank->name,
             $User_Rank->country_id,
             $User_Rank->state_id,
-            $User_Rank->school_id,
-            $User_Rank->user_id,
+            is_null($User_Rank->school_id) ? null : (int)$User_Rank->school_id,
+            is_null($User_Rank->user_id) ? null : (int)$User_Rank->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -81,11 +81,11 @@ abstract class UserRankDAOBase {
         $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` FROM User_Rank WHERE (user_id = ?) LIMIT 1;';
         $params = [$user_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new UserRank($rs);
+        return new UserRank($row);
     }
 
     /**
@@ -136,14 +136,13 @@ abstract class UserRankDAOBase {
         $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` from User_Rank';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new UserRank($row);
         }
         return $allData;
@@ -161,22 +160,22 @@ abstract class UserRankDAOBase {
      */
     final public static function create(UserRank $User_Rank) {
         if (is_null($User_Rank->problems_solved_count)) {
-            $User_Rank->problems_solved_count = '0';
+            $User_Rank->problems_solved_count = 0;
         }
         if (is_null($User_Rank->score)) {
-            $User_Rank->score = '0';
+            $User_Rank->score = (float)0;
         }
         $sql = 'INSERT INTO User_Rank (`user_id`, `rank`, `problems_solved_count`, `score`, `username`, `name`, `country_id`, `state_id`, `school_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $User_Rank->user_id,
-            $User_Rank->rank,
-            $User_Rank->problems_solved_count,
-            $User_Rank->score,
+            is_null($User_Rank->user_id) ? null : (int)$User_Rank->user_id,
+            is_null($User_Rank->rank) ? null : (int)$User_Rank->rank,
+            is_null($User_Rank->problems_solved_count) ? null : (int)$User_Rank->problems_solved_count,
+            is_null($User_Rank->score) ? null : (float)$User_Rank->score,
             $User_Rank->username,
             $User_Rank->name,
             $User_Rank->country_id,
             $User_Rank->state_id,
-            $User_Rank->school_id,
+            is_null($User_Rank->school_id) ? null : (int)$User_Rank->school_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

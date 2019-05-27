@@ -50,12 +50,12 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
     final public static function update(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) {
         $sql = 'UPDATE `Problemset_Identity_Request_History` SET `identity_id` = ?, `problemset_id` = ?, `time` = ?, `accepted` = ?, `admin_id` = ? WHERE `history_id` = ?;';
         $params = [
-            $Problemset_Identity_Request_History->identity_id,
-            $Problemset_Identity_Request_History->problemset_id,
+            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
+            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
             $Problemset_Identity_Request_History->time,
-            $Problemset_Identity_Request_History->accepted,
-            $Problemset_Identity_Request_History->admin_id,
-            $Problemset_Identity_Request_History->history_id,
+            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
+            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
+            is_null($Problemset_Identity_Request_History->history_id) ? null : (int)$Problemset_Identity_Request_History->history_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` FROM Problemset_Identity_Request_History WHERE (history_id = ?) LIMIT 1;';
         $params = [$history_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ProblemsetIdentityRequestHistory($rs);
+        return new ProblemsetIdentityRequestHistory($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` from Problemset_Identity_Request_History';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemsetIdentityRequestHistory($row);
         }
         return $allData;
@@ -162,11 +161,11 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         }
         $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Problemset_Identity_Request_History->identity_id,
-            $Problemset_Identity_Request_History->problemset_id,
+            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
+            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
             $Problemset_Identity_Request_History->time,
-            $Problemset_Identity_Request_History->accepted,
-            $Problemset_Identity_Request_History->admin_id,
+            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
+            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

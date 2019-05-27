@@ -50,8 +50,8 @@ abstract class RunCountsDAOBase {
     final public static function update(RunCounts $Run_Counts) {
         $sql = 'UPDATE `Run_Counts` SET `total` = ?, `ac_count` = ? WHERE `date` = ?;';
         $params = [
-            $Run_Counts->total,
-            $Run_Counts->ac_count,
+            is_null($Run_Counts->total) ? null : (int)$Run_Counts->total,
+            is_null($Run_Counts->ac_count) ? null : (int)$Run_Counts->ac_count,
             $Run_Counts->date,
         ];
         global $conn;
@@ -75,11 +75,11 @@ abstract class RunCountsDAOBase {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` FROM Run_Counts WHERE (date = ?) LIMIT 1;';
         $params = [$date];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new RunCounts($rs);
+        return new RunCounts($row);
     }
 
     /**
@@ -130,14 +130,13 @@ abstract class RunCountsDAOBase {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` from Run_Counts';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new RunCounts($row);
         }
         return $allData;
@@ -155,16 +154,16 @@ abstract class RunCountsDAOBase {
      */
     final public static function create(RunCounts $Run_Counts) {
         if (is_null($Run_Counts->total)) {
-            $Run_Counts->total = '0';
+            $Run_Counts->total = 0;
         }
         if (is_null($Run_Counts->ac_count)) {
-            $Run_Counts->ac_count = '0';
+            $Run_Counts->ac_count = 0;
         }
         $sql = 'INSERT INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
         $params = [
             $Run_Counts->date,
-            $Run_Counts->total,
-            $Run_Counts->ac_count,
+            is_null($Run_Counts->total) ? null : (int)$Run_Counts->total,
+            is_null($Run_Counts->ac_count) ? null : (int)$Run_Counts->ac_count,
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -52,7 +52,7 @@ abstract class PrivacyStatementsDAOBase {
         $params = [
             $PrivacyStatements->git_object_id,
             $PrivacyStatements->type,
-            $PrivacyStatements->privacystatement_id,
+            is_null($PrivacyStatements->privacystatement_id) ? null : (int)$PrivacyStatements->privacystatement_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,11 +75,11 @@ abstract class PrivacyStatementsDAOBase {
         $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` FROM PrivacyStatements WHERE (privacystatement_id = ?) LIMIT 1;';
         $params = [$privacystatement_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new PrivacyStatements($rs);
+        return new PrivacyStatements($row);
     }
 
     /**
@@ -130,14 +130,13 @@ abstract class PrivacyStatementsDAOBase {
         $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` from PrivacyStatements';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new PrivacyStatements($row);
         }
         return $allData;

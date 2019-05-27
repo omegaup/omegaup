@@ -174,7 +174,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($r['admission_mode'], $contest->admission_mode);
         $this->assertEquals($r['alias'], $contest->alias);
         $this->assertEquals($r['points_decay_factor'], $contest->points_decay_factor);
-        $this->assertEquals($r['partial_score'], $contest->partial_score);
+        $this->assertEquals($r['partial_score'] == '1', $contest->partial_score);
         $this->assertEquals($r['submissions_gap'], $contest->submissions_gap);
         $this->assertEquals($r['feedback'], $contest->feedback);
         $this->assertEquals($r['penalty'], $contest->penalty);

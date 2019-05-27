@@ -30,6 +30,7 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/factories/ContestsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/ClarificationsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/UserFactory.php');
+    require_once(OMEGAUP_ROOT . '/tests/factories/IdentityFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/CoursesFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/RunsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
@@ -85,9 +86,9 @@ namespace {
     QualityNominationFactory::initTags();
 
     // Mock time
-    $current_time = time();
-    Time::setTimeForTesting($current_time);
-    $conn->EXECUTE('SET TIMESTAMP = ' . $current_time);
+    $currentTime = time();
+    Time::setTimeForTesting($currentTime);
+    $conn->Execute("SET TIMESTAMP = {$currentTime};");
 
     Grader::setInstanceForTesting(new NoOpGrader());
 }

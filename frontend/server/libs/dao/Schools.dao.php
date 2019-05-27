@@ -39,7 +39,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$name];
 
         $result = [];
-        foreach ($conn->Execute($sql, $args) as $row) {
+        foreach ($conn->GetAll($sql, $args) as $row) {
             $result[] = new Schools($row);
         }
         return $result;
@@ -86,7 +86,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
         $result = [];
-        foreach ($conn->Execute($sql, $args) as $row) {
+        foreach ($conn->GetAll($sql, $args) as $row) {
             $result[] = [
                 'name' => $row['name'],
                 'country_id' => $row['country_id'],

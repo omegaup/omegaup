@@ -250,7 +250,7 @@ class SessionController extends Controller {
         $username = substr($s_Email, 0, $idx);
 
         try {
-            Validators::isValidUsername($username, 'username');
+            Validators::validateValidUsername($username, 'username');
         } catch (InvalidParameterException $e) {
             // How can we know whats wrong with the username?
             // Things that could go wrong:

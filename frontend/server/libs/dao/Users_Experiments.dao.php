@@ -33,7 +33,7 @@ class UsersExperimentsDAO extends UsersExperimentsDAOBase {
                     user_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$user_id]);
+        $rs = $conn->GetAll($sql, [$user_id]);
 
         $users_experiments = [];
         foreach ($rs as $row) {

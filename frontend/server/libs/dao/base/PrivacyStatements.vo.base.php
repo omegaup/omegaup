@@ -27,7 +27,7 @@ class PrivacyStatements extends VO {
             return;
         }
         if (isset($data['privacystatement_id'])) {
-            $this->privacystatement_id = $data['privacystatement_id'];
+            $this->privacystatement_id = (int)$data['privacystatement_id'];
         }
         if (isset($data['git_object_id'])) {
             $this->git_object_id = $data['git_object_id'];
@@ -41,11 +41,11 @@ class PrivacyStatements extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

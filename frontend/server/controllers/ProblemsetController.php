@@ -88,7 +88,6 @@ class ProblemsetController extends Controller {
      * @return Array
      */
     public static function apiDetails(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
@@ -122,7 +121,6 @@ class ProblemsetController extends Controller {
      * @return Array
      */
     public static function apiScoreboard(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
@@ -155,7 +153,6 @@ class ProblemsetController extends Controller {
      * @throws NotFoundException
      */
     public static function apiScoreboardEvents(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] != 'Contest') {
@@ -180,7 +177,7 @@ class ProblemsetController extends Controller {
      * @throws NotFoundException
      */
     public static function wrapRequest(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
+        $r->ensureInt('problemset_id');
 
         try {
             $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
