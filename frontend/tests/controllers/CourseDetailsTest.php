@@ -30,8 +30,8 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        Validators::isNumber($response['start_time'], 'start_time', true);
-        Validators::isNumber($response['finish_time'], 'finish_time', true);
+        Validators::validateNumber($response['start_time'], 'start_time', true);
+        Validators::validateNumber($response['finish_time'], 'finish_time', true);
 
         // Both assignments added should be visible since the caller is an
         // admin.
@@ -46,8 +46,8 @@ class CourseDetailsTest extends OmegaupTestCase {
             $this->assertNotNull($assignment['start_time']);
             $this->assertNotNull($assignment['finish_time']);
 
-            Validators::isNumber($assignment['start_time'], 'start_time', true);
-            Validators::isNumber($assignment['finish_time'], 'finish_time', true);
+            Validators::validateNumber($assignment['start_time'], 'start_time', true);
+            Validators::validateNumber($assignment['finish_time'], 'finish_time', true);
         }
     }
 
@@ -79,8 +79,8 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        Validators::isNumber($response['start_time'], 'start_time', true);
-        Validators::isNumber($response['finish_time'], 'finish_time', true);
+        Validators::validateNumber($response['start_time'], 'start_time', true);
+        Validators::validateNumber($response['finish_time'], 'finish_time', true);
 
         // Only the course that has started should be visible.
         $this->assertEquals(false, $response['is_admin']);

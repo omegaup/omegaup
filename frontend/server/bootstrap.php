@@ -201,23 +201,22 @@ $conn = null;
 try {
     $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
     $conn->debug = OMEGAUP_DB_DEBUG;
+    array_push($conn->optionFlags, [MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true]);
     $conn->SetFetchMode(ADODB_FETCH_ASSOC);
     $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 } catch (Exception $databaseConectionException) {
     $log->error($databaseConectionException);
 
-    if (!$conn) {
-        /**
-         * Dispatch missing parameters
-         * */
-        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+    /**
+     * Dispatch missing parameters
+     * */
+    header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 
-        die(json_encode([
-                    'status' => 'error',
-                    'error' => 'Conection to the database has failed.',
-                    'errorcode' => 1
-                ]));
-    }
+    die(json_encode([
+        'status' => 'error',
+        'error' => 'Conection to the database has failed.',
+        'errorcode' => 1,
+    ]));
 }
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');

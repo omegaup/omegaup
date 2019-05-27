@@ -50,11 +50,11 @@ abstract class GroupsIdentitiesDAOBase {
     final public static function update(GroupsIdentities $Groups_Identities) {
         $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ?, `privacystatement_consent_id` = ?, `accept_teacher` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
         $params = [
-            $Groups_Identities->share_user_information,
-            $Groups_Identities->privacystatement_consent_id,
+            is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
+            is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,
-            $Groups_Identities->group_id,
-            $Groups_Identities->identity_id,
+            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
+            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -77,11 +77,11 @@ abstract class GroupsIdentitiesDAOBase {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$group_id, $identity_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new GroupsIdentities($rs);
+        return new GroupsIdentities($row);
     }
 
     /**
@@ -132,14 +132,13 @@ abstract class GroupsIdentitiesDAOBase {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` from Groups_Identities';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new GroupsIdentities($row);
         }
         return $allData;
@@ -158,10 +157,10 @@ abstract class GroupsIdentitiesDAOBase {
     final public static function create(GroupsIdentities $Groups_Identities) {
         $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Groups_Identities->group_id,
-            $Groups_Identities->identity_id,
-            $Groups_Identities->share_user_information,
-            $Groups_Identities->privacystatement_consent_id,
+            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
+            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
+            is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
+            is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,
         ];
         global $conn;

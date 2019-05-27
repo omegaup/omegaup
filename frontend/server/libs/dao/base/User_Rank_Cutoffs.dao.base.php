@@ -39,14 +39,13 @@ abstract class UserRankCutoffsDAOBase {
         $sql = 'SELECT `User_Rank_Cutoffs`.`score`, `User_Rank_Cutoffs`.`percentile`, `User_Rank_Cutoffs`.`classname` from User_Rank_Cutoffs';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new UserRankCutoffs($row);
         }
         return $allData;
@@ -65,8 +64,8 @@ abstract class UserRankCutoffsDAOBase {
     final public static function create(UserRankCutoffs $User_Rank_Cutoffs) {
         $sql = 'INSERT INTO User_Rank_Cutoffs (`score`, `percentile`, `classname`) VALUES (?, ?, ?);';
         $params = [
-            $User_Rank_Cutoffs->score,
-            $User_Rank_Cutoffs->percentile,
+            is_null($User_Rank_Cutoffs->score) ? null : (float)$User_Rank_Cutoffs->score,
+            is_null($User_Rank_Cutoffs->percentile) ? null : (float)$User_Rank_Cutoffs->percentile,
             $User_Rank_Cutoffs->classname,
         ];
         global $conn;

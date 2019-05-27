@@ -52,10 +52,10 @@ abstract class ProblemsetProblemsDAOBase {
         $params = [
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            $Problemset_Problems->points,
-            $Problemset_Problems->order,
-            $Problemset_Problems->problemset_id,
-            $Problemset_Problems->problem_id,
+            is_null($Problemset_Problems->points) ? null : (float)$Problemset_Problems->points,
+            is_null($Problemset_Problems->order) ? null : (int)$Problemset_Problems->order,
+            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
+            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class ProblemsetProblemsDAOBase {
         $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM Problemset_Problems WHERE (problemset_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$problemset_id, $problem_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ProblemsetProblems($rs);
+        return new ProblemsetProblems($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class ProblemsetProblemsDAOBase {
         $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` from Problemset_Problems';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemsetProblems($row);
         }
         return $allData;
@@ -161,19 +160,19 @@ abstract class ProblemsetProblemsDAOBase {
             $Problemset_Problems->commit = 'published';
         }
         if (is_null($Problemset_Problems->points)) {
-            $Problemset_Problems->points = '1';
+            $Problemset_Problems->points = (float)1;
         }
         if (is_null($Problemset_Problems->order)) {
-            $Problemset_Problems->order = '1';
+            $Problemset_Problems->order = 1;
         }
         $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            $Problemset_Problems->problemset_id,
-            $Problemset_Problems->problem_id,
+            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
+            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            $Problemset_Problems->points,
-            $Problemset_Problems->order,
+            is_null($Problemset_Problems->points) ? null : (float)$Problemset_Problems->points,
+            is_null($Problemset_Problems->order) ? null : (int)$Problemset_Problems->order,
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -34,11 +34,11 @@ abstract class UserRolesDAOBase {
         $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` FROM User_Roles WHERE (user_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
         $params = [$user_id, $role_id, $acl_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new UserRoles($rs);
+        return new UserRoles($row);
     }
 
     /**
@@ -89,14 +89,13 @@ abstract class UserRolesDAOBase {
         $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` from User_Roles';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new UserRoles($row);
         }
         return $allData;
@@ -115,9 +114,9 @@ abstract class UserRolesDAOBase {
     final public static function create(UserRoles $User_Roles) {
         $sql = 'INSERT INTO User_Roles (`user_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
         $params = [
-            $User_Roles->user_id,
-            $User_Roles->role_id,
-            $User_Roles->acl_id,
+            is_null($User_Roles->user_id) ? null : (int)$User_Roles->user_id,
+            is_null($User_Roles->role_id) ? null : (int)$User_Roles->role_id,
+            is_null($User_Roles->acl_id) ? null : (int)$User_Roles->acl_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

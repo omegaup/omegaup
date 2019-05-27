@@ -39,14 +39,13 @@ abstract class IdentityLoginLogDAOBase {
         $sql = 'SELECT `Identity_Login_Log`.`identity_id`, `Identity_Login_Log`.`ip`, `Identity_Login_Log`.`time` from Identity_Login_Log';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new IdentityLoginLog($row);
         }
         return $allData;
@@ -68,8 +67,8 @@ abstract class IdentityLoginLogDAOBase {
         }
         $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
         $params = [
-            $Identity_Login_Log->identity_id,
-            $Identity_Login_Log->ip,
+            is_null($Identity_Login_Log->identity_id) ? null : (int)$Identity_Login_Log->identity_id,
+            is_null($Identity_Login_Log->ip) ? null : (int)$Identity_Login_Log->ip,
             $Identity_Login_Log->time,
         ];
         global $conn;

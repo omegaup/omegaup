@@ -48,7 +48,7 @@ class ProblemController extends Controller {
             $is_required = false;
 
             // We need to check problem_alias
-            Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+            Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
             try {
                 $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -82,7 +82,7 @@ class ProblemController extends Controller {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
                     throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
                 } else {
-                    Validators::isInEnum(
+                    Validators::validateInEnum(
                         $r['visibility'],
                         'visibility',
                         [
@@ -94,7 +94,7 @@ class ProblemController extends Controller {
                     );
                 }
             }
-            Validators::isInEnum(
+            Validators::validateInEnum(
                 $r['update_published'],
                 'update_published',
                 [
@@ -106,45 +106,37 @@ class ProblemController extends Controller {
                 false
             );
         } else {
-            Validators::isValidAlias($r['problem_alias'], 'problem_alias');
-            Validators::isInEnum(
+            Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+            Validators::validateInEnum(
                 $r['visibility'],
                 'visibility',
                 [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
             );
             $r['selected_tags'] = json_decode($r['selected_tags']);
-            $tagsHaveErrors = false;
             if (!empty($r['selected_tags'])) {
                 foreach ($r['selected_tags'] as $tag) {
-                    if (!isset($tag->tagname)) {
+                    if (empty($tag->tagname)) {
                         throw new InvalidParameterException('parameterEmpty', 'tagname');
-                    }
-                    if (!Validators::isStringNonEmpty($tag->tagname, 'tagname', false)) {
-                        $tagsHaveErrors = true;
-                        break;
                     }
                 }
             }
-            if ($tagsHaveErrors) {
-                throw new InvalidParameterException('parameterEmpty', 'tagname');
-            }
         }
 
-        Validators::isStringNonEmpty($r['title'], 'title', $is_required);
-        Validators::isStringNonEmpty($r['source'], 'source', $is_required);
-        Validators::isInEnum(
+        Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
+        Validators::validateStringNonEmpty($r['source'], 'source', $is_required);
+        Validators::validateInEnum(
             $r['validator'],
             'validator',
             ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
             $is_required
         );
-        Validators::isNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['validator_time_limit'], 'validator_time_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['overall_wall_time_limit'], 'overall_wall_time_limit', 0, 60000, $is_required);
-        Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
-        Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['input_limit'], 'input_limit', 0, INF, $is_required);
+        $r->ensureInt('time_limit', 0, null, $is_required);
+        $r->ensureInt('validator_time_limit', 0, null, $is_required);
+        $r->ensureInt('overall_wall_time_limit', 0, 60000, $is_required);
+        $r->ensureInt('extra_wall_time', 0, 5000, $is_required);
+        $r->ensureInt('memory_limit', 0, null, $is_required);
+        $r->ensureInt('output_limit', 0, null, $is_required);
+        $r->ensureInt('input_limit', 0, null, $is_required);
 
         // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
         // on it already, so I'll just leave this here for now...
@@ -153,7 +145,7 @@ class ProblemController extends Controller {
         } elseif (isset($r['languages']) && is_array($r['languages'])) {
             $r['languages'] = implode(',', $r['languages']);
         }
-        Validators::isValidSubset(
+        Validators::validateValidSubset(
             $r['languages'],
             'languages',
             array_keys(RunController::$kSupportedLanguages),
@@ -244,8 +236,7 @@ class ProblemController extends Controller {
             // Operation failed unexpectedly, rollback transaction
             DAO::transRollback();
 
-            // Alias may be duplicated, 1062 error indicates that
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('problemTitleExists');
             } else {
                 throw new InvalidDatabaseOperationException($e);
@@ -267,7 +258,7 @@ class ProblemController extends Controller {
      */
     private static function validateRejudge(Request $r) {
         // We need to check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -307,7 +298,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -349,7 +340,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -384,8 +375,8 @@ class ProblemController extends Controller {
      */
     public static function apiAddTag(Request $r) {
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isStringNonEmpty($r['name'], 'name');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['name'], 'name');
 
         // Authenticate logged user
         self::authenticateRequest($r);
@@ -466,7 +457,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -505,7 +496,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -543,8 +534,8 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check whether problem exists
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isStringNonEmpty($r['name'], 'name');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['name'], 'name');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -593,7 +584,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check whether problem exists
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -631,7 +622,7 @@ class ProblemController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -661,7 +652,7 @@ class ProblemController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         $includeAutogenerated = ($r['include_autogenerated'] == 'true');
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -737,7 +728,7 @@ class ProblemController extends Controller {
         self::validateCreateOrUpdate($r, true /* is update */);
 
         // Validate commit message.
-        Validators::isStringNonEmpty($r['message'], 'message');
+        Validators::validateStringNonEmpty($r['message'], 'message');
 
         // Update the Problem object
         $valueProperties = [
@@ -899,8 +890,8 @@ class ProblemController extends Controller {
         $problem = $r['problem'];
 
         // Validate statement
-        Validators::isStringNonEmpty($r['statement'], 'statement');
-        Validators::isStringNonEmpty($r['message'], 'message');
+        Validators::validateStringNonEmpty($r['statement'], 'statement');
+        Validators::validateStringNonEmpty($r['message'], 'message');
 
         // Check that lang is in the ISO 639-1 code list, default is "es".
         $iso639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
@@ -919,7 +910,7 @@ class ProblemController extends Controller {
             'ta', 'te', 'tg', 'th', 'ti', 'bo', 'tk', 'tl', 'tn', 'to', 'tr', 'ts',
             'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
             'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
-        Validators::isInEnum($r['lang'], 'lang', $iso639_1, false /* is_required */);
+        Validators::validateInEnum($r['lang'], 'lang', $iso639_1, false /* is_required */);
         if (is_null($r['lang'])) {
             $r['lang'] = UserController::getPreferredLanguage($r);
         }
@@ -1004,12 +995,12 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDetails(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias', false);
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias', false);
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Lang is optional. Default is user's preferred.
         if (!is_null($r['lang'])) {
-            Validators::isStringOfMaxLength($r['lang'], 'lang', 2);
+            Validators::validateStringOfLengthInRange($r['lang'], 'lang', 2, 2);
         } else {
             $r['lang'] = UserController::getPreferredLanguage($r);
         }
@@ -1070,24 +1061,24 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the problem statement from the filesystem.
+     * Gets the problem resource (statement/solution) from the gitserver.
      *
      * @param array $params The problem, commit, and language for the problem
      *                      statement.
      *
-     * @return array The contents of the file, plus some metadata.
+     * @return array The contents of the resource, plus some metadata.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemStatementImpl(array $params) : array {
+    public static function getProblemResourceImpl(array $params) : array {
         $problemArtifacts = new ProblemArtifacts($params['alias'], $params['commit']);
-        $sourcePath = "statements/{$params['language']}.markdown";
+        $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
 
         // Read the file that contains the source
         if (!$problemArtifacts->exists($sourcePath)) {
             // If there is no language file for the problem, return the Spanish
             // version.
             $params['language'] = 'es';
-            $sourcePath = "statements/{$params['language']}.markdown";
+            $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
         }
 
         $result = [
@@ -1101,7 +1092,7 @@ class ProblemController extends Controller {
         }
 
         // Get all the images' mappings.
-        $statementFiles = $problemArtifacts->lsTree('statements');
+        $statementFiles = $problemArtifacts->lsTree($params['directory']);
         $imageExtensions = ['bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png',
                             'svg', 'svgz', 'tif', 'tiff'];
         foreach ($statementFiles as $file) {
@@ -1117,7 +1108,9 @@ class ProblemController extends Controller {
             );
             if (!@file_exists($imagePath)) {
                 @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
-                file_put_contents($imagePath, $problemArtifacts->get("statements/{$file['name']}"));
+                file_put_contents($imagePath, $problemArtifacts->get(
+                    "{$params['directory']}/{$file['name']}"
+                ));
             }
         }
 
@@ -1125,14 +1118,14 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the problem statement from the filesystem.
+     * Gets the problem statement from the gitserver.
      *
      * @param Problems $problem  The problem.
      * @param string   $commit   The git commit at which to get the statement.
      * @param string   $language The language of the problem. Will default to
      *                           Spanish if not found.
      *
-     * @return string The contents of the file.
+     * @return array The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
@@ -1145,16 +1138,51 @@ class ProblemController extends Controller {
             Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
             [
+                'directory' => 'statements',
                 'alias' => $problem->alias,
                 'commit' => $commit,
                 'language' => $language,
             ],
-            'ProblemController::getProblemStatementImpl',
+            'ProblemController::getProblemResourceImpl',
             $problemStatement,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
 
         return $problemStatement;
+    }
+
+    /**
+     * Gets the problem solution from the gitserver.
+     *
+     * @param Problems $problem  The problem.
+     * @param string   $commit   The git commit at which to get the statement.
+     * @param string   $language The language of the problem. Will default to
+     *                           Spanish if not found.
+     *
+     * @return array The contents of the file.
+     * @throws InvalidFilesystemOperationException
+     */
+    public static function getProblemSolution(
+        Problems $problem,
+        string $commit,
+        string $language
+    ) : array {
+        $problemSolution = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SOLUTION,
+            "{$problem->alias}-{$commit}-{$language}-markdown",
+            [
+                'directory' => 'solutions',
+                'alias' => $problem->alias,
+                'commit' => $commit,
+                'language' => $language,
+            ],
+            'ProblemController::getProblemResourceImpl',
+            $problemSolution,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+
+        return $problemSolution;
     }
 
     /**
@@ -1231,7 +1259,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDownload(Request $r) {
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1320,7 +1348,7 @@ class ProblemController extends Controller {
      */
     public static function apiDetails(Request $r) {
         // Get user.
-        // Allow unauthenticated requests if we are not openning a problem
+        // Allow unauthenticated requests if we are not opening a problem
         // inside a contest.
         try {
             self::authenticateRequest($r);
@@ -1507,6 +1535,60 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Entry point for Problem Solution API.
+     *
+     * @param Request $r
+     * @throws InvalidFilesystemOperationException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiSolution(Request $r) {
+        self::authenticateRequest($r);
+
+        // Validate request
+        $problem = self::validateDetails($r);
+        if (is_null($problem)) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
+        $problemset = $problem['problemset'];
+        $problem = $problem['problem'];
+
+        if (!Authorization::canViewProblemSolution($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException('problemSolutionNotVisible');
+        }
+
+        // Get the expected commit version.
+        $commit = $problem->commit;
+        $version = $problem->current_version;
+        if (!empty($problemset)) {
+            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+                $problemset->problemset_id,
+                $problem->problem_id
+            );
+            if (is_null($problemsetProblem)) {
+                return [
+                    'status' => 'ok',
+                    'exists' => false,
+                ];
+            }
+            $commit = $problemsetProblem->commit;
+            $version = $problemsetProblem->version;
+        }
+
+        return [
+            'status' => 'ok',
+            'exists' => true,
+            'solution' => ProblemController::getProblemSolution(
+                $problem,
+                $commit,
+                $r['lang']
+            ),
+        ];
+    }
+
+    /**
      * Entry point for Problem Versions API
      *
      * @param Request $r
@@ -1517,7 +1599,7 @@ class ProblemController extends Controller {
     public static function apiVersions(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1569,11 +1651,11 @@ class ProblemController extends Controller {
     public static function apiSelectVersion(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
-        Validators::isStringNonEmpty($r['commit'], 'commit');
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['commit'], 'commit');
         // ProblemController::UPDATE_PUBLISHED_NONE is not allowed here because
         // it would not make any sense!
-        Validators::isInEnum(
+        Validators::validateInEnum(
             $r['update_published'],
             'update_published',
             [
@@ -1698,8 +1780,8 @@ class ProblemController extends Controller {
     public static function apiRunsDiff(Request $r) : array {
         self::authenticateRequest($r);
 
-        Validators::isValidAlias($r['problem_alias'], 'problem_alias');
-        Validators::isStringNonEmpty($r['version'], 'version');
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['version'], 'version');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1778,7 +1860,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateRuns(Request $r) {
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Is the problem valid?
         try {
@@ -2015,7 +2097,7 @@ class ProblemController extends Controller {
         }
 
         // Save the last id we saw in case we saw something
-        if (!is_null($runs) && count($runs) > 0) {
+        if (!empty($runs)) {
             $casesStats['last_submission_id'] = $runs[count($runs) - 1]->submission_id;
         }
 
@@ -2037,8 +2119,8 @@ class ProblemController extends Controller {
      * @param Request $r
      */
     private static function validateList(Request $r) {
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumber($r['rowcount'], 'rowcount', false);
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
 
         // Defaults for offset and rowcount
         if (!isset($r['page'])) {
@@ -2050,7 +2132,7 @@ class ProblemController extends Controller {
             }
         }
 
-        Validators::isStringNonEmpty($r['query'], 'query', false);
+        Validators::validateStringNonEmpty($r['query'], 'query', false);
     }
 
     /**
@@ -2166,8 +2248,8 @@ class ProblemController extends Controller {
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -2215,8 +2297,8 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateList($r);
 
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);

@@ -50,30 +50,30 @@ abstract class ContestsDAOBase {
     final public static function update(Contests $Contests) {
         $sql = 'UPDATE `Contests` SET `problemset_id` = ?, `acl_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `last_updated` = ?, `window_length` = ?, `rerun_id` = ?, `admission_mode` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `urgent` = ?, `languages` = ?, `recommended` = ? WHERE `contest_id` = ?;';
         $params = [
-            $Contests->problemset_id,
-            $Contests->acl_id,
+            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
+            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
             $Contests->start_time,
             $Contests->finish_time,
             $Contests->last_updated,
-            $Contests->window_length,
-            $Contests->rerun_id,
+            is_null($Contests->window_length) ? null : (int)$Contests->window_length,
+            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
             $Contests->admission_mode,
             $Contests->alias,
-            $Contests->scoreboard,
-            $Contests->points_decay_factor,
-            $Contests->partial_score,
-            $Contests->submissions_gap,
+            is_null($Contests->scoreboard) ? null : (int)$Contests->scoreboard,
+            is_null($Contests->points_decay_factor) ? null : (float)$Contests->points_decay_factor,
+            is_null($Contests->partial_score) ? null : (int)$Contests->partial_score,
+            is_null($Contests->submissions_gap) ? null : (int)$Contests->submissions_gap,
             $Contests->feedback,
-            $Contests->penalty,
+            is_null($Contests->penalty) ? null : (int)$Contests->penalty,
             $Contests->penalty_type,
             $Contests->penalty_calc_policy,
-            $Contests->show_scoreboard_after,
-            $Contests->urgent,
+            is_null($Contests->show_scoreboard_after) ? null : (int)$Contests->show_scoreboard_after,
+            is_null($Contests->urgent) ? null : (int)$Contests->urgent,
             $Contests->languages,
-            $Contests->recommended,
-            $Contests->contest_id,
+            is_null($Contests->recommended) ? null : (int)$Contests->recommended,
+            is_null($Contests->contest_id) ? null : (int)$Contests->contest_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -96,11 +96,11 @@ abstract class ContestsDAOBase {
         $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` FROM Contests WHERE (contest_id = ?) LIMIT 1;';
         $params = [$contest_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Contests($rs);
+        return new Contests($row);
     }
 
     /**
@@ -151,14 +151,13 @@ abstract class ContestsDAOBase {
         $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` from Contests';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Contests($row);
         }
         return $allData;
@@ -188,54 +187,54 @@ abstract class ContestsDAOBase {
             $Contests->admission_mode = 'private';
         }
         if (is_null($Contests->scoreboard)) {
-            $Contests->scoreboard = '1';
+            $Contests->scoreboard = 1;
         }
         if (is_null($Contests->points_decay_factor)) {
-            $Contests->points_decay_factor = '0';
+            $Contests->points_decay_factor = (float)0;
         }
         if (is_null($Contests->partial_score)) {
-            $Contests->partial_score = '1';
+            $Contests->partial_score = true;
         }
         if (is_null($Contests->submissions_gap)) {
-            $Contests->submissions_gap = '60';
+            $Contests->submissions_gap = 60;
         }
         if (is_null($Contests->penalty)) {
-            $Contests->penalty = '1';
+            $Contests->penalty = 1;
         }
         if (is_null($Contests->show_scoreboard_after)) {
-            $Contests->show_scoreboard_after = '1';
+            $Contests->show_scoreboard_after = true;
         }
         if (is_null($Contests->urgent)) {
-            $Contests->urgent = '0';
+            $Contests->urgent = false;
         }
         if (is_null($Contests->recommended)) {
-            $Contests->recommended = '0';
+            $Contests->recommended = false;
         }
         $sql = 'INSERT INTO Contests (`problemset_id`, `acl_id`, `title`, `description`, `start_time`, `finish_time`, `last_updated`, `window_length`, `rerun_id`, `admission_mode`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `urgent`, `languages`, `recommended`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Contests->problemset_id,
-            $Contests->acl_id,
+            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
+            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
             $Contests->start_time,
             $Contests->finish_time,
             $Contests->last_updated,
-            $Contests->window_length,
-            $Contests->rerun_id,
+            is_null($Contests->window_length) ? null : (int)$Contests->window_length,
+            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
             $Contests->admission_mode,
             $Contests->alias,
-            $Contests->scoreboard,
-            $Contests->points_decay_factor,
-            $Contests->partial_score,
-            $Contests->submissions_gap,
+            is_null($Contests->scoreboard) ? null : (int)$Contests->scoreboard,
+            is_null($Contests->points_decay_factor) ? null : (float)$Contests->points_decay_factor,
+            is_null($Contests->partial_score) ? null : (int)$Contests->partial_score,
+            is_null($Contests->submissions_gap) ? null : (int)$Contests->submissions_gap,
             $Contests->feedback,
-            $Contests->penalty,
+            is_null($Contests->penalty) ? null : (int)$Contests->penalty,
             $Contests->penalty_type,
             $Contests->penalty_calc_policy,
-            $Contests->show_scoreboard_after,
-            $Contests->urgent,
+            is_null($Contests->show_scoreboard_after) ? null : (int)$Contests->show_scoreboard_after,
+            is_null($Contests->urgent) ? null : (int)$Contests->urgent,
             $Contests->languages,
-            $Contests->recommended,
+            is_null($Contests->recommended) ? null : (int)$Contests->recommended,
         ];
         global $conn;
         $conn->Execute($sql, $params);

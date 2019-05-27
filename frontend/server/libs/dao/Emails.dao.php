@@ -27,7 +27,7 @@ class EmailsDAO extends EmailsDAOBase {
                     user_id = ?';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$user_id]);
+        $rs = $conn->GetAll($sql, [$user_id]);
 
         $emails = [];
         foreach ($rs as $row) {

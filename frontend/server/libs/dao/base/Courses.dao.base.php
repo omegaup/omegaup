@@ -53,16 +53,16 @@ abstract class CoursesDAOBase {
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            $Courses->group_id,
-            $Courses->acl_id,
+            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
+            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
             $Courses->start_time,
             $Courses->finish_time,
-            $Courses->public,
-            $Courses->school_id,
-            $Courses->needs_basic_information,
+            is_null($Courses->public) ? null : (int)$Courses->public,
+            is_null($Courses->school_id) ? null : (int)$Courses->school_id,
+            is_null($Courses->needs_basic_information) ? null : (int)$Courses->needs_basic_information,
             $Courses->requests_user_information,
-            $Courses->show_scoreboard,
-            $Courses->course_id,
+            is_null($Courses->show_scoreboard) ? null : (int)$Courses->show_scoreboard,
+            is_null($Courses->course_id) ? null : (int)$Courses->course_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -85,11 +85,11 @@ abstract class CoursesDAOBase {
         $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` FROM Courses WHERE (course_id = ?) LIMIT 1;';
         $params = [$course_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Courses($rs);
+        return new Courses($row);
     }
 
     /**
@@ -140,14 +140,13 @@ abstract class CoursesDAOBase {
         $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` from Courses';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Courses($row);
         }
         return $allData;
@@ -171,31 +170,31 @@ abstract class CoursesDAOBase {
             $Courses->finish_time = '2000-01-01 06:00:00';
         }
         if (is_null($Courses->public)) {
-            $Courses->public = '0';
+            $Courses->public = false;
         }
         if (is_null($Courses->needs_basic_information)) {
-            $Courses->needs_basic_information = '0';
+            $Courses->needs_basic_information = false;
         }
         if (is_null($Courses->requests_user_information)) {
             $Courses->requests_user_information = 'no';
         }
         if (is_null($Courses->show_scoreboard)) {
-            $Courses->show_scoreboard = '0';
+            $Courses->show_scoreboard = false;
         }
         $sql = 'INSERT INTO Courses (`name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`, `requests_user_information`, `show_scoreboard`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            $Courses->group_id,
-            $Courses->acl_id,
+            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
+            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
             $Courses->start_time,
             $Courses->finish_time,
-            $Courses->public,
-            $Courses->school_id,
-            $Courses->needs_basic_information,
+            is_null($Courses->public) ? null : (int)$Courses->public,
+            is_null($Courses->school_id) ? null : (int)$Courses->school_id,
+            is_null($Courses->needs_basic_information) ? null : (int)$Courses->needs_basic_information,
             $Courses->requests_user_information,
-            $Courses->show_scoreboard,
+            is_null($Courses->show_scoreboard) ? null : (int)$Courses->show_scoreboard,
         ];
         global $conn;
         $conn->Execute($sql, $params);

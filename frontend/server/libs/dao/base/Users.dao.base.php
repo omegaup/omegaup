@@ -53,26 +53,26 @@ abstract class UsersDAOBase {
             $Users->username,
             $Users->facebook_user_id,
             $Users->password,
-            $Users->main_email_id,
-            $Users->main_identity_id,
+            is_null($Users->main_email_id) ? null : (int)$Users->main_email_id,
+            is_null($Users->main_identity_id) ? null : (int)$Users->main_identity_id,
             $Users->name,
             $Users->country_id,
             $Users->state_id,
-            $Users->school_id,
+            is_null($Users->school_id) ? null : (int)$Users->school_id,
             $Users->scholar_degree,
-            $Users->language_id,
+            is_null($Users->language_id) ? null : (int)$Users->language_id,
             $Users->graduation_date,
             $Users->birth_date,
             $Users->gender,
-            $Users->verified,
+            is_null($Users->verified) ? null : (int)$Users->verified,
             $Users->verification_id,
             $Users->reset_digest,
             $Users->reset_sent_at,
-            $Users->hide_problem_tags,
-            $Users->in_mailing_list,
-            $Users->is_private,
+            is_null($Users->hide_problem_tags) ? null : (int)$Users->hide_problem_tags,
+            is_null($Users->in_mailing_list) ? null : (int)$Users->in_mailing_list,
+            is_null($Users->is_private) ? null : (int)$Users->is_private,
             $Users->preferred_language,
-            $Users->user_id,
+            is_null($Users->user_id) ? null : (int)$Users->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -95,11 +95,11 @@ abstract class UsersDAOBase {
         $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`name`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`gender`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` FROM Users WHERE (user_id = ?) LIMIT 1;';
         $params = [$user_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Users($rs);
+        return new Users($row);
     }
 
     /**
@@ -150,14 +150,13 @@ abstract class UsersDAOBase {
         $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`name`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`school_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`gender`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` from Users';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Users($row);
         }
         return $allData;
@@ -175,37 +174,37 @@ abstract class UsersDAOBase {
      */
     final public static function create(Users $Users) {
         if (is_null($Users->verified)) {
-            $Users->verified = '0';
+            $Users->verified = false;
         }
         if (is_null($Users->in_mailing_list)) {
-            $Users->in_mailing_list = '0';
+            $Users->in_mailing_list = false;
         }
         if (is_null($Users->is_private)) {
-            $Users->is_private = '0';
+            $Users->is_private = false;
         }
         $sql = 'INSERT INTO Users (`username`, `facebook_user_id`, `password`, `main_email_id`, `main_identity_id`, `name`, `country_id`, `state_id`, `school_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `gender`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `hide_problem_tags`, `in_mailing_list`, `is_private`, `preferred_language`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Users->username,
             $Users->facebook_user_id,
             $Users->password,
-            $Users->main_email_id,
-            $Users->main_identity_id,
+            is_null($Users->main_email_id) ? null : (int)$Users->main_email_id,
+            is_null($Users->main_identity_id) ? null : (int)$Users->main_identity_id,
             $Users->name,
             $Users->country_id,
             $Users->state_id,
-            $Users->school_id,
+            is_null($Users->school_id) ? null : (int)$Users->school_id,
             $Users->scholar_degree,
-            $Users->language_id,
+            is_null($Users->language_id) ? null : (int)$Users->language_id,
             $Users->graduation_date,
             $Users->birth_date,
             $Users->gender,
-            $Users->verified,
+            is_null($Users->verified) ? null : (int)$Users->verified,
             $Users->verification_id,
             $Users->reset_digest,
             $Users->reset_sent_at,
-            $Users->hide_problem_tags,
-            $Users->in_mailing_list,
-            $Users->is_private,
+            is_null($Users->hide_problem_tags) ? null : (int)$Users->hide_problem_tags,
+            is_null($Users->in_mailing_list) ? null : (int)$Users->in_mailing_list,
+            is_null($Users->is_private) ? null : (int)$Users->is_private,
             $Users->preferred_language,
         ];
         global $conn;

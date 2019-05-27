@@ -76,7 +76,7 @@ class Controller {
         $user = $r['current_user'];
 
         if (!is_null($r['username'])) {
-            Validators::isStringNonEmpty($r['username'], 'username');
+            Validators::validateStringNonEmpty($r['username'], 'username');
 
             try {
                 $user = UsersDAO::FindByUsername($r['username']);
@@ -113,7 +113,7 @@ class Controller {
         if (is_null($r['username'])) {
             return $identity;
         }
-        Validators::isStringNonEmpty($r['username'], 'username');
+        Validators::validateStringNonEmpty($r['username'], 'username');
 
         try {
             $identity = IdentitiesDAO::FindByUsername($r['username']);

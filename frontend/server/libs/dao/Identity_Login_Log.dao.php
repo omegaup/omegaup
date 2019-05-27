@@ -19,7 +19,7 @@ class IdentityLoginLogDAO extends IdentityLoginLogDAOBase {
                     identity_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$identityId]);
+        $rs = $conn->GetAll($sql, [$identityId]);
 
         $identityLoginLogs = [];
         foreach ($rs as $row) {

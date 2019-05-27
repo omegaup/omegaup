@@ -50,16 +50,16 @@ abstract class SubmissionsDAOBase {
     final public static function update(Submissions $Submissions) {
         $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
         $params = [
-            $Submissions->current_run_id,
-            $Submissions->identity_id,
-            $Submissions->problem_id,
-            $Submissions->problemset_id,
+            is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
+            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
+            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
+            is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
             $Submissions->time,
-            $Submissions->submit_delay,
+            is_null($Submissions->submit_delay) ? null : (int)$Submissions->submit_delay,
             $Submissions->type,
-            $Submissions->submission_id,
+            is_null($Submissions->submission_id) ? null : (int)$Submissions->submission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -82,11 +82,11 @@ abstract class SubmissionsDAOBase {
         $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
         $params = [$submission_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Submissions($rs);
+        return new Submissions($row);
     }
 
     /**
@@ -137,14 +137,13 @@ abstract class SubmissionsDAOBase {
         $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` from Submissions';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Submissions($row);
         }
         return $allData;
@@ -165,21 +164,21 @@ abstract class SubmissionsDAOBase {
             $Submissions->time = gmdate('Y-m-d H:i:s');
         }
         if (is_null($Submissions->submit_delay)) {
-            $Submissions->submit_delay = '0';
+            $Submissions->submit_delay = 0;
         }
         if (is_null($Submissions->type)) {
             $Submissions->type = 'normal';
         }
         $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            $Submissions->current_run_id,
-            $Submissions->identity_id,
-            $Submissions->problem_id,
-            $Submissions->problemset_id,
+            is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
+            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
+            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
+            is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
             $Submissions->time,
-            $Submissions->submit_delay,
+            is_null($Submissions->submit_delay) ? null : (int)$Submissions->submit_delay,
             $Submissions->type,
         ];
         global $conn;

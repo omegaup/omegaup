@@ -50,12 +50,12 @@ abstract class QualityNominationCommentsDAOBase {
     final public static function update(QualityNominationComments $QualityNomination_Comments) {
         $sql = 'UPDATE `QualityNomination_Comments` SET `qualitynomination_id` = ?, `user_id` = ?, `time` = ?, `vote` = ?, `contents` = ? WHERE `qualitynomination_comment_id` = ?;';
         $params = [
-            $QualityNomination_Comments->qualitynomination_id,
-            $QualityNomination_Comments->user_id,
+            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
+            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
             $QualityNomination_Comments->time,
-            $QualityNomination_Comments->vote,
+            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
-            $QualityNomination_Comments->qualitynomination_comment_id,
+            is_null($QualityNomination_Comments->qualitynomination_comment_id) ? null : (int)$QualityNomination_Comments->qualitynomination_comment_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class QualityNominationCommentsDAOBase {
         $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` FROM QualityNomination_Comments WHERE (qualitynomination_comment_id = ?) LIMIT 1;';
         $params = [$qualitynomination_comment_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new QualityNominationComments($rs);
+        return new QualityNominationComments($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class QualityNominationCommentsDAOBase {
         $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` from QualityNomination_Comments';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new QualityNominationComments($row);
         }
         return $allData;
@@ -162,10 +161,10 @@ abstract class QualityNominationCommentsDAOBase {
         }
         $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $QualityNomination_Comments->qualitynomination_id,
-            $QualityNomination_Comments->user_id,
+            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
+            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
             $QualityNomination_Comments->time,
-            $QualityNomination_Comments->vote,
+            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
         ];
         global $conn;

@@ -139,37 +139,43 @@ class AddProblemToContestTest extends OmegaupTestCase {
      * Add too many problems to a contest.
      */
     public function testAddTooManyProblemsToContest() {
-        // Get a contest
         $contestData = ContestsFactory::createContest();
         $login = self::login($contestData['director']);
 
-        for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST + 1; $i++) {
-            // Get a problem
-            $problemData = ProblemsFactory::createProblemWithAuthor($contestData['director'], $login);
+        for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST; $i++) {
+            $problemData = ProblemsFactory::createProblemWithAuthor(
+                $contestData['director'],
+                $login
+            );
 
-            // Build request
             $r = new Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'points' => 100,
-                'order_in_contest' => $i + 1
+                'order_in_contest' => $i + 1,
             ]);
+            $response = ContestController::apiAddProblem($r);
+            $this->assertEquals('ok', $response['status']);
+            self::assertProblemAddedToContest($problemData, $contestData, $r);
+        }
 
-            try {
-                // Call API
-                $response = ContestController::apiAddProblem($r);
-
-                $this->assertLessThan(MAX_PROBLEMS_IN_CONTEST, $i);
-
-                // Validate
-                $this->assertEquals('ok', $response['status']);
-
-                self::assertProblemAddedToContest($problemData, $contestData, $r);
-            } catch (ApiException $e) {
-                $this->assertEquals($e->getMessage(), 'contestAddproblemTooManyProblems');
-                $this->assertEquals($i, MAX_PROBLEMS_IN_CONTEST);
-            }
+        // Try to insert one more problem than is allowed, and it should fail this time.
+        $problemData = ProblemsFactory::createProblemWithAuthor(
+            $contestData['director'],
+            $login
+        );
+        try {
+            $response = ContestController::apiAddProblem(new Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['contest']->alias,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'points' => 100,
+                'order_in_contest' => MAX_PROBLEMS_IN_CONTEST + 1,
+            ]));
+            $this->fail('Should have failed adding the problem to the contest');
+        } catch (ApiException $e) {
+            $this->assertEquals($e->getMessage(), 'contestAddproblemTooManyProblems');
         }
     }
 

@@ -34,11 +34,11 @@ abstract class QualityNominationReviewersDAOBase {
         $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` FROM QualityNomination_Reviewers WHERE (qualitynomination_id = ? AND user_id = ?) LIMIT 1;';
         $params = [$qualitynomination_id, $user_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new QualityNominationReviewers($rs);
+        return new QualityNominationReviewers($row);
     }
 
     /**
@@ -89,14 +89,13 @@ abstract class QualityNominationReviewersDAOBase {
         $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` from QualityNomination_Reviewers';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new QualityNominationReviewers($row);
         }
         return $allData;
@@ -115,8 +114,8 @@ abstract class QualityNominationReviewersDAOBase {
     final public static function create(QualityNominationReviewers $QualityNomination_Reviewers) {
         $sql = 'INSERT INTO QualityNomination_Reviewers (`qualitynomination_id`, `user_id`) VALUES (?, ?);';
         $params = [
-            $QualityNomination_Reviewers->qualitynomination_id,
-            $QualityNomination_Reviewers->user_id,
+            is_null($QualityNomination_Reviewers->qualitynomination_id) ? null : (int)$QualityNomination_Reviewers->qualitynomination_id,
+            is_null($QualityNomination_Reviewers->user_id) ? null : (int)$QualityNomination_Reviewers->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
