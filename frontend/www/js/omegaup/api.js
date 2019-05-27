@@ -368,6 +368,8 @@ export default {
   },
 
   Identity: {
+    changePassword: _call('/api/identity/changePassword/'),
+
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
