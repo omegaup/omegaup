@@ -230,7 +230,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $date = new DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
-        $firstDayOfCurrentMonth = $date->modify('first day of next month');
+        $firstDayOfCurrentMonth = $date->modify('first day of this month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
         return self::calculateCoderOfTheMonth($startTime, $endTime);
     }

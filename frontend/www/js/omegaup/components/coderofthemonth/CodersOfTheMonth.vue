@@ -22,7 +22,9 @@
             <td>{{coder.ProblemsSolved}}</td>
             <td>{{coder.score}}</td>
             <td><button class="btn btn-primary"
-                    v-if="canChooseCoder">{{T.coderOfTheMonthChooseAsCoder}}</button></td>
+                    v-if="canChooseCoder &amp;&amp; !coderIsSelected"
+                    v-on:click=
+                    "onSelectCoder(coder.username)">{{T.coderOfTheMonthChooseAsCoder}}</button></td>
           </tr>
         </tbody>
       </table>
@@ -35,11 +37,16 @@ import {T} from '../../omegaup.js';
 import user_Username from '../user/Username.vue';
 import country_Flag from '../CountryFlag.vue';
 export default {
-  props: {coders: Array, canChooseCoder: Boolean},
+  props: {coders: Array, canChooseCoder: Boolean, coderIsSelected: Boolean},
   data: function() {
     return {
       T: T,
     };
+  },
+  methods: {
+    onSelectCoder: function(coderUsername) {
+      this.$emit('select-coder', coderUsername);
+    },
   },
   components: {
     'omegaup-countryflag': country_Flag,

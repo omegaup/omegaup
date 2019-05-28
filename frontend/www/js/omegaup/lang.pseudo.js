@@ -61,6 +61,7 @@ const translations = {
 	coderOfTheMonthFullList: "(S33 fu11 1i57)",
 	coderOfTheMonthIsNotInPeriodToBeChosen: "(C0d3r 0f 7h3 m0n7h i5 n07 in 7h3 p3ri0d 70 b3 ch053n)",
 	coderOfTheMonthNotice: "(Hi %(username)! C0ngra7u1a7i0n5 0n winning 7h3 C0d3r 0f 7h3 M0n7h! W3 hav3 a priz3 f0r y0u, p13a53 c0n7ac7 u5 a7 m3n70r35@0m3gaup.0rg)",
+	coderOfTheMonthSelectedSuccessfully: "(C0d3r 0f 7h3 m0n7h ha5 b33n 5313c73d 5ucc355fu11y!)",
 	codersOfTheMonth: "(C0d3r5 0f 7h3 M0n7h)",
 	codersOfTheMonthCountry: "(C0un7ry)",
 	codersOfTheMonthDate: "(Da73)",

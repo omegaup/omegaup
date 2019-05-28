@@ -11,12 +11,26 @@ OmegaUp.on('ready', function() {
         props: {
           coders: this.bestCoders,
           canChooseCoder: this.canChooseCoder,
+          coderIsSelected: this.coderIsSelected,
         },
+        on: {
+          'select-coder': function(coderUsername) {
+            API.User.selectCoderOfTheMonth({
+                      username: coderUsername,
+                    })
+                .then(function(data) {
+                  UI.success(T.coderOfTheMonthSelectedSuccessfully);
+                  codersOfTheMonth.coderIsSelected = true;
+                })
+                .fail(UI.apiError);
+          }
+        }
       });
     },
     data: {
       bestCoders: payload.bestCoders,
       canChooseCoder: payload.canChooseCoder,
+      coderIsSelected: payload.coderIsSelected,
     },
     components: {'coders-of-the-month': coders_of_the_month}
   });

@@ -16,8 +16,9 @@ try {
     $smarty->assign('payload', [
         'bestCoders' => CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect),
         'canChooseCoder' => Authorization::canChooseCoder($currentTimeStamp),
+        'coderIsSelected' => !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
     ]);
-    $smarty->display('../templates/mentor.codersofthemonth.tpl');
+    $smarty->display('../../templates/mentor.codersofthemonth.tpl');
 } catch (APIException $e) {
     header('HTTP/1.1 404 Not Found');
     die();

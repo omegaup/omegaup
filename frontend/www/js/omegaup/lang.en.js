@@ -61,6 +61,7 @@ const translations = {
 	coderOfTheMonthFullList: "See full list",
 	coderOfTheMonthIsNotInPeriodToBeChosen: "Coder of the month is not in the period to be chosen",
 	coderOfTheMonthNotice: "Hi %(username)! Congratulations on winning the Coder of the Month! We have a prize for you, please contact us at mentores@omegaup.org",
+	coderOfTheMonthSelectedSuccessfully: "Coder of the month has been selected successfully!",
 	codersOfTheMonth: "Coders of the Month",
 	codersOfTheMonthCountry: "Country",
 	codersOfTheMonthDate: "Date",
