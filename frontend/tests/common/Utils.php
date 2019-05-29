@@ -51,7 +51,7 @@ class Utils {
         $sql = 'SELECT NOW() n';
         $rs = $conn->GetRow($sql);
 
-        if (count($rs) === 0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -66,7 +66,7 @@ class Utils {
         $params = [$time];
         $rs = $conn->GetRow($sql, $params);
 
-        if (count($rs) === 0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -80,6 +80,7 @@ class Utils {
 
     public static function CleanLog() {
         file_put_contents(OMEGAUP_LOG_FILE, '');
+        file_put_contents(__DIR__ . '/../controllers/gitserver.log', '');
     }
 
     public static function CleanPath($path) {
@@ -120,10 +121,12 @@ class Utils {
             'Problemset_Identities',
             'Problemsets',
             'QualityNomination_Comments',
+            'QualityNomination_Log',
             'QualityNomination_Reviewers',
             'QualityNominations',
             'Runs',
             'Schools',
+            'Submissions',
             'Submission_Log',
             'Tags',
             'User_Roles',
@@ -154,5 +157,23 @@ class Utils {
             // Enabling them again
             $conn->Execute('SET foreign_key_checks = 1;');
         }
+    }
+
+    public static function Commit() {
+        global $conn;
+        $conn->Execute('COMMIT');
+    }
+
+    public static function RunCronjobScript() {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
     }
 }

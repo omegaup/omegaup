@@ -42,3 +42,12 @@
 [submodule "okfn/csv.js"]
 	path = frontend/www/third_party/js/csv.js
 	url = https://github.com/okfn/csv.js/
+[submodule "paragonie/paseto"]
+	path = frontend/server/libs/third_party/paseto
+	url = https://github.com/paragonie/paseto.git
+[submodule "paragonie/constant_time_encoding"]
+	path = frontend/server/libs/third_party/constant_time_encoding
+	url = https://github.com/paragonie/constant_time_encoding.git
+[submodule "paragonie/sodium_compat"]
+	path = frontend/server/libs/third_party/sodium_compat
+	url = https://github.com/paragonie/sodium_compat.git

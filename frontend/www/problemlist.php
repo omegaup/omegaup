@@ -15,7 +15,19 @@ function getTagList() {
     return array_unique($tags);
 }
 
-require_once('../server/bootstrap.php');
+function getDifficultyRange() {
+    if (empty($_GET['min_difficulty']) || empty($_GET['max_difficulty'])) {
+        return null;
+    }
+    $minDifficulty = intval($_GET['min_difficulty']);
+    $maxDifficulty = intval($_GET['max_difficulty']);
+    if ($minDifficulty > $maxDifficulty || $minDifficulty < 0 || $minDifficulty > 4 || $maxDifficulty < 0 || $maxDifficulty > 4) {
+        return null;
+    }
+    return [$minDifficulty, $maxDifficulty];
+}
+
+require_once('../server/bootstrap_smarty.php');
 $r = new Request();
 $mode = isset($_GET['mode']) ? $_GET['mode'] : 'asc';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
@@ -28,6 +40,9 @@ $r['language'] = $language;
 $r['order_by'] = $order_by;
 $r['mode'] = $mode;
 $r['tag'] = $tags;
+$r['require_all_tags'] = isset($_GET['some_tags']) ? false : null;
+$r['programming_languages'] = isset($_GET['only_karel']) ? ['kp', 'kj'] : null;
+$r['difficulty_range'] = getDifficultyRange();
 
 $keyword = '';
 if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {

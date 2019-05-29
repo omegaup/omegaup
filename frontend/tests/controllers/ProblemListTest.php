@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Description of ProblemList
  *
@@ -113,6 +112,127 @@ class ProblemList extends OmegaupTestCase {
             // But only problems $j or later have tags 0 through $j.
             $this->assertCount($n - $j, $response['results']);
         }
+    }
+
+    /**
+     * Test getting a list of problems using Problem Finder's filters:
+     * - tags
+     * - karel vs language
+     * - difficulty range
+     * - Sort by: quality vs points vs submissions
+     */
+    public function testProblemFinderSearch() {
+        // Create 5 problems
+        // - Even problems could be solved using Karel, odd ones don't
+        // - Each one will have i tags, where i equals the number of the problem
+        $n = 5;
+        $karel_problem = 'kj,kp,cpp,c'; // Karel problems should allow kj AND kp extensions
+        for ($i = 0; $i < $n; $i++) {
+            $problemData[$i] = ProblemsFactory::createProblem(new ProblemParams([
+                'visibility' => ProblemController::VISIBILITY_PROMOTED,
+                'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp,c',
+            ]));
+            for ($j = 0; $j <= $i; $j++) {
+                ProblemsFactory::addTag($problemData[$i], "test-tag-$j", 1 /* public */);
+            }
+        }
+
+        // 5 users are going to be created, each i user will solve i problems
+        // and all users are going to send their feedback to the first problem
+        for ($i = 0; $i < 5; $i++) {
+            $users[$i] = UserFactory::createUser();
+            for ($j = 0; $j <= $i; $j++) {
+                $runData = RunsFactory::createRunToProblem($problemData[$j], $users[$i]);
+                RunsFactory::gradeRun($runData);
+            }
+            $login[] = self::login($users[$i]);
+        }
+
+        QualityNominationFactory::createSuggestion(
+            $login[0],
+            $problemData[0]['request']['problem_alias'],
+            4, // difficulty
+            3, // quality
+            []
+        );
+
+        QualityNominationFactory::createSuggestion(
+            $login[1],
+            $problemData[0]['request']['problem_alias'],
+            4, // difficulty
+            4, // quality
+            []
+        );
+
+        QualityNominationFactory::createSuggestion(
+            $login[2],
+            $problemData[0]['request']['problem_alias'],
+            4, // difficulty
+            2, // quality
+            []
+        );
+
+        QualityNominationFactory::createSuggestion(
+            $login[3],
+            $problemData[0]['request']['problem_alias'],
+            4, // difficulty
+            4, // quality
+            []
+        );
+
+        QualityNominationFactory::createSuggestion(
+            $login[4],
+            $problemData[0]['request']['problem_alias'],
+            4, // difficulty
+            4, // quality
+            []
+        );
+
+        Utils::RunCronjobScript();
+
+        // Filter 1:
+        // - Containing tag-0
+        // - Only Karel problems
+        // - Difficulty between 0 and 3
+        // - Sorted by popularity
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login[0]->auth_token,
+            'tag' => 'test-tag-0',
+            'programming_languages' => ['kp', 'kj'],
+            'difficulty_range' => [0,2],
+            'order_by' => 'submissions',
+        ]));
+        $this->assertCount(2, $response['results']);
+        $this->assertEquals($problemData[2]['request']['problem_alias'], $response['results'][0]['alias']);
+        $this->assertEquals($problemData[4]['request']['problem_alias'], $response['results'][1]['alias']);
+
+        // Filter 2:
+        // - Containing tag-0 or/and tag-3
+        // - Difficulty between 0 and 4
+        // - Sorted by quality
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login[0]->auth_token,
+            'tag' => ['test-tag-0', 'test-tag-3'],
+            'require_all_tags' => false,
+            'difficulty_range' => [0,4],
+            'order_by' => 'quality',
+        ]));
+        $this->assertCount(5, $response['results']);
+        $this->assertEquals($problemData[0]['request']['problem_alias'], $response['results'][0]['alias']);
+
+        // Filter 3:
+        // - Containing tag-2 or/and tag-3
+        // - Only karel
+        // - Difficulty between 2 and 4
+        // - Sorted by quality
+        $response = ProblemController::apiList(new Request([
+            'auth_token' => $login[0]->auth_token,
+            'tag' => ['test-tag-2', 'test-tag-3'],
+            'require_all_tags' => false,
+            'difficulty_range' => [1,4],
+            'order_by' => 'quality',
+        ]));
+        $this->assertCount(0, $response['results']);
     }
 
     /**

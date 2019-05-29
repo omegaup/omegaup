@@ -1,5 +1,8 @@
 <?php
 
+require_once 'libs/Translations.php';
+require_once 'libs/UrlHelper.php';
+
 /**
  *  UserController
  *
@@ -37,15 +40,15 @@ class UserController extends Controller {
      */
     public static function apiCreate(Request $r) {
         // Validate request
-        Validators::isValidUsername($r['username'], 'username');
+        Validators::validateValidUsername($r['username'], 'username');
 
-        Validators::isEmail($r['email'], 'email');
+        Validators::validateEmail($r['email'], 'email');
 
         if (empty($r['scholar_degree'])) {
             $r['scholar_degree'] = 'none';
         }
 
-        Validators::isInEnum(
+        Validators::validateInEnum(
             $r['scholar_degree'],
             'scholar_degree',
             UserController::ALLOWED_SCHOLAR_DEGREES
@@ -68,6 +71,17 @@ class UserController extends Controller {
 
         if (!is_null($userByEmail)) {
             if (!is_null($userByEmail->password)) {
+                // Check if the same user had already tried to create this account.
+                if (!is_null($user) && $user->user_id == $userByEmail->user_id
+                    && SecurityTools::compareHashedStrings(
+                        $r['password'],
+                        $user->password
+                    )) {
+                    return [
+                        'status' => 'ok',
+                        'username' => $user->username,
+                    ];
+                }
                 throw new DuplicatedEntryInDatabaseException('mailInUse');
             }
 
@@ -80,7 +94,7 @@ class UserController extends Controller {
 
             return [
                 'status' => 'ok',
-                'user_id' => $user->user_id
+                'username' => $user->username,
             ];
         }
 
@@ -159,35 +173,31 @@ class UserController extends Controller {
         try {
             DAO::transBegin();
 
-            UsersDAO::save($user);
+            UsersDAO::create($user);
 
             $email->user_id = $user->user_id;
-            EmailsDAO::save($email);
+            EmailsDAO::create($email);
 
             $identity->user_id = $user->user_id;
-            IdentitiesDAO::save($identity);
+            IdentitiesDAO::create($identity);
 
             $user->main_email_id = $email->email_id;
             $user->main_identity_id = $identity->identity_id;
-            UsersDAO::save($user);
+            UsersDAO::update($user);
+
+            $r['user'] = $user;
+            if ($user->verified) {
+                self::$log->info('User ' . $user->username . ' created, trusting e-mail');
+            } else {
+                self::$log->info('User ' . $user->username . ' created, sending verification mail');
+
+                self::sendVerificationEmail($user);
+            }
 
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (!is_null($r['skip_verification_email']) && ($r['skip_verification_email'] == 1)) {
-            UserController::$sendEmailOnVerify = false;
-        }
-
-        $r['user'] = $user;
-        if (!$user->verified) {
-            self::$log->info('User ' . $user->username . ' created, sending verification mail');
-
-            self::sendVerificationEmail($r);
-        } else {
-            self::$log->info('User ' . $user->username . ' created, trusting e-mail');
         }
 
         return [
@@ -258,40 +268,20 @@ class UserController extends Controller {
      * @param password
      *
      * */
-    public function TestPassword(Request $r) {
-        $vo_UserToTest = null;
-
-        //find this user
-        if (!is_null($r['user_id'])) {
-            $vo_UserToTest = UsersDAO::getByPK($r['user_id']);
-        } elseif (!is_null($r['email'])) {
-            $vo_UserToTest = $this->FindByEmail();
-        } elseif (!is_null($r['username'])) {
-            $vo_UserToTest = $this->FindByUserName();
-        } elseif (!is_null($r['identity_id'])) {
-            $vo_UserToTest = IdentitiesDAO::getByPK($r['identity_id']);
-        } else {
-            throw new ApiException('mustProvideUserIdEmailOrUsername');
+    public static function testPassword(Identities $identity, string $password) {
+        if (is_null($identity->password)) {
+            // The user had logged in through a third-party account.
+            throw new LoginDisabledException('loginThroughThirdParty');
         }
 
-        if (is_null($vo_UserToTest)) {
-            //user does not even exist
-            return false;
+        if (strlen($identity->password) === 0) {
+            throw new LoginDisabledException('loginDisabled');
         }
 
-        if (strlen($vo_UserToTest->password) === 0) {
-            throw new LoginDisabledException();
-        }
-
-        $newPasswordCheck = SecurityTools::compareHashedStrings(
-            $r['password'],
-            $vo_UserToTest->password
+        return SecurityTools::compareHashedStrings(
+            $password,
+            $identity->password
         );
-
-        // We are OK
-        if ($newPasswordCheck === true) {
-            return true;
-        }
     }
 
     /**
@@ -301,26 +291,27 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws EmailVerificationSendException
      */
-    private static function sendVerificationEmail(Request $r) {
+    private static function sendVerificationEmail(Users $user) {
         try {
-            $email = EmailsDAO::getByPK($r['user']->main_email_id);
+            $email = EmailsDAO::getByPK($user->main_email_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        global $smarty;
-        $subject = $smarty->getConfigVars('verificationEmailSubject');
+        if (!self::$sendEmailOnVerify) {
+            self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
+            return;
+        }
+
+        $subject = Translations::getInstance()->get('verificationEmailSubject');
         $body = sprintf(
-            $smarty->getConfigVars('verificationEmailBody'),
+            Translations::getInstance()->get('verificationEmailBody'),
             OMEGAUP_URL,
-            $r['user']->verification_id
+            $user->verification_id
         );
 
-        if (self::$sendEmailOnVerify) {
-            Email::sendEmail($email->email, $subject, $body);
-        } else {
-            self::$log->info('Not sending email beacause sendEmailOnVerify = FALSE');
-        }
+        include_once 'libs/Email.php';
+        Email::sendEmail($email->email, $subject, $body);
     }
 
     /**
@@ -329,30 +320,30 @@ class UserController extends Controller {
      * @param Request $r
      * @throws EmailNotVerifiedException
      */
-    public static function checkEmailVerification(Request $r) {
-        if (OMEGAUP_FORCE_EMAIL_VERIFICATION) {
-            // Check if he has been verified
-            if ($r['user']->verified == '0') {
-                self::$log->info('User not verified.');
-
-                if ($r['user']->verification_id == null) {
-                    self::$log->info('User does not have verification id. Generating.');
-
-                    try {
-                        $r['user']->verification_id = SecurityTools::randomString(50);
-                        UsersDAO::save($r['user']);
-                    } catch (Exception $e) {
-                        // best effort, eat exception
-                    }
-
-                    self::sendVerificationEmail($r);
-                }
-
-                throw new EmailNotVerifiedException();
-            } else {
-                self::$log->info('User already verified.');
-            }
+    public static function checkEmailVerification(Users $user) {
+        if ($user->verified != '0') {
+            // Already verified, nothing to do.
+            return;
         }
+        if (!OMEGAUP_FORCE_EMAIL_VERIFICATION) {
+            return;
+        }
+        self::$log->info("User {$user->username} not verified.");
+
+        if (is_null($user->verification_id)) {
+            self::$log->info('User does not have verification id. Generating.');
+
+            try {
+                $user->verification_id = SecurityTools::randomString(50);
+                UsersDAO::save($user);
+            } catch (Exception $e) {
+                self::$log->info("Unable to save verification ID: $e");
+            }
+
+            self::sendVerificationEmail($user);
+        }
+
+        throw new EmailNotVerifiedException();
     }
 
     /**
@@ -365,23 +356,17 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiLogin(Request $r) {
-        // Create a SessionController to perform login
         $sessionController = new SessionController();
 
-        // Require the auth_token back
         $r['returnAuthToken'] = true;
-
-        // Get auth_token
         $auth_token = $sessionController->NativeLogin($r);
-
-        // If user was correctly logged in
-        if ($auth_token !== false) {
-            return [
-                'status' => 'ok',
-                'auth_token' => $auth_token];
-        } else {
+        if ($auth_token === false) {
             throw new InvalidCredentialsException();
         }
+        return [
+            'status' => 'ok',
+            'auth_token' => $auth_token,
+        ];
     }
 
     /**
@@ -405,7 +390,7 @@ class UserController extends Controller {
             if (is_null(self::$permissionKey) || self::$permissionKey != $r['permission_key']) {
                 throw new ForbiddenAccessException();
             }
-            Validators::isStringNonEmpty($r['username'], 'username');
+            Validators::validateStringNonEmpty($r['username'], 'username');
 
             try {
                 $user = UsersDAO::FindByUsername($r['username']);
@@ -427,7 +412,7 @@ class UserController extends Controller {
 
             if ($user->password != null) {
                 // Check the old password
-                Validators::isStringNonEmpty($r['old_password'], 'old_password');
+                Validators::validateStringNonEmpty($r['old_password'], 'old_password');
 
                 $old_password_valid = SecurityTools::compareHashedStrings(
                     $r['old_password'],
@@ -484,14 +469,14 @@ class UserController extends Controller {
 
             self::$log->info('Admin verifiying user...' . $r['usernameOrEmail']);
 
-            Validators::isStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+            Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
             $user = self::resolveUser($r['usernameOrEmail']);
 
             self::$redirectOnVerify = false;
         } else {
             // Normal user verification path
-            Validators::isStringNonEmpty($r['id'], 'id');
+            Validators::validateStringNonEmpty($r['id'], 'id');
 
             try {
                 $users = UsersDAO::getByVerification($r['id']);
@@ -581,7 +566,7 @@ class UserController extends Controller {
      * @throws InvalidParameterException
      */
     public static function resolveUser($userOrEmail) {
-        Validators::isStringNonEmpty($userOrEmail, 'usernameOrEmail');
+        Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
 
         $user = null;
 
@@ -671,39 +656,39 @@ class UserController extends Controller {
 
             // Arreglo de estados de MX
             $keys = [
-                'OMI2018-AGU' => 4,
-                'OMI2018-BCN' => 4,
-                'OMI2018-BCS' => 4,
-                'OMI2018-CAM' => 4,
-                'OMI2018-CHH' => 4,
-                'OMI2018-CHP' => 4,
-                'OMI2018-CMX' => 8,
-                'OMI2018-COA' => 4,
-                'OMI2018-COL' => 4,
-                'OMI2018-DUR' => 4,
-                'OMI2018-GRO' => 4,
-                'OMI2018-GUA' => 4,
-                'OMI2018-HID' => 4,
-                'OMI2018-JAL' => 4,
-                'OMI2018-MEX' => 4,
-                'OMI2018-MIC' => 4,
-                'OMI2018-MOR' => 4,
-                'OMI2018-NAY' => 4,
-                'OMI2018-NLE' => 4,
-                'OMI2018-OAX' => 4,
-                'OMI2018-PUE' => 4,
-                'OMI2018-QTO' => 4,
-                'OMI2018-ROO' => 4,
-                'OMI2018-SIN' => 4,
-                'OMI2018-SLP' => 4,
-                'OMI2018-SON' => 4,
-                'OMI2018-TAB' => 4,
-                'OMI2018-TAM' => 4,
-                'OMI2018-TLA' => 4,
-                'OMI2018-VER' => 4,
-                'OMI2018-YUC' => 4,
-                'OMI2018-ZAC' => 4,
-                'OMI2018-INV' => 4,
+                'OMI2019-AGU' => 4,
+                'OMI2019-BCN' => 4,
+                'OMI2019-BCS' => 4,
+                'OMI2019-CAM' => 4,
+                'OMI2019-CHH' => 4,
+                'OMI2019-CHP' => 4,
+                'OMI2019-CMX' => 4,
+                'OMI2019-COA' => 4,
+                'OMI2019-COL' => 4,
+                'OMI2019-DUR' => 4,
+                'OMI2019-GRO' => 4,
+                'OMI2019-GUA' => 4,
+                'OMI2019-HID' => 4,
+                'OMI2019-JAL' => 4,
+                'OMI2019-MEX' => 4,
+                'OMI2019-MIC' => 4,
+                'OMI2019-MOR' => 4,
+                'OMI2019-NAY' => 4,
+                'OMI2019-NLE' => 4,
+                'OMI2019-OAX' => 4,
+                'OMI2019-PUE' => 4,
+                'OMI2019-QTO' => 4,
+                'OMI2019-ROO' => 4,
+                'OMI2019-SIN' => 8,
+                'OMI2019-SLP' => 4,
+                'OMI2019-SON' => 4,
+                'OMI2019-TAB' => 4,
+                'OMI2019-TAM' => 4,
+                'OMI2019-TLA' => 4,
+                'OMI2019-VER' => 4,
+                'OMI2019-YUC' => 4,
+                'OMI2019-ZAC' => 4,
+                'OMI2019-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMIP') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -713,38 +698,38 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIP2018-AGU' => 25,
-                'OMIP2018-BCN' => 25,
-                'OMIP2018-BCS' => 25,
-                'OMIP2018-CAM' => 25,
-                'OMIP2018-CHH' => 25,
-                'OMIP2018-CHP' => 25,
-                'OMIP2018-CMX' => 25,
-                'OMIP2018-COA' => 25,
-                'OMIP2018-COL' => 25,
-                'OMIP2018-DUR' => 25,
-                'OMIP2018-GRO' => 25,
-                'OMIP2018-GUA' => 25,
-                'OMIP2018-HID' => 25,
-                'OMIP2018-JAL' => 25,
-                'OMIP2018-MEX' => 25,
-                'OMIP2018-MIC' => 25,
-                'OMIP2018-MOR' => 25,
-                'OMIP2018-NAY' => 25,
-                'OMIP2018-NLE' => 25,
-                'OMIP2018-OAX' => 25,
-                'OMIP2018-PUE' => 25,
-                'OMIP2018-QTO' => 25,
-                'OMIP2018-ROO' => 25,
-                'OMIP2018-SIN' => 25,
-                'OMIP2018-SLP' => 25,
-                'OMIP2018-SON' => 25,
-                'OMIP2018-TAB' => 25,
-                'OMIP2018-TAM' => 25,
-                'OMIP2018-TLA' => 25,
-                'OMIP2018-VER' => 25,
-                'OMIP2018-YUC' => 25,
-                'OMIP2018-ZAC' => 25,
+                'OMIP2019-AGU' => 25,
+                'OMIP2019-BCN' => 25,
+                'OMIP2019-BCS' => 25,
+                'OMIP2019-CAM' => 25,
+                'OMIP2019-CHH' => 25,
+                'OMIP2019-CHP' => 25,
+                'OMIP2019-CMX' => 25,
+                'OMIP2019-COA' => 25,
+                'OMIP2019-COL' => 25,
+                'OMIP2019-DUR' => 25,
+                'OMIP2019-GRO' => 25,
+                'OMIP2019-GUA' => 25,
+                'OMIP2019-HID' => 25,
+                'OMIP2019-JAL' => 25,
+                'OMIP2019-MEX' => 25,
+                'OMIP2019-MIC' => 25,
+                'OMIP2019-MOR' => 25,
+                'OMIP2019-NAY' => 25,
+                'OMIP2019-NLE' => 25,
+                'OMIP2019-OAX' => 25,
+                'OMIP2019-PUE' => 25,
+                'OMIP2019-QTO' => 25,
+                'OMIP2019-ROO' => 25,
+                'OMIP2019-SIN' => 25,
+                'OMIP2019-SLP' => 25,
+                'OMIP2019-SON' => 25,
+                'OMIP2019-TAB' => 25,
+                'OMIP2019-TAM' => 25,
+                'OMIP2019-TLA' => 25,
+                'OMIP2019-VER' => 25,
+                'OMIP2019-YUC' => 25,
+                'OMIP2019-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIS') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -754,38 +739,38 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIS2018-AGU' => 25,
-                'OMIS2018-BCN' => 25,
-                'OMIS2018-BCS' => 25,
-                'OMIS2018-CAM' => 25,
-                'OMIS2018-CHH' => 25,
-                'OMIS2018-CHP' => 25,
-                'OMIS2018-CMX' => 25,
-                'OMIS2018-COA' => 25,
-                'OMIS2018-COL' => 25,
-                'OMIS2018-DUR' => 25,
-                'OMIS2018-GRO' => 25,
-                'OMIS2018-GUA' => 25,
-                'OMIS2018-HID' => 25,
-                'OMIS2018-JAL' => 25,
-                'OMIS2018-MEX' => 25,
-                'OMIS2018-MIC' => 25,
-                'OMIS2018-MOR' => 25,
-                'OMIS2018-NAY' => 25,
-                'OMIS2018-NLE' => 25,
-                'OMIS2018-OAX' => 25,
-                'OMIS2018-PUE' => 25,
-                'OMIS2018-QTO' => 25,
-                'OMIS2018-ROO' => 25,
-                'OMIS2018-SIN' => 25,
-                'OMIS2018-SLP' => 25,
-                'OMIS2018-SON' => 25,
-                'OMIS2018-TAB' => 25,
-                'OMIS2018-TAM' => 25,
-                'OMIS2018-TLA' => 25,
-                'OMIS2018-VER' => 25,
-                'OMIS2018-YUC' => 25,
-                'OMIS2018-ZAC' => 25,
+                'OMIS2019-AGU' => 25,
+                'OMIS2019-BCN' => 25,
+                'OMIS2019-BCS' => 25,
+                'OMIS2019-CAM' => 25,
+                'OMIS2019-CHH' => 25,
+                'OMIS2019-CHP' => 25,
+                'OMIS2019-CMX' => 25,
+                'OMIS2019-COA' => 25,
+                'OMIS2019-COL' => 25,
+                'OMIS2019-DUR' => 25,
+                'OMIS2019-GRO' => 25,
+                'OMIS2019-GUA' => 25,
+                'OMIS2019-HID' => 25,
+                'OMIS2019-JAL' => 25,
+                'OMIS2019-MEX' => 25,
+                'OMIS2019-MIC' => 25,
+                'OMIS2019-MOR' => 25,
+                'OMIS2019-NAY' => 25,
+                'OMIS2019-NLE' => 25,
+                'OMIS2019-OAX' => 25,
+                'OMIS2019-PUE' => 25,
+                'OMIS2019-QTO' => 25,
+                'OMIS2019-ROO' => 25,
+                'OMIS2019-SIN' => 25,
+                'OMIS2019-SLP' => 25,
+                'OMIS2019-SON' => 25,
+                'OMIS2019-TAB' => 25,
+                'OMIS2019-TAM' => 25,
+                'OMIS2019-TLA' => 25,
+                'OMIS2019-VER' => 25,
+                'OMIS2019-YUC' => 25,
+                'OMIS2019-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIPN') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -795,39 +780,39 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIP2018-AGU' => 4,
-                'OMIP2018-BCN' => 4,
-                'OMIP2018-BCS' => 4,
-                'OMIP2018-CAM' => 4,
-                'OMIP2018-CHH' => 4,
-                'OMIP2018-CHP' => 4,
-                'OMIP2018-CMX' => 4,
-                'OMIP2018-COA' => 4,
-                'OMIP2018-COL' => 4,
-                'OMIP2018-DUR' => 4,
-                'OMIP2018-GRO' => 4,
-                'OMIP2018-GUA' => 4,
-                'OMIP2018-HID' => 4,
-                'OMIP2018-JAL' => 4,
-                'OMIP2018-MEX' => 4,
-                'OMIP2018-MIC' => 4,
-                'OMIP2018-MOR' => 4,
-                'OMIP2018-NAY' => 4,
-                'OMIP2018-NLE' => 4,
-                'OMIP2018-OAX' => 4,
-                'OMIP2018-PUE' => 4,
-                'OMIP2018-QTO' => 4,
-                'OMIP2018-ROO' => 4,
-                'OMIP2018-SIN' => 4,
-                'OMIP2018-SLP' => 4,
-                'OMIP2018-SON' => 4,
-                'OMIP2018-TAB' => 4,
-                'OMIP2018-TAM' => 4,
-                'OMIP2018-TLA' => 4,
-                'OMIP2018-VER' => 4,
-                'OMIP2018-YUC' => 4,
-                'OMIP2018-ZAC' => 4,
-                'OMIP2018-INV' => 4,
+                'OMIP2019-AGU' => 4,
+                'OMIP2019-BCN' => 4,
+                'OMIP2019-BCS' => 4,
+                'OMIP2019-CAM' => 4,
+                'OMIP2019-CHH' => 4,
+                'OMIP2019-CHP' => 4,
+                'OMIP2019-CMX' => 4,
+                'OMIP2019-COA' => 4,
+                'OMIP2019-COL' => 4,
+                'OMIP2019-DUR' => 4,
+                'OMIP2019-GRO' => 4,
+                'OMIP2019-GUA' => 4,
+                'OMIP2019-HID' => 4,
+                'OMIP2019-JAL' => 4,
+                'OMIP2019-MEX' => 4,
+                'OMIP2019-MIC' => 4,
+                'OMIP2019-MOR' => 4,
+                'OMIP2019-NAY' => 4,
+                'OMIP2019-NLE' => 4,
+                'OMIP2019-OAX' => 4,
+                'OMIP2019-PUE' => 4,
+                'OMIP2019-QTO' => 4,
+                'OMIP2019-ROO' => 4,
+                'OMIP2019-SIN' => 4,
+                'OMIP2019-SLP' => 4,
+                'OMIP2019-SON' => 4,
+                'OMIP2019-TAB' => 4,
+                'OMIP2019-TAM' => 4,
+                'OMIP2019-TLA' => 4,
+                'OMIP2019-VER' => 4,
+                'OMIP2019-YUC' => 4,
+                'OMIP2019-ZAC' => 4,
+                'OMIP2019-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMISN') {
             if ($r['current_user']->username != 'andreasantillana'
@@ -837,39 +822,39 @@ class UserController extends Controller {
             }
 
             $keys = [
-                'OMIS2018-AGU' => 4,
-                'OMIS2018-BCN' => 4,
-                'OMIS2018-BCS' => 4,
-                'OMIS2018-CAM' => 4,
-                'OMIS2018-CHH' => 4,
-                'OMIS2018-CHP' => 4,
-                'OMIS2018-CMX' => 4,
-                'OMIS2018-COA' => 4,
-                'OMIS2018-COL' => 4,
-                'OMIS2018-DUR' => 4,
-                'OMIS2018-GRO' => 4,
-                'OMIS2018-GUA' => 4,
-                'OMIS2018-HID' => 4,
-                'OMIS2018-JAL' => 4,
-                'OMIS2018-MEX' => 4,
-                'OMIS2018-MIC' => 4,
-                'OMIS2018-MOR' => 4,
-                'OMIS2018-NAY' => 4,
-                'OMIS2018-NLE' => 4,
-                'OMIS2018-OAX' => 4,
-                'OMIS2018-PUE' => 4,
-                'OMIS2018-QTO' => 4,
-                'OMIS2018-ROO' => 4,
-                'OMIS2018-SIN' => 4,
-                'OMIS2018-SLP' => 4,
-                'OMIS2018-SON' => 4,
-                'OMIS2018-TAB' => 4,
-                'OMIS2018-TAM' => 4,
-                'OMIS2018-TLA' => 4,
-                'OMIS2018-VER' => 4,
-                'OMIS2018-YUC' => 4,
-                'OMIS2018-ZAC' => 4,
-                'OMIS2018-INV' => 4,
+                'OMIS2019-AGU' => 4,
+                'OMIS2019-BCN' => 4,
+                'OMIS2019-BCS' => 4,
+                'OMIS2019-CAM' => 4,
+                'OMIS2019-CHH' => 4,
+                'OMIS2019-CHP' => 4,
+                'OMIS2019-CMX' => 4,
+                'OMIS2019-COA' => 4,
+                'OMIS2019-COL' => 4,
+                'OMIS2019-DUR' => 4,
+                'OMIS2019-GRO' => 4,
+                'OMIS2019-GUA' => 4,
+                'OMIS2019-HID' => 4,
+                'OMIS2019-JAL' => 4,
+                'OMIS2019-MEX' => 4,
+                'OMIS2019-MIC' => 4,
+                'OMIS2019-MOR' => 4,
+                'OMIS2019-NAY' => 4,
+                'OMIS2019-NLE' => 4,
+                'OMIS2019-OAX' => 4,
+                'OMIS2019-PUE' => 4,
+                'OMIS2019-QTO' => 4,
+                'OMIS2019-ROO' => 4,
+                'OMIS2019-SIN' => 4,
+                'OMIS2019-SLP' => 4,
+                'OMIS2019-SON' => 4,
+                'OMIS2019-TAB' => 4,
+                'OMIS2019-TAM' => 4,
+                'OMIS2019-TLA' => 4,
+                'OMIS2019-VER' => 4,
+                'OMIS2019-YUC' => 4,
+                'OMIS2019-ZAC' => 4,
+                'OMIS2019-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'ORIG') {
             if ($r['current_user']->username != 'kuko.coder'
@@ -909,6 +894,33 @@ class UserController extends Controller {
 
             $keys =  [
                 'Pr8oUAIE' => 20
+            ];
+        } elseif ($r['contest_type'] == 'OMIZAC') {
+            if ($r['current_user']->username != 'rsolis'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIZAC-Prim' => 60,
+                'OMIZAC-Sec' => 60,
+                'OMIZAC-Prepa' => 60
+            ];
+        } elseif ($r['contest_type'] == 'ProgUAIE') {
+            if ($r['current_user']->username != 'rsolis'
+                && !$is_system_admin
+            ) {
+                throw new ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'MS-UAIE' => 60,
+                'Prim-UAIE' => 40,
+                'Sec-UAIE' => 40,
+                'ICPC-UAIE' => 45,
+                'Prim-UAIE-Jalpa' => 30,
+                'Sec-UAIE-Jalpa' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIAGS-2018') {
             if ($r['current_user']->username != 'EfrenGonzalez'
@@ -977,7 +989,7 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys =  [
-                'OVI18' => 155
+                'OVI19' => 200
             ];
         } elseif ($r['contest_type'] == 'UDCCUP') {
             if ($r['current_user']->username != 'Diego_Briaares'
@@ -1014,8 +1026,9 @@ class UserController extends Controller {
                 throw new ForbiddenAccessException();
             }
             $keys = [
-                'OMIROO-D1-18' => 70,
-                'OMIROO-D2-18' => 70
+                'OMIROO-Pri-20' => 100,
+                'OMIROO-Sec-20' => 100,
+                'OMIROO-Pre-20' => 300,
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
             if ($r['current_user']->username != 'lacj20'
@@ -1059,7 +1072,7 @@ class UserController extends Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE',
                 ]
             );
         }
@@ -1100,7 +1113,7 @@ class UserController extends Controller {
     public static function getPreferredLanguage(Request $r = null) {
         // for quick debugging
         if (isset($_GET['lang'])) {
-            return UserController::convertToSupportedLanguage($_GET['lang']);
+            return IdentityController::convertToSupportedLanguage($_GET['lang']);
         }
 
         try {
@@ -1110,7 +1123,7 @@ class UserController extends Controller {
                 if (is_null($result)) {
                     self::$log->warn('Invalid language id for user');
                 } else {
-                    return UserController::convertToSupportedLanguage($result->name);
+                    return IdentityController::convertToSupportedLanguage($result->name);
                 }
             }
         } catch (NotFoundException $ex) {
@@ -1158,29 +1171,6 @@ class UserController extends Controller {
         return 'es';
     }
 
-    private static function convertToSupportedLanguage($lang) {
-        switch ($lang) {
-            case 'en':
-            case 'en-us':
-                return 'en';
-
-            case 'es':
-            case 'es-mx':
-                return 'es';
-
-            case 'pt':
-            case 'pt-pt':
-            case 'pt-br':
-                return 'pt';
-
-            case 'pseudo':
-                return 'pseudo';
-        }
-
-        // Fallback to spanish.
-        return 'es';
-    }
-
     /**
      * Returns the profile of the user given
      *
@@ -1209,7 +1199,7 @@ class UserController extends Controller {
             $query = LanguagesDAO::getByPK($user->language_id);
             if (!is_null($query)) {
                 $response['userinfo']['locale'] =
-                    UserController::convertToSupportedLanguage($query->name);
+                    IdentityController::convertToSupportedLanguage($query->name);
             }
         }
 
@@ -1218,14 +1208,14 @@ class UserController extends Controller {
 
             $response['userinfo']['email'] = $user_db['email'];
             $response['userinfo']['country'] = $user_db['country'];
-            $response['userinfo']['country_id'] = $user->country_id;
+            $response['userinfo']['country_id'] = $user->country_id ?? 'xx';
             $response['userinfo']['state'] = $user_db['state'];
             $response['userinfo']['state_id'] = $user->state_id;
             $response['userinfo']['school'] = $user_db['school'];
             $response['userinfo']['school_id'] = $user->school_id;
 
             if (!is_null($user->language_id)) {
-                $response['userinfo']['locale'] = UserController::convertToSupportedLanguage($user_db['locale']);
+                $response['userinfo']['locale'] = IdentityController::convertToSupportedLanguage($user_db['locale']);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -1320,12 +1310,8 @@ class UserController extends Controller {
             throw new InvalidParameterException('invalidUser');
         }
 
-        return [
-            'status' => 'ok',
-            'username' => $response['username'],
-            'within_last_day' => $response['within_last_day'],
-            'verified' => $response['verified'],
-        ];
+        $response['status'] = 'ok';
+        return $response;
     }
 
     /**
@@ -1338,20 +1324,21 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCoderOfTheMonth(Request $r) {
+        $currentTimestamp = Time::get();
         if (!empty($r['date'])) {
-            Validators::isDate($r['date'], 'date', false);
+            Validators::validateDate($r['date'], 'date', false);
             $firstDay = date('Y-m-01', strtotime($r['date']));
         } else {
             // Get first day of the current month
-            $firstDay = date('Y-m-01');
+            $firstDay = date('Y-m-01', $currentTimestamp);
         }
 
         try {
-            $codersOfTheMonth = CoderOfTheMonthDAO::getByTimeAndRank($firstDay, 1);
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($firstDay);
 
             if (empty($codersOfTheMonth)) {
                 // Generate the coder
-                $users = CoderOfTheMonthDAO::calculateCoderOfTheMonth($firstDay);
+                $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($firstDay);
                 if (is_null($users)) {
                     return [
                         'status' => 'ok',
@@ -1360,24 +1347,21 @@ class UserController extends Controller {
                     ];
                 }
 
-                $codersOfTheMonth = [];
-                foreach ($users as $index => $user) {
-                    // Save it
-                    $c = new CoderOfTheMonth([
-                        'user_id' => $user['user_id'],
-                        'time' => $firstDay,
-                        'rank' => $index + 1,
-                    ]);
-                    CoderOfTheMonthDAO::save($c);
-                    array_push($codersOfTheMonth, $c);
-                }
+                // Only first place coder is saved
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                    'user_id' => $users[0]['user_id'],
+                    'time' => $firstDay,
+                    'rank' => 1,
+                ]));
+                $coderOfTheMonthUserId = $users[0]['user_id'];
+            } else {
+                $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
             }
+            $user = UsersDAO::getByPK($coderOfTheMonthUserId);
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
-
-        $user = UsersDAO::getByPK($codersOfTheMonth[0]->user_id);
 
         // Get the profile of the coder of the month
         $response = UserController::getProfileImpl($user);
@@ -1423,6 +1407,69 @@ class UserController extends Controller {
         return $response;
     }
 
+    /**
+     * Selects coder of the month for next month.
+     *
+     * @param Request $r
+     * @return Array
+     * @throws ForbiddenAccessException
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws NotFoundException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiSelectCoderOfTheMonth(Request $r) {
+        self::authenticateRequest($r);
+        $currentTimestamp = Time::get();
+
+        if (!Authorization::isMentor($r['current_identity_id'])) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+        if (!Authorization::canChooseCoder($currentTimestamp)) {
+            throw new ForbiddenAccessException('coderOfTheMonthIsNotInPeriodToBeChosen');
+        }
+        Validators::validateStringNonEmpty($r['username'], 'username');
+
+        $currentDate = date('Y-m-d', $currentTimestamp);
+        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        try {
+            $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($dateToSelect);
+
+            if (!empty($codersOfTheMonth)) {
+                throw new DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
+            }
+            // Generate the coder
+            $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect);
+
+            if (empty($users)) {
+                throw new NotFoundException('noCoders');
+            }
+
+            foreach ($users as $index => $user) {
+                if ($user['username'] != $r['username']) {
+                    continue;
+                }
+
+                // Save it
+                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                    'user_id' => $user['user_id'],
+                    'time' => $dateToSelect,
+                    'rank' => $index + 1,
+                    'selected_by' => $r['current_identity_id'],
+                ]));
+
+                return ['status' => 'ok'];
+            }
+        } catch (Exception $e) {
+            self::$log->error('Unable to select coder of the month: ' . $e);
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        throw new InvalidDatabaseOperationException();
+    }
+
     public static function userOpenedProblemset($problemset_id, $user_id) {
         // User already started the problemset.
         $problemsetOpened = ProblemsetIdentitiesDAO::getByPK($user_id, $problemset_id);
@@ -1443,8 +1490,8 @@ class UserController extends Controller {
     public static function apiInterviewStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
-        Validators::isStringNonEmpty($r['interview'], 'interview');
-        Validators::isStringNonEmpty($r['username'], 'username');
+        Validators::validateStringNonEmpty($r['interview'], 'interview');
+        Validators::validateStringNonEmpty($r['username'], 'username');
 
         $contest = ContestsDAO::getByAlias($r['interview']);
         if (is_null($contest)) {
@@ -1645,7 +1692,7 @@ class UserController extends Controller {
         }
 
         try {
-            $runsPerDatePerVerdict = RunsDAO::CountRunsOfIdentityPerDatePerVerdict($identity->identity_id);
+            $runsPerDatePerVerdict = RunsDAO::countRunsOfIdentityPerDatePerVerdict((int)$identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1675,7 +1722,7 @@ class UserController extends Controller {
                 throw new InvalidParameterException('parameterUsernameInUse', 'username');
             }
 
-            Validators::isValidUsername($r['username'], 'username');
+            Validators::validateValidUsername($r['username'], 'username');
             $r['current_user']->username = $r['username'];
         }
 
@@ -1715,7 +1762,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         if (!is_null($r['username'])) {
-            Validators::isValidUsername($r['username'], 'username');
+            Validators::validateValidUsername($r['username'], 'username');
             $user = null;
             try {
                 $user = UsersDAO::FindByUsername($r['username']);
@@ -1729,15 +1776,14 @@ class UserController extends Controller {
         }
 
         if (!is_null($r['name'])) {
-            Validators::isStringNonEmpty($r['name'], 'name', true);
-            Validators::isStringOfMaxLength($r['name'], 'name', 50);
+            Validators::validateStringOfLengthInRange($r['name'], 'name', 1, 50);
         }
 
         $state = null;
         if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
             // Both state and country must be specified together.
-            Validators::isStringNonEmpty($r['country_id'], 'country_id', true);
-            Validators::isStringNonEmpty($r['state_id'], 'state_id', true);
+            Validators::validateStringNonEmpty($r['country_id'], 'country_id', true);
+            Validators::validateStringNonEmpty($r['state_id'], 'state_id', true);
 
             try {
                 $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
@@ -1778,13 +1824,13 @@ class UserController extends Controller {
             }
         }
 
-        Validators::isStringNonEmpty($r['scholar_degree'], 'scholar_degree', false);
+        Validators::validateStringNonEmpty($r['scholar_degree'], 'scholar_degree', false);
 
         if (!is_null($r['graduation_date'])) {
             if (is_numeric($r['graduation_date'])) {
                 $r['graduation_date'] = (int)$r['graduation_date'];
             } else {
-                Validators::isDate($r['graduation_date'], 'graduation_date', false);
+                Validators::validateDate($r['graduation_date'], 'graduation_date', false);
                 $r['graduation_date'] = strtotime($r['graduation_date']);
             }
         }
@@ -1792,7 +1838,7 @@ class UserController extends Controller {
             if (is_numeric($r['birth_date'])) {
                 $r['birth_date'] = (int)$r['birth_date'];
             } else {
-                Validators::isDate($r['birth_date'], 'birth_date', false);
+                Validators::validateDate($r['birth_date'], 'birth_date', false);
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
 
@@ -1811,16 +1857,11 @@ class UserController extends Controller {
             $r['current_user']->language_id = $language->language_id;
         }
 
-        if (!is_null($r['is_private'])) {
-            Validators::isNumber($r['is_private'], 'is_private', true);
-        }
-
-        if (!is_null($r['hide_problem_tags'])) {
-            Validators::isNumber($r['hide_problem_tags'], 'hide_problem_tags', true);
-        }
+        $r->ensureBool('is_private', false);
+        $r->ensureBool('hide_problem_tags', false);
 
         if (!is_null($r['gender'])) {
-            Validators::isInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
+            Validators::validateInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
         }
 
         $valueProperties = [
@@ -1876,12 +1917,12 @@ class UserController extends Controller {
      */
 
     public static function apiRankByProblemsSolved(Request $r) {
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumber($r['rowcount'], 'rowcount', false);
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
 
         $r['user'] = null;
         if (!is_null($r['username'])) {
-            Validators::isStringNonEmpty($r['username'], 'username');
+            Validators::validateStringNonEmpty($r['username'], 'username');
             try {
                 $r['user'] = UsersDAO::FindByUsername($r['username']);
                 if (is_null($r['user'])) {
@@ -1893,7 +1934,7 @@ class UserController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         }
-        Validators::isInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
+        Validators::validateInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
@@ -1992,7 +2033,7 @@ class UserController extends Controller {
     public static function apiUpdateMainEmail(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isEmail($r['email'], 'email');
+        Validators::validateEmail($r['email'], 'email');
 
         try {
             // Update email
@@ -2016,8 +2057,7 @@ class UserController extends Controller {
                 }
             }
         } catch (Exception $e) {
-            // If duplicate in DB
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('mailInUse');
             } else {
                 throw new InvalidDatabaseOperationException($e);
@@ -2029,7 +2069,7 @@ class UserController extends Controller {
 
         // Send verification email
         $r['user'] = $r['current_user'];
-        self::sendVerificationEmail($r);
+        self::sendVerificationEmail($r['user']);
 
         return ['status' => 'ok'];
     }
@@ -2057,7 +2097,7 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiValidateFilter(Request $r) {
-        Validators::isStringNonEmpty($r['filter'], 'filter');
+        Validators::validateStringNonEmpty($r['filter'], 'filter');
 
         $response = [
             'status' => 'ok',
@@ -2152,7 +2192,7 @@ class UserController extends Controller {
 
     private static function validateUser(Request $r) {
         // Validate request
-        Validators::isValidUsername($r['username'], 'username');
+        Validators::validateValidUsername($r['username'], 'username');
         try {
             $r['user'] = UsersDAO::FindByUsername($r['username']);
         } catch (Exception $e) {
@@ -2170,7 +2210,7 @@ class UserController extends Controller {
 
         self::validateUser($r);
 
-        Validators::isStringNonEmpty($r['role'], 'role');
+        Validators::validateStringNonEmpty($r['role'], 'role');
         $r['role'] = RolesDAO::getByName($r['role']);
         if (is_null($r['role'])) {
             throw new InvalidParameterException('parameterNotFound', 'role');
@@ -2189,7 +2229,7 @@ class UserController extends Controller {
 
         self::validateUser($r);
 
-        Validators::isStringNonEmpty($r['group'], 'group');
+        Validators::validateStringNonEmpty($r['group'], 'group');
         $r['group'] = GroupsDAO::getByName($r['group']);
         if (is_null($r['group'])) {
             throw new InvalidParameterException('parameterNotFound', 'group');
@@ -2210,7 +2250,7 @@ class UserController extends Controller {
         self::validateAddRemoveRole($r);
 
         try {
-            UserRolesDAO::save(new UserRoles([
+            UserRolesDAO::create(new UserRoles([
                 'user_id' => $r['user']->user_id,
                 'role_id' => $r['role']->role_id,
                 'acl_id' => Authorization::SYSTEM_ACL,
@@ -2314,7 +2354,7 @@ class UserController extends Controller {
 
         self::validateUser($r);
 
-        Validators::isStringNonEmpty($r['experiment'], 'experiment');
+        Validators::validateStringNonEmpty($r['experiment'], 'experiment');
         if (!in_array($r['experiment'], $experiments->getAllKnownExperiments())) {
             throw new InvalidParameterException('parameterNotFound', 'experiment');
         }
@@ -2334,7 +2374,7 @@ class UserController extends Controller {
         self::validateAddRemoveExperiment($r);
 
         try {
-            UsersExperimentsDAO::save(new UsersExperiments([
+            UsersExperimentsDAO::create(new UsersExperiments([
                 'user_id' => $r['user']->user_id,
                 'experiment' => $r['experiment'],
             ]));
@@ -2474,19 +2514,24 @@ class UserController extends Controller {
      * @param Request $r
      * @throws InvalidParameterException
      * @throws InvalidDatabaseOperationException
+     * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiAssociateIdentity(Request $r) {
         global $experiments;
         $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['username'], 'username');
-        Validators::isStringNonEmpty($r['password'], 'password');
+        Validators::validateStringNonEmpty($r['username'], 'username');
+        Validators::validateStringNonEmpty($r['password'], 'password');
 
         $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
 
         if (empty($identity)) {
             throw new InvalidParameterException('parameterInvalid', 'username');
+        }
+
+        if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r['current_user_id'], (int)$identity->identity_id)) {
+            throw new DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 
         $passwordCheck = SecurityTools::compareHashedStrings(

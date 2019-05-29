@@ -240,7 +240,7 @@ class UserFactory {
      * @param int $role_id
      */
     public static function addSystemRole(Users $user, $role_id) {
-        UserRolesDAO::save(new UserRoles([
+        UserRolesDAO::create(new UserRoles([
             'user_id' => $user->user_id,
             'role_id' => $role_id,
             'acl_id' => Authorization::SYSTEM_ACL,

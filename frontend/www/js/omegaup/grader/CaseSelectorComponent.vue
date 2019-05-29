@@ -18,7 +18,8 @@
                    v-bind:class="verdictClass(groupResult(group.name))"
                    v-bind:title="verdictTooltip(groupResult(group.name))">{{
                    verdictLabel(groupResult(group.name)) }}<span class="score">{{
-                   score(groupResult(group.name)) }}</span></span> {{ group.name }}
+                   score(groupResult(group.name)) }}</span></span> <span v-bind:title=
+                   "group.name">{{ group.name }}</span>
             </div>
           </div><button class=
           "list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -26,12 +27,13 @@
                     v-bind:class="{ 'in-group': group.explicit, active: currentCase == item.name }"
                     v-for="item in group.cases"
                     v-on:click="selectCase(item.name)">
-          <div>
+          <div class="case-item">
             <span class="verdict"
                  v-bind:class="verdictClass(item.name)"
                  v-bind:title="verdictTooltip(caseResult(item.name))">{{
                  verdictLabel(caseResult(item.name)) }}<span class="score">{{
-                 score(caseResult(item.name)) }}</span></span> {{ item.name }}
+                 score(caseResult(item.name)) }}</span></span> <span v-bind:title="item.name">{{
+                 item.name }}</span>
           </div><button aria-label="Close"
                   class="close"
                   type="button"
@@ -208,6 +210,11 @@ button[type="submit"] {
 div.summary {
   text-align: center;
   padding: 0.25em;
+}
+div.case-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 span.verdict {
   display: inline-block;

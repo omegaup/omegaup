@@ -35,6 +35,37 @@ class CreateUserTest extends OmegaupTestCase {
     }
 
     /**
+     * Creates an omegaup user then tries to create it again.
+     */
+    public function testCreateUserIdempotent() {
+        // Inflate request
+        UserController::$permissionKey = uniqid();
+        $r = new Request([
+            'username' => Utils::CreateRandomString(),
+            'password' => Utils::CreateRandomString(),
+            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'permission_key' => UserController::$permissionKey
+        ]);
+
+        // Call API twice.
+        $response = UserController::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($r['username'], $response['username']);
+
+        $response = UserController::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals($r['username'], $response['username']);
+
+        $r['password'] = 'a wrong password';
+        try {
+            UserController::apiCreate($r);
+            $this->fail('User creation should have failed');
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('mailInUse', $e->getMessage());
+        }
+    }
+
+    /**
      * Try to create 2 users with same username, should fail.
      *
      * @expectedException DuplicatedEntryInDatabaseException
@@ -208,6 +239,7 @@ class CreateUserTest extends OmegaupTestCase {
             $this->fail('Expected because of the invalid group name');
         } catch (InvalidParameterException $e) {
             // OK
+            $this->assertEquals('parameterInvalidAlias', $e->getMessage());
         }
     }
 

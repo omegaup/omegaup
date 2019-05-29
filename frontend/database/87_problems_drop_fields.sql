@@ -1,0 +1,12 @@
+ALTER TABLE `Problems`
+  DROP COLUMN `validator`,
+  DROP COLUMN `server`,
+  DROP COLUMN `remote_id`,
+  DROP COLUMN `time_limit`,
+  DROP COLUMN `validator_time_limit`,
+  DROP COLUMN `overall_wall_time_limit`,
+  DROP COLUMN `extra_wall_time`,
+  DROP COLUMN `memory_limit`,
+  DROP COLUMN `output_limit`,
+  DROP COLUMN `tolerance`,
+  DROP COLUMN `slow`;

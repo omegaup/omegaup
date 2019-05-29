@@ -34,6 +34,7 @@ function _call(url, transform, defaultParams) {
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
+          omegaup.OmegaUp.addError(errorData);
           dfd.reject(errorData);
         });
     return dfd.promise();
@@ -171,6 +172,8 @@ export default {
 
     runs: _call('/api/contest/runs/', _convertRuntimes),
 
+    runsDiff: _call('/api/contest/runsDiff/'),
+
     scoreboard: _call('/api/contest/scoreboard/'),
 
     scoreboardMerge: _call('/api/contest/scoreboardmerge/'),
@@ -268,6 +271,8 @@ export default {
 
     removeStudent: _call('/api/course/removeStudent/'),
 
+    runs: _call('/api/course/runs/', _convertRuntimes),
+
     studentProgress: _call('/api/course/studentProgress/',
                            function(result) {
                              for (var problem of result.problems) {
@@ -360,6 +365,8 @@ export default {
   },
 
   Identity: {
+    changePassword: _call('/api/identity/changePassword/'),
+
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
@@ -415,6 +422,10 @@ export default {
 
     runs: _call('/api/problem/runs/', _convertRuntimes),
 
+    runsDiff: _call('/api/problem/runsDiff/'),
+
+    selectVersion: _call('/api/problem/selectVersion/'),
+
     stats: _call('/api/problem/stats/'),
 
     tags: _call('/api/problem/tags/'),
@@ -422,6 +433,8 @@ export default {
     update: _call('/api/problem/update/'),
 
     updateStatement: _call('/api/problem/updateStatement/'),
+
+    versions: _call('/api/problem/versions/'),
   },
 
   Problemset: {
@@ -525,6 +538,8 @@ export default {
 
     addGroup: _call('/api/user/addgroup/'),
 
+    associateIdentity: _call('/api/user/associateIdentity/'),
+
     addRole: _call('/api/user/addrole/'),
 
     changePassword: _call('/api/user/changepassword/'),
@@ -548,6 +563,8 @@ export default {
     interviewStats: _call('/api/user/interviewstats/'),
 
     list: _call('/api/user/list/'),
+
+    listAssociatedIdentities: _call('/api/user/listAssociatedIdentities/'),
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
 

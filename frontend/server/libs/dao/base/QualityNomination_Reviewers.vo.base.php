@@ -27,10 +27,10 @@ class QualityNominationReviewers extends VO {
             return;
         }
         if (isset($data['qualitynomination_id'])) {
-            $this->qualitynomination_id = $data['qualitynomination_id'];
+            $this->qualitynomination_id = (int)$data['qualitynomination_id'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
     }
 
@@ -38,11 +38,11 @@ class QualityNominationReviewers extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

@@ -31,7 +31,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         $params[] = $assignmentAlias;
 
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -45,7 +45,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 FROM Assignments a
                 WHERE a.course_id = ?
                 GROUP BY a.assignment_type;';
-        $rs = $conn->Execute($sql, $course_id);
+        $rs = $conn->GetAll($sql, [$course_id]);
         $counts = [];
         foreach ($rs as $row) {
             $counts[$row['assignment_type']] = intval($row['count']);
@@ -68,19 +68,6 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         }
 
         return null;
-    }
-
-    final public static function getByAlias($alias) {
-        $sql = 'SELECT * FROM Assignments WHERE (alias = ?) LIMIT 1;';
-        $params = [$alias];
-
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
-        if (empty($row)) {
-            return null;
-        }
-
-        return new Assignments($row);
     }
 
     final public static function getByProblemset($problemset_id) {
@@ -139,7 +126,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
      */
     final public static function getSortedCourseAssignments($courseId) {
         $sql = 'SELECT
-                   `a`.`assignment_id`,
+                   `a`.`problemset_id`,
                    `a`.`name`,
                    `a`.`description`,
                    `a`.`alias`,
@@ -161,7 +148,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                     `order` ASC, `start_time` ASC';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$courseId]);
+        $rs = $conn->GetAll($sql, [$courseId]);
         $ar = [];
         foreach ($rs as $row) {
             $ar[] = $row;

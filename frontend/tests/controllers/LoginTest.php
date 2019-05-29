@@ -180,6 +180,9 @@ class LoginTest extends OmegaupTestCase {
         // Set old password
         $user->password = md5($plainPassword);
         UsersDAO::save($user);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity->password = $user->password;
+        IdentitiesDAO::save($identity);
 
         // Let's put back plain password
         $user->password = $plainPassword;
@@ -223,6 +226,9 @@ class LoginTest extends OmegaupTestCase {
         // Force empty password
         $user->password = '';
         UsersDAO::save($user);
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity->password = $user->password;
+        IdentitiesDAO::save($identity);
 
         self::login($user);
     }

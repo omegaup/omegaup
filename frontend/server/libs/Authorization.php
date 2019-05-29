@@ -59,24 +59,16 @@ class Authorization {
     // Group identities creators.
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
-    public static function canViewRun($identity_id, Runs $run) {
-        if (is_null($run) || !is_a($run, 'Runs')) {
-            return false;
-        }
-
+    public static function canViewSubmission($identity_id, Submissions $submission) {
         return (
-            $run->identity_id === $identity_id ||
-            Authorization::canEditRun($identity_id, $run)
+            $submission->identity_id === $identity_id ||
+            Authorization::canEditSubmission($identity_id, $submission)
         );
     }
 
-    public static function canEditRun($identity_id, Runs $run) {
-        if (is_null($run) || !is_a($run, 'Runs')) {
-            return false;
-        }
-
+    public static function canEditSubmission($identity_id, Submissions $submission) {
         try {
-            $problem = ProblemsDAO::getByPK($run->problem_id);
+            $problem = ProblemsDAO::getByPK($submission->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -89,7 +81,7 @@ class Authorization {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        $problemset = ProblemsetsDAO::getByPK($run->problemset_id);
+        $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
         if (!is_null($problemset) && Authorization::isAdmin($identity_id, $problemset)) {
             return true;
         }
@@ -140,12 +132,24 @@ class Authorization {
      * reviewers can do so.
      */
     public static function canEditProblem($identity_id, Problems $problem) {
-        if (is_null($problem) || !is_a($problem, 'Problems')) {
-            return false;
-        }
         return self::isProblemAdmin($identity_id, $problem) ||
             self::isQualityReviewer($identity_id) ||
             self::hasRole($identity_id, $problem->acl_id, Authorization::REVIEWER_ROLE);
+    }
+
+    /**
+     * Returns whether the identity can view the problem solution. Only problem
+     * admins and identities that have solved the problem can do so.
+     */
+    public static function canViewProblemSolution(
+        ?int $identityId,
+        Problems $problem
+    ) : bool {
+        if (is_null($identityId)) {
+            return false;
+        }
+        return Authorization::canEditProblem($identityId, $problem) ||
+            ProblemsDAO::isProblemSolved($problem, $identityId);
     }
 
     public static function canViewEmail($identity_id) {
@@ -223,6 +227,20 @@ class Authorization {
             $identity_id,
             self::$mentor_group
         );
+    }
+
+    /**
+     * Only last two days of the month mentor is available to choose
+     * the coder of the month
+     * @return Array
+     */
+    public static function canChooseCoder($currentTimestamp) {
+        $today = date('Y-m-d', $currentTimestamp);
+        $lastDayOfMonth = date('t', $currentTimestamp);
+        $availableDateToChooseCoder = [];
+        $availableDateToChooseCoder[] = date('Y-m-', $currentTimestamp) . $lastDayOfMonth;
+        $availableDateToChooseCoder[] = date('Y-m-', $currentTimestamp) . ($lastDayOfMonth - 1);
+        return in_array($today, $availableDateToChooseCoder);
     }
 
     public static function isGroupIdentityCreator($identityId) {

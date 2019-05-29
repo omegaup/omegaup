@@ -9,6 +9,7 @@
 <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-migrate-3.0.1.min.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/dist/commons.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>

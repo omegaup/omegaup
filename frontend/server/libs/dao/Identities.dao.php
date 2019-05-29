@@ -71,9 +71,17 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     public static function getExtraInformation($email) {
         global  $conn;
         $sql = 'SELECT
-                  u.reset_sent_at,
+                  UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
                   u.verified,
-                  u.username
+                  u.username,
+                  (
+                    SELECT
+                      MAX(UNIX_TIMESTAMP(ill.time))
+                    FROM
+                      Identity_Login_Log AS ill
+                    WHERE
+                      ill.identity_id = i.identity_id
+                  ) AS last_login
                 FROM
                   `Identities` i
                 INNER JOIN
@@ -97,9 +105,10 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return [
           // Asks whether request was made on the last day
-          'within_last_day' => Time::get() - strtotime($rs['reset_sent_at']) < 60 * 60 * 24,
+          'within_last_day' => Time::get() - ((int)$rs['reset_sent_at']) < 60 * 60 * 24,
           'verified' => $rs['verified'] == 1,
-          'username' => $rs['username']
+          'username' => $rs['username'],
+          'last_login' => is_null($rs['last_login']) ? null : ((int)$rs['last_login']),
         ];
     }
 
@@ -132,7 +141,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             return null;
         }
         $sql = 'SELECT
-                    c.`name` AS country,
+                    COALESCE(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
                     e.`email`,
@@ -158,10 +167,37 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         $params = [$identity_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return $rs;
+    }
+
+    public static function isUserAssociatedWithIdentityOfGroup(int $userId, int $identityId) {
+        global  $conn;
+        $sql = '
+            SELECT
+                COUNT(*) = 1 AS associated
+            FROM
+                Groups_Identities gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                i.user_id = ? AND
+                gi.group_id IN (
+                    SELECT
+                        group_id
+                    FROM
+                        Groups_Identities
+                    WHERE
+                        identity_id = ?
+                )
+            LIMIT 1;';
+        $args = [$userId, $identityId];
+
+        $rs = $conn->GetRow($sql, $args);
+
+        return $rs['associated'] == '1';
     }
 
     public static function getUnassociatedIdentity($username) {
@@ -174,11 +210,11 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             WHERE
                 i.username = ?
                 AND user_id IS NULL
-            LIMIT 1';
+            LIMIT 1;';
         $args = [$username];
 
         $rs = $conn->GetRow($sql, $args);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return new Identities($rs);
@@ -201,7 +237,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 i.user_id = ?
                 ';
 
-        $rs = $conn->Execute($sql, [$userId]);
+        $rs = $conn->GetAll($sql, [$userId]);
         $result = [];
         foreach ($rs as $identity) {
             array_push($result, [

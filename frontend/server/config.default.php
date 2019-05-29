@@ -53,22 +53,20 @@ try_define('OMEGAUP_JSERROR_LOG_FILE', '/var/log/omegaup/jserror.log');
 # ####################################
 # GRADER CONFIG
 # ####################################
-try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680/run/grade/');
+try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680');
+try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:33861');
+try_define('OMEGAUP_GITSERVER_SECRET_KEY', 'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA==');
+try_define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw=');
+try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
 try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
-try_define('RUNS_PATH', '/var/lib/omegaup/submissions');
-try_define('GRADE_PATH', '/var/lib/omegaup/grade');
-try_define('PROBLEMS_GIT_PATH', '/var/lib/omegaup/problems.git');
 try_define('BIN_PATH', OMEGAUP_ROOT . '/../bin');
 try_define('IMAGES_PATH', OMEGAUP_ROOT . '/www/img/');
 try_define('IMAGES_URL_PATH', '/img/');
 try_define('TEMPLATES_PATH', OMEGAUP_ROOT . '/www/templates/');
 try_define('TEMPLATES_URL_PATH', '/templates/');
-try_define('OMEGAUP_GRADER_RELOAD_CONFIG_URL', 'https://localhost:21680/reload-config/');
-try_define('OMEGAUP_GRADER_STATUS_URL', 'https://localhost:21680/grader/status/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
-try_define('OMEGAUP_GRADER_BROADCAST_URL', 'https://localhost:21680/broadcast/');
 try_define('OMEGAUP_GRADER_FAKE', false);
 
 # ####################################
@@ -81,7 +79,7 @@ try_define('OMEGAUP_FB_SECRET', 'xxxxx');
 # GOOGLE LOGIN CONFIG
 # ####################################
 try_define('OMEGAUP_GOOGLE_SECRET', 'xxxxx');
-try_define('OMEGAUP_GOOGLE_CLIENTID', 'xxxxx');
+try_define('OMEGAUP_GOOGLE_CLIENTID', '');
 
 # ####################################
 # LINKEDIN LOGIN CONFIG
@@ -159,6 +157,12 @@ try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
 # ########################
 # S3 CONFIG
 # ########################
-try_define('AWS_CLI_BINARY', '/usr/local/bin/aws');
 try_define('AWS_CLI_ACCESS_KEY_ID', null);
 try_define('AWS_CLI_SECRET_ACCESS_KEY', null);
+try_define('AWS_CLI_BINARY', '/usr/bin/aws');
+
+# ########################
+# NEW RELIC CONFIG
+# ########################
+try_define('NEW_RELIC_SCRIPT', null);
+try_define('NEW_RELIC_SCRIPT_HASH', null);

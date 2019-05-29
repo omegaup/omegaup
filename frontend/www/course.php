@@ -1,5 +1,5 @@
 <?php
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 
 UITools::redirectToLoginIfNotLoggedIn();
 
@@ -58,7 +58,11 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         header('HTTP/1.1 404 Not Found');
         die();
     }
-    $showScoreboard = $session['valid'] && CourseController::shouldShowScoreboard($session['identity']->identity_id, $course, $group);
+    $showScoreboard = $session['valid'] && CourseController::shouldShowScoreboard(
+        intval($session['identity']->identity_id),
+        $course,
+        $group
+    );
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {

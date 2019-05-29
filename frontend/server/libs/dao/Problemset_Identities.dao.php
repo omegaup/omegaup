@@ -10,12 +10,19 @@ include_once('base/Problemset_Identities.vo.base.php');
   *
   */
 class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
-    public static function CheckAndSaveFirstTimeAccess(
+    public static function checkProblemsetOpened(
+        int $identityId,
+        int $problemsetId
+    ) : bool {
+        return !is_null(self::getByPK($identityId, $problemsetId));
+    }
+
+    public static function checkAndSaveFirstTimeAccess(
         $identity_id,
         $problemset_id,
         $grant_access = false,
         $share_user_information = false
-    ) {
+    ) : ProblemsetIdentities {
         $problemset_identity = self::getByPK($identity_id, $problemset_id);
         if (is_null($problemset_identity)) {
             if (!$grant_access) {
@@ -28,6 +35,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemset_identity->access_time = date('Y-m-d H:i:s');
             $problemset_identity->score = 0;
             $problemset_identity->time = 0;
+            $problemset_identity->is_invited = 0;
             $problemset_identity->share_user_information = $share_user_information;
             ProblemsetIdentitiesDAO::save($problemset_identity);
         } elseif (is_null($problemset_identity->access_time)) {
@@ -72,6 +80,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 i.user_id,
                 i.username,
                 pi.access_time,
+                pi.is_invited,
                 e.email,
                 i.country_id,
                 pi.access_time

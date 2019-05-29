@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 
 // If the user have private material (contests/problems), an alert is issued
 // suggesting to contribute to the community by releasing the material to

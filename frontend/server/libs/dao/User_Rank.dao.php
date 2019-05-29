@@ -41,10 +41,10 @@ class UserRankDAO extends UserRankDAOBase {
             $sql_from .= ' WHERE country_id = ? AND state_id = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sql_from .= ' WHERE ' . mysqli_real_escape_string($conn->_connectionID, $filteredBy) . '_id = ?';
+            $sql_from .= ' WHERE ' . $conn->escape($filteredBy) . '_id = ?';
         }
         if (!is_null($order)) {
-            $sql_from .= ' ORDER BY ' . mysqli_real_escape_string($conn->_connectionID, $order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
+            $sql_from .= ' ORDER BY ' . $conn->escape($order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         $sql_limit = '';
         $params_limit = [];
@@ -59,7 +59,7 @@ class UserRankDAO extends UserRankDAOBase {
         $params = array_merge($params, $params_limit);
 
         // Get rows
-        $rs = $conn->Execute($sql . $sql_from . $sql_limit, $params);
+        $rs = $conn->GetAll($sql . $sql_from . $sql_limit, $params);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = new UserRank($row);

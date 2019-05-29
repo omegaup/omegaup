@@ -27,10 +27,10 @@ class RolesPermissions extends VO {
             return;
         }
         if (isset($data['role_id'])) {
-            $this->role_id = $data['role_id'];
+            $this->role_id = (int)$data['role_id'];
         }
         if (isset($data['permission_id'])) {
-            $this->permission_id = $data['permission_id'];
+            $this->permission_id = (int)$data['permission_id'];
         }
     }
 
@@ -38,11 +38,11 @@ class RolesPermissions extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

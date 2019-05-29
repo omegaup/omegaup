@@ -3,6 +3,7 @@
 import JSZip from 'jszip';
 import Vue from 'vue';
 import Vuex from 'vuex';
+import pako from 'pako';
 
 import * as Util from './util';
 import CaseSelectorComponent from './CaseSelectorComponent.vue';
@@ -12,7 +13,8 @@ import SettingsComponent from './SettingsComponent.vue';
 import TextEditorComponent from './TextEditorComponent.vue';
 import ZipViewerComponent from './ZipViewerComponent.vue';
 
-let defaultValidatorSource = `#!/usr/bin/python
+const isEmbedded = window.location.search.indexOf('embedded') !== -1;
+const defaultValidatorSource = `#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -62,6 +64,121 @@ int main(int argc, char* argv[]) {
     printf("%d\\n", sumas(a, b));
 }`;
 
+const sourceTemplates = {
+  c: `#include <stdio.h>
+#include <stdint.h>
+
+int main() {
+  int64_t a, b;
+  scanf("%" SCNd64 " %" SCNd64, &a, &b);
+  printf("%" PRId64 "\\n", a + b);
+}`,
+  cpp: `#include <iostream>
+
+int main() {
+  int64_t a, b;
+  std::cin >> a >> b;
+  std::cout << a + b << '\\n';
+}`,
+  cs: `using System.Collections.Generic;
+using System.Linq;
+using System;
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    List<long> l = new List<long>();
+    foreach (String token in Console.ReadLine().Trim().Split(' ')) {
+      l.Add(Int64.Parse(token));
+    }
+    Console.WriteLine(l.Sum(x => x));
+  }
+}`,
+  java: `import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class Main {
+  public static void main(String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(
+                          new InputStreamReader(System.in));
+
+    StringTokenizer st = new StringTokenizer(br.readLine());
+    long a = Long.parseLong(st.nextToken());
+    long b = Long.parseLong(st.nextToken());
+    System.out.println(a + b);
+  }
+}`,
+  lua: `a = io.read("*n");
+b = io.read("*n");
+io.write(a + b);`,
+  py: `#!/usr/bin/python
+
+from __future__ import print_function
+
+def _main():
+  a, b = (int(num) for num in raw_input().strip().split())
+  print('%d', a + b)
+
+if __name__ == '__main__':
+  _main()`,
+  rb: `a, b = gets.chomp.split(' ').map!{ |num| num.to_i }
+print a + b`,
+};
+
+const interactiveTemplates = {
+  c: `#include "sumas.h"
+
+int sumas(int a, int b) {
+  // FIXME
+  return 0;
+}`,
+  cpp: `#include "sumas.h"
+
+int sumas(int a, int b) {
+  // FIXME
+  return 0;
+}`,
+  cs: '// not supported',
+  java: `public class sumas {
+  public static int sumas(int a, int b) {
+    // FIXME
+    return 0;
+  }
+}`,
+  lua: '-- not supported',
+  pas: `unit sumas;
+{
+ unit Main;
+}
+
+interface
+  function sumas(a: LongInt; b: LongInt): LongInt;
+
+implementation
+
+uses Main;
+
+function sumas(a: LongInt; b: LongInt): LongInt;
+begin
+  { FIXME }
+  sumas := 0;
+end;
+
+end.`,
+  py: `#!/usr/bin/python
+
+import Main
+
+def sumas(a, b):
+    """ sumas """
+    # FIXME
+    return 0`,
+  rb: '# not supported',
+};
+
 Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
@@ -71,6 +188,7 @@ let store = new Vuex.Store({
       },
     },
     dirty: true,
+    updatingSettings: false,
     max_score: 1,
     results: null,
     outputs: {},
@@ -173,6 +291,7 @@ let store = new Vuex.Store({
       return !!state.request.input.validator.custom_validator;
     },
     isInteractive(state) { return !!state.request.input.interactive; },
+    isUpdatingSettings(state) { return !!state.updatingSettings; },
     isDirty(state) { return !!state.dirty; },
   },
   mutations: {
@@ -292,6 +411,7 @@ let store = new Vuex.Store({
       state.request.input.interactive.module_name = value;
       state.dirty = true;
     },
+    updatingSettings(state, value) { state.updatingSettings = value; },
 
     createCase(state, caseData) {
       if (!state.request.input.cases.hasOwnProperty(caseData.name)) {
@@ -302,6 +422,7 @@ let store = new Vuex.Store({
         });
       }
       state.request.input.cases[caseData.name].weight = caseData.weight;
+      state.currentCase = caseData.name;
       state.dirty = true;
     },
     removeCase(state, name) {
@@ -313,8 +434,7 @@ let store = new Vuex.Store({
     },
     reset(state) {
       Vue.set(state, 'request', {
-        source:
-            "#include <iostream>\n\nint main() {\n\tint64_t a, b;\n\tstd::cin >> a >> b;\n\tstd::cout << a + b << '\\n';\n}",
+        source: sourceTemplates.cpp,
         language: 'cpp11',
         input: {
           limits: {
@@ -348,6 +468,7 @@ let store = new Vuex.Store({
       state.currentCase = 'sample';
       state.logs = '';
       state.compilerOutput = '';
+      state.updatingSettings = false;
       state.dirty = true;
     },
   },
@@ -365,10 +486,11 @@ const goldenLayoutSettings = {
       content: [
         {
           type: 'column',
+          id: 'main-column',
           content: [
             {
               type: 'stack',
-              id: 'sourceAndSettings',
+              id: 'source-and-settings',
               content: [
                 {
                   type: 'component',
@@ -386,6 +508,7 @@ const goldenLayoutSettings = {
                 {
                   type: 'component',
                   componentName: 'settings-component',
+                  id: 'settings',
                   componentState: {
                     storeMapping: {},
                     id: 'settings',
@@ -439,9 +562,11 @@ const goldenLayoutSettings = {
               height: 20,
             },
           ],
+          isClosable: false,
         },
         {
           type: 'column',
+          id: 'cases-column',
           content: [
             {
               type: 'row',
@@ -522,9 +647,11 @@ const goldenLayoutSettings = {
               ],
             },
           ],
+          isClosable: false,
         },
         {
           type: 'component',
+          id: 'case-selector-column',
           componentName: 'case-selector-component',
           componentState: {
             storeMapping: {
@@ -563,8 +690,9 @@ const interactiveIdlSettings = {
       module: 'request.input.interactive.module_name',
     },
     initialLanguage: 'idl',
+    readOnly: isEmbedded,
   },
-  id: 'interactive_idl',
+  id: 'interactive-idl',
   isClosable: false,
 };
 const interactiveMainSourceSettings = {
@@ -577,7 +705,7 @@ const interactiveMainSourceSettings = {
     },
     initialModule: 'Main',
   },
-  id: 'interactive_main_source',
+  id: 'interactive-main-source',
   isClosable: false,
 };
 
@@ -635,48 +763,119 @@ RegisterVueComponent(layout, 'text-editor-component', TextEditorComponent,
 RegisterVueComponent(layout, 'zip-viewer-component', ZipViewerComponent,
                      componentMapping);
 
-layout.init();
+function initialize() {
+  layout.init();
 
-let sourceAndSettings = layout.root.getItemsById('sourceAndSettings')[0];
-if (store.getters.isCustomValidator)
-  sourceAndSettings.addChild(validatorSettings);
-store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
-    function(value) {
-      if (value)
-        sourceAndSettings.addChild(validatorSettings);
-      else
-        layout.root.getItemsById(validatorSettings.id)[0].remove();
+  let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
+  if (store.getters.isCustomValidator)
+    sourceAndSettings.addChild(validatorSettings);
+  store.watch(
+      Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
+      function(value) {
+        if (value)
+          sourceAndSettings.addChild(validatorSettings);
+        else
+          layout.root.getItemsById(validatorSettings.id)[0].remove();
+      });
+  if (store.getters.isInteractive) {
+    sourceAndSettings.addChild(interactiveIdlSettings);
+    sourceAndSettings.addChild(interactiveMainSourceSettings);
+    let sourceItem = layout.root.getItemsById('source')[0];
+    sourceItem.parent.setActiveContentItem(sourceItem);
+  }
+  store.watch(
+      Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
+      function(value) {
+        if (value) {
+          sourceAndSettings.addChild(interactiveIdlSettings);
+          sourceAndSettings.addChild(interactiveMainSourceSettings);
+          let sourceItem = layout.root.getItemsById('source')[0];
+          sourceItem.parent.setActiveContentItem(sourceItem);
+        } else {
+          layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
+          layout.root.getItemsById(interactiveMainSourceSettings.id)[0]
+              .remove();
+        }
+      });
+
+  if (isEmbedded) {
+    // Embedded layout should not be able to modify the settings.
+    layout.root.getItemsById('settings')[0].remove();
+    document.getElementById('download').style.display = 'none';
+    document.getElementById('upload').style.display = 'none';
+    document.querySelector('label[for="upload"]').style.display = 'none';
+
+    // Since the embedded grader has a lot less horizontal space available, we
+    // move the first two columns into a stack so they can be switched between.
+    let mainColumn = layout.root.getItemsById('main-column')[0];
+    let casesColumn = layout.root.getItemsById('cases-column')[0];
+    let caseSelectorColumn =
+        layout.root.getItemsById('case-selector-column')[0];
+    let oldWidth = caseSelectorColumn.element[0].clientWidth;
+    let oldHeight = caseSelectorColumn.element[0].clientHeight;
+
+    let newStack = layout.createContentItem({
+      type: 'stack',
+      content: [],
+      isClosable: false,
     });
-if (store.getters.isInteractive) {
-  sourceAndSettings.addChild(interactiveIdlSettings);
-  sourceAndSettings.addChild(interactiveMainSourceSettings);
+
+    mainColumn.parent.addChild(newStack, 0);
+
+    casesColumn.setTitle('cases');
+    casesColumn.parent.removeChild(casesColumn, true);
+    newStack.addChild(casesColumn, 0);
+
+    mainColumn.setTitle('code');
+    mainColumn.parent.removeChild(mainColumn, true);
+    newStack.addChild(mainColumn, 0);
+
+    // Also extend the case selector column a little bit so that it looks nicer.
+    caseSelectorColumn.container.setSize(Math.max(160, oldWidth), oldHeight);
+
+    // Whenever a case is selected, show the cases tab.
+    store.watch(
+        Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
+        (value) => {
+          if (store.getters.isUpdatingSettings) return;
+          casesColumn.parent.setActiveContentItem(casesColumn);
+        });
+  }
 }
-store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
-    function(value) {
-      if (value) {
-        sourceAndSettings.addChild(interactiveIdlSettings);
-        sourceAndSettings.addChild(interactiveMainSourceSettings);
-      } else {
-        layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
-        layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
-      }
-    });
+
+function onResized() {
+  const layoutRoot = document.getElementById('layout-root');
+  if (!layoutRoot.clientWidth) return;
+  if (!layout.isInitialised) {
+    initialize();
+  }
+  layout.updateSize();
+}
 
 if (window.ResizeObserver) {
-  new ResizeObserver(() => { layout.updateSize(); })
-      .observe(document.getElementById('layout-root'));
+  new ResizeObserver(onResized).observe(document.getElementById('layout-root'));
 } else {
-  window.addEventListener('resize', () => { layout.updateSize(); });
+  window.addEventListener('resize', onResized);
 }
+onResized();
 
 document.getElementById('language')
     .addEventListener(
         'change', function() { store.commit('request.language', this.value); });
 store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'request.language').get,
-    function(value) { document.getElementById('language').value = value; });
+    (value) => {
+      document.getElementById('language').value = value;
+      if (!Util.languageExtensionMapping.hasOwnProperty(value)) return;
+      let language = Util.languageExtensionMapping[value];
+      if (store.getters.isInteractive) {
+        if (!interactiveTemplates.hasOwnProperty(language)) return;
+        store.commit('request.source', interactiveTemplates[language]);
+      } else {
+        if (!sourceTemplates.hasOwnProperty(language)) return;
+        store.commit('request.source', sourceTemplates[language]);
+      }
+    });
 
 function onDetailsJsonReady(results) {
   store.commit('results', results);
@@ -713,7 +912,7 @@ function onFilesZipReady(blob) {
                 }
                 store.commit('compilerOutput', '');
               })
-              .fail(Util.asyncError);
+              .catch(Util.asyncError);
           for (let filename in zip.files) {
             if (filename.indexOf('/') !== -1) continue;
             zip.file(filename)
@@ -724,10 +923,10 @@ function onFilesZipReady(blob) {
                     contents: contents,
                   });
                 })
-                .fail(Util.asyncError);
+                .catch(Util.asyncError);
           }
         })
-        .fail(Util.asyncError);
+        .catch(Util.asyncError);
   });
   reader.readAsArrayBuffer(blob);
 }
@@ -735,8 +934,8 @@ function onFilesZipReady(blob) {
 store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isDirty').get,
     function(value) {
-      if (!value) return;
       let downloadLabelElement = document.getElementById('download-label');
+      if (!value || !downloadLabelElement) return;
 
       if (downloadLabelElement.className.indexOf('fa-download') == -1) return;
       downloadLabelElement.className = downloadLabelElement.className.replace(
@@ -778,14 +977,14 @@ document.getElementById('upload').addEventListener('change', e => {
                     store.commit('currentCase', caseName);
                     store.commit('inputIn', value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
               zip.file(caseOutFileName)
                   .async('string')
                   .then(value => {
                     store.commit('currentCase', caseName);
                     store.commit('inputOut', value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             } else if (fileName.startsWith('validator.')) {
               let extension = fileName.substring('validator.'.length);
               if (!Util.languageExtensionMapping.hasOwnProperty(extension))
@@ -799,7 +998,7 @@ document.getElementById('upload').addEventListener('change', e => {
                         'request.input.validator.custom_validator.source',
                         value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             } else if (fileName.startsWith('interactive/') &&
                        fileName.endsWith('.idl')) {
               let moduleName = fileName.substring(
@@ -811,7 +1010,7 @@ document.getElementById('upload').addEventListener('change', e => {
                     store.commit('InteractiveModuleName', moduleName);
                     store.commit('request.input.interactive.idl', value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             } else if (fileName.startsWith('interactive/Main.')) {
               let extension = fileName.substring('interactive/Main.'.length);
               if (!Util.languageExtensionMapping.hasOwnProperty(extension))
@@ -824,7 +1023,7 @@ document.getElementById('upload').addEventListener('change', e => {
                     store.commit('request.input.interactive.main_source',
                                  value);
                   })
-                  .fail(Util.asyncError);
+                  .catch(Util.asyncError);
             }
           }
 
@@ -844,7 +1043,7 @@ document.getElementById('upload').addEventListener('change', e => {
                     });
                   }
                 })
-                .fail(Util.asyncError);
+                .catch(Util.asyncError);
           }
           if (zip.files.hasOwnProperty('settings.json')) {
             zip.file('settings.json')
@@ -869,10 +1068,10 @@ document.getElementById('upload').addEventListener('change', e => {
                     }
                   }
                 })
-                .fail(Util.asyncError);
+                .catch(Util.asyncError);
           }
         })
-        .fail(Util.asyncError);
+        .catch(Util.asyncError);
   });
   reader.readAsArrayBuffer(files[0]);
 });
@@ -946,7 +1145,7 @@ document.getElementById('download')
             downloadElement.download = 'omegaup.zip';
             downloadElement.href = window.URL.createObjectURL(blob);
           })
-          .fail(Util.asyncError);
+          .catch(Util.asyncError);
     });
 
 document.getElementsByTagName('form')[0].addEventListener('submit', e => {
@@ -1006,8 +1205,68 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
 
         onFilesZipReady(formData.get('files.zip'));
       })
-      .fail(Util.asyncError);
+      .catch(Util.asyncError);
 });
+
+function setSettings(settings) {
+  store.commit('reset');
+  store.commit('updatingSettings', true);
+  store.commit('removeCase', 'long');
+  store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
+  store.commit('OutputLimit', settings.limits.OutputLimit);
+  for (let name of['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
+    if (!settings.limits.hasOwnProperty(name)) continue;
+    store.commit(name, Util.parseDuration(settings.limits[name]));
+  }
+  store.commit('Validator', settings.validator.name);
+  store.commit('Tolerance', settings.validator.tolerance);
+
+  store.commit('Interactive', !!settings.interactive);
+  if (settings.interactive) {
+    for (let language in settings.interactive.templates) {
+      if (!settings.interactive.templates.hasOwnProperty(language)) continue;
+      interactiveTemplates[language] = settings.interactive.templates[language];
+    }
+    store.commit('request.source', interactiveTemplates.cpp);
+    store.commit('InteractiveLanguage', settings.interactive.language);
+    store.commit('InteractiveModuleName', settings.interactive.module_name);
+    store.commit('request.input.interactive.idl', settings.interactive.idl);
+    store.commit('request.input.interactive.main_source',
+                 settings.interactive.main_source);
+  }
+  for (let caseName in settings.cases) {
+    if (!settings.cases.hasOwnProperty(caseName)) continue;
+    let caseData = settings.cases[caseName];
+    store.commit('createCase', {
+      name: caseName,
+      weight: caseData.weight,
+    });
+    store.commit('inputIn', caseData['in']);
+    store.commit('inputOut', caseData.out);
+  }
+  // Given that the current case will change several times, schedule the
+  // flag to avoid swapping into the cases view for the next tick.
+  //
+  // Also change to the main column in case it was not previously selected.
+  setTimeout(() => {
+    store.commit('updatingSettings', false);
+    if (!layout.isInitialised) return;
+    let mainColumn = layout.root.getItemsById('main-column')[0];
+    mainColumn.parent.setActiveContentItem(mainColumn);
+  });
+}
+
+// Add a message listener in case we are embedded or the embedded runner was
+// popped into a full-blown tab.
+window.addEventListener('message', e => {
+  if (e.origin != window.location.origin || !e.data) return;
+
+  switch (e.data.method) {
+    case 'setSettings':
+      setSettings(...e.data.params);
+      break;
+  }
+}, false);
 
 function onHashChanged() {
   if (window.location.hash.length == 0) {
@@ -1038,6 +1297,16 @@ function onHashChanged() {
             Util.parseDuration(request.input.limits.OverallWallTimeLimit);
         request.input.limits.TimeLimit =
             Util.parseDuration(request.input.limits.TimeLimit);
+        if (!request.input.cases.sample) {
+          // When the run was made programatically, it does not always contain
+          // a sample case. In order to display those runs without crashing,
+          // just create a fake entry with no weight.
+          request.input.cases.sample = {
+            'in': '',
+            out: '',
+            weight: 0,
+          };
+        }
         store.commit('request', request);
         fetch(`run/${token}/details.json`)
             .then(response => {
@@ -1045,23 +1314,23 @@ function onHashChanged() {
               return response.json();
             })
             .then(onDetailsJsonReady)
-            .fail(Util.asyncError);
+            .catch(Util.asyncError);
         fetch(`run/${token}/files.zip`)
             .then(response => {
               if (!response.ok) return null;
               return response.blob();
             })
             .then(onFilesZipReady)
-            .fail(Util.asyncError);
+            .catch(Util.asyncError);
         fetch(`run/${token}/logs.txt`)
             .then(response => {
               if (!response.ok) return '';
               return response.text();
             })
             .then(text => store.commit('logs', text))
-            .fail(Util.asyncError);
+            .catch(Util.asyncError);
       })
-      .fail(Util.asyncError);
+      .catch(Util.asyncError);
 }
 window.addEventListener('hashchange', onHashChanged, false);
 onHashChanged();

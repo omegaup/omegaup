@@ -11,15 +11,6 @@ class ApiCaller {
     public static $log;
 
     /**
-     * Initializes the Request before calling API
-     *
-     * @return Request
-     */
-    private static function init() {
-        return self::parseUrl();
-    }
-
-    /**
      * Execute the request and return the response as associative
      * array.
      *
@@ -29,9 +20,6 @@ class ApiCaller {
     public static function call(Request $request) {
         try {
             $response = $request->execute();
-        } catch (InvalidCredentialsException $e) {
-            // No log because the code that threw it already logged.
-            $response = $e->asResponseArray();
         } catch (ApiException $e) {
             self::$log->error($e);
             $response = $e->asResponseArray();
@@ -70,29 +58,33 @@ class ApiCaller {
     }
 
     /**
-     *Handles main API workflow. All HTTP API calls start here.
-     *
+     * Handles main API workflow. All HTTP API calls start here.
      */
-    public static function httpEntryPoint() {
+    public static function httpEntryPoint() : string {
         $r = null;
+        $apiException = null;
         try {
-            $r = self::init();
             if (self::isCSRFAttempt()) {
                 throw new CSRFException();
             }
-            $response = self::call($r);
-        } catch (ApiException $apiException) {
-            self::$log->error($apiException);
-            $response = $apiException->asResponseArray();
+            $r = self::createRequest();
+            $response = $r->execute();
+            if (is_null($response) || !is_array($response)) {
+                $apiException = new InternalServerErrorException(
+                    new Exception('API did not return an array.')
+                );
+            }
+        } catch (ApiException $e) {
+            $apiException = $e;
         } catch (Exception $e) {
-            self::$log->error($e);
             $apiException = new InternalServerErrorException($e);
-            $response = $apiException->asResponseArray();
         }
 
-        if (is_null($response) || !is_array($response)) {
-            $apiException = new InternalServerErrorException(new Exception('Api did not return an array.'));
+        if (!is_null($apiException)) {
             self::$log->error($apiException);
+            if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
+                newrelic_notice_error($apiException);
+            }
             $response = $apiException->asResponseArray();
         }
 
@@ -100,67 +92,85 @@ class ApiCaller {
     }
 
     /**
-     * Renders the response properly and, in the case of HTTP API,
-     * sets the header
+     * Determines whether the array is associative or packed.
+     *
+     * @param array $array the input array.
+     *
+     * @return boolean whether the array is associative.
+     */
+    static function isAssociativeArray(array &$array) {
+        if (!is_array($array)) {
+            return false;
+        }
+        $i = 0;
+        foreach ($array as $key => &$value) {
+            if ($key != $i++) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Renders the response properly and sets the HTTP header.
      *
      * @param array $response
      * @param Request $r
      */
-    private static function render(array $response, Request $r = null) {
-        if (!is_null($r) && $r->renderFormat == Request::HTML_FORMAT) {
-            $smarty->assign('EXPLORER_RESPONSE', $response);
-            $smarty->display('../templates/explorer.tpl');
-        } else {
-            static::setHttpHeaders($response);
-            $json_result = json_encode($response);
-
-            if ($json_result === false) {
-                self::$log->warn('json_encode failed for: '. print_r($response, true));
-                if (json_last_error() == JSON_ERROR_UTF8) {
-                    // Attempt to recover gracefully, removing any unencodeable
-                    // elements from the response. This should at least prevent
-                    // completely and premanently breaking some scenarios, like
-                    // trying to fix a problem with illegal UTF-8 codepoints.
-                    $json_result = json_encode($response, JSON_PARTIAL_OUTPUT_ON_ERROR);
-                }
-                if ($json_result === false) {
-                    $apiException = new InternalServerErrorException();
-                    $json_result = json_encode($apiException->asResponseArray());
-                }
-            }
-
-            // Print the result using late static binding semantics
-            // Return needed for testability purposes, for production it
-            // returns void.
-            return static::printResult($json_result);
+    private static function render(array $response, ?Request $r = null) : string {
+        // Only add the request ID if the response is an associative array. This
+        // allows the APIs that return a flat array to return the right type.
+        if (self::isAssociativeArray($response)) {
+            $response['_id'] = Request::requestId();
         }
-    }
+        $jsonEncodeFlags = 0;
+        // If this request is being explicitly made from the browser,
+        // pretty-print the response.
+        if (!is_null($r) && $r['prettyprint'] == 'true') {
+            $jsonEncodeFlags = JSON_PRETTY_PRINT;
+        }
+        static::setHttpHeaders($response);
+        $jsonResult = json_encode($response, $jsonEncodeFlags);
 
-    /**
-     * In production, prints the result.
-     * Decoupled for testability purposes
-     *
-     * @param string $string
-     */
-    private static function printResult($string) {
-        echo $string;
+        if ($jsonResult === false) {
+            self::$log->warn('json_encode failed for: '. print_r($response, true));
+            if (json_last_error() == JSON_ERROR_UTF8) {
+                // Attempt to recover gracefully, removing any unencodeable
+                // elements from the response. This should at least prevent
+                // completely and premanently breaking some scenarios, like
+                // trying to fix a problem with illegal UTF-8 codepoints.
+                $jsonResult = json_encode(
+                    $response,
+                    $jsonEncodeFlags|JSON_PARTIAL_OUTPUT_ON_ERROR
+                );
+            }
+            if ($jsonResult === false) {
+                $apiException = new InternalServerErrorException();
+                self::$log->error($apiException);
+                if (extension_loaded('newrelic')) {
+                    newrelic_notice_error($apiException);
+                }
+                $jsonResult = json_encode($apiException->asResponseArray());
+            }
+        }
+        return $jsonResult;
     }
 
     /**
      * Parses the URI from $_SERVER and determines which controller and
-     * function to call.
+     * function to call in order to build a Request object.
      *
      * @return Request
      * @throws NotFoundException
      */
-    private static function parseUrl() {
+    private static function createRequest() {
         $apiAsUrl = $_SERVER['REQUEST_URI'];
         // Spliting only by '/' results in URIs with parameters like this:
-        //		/api/problem/list/?page=1
-        //						 ^^
+        //      /api/problem/list/?page=1
+        //                       ^^
         // Adding '?' as a separator results in URIs like this:
-        //		/api/problem/list?page=1
-        //						 ^
+        //      /api/problem/list?page=1
+        //                       ^
         $args = preg_split('/[\/?]/', $apiAsUrl);
 
         if ($args === false || count($args) < 2) {

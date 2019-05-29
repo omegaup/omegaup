@@ -50,9 +50,6 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response['title'], $problemDAO->title);
         $this->assertEquals($response['alias'], $problemDAO->alias);
         $this->assertEquals($response['points'], 100);
-        $this->assertEquals($response['validator'], $problemDAO->validator);
-        $this->assertEquals($response['time_limit'], $problemDAO->time_limit);
-        $this->assertEquals($response['memory_limit'], $problemDAO->memory_limit);
         $this->assertEquals($response['problemsetter']['username'], $author->username);
         $this->assertEquals($response['problemsetter']['name'], $author->name);
         $this->assertEquals($response['source'], $problemDAO->source);
@@ -140,6 +137,8 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ]));
 
         $this->assertEquals($response['alias'], $problemData['request']['problem_alias']);
+        $this->assertEquals($response['commit'], $problemData['problem']->commit);
+        $this->assertEquals($response['version'], $problemData['problem']->current_version);
     }
 
     /**
@@ -279,5 +278,107 @@ class ProblemDetailsTest extends OmegaupTestCase {
             $runDataInContest['response']['guid'],
             $response['runs'][0]['guid']
         );
+    }
+
+    /**
+     * Solvers are returned only outside of a contests.
+     */
+    public function testShowSolvers() {
+        // Create problem and contest
+        $problemData = ProblemsFactory::createProblem();
+        $contestData = ContestsFactory::createContest();
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Create contestant
+        $contestant = UserFactory::createUser();
+
+        // Create an accepted run.
+        $runDataInsideContest = RunsFactory::createRun($problemData, $contestData, $contestant);
+        RunsFactory::gradeRun($runDataInsideContest);
+
+        // Call API
+        $login = self::login($contestant);
+        {
+            $response = ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'contest_alias' => $contestData['request']['alias'],
+                'show_solvers' => true,
+            ]));
+            $this->assertArrayNotHasKey('solvers', $response);
+        }
+        {
+            $response = ProblemController::apiDetails(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'show_solvers' => true,
+            ]));
+            $this->assertCount(1, $response['solvers']);
+            $this->assertEquals($contestant->username, $response['solvers'][0]['username']);
+        }
+    }
+
+    /**
+     * Solutions that don't exist don't cause an exception.
+     */
+    public function testShowSolutionInexistent() {
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'imagetest.zip',
+        ]));
+        $login = self::login($problemData['author']);
+        {
+            $response = ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->assertEmpty($response['solution']['markdown']);
+        }
+    }
+
+    /**
+     * Solutions can be viewed by a problem admin.
+     */
+    public function testShowSolutionByAdmin() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        {
+            $response = ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->assertContains('`long long`', $response['solution']['markdown']);
+        }
+    }
+
+    /**
+     * Solutions can be viewed by a user that has solved the problem.
+     */
+    public function testShowSolutionBySolver() {
+        $problemData = ProblemsFactory::createProblem();
+
+        $contestant = UserFactory::createUser();
+
+        try {
+            $login = self::login($contestant);
+            ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->fail('User should not have been able to view solution');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals('problemSolutionNotVisible', $e->getMessage());
+        }
+
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        {
+            $login = self::login($contestant);
+            $response = ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->assertContains('`long long`', $response['solution']['markdown']);
+        }
     }
 }

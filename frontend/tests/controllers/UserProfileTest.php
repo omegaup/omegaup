@@ -7,8 +7,8 @@
  */
 class UserProfileTest extends OmegaupTestCase {
     /*
-	 * Test for the function which returns the general user info
-	 */
+     * Test for the function which returns the general user info
+     */
     public function testUserData() {
         $user = UserFactory::createUser(new UserParams(['username' => 'testuser1']));
 
@@ -23,8 +23,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test for the function which returns the general user info
-	 */
+     * Test for the function which returns the general user info
+     */
     public function testUserDataAnotherUser() {
         $user = UserFactory::createUser(new UserParams(['username' => 'testuser2']));
         $user2 = UserFactory::createUser(new UserParams(['username' => 'testuser3']));
@@ -42,8 +42,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test apiProfile with is_private enabled
-	 */
+     * Test apiProfile with is_private enabled
+     */
     public function testUserPrivateDataAnotherUser() {
         $user = UserFactory::createUser();
         // Mark user2's profile as private (5th argument)
@@ -132,8 +132,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test the contest which a certain user has participated
-	 */
+     * Test the contest which a certain user has participated
+     */
     public function testUserContests() {
         $contestant = UserFactory::createUser();
 
@@ -163,9 +163,9 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test the contest which a certain user has participated.
-	 * API can be accessed by a user who cannot see the contest (contest is private)
-	 */
+     * Test the contest which a certain user has participated.
+     * API can be accessed by a user who cannot see the contest (contest is private)
+     */
     public function testUserContestsPrivateContestOutsider() {
         $contestant = UserFactory::createUser();
 
@@ -198,8 +198,8 @@ class UserProfileTest extends OmegaupTestCase {
     }
 
     /*
-	 * Test the problems solved by user
-	 */
+     * Test the problems solved by user
+     */
     public function testProblemsSolved() {
         $user = UserFactory::createUser();
 
@@ -213,9 +213,12 @@ class UserProfileTest extends OmegaupTestCase {
 
         ContestsFactory::addUser($contest, $user);
 
+        //Submission gap between runs must be 60 seconds
         $runs = [];
         $runs[0] = RunsFactory::createRun($problemOne, $contest, $user);
+        Time::setTimeForTesting(Time::get() + 60);
         $runs[1] = RunsFactory::createRun($problemTwo, $contest, $user);
+        Time::setTimeForTesting(Time::get() + 60);
         $runs[2] = RunsFactory::createRun($problemOne, $contest, $user);
 
         RunsFactory::gradeRun($runs[0]);
@@ -248,5 +251,39 @@ class UserProfileTest extends OmegaupTestCase {
         // Check email in db
         $user_in_db = UsersDAO::FindByEmail('new@email.com');
         $this->assertEquals($user->user_id, $user_in_db->user_id);
+    }
+
+    /**
+     * Test update main email api
+     */
+    public function testStats() {
+        $user = UserFactory::createUser();
+        $problem = ProblemsFactory::createProblem();
+
+        $login = self::login($user);
+        {
+            $run = RunsFactory::createRunToProblem($problem, $user, $login);
+            RunsFactory::gradeRun($run, 0.0, 'CE');
+        }
+        {
+            $run = RunsFactory::createRunToProblem($problem, $user, $login);
+            RunsFactory::gradeRun($run, 0.5, 'PA');
+        }
+        {
+            $run = RunsFactory::createRunToProblem($problem, $user, $login);
+            RunsFactory::gradeRun($run);
+        }
+
+        $response = UserController::apiStats(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        foreach (['CE', 'PA', 'AC'] as $verdict) {
+            $this->assertEquals(
+                1,
+                $this->findByPredicate($response['runs'], function ($run) use ($verdict) {
+                    return $run['verdict'] == $verdict;
+                })['runs']
+            );
+        }
     }
 }

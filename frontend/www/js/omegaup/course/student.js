@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
             if (assignment == null) return;
             API.Course.studentProgress({
                         course_alias: payload.course.alias,
-                        assignment: assignment.alias,
+                        assignment_alias: assignment.alias,
                         usernameOrEmail: student.username,
                       })
                 .then(function(data) { viewStudent.problems = data.problems; })

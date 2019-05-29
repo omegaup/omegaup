@@ -12,7 +12,7 @@
 {else}
 <script type="text/json" id="current-user-payload">null</script>
 {/if}
-<script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/dist/coder_of_the_month_notice.js"}" async></script>
 <div id="coder-of-the-month-notice"></div>
 
 <div class="container-fluid">
@@ -44,7 +44,7 @@
 			<div class="col-md-6">
 				<div class="panel panel-default">
 					<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
-					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>
+					<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}" async></script>
 					<div id="omegaup-schools-rank"></div>
 					<div class="container-fluid">
 						<div class="col-xs-12 vertical-padding">
@@ -82,7 +82,7 @@
 					<div id="coder-of-the-month-name">{$coderOfTheMonthData.name|htmlspecialchars}</div>
 					<div id="coder-of-the-month-school">{$coderOfTheMonthData.school|htmlspecialchars}</div>
 					<div id="coder-of-the-month-place">
-						{if isset($coderOfTheMonthData.state)} {$coderOfTheMonthData.state|htmlspecialchars}, {/if}{$coderOfTheMonthData.country|htmlspecialchars}
+						{if isset($coderOfTheMonthData.state)} {$coderOfTheMonthData.state|htmlspecialchars}, {/if}{if $coderOfTheMonthData.country != 'xx'}{$coderOfTheMonthData.country|htmlspecialchars}{/if}
 					</div>
 				</div>
 			</div>
@@ -118,6 +118,6 @@
 </div>
 </div><!-- container -->
 
-<script type="text/javascript" src="{version_hash src="/js/index.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/index.js"}" async></script>
 
 {include file='footer.tpl'}

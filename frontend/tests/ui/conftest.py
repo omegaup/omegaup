@@ -20,7 +20,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from ui import util
+from ui import util  # pylint: disable=no-name-in-module
 
 _DEFAULT_TIMEOUT = 10  # seconds
 _DIRNAME = os.path.dirname(__file__)
@@ -294,13 +294,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             SELECT
                 MAX(`r`.`run_id`)
             FROM
-                `Runs` AS `r`
+                `Submissions` AS `s`
+            INNER JOIN
+                `Runs` AS `r` ON
+                `r`.`run_id` = `s`.`current_run_id`
             INNER JOIN
                 `Problems` AS `p` ON
-                `p`.`problem_id` = `r`.`problem_id`
+                `p`.`problem_id` = `s`.`problem_id`
             INNER JOIN
                 `Problemsets` AS `ps` ON
-                `ps`.`problemset_id` = `r`.`problemset_id`
+                `ps`.`problemset_id` = `s`.`problemset_id`
             INNER JOIN
                 `Assignments` AS `a` ON `a`.`acl_id` = `ps`.`acl_id`
             WHERE
@@ -319,13 +322,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             SELECT
                 MAX(`r`.`run_id`)
             FROM
-                `Runs` AS `r`
+                `Submissions` AS `s`
+            INNER JOIN
+                `Runs` AS `r` ON
+                `r`.`run_id` = `s`.`current_run_id`
             INNER JOIN
                 `Problems` AS `p` ON
-                `p`.`problem_id` = `r`.`problem_id`
+                `p`.`problem_id` = `s`.`problem_id`
             INNER JOIN
                 `Problemsets` AS `ps` ON
-                `ps`.`problemset_id` = `r`.`problemset_id`
+                `ps`.`problemset_id` = `s`.`problemset_id`
             INNER JOIN
                 `Contests` AS `c` ON `c`.`acl_id` = `ps`.`acl_id`
             WHERE
@@ -412,7 +418,7 @@ def pytest_pyfunc_call(pyfuncitem):
         current_driver = pyfuncitem.funcargs['driver']
         try:
             logs = current_driver.browser.get_log('browser')
-        except:  # pylint: disable=bare-except
+        except:  # noqa: bare-except
             # geckodriver does not support getting logs:
             # https://github.com/mozilla/geckodriver/issues/284
             logs = []
@@ -461,7 +467,7 @@ def _get_browser(request, browser_name):
 
     if util.CI:
         capabilities = {
-            'tunnel-identifier': os.environ['TRAVIS_JOB_NUMBER'],
+            'tunnelIdentifier': os.environ['TRAVIS_JOB_NUMBER'],
             'name': 'Travis CI run %s[%s]' % (
                 os.environ.get('TRAVIS_BUILD_NUMBER', ''), browser_name),
             'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
@@ -472,7 +478,9 @@ def _get_browser(request, browser_name):
         # Add browser configuration
         capabilities.update({
             'browserName': browser_name,
-            'version': 'latest',
+            'version': '69.0',
+            'chromedriverVersion': '2.41',
+            'seleniumVersion': '3.13',
             'platform': 'Windows 10',
             'screenResolution': '%dx%d' % _WINDOW_SIZE,
         })
@@ -546,6 +554,6 @@ def driver(request, browser_name):
                     # Test is done. Just ignore the error.
                     pass
             browser.quit()
-    except:
+    except:  # noqa: bare-except
         logging.exception('Failed to initialize')
         raise

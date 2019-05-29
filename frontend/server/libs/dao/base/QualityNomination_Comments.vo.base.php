@@ -27,19 +27,19 @@ class QualityNominationComments extends VO {
             return;
         }
         if (isset($data['qualitynomination_comment_id'])) {
-            $this->qualitynomination_comment_id = $data['qualitynomination_comment_id'];
+            $this->qualitynomination_comment_id = (int)$data['qualitynomination_comment_id'];
         }
         if (isset($data['qualitynomination_id'])) {
-            $this->qualitynomination_id = $data['qualitynomination_id'];
+            $this->qualitynomination_id = (int)$data['qualitynomination_id'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
         if (isset($data['vote'])) {
-            $this->vote = $data['vote'];
+            $this->vote = (int)$data['vote'];
         }
         if (isset($data['contents'])) {
             $this->contents = $data['contents'];
@@ -50,11 +50,11 @@ class QualityNominationComments extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**
@@ -90,7 +90,7 @@ class QualityNominationComments extends VO {
     /**
       * El voto emitido en este comentario. En el rango de [-2, +2]
       * @access public
-      * @var tinyint(1)
+      * @var int(1)
       */
     public $vote;
 
