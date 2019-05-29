@@ -1,14 +1,42 @@
 <?php
 
+require_once 'libs/Email.php';
+
 /**
  * Parent class of all Test cases for Omegaup
  * Implements common methods for setUp and asserts
  *
  * @author joemmanuel
  */
-class OmegaupTestCase extends PHPUnit_Framework_TestCase {
+class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public $mockClarificationController = null;
     private static $logObj = null;
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        $scriptFilename = __DIR__ . '/gitserver-start.sh ' .
+            OMEGAUP_GITSERVER_PORT . ' /tmp/omegaup/problems.git';
+        exec($scriptFilename, $output, $returnVar);
+        if ($returnVar != 0) {
+            throw new Exception(
+                "{$scriptFilename} failed with {$returnVar}:\n" .
+                implode("\n", $output)
+            );
+        }
+    }
+
+    public static function tearDownAfterClass() {
+        parent::tearDownAfterClass();
+        $scriptFilename = __DIR__ . '/gitserver-stop.sh';
+        exec($scriptFilename, $output, $returnVar);
+        if ($returnVar != 0) {
+            throw new Exception(
+                "{$scriptFilename} failed with {$returnVar}:\n" .
+                implode("\n", $output)
+            );
+        }
+    }
 
     /**
      * setUp function gets executed before each test (thanks to phpunit)
@@ -146,7 +174,7 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         $this->assertEquals($r['admission_mode'], $contest->admission_mode);
         $this->assertEquals($r['alias'], $contest->alias);
         $this->assertEquals($r['points_decay_factor'], $contest->points_decay_factor);
-        $this->assertEquals($r['partial_score'], $contest->partial_score);
+        $this->assertEquals($r['partial_score'] == '1', $contest->partial_score);
         $this->assertEquals($r['submissions_gap'], $contest->submissions_gap);
         $this->assertEquals($r['feedback'], $contest->feedback);
         $this->assertEquals($r['penalty'], $contest->penalty);
@@ -207,6 +235,20 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
             }
         }
         $this->fail('No elements in array satisfied predicate');
+    }
+
+    /**
+     * Asserts that $array has no elements that matches $predicate.
+     *
+     * @param array $array
+     * @param callable $predicate
+     */
+    public function assertArrayNotContainsWithPredicate($array, $predicate) {
+        foreach ($array as $key => $value) {
+            if ($predicate($value)) {
+                $this->fail('At least one element in array satisfied predicate');
+            }
+        }
     }
 
     /**
@@ -303,45 +345,14 @@ class OmegaupTestCase extends PHPUnit_Framework_TestCase {
         return copy($filename, $targetpath);
     }
 
-    /**
-     * Detours the Grader calls.
-     * Problem: Submiting a new run invokes the Grader::grade() function which makes
-     * a HTTP call to official grader using CURL. This call will fail if grader is
-     * not turned on. We are not testing the Grader functionallity itself, we are
-     * only validating that we populate the DB correctly and that we make a call
-     * to the function Grader::grade(), without executing the contents.
-     *
-     * Solution: We create a phpunit mock of the Grader class. We create a fake
-     * object Grader with the function grade() which will always return true
-     * and expects to be excecuted once.
-     *
-     */
-    public function detourGraderCalls($times = null) {
-        if (is_null($times)) {
-            $times = $this->once();
-        }
-
-        // Create a fake Grader object which will always return true (see
-        // next line)
-        $graderMock = $this->getMockBuilder('Grader')->getMock();
-
-        // Set expectations:
-        $graderMock->expects($times)
-                ->method('Grade')
-                ->will($this->returnValue(true));
-
-        // Detour all Grader::grade() calls to our mock
-        RunController::$grader = $graderMock;
-        ProblemController::$grader = $graderMock;
-    }
-
     protected function detourBroadcasterCalls($times = null) {
         if (is_null($times)) {
             $times = $this->once();
         }
 
         $broadcasterMock = $this->getMockBuilder('Broadcaster')->getMock();
-        $broadcasterMock->expects($times)
+        $broadcasterMock
+            ->expects($times)
             ->method('broadcastClarification');
         ClarificationController::$broadcaster = $broadcasterMock;
     }
@@ -405,5 +416,126 @@ class ScopedEmailSender {
 
     public function sendEmail($emails, $subject, $body) {
         self::$listEmails[] = ['email' => $emails, 'subject' => $subject, 'body' => $body];
+    }
+}
+
+/**
+ * No-op version of the Grader.
+ *
+ * We are not testing the Grader functionallity itself, we are only validating
+ * that we populate the DB correctly and that we make a call to the function
+ * Grader::grade(), without executing the contents.
+ */
+class NoOpGrader extends Grader {
+    private $_resources = [];
+    private $_submissions = [];
+    private $_runs = [];
+
+    public function grade(Runs $run, string $source) {
+        global $conn;
+        $sql = '
+            SELECT
+                s.guid
+            FROM
+                Submissions s
+            WHERE
+                s.submission_id = ?;
+        ';
+        $guid = $conn->GetOne($sql, [$run->submission_id]);
+        $this->_submissions[$guid] = $source;
+        array_push($this->_runs, $run);
+    }
+
+    public function rejudge(array $runs, bool $debug) {
+        $this->_runs += $runs;
+    }
+
+    public function getSource(string $guid) {
+        return $this->_submissions[$guid];
+    }
+
+    public function status() {
+        return [
+            'status' => 'ok',
+            'broadcaster_sockets' => 0,
+            'embedded_runner' => false,
+            'queue' => [
+                'running' => [],
+                'run_queue_length' => 0,
+                'runner_queue_length' => 0,
+                'runners' => []
+            ],
+        ];
+    }
+
+    public function broadcast(
+        /* string? */ $contestAlias,
+        /* string? */ $problemsetId,
+        /* string? */ $problemAlias,
+        string $message,
+        bool $public,
+        /* string? */ $username,
+        int $userId = -1,
+        bool $userOnly = false
+    ) {
+    }
+
+    public function getGraderResource(
+        Runs $run,
+        string $filename,
+        bool $passthru = false,
+        bool $missingOk = false
+    ) {
+        if ($passthru) {
+            throw new UnimplementedException();
+        }
+        $path = "{$run->run_id}/{$filename}";
+        if (!array_key_exists($path, $this->_resources)) {
+            if (!$missingOk) {
+                throw new Exception("Resource {$path} not found");
+            }
+            return null;
+        }
+
+        return $this->_resources[$path];
+    }
+
+    public function setGraderResourceForTesting(
+        Runs $run,
+        string $filename,
+        string $contents
+    ) {
+        $path = "{$run->run_id}/{$filename}";
+        $this->_resources[$path] = $contents;
+    }
+
+    public function getRuns() : array {
+        return $this->_runs;
+    }
+}
+
+/**
+ * Simple RAII class to detour grader calls to a mock instance.
+ */
+class ScopedGraderDetour {
+    private $_originalInstance = null;
+    private $_instance = null;
+
+    public function __construct() {
+        $this->_originalInstance = Grader::getInstance();
+        $this->_instance = new NoOpGrader();
+        Grader::setInstanceForTesting($this->_instance);
+    }
+
+    public function __destruct() {
+        Grader::setInstanceForTesting($this->_originalInstance);
+    }
+
+    public function getGraderCallCount() : int {
+        return count($this->_instance->getRuns());
+    }
+
+    public function getRuns() : array {
+        return $this->_instance->getRuns();
     }
 }

@@ -18,7 +18,7 @@ class UsersDAO extends UsersDAOBase {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return new Users($rs);
@@ -26,9 +26,9 @@ class UsersDAO extends UsersDAOBase {
 
     public static function FindByUsername($username) {
         global  $conn;
-        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1';
+        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
         $rs = $conn->GetRow($sql, [$username]);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
         return new Users($rs);
@@ -67,7 +67,7 @@ class UsersDAO extends UsersDAOBase {
             LIMIT 10";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
-        $rs = $conn->Execute($sql, $args);
+        $rs = $conn->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $user_data) {
             array_push($result, new Users($user_data));
@@ -111,7 +111,7 @@ class UsersDAO extends UsersDAOBase {
             return null;
         }
         $sql = 'SELECT
-                    c.`name` AS country,
+                    COALESCE(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
                     e.`email`,
@@ -135,7 +135,7 @@ class UsersDAO extends UsersDAOBase {
         $params = [$user_id];
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
         return $rs;
@@ -195,7 +195,7 @@ class UsersDAO extends UsersDAOBase {
                     verification_id = ?';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$verification_id]);
+        $rs = $conn->GetAll($sql, [$verification_id]);
 
         $users = [];
         foreach ($rs as $row) {
@@ -215,7 +215,7 @@ class UsersDAO extends UsersDAOBase {
                     in_mailing_list = ?';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$verified, $in_mailing_list]);
+        $rs = $conn->GetAll($sql, [$verified, $in_mailing_list]);
 
         $users = [];
         foreach ($rs as $row) {

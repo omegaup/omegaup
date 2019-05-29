@@ -27,16 +27,16 @@ class Assignments extends VO {
             return;
         }
         if (isset($data['assignment_id'])) {
-            $this->assignment_id = $data['assignment_id'];
+            $this->assignment_id = (int)$data['assignment_id'];
         }
         if (isset($data['course_id'])) {
-            $this->course_id = $data['course_id'];
+            $this->course_id = (int)$data['course_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];
@@ -48,7 +48,7 @@ class Assignments extends VO {
             $this->alias = $data['alias'];
         }
         if (isset($data['publish_time_delay'])) {
-            $this->publish_time_delay = $data['publish_time_delay'];
+            $this->publish_time_delay = (int)$data['publish_time_delay'];
         }
         if (isset($data['assignment_type'])) {
             $this->assignment_type = $data['assignment_type'];
@@ -60,10 +60,10 @@ class Assignments extends VO {
             $this->finish_time = $data['finish_time'];
         }
         if (isset($data['max_points'])) {
-            $this->max_points = $data['max_points'];
+            $this->max_points = (float)$data['max_points'];
         }
         if (isset($data['order'])) {
-            $this->order = $data['order'];
+            $this->order = (int)$data['order'];
         }
     }
 
@@ -71,11 +71,11 @@ class Assignments extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['start_time', 'finish_time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

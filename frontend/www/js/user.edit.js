@@ -17,21 +17,31 @@ omegaup.OmegaUp.on('ready', function() {
         $('#state_id option').remove();
         $('#state_id').val('');
 
-        var country = iso3166.country($('#country_id').val());
+        var country = iso3166.country($('#country_id').val() || '');
+
         if (!country.sub) {
           $('#state_id').attr('disabled', 'disabled');
           return;
         }
         $('#state_id').prop('disabled', false);
 
-        for (var key in country.sub) {
-          if (!country.sub.hasOwnProperty(key)) continue;
-          var id = key.split('-')[1];
+        var subdivisions =
+            Object.keys(country.sub)
+                .map(function(code) {
+                  return {code: code, name: country.sub[code].name};
+                });
+
+        subdivisions.sort(function(a, b) {
+          return Intl.Collator().compare(a.name, b.name);
+        });
+
+        subdivisions.forEach(function(subdivision) {
+          var id = subdivision.code.split('-')[1];
           $('#state_id')
               .append($('<option></option')
                           .attr('value', id)
-                          .text(country.sub[key].name));
-        }
+                          .text(subdivision.name));
+        });
       });
 
   omegaup.API.User.profile()

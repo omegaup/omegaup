@@ -36,12 +36,12 @@
  */
 class Experiments {
     /**
-     * Support for virtual contest (a.k.a. Ghost mode).
+     * Constant for ephemeral grader experiment.
      */
-    const VIRTUAL = 'virtual';
+    const EPHEMERAL = 'ephemeral';
 
     /**
-     * Constant for manage identities experiment.
+     * Constant for identity management experiment.
      */
     const IDENTITIES = 'identities';
 
@@ -49,7 +49,7 @@ class Experiments {
      * An array with all the known experiments.
      */
     private static $kKnownExperiments = [
-        self::VIRTUAL,
+        self::EPHEMERAL,
         self::IDENTITIES,
     ];
 

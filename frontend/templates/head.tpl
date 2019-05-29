@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" lang="{#locale#}">
+<html lang="{#locale#}">
 	<head data-locale="{#locale#}">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+{if !is_null($smarty.const.NEW_RELIC_SCRIPT)}
+		{$smarty.const.NEW_RELIC_SCRIPT}
+{/if}
 {if isset($inArena) && $inArena}
 		{assign var='LOAD_MATHJAX' value='true'}
 		{assign var='navbarSection' value='arena'}
@@ -18,9 +21,9 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-3.5.0beta.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/knockout-secure-binding.min.js"}"></script>
 
+		<script type="text/javascript" src="{version_hash src="/js/dist/commons.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/dist/omegaup.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
-		<script type="text/javascript" src="{version_hash src="/js/omegaup/lang.#locale#.js"}"></script>
 {if (isset($inArena) && $inArena) || (isset($loadMarkdown) && $loadMarkdown)}
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
@@ -78,7 +81,7 @@
 	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
 	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
 	<script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}"></script>
-	<link rel="stylesheet" type="text/css" href="/third_party/js/pagedown/demo/browser/demo.css" />
+	<link rel="stylesheet" type="text/css" href="/css/markdown-editor-widgets.css" />
 {/if}
 {if !empty($ENABLED_EXPERIMENTS)}
 		<script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>

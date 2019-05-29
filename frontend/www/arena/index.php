@@ -1,7 +1,5 @@
 <?php
-require_once('../../server/bootstrap.php');
-
-UITools::setProfile($smarty);
+require_once('../../server/bootstrap_smarty.php');
 
 // Fetch contests
 try {

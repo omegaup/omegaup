@@ -27,13 +27,13 @@ class ProblemsetAccessLog extends VO {
             return;
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['ip'])) {
-            $this->ip = $data['ip'];
+            $this->ip = (int)$data['ip'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
@@ -44,11 +44,11 @@ class ProblemsetAccessLog extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

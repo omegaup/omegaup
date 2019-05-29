@@ -10,7 +10,7 @@ import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-from ui import util
+from ui import util  # pylint: disable=no-name-in-module
 
 
 @util.no_javascript_errors()
@@ -110,11 +110,8 @@ def test_create_problem(driver):
         driver.browser.find_element_by_id('overlay').click()
 
 
-# Creating a problem intentionally attempts to get the details of a problem to
-# see if the alias is being used already.
-@util.no_javascript_errors(path_whitelist=('/api/problem/details/',),
-                           message_whitelist=('/api/problem/details/',))
 @util.annotate
+@util.no_javascript_errors()
 def create_problem(driver, problem_alias):
     '''Create a problem.'''
     with driver.login_admin():

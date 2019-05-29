@@ -45,6 +45,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
                 $runDescription['verdict'],
                 $runDescription['submit_delay']
             );
+            Time::setTimeForTesting(Time::get() + 60);
         }
 
         if ($runForDirector) {
@@ -72,35 +73,40 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testBasicScoreboard() {
         $runMap = [
-            ['problem_idx' => 0,
-             'contestant_idx' => 0,
-             'points' => 0,
-             'verdict' => 'CE',
-             'submit_delay' => 60
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 60,
             ],
-            ['problem_idx' => 0,
-             'contestant_idx' => 0,
-             'points' => 1,
-             'verdict' => 'AC',
-             'submit_delay' => 60
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 60,
             ],
-            ['problem_idx' => 0,
-             'contestant_idx' => 1,
-             'points' => .9,
-             'verdict' => 'PA',
-             'submit_delay' => 60
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 1,
+                'points' => .9,
+                'verdict' => 'PA',
+                'submit_delay' => 60,
             ],
-            ['problem_idx' => 0,
-             'contestant_idx' => 2,
-             'points' => 1,
-             'verdict' => 'AC',
-             'submit_delay' => 200
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 2,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 200,
             ],
-            ['problem_idx' => 1,
-             'contestant_idx' => 0,
-             'points' => 1,
-             'verdict' => 'AC',
-             'submit_delay' => 200
+            [
+                'problem_idx' => 1,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 200,
             ],
         ];
         $testData = $this->prepareContestScoreboardData(3, $runMap);
@@ -465,13 +471,13 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
         RunsFactory::gradeRun($runData);
 
-        // Get the scoreboard url by using the MyList api being the
+        // Get the scoreboard url by using the AdminList api being the
         // contest director
         $login = self::login($contestData['director']);
         $r = new Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiMyList($r);
+        $response = ContestController::apiAdminList($r);
         unset($login);
 
         // Look for our contest from the list and save the scoreboard tokens
@@ -509,41 +515,47 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testBasicScoreboardEventsPositive() {
         $runMap = [
-            ['problem_idx' => 0,
-             'contestant_idx' => 0,
-             'points' => 0,
-             'verdict' => 'CE',
-             'submit_delay' => 60
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 60,
             ],
-            ['problem_idx' => 0,
-             'contestant_idx' => 0,
-             'points' => 1,
-             'verdict' => 'AC',
-             'submit_delay' => 60
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 60,
             ],
-            ['problem_idx' => 0,
-             'contestant_idx' => 1,
-             'points' => .9,
-             'verdict' => 'PA',
-             'submit_delay' => 60
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 1,
+                'points' => .9,
+                'verdict' => 'PA',
+                'submit_delay' => 60,
             ],
-            ['problem_idx' => 0,
-             'contestant_idx' => 2,
-             'points' => 1,
-             'verdict' => 'AC',
-             'submit_delay' => 200
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 2,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 200,
             ],
-            ['problem_idx' => 1,
-             'contestant_idx' => 0,
-             'points' => 1,
-             'verdict' => 'AC',
-             'submit_delay' => 200
+            [
+                'problem_idx' => 1,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 200,
             ],
-            ['problem_idx' => 1,
-             'contestant_idx' => 2,
-             'points' => 0,
-             'verdict' => 'CE',
-             'submit_delay' => 200
+            [
+                'problem_idx' => 1,
+                'contestant_idx' => 2,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 200,
             ],
         ];
 
@@ -634,18 +646,20 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $scoreboardTestRun = new ScopedScoreboardTestRun();
 
         $runMap = [
-            ['problem_idx' => 0,
-             'contestant_idx' => 0,
-             'points' => 0,
-             'verdict' => 'CE',
-             'submit_delay' => 60
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 60,
             ],
-            ['problem_idx' => 0,
-             'contestant_idx' => 0,
-             'points' => 1,
-             'verdict' => 'AC',
-             'submit_delay' => 60
-            ]
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 60,
+            ],
         ];
 
         $testData = $this->prepareContestScoreboardData(2, $runMap);
@@ -674,5 +688,51 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $response4 = ProblemsetController::$testApi($r);
         $this->assertEquals(true, Scoreboard::getIsLastRunFromCacheForTesting());
         $this->assertEquals($response3, $response4);
+    }
+
+    /**
+     * Test for Scoreboard with an added and removed problem from the problemset.
+     */
+    public function testScoreboardWithRemovedProblem() {
+        $runMap = [
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 60,
+            ],
+            [
+                'problem_idx' => 1,
+                'contestant_idx' => 0,
+                'points' => 1,
+                'verdict' => 'AC',
+                'submit_delay' => 60,
+            ],
+        ];
+
+        $testData = $this->prepareContestScoreboardData(2, $runMap);
+
+        // Only system admins can remove problems from a problemset where at
+        // least one run has been added.
+        UserFactory::addSystemRole(
+            $testData['contestData']['director'],
+            Authorization::ADMIN_ROLE
+        );
+        $login = self::login($testData['contestData']['director']);
+        ContestController::apiRemoveProblem(new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $testData['contestData']['contest']->alias,
+            'problem_alias' => $testData['problemData'][1]['problem']->alias,
+        ]));
+
+        // Now the scoreboard should be available with a single problem.
+        $response = ProblemsetController::apiScoreboard(new Request([
+            'auth_token' => $login->auth_token,
+            'problemset_id' => $testData['contestData']['contest']->problemset_id,
+        ]));
+        $this->assertEquals(1, count($response['ranking']));
+        $this->assertEquals(1, count($response['problems']));
+        $this->assertEquals(1, count($response['ranking'][0]['problems']));
     }
 }

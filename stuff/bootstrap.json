@@ -60,7 +60,7 @@
 					"scoreboard": 100,
 					"points_decay_factor": 0,
 					"partial_score": 1,
-					"submissions_gap": 20,
+					"submissions_gap": 1200,
 					"feedback": "yes",
 					"penalty_type": "contest_start",
 					"penalty_calc_policy": "sum",
@@ -214,6 +214,14 @@
 					"username": "test_user_4",
 					"email": "test_user_4@localhost.localdomain",
 					"password": "test_user_4"
+				}
+			},
+			{
+				"api": "/user/create",
+				"params": {
+					"username": "test_user_5",
+					"email": "test_user_5@localhost.localdomain",
+					"password": "test_user_5"
 				}
 			},
 			{
@@ -388,6 +396,30 @@
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
+					"language": "py",
+					"source": "syntax error"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_4",
+		"password": "test_user_4",
+		"requests": [
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos",
 					"language": "py",
 					"source": "syntax error"
 				}

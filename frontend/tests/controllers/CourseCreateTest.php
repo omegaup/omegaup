@@ -100,25 +100,27 @@ class CourseCreateTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        $course = CourseController::apiCreate($r);
-        $this->assertEquals('ok', $course['status']);
+        $response = CourseController::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
 
         // Create a test course
         $login = self::login($user);
-        $assignment_alias = Utils::CreateRandomString();
-        $course = CourseController::apiCreateAssignment(new Request([
+        $assignmentAlias = Utils::CreateRandomString();
+        $response = CourseController::apiCreateAssignment(new Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
-            'alias' => $assignment_alias,
+            'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
             'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
             'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
         ]));
+        $this->assertEquals('ok', $response['status']);
 
         // There should exist 1 assignment with this alias
-        $assignment = AssignmentsDAO::getByAlias($assignment_alias);
+        $course = CoursesDAO::getByAlias($courseAlias);
+        $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         $this->assertNotNull($assignment);
 
         // Add a problem to the assignment.

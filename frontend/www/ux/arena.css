@@ -267,6 +267,11 @@ body#only-problem #problems .main {
 	text-align: justify;
 }
 
+#problem .statement figure {
+	text-align: center;
+	page-break-inside: avoid;
+}
+
 #problem .statement table td {
 	border: 1px solid #000;
 	padding: 10px;

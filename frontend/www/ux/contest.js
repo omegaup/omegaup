@@ -91,7 +91,7 @@ omegaup.OmegaUp.on('ready', function() {
         arena.codeEditor.code = arena.currentProblem.template;
         arena.codeEditor.refresh();
 
-        if (window.location.hash.indexOf('tutorial') !== -1) {
+        if (arena.options.isTutorial) {
           window.scrollTo(0, 0);
           introJs()
               .addSteps([

@@ -2,13 +2,12 @@
 
 require_once 'libs/FileHandler.php';
 require_once 'libs/ProblemArtifacts.php';
-require_once 'libs/ZipHandler.php';
+require_once 'libs/ProblemDeployer.php';
+
 /**
  * ProblemsController
  */
 class ProblemController extends Controller {
-    public static $grader = null;
-
     // Constants for problem visibility.
     const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
     const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
@@ -17,15 +16,19 @@ class ProblemController extends Controller {
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;
 
-    /**
-     * Creates an instance of Grader if not already created
-     */
-    private static function initializeGrader() {
-        if (is_null(self::$grader)) {
-            // Create new grader
-            self::$grader = new Grader();
-        }
-    }
+    const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
+    const VALID_LANGUAGES = ['en', 'es', 'pt'];
+
+    // Do not update the published branch.
+    const UPDATE_PUBLISHED_NONE = 'none';
+    // Update only non-problemset runs.
+    const UPDATE_PUBLISHED_NON_PROBLEMSET = 'non-problemset';
+    // Update non-problemset runs and running problemsets that are owned by the
+    // author.
+    const UPDATE_PUBLISHED_OWNED_PROBLEMSETS = 'owned-problemsets';
+    // Update non-problemset runs and running problemsets that the author has
+    // edit privileges.
+    const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
 
     /**
      * Validates a Create or Update Problem API request
@@ -45,7 +48,7 @@ class ProblemController extends Controller {
             $is_required = false;
 
             // We need to check problem_alias
-            Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+            Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
             try {
                 $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -79,7 +82,7 @@ class ProblemController extends Controller {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
                     throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
                 } else {
-                    Validators::isInEnum(
+                    Validators::validateInEnum(
                         $r['visibility'],
                         'visibility',
                         [
@@ -91,46 +94,49 @@ class ProblemController extends Controller {
                     );
                 }
             }
+            Validators::validateInEnum(
+                $r['update_published'],
+                'update_published',
+                [
+                    ProblemController::UPDATE_PUBLISHED_NONE,
+                    ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                    ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                    ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                ],
+                false
+            );
         } else {
-            Validators::isValidAlias($r['problem_alias'], 'problem_alias');
-            Validators::isInEnum(
+            Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+            Validators::validateInEnum(
                 $r['visibility'],
                 'visibility',
                 [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
             );
             $r['selected_tags'] = json_decode($r['selected_tags']);
-            $tagsHaveErrors = false;
             if (!empty($r['selected_tags'])) {
                 foreach ($r['selected_tags'] as $tag) {
-                    if (!isset($tag->tagname)) {
+                    if (empty($tag->tagname)) {
                         throw new InvalidParameterException('parameterEmpty', 'tagname');
-                    }
-                    if (!Validators::isStringNonEmpty($tag->tagname, 'tagname', false)) {
-                        $tagsHaveErrors = true;
-                        break;
                     }
                 }
             }
-            if ($tagsHaveErrors) {
-                throw new InvalidParameterException('parameterEmpty', 'tagname');
-            }
         }
 
-        Validators::isStringNonEmpty($r['title'], 'title', $is_required);
-        Validators::isStringNonEmpty($r['source'], 'source', $is_required);
-        Validators::isInEnum(
+        Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
+        Validators::validateStringNonEmpty($r['source'], 'source', $is_required);
+        Validators::validateInEnum(
             $r['validator'],
             'validator',
             ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
             $is_required
         );
-        Validators::isNumberInRange($r['time_limit'], 'time_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['validator_time_limit'], 'validator_time_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['overall_wall_time_limit'], 'overall_wall_time_limit', 0, 60000, $is_required);
-        Validators::isNumberInRange($r['extra_wall_time'], 'extra_wall_time', 0, 5000, $is_required);
-        Validators::isNumberInRange($r['memory_limit'], 'memory_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['output_limit'], 'output_limit', 0, INF, $is_required);
-        Validators::isNumberInRange($r['input_limit'], 'input_limit', 0, INF, $is_required);
+        $r->ensureInt('time_limit', 0, null, $is_required);
+        $r->ensureInt('validator_time_limit', 0, null, $is_required);
+        $r->ensureInt('overall_wall_time_limit', 0, 60000, $is_required);
+        $r->ensureInt('extra_wall_time', 0, 5000, $is_required);
+        $r->ensureInt('memory_limit', 0, null, $is_required);
+        $r->ensureInt('output_limit', 0, null, $is_required);
+        $r->ensureInt('input_limit', 0, null, $is_required);
 
         // HACK! I don't know why "languages" doesn't make it into $r, and I've spent far too much time
         // on it already, so I'll just leave this here for now...
@@ -139,7 +145,7 @@ class ProblemController extends Controller {
         } elseif (isset($r['languages']) && is_array($r['languages'])) {
             $r['languages'] = implode(',', $r['languages']);
         }
-        Validators::isValidSubset(
+        Validators::validateValidSubset(
             $r['languages'],
             'languages',
             array_keys(RunController::$kSupportedLanguages),
@@ -161,71 +167,66 @@ class ProblemController extends Controller {
         self::validateCreateOrUpdate($r);
 
         // Populate a new Problem object
-        $problem = new Problems();
-        $problem->visibility = $r['visibility']; /* private by default */
-        $problem->title = $r['title'];
-        $problem->validator = $r['validator'];
-        $problem->time_limit = $r['time_limit'];
-        $problem->validator_time_limit = $r['validator_time_limit'];
-        $problem->overall_wall_time_limit = $r['overall_wall_time_limit'];
-        $problem->extra_wall_time = $r['extra_wall_time'];
-        $problem->memory_limit = $r['memory_limit'];
-        $problem->output_limit = $r['output_limit'];
-        $problem->input_limit = $r['input_limit'];
-        $problem->visits = 0;
-        $problem->submissions = 0;
-        $problem->accepted = 0;
-        $problem->difficulty = 0;
-        $problem->source = $r['source'];
-        $problem->order = 'normal'; /* defaulting to normal */
-        $problem->alias = $r['problem_alias'];
-        $problem->languages = $r['languages'];
-        $problem->email_clarifications = $r['email_clarifications'];
+        $problem = new Problems([
+            'visibility' => $r['visibility'], /* private by default */
+            'title' => $r['title'],
+            'visits' => 0,
+            'input_limit' => $r['input_limit'],
+            'submissions' => 0,
+            'accepted' => 0,
+            'difficulty' => 0,
+            'source' => $r['source'],
+            'order' => 'normal', /* defaulting to normal */
+            'alias' => $r['problem_alias'],
+            'languages' => $r['languages'],
+            'email_clarifications' => $r['email_clarifications'],
+        ]);
 
+        $problemSettings = self::getDefaultProblemSettings();
+        self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $r['languages'] !== '';
-        $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::CREATE, $acceptsSubmissions);
 
         $acl = new ACLs();
         $acl->owner_id = $r['current_user_id'];
 
         // Insert new problem
         try {
-            ProblemsDAO::transBegin();
+            DAO::transBegin();
 
-            // Create file after we know that alias is unique
-            $problemDeployer->deploy();
-            if ($problemDeployer->hasValidator) {
-                $problem->validator = 'custom';
-            } elseif ($problem->validator == 'custom') {
-                throw new ProblemDeploymentFailedException('problemDeployerValidatorRequired');
-            }
-            $problem->slow = $problemDeployer->isSlow($problem);
-
-            // Calculate output limit.
-            $output_limit = $problemDeployer->getOutputLimit();
-
-            if ($output_limit != -1) {
-                $problem->output_limit = $output_limit;
-            }
+            // Commit at the very end
+            $problemDeployer = new ProblemDeployer(
+                $r['problem_alias'],
+                $acceptsSubmissions
+            );
+            $problemDeployer->commit(
+                'Initial commit',
+                $r['current_user'],
+                ProblemDeployer::CREATE,
+                $problemSettings
+            );
+            $problem->commit = $problemDeployer->publishedCommit;
+            $problem->current_version = $problemDeployer->privateTreeHash;
 
             // Save the contest object with data sent by user to the database
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
             $problem->acl_id = $acl->acl_id;
-            ProblemsDAO::save($problem);
+            ProblemsDAO::create($problem);
 
             // Add tags
             if (!empty($r['selected_tags'])) {
                 foreach ($r['selected_tags'] as $tag) {
-                    self::addTag($tag->tagname, $tag->public, $problem->problem_id);
+                    $tagName = TagController::normalize($tag->tagname);
+                    if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
+                        continue;
+                    }
+                    self::addTag($tagName, $tag->public, $problem);
                 }
             }
-            ProblemsDAO::transEnd();
-
-            // Commit at the very end
-            $problemDeployer->commit('Initial commit', $r['current_user']);
+            ProblemController::setRestrictedTags($problem);
+            DAO::transEnd();
         } catch (ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
 
             throw $e;
         } catch (Exception $e) {
@@ -233,25 +234,20 @@ class ProblemController extends Controller {
             self::$log->error($e);
 
             // Operation failed unexpectedly, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
 
-            // Alias may be duplicated, 1062 error indicates that
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('problemTitleExists');
             } else {
                 throw new InvalidDatabaseOperationException($e);
             }
-        } finally {
-            $problemDeployer->cleanup();
         }
-
-        // Adding unzipped files to response
-        $result['uploaded_files'] = $problemDeployer->filesToUnzip;
-        $result['status'] = 'ok';
 
         self::updateLanguages($problem);
 
-        return $result;
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**
@@ -262,7 +258,7 @@ class ProblemController extends Controller {
      */
     private static function validateRejudge(Request $r) {
         // We need to check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -302,7 +298,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -344,7 +340,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -379,8 +375,8 @@ class ProblemController extends Controller {
      */
     public static function apiAddTag(Request $r) {
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isStringNonEmpty($r['name'], 'name');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['name'], 'name');
 
         // Authenticate logged user
         self::authenticateRequest($r);
@@ -391,14 +387,23 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        self::addTag($r['name'], $r['public'], $problem->problem_id);
+        self::addTag($r['name'], $r['public'] || false, $problem);
 
         return ['status' => 'ok', 'name' => $r['name']];
     }
 
-    private static function addTag($tagName, $isPublic, $problemId) {
+    private static function addTag(
+        string $tagName,
+        bool $isPublic,
+        Problems $problem,
+        bool $allowRestricted = false
+    ) : void {
         // Normalize name.
         $tagName = TagController::normalize($tagName);
+
+        if (!$allowRestricted && in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
+            throw new InvalidParameterException('tagRestricted', 'name');
+        }
 
         try {
             $tag = TagsDAO::getByName($tagName);
@@ -425,16 +430,13 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException(new Exception('tag'));
         }
 
-        $problemTag = new ProblemsTags([
-            'problem_id' => $problemId,
-            'tag_id' => $tag->tag_id,
-            'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
-            'autogenerated' => 0,
-        ]);
-
-        // Save the tag to the DB
         try {
-            ProblemsTagsDAO::save($problemTag);
+            ProblemsTagsDAO::save(new ProblemsTags([
+                'problem_id' => $problem->problem_id,
+                'tag_id' => $tag->tag_id,
+                'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
+                'autogenerated' => 0,
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             self::$log->error('Failed to save tag', $e);
@@ -455,7 +457,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -494,7 +496,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::FindByAlias($r['group']);
 
@@ -532,19 +534,19 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check whether problem exists
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['name'], 'name');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
             $tag = TagsDAO::getByName($r['name']);
         } catch (Exception $e) {
-            // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($problem)) {
             throw new NotFoundException('problem');
-        } elseif (is_null($tag)) {
+        }
+        if (is_null($tag)) {
             throw new NotFoundException('tag');
         }
 
@@ -552,13 +554,15 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $problem_tag = new ProblemsTags();
-        $problem_tag->problem_id = $problem->problem_id;
-        $problem_tag->tag_id = $tag->tag_id;
+        if (in_array($tag->name, self::RESTRICTED_TAG_NAMES)) {
+            throw new InvalidParameterException('tagRestricted', 'name');
+        }
 
-        // Delete the role
         try {
-            ProblemsTagsDAO::delete($problem_tag);
+            ProblemsTagsDAO::delete(new ProblemsTags([
+                'problem_id' => $problem->problem_id,
+                'tag_id' => $tag->tag_id,
+            ]));
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
@@ -580,7 +584,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check whether problem exists
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -618,7 +622,7 @@ class ProblemController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -648,7 +652,7 @@ class ProblemController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         $includeAutogenerated = ($r['include_autogenerated'] == 'true');
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -680,18 +684,14 @@ class ProblemController extends Controller {
 
         self::validateRejudge($r);
 
-        // We need to rejudge runs after an update, let's initialize the grader
-        self::initializeGrader();
-
         // Call Grader
         $runs = [];
         try {
-            $runs = RunsDAO::getByKeys($r['problem']->problem_id);
+            $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
 
-            $guids = [];
             foreach ($runs as $run) {
-                $guids[] = $run->guid;
                 $run->status = 'new';
+                $run->version = $r['problem']->current_version;
                 $run->verdict = 'JE';
                 $run->score = 0;
                 $run->contest_score = 0;
@@ -700,7 +700,7 @@ class ProblemController extends Controller {
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
             }
-            self::$grader->Grade($guids, true, false);
+            Grader::getInstance()->rejudge($runs, false);
         } catch (Exception $e) {
             self::$log->error('Failed to rejudge runs after problem update');
             self::$log->error($e);
@@ -728,96 +728,118 @@ class ProblemController extends Controller {
         self::validateCreateOrUpdate($r, true /* is update */);
 
         // Validate commit message.
-        Validators::isStringNonEmpty($r['message'], 'message');
+        Validators::validateStringNonEmpty($r['message'], 'message');
 
         // Update the Problem object
         $valueProperties = [
             'visibility',
             'title',
-            'validator'     => ['important' => true], // requires rejudge
-            'time_limit'    => ['important' => true], // requires rejudge
-            'validator_time_limit'    => ['important' => true], // requires rejudge
-            'overall_wall_time_limit' => ['important' => true], // requires rejudge
-            'extra_wall_time' => ['important' => true], // requires rejudge
-            'memory_limit'  => ['important' => true], // requires rejudge
-            'output_limit'  => ['important' => true], // requires rejudge
-            'input_limit'  => ['important' => true], // requires rejudge
+            'input_limit',
             'email_clarifications',
             'source',
             'order',
             'languages',
         ];
         $problem = $r['problem'];
-        $requiresRejudge = self::updateValueProperties($r, $problem, $valueProperties);
-        $r['problem'] = $problem;
+        self::updateValueProperties($r, $problem, $valueProperties);
 
         $response = [
             'rejudged' => false
         ];
 
+        $problemSettings = self::getProblemSettingsDistrib($problem, $problem->commit);
+        unset($problemSettings['cases']);
+        unset($problemSettings['slow']);
+        self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $problem->languages !== '';
-        $problemDeployer = new ProblemDeployer($problem->alias, ProblemDeployer::UPDATE_CASES, $acceptsSubmissions);
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
+        $updatedStatementLanguages = [];
 
         // Insert new problem
         try {
             //Begin transaction
-            ProblemsDAO::transBegin();
+            DAO::transBegin();
 
-            if (isset($_FILES['problem_contents']) && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])) {
-                // DeployProblemZip requires alias => problem_alias
-                $r['alias'] = $r['problem_alias'];
+            $operation = ProblemDeployer::UPDATE_SETTINGS;
+            if (isset($_FILES['problem_contents'])
+                && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
+            ) {
+                $operation = ProblemDeployer::UPDATE_CASES;
+            }
+            $problemDeployer = new ProblemDeployer(
+                $problem->alias,
+                $acceptsSubmissions,
+                $updatePublished != ProblemController::UPDATE_PUBLISHED_NONE
+            );
+            $problemDeployer->commit(
+                $r['message'],
+                $r['current_user'],
+                $operation,
+                $problemSettings
+            );
 
-                $problemDeployer->deploy();
-                if ($problemDeployer->hasValidator) {
-                    $problem->validator = 'custom';
-                } elseif ($problem->validator == 'custom') {
-                    throw new ProblemDeploymentFailedException('problemDeployerValidatorRequired');
+            $response['rejudged'] = false;
+            $needsUpdate = false;
+            if (!is_null($problemDeployer->publishedCommit)) {
+                $oldCommit = $problem->commit;
+                $oldVersion = $problem->current_version;
+                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+                    $problem,
+                    $problemDeployer->publishedCommit
+                );
+                $response['rejudged'] = ($oldVersion != $problem->current_version);
+                $needsUpdate = $response['rejudged'] || ($oldCommit != $problem->commit);
+            }
+
+            if ($needsUpdate) {
+                RunsDAO::createRunsForVersion($problem);
+                RunsDAO::updateVersionToCurrent($problem);
+                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                        $problem,
+                        $r['current_user'],
+                        $updatePublished
+                    );
                 }
-                // This must come before the commit in case isSlow throws an exception.
-                $problem->slow = $problemDeployer->isSlow($problem);
-
-                // Calculate output limit.
-                $output_limit = $problemDeployer->getOutputLimit();
-
-                if ($output_limit != -1) {
-                    $r['problem']->output_limit = $output_limit;
-                }
-
-                $response['uploaded_files'] = $problemDeployer->filesToUnzip;
-                $problemDeployer->commit($r['message'], $r['current_user']);
-                $requiresRejudge |= $problemDeployer->requiresRejudge;
-            } else {
-                $problem->slow = $problemDeployer->isSlow($problem);
+                $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
             }
 
             // Save the contest object with data sent by user to the database
-            ProblemsDAO::save($problem);
+            ProblemsDAO::update($problem);
 
-            //End transaction
-            ProblemsDAO::transEnd();
+            ProblemController::setRestrictedTags($problem);
+
+            DAO::transEnd();
         } catch (ApiException $e) {
             // Operation failed in the data layer, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
 
             throw $e;
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            ProblemsDAO::transRollback();
+            DAO::transRollback();
             self::$log->error('Failed to update problem');
             self::$log->error($e);
 
             throw new InvalidDatabaseOperationException($e);
-        } finally {
-            $problemDeployer->cleanup();
         }
 
-        if (($requiresRejudge == true) && (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE == true)) {
+        if ($response['rejudged'] && OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
-                self::apiRejudge($r);
-                $response['rejudged'] = true;
+                $runs = RunsDAO::getNewRunsForVersion($problem);
+                Grader::getInstance()->rejudge($runs, false);
+
+                // Expire details of the runs
+                foreach ($runs as $run) {
+                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                }
+                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
             } catch (Exception $e) {
-                self::$log->error('Best efort ProblemController::apiRejudge failed', $e);
+                self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
             }
         }
 
@@ -825,20 +847,32 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
-        self::updateLanguages($problem);
+        self::invalidateCache($problem, $updatedStatementLanguages);
 
         // All clear
         $response['status'] = 'ok';
-
-        // Invalidar problem statement cache @todo invalidar todos los lenguajes
-        foreach ($problemDeployer->getUpdatedLanguages() as $lang) {
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $lang . 'markdown');
-        }
-        Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
-        Cache::deleteFromCache(Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME, $r['problem']->alias);
-
         return $response;
+    }
+
+    private static function setRestrictedTags(Problems $problem) {
+        ProblemsTagsDAO::clearRestrictedTags($problem);
+        $languages = explode(',', $problem->languages);
+        if (in_array('cat', $languages)) {
+            ProblemController::addTag('solo-salida', true, $problem, true);
+        } elseif (!empty(array_intersect(['kp', 'kj'], $languages))) {
+            ProblemController::addTag('karel', true, $problem, true);
+        } else {
+            ProblemController::addTag('lenguaje', true, $problem, true);
+        }
+
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $distribSettings = json_decode(
+            $problemArtifacts->get('settings.distrib.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
+        if (!empty($distribSettings['interactive'])) {
+            ProblemController::addTag('interactive', true, $problem, true);
+        }
     }
 
     /**
@@ -853,10 +887,11 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         self::validateCreateOrUpdate($r, true);
+        $problem = $r['problem'];
 
         // Validate statement
-        Validators::isStringNonEmpty($r['statement'], 'statement');
-        Validators::isStringNonEmpty($r['message'], 'message');
+        Validators::validateStringNonEmpty($r['statement'], 'statement');
+        Validators::validateStringNonEmpty($r['message'], 'message');
 
         // Check that lang is in the ISO 639-1 code list, default is "es".
         $iso639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
@@ -875,30 +910,48 @@ class ProblemController extends Controller {
             'ta', 'te', 'tg', 'th', 'ti', 'bo', 'tk', 'tl', 'tn', 'to', 'tr', 'ts',
             'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
             'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
-        Validators::isInEnum($r['lang'], 'lang', $iso639_1, false /* is_required */);
+        Validators::validateInEnum($r['lang'], 'lang', $iso639_1, false /* is_required */);
         if (is_null($r['lang'])) {
             $r['lang'] = UserController::getPreferredLanguage($r);
         }
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
+        $updatedStatementLanguages = [];
 
-        $problemDeployer = new ProblemDeployer($r['problem_alias'], ProblemDeployer::UPDATE_STATEMENTS);
+        $updatedStatementLanguages = [];
         try {
-            $problemDeployer->updateStatement($r['lang'], $r['statement']);
-            $problemDeployer->commit("{$r['lang']}.markdown: {$r['message']}", $r['current_user']);
-
-            // Invalidar problem statement cache
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'html');
-            Cache::deleteFromCache(Cache::PROBLEM_STATEMENT, $r['problem']->alias . '-' . $r['lang'] . '-' . 'markdown');
-            Cache::deleteFromCache(Cache::PROBLEM_SAMPLE, $r['problem']->alias . '-sample.in');
+            $problemDeployer = new ProblemDeployer($r['problem_alias']);
+            $problemDeployer->commitStatements(
+                "{$r['lang']}.markdown: {$r['message']}",
+                $r['current_user'],
+                [
+                    "statements/{$r['lang']}.markdown" => $r['statement'],
+                ]
+            );
+            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
+                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+                    $problem,
+                    $problemDeployer->publishedCommit
+                );
+                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                        $problem,
+                        $r['current_user'],
+                        $updatePublished
+                    );
+                }
+                ProblemsDAO::update($problem);
+            }
+            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
-        } finally {
-            $problemDeployer->cleanup();
         }
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        self::updateLanguages($problem);
+        self::invalidateCache($problem, $updatedStatementLanguages);
 
         // All clear
         $response['status'] = 'ok';
@@ -906,33 +959,60 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Invalidates the various caches of the problem, as well as updating the
+     * languages.
+     *
+     * @param Problems $problem                   the problem
+     * @param array    $updatedStatementLanguages the array of updated
+     *                                            statement languages.
+     *
+     * @return void
+     */
+    private static function invalidateCache(Problems $problem, array $updatedStatementLanguages) {
+        self::updateLanguages($problem);
+
+        // Invalidate problem statement cache
+        foreach ($updatedStatementLanguages as $lang) {
+            Cache::deleteFromCache(
+                Cache::PROBLEM_STATEMENT,
+                "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
+            );
+        }
+        Cache::deleteFromCache(
+            Cache::PROBLEM_SETTINGS_DISTRIB,
+            "{$problem->alias}-{$problem->commit}"
+        );
+    }
+
+    /**
      * Validate problem Details API
      *
      * @param Request $r
+     * @return Array
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateDetails(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias', false);
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias', false);
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Lang is optional. Default is user's preferred.
         if (!is_null($r['lang'])) {
-            Validators::isStringOfMaxLength($r['lang'], 'lang', 2);
+            Validators::validateStringOfLengthInRange($r['lang'], 'lang', 2, 2);
         } else {
             $r['lang'] = UserController::getPreferredLanguage($r);
         }
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+        if (is_null($problem)) {
+            return null;
         }
 
         if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
@@ -940,23 +1020,24 @@ class ProblemController extends Controller {
         }
 
         // If we request a problem inside a contest
-        if (self::validateProblemset($r)) {
-            if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
+        $problemset = self::validateProblemset($problem, $r['problemset_id'], $r['contest_alias']);
+        if (!is_null($problemset) && isset($problemset['problemset'])) {
+            if (!Authorization::isAdmin($r['current_identity_id'], $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
-                if (isset($r['contest'])) {
-                    if (!ContestController::isPublic($r['contest']->admission_mode)) {
-                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $r['problemset']->problemset_id))) {
+                if (!empty($problemset['contest'])) {
+                    if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
+                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset['problemset']->problemset_id))) {
                             throw new ForbiddenAccessException();
                         }
                     }
                     // If the contest has not started, non-admin users should not see it
-                    if (!ContestsDAO::hasStarted($r['contest'])) {
+                    if (!ContestsDAO::hasStarted($problemset['contest'])) {
                         throw new ForbiddenAccessException('contestNotStarted');
                     }
                 } else {    // Not a contest, but we still have a problemset
                     if (!Authorization::canSubmitToProblemset(
                         $r['current_identity_id'],
-                        $r['problemset']
+                        $problemset['problemset']
                     )
                     ) {
                         throw new ForbiddenAccessException();
@@ -965,39 +1046,43 @@ class ProblemController extends Controller {
                 }
             }
         } else {
-            if (!Authorization::canEditProblem($r['current_identity_id'], $r['problem'])) {
+            if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
-                if (!ProblemsDAO::isVisible($r['problem'])) {
+                if (!ProblemsDAO::isVisible($problem)) {
                     throw new ForbiddenAccessException('problemIsPrivate');
                 }
             }
         }
+        return [
+            'problem' => $problem,
+            'problemset' => $problemset['problemset'],
+        ];
     }
 
     /**
-     * Gets the problem statement from the filesystem.
+     * Gets the problem resource (statement/solution) from the gitserver.
      *
-     * @param string $sourcePath The filesystem path for the problem statement.
+     * @param array $params The problem, commit, and language for the problem
+     *                      statement.
      *
-     * @return The contents of the file.
+     * @return array The contents of the resource, plus some metadata.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemStatementImpl($params) {
-        list($problemAlias, $language) = $params;
-        $problemArtifacts = new ProblemArtifacts($problemAlias);
-        $sourcePath = "statements/{$language}.markdown";
+    public static function getProblemResourceImpl(array $params) : array {
+        $problemArtifacts = new ProblemArtifacts($params['alias'], $params['commit']);
+        $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
 
         // Read the file that contains the source
         if (!$problemArtifacts->exists($sourcePath)) {
             // If there is no language file for the problem, return the Spanish
             // version.
-            $language = 'es';
-            $sourcePath = "statements/{$language}.markdown";
+            $params['language'] = 'es';
+            $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
         }
 
         $result = [
-            'language' => $language,
+            'language' => $params['language'],
             'images' => [],
         ];
         try {
@@ -1007,7 +1092,7 @@ class ProblemController extends Controller {
         }
 
         // Get all the images' mappings.
-        $statementFiles = $problemArtifacts->lsTree('statements');
+        $statementFiles = $problemArtifacts->lsTree($params['directory']);
         $imageExtensions = ['bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png',
                             'svg', 'svgz', 'tif', 'tiff'];
         foreach ($statementFiles as $file) {
@@ -1015,11 +1100,17 @@ class ProblemController extends Controller {
             if (!in_array($extension, $imageExtensions)) {
                 continue;
             }
-            $result['images'][$file['name']] = IMAGES_URL_PATH . "{$problemAlias}/{$file['object']}.{$extension}";
-            $imagePath = IMAGES_PATH . "{$problemAlias}/{$file['object']}.{$extension}";
+            $result['images'][$file['name']] = (
+                IMAGES_URL_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+            );
+            $imagePath = (
+                IMAGES_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+            );
             if (!@file_exists($imagePath)) {
-                @mkdir(IMAGES_PATH . $problemAlias, 0755, true);
-                file_put_contents($imagePath, $problemArtifacts->get("statements/{$file['name']}"));
+                @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
+                file_put_contents($imagePath, $problemArtifacts->get(
+                    "{$params['directory']}/{$file['name']}"
+                ));
             }
         }
 
@@ -1027,25 +1118,32 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the problem statement from the filesystem.
+     * Gets the problem statement from the gitserver.
      *
-     * @param string $problemAlias    The alias of the problem.
-     * @param string $language        The language of the problem. Will default
-     *                                to Spanish if not found.
+     * @param Problems $problem  The problem.
+     * @param string   $commit   The git commit at which to get the statement.
+     * @param string   $language The language of the problem. Will default to
+     *                           Spanish if not found.
      *
-     * @return The contents of the file.
+     * @return array The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
-        $problemAlias,
-        $language
-    ) {
+        Problems $problem,
+        string $commit,
+        string $language
+    ) : array {
         $problemStatement = null;
         Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
-            $problemAlias . '-' . $language,
-            [$problemAlias, $language],
-            'ProblemController::getProblemStatementImpl',
+            "{$problem->alias}-{$commit}-{$language}-markdown",
+            [
+                'directory' => 'statements',
+                'alias' => $problem->alias,
+                'commit' => $commit,
+                'language' => $language,
+            ],
+            'ProblemController::getProblemResourceImpl',
             $problemStatement,
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
@@ -1054,46 +1152,76 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the sample input from the filesystem.
+     * Gets the problem solution from the gitserver.
      *
-     * @param Request $r
+     * @param Problems $problem  The problem.
+     * @param string   $commit   The git commit at which to get the statement.
+     * @param string   $language The language of the problem. Will default to
+     *                           Spanish if not found.
+     *
+     * @return array The contents of the file.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getSampleInput(Request $r) {
-        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
+    public static function getProblemSolution(
+        Problems $problem,
+        string $commit,
+        string $language
+    ) : array {
+        $problemSolution = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SOLUTION,
+            "{$problem->alias}-{$commit}-{$language}-markdown",
+            [
+                'directory' => 'solutions',
+                'alias' => $problem->alias,
+                'commit' => $commit,
+                'language' => $language,
+            ],
+            'ProblemController::getProblemResourceImpl',
+            $problemSolution,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
 
-        try {
-            $file_content = $problemArtifacts->get('examples/sample.in', true /* quiet */);
-        } catch (Exception $e) {
-            // Most problems won't have a sample input.
-            $file_content = '';
-        }
-
-        return $file_content;
+        return $problemSolution;
     }
 
     /**
-     * Gets the libinteractive interface name from the filesystem.
+     * Gets the distributable problem settings for the problem, using the cache
+     * if needed.
      *
-     * @param Request $r
-     * @throws InvalidFilesystemOperationException
+     * @param Problems $problem the problem.
+     * @return array the problem settings.
      */
-    public static function getLibinteractiveInterfaceName(Request $r) {
-        $problemArtifacts = new ProblemArtifacts($r['problem']->alias);
+    private static function getProblemSettingsDistrib(
+        Problems $problem,
+        string $commit
+    ) : array {
+        $problemSettingsDistrib = null;
+        Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SETTINGS_DISTRIB,
+            "{$problem->alias}-{$problem->commit}",
+            [
+                'alias' => $problem->alias,
+                'commit' => $problem->commit,
+            ],
+            'ProblemController::getProblemSettingsDistribImpl',
+            $problemSettingsDistrib,
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+        return $problemSettingsDistrib;
+    }
 
-        $interactiveFiles = [];
-        try {
-            $interactiveFiles = $problemArtifacts->lsTree('interactive');
-        } catch (Exception $e) {
-            // Most problems won't have interactive files
-        }
-
-        foreach ($interactiveFiles as $file) {
-            if (strrpos($file['name'], '.idl') == strlen($file['name']) - 4) {
-                return $file['name'];
-            }
-        }
-        return null;
+    /**
+     * Gets the distributable problem settings for the problem.
+     *
+     * @param array $params the payload with the problem and commit.
+     * @return array the problem settings.
+     */
+    public static function getProblemSettingsDistribImpl(array $params) : array {
+        return json_decode(
+            (new ProblemArtifacts($params['alias'], $params['commit']))->get('settings.distrib.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
     }
 
     /**
@@ -1107,21 +1235,16 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Validate request
-        self::validateDownload($r);
+        $problem = self::validateDownload($r);
 
-        // Get HEAD revision to avoid race conditions.
-        $gitDir = PROBLEMS_GIT_PATH . DIRECTORY_SEPARATOR . $r['problem']->alias;
-        $git = new Git($gitDir);
-        $head = trim($git->get(['rev-parse', 'HEAD']));
-
-        // Set headers to auto-download file
         header('Pragma: public');
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment;filename=' . $r['problem']->alias . '_' . $head . '.zip');
+        header("Content-Disposition: attachment;filename={$problem->alias}.zip");
         header('Content-Transfer-Encoding: binary');
-        $git->exec(['archive', '--format=zip', $head]);
+        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts->download();
 
         die();
     }
@@ -1136,34 +1259,48 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDownload(Request $r) {
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($r['problem'])) {
+        if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::canEditProblem($r['current_identity_id'], $r['problem'])) {
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
             throw new ForbiddenAccessException();
         }
+
+        return $problem;
     }
 
-    private static function validateProblemset(Request $r) {
+    /**
+     * Validate problemset Details API
+     *
+     * @param Problems $problem
+     * @param $problemsetId
+     * @param $contestAlias
+     * @return Array
+     * @throws ApiException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    private static function validateProblemset(Problems $problem, $problemsetId, $contestAlias = null) {
         $problemNotFound = null;
-        if (!empty($r['contest_alias'])) {
+        $response = [];
+        if (!empty($contestAlias)) {
             try {
                 // Is it a valid contest_alias?
-                $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-                if (is_null($r['contest'])) {
+                $response['contest'] = ContestsDAO::getByAlias($contestAlias);
+                if (is_null($response['contest'])) {
                     throw new NotFoundException('contestNotFound');
                 }
-                $r['problemset'] = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-                if (is_null($r['problemset'])) {
+                $response['problemset'] = ProblemsetsDAO::getByPK($response['contest']->problemset_id);
+                if (is_null($response['problemset'])) {
                     throw new NotFoundException('contestNotFound');
                 }
                 $problemNotFound = 'problemNotFoundInContest';
@@ -1172,11 +1309,11 @@ class ProblemController extends Controller {
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
-        } elseif (!empty($r['problemset_id'])) {
+        } elseif (!is_null($problemsetId)) {
             try {
                 // Is it a valid problemset_id?
-                $r['problemset'] = ProblemsetsDAO::getByPK($r['problemset_id']);
-                if (is_null($r['problemset'])) {
+                $response['problemset'] = ProblemsetsDAO::getByPK($problemsetId);
+                if (is_null($response['problemset'])) {
                     throw new NotFoundException('problemsetNotFound');
                 }
                 $problemNotFound = 'problemNotFoundInProblemset';
@@ -1187,19 +1324,19 @@ class ProblemController extends Controller {
             }
         } else {
             // Nothing to see here, move along.
-            return false;
+            return null;
         }
 
         // Is the problem actually in the problemset?
         if (is_null(ProblemsetProblemsDAO::getByPK(
-            $r['problemset']->problemset_id,
-            $r['problem']->problem_id
+            $response['problemset']->problemset_id,
+            $problem->problem_id
         ))
         ) {
             throw new NotFoundException($problemNotFound);
         }
 
-        return true;
+        return $response;
     }
 
     /**
@@ -1211,7 +1348,7 @@ class ProblemController extends Controller {
      */
     public static function apiDetails(Request $r) {
         // Get user.
-        // Allow unauthenticated requests if we are not openning a problem
+        // Allow unauthenticated requests if we are not opening a problem
         // inside a contest.
         try {
             self::authenticateRequest($r);
@@ -1222,49 +1359,42 @@ class ProblemController extends Controller {
         }
 
         // Validate request
-        self::validateDetails($r);
-
+        $problem = self::validateDetails($r);
+        if (is_null($problem)) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
         $response = [];
 
-        // Create array of relevant columns
-        $relevant_columns = ['title', 'alias', 'validator', 'time_limit',
-            'validator_time_limit', 'overall_wall_time_limit', 'extra_wall_time',
-            'memory_limit', 'output_limit', 'input_limit', 'visits', 'submissions',
-            'accepted','difficulty', 'creation_date', 'source', 'order', 'points',
-            'visibility','languages', 'slow', 'email_clarifications'];
+        // Get the expected commit version.
+        $commit = $problem['problem']->commit;
+        $version = $problem['problem']->current_version;
+        if (!empty($problem['problemset'])) {
+            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+                $problem['problemset']->problemset_id,
+                $problem['problem']->problem_id
+            );
+            if (is_null($problemsetProblem)) {
+                return [
+                    'status' => 'ok',
+                    'exists' => false,
+                ];
+            }
+            $commit = $problemsetProblem->commit;
+            $version = $problemsetProblem->version;
+        }
 
         $response['statement'] = ProblemController::getProblemStatement(
-            $r['problem']->alias,
+            $problem['problem'],
+            $commit,
             $r['lang']
         );
-
-        // Add the example input.
-        $sample_input = null;
-        Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SAMPLE,
-            $r['problem']->alias . '-sample.in',
-            $r,
-            'ProblemController::getSampleInput',
-            $sample_input,
-            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        $response['settings'] = ProblemController::getProblemSettingsDistrib(
+            $problem['problem'],
+            $commit
         );
-        if (!empty($sample_input)) {
-            $response['sample_input'] = $sample_input;
-        }
-
-        // Add the libinteractive interface name.
-        $libinteractive_interface_name = null;
-        Cache::getFromCacheOrSet(
-            Cache::PROBLEM_LIBINTERACTIVE_INTERFACE_NAME,
-            $r['problem']->alias,
-            $r,
-            'ProblemController::getLibinteractiveInterfaceName',
-            $libinteractive_interface_name,
-            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
-        );
-        if (!empty($libinteractive_interface_name)) {
-            $response['libinteractive_interface_name'] = $libinteractive_interface_name;
-        }
 
         // Add preferred language of the user.
         $user_data = [];
@@ -1285,40 +1415,41 @@ class ProblemController extends Controller {
         }
 
         // Add the problem the response
-        $response = array_merge($response, $r['problem']->asFilteredArray($relevant_columns));
+        $response = array_merge($response, $problem['problem']->asFilteredArray([
+            'title', 'alias', 'input_limit', 'visits', 'submissions',
+            'accepted', 'difficulty', 'creation_date', 'source', 'order',
+            'points', 'visibility', 'languages', 'email_clarifications',
+        ]));
+        $response['version'] = $version;
+        $response['commit'] = $commit;
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
-        if (ProblemsDAO::isVisible($r['problem']) ||
-            Authorization::isProblemAdmin($r['current_identity_id'], $r['problem'])) {
-            $acl = ACLsDAO::getByPK($r['problem']->acl_id);
+        if (ProblemsDAO::isVisible($problem['problem']) ||
+            Authorization::isProblemAdmin($r['current_identity_id'], $problem['problem'])) {
+            $acl = ACLsDAO::getByPK($problem['problem']->acl_id);
             $problemsetter = UsersDAO::getByPK($acl->owner_id);
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
                 'name' => is_null($problemsetter->name) ?
                           $problemsetter->username :
-                          $problemsetter->name
+                          $problemsetter->name,
+                'creation_date' => strtotime($response['creation_date']),
             ];
         } else {
             unset($response['source']);
         }
 
-        $problemset_id = isset($r['problemset']) ? $r['problemset']->problemset_id : null;
+        $problemset = $problem['problemset'];
+        $problemsetId = !is_null($problemset) ? (int)$problemset->problemset_id : null;
 
         if (!is_null($r['current_user_id'])) {
-            // Create array of relevant columns for list of runs
-            $relevant_columns = ['guid', 'language', 'status', 'verdict',
-                'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-                'submit_delay'];
-
-            // Search the relevant runs from the DB
-
             // Get all the available runs done by the current_user
             try {
-                $runsArray = RunsDAO::getByKeys(
-                    $r['problem']->problem_id,
-                    $problemset_id,
-                    $r['current_identity_id']
+                $runsArray = RunsDAO::getForProblemDetails(
+                    (int)$problem['problem']->problem_id,
+                    $problemsetId,
+                    (int)$r['current_identity_id']
                 );
             } catch (Exception $e) {
                 // Operation failed in the data layer
@@ -1326,48 +1457,48 @@ class ProblemController extends Controller {
             }
 
             // Add each filtered run to an array
-            $runs_filtered_array = [];
+            $response['runs'] = [];
             foreach ($runsArray as $run) {
-                $filtered = $run->asFilteredArray($relevant_columns);
-                $filtered['alias'] = $r['problem']->alias;
-                $filtered['username'] = $r['current_user']->username;
-                $filtered['time'] = strtotime($filtered['time']);
-                $filtered['contest_score'] = (float)$filtered['contest_score'];
-                array_push($runs_filtered_array, $filtered);
+                $run['alias'] = $problem['problem']->alias;
+                $run['username'] = $r['current_user']->username;
+                $run['time'] = (int)$run['time'];
+                $run['contest_score'] = (float)$run['contest_score'];
+                array_push($response['runs'], $run);
             }
-
-            $response['runs'] = $runs_filtered_array;
         }
 
-        if (!is_null($problemset_id)) {
-            // At this point, contestant_user relationship should be established.
-            try {
-                ProblemsetIdentitiesDAO::CheckAndSaveFirstTimeAccess(
-                    $r['current_identity_id'],
-                    $problemset_id,
-                    Authorization::canSubmitToProblemset(
+        if (!is_null($problemset)) {
+            $result['admin'] = Authorization::isAdmin($r['current_identity_id'], $problemset);
+            if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
+                // At this point, contestant_user relationship should be established.
+                try {
+                    ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                         $r['current_identity_id'],
-                        $r['problemset']
-                    )
-                );
-            } catch (ApiException $e) {
-                throw $e;
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
+                        $problemset->problemset_id,
+                        Authorization::canSubmitToProblemset(
+                            $r['current_identity_id'],
+                            $problem['problemset']
+                        )
+                    );
+                } catch (ApiException $e) {
+                    throw $e;
+                } catch (Exception $e) {
+                    // Operation failed in the data layer
+                    throw new InvalidDatabaseOperationException($e);
+                }
             }
 
             // As last step, register the problem as opened
             if (!ProblemsetProblemOpenedDAO::getByPK(
-                $problemset_id,
-                $r['problem']->problem_id,
+                $problemsetId,
+                $problem['problem']->problem_id,
                 $r['current_identity_id']
             )) {
                 try {
                     // Save object in the DB
                     ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
-                        'problemset_id' => $problemset_id,
-                        'problem_id' => $r['problem']->problem_id,
+                        'problemset_id' => $problemset->problemset_id,
+                        'problem_id' => $problem['problem']->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
                         'identity_id' => $r['current_identity_id']
                     ]));
@@ -1377,13 +1508,13 @@ class ProblemController extends Controller {
                 }
             }
         } elseif (isset($r['show_solvers']) && $r['show_solvers']) {
-            $response['solvers'] = RunsDAO::GetBestSolvingRunsForProblem($r['problem']->problem_id);
+            $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem((int)$problem['problem']->problem_id);
         }
 
         if (!is_null($r['current_identity_id'])) {
             ProblemViewedDAO::MarkProblemViewed(
                 $r['current_identity_id'],
-                $r['problem']->problem_id
+                $problem['problem']->problem_id
             );
         }
 
@@ -1392,9 +1523,331 @@ class ProblemController extends Controller {
         $response['languages'] = array_filter(explode(',', $response['languages']));
 
         $response['points'] = round(100.0 / (log(max($response['accepted'], 1.0) + 1, 2)), 2);
-        $response['score'] = self::bestScore($r);
+        $response['score'] = self::bestScore(
+            $problem['problem'],
+            $problemsetId,
+            $r['contest_alias'],
+            $r['current_identity_id']
+        );
         $response['status'] = 'ok';
+        $response['exists'] = true;
         return $response;
+    }
+
+    /**
+     * Entry point for Problem Solution API.
+     *
+     * @param Request $r
+     * @throws InvalidFilesystemOperationException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiSolution(Request $r) {
+        self::authenticateRequest($r);
+
+        // Validate request
+        $problem = self::validateDetails($r);
+        if (is_null($problem)) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
+        $problemset = $problem['problemset'];
+        $problem = $problem['problem'];
+
+        if (!Authorization::canViewProblemSolution($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException('problemSolutionNotVisible');
+        }
+
+        // Get the expected commit version.
+        $commit = $problem->commit;
+        $version = $problem->current_version;
+        if (!empty($problemset)) {
+            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+                $problemset->problemset_id,
+                $problem->problem_id
+            );
+            if (is_null($problemsetProblem)) {
+                return [
+                    'status' => 'ok',
+                    'exists' => false,
+                ];
+            }
+            $commit = $problemsetProblem->commit;
+            $version = $problemsetProblem->version;
+        }
+
+        return [
+            'status' => 'ok',
+            'exists' => true,
+            'solution' => ProblemController::getProblemSolution(
+                $problem,
+                $commit,
+                $r['lang']
+            ),
+        ];
+    }
+
+    /**
+     * Entry point for Problem Versions API
+     *
+     * @param Request $r
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiVersions(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $privateTreeMapping = [];
+        foreach ((new ProblemArtifacts($problem->alias, 'private'))->log() as $logEntry) {
+            $privateTreeMapping[$logEntry['commit']] = $logEntry['tree'];
+        }
+
+        $masterLog = [];
+        foreach ((new ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
+            if (count($logEntry['parents']) < 3) {
+                // Master commits always have 3 or 4 parents. If they have
+                // fewer, it's one of the commits in the merged branches.
+                continue;
+            }
+            $logEntry['version'] = $privateTreeMapping[$logEntry['parents'][count($logEntry['parents']) - 1]];
+            $logEntry['tree'] = [];
+            foreach ((new ProblemArtifacts($problem->alias, $logEntry['commit']))->lsTreeRecursive() as $treeEntry) {
+                $logEntry['tree'][$treeEntry['path']] = $treeEntry['id'];
+            }
+            array_push($masterLog, $logEntry);
+        }
+
+        return [
+            'status' => 'ok',
+            'published' => (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
+            'log' => $masterLog,
+        ];
+    }
+
+    /**
+     * Change the version of the problem.
+     *
+     * @param Request $r
+     * @throws ForbiddenAccessException
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function apiSelectVersion(Request $r) {
+        self::authenticateRequest($r);
+
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['commit'], 'commit');
+        // ProblemController::UPDATE_PUBLISHED_NONE is not allowed here because
+        // it would not make any sense!
+        Validators::validateInEnum(
+            $r['update_published'],
+            'update_published',
+            [
+                ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+            ],
+            false
+        );
+
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        $oldVersion = $problem->current_version;
+        $oldCommit = $problem->commit;
+
+        [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+            $problem,
+            $r['commit']
+        );
+
+        if ($oldCommit == $problem->commit && $oldVersion == $problem->current_version) {
+            return [
+                'status' => 'ok',
+            ];
+        }
+
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
+
+        // Update problem fields.
+        $problemSettings = json_decode(
+            $problemArtifacts->get('settings.json'),
+            JSON_OBJECT_AS_ARRAY
+        );
+
+        $problemDeployer = new ProblemDeployer($problem->alias);
+        try {
+            // Begin transaction
+            DAO::transBegin();
+            $problemDeployer->updatePublished(
+                ((new ProblemArtifacts($problem->alias, 'published'))->commit())['commit'],
+                $problem->commit,
+                $r['current_user']
+            );
+
+            RunsDAO::createRunsForVersion($problem);
+            RunsDAO::updateVersionToCurrent($problem);
+            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                ProblemsetProblemsDAO::updateVersionToCurrent(
+                    $problem,
+                    $r['current_user'],
+                    $updatePublished
+                );
+            }
+
+            ProblemsDAO::update($problem);
+
+            DAO::transEnd();
+        } catch (ApiException $e) {
+            // Operation failed in the data layer, rollback transaction
+            DAO::transRollback();
+
+            throw $e;
+        } catch (Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            DAO::transRollback();
+            self::$log->error('Failed to update problem: ', $e);
+
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        if (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
+            self::$log->info('Calling ProblemController::apiRejudge');
+            try {
+                $runs = RunsDAO::getNewRunsForVersion($problem);
+                Grader::getInstance()->rejudge($runs, false);
+
+                // Expire details of the runs
+                foreach ($runs as $run) {
+                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                }
+                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
+            } catch (Exception $e) {
+                self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
+            }
+        }
+        $updatedStatementLanguages = [];
+        foreach ($problemArtifacts->lsTree('statements') as $file) {
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if ($extension != 'markdown') {
+                continue;
+            }
+            $updatedStatementLanguages[] = pathinfo($file['name'], PATHINFO_FILENAME);
+        }
+        self::invalidateCache(
+            $problem,
+            array_merge($updatedStatementLanguages, ProblemController::VALID_LANGUAGES)
+        );
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Return a report of which runs would change due to a version change.
+     */
+    public static function apiRunsDiff(Request $r) : array {
+        self::authenticateRequest($r);
+
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['version'], 'version');
+
+        try {
+            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+        if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
+            throw new ForbiddenAccessException();
+        }
+
+        return [
+            'status' => 'ok',
+            'diff' => RunsDAO::getRunsDiffsForVersion(
+                $problem,
+                null,
+                $problem->current_version,
+                $r['version']
+            ),
+        ];
+    }
+
+    /**
+     * Resolve a commit from the problem's master branch.
+     *
+     * @param Problems $problem the problem.
+     * @param ?string  $commit  the optional explicit commit hash.
+     *
+     * @return the SHA1 of a commit in the problem's master branch, plus
+     *         the SHA1 of the private branch tree associated with that commit.
+     * @throws NotFoundException
+     */
+    public static function resolveCommit(
+        Problems $problem,
+        ?string $commit
+    ) : array {
+        $masterCommit = null;
+        if (is_null($commit)) {
+            $masterCommit = (new ProblemArtifacts($problem->alias, 'published'))->commit();
+        } else {
+            foreach ((new ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
+                if (count($logEntry['parents']) < 3) {
+                    // Master commits always have 3 or 4 parents. If they have
+                    // fewer, it's one of the commits in the merged branches.
+                    continue;
+                }
+                if ($logEntry['commit'] == $commit) {
+                    $masterCommit = $logEntry;
+                    break;
+                }
+            }
+        }
+
+        if ($masterCommit == null) {
+            throw new NotFoundException('problemVersionNotFound');
+        }
+
+        // The private branch is always the last parent.
+        $privateCommitHash = $masterCommit['parents'][count($masterCommit['parents']) - 1];
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $privateCommitHash);
+        $privateCommit = $problemArtifacts->commit();
+
+        // Update problem fields.
+        return [$masterCommit['commit'], $privateCommit['tree']];
     }
 
     /**
@@ -1407,7 +1860,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateRuns(Request $r) {
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Is the problem valid?
         try {
@@ -1451,7 +1904,7 @@ class ProblemController extends Controller {
                 }
             }
             try {
-                $runs = RunsDAO::GetAllRuns(
+                $runs = RunsDAO::getAllRuns(
                     null,
                     $r['status'],
                     $r['verdict'],
@@ -1481,23 +1934,21 @@ class ProblemController extends Controller {
         } else {
             // Get all the available runs
             try {
-                $runs_array = RunsDAO::getByKeys($r['problem']->problem_id, null, $r['current_identity_id']);
-
-                // Create array of relevant columns for list of runs
-                $relevant_columns = ['guid', 'language', 'status', 'verdict',
-                    'runtime', 'penalty', 'memory', 'score', 'contest_score', 'time',
-                    'submit_delay'];
+                $runsArray = RunsDAO::getForProblemDetails(
+                    (int)$r['problem']->problem_id,
+                    null,
+                    (int)$r['current_identity_id']
+                );
 
                 // Add each filtered run to an array
                 $response['runs'] = [];
-                if (count($runs_array) >= 0) {
-                    $runs_filtered_array = [];
-                    foreach ($runs_array as $run) {
-                        $filtered = $run->asFilteredArray($relevant_columns);
-                        $filtered['time'] = strtotime($filtered['time']);
-                        $filtered['username'] = $r['current_user']->username;
-                        $filtered['alias'] = $r['problem']->alias;
-                        array_push($response['runs'], $filtered);
+                if (!empty($runsArray)) {
+                    foreach ($runsArray as $run) {
+                        $run['time'] = (int)$run['time'];
+                        $run['contest_score'] = (float)$run['contest_score'];
+                        $run['username'] = $r['current_user']->username;
+                        $run['alias'] = $r['problem']->alias;
+                        array_push($response['runs'], $run);
                     }
                 }
             } catch (Exception $e) {
@@ -1571,16 +2022,23 @@ class ProblemController extends Controller {
 
         try {
             // Array of GUIDs of pending runs
-            $pendingRunsGuids = RunsDAO::GetPendingRunsOfProblem($r['problem']->problem_id);
+            $pendingRunsGuids = RunsDAO::getPendingRunsOfProblem(
+                (int)$r['problem']->problem_id
+            );
 
             // Count of pending runs (int)
-            $totalRunsCount = RunsDAO::CountTotalRunsOfProblem($r['problem']->problem_id);
+            $totalRunsCount = SubmissionsDAO::countTotalSubmissionsOfProblem(
+                (int)$r['problem']->problem_id
+            );
 
             // List of verdicts
             $verdict_counts = [];
 
             foreach (self::$verdicts as $verdict) {
-                $verdict_counts[$verdict] = RunsDAO::CountTotalRunsOfProblemByVerdict($r['problem']->problem_id, $verdict);
+                $verdict_counts[$verdict] = RunsDAO::countTotalRunsOfProblemByVerdict(
+                    (int)$r['problem']->problem_id,
+                    $verdict
+                );
             }
 
             // Array to count AC stats per case.
@@ -1592,28 +2050,32 @@ class ProblemController extends Controller {
                 $casesStats = [];
                 $casesStats['counts'] = [];
 
-                // We need to save the last_id that we processed, so next time we do not repeat this
-                $casesStats['last_id'] = 0;
+                // We need to save the last_submission_id that we processed, so next time we do not repeat this
+                $casesStats['last_submission_id'] = 0;
             }
 
             // Get all runs of this problem after the last id we had
-            $runs = RunsDAO::searchRunIdGreaterThan(new Runs([
-                'problem_id' => $r['problem']->problem_id
-            ]), $casesStats['last_id'], 'run_id');
+            $runs = RunsDAO::searchWithRunIdGreaterThan(
+                (int)$r['problem']->problem_id,
+                (int)$casesStats['last_submission_id']
+            );
 
             // For each run we got
             foreach ($runs as $run) {
-                // Build grade dir
-                $grade_dir = RunController::getGradePath($run->guid);
-
                 // Skip it if it failed to compile.
                 if ($run->verdict == 'CE') {
                     continue;
                 }
 
-                // Try to open the details file.
-                if (file_exists("$grade_dir/details.json")) {
-                    $details = json_decode(file_get_contents("$grade_dir/details.json"));
+                // Try to open the details file. It's okay if the file is missing.
+                $details = Grader::getInstance()->getGraderResource(
+                    $run,
+                    'details.json',
+                    /*passthru=*/false,
+                    /*missingOk=*/true
+                );
+                if (!is_null($details)) {
+                    $details = json_decode($details);
                     foreach ($details as $group) {
                         if (!isset($group->cases) || !is_array($group->cases)) {
                             continue;
@@ -1635,8 +2097,8 @@ class ProblemController extends Controller {
         }
 
         // Save the last id we saw in case we saw something
-        if (!is_null($runs) && count($runs) > 0) {
-            $casesStats['last_id'] = $runs[count($runs) - 1]->run_id;
+        if (!empty($runs)) {
+            $casesStats['last_submission_id'] = $runs[count($runs) - 1]->submission_id;
         }
 
         // Save in cache what we got
@@ -1657,8 +2119,8 @@ class ProblemController extends Controller {
      * @param Request $r
      */
     private static function validateList(Request $r) {
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumber($r['rowcount'], 'rowcount', false);
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', null, null, false);
 
         // Defaults for offset and rowcount
         if (!isset($r['page'])) {
@@ -1670,7 +2132,7 @@ class ProblemController extends Controller {
             }
         }
 
-        Validators::isStringNonEmpty($r['query'], 'query', false);
+        Validators::validateStringNonEmpty($r['query'], 'query', false);
     }
 
     /**
@@ -1691,39 +2153,38 @@ class ProblemController extends Controller {
 
         // Filter results
         $language = null; // Filter by language, all by default.
-        $valid_languages = ['en', 'es', 'pt'];
         // "language" may be one of the allowed options, otherwise the default filter will be used.
-        if (!is_null($r['language']) && in_array($r['language'], $valid_languages)) {
+        if (!is_null($r['language']) && in_array($r['language'], ProblemController::VALID_LANGUAGES)) {
             $language = $r['language'];
         }
 
         // Sort results
-        $order = 'problem_id'; // Order by problem_id by default.
+        $orderBy = 'problem_id'; // Order by problem_id by default.
         $sorting_options = ['title', 'quality', 'difficulty', 'submissions', 'accepted', 'ratio', 'points', 'score', 'problem_id'];
         // "order_by" may be one of the allowed options, otherwise the default ordering will be used.
         if (!is_null($r['order_by']) && in_array($r['order_by'], $sorting_options)) {
-            $order = $r['order_by'];
+            $orderBy = $r['order_by'];
         }
 
-        // "mode" may be a valid one, for compatibility reasons 'descending' is the mode by default.
+        // "mode" may be a valid one, for compatibility reasons 'descending' is the order by default.
         if (!is_null($r['mode']) && ($r['mode'] === 'asc' || $r['mode'] === 'desc')) {
-            $mode = $r['mode'];
+            $order = $r['mode'];
         } else {
-            $mode = 'desc';
+            $order = 'desc';
         }
 
         $response = [];
         $response['results'] = [];
-        $author_identity_id = null;
-        $author_user_id = null;
+        $authorIdentityId = null;
+        $authorUserId = null;
         // There are basically three types of users:
         // - Non-logged in users: Anonymous
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
-        $identity_type = IDENTITY_ANONYMOUS;
+        $identityType = IDENTITY_ANONYMOUS;
         if (!is_null($r['current_identity_id'])) {
-            $author_identity_id = intval($r['current_identity_id']);
-            $author_user_id = intval($r['current_user_id']);
+            $authorIdentityId = intval($r['current_identity_id']);
+            $authorUserId = intval($r['current_user_id']);
             if (Authorization::isSystemAdmin($r['current_identity_id']) ||
                 Authorization::hasRole(
                     $r['current_identity_id'],
@@ -1731,9 +2192,9 @@ class ProblemController extends Controller {
                     Authorization::REVIEWER_ROLE
                 )
             ) {
-                $identity_type = IDENTITY_ADMIN;
+                $identityType = IDENTITY_ADMIN;
             } else {
-                $identity_type = IDENTITY_NORMAL;
+                $identityType = IDENTITY_NORMAL;
             }
         }
 
@@ -1754,17 +2215,20 @@ class ProblemController extends Controller {
 
         $total = 0;
         $response['results'] = ProblemsDAO::byIdentityType(
-            $identity_type,
+            $identityType,
             $language,
+            $orderBy,
             $order,
-            $mode,
             $offset,
             $rowcount,
             $query,
-            $author_identity_id,
-            $author_user_id,
+            $authorIdentityId,
+            $authorUserId,
             $r['tag'],
             is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
+            is_null($r['require_all_tags']) ? true : !!$r['require_all_tags'],
+            $r['programming_languages'],
+            $r['difficulty_range'],
             $total
         );
         $response['total'] = $total;
@@ -1784,8 +2248,8 @@ class ProblemController extends Controller {
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -1833,8 +2297,8 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateList($r);
 
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -1873,55 +2337,72 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Uses same params as apiDetails, except for lang, which is optional
-        self::validateDetails($r);
+        $problem = self::validateDetails($r);
 
         // If username is set in the request, we use that identity as target.
         // else, we query using current_user
         $identity = self::resolveTargetIdentity($r);
 
-        $response['score'] = self::bestScore($r, $identity);
+        $response['score'] = self::bestScore(
+            $problem['problem'],
+            $r['problemset_id'],
+            $r['contest_alias'],
+            $r['current_identity_id'],
+            $identity
+        );
         $response['status'] = 'ok';
         return $response;
     }
 
     /**
      * Returns the best score of a problem.
-     * Problem must be loadad in $r["problem"]
-     * Contest could be loadad in $r["contest"]. If set, will only look for
-     * runs inside that contest.
+     * If problemset is set, will only look for
+     * runs inside the contest.
      *
      * Authentication is expected to be performed earlier.
      *
-     * @param Request $r
+     * @param Problems $problem
+     * @param $problemsetId
+     * @param $contestAlias
+     * @param $currentLoggedIdentityId
+     * @param Identities $identity
      * @return float
      * @throws InvalidDatabaseOperationException
      */
-    private static function bestScore(Request $r, Identities $identity = null) {
-        $current_identity_id = (is_null($identity) ? $r['current_identity_id'] : $identity->identity_id);
+    private static function bestScore(
+        Problems $problem,
+        $problemsetId,
+        $contestAlias,
+        $currentLoggedIdentityId,
+        Identities $identity = null
+    ) : float {
+        $currentIdentityId = (is_null($identity) ? $currentLoggedIdentityId : $identity->identity_id);
 
-        if (is_null($current_identity_id)) {
-            return 0;
+        if (is_null($currentIdentityId)) {
+            return 0.0;
         }
 
-        $score = 0;
+        $score = 0.0;
         try {
             // Add best score info
-            if (!self::validateProblemset($r)) {
-                $score = RunsDAO::GetBestScore($r['problem']->problem_id, $current_identity_id);
-            } else {
-                $bestRun = RunsDAO::GetBestRun(
-                    $r['problemset']->problemset_id,
-                    $r['problem']->problem_id,
-                    $current_identity_id,
-                    false /*showAllRuns*/
+            $problemset = self::validateProblemset($problem, $problemsetId, $contestAlias);
+            if (is_null($problemset['problemset'])) {
+                $score = (float)RunsDAO::getBestProblemScore(
+                    (int)$problem->problem_id,
+                    (int)$currentIdentityId
                 );
-                $score = is_null($bestRun->contest_score) ? 0 : $bestRun->contest_score;
+            } else {
+                $score = (float)RunsDAO::getBestProblemScoreInProblemset(
+                    (int)$problemset['problemset']->problemset_id,
+                    (int)$problem->problem_id,
+                    (int)$currentIdentityId
+                );
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return $score;
+        return round($score, 2);
     }
 
     /**
@@ -1933,7 +2414,7 @@ class ProblemController extends Controller {
     private static function updateLanguages(Problems $problem) {
         $problemArtifacts = new ProblemArtifacts($problem->alias);
         try {
-            ProblemsLanguagesDAO::transBegin();
+            DAO::transBegin();
 
             // Removing existing data
             $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
@@ -1944,16 +2425,87 @@ class ProblemController extends Controller {
                 if (!$problemArtifacts->exists("statements/{$lang->name}.markdown")) {
                     continue;
                 }
-                ProblemsLanguagesDAO::save(new ProblemsLanguages([
+                ProblemsLanguagesDAO::create(new ProblemsLanguages([
                     'problem_id' => $problem->problem_id,
                     'language_id' => $lang->language_id,
                 ]));
             }
-            ProblemsLanguagesDAO::transEnd();
+            DAO::transEnd();
         } catch (ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
-            ProblemsLanguagesDAO::transRollback();
+            DAO::transRollback();
             throw new InvalidDatabaseOperationException($e);
+        }
+    }
+
+    /**
+     * Gets a Problem settings object with default values.
+     *
+     * @return array The Problem settings object.
+     */
+    private static function getDefaultProblemSettings() : array {
+        return [
+            'limits' => [
+                'ExtraWallTime' => '0s',
+                'MemoryLimit' => '64MiB',
+                'OutputLimit' => '10240KiB',
+                'OverallWallTimeLimit' => '30s',
+                'TimeLimit' => '1s',
+            ],
+            'validator' => [
+                'name' => 'token-caseless',
+                'tolerance' => 1e-9,
+                'limits' => [
+                    'ExtraWallTime' => '0s',
+                    'MemoryLimit' => '256MiB',
+                    'OutputLimit' => '10KiB',
+                    'OverallWallTimeLimit' => '5s',
+                    'TimeLimit' => '30s',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Updates the Problem's settings with the values from the request.
+     *
+     * @param array $problemSettings the original problem settings.
+     * @param Request $r the request
+     */
+    private static function updateProblemSettings(array &$problemSettings, Request $r) : void {
+        if (!is_null($r['extra_wall_time'])) {
+            $problemSettings['limits']['ExtraWallTime'] = (int)$r['extra_wall_time'] . 'ms';
+        }
+        if (!is_null($r['memory_limit'])) {
+            $problemSettings['limits']['MemoryLimit'] = (int)$r['memory_limit'] . 'KiB';
+        }
+        if (!is_null($r['output_limit'])) {
+            $problemSettings['limits']['OutputLimit'] = (int)$r['output_limit'];
+        }
+        if (!is_null($r['overall_wall_time_limit'])) {
+            $problemSettings['limits']['OverallWallTimeLimit'] = (
+                (int)$r['overall_wall_time_limit'] . 'ms'
+            );
+        }
+        if (!is_null($r['time_limit'])) {
+            $problemSettings['limits']['TimeLimit'] = (int)$r['time_limit'] . 'ms';
+        }
+        if (!is_null($r['validator'])) {
+            $problemSettings['validator']['name'] = $r['validator'];
+        }
+        if (!is_null($r['validator_time_limit'])) {
+            if (empty($problemSettings['validator']['limits'])) {
+                $problemSettings['validator']['limits'] = [
+                    'ExtraWallTime' => '0s',
+                    'MemoryLimit' => '256MiB',
+                    'OutputLimit' => '10KiB',
+                    'OverallWallTimeLimit' => '5s',
+                    'TimeLimit' => '30s',
+                ];
+            }
+            $problemSettings['validator']['limits']['TimeLimit'] = (
+                (int)$r['validator_time_limit'] . 'ms'
+            );
         }
     }
 }

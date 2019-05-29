@@ -27,7 +27,7 @@ class Identities extends VO {
             return;
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['username'])) {
             $this->username = $data['username'];
@@ -39,10 +39,10 @@ class Identities extends VO {
             $this->name = $data['name'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['language_id'])) {
-            $this->language_id = $data['language_id'];
+            $this->language_id = (int)$data['language_id'];
         }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
@@ -51,7 +51,7 @@ class Identities extends VO {
             $this->state_id = $data['state_id'];
         }
         if (isset($data['school_id'])) {
-            $this->school_id = $data['school_id'];
+            $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['gender'])) {
             $this->gender = $data['gender'];
@@ -62,11 +62,11 @@ class Identities extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

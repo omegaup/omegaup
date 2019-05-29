@@ -98,7 +98,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
 
         global $conn;
         $problemset = $conn->GetRow($sql, $params);
-        if (count($problemset) == 0) {
+        if (empty($problemset)) {
             return null;
         }
 

@@ -6,7 +6,7 @@ export default class ArenaAdmin {
     var self = this;
 
     self.arena = arena;
-    self.arena.contestAdmin = true;
+    self.arena.problemsetAdmin = true;
 
     self.setUpPagers();
     self.arena.runs.attach($('#runs table.runs'));

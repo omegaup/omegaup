@@ -71,7 +71,7 @@
 			<p id="description"></p>
 		</div>
 		<div id="contest-rules" class="">
-			<h1>{#RegisterForContestRules#}</h1>
+			<h1>{#registerForContestRules#}</h1>
 			<ul>
 				<li id="show-scoreboard-after" name="show_scoreboard_after"></li>
 				<li id="window-length-enabled" name="window_length_enabled"></li>

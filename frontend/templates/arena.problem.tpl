@@ -48,6 +48,10 @@
 {/if}
 {if $problemsetter}
 					<div class="problemsetter">{#wordsProblemsetter#}: <a href="/profile/{$problemsetter.username}/">{$problemsetter.name|escape}</a></div>
+					<div class="problem-creation-date"></div>
+{/if}
+{if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
+					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
 {/if}
 					<div class="help">{#wordsNeedHelpToSendSubmission#}
 						<a href="#" id="submissions-help">{#wordsClickHere#}</a>

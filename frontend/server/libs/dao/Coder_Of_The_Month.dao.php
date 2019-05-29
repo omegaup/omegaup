@@ -33,7 +33,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           SELECT DISTINCT
             i.user_id,
             i.username,
-            i.country_id,
+            COALESCE(i.country_id, 'xx') AS country_id,
             COUNT(ps.problem_id) ProblemsSolved,
             SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)) score,
             (SELECT urc.classname FROM
@@ -54,13 +54,16 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           FROM
             (
               SELECT DISTINCT
-                r.identity_id, r.problem_id
+                s.identity_id, s.problem_id
               FROM
+                Submissions s
+              INNER JOIN
                 Runs r
+              ON
+                r.run_id = s.current_run_id
               WHERE
-                r.verdict = 'AC' AND r.type= 'normal' AND
-                r.time >= ? AND
-                r.time <= ?
+                r.verdict = 'AC' AND s.type= 'normal' AND
+                s.time >= ? AND s.time <= ?
             ) AS up
           INNER JOIN
             Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
@@ -71,18 +74,16 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
               SELECT
                 user_id,
                 MAX(time) latest_time,
-                rank
+                selected_by
               FROM
                 Coder_Of_The_Month
-              WHERE
-                rank = 1
               GROUP BY
                 user_id,
-                rank
+                selected_by
             ) AS cm on i.user_id = cm.user_id
           WHERE
-            cm.user_id IS NULL
-            OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?
+            (cm.user_id IS NULL
+            OR DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < ?)
           GROUP BY
             up.identity_id
           ORDER BY
@@ -94,7 +95,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         global $conn;
         $results = $conn->getAll($sql, $val);
-        if (count($results) == 0) {
+        if (empty($results)) {
             return null;
         }
         return $results;
@@ -109,7 +110,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     final public static function getCodersOfTheMonth() {
         $sql = '
           SELECT
-            cm.time, u.username, u.country_id, e.email
+            cm.time, u.username, COALESCE(u.country_id, "xx") AS country_id, e.email
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
@@ -117,13 +118,13 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LEFT JOIN
             Emails e ON e.user_id = u.user_id
           WHERE
-            cm.rank = 1
+            cm.rank = 1 OR cm.selected_by IS NOT NULL
           ORDER BY
             cm.time DESC
         ';
 
         global $conn;
-        $rs = $conn->Execute($sql);
+        $rs = $conn->GetAll($sql);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = $row;
@@ -141,7 +142,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $date = date('Y-m-01', strtotime($firstDay));
         $sql = '
           SELECT
-            cm.time, u.username, u.country_id, e.email, u.user_id
+            cm.time, u.username, COALESCE(u.country_id, "xx") AS country_id, e.email, u.user_id
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
@@ -181,13 +182,14 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, []);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return false;
         }
         return $username == $rs['username'];
     }
 
-    final public static function getByTimeAndRank($time, $rank) {
+    final public static function getByTimeAndSelected($time, $autoselected = false) {
+        $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = 'SELECT
                     *
                 FROM
@@ -195,10 +197,9 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?
                 AND
-                    `rank` = ?;';
-
+                    `selected_by` ' . $clause . ';';
         global $conn;
-        $rs = $conn->Execute($sql, [$time, $rank]);
+        $rs = $conn->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -207,21 +208,30 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         return $coders;
     }
 
-    public static function calculateCoderOfLastMonth($currentDate) {
-        $date = new DateTime($currentDate);
+    final public static function getByTime($time) {
+        $sql = 'SELECT
+                    *
+                FROM
+                    Coder_Of_The_Month
+                WHERE
+                    `time` = ?;';
+
+        global $conn;
+        $rs = $conn->GetAll($sql, [$time]);
+
+        $coders = [];
+        foreach ($rs as $row) {
+            array_push($coders, new CoderOfTheMonth($row));
+        }
+        return $coders;
+    }
+
+    public static function calculateCoderOfMonthByGivenDate($date) {
+        $date = new DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of next month');
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        return self::calculateCoderOfTheMonth($startTime, $endTime);
-    }
-
-    public static function calculateCoderOfCurrentMonth($currentDate) {
-        $date = new DateTime($currentDate);
-        $firstDayOfCurrentMonth = $date->modify('first day of this month');
-        $startTime = $firstDayOfCurrentMonth->format('Y-m-d');
-        $firstDayOfNextMonth = $date->modify('first day of next month');
-        $endTime = $firstDayOfNextMonth->format('Y-m-d');
         return self::calculateCoderOfTheMonth($startTime, $endTime);
     }
 }

@@ -13,7 +13,7 @@ class GroupsScoreboardsProblemsetsDAO extends GroupsScoreboardsProblemsetsDAOBas
     public static function getByGroupScoreboard($group_scoreboard_id) {
         $sql = 'SELECT * FROM Groups_Scoreboards_Problemsets WHERE group_scoreboard_id = ?;';
         global $conn;
-        $rs = $conn->Execute($sql, [$group_scoreboard_id]);
+        $rs = $conn->GetAll($sql, [$group_scoreboard_id]);
 
         $groupsScoreboardsProblemsets = [];
         foreach ($rs as $row) {
