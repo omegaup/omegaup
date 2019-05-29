@@ -66,6 +66,7 @@ const translations = {
 	codersOfTheMonthCountry: "(C0un7ry)",
 	codersOfTheMonthDate: "(Da73)",
 	codersOfTheMonthList: "(T0p c0d3r m0n7h1y 1i57)",
+	codersOfTheMonthListCandidate: "(Li57 0f candida735 70 c0d3r 0f 7h3 m0n7h)",
 	codersOfTheMonthUser: "(U53rnam3)",
 	contestAddgroupAddGroup: "(Add gr0up)",
 	contestAddproblemContestOrder: "(C0n7357 0rd3r)",

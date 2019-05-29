@@ -66,6 +66,7 @@ const translations = {
 	codersOfTheMonthCountry: "Pa\u00eds",
 	codersOfTheMonthDate: "Data",
 	codersOfTheMonthList: "Codificador superior da lista de meses",
+	codersOfTheMonthListCandidate: "Lista de candidatos ao codificador do m\u00eas",
 	codersOfTheMonthUser: "Usu\u00e1rio",
 	contestAddgroupAddGroup: "Adicionar grupo",
 	contestAddproblemContestOrder: "Ordem concurso",
