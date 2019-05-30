@@ -29,16 +29,15 @@ OmegaUp.on('ready', function() {
                 .fail(UI.apiError);
           },
           'edit-identity-member': function(groupMembersInstance, identity,
-                                           username, name, selectedCountry,
-                                           selectedState, school) {
+                                           username) {
             API.Identity.update({
-                          username: username,
-                          name: name,
-                          country_id: selectedCountry,
-                          state_id: selectedState,
-                          school_name: school,
+                          username: identity.username,
+                          name: identity.name,
+                          country_id: identity.country_id,
+                          state_id: identity.state_id,
+                          school_name: identity.school,
                           group_alias: groupAlias,
-                          originalIdentityUsername: identity['username'],
+                          original_username: username,
                         })
                 .then(function(data) {
                   refreshMemberList();

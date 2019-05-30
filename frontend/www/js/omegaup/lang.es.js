@@ -320,7 +320,7 @@ const translations = {
 	groupCreateIdentities: "Crear identidades",
 	groupEditIdentity: "Editar identidad",
 	groupEditMemberAdded: "\u00a1Miembro agregado correctamente!",
-	groupEditMemberPasswordUpdated: "\u00a1Contrase\u00f1a de la identidad actualizada caorrectamente!",
+	groupEditMemberPasswordUpdated: "\u00a1Contrase\u00f1a de la identidad actualizada correctamente!",
 	groupEditMemberRemoved: "\u00a1Miembro eliminado correctamente!",
 	groupEditMemberUpdated: "\u00a1Miembro actualizado correctamente!",
 	groupEditMembers: "Miembros",
