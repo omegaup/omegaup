@@ -1,6 +1,6 @@
 <?php
 
-class DbConfigTest extends PHPUnit_Framework_TestCase {
+class DbConfigTest extends \PHPUnit\Framework\TestCase {
     public function testTimeSync() {
         $db_time = Utils::GetDbDatetime();
         $php_time = date('Y-m-d H:i:s', Time::get());

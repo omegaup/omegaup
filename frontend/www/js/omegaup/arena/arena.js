@@ -110,7 +110,7 @@ class EventsSocket {
         self.arena.updateClarification(data.clarification);
       }
     } else if (data.message == '/scoreboard/update/') {
-      if (self.arena.contestAdmin && data.scoreboard_type != 'admin') {
+      if (self.arena.problemsetAdmin && data.scoreboard_type != 'admin') {
         if (self.arena.options.originalContestAlias == null) return;
         self.arena.virtualRankingChange(data.scoreboard);
         return;
@@ -146,6 +146,47 @@ class EventsSocket {
   }
 }
 ;
+
+class EphemeralGrader {
+  constructor() {
+    let self = this;
+
+    self.ephemeralEmbeddedGraderElement =
+        document.getElementById('ephemeral-embedded-grader');
+    self.messageQueue = [];
+    self.loaded = false;
+
+    if (!self.ephemeralEmbeddedGraderElement) return;
+
+    self.ephemeralEmbeddedGraderElement.onload = () => {
+      self.loaded = true;
+      while (self.messageQueue.length > 0) {
+        self._sendInternal(self.messageQueue.shift());
+      }
+    };
+  }
+
+  send(method, ...params) {
+    let self = this;
+    let message = {
+      method: method,
+      params: params,
+    };
+
+    if (!self.loaded) {
+      self.messageQueue.push(message);
+      return;
+    }
+    self._sendInternal(message);
+  }
+
+  _sendInternal(message) {
+    let self = this;
+
+    self.ephemeralEmbeddedGraderElement.contentWindow.postMessage(
+        message, window.location.origin + '/grader/ephemeral/embedded/');
+  }
+}
 
 export class Arena {
   constructor(options) {
@@ -207,7 +248,8 @@ export class Arena {
     self.currentProblem = null;
 
     // If we have admin powers in self contest.
-    self.contestAdmin = false;
+    self.problemsetAdmin = false;
+    self.problemsetOpened = true;
     self.answeredClarifications = 0;
     self.clarificationsOffset = 0;
     self.clarificationsRowcount = 20;
@@ -300,6 +342,9 @@ export class Arena {
 
     // Virtual contest refresh interval
     self.virtualContestRefreshInterval = null;
+
+    // Ephemeral grader support.
+    self.ephemeralGrader = new EphemeralGrader();
   }
 
   installLibinteractiveHooks() {
@@ -309,13 +354,14 @@ export class Arena {
           let form = $(e.target);
           e.preventDefault();
           let alias = self.currentProblem.alias;
+          let commit = self.currentProblem.commit;
           let os = form.find('.download-os').val();
           let lang = form.find('.download-lang').val();
           let extension = (os == 'unix' ? '.tar.bz2' : '.zip');
 
-          UI.navigateTo(window.location.protocol + '//' + window.location.host +
-                        '/templates/' + alias + '/' + alias + '_' + os + '_' +
-                        lang + extension);
+          UI.navigateTo(
+              window.location.protocol + '//' + window.location.host +
+              `/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`);
 
           return false;
         });
@@ -388,9 +434,10 @@ export class Arena {
 
   initProblemsetId(problemset) {
     let self = this;
-    if (problemset.hasOwnProperty('problemset_id')) {
-      self.options.problemsetId = problemset.problemset_id;
+    if (!problemset.hasOwnProperty('problemset_id')) {
+      return;
     }
+    self.options.problemsetId = problemset.problemset_id;
   }
 
   initClock(start, finish, deadline) {
@@ -500,7 +547,14 @@ export class Arena {
   initProblems(problemset) {
     let self = this;
     self.currentProblemset = problemset;
-    self.contestAdmin = problemset.admin;
+    self.problemsetAdmin = problemset.admin;
+    self.problemsetOpened =
+        !problemset.hasOwnProperty('opened') || problemset.opened;
+    if (!self.problemsetOpened) {
+      $('#new-run a')
+          .attr('href', `/arena/${self.options.contestAlias}/`)
+          .text(T.arenaContestNotOpened);
+    }
     let problems = problemset.problems;
     for (let i = 0; i < problems.length; i++) {
       let problem = problems[i];
@@ -599,8 +653,8 @@ export class Arena {
               self.rankingChange(response);
           })
           .fail(UI.ignoreError);
-    } else if (self.options.contestAdmin || self.options.contestAlias != null ||
-               self.contestAdmin ||
+    } else if (self.options.problemsetAdmin ||
+               self.options.contestAlias != null || self.problemsetAdmin ||
                (self.options.courseAlias && self.options.assignmentAlias)) {
       API.Problemset.scoreboard(scoreboardParams)
           .then(self.rankingChange.bind(self))
@@ -995,7 +1049,7 @@ export class Arena {
               .removeClass('template')
               .addClass('inserted');
 
-      if (self.contestAdmin) {
+      if (self.problemsetAdmin) {
         (function(id, answerNode) {
           let responseFormNode =
               $('#create-response-form', answerNode).removeClass('template');
@@ -1031,7 +1085,7 @@ export class Arena {
                 .then(function() {
                   $('pre', answerNode).html(responseText);
                   $('#create-response-text', answerNode).val('');
-                  if (self.contestAdmin) {
+                  if (self.problemsetAdmin) {
                     self.notifications.resolve({
                       id: 'clarification-' + clarification.clarification_id
                     });
@@ -1050,7 +1104,7 @@ export class Arena {
     $('.anchor', r).attr('name', anchor);
     $('.contest', r).html(clarification.contest_alias);
     $('.problem', r).html(clarification.problem_alias);
-    if (self.contestAdmin) $('.author', r).html(clarification.author);
+    if (self.problemsetAdmin) $('.author', r).html(clarification.author);
     $('.time', r)
         .html(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',
                                     clarification.time.getTime()));
@@ -1060,7 +1114,7 @@ export class Arena {
       self.answeredClarifications++;
     }
 
-    if (self.contestAdmin != !!clarification.answer) {
+    if (self.problemsetAdmin != !!clarification.answer) {
       self.notifications.notify({
         id: 'clarification-' + clarification.clarification_id,
         author: clarification.author,
@@ -1132,7 +1186,7 @@ export class Arena {
       {language: 'lua', name: 'Lua'},
       {language: 'kp', name: 'Karel (Pascal)'},
       {language: 'kj', name: 'Karel (Java)'},
-      {language: 'cat', name: T.wordJustOutput},
+      {language: 'cat', name: T.wordsJustOutput},
     ];
 
     let self = this;
@@ -1294,10 +1348,11 @@ export class Arena {
         $('#problem > .title')
             .text(problem.letter + '. ' + UI.escape(problem.title));
         $('#problem .data .points').text(problem.points);
-        $('#problem .memory_limit').text(problem.memory_limit / 1024 + 'MB');
-        $('#problem .time_limit').text(problem.time_limit / 1000 + 's');
+        $('#problem .memory_limit')
+            .text((problem.settings.limits.MemoryLimit / 1024 / 1024) + ' MiB');
+        $('#problem .time_limit').text(problem.settings.limits.TimeLimit);
         $('#problem .overall_wall_time_limit')
-            .text(problem.overall_wall_time_limit / 1000 + 's');
+            .text(problem.settings.limits.OverallWallTimeLimit);
         $('#problem .input_limit').text(problem.input_limit / 1024 + ' KiB');
         self.renderProblem(problem);
         self.myRuns.attach($('#problem .runs'));
@@ -1310,10 +1365,11 @@ export class Arena {
           if (hash_index != -1) {
             original_href = original_href.substring(0, hash_index);
           }
-          if (problem.sample_input) {
+          if (problem.settings.cases.sample) {
             $('#problem .karel-js-link a')
-                .attr('href', original_href + '#mundo:' +
-                                  encodeURIComponent(problem.sample_input));
+                .attr('href',
+                      original_href + '#mundo:' +
+                          encodeURIComponent(problem.settings.cases.sample.in));
           } else {
             $('#problem .karel-js-link a').attr('href', original_href);
           }
@@ -1335,8 +1391,10 @@ export class Arena {
         } else {
           $('#problem .problemsetter').hide();
         }
-        $('#problem .runs tfoot td a')
-            .attr('href', '#problems/' + problem.alias + '/new-run');
+        if (self.problemsetOpened) {
+          $('#problem .runs tfoot td a')
+              .attr('href', '#problems/' + problem.alias + '/new-run');
+        }
 
         $('#problem tbody.added').remove();
 
@@ -1365,15 +1423,18 @@ export class Arena {
           update(problem);
         } else {
           let problemset = self.computeProblemsetArg();
-          API.Problem.details(
-                         $.extend(problemset, {problem_alias: problem.alias}))
+          API.Problem.details($.extend(problemset,
+                                       {
+                                         problem_alias: problem.alias,
+                                         prevent_problemset_open:
+                                             self.problemsetAdmin &&
+                                                 !self.problemsetOpened
+                                       }))
               .then(function(problem_ext) {
                 problem.source = problem_ext.source;
                 problem.problemsetter = problem_ext.problemsetter;
                 problem.statement = problem_ext.statement;
-                problem.libinteractive_interface_name =
-                    problem_ext.libinteractive_interface_name;
-                problem.sample_input = problem_ext.sample_input;
+                problem.settings = problem_ext.settings;
                 problem.input_limit = problem_ext.input_limit;
                 problem.runs = problem_ext.runs;
                 problem.templates = problem_ext.templates;
@@ -1433,15 +1494,26 @@ export class Arena {
     self.currentProblem = problem;
     let statement = document.querySelector('#problem div.statement');
     statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
-        problem.statement.markdown, problem.statement.images);
+        problem.statement.markdown, problem.statement.images, problem.settings);
+    const creationDate =
+        document.querySelector('#problem .problem-creation-date');
+    if (problem.problemsetter && creationDate) {
+      creationDate.innerText =
+          omegaup.UI.formatString(omegaup.T.wordsUploadedOn, {
+            date: omegaup.UI.formatDate(
+                new Date(problem.problemsetter.creation_date * 1000))
+          });
+    }
 
     UI.renderSampleToClipboardButton();
 
     let libinteractiveInterfaceName =
         statement.querySelector('span.libinteractive-interface-name');
-    if (libinteractiveInterfaceName && problem.libinteractive_interface_name) {
+    if (libinteractiveInterfaceName && problem.settings &&
+        problem.settings.interactive &&
+        problem.settings.interactive.module_name) {
       libinteractiveInterfaceName.innerText =
-          problem.libinteractive_interface_name.replace(/\.idl$/, '');
+          problem.settings.interactive.module_name.replace(/\.idl$/, '');
     }
     self.installLibinteractiveHooks();
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
@@ -1451,6 +1523,8 @@ export class Arena {
     let languageArray = problem.languages;
     self.updateAllowedLanguages(languageArray);
     self.selectDefaultLanguage();
+
+    self.ephemeralGrader.send('setSettings', problem.settings);
   }
 
   detectShowRun() {
@@ -2066,7 +2140,7 @@ class ObservableRun {
 
   $status_text() {
     let self = this;
-    if (self.type() == 'disqualified') return T['wordsDisqualify'];
+    if (self.type() == 'disqualified') return T['wordsDisqualified'];
 
     return self.status() == 'ready' ? T['verdict' + self.verdict()] :
                                       self.status();
@@ -2086,6 +2160,7 @@ class ObservableRun {
         return T.verdictHelpKarelTLE;
       }
     }
+    if (self.type() == 'disqualified') return T.verdictHelpDisqualified;
 
     return T['verdictHelp' + self.verdict()];
   }

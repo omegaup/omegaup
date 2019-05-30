@@ -64,9 +64,6 @@ class ContestDetailsTest extends OmegaupTestCase {
             // Assert data in DB
             $this->assertEquals($problem->title, $problem_array['title']);
             $this->assertEquals($problem->alias, $problem_array['alias']);
-            $this->assertEquals($problem->validator, $problem_array['validator']);
-            $this->assertEquals($problem->time_limit, $problem_array['time_limit']);
-            $this->assertEquals($problem->memory_limit, $problem_array['memory_limit']);
             $this->assertEquals($problem->visits, $problem_array['visits']);
             $this->assertEquals($problem->submissions, $problem_array['submissions']);
             $this->assertEquals($problem->accepted, $problem_array['accepted']);
@@ -75,6 +72,8 @@ class ContestDetailsTest extends OmegaupTestCase {
             // Get points of problem from Contest-Problem relationship
             $problemInContest = ProblemsetProblemsDAO::getByPK($contest->problemset_id, $problem->problem_id);
             $this->assertEquals($problemInContest->points, $problem_array['points']);
+            $this->assertEquals($problemInContest->commit, $problem_array['commit']);
+            $this->assertEquals($problemInContest->version, $problem_array['version']);
 
             $i++;
         }
@@ -532,13 +531,20 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestAdmin = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
+        $detourGrader = new ScopedGraderDetour();
+
         // Create runs
         $runsData = [];
         $runsData[0] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runsData[1] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runsData[2] = RunsFactory::createRun($problemData, $contestData, $contestants[1]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runsData[3] = RunsFactory::createRun($problemData, $contestData, $contestants[2]);
+        Time::setTimeForTesting(Time::get() + 60);
         $runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
+        Time::setTimeForTesting(Time::get() + 60);
         $runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
 
         // Grade the runs
@@ -624,6 +630,78 @@ class ContestDetailsTest extends OmegaupTestCase {
         } catch (ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    /**
+     * Check that the download functionality works.
+     */
+    public function testDownload() {
+        $contestData = ContestsFactory::createContest();
+        $contestDirector = $contestData['director'];
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblemWithAuthor($contestDirector);
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Create our contestants
+        $contestants = [];
+        array_push($contestants, UserFactory::createUser());
+        array_push($contestants, UserFactory::createUser());
+
+        $detourGrader = new ScopedGraderDetour();
+
+        // Create runs
+        $runsData = [];
+        {
+            $run = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+            RunsFactory::gradeRun($run, 0, 'CE');
+            $runsData[] = $run;
+        }
+
+        {
+            Time::setTimeForTesting(Time::get() + 60);
+            $run = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
+            RunsFactory::gradeRun($run, 1, 'AC', 60);
+            $runsData[] = $run;
+        }
+
+        {
+            Time::setTimeForTesting(Time::get() + 60);
+            $run = RunsFactory::createRun($problemData, $contestData, $contestants[1]);
+            RunsFactory::gradeRun($run, .9, 'PA');
+            $runsData[] = $run;
+        }
+
+        // Create a mock that stores the file name-contents mapping into an associative array.
+        $files = [];
+        include_once 'libs/third_party/ZipStream.php';
+        $zip = $this->createMock(ZipStream::class);
+        $zip->method('add_file')
+            ->will($this->returnCallback(function (
+                string $path,
+                string $contents,
+                array $opt = []
+            ) use (&$files) {
+                $files[$path] = $contents;
+            }));
+
+        ProblemsetController::downloadRuns($contestData['contest']->problemset_id, $zip);
+
+        // Verify that the data is there.
+        $summary = $files['summary.csv'];
+        $this->assertNotEquals($summary, '');
+        foreach ($runsData as $runData) {
+            $this->assertEquals(
+                $files["runs/{$runData['response']['guid']}.{$runData['request']['language']}"],
+                $runData['request']['source']
+            );
+            $this->assertContains(
+                "{$runData['response']['guid']},{$runData['contestant']->username},{$problemData['problem']->alias}",
+                $summary
+            );
         }
     }
 }

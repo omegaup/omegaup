@@ -109,24 +109,23 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
         $this->assertArrayHasKey('guid', $response);
 
-        // Get run from DB
-        $run = RunsDAO::getByAlias($response['guid']);
-        $this->assertNotNull($run);
+        // Get submissionn from DB
+        $submission = SubmissionsDAO::getByGuid($response['guid']);
+        $this->assertNotNull($submission);
 
         // Get contest from DB to check times with respect to contest start
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
 
         // Validate data
-        $this->assertEquals($r['language'], $run->language);
-        $this->assertNotNull($run->guid);
+        $this->assertEquals($r['language'], $submission->language);
+        $this->assertNotNull($submission->guid);
 
         // Validate file created
-        $filename = RunController::getSubmissionPath($run);
-        $this->assertFileExists($filename);
-        $fileContent = file_get_contents($filename);
+        $fileContent = SubmissionController::getSource($submission->guid);
         $this->assertEquals($r['source'], $fileContent);
 
         // Validate defaults
+        $run = RunsDAO::getByPK($submission->current_run_id);
         $this->assertEquals('new', $run->status);
         $this->assertEquals(0, $run->runtime);
         $this->assertEquals(0, $run->memory);
@@ -137,13 +136,18 @@ class RunCreateTest extends OmegaupTestCase {
         $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
         $this->assertEquals(Utils::GetPhpUnixTimestamp() + $submission_gap, $response['nextSubmissionTimestamp']);
 
-        $log = SubmissionLogDAO::getByPK($run->run_id);
+        $log = SubmissionLogDAO::getByPK($submission->submission_id);
 
         $this->assertNotNull($log);
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
-            $this->assertEquals((Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60, $run->penalty, '', 0.5);
+            $this->assertEquals(
+                (Utils::GetPhpUnixTimestamp() - intval(strtotime($contest->start_time))) / 60,
+                $run->penalty,
+                '',
+                0.5
+            );
         }
 
         $this->assertEquals('JE', $run->verdict);
@@ -154,7 +158,7 @@ class RunCreateTest extends OmegaupTestCase {
      */
     public function testNewRunValid() {
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = new ScopedGraderDetour();
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -188,7 +192,7 @@ class RunCreateTest extends OmegaupTestCase {
      */
     public function testRunToValidPrivateContest() {
         $r = $this->setValidRequest('private' /* admission mode */);
-        $this->detourGraderCalls();
+        $detourGrader = new ScopedGraderDetour();
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -243,7 +247,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testInvalidRunInsideSubmissionsGap() {
         // Set the context
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = new ScopedGraderDetour();
 
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -268,8 +272,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = $this->setValidRequest();
 
         // Prepare the Grader mock, validate that grade is called 2 times
-        // (we will use 2 problems for this test)
-        $this->detourGraderCalls($this->exactly(2));
+        $detourGrader = new ScopedGraderDetour();
 
         // Add a second problem to the contest
         $problemData2 = ProblemsFactory::createProblem();
@@ -318,7 +321,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testMissingParameters() {
         // Set the context for the first contest
         $original_r = $this->setValidRequest();
-        $this->detourGraderCalls($this->any());
+        $detourGrader = new ScopedGraderDetour();
 
         $needed_keys = [
             'problem_alias',
@@ -353,7 +356,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testNewRunInWindowLengthPublicContest() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = new ScopedGraderDetour();
 
         // Alter Contest window length to 20
         // This means: once I started the contest, I have 20 more mins
@@ -400,13 +403,13 @@ class RunCreateTest extends OmegaupTestCase {
     public function testRunWhenContestNotStartedForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $this->detourGraderCalls();
+        $detourGrader = new ScopedGraderDetour();
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
         $r['auth_token'] = $login->auth_token;
 
-        // Manually set the contest	start 10 mins in the future
+        // Manually set the contest start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10);
         ContestsDAO::save($contest);
@@ -430,7 +433,7 @@ class RunCreateTest extends OmegaupTestCase {
         $login = self::login($this->contestData['director']);
         $r['auth_token'] = $login->auth_token;
 
-        // Manually set the contest	start 10 mins in the future
+        // Manually set the contest start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->finish_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1);
         ContestsDAO::save($contest);
@@ -448,7 +451,7 @@ class RunCreateTest extends OmegaupTestCase {
     public function testInvalidRunInsideSubmissionsGapForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $this->detourGraderCalls($this->exactly(2));
+        $detourGrader = new ScopedGraderDetour();
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -500,7 +503,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $this->detourGraderCalls($this->exactly(1));
+        $detourGrader = new ScopedGraderDetour();
         $response = RunController::apiCreate($r);
 
         // Validate the run
@@ -634,7 +637,7 @@ class RunCreateTest extends OmegaupTestCase {
             ]);
 
             // Call API
-            $this->detourGraderCalls($this->exactly(1));
+            $detourGrader = new ScopedGraderDetour();
             $response = RunController::apiCreate($r);
 
             // Validate the run

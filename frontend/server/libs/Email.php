@@ -1,4 +1,8 @@
 <?php
+
+require_once 'libs/third_party/phpmailer/class.phpmailer.php';
+require_once 'libs/third_party/phpmailer/class.smtp.php';
+
 class Email {
     public static $log;
     private static $emailSender = null;
@@ -23,7 +27,7 @@ class Email {
             return;
         }
 
-        self::$log->info('Really sending email.');
+        self::$log->debug('Sending email to ' . (is_array($emails) ? join(',', $emails) : $emails));
 
         $mail = new PHPMailer();
         $mail->IsSMTP();

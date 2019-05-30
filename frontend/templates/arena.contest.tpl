@@ -101,7 +101,6 @@
 					<form enctype="multipart/form-data" action="/api/problem/update" method="post" id="update-problem">
 						<fieldset>
 							<legend>Administrar problema</legend>
-							<button id="rejudge-problem" value="Rejuecear">Rejuecear</button>
 							<input name="problem_alias" type="hidden" />
 							<input name="problem_contents" type="file" />
 							<button type="submit">Actualizar casos/redacci&oacute;n</button>
@@ -115,6 +114,9 @@
 					<hr />
 					<div class="source">{#wordsSource#}: <span></span></div>
 					<div class="problemsetter">{#wordsProblemsetter#}: <a></a></div>
+{if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
+					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
+{/if}
 {if $showPoints}
 {include file='arena.runs.tpl' show_points=true show_submit=true show_details=true}
 {else}

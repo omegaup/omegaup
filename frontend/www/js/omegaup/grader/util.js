@@ -18,16 +18,22 @@ export function parseDuration(value) {
     return value;
   }
 
-  let scale = 1.0;
-  if (value.indexOf('ns') === value.length - 2) {
-    scale = 1e-9;
-  } else if (value.indexOf('us') === value.length - 2 ||
-             value.indexOf('µs') === value.length - 2) {
-    scale = 1e-6;
-  } else if (value.indexOf('ms') === value.length - 2) {
-    scale = 1e-3;
+  let result = 0.0;
+  for (let chunk of value.match(/\d+(ns|us|µs|m|s)?/g)) {
+    let scale = 1.0;
+    if (chunk.indexOf('ns') === chunk.length - 2) {
+      scale = 1e-9;
+    } else if (chunk.indexOf('us') === chunk.length - 2 ||
+               chunk.indexOf('µs') === chunk.length - 2) {
+      scale = 1e-6;
+    } else if (chunk.indexOf('ms') === chunk.length - 2) {
+      scale = 1e-3;
+    } else if (chunk.indexOf('m') === chunk.length - 1) {
+      scale = 60;
+    }
+    result += scale * parseFloat(chunk);
   }
-  return scale * parseFloat(value);
+  return result;
 }
 
 export const languageMonacoModelMapping = {

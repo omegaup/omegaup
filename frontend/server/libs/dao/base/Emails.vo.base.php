@@ -27,13 +27,13 @@ class Emails extends VO {
             return;
         }
         if (isset($data['email_id'])) {
-            $this->email_id = $data['email_id'];
+            $this->email_id = (int)$data['email_id'];
         }
         if (isset($data['email'])) {
             $this->email = $data['email'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
     }
 
@@ -41,11 +41,11 @@ class Emails extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

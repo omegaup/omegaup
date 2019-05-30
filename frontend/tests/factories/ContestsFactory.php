@@ -114,7 +114,7 @@ class ContestsFactory {
             'alias' => substr($params['title'], 0, 20),
             'points_decay_factor' => '0.02',
             'partial_score' => '0',
-            'submissions_gap' => '0',
+            'submissions_gap' => '60',
             'feedback' => 'yes',
             'penalty' => 100,
             'scoreboard' => 100,

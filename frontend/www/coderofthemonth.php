@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 
 $request = new Request([
     'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN')

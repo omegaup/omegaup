@@ -54,13 +54,16 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           FROM
             (
               SELECT DISTINCT
-                r.identity_id, r.problem_id
+                s.identity_id, s.problem_id
               FROM
+                Submissions s
+              INNER JOIN
                 Runs r
+              ON
+                r.run_id = s.current_run_id
               WHERE
-                r.verdict = 'AC' AND r.type= 'normal' AND
-                r.time >= ? AND
-                r.time <= ?
+                r.verdict = 'AC' AND s.type= 'normal' AND
+                s.time >= ? AND s.time <= ?
             ) AS up
           INNER JOIN
             Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
@@ -92,7 +95,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         global $conn;
         $results = $conn->getAll($sql, $val);
-        if (count($results) == 0) {
+        if (empty($results)) {
             return null;
         }
         return $results;
@@ -121,7 +124,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         ';
 
         global $conn;
-        $rs = $conn->Execute($sql);
+        $rs = $conn->GetAll($sql);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = $row;
@@ -179,7 +182,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, []);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return false;
         }
         return $username == $rs['username'];
@@ -196,7 +199,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 AND
                     `selected_by` ' . $clause . ';';
         global $conn;
-        $rs = $conn->Execute($sql, [$time]);
+        $rs = $conn->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -214,7 +217,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                     `time` = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$time]);
+        $rs = $conn->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -224,7 +227,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     }
 
     public static function calculateCoderOfMonthByGivenDate($date) {
-        $date = new DateTime($date);
+        $date = new DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');
         $firstDayOfCurrentMonth = $date->modify('first day of next month');

@@ -18,7 +18,7 @@ class CoursesDAO extends CoursesDAOBase {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        $resultRows = $conn->Execute($sql, [$name]);
+        $resultRows = $conn->GetAll($sql, [$name]);
         $finalResult = [];
 
         foreach ($resultRows as $row) {
@@ -58,7 +58,7 @@ class CoursesDAO extends CoursesDAOBase {
             ORDER BY
                 start_time;";
 
-        $rs = $conn->Execute($sql, [$alias]);
+        $rs = $conn->GetAll($sql, [$alias]);
 
         $ar = [];
         foreach ($rs as $row) {
@@ -84,7 +84,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        $rs = $conn->Execute($sql, $identity_id);
+        $rs = $conn->GetAll($sql, [$identity_id]);
         $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
@@ -110,23 +110,25 @@ class CoursesDAO extends CoursesDAOBase {
                 LEFT JOIN (
                     SELECT bpr.alias, bpr.identity_id, sum(best_score_of_problem) as assignment_score
                     FROM (
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, s.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemsets ps
                             ON a.problemset_id = ps.problemset_id
                         INNER JOIN Problemset_Problems psp
                             ON psp.problemset_id = ps.problemset_id
+                        INNER JOIN Submissions s
+                            ON s.problem_id = psp.problem_id
+                            AND s.problemset_id = a.problemset_id
                         INNER JOIN Runs r
-                            ON r.problem_id = psp.problem_id
-                            AND r.problemset_id = a.problemset_id
+                            ON r.run_id = s.current_run_id
                         WHERE a.course_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
+                        GROUP BY a.assignment_id, psp.problem_id, s.identity_id
                     ) bpr
                     GROUP BY bpr.assignment_id, bpr.identity_id
                 ) pr
                 ON pr.identity_id = i.identity_id';
 
-        $rs = $conn->Execute($sql, [$group_id, $course_id]);
+        $rs = $conn->GetAll($sql, [$group_id, $course_id]);
         $progress = [];
         foreach ($rs as $row) {
             $username = $row['username'];
@@ -167,22 +169,24 @@ class CoursesDAO extends CoursesDAOBase {
                     SELECT bpr.alias, bpr.assignment_id, sum(best_score_of_problem) as total_score
                     FROM (
                         -- get all runs belonging to an identity and get the best score
-                        SELECT a.alias, a.assignment_id, psp.problem_id, r.identity_id, max(r.contest_score) as best_score_of_problem
+                        SELECT a.alias, a.assignment_id, psp.problem_id, s.identity_id, max(r.contest_score) as best_score_of_problem
                         FROM Assignments a
                         INNER JOIN Problemset_Problems psp
                             ON a.problemset_id = psp.problemset_id
+                        INNER JOIN Submissions s
+                            ON s.problem_id = psp.problem_id
+                            AND s.problemset_id = a.problemset_id
                         INNER JOIN Runs r
-                            ON r.problem_id = psp.problem_id
-                            AND r.problemset_id = a.problemset_id
-                        WHERE a.course_id = ? AND r.identity_id = ?
-                        GROUP BY a.assignment_id, psp.problem_id, r.identity_id
+                            ON r.run_id = s.current_run_id
+                        WHERE a.course_id = ? AND s.identity_id = ?
+                        GROUP BY a.assignment_id, psp.problem_id, s.identity_id
                     ) bpr
                     GROUP BY bpr.assignment_id
                 ) pr
                 ON a.assignment_id = pr.assignment_id
                 where a.course_id = ?';
 
-        $rs = $conn->Execute($sql, [$course_id, $identity_id, $course_id]);
+        $rs = $conn->GetAll($sql, [$course_id, $identity_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {
@@ -238,12 +242,12 @@ class CoursesDAO extends CoursesDAOBase {
             $identity_id,
             Authorization::ADMIN_ROLE,
             $identity_id,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
@@ -276,12 +280,12 @@ class CoursesDAO extends CoursesDAOBase {
                 ?, ?';
         $params = [
             $user_id,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {

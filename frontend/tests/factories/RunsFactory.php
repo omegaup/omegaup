@@ -6,25 +6,6 @@
  * @author joemmanuel
  */
 
-/**
- * Detours the Grader calls.
- * Problem: Submiting a new run invokes the Grader::grade() function which makes
- * a HTTP call to official grader using CURL. This call will fail if grader is
- * not turned on. We are not testing the Grader functionallity itself, we are
- * only validating that we populate the DB correctly and that we make a call
- * to the function Grader::grade(), without executing the contents.
- *
- * Solution: We create a phpunit mock of the Grader class. We create a fake
- * object Grader with the function grade() which will always return true
- * and expects to be excecuted once.
- *
- */
-class GraderMock extends Grader {
-    public function Grade($runGuids, $rejudge, $debug) {
-        return;
-    }
-}
-
 class RunsFactory {
     /**
      * Builds and returns a request object to be used for RunController::apiCreate
@@ -117,7 +98,6 @@ class RunsFactory {
         $r = self::createRequestCourseAssignmentCommon($problemData, $courseAssignmentData, $participant);
 
         // Call API
-        RunController::$grader = new GraderMock();
         $response = RunController::apiCreate($r);
 
         // Clean up
@@ -148,7 +128,6 @@ class RunsFactory {
         $r = self::createRequestCommon($problemData, $contestData, $contestant);
 
         // Call API
-        RunController::$grader = new GraderMock();
         $response = RunController::apiCreate($r);
 
         // Clean up
@@ -171,7 +150,6 @@ class RunsFactory {
         $r = self::createRequestCommon($problemData, null, $contestant, $login);
 
         // Call API
-        RunController::$grader = new GraderMock();
         $response = RunController::apiCreate($r);
 
         // Clean up
@@ -185,14 +163,30 @@ class RunsFactory {
     }
 
     /**
-     * Given a run id, set a score to a given run
+     * Given a run, set a score to a given run
      *
-     * @param type $runData
-     * @param int $points
-     * @param string $verdict
+     * @param ?array  $runData     The run.
+     * @param float   $points      The score of the run
+     * @param string  $verdict     The verdict of the run.
+     * @param ?int    $submitDelay The number of minutes worth of penalty.
+     * @param ?string $runGuid     The GUID of the submission.
+     * @param ?int    $runID       The ID of the run.
      */
-    public static function gradeRun($runData, $points = 1, $verdict = 'AC', $submitDelay = null, $runGuid = null) {
-        $run = RunsDAO::getByAlias($runGuid === null ? $runData['response']['guid'] : $runGuid);
+    public static function gradeRun(
+        ?array $runData,
+        float $points = 1,
+        string $verdict = 'AC',
+        ?int $submitDelay = null,
+        ?string $runGuid = null,
+        ?int $runId = null
+    ) : void {
+        if (!is_null($runId)) {
+            $run = RunsDAO::getByPK($runId);
+            $submission = SubmissionsDAO::getByPK($run->submission_id);
+        } else {
+            $submission = SubmissionsDAO::getByGuid($runGuid === null ? $runData['response']['guid'] : $runGuid);
+            $run = RunsDAO::getByPK($submission->current_run_id);
+        }
 
         $run->verdict = $verdict;
         $run->score = $points;
@@ -201,19 +195,37 @@ class RunsFactory {
         $run->judged_by = 'J1';
 
         if (!is_null($submitDelay)) {
+            $submission->submit_delay = $submitDelay;
+            SubmissionsDAO::save($submission);
             $run->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
         }
 
         RunsDAO::save($run);
 
-        $gradeDir = RunController::getGradePath($run->guid);
-        mkdir($gradeDir, 0755, true);
-        file_put_contents("$gradeDir/details.json", json_encode([
-            'verdict' => $verdict,
-            'contest_score' => $points,
-            'score' => $points,
-            'judged_by' => 'RunsFactory.php',
-        ]));
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'details.json',
+            json_encode([
+                'verdict' => $verdict,
+                'contest_score' => $points,
+                'score' => $points,
+                'judged_by' => 'RunsFactory.php',
+            ])
+        );
+        // An empty gzip file.
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'logs.txt.gz',
+            "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
+            "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        );
+        // An empty zip file.
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'files.zip',
+            "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
+            "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        );
     }
 }

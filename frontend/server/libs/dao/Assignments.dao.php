@@ -31,7 +31,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         $params[] = $assignmentAlias;
 
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -45,7 +45,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 FROM Assignments a
                 WHERE a.course_id = ?
                 GROUP BY a.assignment_type;';
-        $rs = $conn->Execute($sql, $course_id);
+        $rs = $conn->GetAll($sql, [$course_id]);
         $counts = [];
         foreach ($rs as $row) {
             $counts[$row['assignment_type']] = intval($row['count']);
@@ -171,7 +171,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                     `order` ASC, `start_time` ASC';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$courseId]);
+        $rs = $conn->GetAll($sql, [$courseId]);
         $ar = [];
         foreach ($rs as $row) {
             $ar[] = $row;

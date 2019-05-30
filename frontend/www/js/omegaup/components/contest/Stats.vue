@@ -4,10 +4,10 @@
       <h1>{{ T.liveStatistics }}</h1>
       <div>
         {{ totalRuns }}
-      </div><omegaup-verdict-chart v-bind:contest-alias="contestAlias"
-           v-bind:stats="stats"></omegaup-verdict-chart>
-           <omegaup-distribution-chart v-bind:contest-alias="contestAlias"
-           v-bind:stats="stats"></omegaup-distribution-chart>
+      </div><omegaup-verdict-chart v-bind:stats="stats"
+           v-bind:title="contestAlias"></omegaup-verdict-chart>
+           <omegaup-distribution-chart v-bind:stats="stats"
+           v-bind:title="contestAlias"></omegaup-distribution-chart>
       <div class="pending-runs-chart"></div>
     </div>
   </div>

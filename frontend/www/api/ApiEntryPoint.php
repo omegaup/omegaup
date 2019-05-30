@@ -2,4 +2,4 @@
 
 require_once('ApiCaller.php');
 
-ApiCaller::httpEntryPoint();
+echo ApiCaller::httpEntryPoint();

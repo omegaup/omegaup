@@ -29,8 +29,7 @@ class RunRejudgeTest extends OmegaupTestCase {
         // Grade the run
         RunsFactory::gradeRun($runData);
 
-        // Detour grader calls expecting one call
-        $this->detourGraderCalls($this->once());
+        $detourGrader = new ScopedGraderDetour();
 
         // Build request
         $login = self::login($contestData['director']);
@@ -43,5 +42,6 @@ class RunRejudgeTest extends OmegaupTestCase {
         $response = RunController::apiRejudge($r);
 
         $this->assertEquals('ok', $response['status']);
+        $this->assertEquals(1, $detourGrader->getGraderCallCount());
     }
 }

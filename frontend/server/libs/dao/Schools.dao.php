@@ -39,7 +39,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$name];
 
         $result = [];
-        foreach ($conn->Execute($sql, $args) as $row) {
+        foreach ($conn->GetAll($sql, $args) as $row) {
             $result[] = new Schools($row);
         }
         return $result;
@@ -66,14 +66,16 @@ class SchoolsDAO extends SchoolsDAOBase {
             FROM
               Identities i
             INNER JOIN
-              Runs r ON i.identity_id = r.identity_id
+              Submissions su ON su.identity_id = i.identity_id
+            INNER JOIN
+              Runs r ON r.run_id = su.current_run_id
             INNER JOIN
               Schools s ON i.school_id = s.school_id
             INNER JOIN
-              Problems p ON p.problem_id = r.problem_id
+              Problems p ON p.problem_id = su.problem_id
             WHERE
               r.verdict = "AC" AND p.visibility >= 1 AND
-              r.time BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)
+              su.time BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)
             GROUP BY
               s.school_id
             ORDER BY
@@ -84,7 +86,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
         $result = [];
-        foreach ($conn->Execute($sql, $args) as $row) {
+        foreach ($conn->GetAll($sql, $args) as $row) {
             $result[] = [
                 'name' => $row['name'],
                 'country_id' => $row['country_id'],
