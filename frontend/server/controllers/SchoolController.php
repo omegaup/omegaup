@@ -48,7 +48,7 @@ class SchoolController extends Controller {
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['name'], 'name');
+        Validators::validateStringNonEmpty($r['name'], 'name');
 
         $state = self::getStateIdFromCountryAndState($r['country_id'], $r['state_id']);
 
@@ -76,7 +76,7 @@ class SchoolController extends Controller {
         $school_id = 0;
         try {
             $existing = SchoolsDAO::findByName($name);
-            if (count($existing) > 0) {
+            if (!empty($existing)) {
                 return $existing[0]->school_id;
             }
             // Save in db
@@ -96,10 +96,10 @@ class SchoolController extends Controller {
      * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
-        Validators::isNumber($r['offset'], 'offset', false);
-        Validators::isNumberInRange($r['rowcount'], 'rowcount', 100, 100, false);
-        Validators::isNumber($r['start_time'], 'start_time', false); // Unix timestamp
-        Validators::isNumber($r['finish_time'], 'finish_time', false); // Unix timestamp
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', 100, 100, false);
+        $r->ensureInt('start_time', null, null, false);
+        $r->ensureInt('finish_time', null, null, false);
 
         try {
             self::authenticateRequest($r);

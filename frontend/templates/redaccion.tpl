@@ -2,7 +2,7 @@
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Converter.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Sanitizer.js"}"></script>
 <script type="text/javascript" src="{version_hash src="/third_party/js/pagedown/Markdown.Editor.js"}"></script>
-<link rel="stylesheet" type="text/css" href="/third_party/js/pagedown/demo/browser/demo.css" />
+<link rel="stylesheet" type="text/css" href="/css/markdown-editor-widgets.css" />
 <script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 
 <div class="post">

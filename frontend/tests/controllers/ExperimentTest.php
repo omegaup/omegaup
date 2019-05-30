@@ -1,6 +1,6 @@
 <?php
 
-class ExperimentsTest extends PHPUnit_Framework_TestCase {
+class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     const TEST = 'experiment_test';
 
     private static $kKnownExperiments = [
@@ -91,7 +91,7 @@ class ExperimentsTest extends PHPUnit_Framework_TestCase {
 
         // After adding the user-experiment relationship to the database, the
         // experiment should be enabled.
-        UsersExperimentsDAO::save(new UsersExperiments([
+        UsersExperimentsDAO::create(new UsersExperiments([
             'user_id' => $user->user_id,
             'experiment' => self::TEST,
         ]));

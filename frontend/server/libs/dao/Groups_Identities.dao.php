@@ -53,7 +53,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
             WHERE
                 gi.group_id = ?;';
 
-        $rs = $conn->Execute($sql, [$group->group_id]);
+        $rs = $conn->GetAll($sql, [$group->group_id]);
         $identities = [];
         foreach ($rs as $row) {
             $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
@@ -93,7 +93,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
 
         global $conn;
         $groupsIdentities = [];
-        foreach ($conn->Execute($sql, [$groupId]) as $row) {
+        foreach ($conn->GetAll($sql, [$groupId]) as $row) {
             array_push($groupsIdentities, new GroupsIdentities($row));
         }
         return $groupsIdentities;
@@ -114,7 +114,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
 
         global $conn;
         $identities = [];
-        foreach ($conn->Execute($sql, [$group_id]) as $row) {
+        foreach ($conn->GetAll($sql, [$group_id]) as $row) {
             array_push($identities, $row['username']);
         }
         return $identities;

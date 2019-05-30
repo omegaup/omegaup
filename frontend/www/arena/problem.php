@@ -1,13 +1,18 @@
 <?php
-require_once('../../server/bootstrap.php');
+require_once('../../server/bootstrap_smarty.php');
+require_once('libs/dao/QualityNominations.dao.php');
 
 $r = new Request($_REQUEST);
+$problemAlias = $r['problem_alias'];
 $session = SessionController::apiCurrentSession($r)['session'];
-$r['statement_type'] = 'markdown';
 $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
-    $problem = ProblemsDAO::GetByAlias($result['alias']);
+    if (is_null($result) || empty($result['exists'])) {
+        header('HTTP/1.1 404 Not Found');
+        die(file_get_contents('../404.html'));
+    }
+    $problem = ProblemsDAO::GetByAlias($problemAlias);
     $nominationStatus = null;
     if ($session['valid']) {
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
@@ -27,12 +32,10 @@ $smarty->assign('source', $result['source']);
 $smarty->assign('problemsetter', $result['problemsetter']);
 $smarty->assign('title', $result['title']);
 $smarty->assign('points', $result['points']);
-$smarty->assign('validator', $result['validator']);
-$smarty->assign('time_limit', $result['time_limit'] / 1000 . 's');
-$smarty->assign('validator_time_limit', $result['validator_time_limit'] / 1000 . 's');
-$smarty->assign('overall_wall_time_limit', $result['overall_wall_time_limit'] / 1000 . 's');
-$smarty->assign('memory_limit', $result['memory_limit'] / 1024 . 'MB');
-$smarty->assign('input_limit', $result['input_limit'] / 1024 . ' KiB');
+$smarty->assign('time_limit', $result['settings']['limits']['TimeLimit']);
+$smarty->assign('overall_wall_time_limit', $result['settings']['limits']['OverallWallTimeLimit']);
+$smarty->assign('memory_limit', ($result['settings']['limits']['MemoryLimit'] / 1024 / 1024) . ' MiB');
+$smarty->assign('input_limit', ($result['input_limit'] / 1024) . ' KiB');
 $smarty->assign('solvers', $result['solvers']);
 $smarty->assign('quality_payload', [
     'solved' => (bool) $nominationStatus['solved'],
@@ -48,8 +51,11 @@ $smarty->assign('karel_problem', count(array_intersect(
     $result['languages'],
     ['kp', 'kj']
 )) == 2);
-if (isset($result['sample_input'])) {
-    $smarty->assign('sample_input', $result['sample_input']);
+if (isset($result['settings']['cases'])
+    && isset($result['settings']['cases']['sample'])
+    && isset($result['settings']['cases']['sample']['in'])
+) {
+    $smarty->assign('sample_input', $result['settings']['cases']['sample']['in']);
 }
 
 $result['user'] = [

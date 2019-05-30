@@ -11,18 +11,12 @@
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
 
+{if $GOOGLECLIENTID != ""}
 				<div
-					id="signinButton"
-					title="{#loginWithGoogle#}"
-					class="openid_large_btn">
-					<span class="g-signin "
-						data-scope="email"
-						data-clientid="{$GOOGLECLIENTID}"
-						data-redirecturi="postmessage"
-						data-cookiepolicy="single_host_origin"
-						data-callback="signInCallback">
-					</span>
+					id="google-signin"
+					title="{#loginWithGoogle#}">
 				</div>
+{/if}
 
 				<a href="{$FB_URL}"
 					title="{#loginWithFacebook#}"
@@ -120,5 +114,7 @@
 </div>
 
 <script type="text/javascript" src="{version_hash src="/js/login.js"}"></script>
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" defer></script>
+{if $GOOGLECLIENTID != ""}
+<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+{/if}
 {include file='footer.tpl'}

@@ -1,7 +1,9 @@
 <?php
-require_once 'libs/dao/QualityNominations.dao.php';
+
+require_once 'libs/Translations.php';
 require_once 'libs/dao/QualityNomination_Log.dao.php';
 require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
+require_once 'libs/dao/QualityNominations.dao.php';
 
 class QualityNominationController extends Controller {
     /**
@@ -70,9 +72,9 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
-        Validators::isStringNonEmpty($r['contents'], 'contents');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
+        Validators::validateStringNonEmpty($r['contents'], 'contents');
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)) {
             throw new InvalidParameterException('parameterInvalid', 'contents');
@@ -85,7 +87,7 @@ class QualityNominationController extends Controller {
         if ($r['nomination'] != 'demotion') {
             // All nominations types, except demotions, are only allowed for
             // uses who have already solved the problem.
-            if (!ProblemsDAO::isProblemSolved($problem, $r['current_identity_id'])) {
+            if (!ProblemsDAO::isProblemSolved($problem, (int)$r['current_identity_id'])) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
         }
@@ -202,7 +204,7 @@ class QualityNominationController extends Controller {
                 $qualityReviewerGroup,
                 self::REVIEWERS_PER_NOMINATION
             ) as $reviewer) {
-                QualityNominationReviewersDAO::save(new QualityNominationReviewers([
+                QualityNominationReviewersDAO::create(new QualityNominationReviewers([
                     'qualitynomination_id' => $nomination->qualitynomination_id,
                     'user_id' => $reviewer->user_id,
                 ]));
@@ -227,8 +229,8 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        Validators::isInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
-        Validators::isStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
+        Validators::validateInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
+        Validators::validateStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
 
         // Validate request
         self::authenticateRequest($r);
@@ -286,19 +288,19 @@ class QualityNominationController extends Controller {
         ]);
         $qualitynomination->status = $r['status'];
 
-        QualityNominationsDAO::transBegin();
+        DAO::transBegin();
         try {
             $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::save($qualitynomination);
             QualityNominationLogDAO::save($qualitynominationlog);
-            QualityNominationsDAO::transEnd();
+            DAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
               $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
                 $response = self::sendDemotionEmail($r, $qualitynomination, $qualitynominationlog->rationale);
             }
         } catch (Exception $e) {
-            QualityNominationsDAO::transRollback();
+            DAO::transRollback();
             self::$log->error('Failed to resolve demotion request');
             self::$log->error($e);
             throw new InvalidDatabaseOperationException($e);
@@ -336,16 +338,16 @@ class QualityNominationController extends Controller {
             'problem_name' => htmlspecialchars($r['problem']->title),
             'user_name' => $username
         ];
-        global $smarty;
         $mail_subject = ApiUtils::FormatString(
-            $smarty->getConfigVars('demotionProblemEmailSubject'),
+            Translations::getInstance()->get('demotionProblemEmailSubject'),
             $email_params
         );
         $mail_body = ApiUtils::FormatString(
-            $smarty->getConfigVars('demotionProblemEmailBody'),
+            Translations::getInstance()->get('demotionProblemEmailBody'),
             $email_params
         );
 
+        include_once 'libs/Email.php';
         Email::sendEmail($email, $mail_subject, $mail_body);
     }
 
@@ -363,8 +365,8 @@ class QualityNominationController extends Controller {
      * @return array The response.
      */
     private static function getListImpl(Request $r, $nominator, $assignee) {
-        Validators::isNumber($r['page'], 'page', false);
-        Validators::isNumber($r['page_size'], 'page_size', false);
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('page_size', null, null, false);
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -491,7 +493,7 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
 
-        Validators::isNumber($r['qualitynomination_id'], 'qualitynomination_id');
+        $r->ensureInt('qualitynomination_id');
         $response = QualityNominationsDAO::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
             throw new NotFoundException('qualityNominationNotFound');
@@ -528,7 +530,8 @@ class QualityNominationController extends Controller {
             // Pull original problem statements in every language the nominator is trying to override.
             foreach ($response['contents']['statements'] as $language => $_) {
                 $response['original_contents']['statements'][$language] = ProblemController::getProblemStatement(
-                    $problem->alias,
+                    $problem,
+                    'published',
                     $language
                 );
             }

@@ -27,7 +27,7 @@ class StatesDAO extends StatesDAOBase {
                     country_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$countryId]);
+        $rs = $conn->GetAll($sql, [$countryId]);
 
         $states = [];
         foreach ($rs as $row) {

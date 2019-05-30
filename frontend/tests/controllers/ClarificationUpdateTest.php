@@ -51,7 +51,7 @@ class UpdateClarificationTest extends OmegaupTestCase {
             $clarification->message
         );
         $this->assertEquals(
-            $clarificationData['request']['public'],
+            $clarificationData['request']['public'] == '1',
             $clarification->public
         );
 

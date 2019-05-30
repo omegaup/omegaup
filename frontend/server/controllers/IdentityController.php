@@ -29,7 +29,7 @@ class IdentityController extends Controller {
      * @throws ApiException
      */
     public static function resolveIdentity($userOrEmail) {
-        Validators::isStringNonEmpty($userOrEmail, 'usernameOrEmail');
+        Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
         try {
             $identity = IdentitiesDAO::FindByEmail($userOrEmail);
             if (!is_null($identity)) {
@@ -194,7 +194,7 @@ class IdentityController extends Controller {
                 'identity_id' => $identity->identity_id,
             ]));
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);
@@ -293,19 +293,19 @@ class IdentityController extends Controller {
             throw new InvalidParameterException('parameterInvalid', 'group_alias');
         }
         // Validate request
-        Validators::isValidUsernameIdentity($username, 'username');
+        Validators::validateValidUsernameIdentity($username, 'username');
 
         if (!is_null($name)) {
             $name = trim($name);
-            Validators::isStringNonEmpty($name, 'name', true);
-            Validators::isStringOfMaxLength($name, 'name', 50);
+            Validators::validateStringNonEmpty($name, 'name', true);
+            Validators::validateStringOfLengthInRange($name, 'name', null, 50);
         }
 
         if (!is_null($gender)) {
             $gender = trim($gender);
         }
         if (!empty($gender)) {
-            Validators::isInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
+            Validators::validateInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
         }
     }
 
@@ -413,11 +413,34 @@ class IdentityController extends Controller {
                     'school' => $extendedProfile['school'],
                     'school_id' => $identity->school_id,
                     'is_private' => true,
-                    'locale' => UserController::convertToSupportedLanguage($extendedProfile['locale']),
+                    'locale' => IdentityController::convertToSupportedLanguage($extendedProfile['locale']),
                 ]
             ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    public static function convertToSupportedLanguage($lang) {
+        switch ($lang) {
+            case 'en':
+            case 'en-us':
+                return 'en';
+
+            case 'es':
+            case 'es-mx':
+                return 'es';
+
+            case 'pt':
+            case 'pt-pt':
+            case 'pt-br':
+                return 'pt';
+
+            case 'pseudo':
+                return 'pseudo';
+        }
+
+        // Fallback to spanish.
+        return 'es';
     }
 }

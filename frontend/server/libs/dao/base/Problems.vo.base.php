@@ -27,13 +27,13 @@ class Problems extends VO {
             return;
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = $data['acl_id'];
+            $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['visibility'])) {
-            $this->visibility = $data['visibility'];
+            $this->visibility = (int)$data['visibility'];
         }
         if (isset($data['title'])) {
             $this->title = $data['title'];
@@ -41,50 +41,29 @@ class Problems extends VO {
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
         }
-        if (isset($data['validator'])) {
-            $this->validator = $data['validator'];
+        if (isset($data['commit'])) {
+            $this->commit = $data['commit'];
+        }
+        if (isset($data['current_version'])) {
+            $this->current_version = $data['current_version'];
         }
         if (isset($data['languages'])) {
             $this->languages = $data['languages'];
         }
-        if (isset($data['server'])) {
-            $this->server = $data['server'];
-        }
-        if (isset($data['remote_id'])) {
-            $this->remote_id = $data['remote_id'];
-        }
-        if (isset($data['time_limit'])) {
-            $this->time_limit = $data['time_limit'];
-        }
-        if (isset($data['validator_time_limit'])) {
-            $this->validator_time_limit = $data['validator_time_limit'];
-        }
-        if (isset($data['overall_wall_time_limit'])) {
-            $this->overall_wall_time_limit = $data['overall_wall_time_limit'];
-        }
-        if (isset($data['extra_wall_time'])) {
-            $this->extra_wall_time = $data['extra_wall_time'];
-        }
-        if (isset($data['memory_limit'])) {
-            $this->memory_limit = $data['memory_limit'];
-        }
-        if (isset($data['output_limit'])) {
-            $this->output_limit = $data['output_limit'];
-        }
         if (isset($data['input_limit'])) {
-            $this->input_limit = $data['input_limit'];
+            $this->input_limit = (int)$data['input_limit'];
         }
         if (isset($data['visits'])) {
-            $this->visits = $data['visits'];
+            $this->visits = (int)$data['visits'];
         }
         if (isset($data['submissions'])) {
-            $this->submissions = $data['submissions'];
+            $this->submissions = (int)$data['submissions'];
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'];
+            $this->accepted = (int)$data['accepted'];
         }
         if (isset($data['difficulty'])) {
-            $this->difficulty = $data['difficulty'];
+            $this->difficulty = (float)$data['difficulty'];
         }
         if (isset($data['creation_date'])) {
             $this->creation_date = $data['creation_date'];
@@ -95,20 +74,14 @@ class Problems extends VO {
         if (isset($data['order'])) {
             $this->order = $data['order'];
         }
-        if (isset($data['tolerance'])) {
-            $this->tolerance = $data['tolerance'];
-        }
-        if (isset($data['slow'])) {
-            $this->slow = $data['slow'];
-        }
         if (isset($data['deprecated'])) {
-            $this->deprecated = $data['deprecated'];
+            $this->deprecated = $data['deprecated'] == '1';
         }
         if (isset($data['email_clarifications'])) {
-            $this->email_clarifications = $data['email_clarifications'];
+            $this->email_clarifications = $data['email_clarifications'] == '1';
         }
         if (isset($data['quality'])) {
-            $this->quality = $data['quality'];
+            $this->quality = (float)$data['quality'];
         }
         if (isset($data['quality_histogram'])) {
             $this->quality_histogram = $data['quality_histogram'];
@@ -122,11 +95,11 @@ class Problems extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['creation_date']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**
@@ -148,7 +121,7 @@ class Problems extends VO {
     /**
       * -1 banned, 0 private, 1 public, 2 recommended
       * @access public
-      * @var tinyint(1)
+      * @var int(1)
       */
     public $visibility;
 
@@ -167,11 +140,18 @@ class Problems extends VO {
     public $alias;
 
     /**
-      *  [Campo no documentado]
+      * El hash SHA1 del commit en la rama master del problema.
       * @access public
-      * @var enum('token','token-caseless','token-numeric','custom','literal')
+      * @var char(40)
       */
-    public $validator;
+    public $commit;
+
+    /**
+      * El hash SHA1 del árbol de la rama private.
+      * @access public
+      * @var char(40)
+      */
+    public $current_version;
 
     /**
       *  [Campo no documentado]
@@ -179,62 +159,6 @@ class Problems extends VO {
       * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */
     public $languages;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('uva','livearchive','pku','tju','spoj')
-      */
-    public $server;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(10)
-      */
-    public $remote_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $time_limit;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $validator_time_limit;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $overall_wall_time_limit;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $extra_wall_time;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $memory_limit;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $output_limit;
 
     /**
       *  [Campo no documentado]
@@ -291,20 +215,6 @@ class Problems extends VO {
       * @var enum('normal','inverse')
       */
     public $order;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $tolerance;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $slow;
 
     /**
       *  [Campo no documentado]

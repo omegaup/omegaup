@@ -27,10 +27,10 @@ class UserRankCutoffs extends VO {
             return;
         }
         if (isset($data['score'])) {
-            $this->score = $data['score'];
+            $this->score = (float)$data['score'];
         }
         if (isset($data['percentile'])) {
-            $this->percentile = $data['percentile'];
+            $this->percentile = (float)$data['percentile'];
         }
         if (isset($data['classname'])) {
             $this->classname = $data['classname'];
@@ -41,11 +41,11 @@ class UserRankCutoffs extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

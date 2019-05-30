@@ -1,5 +1,5 @@
 <?php
-    require_once('../../../server/bootstrap.php');
+    require_once('../../../server/bootstrap_smarty.php');
 
 if ($_POST) {
     if (!in_array($_POST['language'], ['c', 'cpp', 'java'])) {

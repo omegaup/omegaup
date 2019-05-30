@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 class InterviewController extends Controller {
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = !$is_update;
@@ -9,10 +11,10 @@ class InterviewController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        Validators::isStringNonEmpty($r['title'], 'title', $is_required);
-        Validators::isStringNonEmpty($r['description'], 'description', false);
-        Validators::isNumberInRange($r['duration'], 'duration', 60, 60 * 5, false);
-        Validators::isValidAlias($r['alias'], 'alias', $is_required);
+        Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
+        Validators::validateStringNonEmpty($r['description'], 'description', false);
+        $r->ensureInt('duration', 60, 60 * 5, false);
+        Validators::validateValidAlias($r['alias'], 'alias', $is_required);
     }
 
     public static function apiCreate(Request $r) {
@@ -35,7 +37,7 @@ class InterviewController extends Controller {
         ]);
 
         try {
-            InterviewsDAO::transBegin();
+            DAO::transBegin();
 
             ACLsDAO::save($acl);
             $interview->acl_id = $acl->acl_id;
@@ -54,13 +56,12 @@ class InterviewController extends Controller {
             $problemset->interview_id = $interview->interview_id;
             ProblemsetsDAO::save($problemset);
 
-            InterviewsDAO::transEnd();
+            DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            InterviewsDAO::transRollback();
+            DAO::transRollback();
 
-            // Alias may be duplicated, 1062 error indicates that
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);
@@ -80,7 +81,7 @@ class InterviewController extends Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
+        Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
         $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
 
         foreach ($usersToAdd as $addThisUser) {
@@ -94,8 +95,8 @@ class InterviewController extends Controller {
     }
 
     private static function addUserInternal($r) {
-        Validators::isStringNonEmpty($r['interview_alias'], 'interview_alias');
-        Validators::isStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+        Validators::validateStringNonEmpty($r['interview_alias'], 'interview_alias');
+        Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
         // Does the interview exist ?
         try {
@@ -117,8 +118,7 @@ class InterviewController extends Controller {
             // this is fine, we'll create an account for this user
         }
 
-        global $smarty;
-        $subject = $smarty->getConfigVariable('interviewInvitationEmailSubject');
+        $subject = Translations::getInstance()->get('interviewInvitationEmailSubject');
 
         if (is_null($r['user'])) {
             // create a new user
@@ -128,24 +128,23 @@ class InterviewController extends Controller {
             $newUserRequest['email'] = $r['usernameOrEmail'];
             $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
             $newUserRequest['password'] = SecurityTools::randomString(8);
-            $newUserRequest['skip_verification_email'] = 1;
 
             UserController::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
-            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
                            . '<br>'
                            . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '">'
                            . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '</a>'
                            . '<br>';
 
-            $body .= $smarty->getConfigVariable('interviewUseTheFollowingLoginInfoEmail')
+            $body .= Translations::getInstance()->get('interviewEmailDraft')
                             . '<br>'
-                            . $smarty->getConfigVariable('profileUsername')
+                            . Translations::getInstance()->get('profileUsername')
                             . ' : '
                             . $newUserRequest['username']
                             . '<br>'
-                            . $smarty->getConfigVariable('loginPassword')
+                            . Translations::getInstance()->get('loginPassword')
                             . ' : '
                             . $newUserRequest['password']
                             . '<br>';
@@ -153,7 +152,7 @@ class InterviewController extends Controller {
             $r['user'] = $newUserRequest['user'];
         } else {
             // Email to current OmegaUp user
-            $body = $smarty->getConfigVariable('interviewInvitationEmailBodyIntro')
+            $body = Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
                            . ' <a href="https://omegaup.com/interview/' . $r['interview']->alias . '/arena">'
                            . ' https://omegaup.com/interview/' . $r['interview']->alias . '/arena</a>';
         }
@@ -188,6 +187,7 @@ class InterviewController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        include_once 'libs/Email.php';
         Email::sendEmail($email, $subject, $body);
 
         self::$log->info('Added ' . $r['username'] . ' to interview.');

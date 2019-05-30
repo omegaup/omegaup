@@ -36,7 +36,7 @@ class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
                     problem_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$problemId]);
+        $rs = $conn->GetAll($sql, [$problemId]);
 
         $problemsLanguages = [];
         foreach ($rs as $row) {

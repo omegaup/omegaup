@@ -27,10 +27,10 @@ class ProblemOfTheWeek extends VO {
             return;
         }
         if (isset($data['problem_of_the_week_id'])) {
-            $this->problem_of_the_week_id = $data['problem_of_the_week_id'];
+            $this->problem_of_the_week_id = (int)$data['problem_of_the_week_id'];
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
+            $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
@@ -44,11 +44,11 @@ class ProblemOfTheWeek extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

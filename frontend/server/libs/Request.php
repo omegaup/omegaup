@@ -18,13 +18,6 @@ class Request extends ArrayObject {
     private $parent = null;
 
     /**
-     * The format in which the request will be rendered.
-     */
-    const JSON_FORMAT = 0;
-    const HTML_FORMAT = 1;
-    public $renderFormat = Request::JSON_FORMAT;
-
-    /**
      * The object of the user currently logged in.
      */
     public $user = null;
@@ -33,6 +26,11 @@ class Request extends ArrayObject {
      * The method that will be called.
      */
     public $method = null;
+
+    /**
+     * A global per-request unique(-ish) ID.
+     */
+    public static $_requestId = null;
 
     /**
      * Whether $key exists. Used as isset($req[$key]);
@@ -49,7 +47,13 @@ class Request extends ArrayObject {
      * @param string $key The key.
      */
     public function offsetGet($key) {
-        return (isset($this[$key]) && parent::offsetGet($key) !== 'null') ? parent::offsetGet($key) : ($this->parent != null ? $this->parent->offsetGet($key) : null);
+        if (isset($this[$key]) && parent::offsetGet($key) !== 'null') {
+            return parent::offsetGet($key);
+        }
+        if ($this->parent != null) {
+            return $this->parent->offsetGet($key);
+        }
+        return null;
     }
 
     /**
@@ -61,7 +65,6 @@ class Request extends ArrayObject {
         $req = new Request($contents);
         $req->parent = $this;
         $req->user = $this->user;
-        $req->renderFormat = $this->renderFormat;
         return $req;
     }
 
@@ -77,4 +80,78 @@ class Request extends ArrayObject {
 
         return $response;
     }
+
+    /**
+     * Gets the request ID.
+     *
+     * @return the global per-request unique(-ish) ID
+     */
+    public static function requestId() {
+        return Request::$_requestId;
+    }
+
+    /**
+     * Ensures that the value associated with the key is a bool.
+     */
+    public function ensureBool(
+        string $key,
+        bool $required = true
+    ) {
+        $val = self::offsetGet($key);
+        if (is_int($val)) {
+            $this[$key] = $val == 1;
+        } elseif (is_bool($val)) {
+            $this[$key] = $val;
+        } else {
+            if (empty($val)) {
+                if (!$required) {
+                    return;
+                }
+                throw new InvalidParameterException('parameterEmpty', $key);
+            }
+            $this[$key] = $val == '1' || $val == 'true';
+        }
+    }
+
+    /**
+     * Ensures that the value associated with the key is an int.
+     */
+    public function ensureInt(
+        string $key,
+        ?int $lowerBound = null,
+        ?int $upperBound = null,
+        bool $required = true
+    ) {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new InvalidParameterException('parameterEmpty', $key);
+        }
+        $val = self::offsetGet($key);
+        Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        $this[$key] = (int)$val;
+    }
+
+    /**
+     * Ensures that the value associated with the key is a float.
+     */
+    public function ensureFloat(
+        string $key,
+        ?float $lowerBound = null,
+        ?float $upperBound = null,
+        bool $required = true
+    ) {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return;
+            }
+            throw new InvalidParameterException('parameterEmpty', $key);
+        }
+        $val = self::offsetGet($key);
+        Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        $this[$key] = (float)$val;
+    }
 }
+
+Request::$_requestId = str_replace('.', '', uniqid('', true));

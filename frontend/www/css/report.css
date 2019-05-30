@@ -1,52 +1,100 @@
 @media all {
-	.page-break	   { display: none; }
 	body {
 		font-size: 10pt;
 		font-family: "Arial Narrow", sans-serif;
+		margin: 0;
+		padding: 0;
 	}
-	tr:nth-child(even) { background-color: #eee; }
-	td.numeric         { text-align: right; }
-	table td {
-		border: 1px solid #000;
-		padding: 0.2em;
+
+	div.problem {
+		page-break-before: always;
+	}
+
+	.title h1.problem-title {
+		text-align: center;
 	}
 	.title .data {
 		margin: 0 auto 1em auto;
 	}
-	.title .data tr:nth-child(even) { background-color: transparent; }
+	.title .data tr:nth-child(even) {
+		background-color: transparent;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		page-break-after: avoid;
+		page-break-inside: avoid;
+	}
+	h1 {
+		font-size: 1.5em;
+	}
+	h2 {
+		font-size: 1.3em;
+	}
+	h3 {
+		font-size: 1.15em;
+	}
+
+	table {
+		page-break-inside: avoid;
+	}
+	table td {
+		border: 1px solid #000;
+		padding: 0.2em;
+	}
+	tr:nth-child(even) {
+		background-color: #eee;
+	}
+	td.numeric {
+		text-align: right;
+	}
+
 	.statement p, .statement li {
+		hyphens: auto;
 		line-height: 150%;
 		text-align: justify;
+		orphans: 2;
+		widows: 2;
+		page-break-inside: avoid;
 	}
-	#report > .title {
-		text-align: center;
+	.statement p {
+		margin-bottom: 1.5em;
 	}
 	.statement ul {
 		list-style: disc;
 	}
-
 	.statement ol {
 		list-style: decimal;
 	}
-
 	.statement li {
 		margin-left: 2em;
+	}
+
+	.statement img {
+		max-width: 50%;
+		page-break-inside: avoid;
+	}
+
+	.statement pre {
+		line-height: 125%;
 	}
 
 	.statement table.sample_io {
 		border: 1px solid #000;
 		background: #eee;
-		margin: 5px;
-		padding : 5px;
+		margin: 0.75ex;
+		padding : 0.75ex;
 	}
-	.statement .sample_io td {
+	.statement table.sample_io th {
+		padding: 0.75ex;
+	}
+	.statement table.sample_io td {
 		font-size: 10pt;
 		background: #eee;
 		vertical-align: top;
-		padding: 10px;
+		padding: 1.25ex;
 		border: 1px solid #000;
 	}
-	.statement .sample_io pre {
+	.statement table.sample_io pre {
 		white-space: pre;
 		word-break: keep-all;
 		word-wrap: normal;
@@ -55,35 +103,20 @@
 		padding: 0px;
 		margin: inherit;
 	}
-	p, li {
-		font-family: "Arial Narrow", sans-serif;
-		line-height: 100% !important;
+	figure {
+		text-align: center;
+		page-break-inside: avoid;
 	}
-	hr { display: none; }
-	h1, h2, h3 {
-		page-break-after: avoid;
-		break-after: avoid;
-		-webkit-region-break-after: avoid;
+	hr {
+		display: none;
 	}
 	div.libinteractive-download {
 		display: none;
 	}
-	.statement img {
-		max-width: 100%;
-	}
 }
 
 @media print {
-	@page { margin: 1in; }
-	.page-break	{
-		display: block;
-		page-break-before: always;
-		break-before: always;
-		-webkit-region-break-before: always;
-	}
-	table {
-		page-break-inside: avoid;
-		break-inside: avoid;
-		-webkit-region-break-inside: avoid;
+	@page {
+		margin: 1in;
 	}
 }

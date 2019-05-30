@@ -6,8 +6,8 @@
 const babylon = require('babylon');
 const fs = require('fs');
 const process = require('process');
-const t = require('babel-types');
-const traverse = require('babel-traverse').default;
+const t = require('@babel/types');
+const traverse = require('@babel/traverse').default;
 
 if (process.argv.length != 4) {
   console.error('Usage: ' + process.argv[1] + ' <filename> <original filename>');

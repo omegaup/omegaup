@@ -50,8 +50,8 @@ def main():
     # Create new contest
     start_time = int(time.time())
     new_alias = "%s_%d" % (contest_alias, start_time)
-    scoreboard_token = hashlib.md5(new_alias +
-                                   '_scoreboard_admin').hexdigest()[:30]
+    scoreboard_token = hashlib.md5(
+        '%s_scoreboard_admin' % new_alias).hexdigest()[:30]
     cur.execute(
         '''
         INSERT INTO Contests(
@@ -124,11 +124,10 @@ def main():
                 %s
             );
             ''',
-            (row[1], row[2], new_id,
-             hashlib.md5(new_alias + row[4]).hexdigest()) +
-            row[5:13] + row[14:] +
-            (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()),)
-        )
+            ((row[1], row[2], new_id,
+              hashlib.md5(new_alias + row[4]).hexdigest())
+             + row[5:13] + row[14:]
+             + (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()),)))
 
         run_id = cur.lastrowid
         db.commit()

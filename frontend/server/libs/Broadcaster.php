@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 class Broadcaster {
     // Logging.
     private $log = null;
@@ -23,16 +25,15 @@ class Broadcaster {
                 ]
             ]);
 
-            $grader = new Grader();
             $this->log->debug("Sending update $message");
-            $grader->broadcast(
+            Grader::getInstance()->broadcast(
                 is_null($r['contest']) ? null : $r['contest']->alias,
                 is_null($r['contest']) ? null : (int)$r['contest']->problemset_id,
                 is_null($r['problem']) ? null : $r['problem']->alias,
                 $message,
                 $r['clarification']->public != '0',
                 $r['user']->username,
-                $r['clarification']->author_id,
+                (int)$r['clarification']->author_id,
                 false  // user_only
             );
         } catch (Exception $e) {
@@ -49,7 +50,6 @@ class Broadcaster {
         try {
             $emails = ProblemsDAO::getExplicitAdminEmails($r['problem']);
 
-            global $smarty;
             $email_params = [
                 'clarification_id' => $r['clarification']->clarification_id,
                 'clarification_body' => htmlspecialchars($r['clarification']->message),
@@ -61,14 +61,15 @@ class Broadcaster {
                 'user_name' => $r['user']->username
             ];
             $subject = ApiUtils::FormatString(
-                $smarty->getConfigVars('clarificationEmailSubject'),
+                Translations::getInstance()->get('clarificationEmailSubject'),
                 $email_params
             );
             $body = ApiUtils::FormatString(
-                $smarty->getConfigVars('clarificationEmailBody'),
+                Translations::getInstance()->get('clarificationEmailBody'),
                 $email_params
             );
 
+            include_once 'libs/Email.php';
             Email::sendEmail($emails, $subject, $body);
         } catch (Exception $e) {
             $this->log->error('Failed to send clarification email ' . $e->getMessage());

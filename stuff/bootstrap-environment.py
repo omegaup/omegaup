@@ -90,7 +90,7 @@ class Session:
             return None
         try:
             result = req.json()
-        except:
+        except:  # noqa: bare-except
             logging.exception('Failed to parse json: %s', req.text)
             raise
         logging.debug('Result: %s', result)
@@ -117,6 +117,15 @@ def _does_resource_exist(s, request):
         if s.request('/course/adminDetails/',
                      {'alias': request['params']['alias']}):
             logging.warning('Course %s exists, skipping',
+                            request['params']['alias'])
+            return True
+    if request['api'] == '/course/createAssignment':
+        if s.request(
+                '/course/assignmentDetails/', {
+                    'course': request['params']['course_alias'],
+                    'assignment': request['params']['alias']
+                }):
+            logging.warning('Assignment %s exists, skipping',
                             request['params']['alias'])
             return True
     if request['api'] == '/user/create':
@@ -215,11 +224,12 @@ def main():
             if value is not None:
                 db_migrate_args.extend([name, value])
         subprocess.check_call(db_migrate_args + ['purge'])
-        subprocess.check_call(db_migrate_args +
-                              ['migrate', '--development-environment'])
+        subprocess.check_call(db_migrate_args
+                              + ['migrate', '--development-environment'])
 
     for path in args.scripts:
         _run_script(path, args, now)
+
 
 if __name__ == '__main__':
     main()

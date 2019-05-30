@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 /**
  * Description:
  *     Session controller handles sessions.
@@ -7,8 +9,7 @@
  * Author:
  *     Alan Gonzalez alanboy@alanboy.net
  *
- * */
-
+ */
 class SessionController extends Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
 
@@ -30,6 +31,7 @@ class SessionController extends Controller {
      * */
     private static function getFacebookInstance() {
         if (is_null(self::$_facebook)) {
+            require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
             self::$_facebook = new Facebook\Facebook([
                 'app_id' => OMEGAUP_FB_APPID,
                 'app_secret' => OMEGAUP_FB_SECRET,
@@ -136,7 +138,15 @@ class SessionController extends Controller {
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
         $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
 
-        if (is_null($currentUser) && is_null($currentIdentity)) {
+        // Get email via their id
+        if (!is_null($currentUser)) {
+            $email = EmailsDAO::getByPK($currentUser->main_email_id);
+            if (is_null($currentIdentity)) {
+                $currentIdentity = IdentitiesDAO::getByPK($currentUser->main_identity_id);
+            }
+        }
+
+        if (is_null($currentIdentity)) {
             // Means user has auth token, but does not exist in DB
             return [
                 'valid' => false,
@@ -146,11 +156,6 @@ class SessionController extends Controller {
                 'auth_token' => null,
                 'is_admin' => false,
             ];
-        }
-
-        // Get email via their id
-        if (!is_null($currentUser)) {
-            $email = EmailsDAO::getByPK($currentUser->main_email_id);
         }
 
         return [
@@ -197,21 +202,16 @@ class SessionController extends Controller {
 
     private function RegisterSession(Identities $identity, $b_ReturnAuthTokenAsString = false) {
         // Log the login.
-        IdentityLoginLogDAO::save(new IdentityLoginLog([
+        IdentityLoginLogDAO::create(new IdentityLoginLog([
             'identity_id' => $identity->identity_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));
 
         $this->InvalidateLocalCache();
 
-        //find if this user has older sessions
-        $authToken = new AuthTokens();
-        $authToken->user_id = $identity->user_id;
-        $authToken->identity_id = $identity->identity_id;
-
         //erase expired tokens
         try {
-            $tokens_erased = AuthTokensDAO::expireAuthTokens($identity->identity_id);
+            AuthTokensDAO::expireAuthTokens($identity->identity_id);
         } catch (Exception $e) {
             // Best effort
             self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
@@ -250,11 +250,11 @@ class SessionController extends Controller {
         $username = substr($s_Email, 0, $idx);
 
         try {
-            Validators::isValidUsername($username, 'username');
+            Validators::validateValidUsername($username, 'username');
         } catch (InvalidParameterException $e) {
             // How can we know whats wrong with the username?
             // Things that could go wrong:
-            //		generated email is too short
+            //      generated email is too short
             $username = 'OmegaupUser';
         }
 
@@ -283,48 +283,38 @@ class SessionController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'storeToken');
         }
 
+        require_once 'libs/third_party/google-api-php-client/src/Google/autoload.php';
+
         $client = new Google_Client();
         $client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
         $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
-        $client->setRedirectUri('postmessage');
-        $client->setScopes([
-            'https://www.googleapis.com/auth/userinfo.email',
-            'https://www.googleapis.com/auth/userinfo.profile']);
 
         try {
-            $client->authenticate($r['storeToken']);
+            $loginTicket = $client->verifyIdToken($r['storeToken']);
         } catch (Google_Auth_Exception $ge) {
-            self::$log->error($ge->getMessage());
-            throw new InternalServerErrorException($ge);
+            throw new UnauthorizedException('loginRequired', $ge);
         }
 
-        if ($client->getAccessToken()) {
-            $request = new Google_Http_Request('https://www.googleapis.com/oauth2/v2/userinfo?alt=json');
-            $userinfo = $client->getAuth()->authenticatedRequest($request);
-            $responseJson = json_decode($userinfo->getResponseBody(), true);
+        $payload = $loginTicket->getAttributes()['payload'];
 
-            // responseJson will have:
-            //    [id] => 103621569728764469767
-            //    [email] => johndoe@gmail.com
-            //    [verified_email] => 1
-            //    [name] => Alan Gonzalez
-            //    [given_name] => Alan
-            //    [family_name] => Gonzalez
-            //    [link] => https://plus.google.com/123621569728764469767
-            //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
-            //    [gender] => male
-            //    [locale] => en
+        // payload will have a superset of:
+        //    [email] => johndoe@gmail.com
+        //    [email_verified] => 1
+        //    [name] => Alan Gonzalez
+        //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
+        //    [locale] => en
 
-            $controller = (new SessionController())->LoginViaGoogle($responseJson['email']);
-        } else {
-            throw new InternalServerErrorException(new Exception());
-        }
+        $controller = new SessionController();
+        $controller->LoginViaGoogle(
+            $payload['email'],
+            (isset($payload['name']) ? $payload['name'] : null)
+        );
 
         return ['status' => 'ok'];
     }
 
-    public function LoginViaGoogle($s_Email) {
-        return $this->ThirdPartyLogin('Google', $s_Email);
+    public function LoginViaGoogle($email, $name = null) {
+        return $this->ThirdPartyLogin('Google', $email, $name);
     }
 
     /**
@@ -367,10 +357,9 @@ class SessionController extends Controller {
         self::$log->info('User is logged in via facebook !!');
         if (!isset($fb_user_profile['email'])) {
             self::$log->error('Facebook email empty');
-            global $smarty;
             return [
                 'status' => 'error',
-                'error' => $smarty->getConfigVariable(
+                'error' => Translations::getInstance()->get(
                     'loginFacebookEmptyEmailError'
                 ),
             ];
@@ -393,7 +382,6 @@ class SessionController extends Controller {
      * @return boolean
      */
     public function NativeLogin(Request $r) {
-        $c_Users = new UserController();
         $identity = null;
 
         if (null != $r['returnAuthToken']) {
@@ -408,20 +396,21 @@ class SessionController extends Controller {
             $r['identity_id'] = $identity->identity_id;
             $r['user'] = $identity;
         } catch (ApiException $e) {
-            self::$log->warn('Identity ' . $r['usernameOrEmail'] . ' not found.');
+            self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
             return false;
         }
 
-        $b_Valid = $c_Users->TestPassword($r);
-
-        if (!$b_Valid) {
-            self::$log->warn('Identity ' . $r['usernameOrEmail'] . ' has introduced invalid credentials.');
+        if (!UserController::testPassword($identity, $r['password'])) {
+            self::$log->warn("Identity {$r['usernameOrEmail']} has introduced invalid credentials.");
             return false;
         }
 
-        self::$log->info('Identity ' . $r['usernameOrEmail'] . ' has loged in natively.');
+        self::$log->info("Identity {$r['usernameOrEmail']} has logged in natively.");
 
-        UserController::checkEmailVerification($r);
+        if (!is_null($identity->user_id)) {
+            $user = UsersDAO::getByPK($identity->user_id);
+            UserController::checkEmailVerification($user);
+        }
 
         try {
             return $this->RegisterSession($identity, $returnAuthToken);
@@ -433,6 +422,7 @@ class SessionController extends Controller {
     }
 
     public static function getLinkedInInstance() {
+        require_once 'libs/LinkedIn.php';
         return new LinkedIn(
             OMEGAUP_LINKEDIN_CLIENTID,
             OMEGAUP_LINKEDIN_SECRET,
@@ -493,8 +483,6 @@ class SessionController extends Controller {
                 'password' => null,
                 'permission_key' => UserController::$permissionKey,
                 'ignore_password' => true
-                // TODO(lhchavez): Do we actually need this? It's stored but never used.
-                //'facebook_user_id' => $fb_user_profile['id'],
             ]);
 
             try {

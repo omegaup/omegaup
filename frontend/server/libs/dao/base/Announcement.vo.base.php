@@ -27,10 +27,10 @@ class Announcement extends VO {
             return;
         }
         if (isset($data['announcement_id'])) {
-            $this->announcement_id = $data['announcement_id'];
+            $this->announcement_id = (int)$data['announcement_id'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
@@ -44,11 +44,11 @@ class Announcement extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**
