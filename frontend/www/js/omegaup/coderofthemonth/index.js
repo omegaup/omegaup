@@ -36,9 +36,8 @@ OmegaUp.on('ready', function() {
       isMentor: payload.isMentor,
       candidatesToCoderOfTheMonth:
           payload.isMentor ? payload.options.bestCoders : [],
-      canChooseCoder: payload.isMentor ? payload.options.canChooseCoder : false,
-      coderIsSelected: payload.isMentor ? payload.options.coderIsSelected :
-                                          false,
+      canChooseCoder: payload.isMentor && payload.options.canChooseCoder,
+      coderIsSelected: payload.isMentor && payload.options.coderIsSelected,
     },
     components: {'coder-of-the-month': coder_of_the_month}
   });

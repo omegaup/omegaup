@@ -3,14 +3,14 @@
     <div class="panel-heading">
       <ul class="nav nav-tabs">
         <li class="active"
-            v-on:click="showCurrentMonth = 1">
+            v-on:click="selectedTab = 'codersOfTheMonth'">
           <a data-toggle="tab">{{T.codersOfTheMonth}}</a>
         </li>
-        <li v-on:click="showCurrentMonth = 2">
+        <li v-on:click="selectedTab = 'codersOfPreviousMonth'">
           <a data-toggle="tab">{{T.codersOfTheMonthList}}</a>
         </li>
         <li v-if="isMentor"
-            v-on:click="showCurrentMonth = 3">
+            v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'">
           <a data-toggle="tab">{{T.codersOfTheMonthListCandidate}}</a>
         </li>
       </ul>
@@ -22,10 +22,11 @@
           <th></th>
           <th>{{T.codersOfTheMonthCountry}}</th>
           <th>{{T.codersOfTheMonthUser}}</th>
-          <th v-if="showCurrentMonth == 1">{{T.codersOfTheMonthDate}}</th>
-          <th v-if="showCurrentMonth == 3">{{T.profileStatisticsNumberOfSolvedProblems}}</th>
-          <th v-if="showCurrentMonth == 3">{{T.rankScore}}</th>
-          <th v-if="showCurrentMonth == 3">{{T.wordsActions}}</th>
+          <th v-if="selectedTab == 'codersOfTheMonth'">{{T.codersOfTheMonthDate}}</th>
+          <th v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
+          {{T.profileStatisticsNumberOfSolvedProblems}}</th>
+          <th v-if="selectedTab == 'candidatesToCoderOfTheMonth'">{{T.rankScore}}</th>
+          <th v-if="selectedTab == 'candidatesToCoderOfTheMonth'">{{T.wordsActions}}</th>
         </tr>
       </thead>
       <tbody>
@@ -35,10 +36,10 @@
           <td><omegaup-user-username v-bind:classname="coder.classname"
                                  v-bind:linkify="true"
                                  v-bind:username="coder.username"></omegaup-user-username></td>
-          <td v-if="showCurrentMonth == 1">{{coder.date}}</td>
-          <td v-if="showCurrentMonth == 3">{{coder.ProblemsSolved}}</td>
-          <td v-if="showCurrentMonth == 3">{{coder.score}}</td>
-          <td v-if="showCurrentMonth == 3"><button class="btn btn-primary"
+          <td v-if="selectedTab == 'codersOfTheMonth'">{{coder.date}}</td>
+          <td v-if="selectedTab == 'candidatesToCoderOfTheMonth'">{{coder.ProblemsSolved}}</td>
+          <td v-if="selectedTab == 'candidatesToCoderOfTheMonth'">{{coder.score}}</td>
+          <td v-if="selectedTab == 'candidatesToCoderOfTheMonth'"><button class="btn btn-primary"
                   v-if="canChooseCoder &amp;&amp; !coderIsSelected"
                   v-on:click=
                   "onSelectCoder(coder.username)">{{T.coderOfTheMonthChooseAsCoder}}</button></td>
@@ -64,22 +65,21 @@ export default {
   },
   computed: {
     visibleCoders: function() {
-      switch (this.showCurrentMonth) {
-        case 1:
-          return this.codersOfCurrentMonth;
-        case 2:
-          return this.codersOfPreviousMonth;
-        case 3:
-          return this.candidatesToCoderOfTheMonth;
+      switch (this.selectedTab) {
+        case 'codersOfTheMonth':
         default:
           return this.codersOfCurrentMonth;
+        case 'codersOfPreviousMonth':
+          return this.codersOfPreviousMonth;
+        case 'candidatesToCoderOfTheMonth':
+          return this.candidatesToCoderOfTheMonth;
       }
     },
   },
   data: function() {
     return {
       T: T,
-      showCurrentMonth: 1,
+      selectedTab: 'codersOfTheMonth',
     };
   },
   methods: {

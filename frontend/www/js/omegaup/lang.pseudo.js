@@ -1025,7 +1025,6 @@ const translations = {
 	wordsMode: "(M0d3)",
 	wordsModeAsc: "(A5c3nding)",
 	wordsModeDesc: "(D35c3nding)",
-	wordsMore: "(M0r3)",
 	wordsMultipleUser: "(Mu17ip13 u53r5 (S3para73d by c0mma5))",
 	wordsMyScore: "(My 5c0r3)",
 	wordsName: "(Nam3)",

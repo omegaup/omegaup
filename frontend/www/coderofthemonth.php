@@ -3,8 +3,8 @@
 require_once('../server/bootstrap_smarty.php');
 
 $session = SessionController::apiCurrentSession(new Request([
-        'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
-    ]))['session'];
+    'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
+]))['session'];
 
 $currentTimeStamp = Time::get();
 $currentDate = date('Y-m-d', $currentTimeStamp);
