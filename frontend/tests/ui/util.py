@@ -180,7 +180,6 @@ def is_message_whitelisted(message, message_whitelist):
 def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
     '''Verifies chart is correctly generated'''
 
-    series = 'highcharts-series-group'
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -189,6 +188,7 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
                  (alias, scoreboard)))).click()
     assert (url in driver.browser.current_url), driver.browser.current_url
 
+    series = 'highcharts-series-group'
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,

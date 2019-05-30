@@ -94,7 +94,10 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemAssignmentsMap = [];
         for ($i = 0; $i < $problemsInAssignment; $i++) {
-            $problemData = ProblemsFactory::createProblem();
+            $problemData = ProblemsFactory::createProblem(
+                new ProblemParams(),
+                $adminLogin
+            );
 
             CourseController::apiAddProblem(new Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -109,7 +112,11 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         // Add students to course
         $students = [];
         for ($i = 0; $i < $studentsInCourse; $i++) {
-            $students[] = CoursesFactory::addStudentToCourse($courseData);
+            $students[] = CoursesFactory::addStudentToCourse(
+                $courseData,
+                null,
+                $adminLogin
+            );
         }
 
         // Generate runs
@@ -121,13 +128,37 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         );
 
         // Call API
-        $adminLogin = self::login($courseData['admin']);
         $response = ProblemsetController::apiScoreboardEvents(new Request([
             'auth_token' => $adminLogin->auth_token,
             'problemset_id' => $courseData['problemset_id'],
         ]));
 
+        $tempUsername = '';
+        $tempProblemAlias = '';
+        $results = [];
+        $numberOfSubmissions = 0;
+        foreach ($response['events'] as $runData) {
+            $numberOfSubmissions++;
+            if ($tempUsername == $runData['username']) {
+                $results[$runData['username']][$courseData['assignment_alias']][$runData['problem']['alias']] = $runData['problem']['points'];
+                continue;
+            }
+            $results[$runData['username']][$courseData['assignment_alias']][$runData['problem']['alias']] = $runData['problem']['points'];
+            $tempUsername = $runData['username'];
+        }
+
         // From the map above, there are 9 meaningful combinations for events
-        $this->assertEquals(9, count($response['events']));
+        $this->assertEquals($numberOfSubmissions, count($response['events']));
+
+        // Score result and expected score must contain the same value
+        foreach ($results as $username => $student) {
+            $sassignmentScore = array_sum($student[$courseData['assignment_alias']]);
+
+            $this->assertEquals(
+                array_sum($student[$courseData['assignment_alias']]),
+                $expectedScores[$username][$courseData['assignment_alias']],
+                'Scoreboard is not properly matched with the expected scores.'
+            );
+        }
     }
 }
