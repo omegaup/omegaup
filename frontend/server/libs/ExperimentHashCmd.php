@@ -1,9 +1,5 @@
 <?php
 
-// Required so that the facebook SDK does not explode.
-$_SERVER['HTTP_HOST'] = 'localhost';
-$_SERVER['REQUEST_URI'] = '/';
-
 require_once(__DIR__.'/../bootstrap.php');
 
 if (count($argv) < 2) {
