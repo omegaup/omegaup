@@ -962,7 +962,7 @@ export class Arena {
 
   createChart(series, navigatorSeries) {
     let self = this;
-    if (series.length == 0) return;
+    if (series.length == 0 || self.elements.ranking.length == 0) return;
 
     Highcharts.setOptions({colors: ScoreboardColors});
 

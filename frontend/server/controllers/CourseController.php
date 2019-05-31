@@ -1598,7 +1598,7 @@ class CourseController extends Controller {
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
-            ProblemsetAccessLogDAO::save(new ProblemsetAccessLog([
+            ProblemsetAccessLogDAO::create(new ProblemsetAccessLog([
                 'identity_id' => $r['current_identity_id'],
                 'problemset_id' => $r['assignment']->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR']),
