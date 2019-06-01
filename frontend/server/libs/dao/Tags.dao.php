@@ -24,7 +24,7 @@ class TagsDAO extends TagsDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -36,7 +36,7 @@ class TagsDAO extends TagsDAOBase {
         $sql = "SELECT name FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
-        $rs = $conn->Execute($sql, $args);
+        $rs = $conn->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $row) {
             array_push($result, new Tags($row));

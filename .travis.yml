@@ -1,10 +1,6 @@
 language: php
 
-dist: trusty
-
-group: edge
-
-sudo: false
+dist: xenial
 
 branches:
   only:
@@ -12,7 +8,7 @@ branches:
     - release
 
 php:
-  - 7.0.7
+  - 7.2
 
 # Common sources and packages. If a matrix entry needs these, it should
 # explicitly add both of the sources and package YAML references in its addons
@@ -21,7 +17,6 @@ addons:
   apt:
     sources: &common_sources
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.7
       - deadsnakes
     packages: &common_packages
       - libmysqlclient-dev
@@ -33,15 +28,15 @@ addons:
 matrix:
   include:
     - env: TEST_SUITE=phpunit
+      services:
+        - mysql
     - env: TEST_SUITE=lint
       addons:
         apt:
           sources:
             - *common_sources
-            - [llvm-toolchain-precise-3.7]
           packages:
             - *common_packages
-            - [clang-format-3.7]
     - env: TEST_SUITE=selenium
       addons:
         apt:
@@ -54,6 +49,8 @@ matrix:
           username: lhchavez
         jwt:
           secure: PjNJHqneJ7qPBxbZEmgBemJT6tFE+sHKmVGQ2GwzaXSHT+3cthzTjMGe/k/fi+XiiuMTfHXs09uF6bEzJAMPW6PeCjkOYR+9H5btMmEEQJvdJBafNTbL26xSr4bBNLYBlryudDCx4hKDXOGoIPCJ+mhKHTtwApbfdx5ec8r1kD4=
+      services:
+        - mysql
 
 cache:
   directories:
@@ -73,6 +70,10 @@ before_script: stuff/travis/run.sh "${TEST_SUITE}" before_script
 script: stuff/travis/run.sh "${TEST_SUITE}" script
 
 after_success: stuff/travis/run.sh "${TEST_SUITE}" after_success
+
+after_failure: stuff/travis/run.sh "${TEST_SUITE}" after_failure
+
+after_script: stuff/travis/run.sh "${TEST_SUITE}" after_script
 
 notifications:
   slack:

@@ -30,8 +30,8 @@ def generate(alias):
             filename = str(filename, encoding='utf-8')
             if filename.endswith('.idl'):
                 idlname = filename
-            elif (not filename.startswith('Main.') and
-                  not filename.startswith('examples/')):
+            elif (not filename.startswith('Main.')
+                  and not filename.startswith('examples/')):
                 continue
             outpath = os.path.join(dirname, filename)
             os.makedirs(os.path.dirname(outpath), exist_ok=True)
@@ -61,6 +61,7 @@ def main():
     for alias in os.listdir(_TEMPLATES_DIR):
         logging.info('Refreshing files for problem %s...', alias)
         generate(alias)
+
 
 if __name__ == '__main__':
     logging.getLogger().setLevel('INFO')

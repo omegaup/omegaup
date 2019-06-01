@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 
 if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
     header('HTTP/1.1 404 Not found');

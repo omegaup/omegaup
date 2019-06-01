@@ -10,13 +10,20 @@ include_once('base/Problemset_Identities.vo.base.php');
   *
   */
 class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
-    public static function CheckAndSaveFirstTimeAccess(
+    public static function checkProblemsetOpened(
+        int $identityId,
+        int $problemsetId
+    ) : bool {
+        return !is_null(self::getByPK($identityId, $problemsetId));
+    }
+
+    public static function checkAndSaveFirstTimeAccess(
         $identityId,
         $problemsetId,
         $windowLength,
         $grantAccess = false,
         $shareUserInformation = false
-    ) {
+    ) : ProblemsetIdentities {
         $currentTime = Time::get();
         $problemsetIdentity = self::getByPK($identityId, $problemsetId);
         if (is_null($problemsetIdentity)) {

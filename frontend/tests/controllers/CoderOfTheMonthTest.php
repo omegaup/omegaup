@@ -9,9 +9,9 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
     public function testCoderOfTheMonthCalc() {
         $user = UserFactory::createUser();
         // Creating 10 AC runs for our user in the last month
-        $runCreationDate = date_create(date('Y-m-d'));
-        date_add($runCreationDate, date_interval_create_from_date_string('-1 month'));
-        $runCreationDate = date_format($runCreationDate, 'Y-m-01');
+        $runCreationDate = new DateTimeImmutable(date('Y-m-d'));
+        $runCreationDate = $runCreationDate->modify('first day of last month');
+        $runCreationDate = $runCreationDate->format('Y-m-d');
 
         $this->createRuns($user, $runCreationDate, 10 /*numRuns*/);
 
@@ -84,11 +84,16 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $runData = RunsFactory::createRun($problem, $contest, $user);
             RunsFactory::gradeRun($runData);
+            //sumbmission gap between runs must be 60 seconds
+            Time::setTimeForTesting(Time::get() + 60);
 
-            // Force the run to be in any date
-            $run = RunsDAO::getByAlias($runData['response']['guid']);
+            // Force the submission to be in any date
+            $submission = SubmissionsDAO::getByGuid($runData['response']['guid']);
+            $submission->time = $runCreationDate;
+            SubmissionsDAO::update($submission);
+            $run = RunsDAO::getByPK($submission->current_run_id);
             $run->time = $runCreationDate;
-            RunsDAO::save($run);
+            RunsDAO::update($run);
         }
     }
 
@@ -154,34 +159,33 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
     public function testMentorSelectsUserAsCoderOfTheMonth() {
         $mentor = UserFactory::createMentorIdentity();
 
-        // Setting time
-        $currentMonth = date('m');
-        $runCreationDate = date('Y-m-15');
-        $runCreationDate = strtotime('+1 month', strtotime($runCreationDate));
-        $runCreationDate = date('Y-m-d', $runCreationDate);
-        Time::setTimeForTesting(strtotime($runCreationDate));
+        // Setting time to the 15th of next month.
+        $runCreationDate = new DateTimeImmutable(date('Y-m-d', Time::get()));
+        $runCreationDate = $runCreationDate->modify('first day of next month');
+        $runCreationDate = new DateTimeImmutable($runCreationDate->format('Y-m-15'));
+        Time::setTimeForTesting(strtotime($runCreationDate->format('Y-m-d')));
 
         // Submitting some runs with new users
         $user1 = UserFactory::createUser();
         $user2 = UserFactory::createUser();
         $user3 = UserFactory::createUser();
-        $this->createRuns($user1, $runCreationDate, 2);
-        $this->createRuns($user1, $runCreationDate, 3);
-        $this->createRuns($user2, $runCreationDate, 4);
-        $this->createRuns($user2, $runCreationDate, 1);
-        $this->createRuns($user3, $runCreationDate, 2);
+        $this->createRuns($user1, $runCreationDate->format('Y-m-d'), 2);
+        $this->createRuns($user1, $runCreationDate->format('Y-m-d'), 3);
+        $this->createRuns($user2, $runCreationDate->format('Y-m-d'), 4);
+        $this->createRuns($user2, $runCreationDate->format('Y-m-d'), 1);
+        $this->createRuns($user3, $runCreationDate->format('Y-m-d'), 2);
 
-        // Setting new date
-        $firstDayOfMonth = new DateTime($runCreationDate);
-        $firstDayOfMonth->modify('first day of next month');
-        Time::setTimeForTesting(strtotime($firstDayOfMonth->format('Y-m-d')));
+        // Setting new date to the first of the month following the run
+        // creation.
+        $firstDayOfNextMonth = $runCreationDate->modify('first day of next month');
+        Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
 
         // Selecting one user as coder of the month
         $login = self::login($mentor);
 
         // Call api. This should fail.
         try {
-            $response = UserController::apiSelectCoderOfTheMonth(new Request([
+            UserController::apiSelectCoderOfTheMonth(new Request([
                 'auth_token' => $login->auth_token,
                 'username' => $user3->username,
             ]));
@@ -191,33 +195,24 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             // Pass
         }
 
-        // Changing date with valid range
-        $runCreationDate = date('Y-m-t', Time::get()); // Last day of the month is valid date to select a coder
-        $runCreationDate = strtotime('-1 month', strtotime($runCreationDate));
-        $runCreationDate = date('Y-m-d', $runCreationDate);
-        Time::setTimeForTesting(strtotime($runCreationDate));
+        // Changing date to the last day of the month in which the run was created.
+        Time::setTimeForTesting(strtotime($runCreationDate->format('Y-m-t')));
 
         // Call api again.
-        $response = UserController::apiSelectCoderOfTheMonth(new Request([
+        UserController::apiSelectCoderOfTheMonth(new Request([
             'auth_token' => $login->auth_token,
             'username' => $user3->username,
         ]));
 
         // Set date to first day of next month
-        $nextMonthDate = strtotime('+1 day', strtotime($runCreationDate));
-        $nextMonthDate = date('Y-m-d', $nextMonthDate);
-        Time::setTimeForTesting(strtotime($nextMonthDate));
+        Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
 
-        $response = UserController::apiCoderOfTheMonth(new Request([]));
+        $response = UserController::apiCoderOfTheMonth(new Request());
         $this->assertNotNull($response['userinfo'], 'A user has been selected by a mentor');
         $this->assertEquals($response['userinfo']['username'], $user3->username);
         $response = UserController::apiCoderOfTheMonthList(new Request());
 
-        $currentDate = date('Y-m-d');
-        $dateTwoMonthsLater = strtotime('+2 month', strtotime($currentDate));
-        $firstDayTwoMonthsLater = date('Y-m-01', $dateTwoMonthsLater);
-
-        $this->assertEquals($firstDayTwoMonthsLater, $response['coders'][0]['date']);
+        $this->assertEquals($firstDayOfNextMonth->format('Y-m-d'), $response['coders'][0]['date']);
     }
 
     /**
@@ -238,6 +233,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Testing with an intermediate day of the month
         $timestampTest = Time::get();
         $dateTest = date('Y-m-15', $timestampTest);
+        $timestampTest = strtotime($dateTest);
         $canChooseCoder = Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
 

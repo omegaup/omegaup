@@ -34,6 +34,7 @@ function _call(url, transform, defaultParams) {
           } catch (err) {
             errorData = {status: 'error', error: err};
           }
+          omegaup.OmegaUp.addError(errorData);
           dfd.reject(errorData);
         });
     return dfd.promise();
@@ -170,6 +171,8 @@ export default {
     removeUser: _call('/api/contest/removeUser/'),
 
     runs: _call('/api/contest/runs/', _convertRuntimes),
+
+    runsDiff: _call('/api/contest/runsDiff/'),
 
     scoreboard: _call('/api/contest/scoreboard/'),
 
@@ -365,6 +368,8 @@ export default {
   },
 
   Identity: {
+    changePassword: _call('/api/identity/changePassword/'),
+
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
@@ -420,6 +425,10 @@ export default {
 
     runs: _call('/api/problem/runs/', _convertRuntimes),
 
+    runsDiff: _call('/api/problem/runsDiff/'),
+
+    selectVersion: _call('/api/problem/selectVersion/'),
+
     stats: _call('/api/problem/stats/'),
 
     tags: _call('/api/problem/tags/'),
@@ -427,6 +436,8 @@ export default {
     update: _call('/api/problem/update/'),
 
     updateStatement: _call('/api/problem/updateStatement/'),
+
+    versions: _call('/api/problem/versions/'),
   },
 
   Problemset: {
@@ -580,6 +591,8 @@ export default {
     removeRole: _call('/api/user/removerole/'),
 
     stats: _call('/api/user/stats/'),
+
+    selectCoderOfTheMonth: _call('/api/user/selectCoderOfTheMonth/'),
 
     update: _call('/api/user/update/'),
 

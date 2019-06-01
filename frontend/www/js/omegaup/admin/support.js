@@ -11,6 +11,7 @@ OmegaUp.on('ready', function() {
           username: this.username,
           link: this.link,
           verified: this.verified,
+          lastLogin: this.lastLogin,
         },
         on: {
           'search-email': function(email) {
@@ -21,6 +22,9 @@ OmegaUp.on('ready', function() {
                 .then(function(data) {
                   adminSupport.username = data.username;
                   adminSupport.verified = data.verified;
+                  adminSupport.lastLogin = data.last_login == null ?
+                                               null :
+                                               new Date(data.last_login * 1000);
                 })
                 .fail(omegaup.UI.apiError);
           },
@@ -50,11 +54,12 @@ OmegaUp.on('ready', function() {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;
+            adminSupport.lastLogin = null;
           }
         },
       });
     },
-    data: {username: null, link: null, verified: false},
+    data: {username: null, link: null, verified: false, lastLogin: null},
     components: {
       'omegaup-admin-support': admin_Support,
     },

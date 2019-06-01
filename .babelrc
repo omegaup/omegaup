@@ -1,8 +1,8 @@
 {
   "presets": [
-    ["env", { "modules": false }]
+    ["@babel/env", { "modules": false }]
   ],
   "plugins": [
-    "transform-async-to-generator"
+    "@babel/plugin-transform-async-to-generator"
   ]
 }

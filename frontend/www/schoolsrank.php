@@ -1,5 +1,5 @@
 <?php
-require_once('../server/bootstrap.php');
+require_once('../server/bootstrap_smarty.php');
 
 // Fetch ranking
 try {

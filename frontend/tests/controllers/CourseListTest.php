@@ -36,7 +36,7 @@ class CourseListTest extends OmegaupTestCase {
 
         $this->assertEquals(1, count($response['admin']));
         $course_array = $response['admin'][0];
-        Validators::isNumber(
+        Validators::validateNumber(
             $course_array['finish_time'],
             'finish_time',
             true /* required */
@@ -57,7 +57,7 @@ class CourseListTest extends OmegaupTestCase {
 
         $this->assertEquals(1, count($response['student']));
         $course_array = $response['student'][0];
-        Validators::isNumber(
+        Validators::validateNumber(
             $course_array['finish_time'],
             'finish_time',
             true /* required */

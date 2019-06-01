@@ -293,80 +293,100 @@ class UpdateContestTest extends OmegaupTestCase {
      * active contest
      */
     public function testUpdatePenaltyTypeFromAContest() {
-        // Get a problem
+        $originalTime = Time::get();
+
+        // Create a contest with one problem.
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'start_time' => $originalTime,
+            'last_updated' => $originalTime,
+            'finish_time' => $originalTime + 60 * 60,
+        ]));
         $problemData = ProblemsFactory::createProblem();
-
-        // Get a contest
-        $contestData = ContestsFactory::createContest();
-
-        // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        // Create our contestant
-        $contestant = UserFactory::createUser();
-
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        {
+            Time::setTimeForTesting($originalTime + 5 * 60);
+            $contestant = UserFactory::createUser();
+            ContestsFactory::addUser($contestData, $contestant);
 
-        // Grade the run
-        RunsFactory::gradeRun($runData);
+            // The problem is opened 5 minutes after contest starts.
+            ContestsFactory::openContest($contestData, $contestant);
+            ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
 
-        // Build request
+            // The run is sent 10 minutes after contest starts.
+            Time::setTimeForTesting($originalTime + 10 * 60);
+            $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+            RunsFactory::gradeRun($runData, 1.0, 'AC', 10);
+            Time::setTimeForTesting($originalTime);
+        }
+
         $directorLogin = self::login($contestData['director']);
 
-        // Call API
+        // Get the original penalty, since the contest was created with the
+        // 'contest_start' penalty type.
         $response = ContestController::apiRuns(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));
-        $penalty_contestant_start = $response['runs'][0]['penalty'];
-
         $this->assertEquals(100, $response['runs'][0]['contest_score']);
+        $originalPenalty = $response['runs'][0]['penalty'];
 
         // Update penalty type to runtime
-        ContestController::apiUpdate(new Request([
-            'auth_token' => $directorLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'penalty_type' => 'runtime',
-        ]));
-
-        // Call API
-        $response = ContestController::apiRuns(new Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $directorLogin->auth_token,
-        ]));
-
-        $this->assertEquals($response['runs'][0]['penalty'], $response['runs'][0]['runtime']);
+        {
+            ContestController::apiUpdate(new Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'penalty_type' => 'runtime',
+            ]));
+            $response = ContestController::apiRuns(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+            ]));
+            $this->assertEquals($response['runs'][0]['penalty'], $response['runs'][0]['runtime']);
+        }
 
         // Update penalty type to none
-        ContestController::apiUpdate(new Request([
-            'auth_token' => $directorLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'penalty_type' => 'none',
-        ]));
+        {
+            ContestController::apiUpdate(new Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'penalty_type' => 'none',
+            ]));
+            $response = ContestController::apiRuns(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+            ]));
+            $this->assertEquals(0, $response['runs'][0]['penalty']);
+        }
 
-        // Call API
-        $response = ContestController::apiRuns(new Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $directorLogin->auth_token,
-        ]));
+        // Update penalty type to problem open.
+        {
+            ContestController::apiUpdate(new Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'penalty_type' => 'problem_open',
+            ]));
+            $response = ContestController::apiRuns(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+            ]));
+            $this->assertEquals(5, $response['runs'][0]['penalty']);
+        }
 
-        $this->assertEquals(0, $response['runs'][0]['penalty']);
-
-        // Update penalty type to contest start
-        ContestController::apiUpdate(new Request([
-            'auth_token' => $directorLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'penalty_type' => 'contest_start',
-        ]));
-
-        // Call API
-        $response = ContestController::apiRuns(new Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $directorLogin->auth_token,
-        ]));
-
-        $this->assertEquals($penalty_contestant_start, $response['runs'][0]['penalty']);
+        // Update penalty type back to contest start.
+        {
+            ContestController::apiUpdate(new Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'penalty_type' => 'contest_start',
+            ]));
+            $response = ContestController::apiRuns(new Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+            ]));
+            $this->assertEquals($originalPenalty, $response['runs'][0]['penalty']);
+        }
     }
 
     /**
@@ -383,8 +403,9 @@ class UpdateContestTest extends OmegaupTestCase {
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        // Create our contestant
+        // Create our contestants
         $contestant = UserFactory::createUser();
+        $contestant2 = UserFactory::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
@@ -402,7 +423,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $contest = ContestController::apiDetails($r);
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun($problemData, $contestData, $contestant2);
 
         $this->assertNull($contest['window_length'], 'Window length is not setted');
 

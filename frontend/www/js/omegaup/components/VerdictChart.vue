@@ -9,11 +9,11 @@ export default {
   },
   props: {
     stats: Object,
-    contestAlias: String,
+    title: String,
   },
   mounted: function() {
     this.runCountsChart =
-        oGraph.verdictCounts(this.$el, this.contestAlias, this.stats);
+        oGraph.verdictCounts(this.$el, this.title, this.stats);
   },
   watch: {
     stats: function() {

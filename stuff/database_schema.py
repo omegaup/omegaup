@@ -59,8 +59,8 @@ def main():
 
     # If running in an automated environment, we can close stdin.
     # This will disable all prompts.
-    if (args.continuous_integration or
-            os.environ.get('CONTINUOUS_INTEGRATION') == 'true'):
+    if (args.continuous_integration
+            or os.environ.get('CONTINUOUS_INTEGRATION') == 'true'):
         sys.stdin.close()
 
     validate_only = args.tool == 'validate'
@@ -78,8 +78,8 @@ def main():
     actual = git_tools.file_contents(
         args, root, 'frontend/database/schema.sql')
 
-    if (strip_mysql_extensions(expected.strip()) !=
-            strip_mysql_extensions(actual.strip())):
+    if (strip_mysql_extensions(expected.strip()) != strip_mysql_extensions(
+            actual.strip())):
         if validate_only:
             if git_tools.attempt_automatic_fixes(sys.argv[0], args,
                                                  filtered_files):

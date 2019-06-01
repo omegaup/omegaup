@@ -222,24 +222,39 @@ div#sidebar { display: none }
 	font-size: 2em;
 	line-height: 3em;
 }
+.statement table {
+	margin: 1rem auto;
+}
+.statement table th {
+	padding: 3px;
+	border-top: 0;
+}
+.statement table td {
+	border: 1px solid #000;
+	vertical-align: top;
+	padding: 3px;
+}
+.statement table tbody tr:nth-child(even) {
+	background: #f5f5f5;
+}
 table.sample_io {
 	margin: 5px;
 	padding : 5px;
 }
-.sample_io tbody {
+table.sample_io tbody {
 	background: #eee;
 	border: 1px solid #000;
 }
-.sample_io th {
+table.sample_io th {
 	padding: 10px;
-	border-top: 0;
 }
-.sample_io td {
-	vertical-align: top;
+table.sample_io td {
 	padding: 10px;
-	border: 1px solid #000;
 }
-.sample_io pre {
+table.sample_io tbody tr, table.sample_io tbody tr:nth-child(even) {
+	background: #eee;
+}
+table.sample_io pre {
 	white-space: pre;
 	word-break: keep-all;
 	word-wrap: normal;
@@ -501,6 +516,8 @@ padding-right: 5px;
 #content > .navbar { border-radius: 4px; }
 #inner-content { margin-left: 0; margin-right: 0; }
 
+#contest-rules ul { list-style-type: circle; }
+
 #userbox { padding: 0 10px 0 0; }
 #userbox-inner { text-align: center;}
 #userbox-inner > div { margin-bottom: 15px;}
@@ -526,7 +543,10 @@ padding-right: 5px;
 #problem .statement p { text-align: justify; }
 #problem .statement li { text-align: justify; }
 #problem .statement h1 { font-weight: bold; }
-#problem .statement ul { list-style: initial; }
+#problem .statement ul {
+	list-style: initial;
+	padding-left: 2em;
+}
 
 #problem-form .languages {
 	padding: 0;
