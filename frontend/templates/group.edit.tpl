@@ -17,7 +17,7 @@
 		{include file='group.edit.members.tpl'}
 	</div>
 	<div class="tab-pane" id="scoreboards">
-		{include file='group.edit.scoreboards.tpl' payload=$payload}
+		{include file='group.edit.scoreboards.tpl'}
 	</div>
 	{if $IS_ORGANIZER}
 		<div class="tab-pane" id="identities">

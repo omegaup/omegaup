@@ -11,9 +11,5 @@ if (is_null($session['identity'])) {
 
 $is_organizer = $experiments->isEnabled(Experiments::IDENTITIES) &&
     Authorization::canCreateGroupIdentities($session['identity']->identity_id);
-$smarty->assign('IS_UPDATE', 1);
 $smarty->assign('IS_ORGANIZER', $is_organizer);
-$smarty->assign('payload', [
-    'countries' => CountriesDAO::getAll(null, null, 'name'),
-]);
 $smarty->display('../templates/group.edit.tpl');

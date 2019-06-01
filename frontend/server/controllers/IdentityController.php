@@ -232,6 +232,8 @@ class IdentityController extends Controller {
         // Save in DB
         IdentitiesDAO::save($identity);
 
+        Cache::deleteFromCache(Cache::USER_PROFILE, $identity->username);
+
         return [
             'status' => 'ok',
         ];

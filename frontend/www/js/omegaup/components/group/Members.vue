@@ -57,9 +57,8 @@
           <td>{{ identity.school }}</td>
           <td>
             <a class="glyphicon glyphicon-edit"
-                href="#"
-                v-bind:title="T.groupEditMembersEdit"
-                v-on:click="onEdit(identity)"></a> <a class="glyphicon glyphicon-lock"
+                v-bind:href="`/group/${groupAlias}/editidentity/${identity.username}/`"
+                v-bind:title="T.groupEditMembersEdit"></a> <a class="glyphicon glyphicon-lock"
                 href="#"
                 v-bind:title="T.groupEditMembersChangePassword"
                 v-on:click="onChangePass(identity.username)"></a> <a class=
@@ -70,10 +69,7 @@
           </td>
         </tr>
       </tbody>
-    </table><!-- Modal Edit-->
-    <omegaup-identity-edit v-bind:countries="countries"
-         v-bind:identity="identity"
-         v-bind:username="username"></omegaup-identity-edit> <!-- Modal Change Password-->
+    </table><!-- Modal Change Password-->
     <div class="modal fade modal-change-password"
          role="dialog">
       <div class="modal-dialog">
@@ -152,7 +148,7 @@ export default {
   props: {
     identities: Array,
     identitiesCsv: Array,
-    countries: Array,
+    groupAlias: String,
   },
   data: function() {
     return {
@@ -183,11 +179,6 @@ export default {
         this.memberUsername = $('input.typeahead.tt-input', this.$el).val();
       }
       this.$emit('add-member', this, this.memberUsername);
-    },
-    onEdit: function(identity) {
-      this.identity = identity;
-      this.username = identity.username;
-      $('.modal-edit').modal();
     },
     onChangePass: function(username) {
       this.username = username;

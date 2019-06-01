@@ -1241,7 +1241,7 @@ class UserController extends Controller {
 
         $response = IdentityController::getProfile($r);
         if ((is_null($r['current_identity']) || $r['current_identity']->username != $r['identity']->username)
-            && (isset($r['user']) && $r['user']->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+            && (!is_null($r['user']) && $r['user']->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
                 $response['userinfo'][$k] = null;

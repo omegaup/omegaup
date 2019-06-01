@@ -5,7 +5,6 @@ import Vue from 'vue';
 OmegaUp.on('ready', function() {
   const formData = document.querySelector('#form-data');
   const groupAlias = formData.getAttribute('data-alias');
-  const payload = JSON.parse(document.getElementById('payload').innerText);
   let groupMembers = new Vue({
     el: '#group_members',
     render: function(createElement) {
@@ -13,7 +12,7 @@ OmegaUp.on('ready', function() {
         props: {
           identities: this.identities,
           identitiesCsv: this.identitiesCsv,
-          countries: this.countries,
+          groupAlias: this.groupAlias,
         },
         on: {
           'add-member': function(groupMembersInstance, username) {
@@ -27,27 +26,6 @@ OmegaUp.on('ready', function() {
                   groupMembersInstance.reset();
                 })
                 .fail(UI.apiError);
-          },
-          'edit-identity-member': function(groupMembersInstance, identity,
-                                           username) {
-            API.Identity.update({
-                          username: identity.username,
-                          name: identity.name,
-                          country_id: identity.country_id,
-                          state_id: identity.state_id,
-                          school_name: identity.school,
-                          group_alias: groupAlias,
-                          original_username: username,
-                        })
-                .then(function(data) {
-                  refreshMemberList();
-                  UI.success(T.groupEditMemberUpdated);
-                  groupMembersInstance.reset();
-                })
-                .fail(function(response) {
-                  $('.modal').modal('hide');
-                  UI.apiError(response);
-                });
           },
           'change-password-identity-member': function(
               groupMembersInstance, username, newPassword, newPasswordRepeat) {
@@ -87,7 +65,7 @@ OmegaUp.on('ready', function() {
     data: {
       identities: [],
       identitiesCsv: [],
-      countries: payload.countries,
+      groupAlias: groupAlias,
     },
     components: {
       'omegaup-group-members': group_Members,

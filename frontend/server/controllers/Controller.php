@@ -74,6 +74,11 @@ class Controller {
     protected static function resolveTargetUser(Request $r) {
         // By default use current user
         $user = $r['current_user'];
+        // Whether there is a valid identity and it does not have an associated user
+        // we will return null
+        if (!is_null($r['identity']) && is_null($r['identity']->user_id)) {
+            return null;
+        }
 
         if (!is_null($r['username'])) {
             Validators::validateStringNonEmpty($r['username'], 'username');
