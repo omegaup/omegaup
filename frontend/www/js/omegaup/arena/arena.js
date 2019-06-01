@@ -57,7 +57,7 @@ export function GetOptionsFromLocation(arenaLocation) {
             .start()
             .oncomplete(function() {
               options.isTutorial = true;
-              document.querySelector('td#new-run > a').trigger('click');
+              document.querySelector('td#new-run > a').click();
             });
         return false;
       });

@@ -125,6 +125,10 @@ const jQueryDeprecatedFunctionVisitor = {
       return;
     }
     if (path.node.arguments.length == 0) {
+      // Excluding expressions that do not belong to jQuery
+      if (callee.name != '$' && callee.name != 'jQuery') {
+        return;
+      }
       // This is a trigger.
       fixes.push({
         start: identifier.start,
