@@ -589,6 +589,8 @@ export default {
 
     stats: _call('/api/user/stats/'),
 
+    selectCoderOfTheMonth: _call('/api/user/selectCoderOfTheMonth/'),
+
     update: _call('/api/user/update/'),
 
     /**
