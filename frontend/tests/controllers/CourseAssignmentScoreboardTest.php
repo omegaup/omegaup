@@ -133,11 +133,9 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
             'problemset_id' => $courseData['problemset_id'],
         ]));
 
-        $tempUsername = '';
         $results = [];
         foreach ($response['events'] as $runData) {
             $results[$runData['username']][$courseData['assignment_alias']][$runData['problem']['alias']] = $runData['problem']['points'];
-            $tempUsername = $runData['username'];
         }
 
         // From the map above, there are 9 meaningful combinations for events
