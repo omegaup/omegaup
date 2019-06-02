@@ -540,7 +540,7 @@ class Scoreboard {
                     $contestant['username'],
                 'total' => null,
                 'country' => $contestant['country_id'],
-                'is_invited' => $contestant['is_invited'] == '1',
+                'is_invited' => $contestant['is_invited'],
             ];
         }
 
