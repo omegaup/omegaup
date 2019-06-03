@@ -85,6 +85,7 @@ class CoursesFactory {
             'course' => $course,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
+            'problemset_id' => $assignment->problemset_id,
             'assignment' => $assignment,
             'request' => $r,
             'admin' => $admin

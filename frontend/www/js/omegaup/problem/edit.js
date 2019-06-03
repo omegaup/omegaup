@@ -456,8 +456,8 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .problemsetter')
         .attr('href', '/profile/' + problem.problemsetter.username + '/')
         .html(UI.escape(problem.problemsetter.name));
-    $('input[name=email_clarifications][value=' + problem.email_clarifications +
-      ']')
+    $('input[name=email_clarifications][value=' +
+      (problem.email_clarifications ? '0' : '1') + ']')
         .attr('checked', 1);
     $('select[name=validator]').val(problem.settings.validator.name);
     var visibility = Math.max(0, Math.min(1, problem.visibility));

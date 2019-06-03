@@ -53,18 +53,7 @@ def test_user_ranking_course(driver):
     update_scoreboard_for_assignment(driver, assignment_alias, course_alias)
 
     with driver.login_admin():
-        with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-        with driver.page_transition():
-            course_url = '/course/%s' % course_alias
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     '//a[@href = "%s"]' % course_url))).click()
-
+        enter_course_assignments_page(driver, course_alias)
         with driver.page_transition():
             driver.wait.until(EC.element_to_be_clickable(
                 (By.XPATH,
@@ -75,6 +64,33 @@ def test_user_ranking_course(driver):
             '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
             '"user"]')
         assert run_user.text == driver.user_username, run_user
+
+        url = '/course/%s/assignment/%s/scoreboard' % (course_alias,
+                                                       assignment_alias)
+
+        enter_course_assignments_page(driver, course_alias)
+        util.check_scoreboard_events(driver, assignment_alias, url,
+                                     num_elements=1, scoreboard='Public')
+
+        enter_course_assignments_page(driver, course_alias)
+        util.check_scoreboard_events(driver, assignment_alias, url,
+                                     num_elements=1, scoreboard='Admin')
+
+
+def enter_course_assignments_page(driver, course_alias):
+    '''Steps to enter into scoreboard page'''
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//a[@href = "/schools/"]'))).click()
+
+    with driver.page_transition():
+        course_url = '/course/%s' % course_alias
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[@href = "%s"]' % course_url))).click()
 
 
 @util.annotate
