@@ -159,13 +159,11 @@ class ProblemsetController extends Controller {
         if ($r['problemset']['type'] == 'Interview') {
             // Not implemented in interviews yet
             return ['events' => []];
-        }
-        if ($r['problemset']['type'] == 'Contest') {
+        } elseif ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiScoreboardEvents(
                 new Request([
                     'auth_token' => $r['auth_token'],
                     'contest_alias' => $r['problemset']['contest_alias'],
-                    'token' => $r['token'],
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {

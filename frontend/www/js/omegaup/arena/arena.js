@@ -806,22 +806,6 @@ export class Arena {
     }
   }
 
-  rankingCourseChange(data) {
-    let self = this;
-    self.onRankingChanged(data);
-
-    let assignmentScoreboardEventsParams = {
-      course_alias: self.options.courseAlias,
-      assignment_alias: self.options.assignmentAlias,
-    };
-    if (self.options.scoreboardToken) {
-      assignmentScoreboardEventsParams.token = self.options.scoreboardToken;
-    }
-    API.Course.assignmentScoreboardEvents(assignmentScoreboardEventsParams)
-        .then(self.onRankingEvents.bind(self))
-        .fail(UI.ignoreError);
-  }
-
   onRankingChanged(data) {
     let self = this;
     $('tbody.inserted', self.elements.miniRanking).remove();
