@@ -797,22 +797,6 @@ export class Arena {
     }
   }
 
-  rankingCourseChange(data) {
-    let self = this;
-    self.onRankingChanged(data);
-
-    let params = {
-      course_alias: self.options.courseAlias,
-      assignment_alias: self.options.assignmentAlias,
-    };
-    if (self.options.scoreboardToken) {
-      params.token = self.options.scoreboardToken;
-    }
-    API.Course.assignmentScoreboardEvents(params)
-        .then(self.onRankingEvents.bind(self))
-        .fail(UI.ignoreError);
-  }
-
   onRankingChanged(data) {
     let self = this;
     $('tbody.inserted', self.elements.miniRanking).remove();
@@ -1485,7 +1469,7 @@ export class Arena {
     self.currentProblem = problem;
     let statement = document.querySelector('#problem div.statement');
     statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
-        problem.statement.markdown, problem.statement.images);
+        problem.statement.markdown, problem.statement.images, problem.settings);
     const creationDate =
         document.querySelector('#problem .problem-creation-date');
     if (problem.problemsetter && creationDate) {

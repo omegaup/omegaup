@@ -129,6 +129,7 @@ class Cache {
     const CONTEST_INFO = 'contest-info-';
     const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
     const PROBLEM_STATEMENT = 'statement-';
+    const PROBLEM_SOLUTION = 'solution-';
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';

@@ -317,4 +317,68 @@ class ProblemDetailsTest extends OmegaupTestCase {
             $this->assertEquals($contestant->username, $response['solvers'][0]['username']);
         }
     }
+
+    /**
+     * Solutions that don't exist don't cause an exception.
+     */
+    public function testShowSolutionInexistent() {
+        $problemData = ProblemsFactory::createProblem(new ProblemParams([
+            'zipName' => OMEGAUP_RESOURCES_ROOT . 'imagetest.zip',
+        ]));
+        $login = self::login($problemData['author']);
+        {
+            $response = ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->assertEmpty($response['solution']['markdown']);
+        }
+    }
+
+    /**
+     * Solutions can be viewed by a problem admin.
+     */
+    public function testShowSolutionByAdmin() {
+        $problemData = ProblemsFactory::createProblem();
+        $login = self::login($problemData['author']);
+        {
+            $response = ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->assertContains('`long long`', $response['solution']['markdown']);
+        }
+    }
+
+    /**
+     * Solutions can be viewed by a user that has solved the problem.
+     */
+    public function testShowSolutionBySolver() {
+        $problemData = ProblemsFactory::createProblem();
+
+        $contestant = UserFactory::createUser();
+
+        try {
+            $login = self::login($contestant);
+            ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->fail('User should not have been able to view solution');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals('problemSolutionNotVisible', $e->getMessage());
+        }
+
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        {
+            $login = self::login($contestant);
+            $response = ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+            $this->assertContains('`long long`', $response['solution']['markdown']);
+        }
+    }
 }

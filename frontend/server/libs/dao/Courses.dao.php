@@ -18,7 +18,7 @@ class CoursesDAO extends CoursesDAOBase {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        $resultRows = $conn->Execute($sql, [$name]);
+        $resultRows = $conn->GetAll($sql, [$name]);
         $finalResult = [];
 
         foreach ($resultRows as $row) {
@@ -58,7 +58,7 @@ class CoursesDAO extends CoursesDAOBase {
             ORDER BY
                 start_time;";
 
-        $rs = $conn->Execute($sql, [$alias]);
+        $rs = $conn->GetAll($sql, [$alias]);
 
         $ar = [];
         foreach ($rs as $row) {
@@ -84,7 +84,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        $rs = $conn->Execute($sql, $identity_id);
+        $rs = $conn->GetAll($sql, [$identity_id]);
         $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
@@ -128,7 +128,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) pr
                 ON pr.identity_id = i.identity_id';
 
-        $rs = $conn->Execute($sql, [$group_id, $course_id]);
+        $rs = $conn->GetAll($sql, [$group_id, $course_id]);
         $progress = [];
         foreach ($rs as $row) {
             $username = $row['username'];
@@ -186,7 +186,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ON a.assignment_id = pr.assignment_id
                 where a.course_id = ?';
 
-        $rs = $conn->Execute($sql, [$course_id, $identity_id, $course_id]);
+        $rs = $conn->GetAll($sql, [$course_id, $identity_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {
@@ -242,12 +242,12 @@ class CoursesDAO extends CoursesDAOBase {
             $identity_id,
             Authorization::ADMIN_ROLE,
             $identity_id,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
@@ -280,12 +280,12 @@ class CoursesDAO extends CoursesDAOBase {
                 ?, ?';
         $params = [
             $user_id,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {

@@ -9,17 +9,16 @@ and rating based on bayesian averages.
 import argparse
 import calendar
 import collections
-import configparser
 import datetime
-import getpass
 import json
 import operator
 import logging
-import os
 import warnings
 
-import MySQLdb
 import MySQLdb.constants.ER
+
+import lib.db
+import lib.logs
 
 CONFIDENCE = 10
 MIN_POINTS = 10
@@ -321,37 +320,6 @@ def aggregate_feedback(dbconn):
                                        global_difficulty_average)
 
 
-def mysql_connect(args):
-    '''Connects to MySQL with the arguments provided.
-
-    Returns a MySQLdb connection.
-    '''
-
-    host = args.host
-    user = args.user
-    password = args.password
-    if user is None and os.path.isfile(args.mysql_config_file):
-        config = configparser.ConfigParser()
-        config.read(args.mysql_config_file)
-        # Puppet quotes some configuration entries.
-        host = config['client']['host'].strip("'")
-        user = config['client']['user'].strip("'")
-        password = config['client']['password'].strip("'")
-    if password is None:
-        password = getpass.getpass()
-
-    assert user is not None, 'Missing --user parameter'
-    assert host is not None, 'Missing --host parameter'
-    assert password is not None, 'Missing --password parameter'
-
-    return MySQLdb.connect(
-        host=host,
-        user=user,
-        passwd=password,
-        db=args.database
-    )
-
-
 def get_last_friday():
     '''Returns datetime object corresponding to last Friday.
     '''
@@ -444,32 +412,14 @@ def main():
     parser = argparse.ArgumentParser(
         description='Aggregate user feedback.')
 
-    parser.add_argument('--mysql-config-file',
-                        default=os.path.join(os.getenv('HOME') or '.',
-                                             '.my.cnf'),
-                        help='.my.cnf file that stores credentials')
-    parser.add_argument('--quiet', '-q', action='store_true',
-                        help='Disables logging')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                        help='Enables verbose logging')
-    parser.add_argument('--logfile', type=str, default=None,
-                        help='Enables logging to a file')
-    parser.add_argument('--host', type=str, help='MySQL host',
-                        default='localhost')
-    parser.add_argument('--user', type=str, help='MySQL username')
-    parser.add_argument('--password', type=str, help='MySQL password')
-    parser.add_argument('--database', type=str, help='MySQL database',
-                        default='omegaup')
+    lib.db.configure_parser(parser)
+    lib.logs.configure_parser(parser)
 
     args = parser.parse_args()
-    logging.basicConfig(filename=args.logfile,
-                        format='%%(asctime)s:%s:%%(message)s' % parser.prog,
-                        level=(logging.DEBUG if args.verbose else
-                               logging.INFO if not args.quiet else
-                               logging.ERROR))
+    lib.logs.init(parser.prog, args)
 
     logging.info('Started')
-    dbconn = mysql_connect(args)
+    dbconn = lib.db.connect(args)
     warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
         try:

@@ -30,7 +30,7 @@ class LanguagesDAO extends LanguagesDAOBase {
 
         global $conn;
         $row = $conn->GetRow($sql, [$name]);
-        if (count($row) == 0) {
+        if (empty($row)) {
             return null;
         }
 

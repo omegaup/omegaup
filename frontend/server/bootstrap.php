@@ -130,66 +130,66 @@ require_once('libs/Time.php');
 require_once('libs/Validators.php');
 
 Logger::configure([
-        'rootLogger' => [
-            'appenders' => ['default'],
-            'level' => OMEGAUP_LOG_LEVEL
+    'rootLogger' => [
+        'appenders' => ['default'],
+        'level' => OMEGAUP_LOG_LEVEL,
+    ],
+    'loggers' => [
+        'csp' => [
+            'appenders' => ['csp'],
+            'additivity' => false,
         ],
-        'loggers' => [
-            'csp' => [
-                'appenders' => ['csp'],
-                'additivity' => false,
+        'jserror' => [
+            'appenders' => ['jserror'],
+            'additivity' => false,
+        ],
+    ],
+    'appenders' => [
+        'default' => [
+            'class' => 'LoggerAppenderFile',
+            'layout' => [
+                'class' => 'LoggerLayoutPattern',
+                'params' => [
+                    'conversionPattern' => (
+                        '%date [%level]: ' .
+                        Request::requestId() .
+                        ' %server{REQUEST_URI} %message (%F:%L) %newline'
+                    ),
+                ],
             ],
-            'jserror' => [
-                'appenders' => ['jserror'],
-                'additivity' => false,
+            'params' => [
+                'file' => OMEGAUP_LOG_FILE,
+                'append' => true,
             ],
         ],
-        'appenders' => [
-            'default' => [
-                'class' => 'LoggerAppenderFile',
-                'layout' => [
-                    'class' => 'LoggerLayoutPattern',
-                    'params' => [
-                        'conversionPattern' => (
-                            '%date [%level]: ' .
-                            Request::requestId() .
-                            ' %server{REQUEST_URI} %message (%F:%L) %newline'
-                        ),
-                    ]
-                ],
+        'csp' => [
+            'class' => 'LoggerAppenderFile',
+            'layout' => [
+                'class' => 'LoggerLayoutPattern',
                 'params' => [
-                    'file' => OMEGAUP_LOG_FILE,
-                    'append' => true
-                ]
-            ],
-            'csp' => [
-                'class' => 'LoggerAppenderFile',
-                'layout' => [
-                    'class' => 'LoggerLayoutPattern',
-                    'params' => [
-                        'conversionPattern' => '%date: %message %newline',
-                    ],
-                ],
-                'params' => [
-                    'file' => OMEGAUP_CSP_LOG_FILE,
-                    'append' => true,
+                    'conversionPattern' => '%date: %message %newline',
                 ],
             ],
-            'jserror' => [
-                'class' => 'LoggerAppenderFile',
-                'layout' => [
-                    'class' => 'LoggerLayoutPattern',
-                    'params' => [
-                        'conversionPattern' => '%date: %message %newline',
-                    ],
-                ],
+            'params' => [
+                'file' => OMEGAUP_CSP_LOG_FILE,
+                'append' => true,
+            ],
+        ],
+        'jserror' => [
+            'class' => 'LoggerAppenderFile',
+            'layout' => [
+                'class' => 'LoggerLayoutPattern',
                 'params' => [
-                    'file' => OMEGAUP_JSERROR_LOG_FILE,
-                    'append' => true,
+                    'conversionPattern' => '%date: %message %newline',
                 ],
-            ]
-        ]
-    ]);
+            ],
+            'params' => [
+                'file' => OMEGAUP_JSERROR_LOG_FILE,
+                'append' => true,
+            ],
+        ],
+    ],
+]);
 $log = Logger::getLogger('bootstrap');
 
 require_once('libs/third_party/adodb/adodb.inc.php');
@@ -201,23 +201,22 @@ $conn = null;
 try {
     $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
     $conn->debug = OMEGAUP_DB_DEBUG;
+    array_push($conn->optionFlags, [MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true]);
     $conn->SetFetchMode(ADODB_FETCH_ASSOC);
     $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
 } catch (Exception $databaseConectionException) {
     $log->error($databaseConectionException);
 
-    if (!$conn) {
-        /**
-         * Dispatch missing parameters
-         * */
-        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+    /**
+     * Dispatch missing parameters
+     * */
+    header('HTTP/1.1 500 INTERNAL SERVER ERROR');
 
-        die(json_encode([
-                    'status' => 'error',
-                    'error' => 'Conection to the database has failed.',
-                    'errorcode' => 1
-                ]));
-    }
+    die(json_encode([
+        'status' => 'error',
+        'error' => 'Conection to the database has failed.',
+        'errorcode' => 1,
+    ]));
 }
 $conn->SetCharSet('utf8');
 $conn->EXECUTE('SET NAMES \'utf8\';');

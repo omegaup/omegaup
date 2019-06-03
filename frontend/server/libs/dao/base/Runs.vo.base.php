@@ -27,10 +27,10 @@ class Runs extends VO {
             return;
         }
         if (isset($data['run_id'])) {
-            $this->run_id = $data['run_id'];
+            $this->run_id = (int)$data['run_id'];
         }
         if (isset($data['submission_id'])) {
-            $this->submission_id = $data['submission_id'];
+            $this->submission_id = (int)$data['submission_id'];
         }
         if (isset($data['version'])) {
             $this->version = $data['version'];
@@ -42,19 +42,19 @@ class Runs extends VO {
             $this->verdict = $data['verdict'];
         }
         if (isset($data['runtime'])) {
-            $this->runtime = $data['runtime'];
+            $this->runtime = (int)$data['runtime'];
         }
         if (isset($data['penalty'])) {
-            $this->penalty = $data['penalty'];
+            $this->penalty = (int)$data['penalty'];
         }
         if (isset($data['memory'])) {
-            $this->memory = $data['memory'];
+            $this->memory = (int)$data['memory'];
         }
         if (isset($data['score'])) {
-            $this->score = $data['score'];
+            $this->score = (float)$data['score'];
         }
         if (isset($data['contest_score'])) {
-            $this->contest_score = $data['contest_score'];
+            $this->contest_score = (float)$data['contest_score'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
@@ -68,11 +68,11 @@ class Runs extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

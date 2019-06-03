@@ -27,7 +27,7 @@ class Badges extends VO {
             return;
         }
         if (isset($data['badge_id'])) {
-            $this->badge_id = $data['badge_id'];
+            $this->badge_id = (int)$data['badge_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];
@@ -47,11 +47,11 @@ class Badges extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

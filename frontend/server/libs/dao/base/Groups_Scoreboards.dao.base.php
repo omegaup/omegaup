@@ -50,12 +50,12 @@ abstract class GroupsScoreboardsDAOBase {
     final public static function update(GroupsScoreboards $Groups_Scoreboards) {
         $sql = 'UPDATE `Groups_Scoreboards` SET `group_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_scoreboard_id` = ?;';
         $params = [
-            $Groups_Scoreboards->group_id,
+            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
             $Groups_Scoreboards->create_time,
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,
             $Groups_Scoreboards->description,
-            $Groups_Scoreboards->group_scoreboard_id,
+            is_null($Groups_Scoreboards->group_scoreboard_id) ? null : (int)$Groups_Scoreboards->group_scoreboard_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,11 +78,11 @@ abstract class GroupsScoreboardsDAOBase {
         $sql = 'SELECT `Groups_Scoreboards`.`group_scoreboard_id`, `Groups_Scoreboards`.`group_id`, `Groups_Scoreboards`.`create_time`, `Groups_Scoreboards`.`alias`, `Groups_Scoreboards`.`name`, `Groups_Scoreboards`.`description` FROM Groups_Scoreboards WHERE (group_scoreboard_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new GroupsScoreboards($rs);
+        return new GroupsScoreboards($row);
     }
 
     /**
@@ -133,14 +133,13 @@ abstract class GroupsScoreboardsDAOBase {
         $sql = 'SELECT `Groups_Scoreboards`.`group_scoreboard_id`, `Groups_Scoreboards`.`group_id`, `Groups_Scoreboards`.`create_time`, `Groups_Scoreboards`.`alias`, `Groups_Scoreboards`.`name`, `Groups_Scoreboards`.`description` from Groups_Scoreboards';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new GroupsScoreboards($row);
         }
         return $allData;
@@ -162,7 +161,7 @@ abstract class GroupsScoreboardsDAOBase {
         }
         $sql = 'INSERT INTO Groups_Scoreboards (`group_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            $Groups_Scoreboards->group_id,
+            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
             $Groups_Scoreboards->create_time,
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,

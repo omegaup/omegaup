@@ -26,11 +26,11 @@ class ClarificationController extends Controller {
      * @throws NotFoundException
      */
     private static function validateCreate(Request $r) {
-        Validators::isStringNonEmpty($r['contest_alias'], 'contest_alias');
-        Validators::isStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::isStringNonEmpty($r['username'], 'username', false);
-        Validators::isStringNonEmpty($r['message'], 'message');
-        Validators::isStringOfMaxLength($r['message'], 'message', 200);
+        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['username'], 'username', false);
+        Validators::validateStringNonEmpty($r['message'], 'message');
+        Validators::validateStringOfLengthInRange($r['message'], 'message', null, 200);
 
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
@@ -68,8 +68,6 @@ class ClarificationController extends Controller {
         // Validate request
         self::validateCreate($r);
 
-        $response = [];
-
         $time = Time::get();
         $receiver_id = $r['identity'] ? $r['identity']->identity_id : null;
         $r['clarification'] = new Clarifications([
@@ -94,10 +92,10 @@ class ClarificationController extends Controller {
         $r['user'] = $r['current_user'];
         self::clarificationUpdated($r, $time);
 
-        $response['clarification_id'] = $r['clarification']->clarification_id;
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'clarification_id' => $r['clarification']->clarification_id,
+        ];
     }
 
     /**
@@ -109,7 +107,7 @@ class ClarificationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDetails(Request $r) {
-        Validators::isNumber($r['clarification_id'], 'clarification_id');
+        $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists
         try {
@@ -161,10 +159,10 @@ class ClarificationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateUpdate(Request $r) {
-        Validators::isNumber($r['clarification_id'], 'clarificaion_id');
-        Validators::isStringNonEmpty($r['answer'], 'answer', false /* not required */);
-        Validators::isInEnum($r['public'], 'public', ['0', '1'], false /* not required */);
-        Validators::isStringNonEmpty($r['message'], 'message', false /* not required */);
+        $r->ensureInt('clarification_id');
+        $r->ensureBool('public', false /* not required */);
+        Validators::validateStringNonEmpty($r['answer'], 'answer', false /* not required */);
+        Validators::validateStringNonEmpty($r['message'], 'message', false /* not required */);
 
         // Check that clarification exists
         try {

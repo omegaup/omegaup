@@ -1,5 +1,8 @@
 <?php
 
+require_once 'libs/FileHandler.php';
+require_once 'libs/ProblemArtifacts.php';
+
 /**
  * Class to abstract interactions with omegaup-gitserver.
  */
@@ -122,7 +125,7 @@ class ProblemDeployer {
                 }
             }
         }
-        $this->generateLibinteractiveTemplates();
+        $this->generateLibinteractiveTemplates($this->publishedCommit);
     }
 
     /**
@@ -133,11 +136,11 @@ class ProblemDeployer {
      *
      * @return void
      */
-    private function generateLibinteractiveTemplates() {
-        if (is_null($this->publishedCommit)) {
+    public function generateLibinteractiveTemplates(?string $publishedCommit) : void {
+        if (is_null($publishedCommit)) {
             return;
         }
-        $problemArtifacts = new ProblemArtifacts($this->alias, $this->publishedCommit);
+        $problemArtifacts = new ProblemArtifacts($this->alias, $publishedCommit);
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
             JSON_OBJECT_AS_ARRAY
@@ -168,13 +171,13 @@ class ProblemDeployer {
                     $problemArtifacts->get("examples/{$filename}.in")
                 );
             }
-            $target = TEMPLATES_PATH . "/{$this->alias}/{$this->publishedCommit}";
+            $target = TEMPLATES_PATH . "/{$this->alias}/{$publishedCommit}";
             @mkdir($target, 0755, true);
             $args = ['/usr/bin/java', '-Xmx64M', '-jar',
                 '/usr/share/java/libinteractive.jar', 'generate-all', $idlPath,
                 '--package-directory', $target, '--package-prefix',
                 "{$this->alias}_", '--shift-time-for-zip'];
-            return $this->executeRaw($args, $target);
+            $this->executeRaw($args, $target);
         } catch (Exception $e) {
             throw new InvalidParameterException(
                 'problemDeployerLibinteractiveValidationError',
@@ -237,7 +240,7 @@ class ProblemDeployer {
         return $this->updatedStatementLanguages;
     }
 
-    private function executeRaw(array $args, string $cwd) {
+    private function executeRaw(array $args, string $cwd) : array {
         $descriptorspec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],

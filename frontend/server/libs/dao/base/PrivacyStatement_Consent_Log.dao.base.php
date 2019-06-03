@@ -50,10 +50,10 @@ abstract class PrivacyStatementConsentLogDAOBase {
     final public static function update(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
         $sql = 'UPDATE `PrivacyStatement_Consent_Log` SET `identity_id` = ?, `privacystatement_id` = ?, `timestamp` = ? WHERE `privacystatement_consent_id` = ?;';
         $params = [
-            $PrivacyStatement_Consent_Log->identity_id,
-            $PrivacyStatement_Consent_Log->privacystatement_id,
+            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
+            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
             $PrivacyStatement_Consent_Log->timestamp,
-            $PrivacyStatement_Consent_Log->privacystatement_consent_id,
+            is_null($PrivacyStatement_Consent_Log->privacystatement_consent_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -76,11 +76,11 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` FROM PrivacyStatement_Consent_Log WHERE (privacystatement_consent_id = ?) LIMIT 1;';
         $params = [$privacystatement_consent_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new PrivacyStatementConsentLog($rs);
+        return new PrivacyStatementConsentLog($row);
     }
 
     /**
@@ -131,14 +131,13 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` from PrivacyStatement_Consent_Log';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new PrivacyStatementConsentLog($row);
         }
         return $allData;
@@ -160,8 +159,8 @@ abstract class PrivacyStatementConsentLogDAOBase {
         }
         $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?);';
         $params = [
-            $PrivacyStatement_Consent_Log->identity_id,
-            $PrivacyStatement_Consent_Log->privacystatement_id,
+            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
+            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
             $PrivacyStatement_Consent_Log->timestamp,
         ];
         global $conn;

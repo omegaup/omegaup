@@ -27,7 +27,7 @@ class Schools extends VO {
             return;
         }
         if (isset($data['school_id'])) {
-            $this->school_id = $data['school_id'];
+            $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
@@ -44,11 +44,11 @@ class Schools extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

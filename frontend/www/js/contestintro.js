@@ -136,7 +136,7 @@ omegaup.OmegaUp.on('ready', function() {
         $('.contest #time-until-start').text(contest.start_time);
         $('.contest #start-time').text(contest.start_time.long());
         $('.contest #finish-time').text(contest.finish_time.long());
-        if (contest.show_scoreboard_after == 1) {
+        if (contest.show_scoreboard_after) {
           $('.contest #show-scoreboard-after')
               .text(omegaup.T.contestNewFormScoreboardAtContestEnd);
         } else {

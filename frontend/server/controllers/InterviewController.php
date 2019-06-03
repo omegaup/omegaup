@@ -11,10 +11,10 @@ class InterviewController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        Validators::isStringNonEmpty($r['title'], 'title', $is_required);
-        Validators::isStringNonEmpty($r['description'], 'description', false);
-        Validators::isNumberInRange($r['duration'], 'duration', 60, 60 * 5, false);
-        Validators::isValidAlias($r['alias'], 'alias', $is_required);
+        Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
+        Validators::validateStringNonEmpty($r['description'], 'description', false);
+        $r->ensureInt('duration', 60, 60 * 5, false);
+        Validators::validateValidAlias($r['alias'], 'alias', $is_required);
     }
 
     public static function apiCreate(Request $r) {
@@ -61,8 +61,7 @@ class InterviewController extends Controller {
             // Operation failed in the data layer, rollback transaction
             DAO::transRollback();
 
-            // Alias may be duplicated, 1062 error indicates that
-            if (strpos($e->getMessage(), '1062') !== false) {
+            if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             } else {
                 throw new InvalidDatabaseOperationException($e);
@@ -82,7 +81,7 @@ class InterviewController extends Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        Validators::isStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
+        Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
         $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
 
         foreach ($usersToAdd as $addThisUser) {
@@ -96,8 +95,8 @@ class InterviewController extends Controller {
     }
 
     private static function addUserInternal($r) {
-        Validators::isStringNonEmpty($r['interview_alias'], 'interview_alias');
-        Validators::isStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+        Validators::validateStringNonEmpty($r['interview_alias'], 'interview_alias');
+        Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
         // Does the interview exist ?
         try {

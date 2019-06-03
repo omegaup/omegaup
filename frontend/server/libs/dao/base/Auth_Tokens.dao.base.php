@@ -50,8 +50,8 @@ abstract class AuthTokensDAOBase {
     final public static function update(AuthTokens $Auth_Tokens) {
         $sql = 'UPDATE `Auth_Tokens` SET `user_id` = ?, `identity_id` = ?, `create_time` = ? WHERE `token` = ?;';
         $params = [
-            $Auth_Tokens->user_id,
-            $Auth_Tokens->identity_id,
+            is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
+            is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->create_time,
             $Auth_Tokens->token,
         ];
@@ -76,11 +76,11 @@ abstract class AuthTokensDAOBase {
         $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` FROM Auth_Tokens WHERE (token = ?) LIMIT 1;';
         $params = [$token];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new AuthTokens($rs);
+        return new AuthTokens($row);
     }
 
     /**
@@ -131,14 +131,13 @@ abstract class AuthTokensDAOBase {
         $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` from Auth_Tokens';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new AuthTokens($row);
         }
         return $allData;
@@ -160,8 +159,8 @@ abstract class AuthTokensDAOBase {
         }
         $sql = 'INSERT INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
         $params = [
-            $Auth_Tokens->user_id,
-            $Auth_Tokens->identity_id,
+            is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
+            is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->token,
             $Auth_Tokens->create_time,
         ];

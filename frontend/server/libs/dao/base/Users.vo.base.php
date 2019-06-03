@@ -27,7 +27,7 @@ class Users extends VO {
             return;
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['username'])) {
             $this->username = $data['username'];
@@ -39,10 +39,10 @@ class Users extends VO {
             $this->password = $data['password'];
         }
         if (isset($data['main_email_id'])) {
-            $this->main_email_id = $data['main_email_id'];
+            $this->main_email_id = (int)$data['main_email_id'];
         }
         if (isset($data['main_identity_id'])) {
-            $this->main_identity_id = $data['main_identity_id'];
+            $this->main_identity_id = (int)$data['main_identity_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];
@@ -54,13 +54,13 @@ class Users extends VO {
             $this->state_id = $data['state_id'];
         }
         if (isset($data['school_id'])) {
-            $this->school_id = $data['school_id'];
+            $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = $data['scholar_degree'];
         }
         if (isset($data['language_id'])) {
-            $this->language_id = $data['language_id'];
+            $this->language_id = (int)$data['language_id'];
         }
         if (isset($data['graduation_date'])) {
             $this->graduation_date = $data['graduation_date'];
@@ -72,7 +72,7 @@ class Users extends VO {
             $this->gender = $data['gender'];
         }
         if (isset($data['verified'])) {
-            $this->verified = $data['verified'];
+            $this->verified = $data['verified'] == '1';
         }
         if (isset($data['verification_id'])) {
             $this->verification_id = $data['verification_id'];
@@ -84,13 +84,13 @@ class Users extends VO {
             $this->reset_sent_at = $data['reset_sent_at'];
         }
         if (isset($data['hide_problem_tags'])) {
-            $this->hide_problem_tags = $data['hide_problem_tags'];
+            $this->hide_problem_tags = $data['hide_problem_tags'] == '1';
         }
         if (isset($data['in_mailing_list'])) {
-            $this->in_mailing_list = $data['in_mailing_list'];
+            $this->in_mailing_list = $data['in_mailing_list'] == '1';
         }
         if (isset($data['is_private'])) {
-            $this->is_private = $data['is_private'];
+            $this->is_private = $data['is_private'] == '1';
         }
         if (isset($data['preferred_language'])) {
             $this->preferred_language = $data['preferred_language'];
@@ -101,11 +101,11 @@ class Users extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

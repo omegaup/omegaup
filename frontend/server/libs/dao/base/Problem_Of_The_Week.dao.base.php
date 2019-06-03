@@ -50,10 +50,10 @@ abstract class ProblemOfTheWeekDAOBase {
     final public static function update(ProblemOfTheWeek $Problem_Of_The_Week) {
         $sql = 'UPDATE `Problem_Of_The_Week` SET `problem_id` = ?, `time` = ?, `difficulty` = ? WHERE `problem_of_the_week_id` = ?;';
         $params = [
-            $Problem_Of_The_Week->problem_id,
+            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
-            $Problem_Of_The_Week->problem_of_the_week_id,
+            is_null($Problem_Of_The_Week->problem_of_the_week_id) ? null : (int)$Problem_Of_The_Week->problem_of_the_week_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -76,11 +76,11 @@ abstract class ProblemOfTheWeekDAOBase {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` FROM Problem_Of_The_Week WHERE (problem_of_the_week_id = ?) LIMIT 1;';
         $params = [$problem_of_the_week_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new ProblemOfTheWeek($rs);
+        return new ProblemOfTheWeek($row);
     }
 
     /**
@@ -131,14 +131,13 @@ abstract class ProblemOfTheWeekDAOBase {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` from Problem_Of_The_Week';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new ProblemOfTheWeek($row);
         }
         return $allData;
@@ -160,7 +159,7 @@ abstract class ProblemOfTheWeekDAOBase {
         }
         $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
         $params = [
-            $Problem_Of_The_Week->problem_id,
+            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
         ];

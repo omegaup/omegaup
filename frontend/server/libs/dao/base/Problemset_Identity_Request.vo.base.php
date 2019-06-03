@@ -27,10 +27,10 @@ class ProblemsetIdentityRequest extends VO {
             return;
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['request_time'])) {
             $this->request_time = $data['request_time'];
@@ -39,7 +39,7 @@ class ProblemsetIdentityRequest extends VO {
             $this->last_update = $data['last_update'];
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'];
+            $this->accepted = $data['accepted'] == '1';
         }
         if (isset($data['extra_note'])) {
             $this->extra_note = $data['extra_note'];
@@ -50,11 +50,11 @@ class ProblemsetIdentityRequest extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['request_time', 'last_update']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

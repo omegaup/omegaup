@@ -25,7 +25,7 @@ class I18nLinter(linters.Linter):
     _FAIL = git_tools.COLORS.FAIL
     _NORMAL = git_tools.COLORS.NORMAL
     _HEADER = git_tools.COLORS.HEADER
-    _LANGS = ['en', 'es', 'pt', 'pseudo']
+    _LANGS = ['en', 'es', 'pt']
 
     def __init__(self, options=None):
         super().__init__()
@@ -105,9 +105,6 @@ class I18nLinter(linters.Linter):
         missing_items_lang = set()
         for key, values in strings.items():
             missing_languages = languages.difference(list(values.keys()))
-            if 'pseudo' in missing_languages:
-                missing_languages.remove('pseudo')
-
             if missing_languages:
                 print('%s%s%s' % (self._HEADER, key, self._NORMAL),
                       file=sys.stderr)
@@ -146,7 +143,7 @@ class I18nLinter(linters.Linter):
     def _generate_new_contents(self, strings, contents_callback):
         new_contents = {}
         original_contents = {}
-        for language in self._LANGS:
+        for language in self._LANGS + ['pseudo']:
             self._generate_content_entry(new_contents, original_contents,
                                          path='%s/%s.lang' % (
                                              self._TEMPLATES_PATH,
@@ -168,13 +165,6 @@ class I18nLinter(linters.Linter):
                                          new_content=self._generate_json(
                                              language, strings),
                                          contents_callback=contents_callback)
-
-        self._generate_content_entry(new_contents, original_contents,
-                                     path='%s/pseudo.lang' % (
-                                         self._TEMPLATES_PATH),
-                                     new_content=self._generate_sorted(
-                                         'pseudo', strings),
-                                     contents_callback=contents_callback)
 
         return new_contents, original_contents
 

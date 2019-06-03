@@ -209,9 +209,6 @@ export default {
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
 
-    assignmentScoreboardEvents:
-        _call('/api/course/assignmentScoreboardEvents/'),
-
     clone: _call('/api/course/clone/'),
 
     create: _call('/api/course/create/'),
@@ -368,6 +365,8 @@ export default {
   },
 
   Identity: {
+    changePassword: _call('/api/identity/changePassword/'),
+
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
@@ -589,6 +588,8 @@ export default {
     removeRole: _call('/api/user/removerole/'),
 
     stats: _call('/api/user/stats/'),
+
+    selectCoderOfTheMonth: _call('/api/user/selectCoderOfTheMonth/'),
 
     update: _call('/api/user/update/'),
 

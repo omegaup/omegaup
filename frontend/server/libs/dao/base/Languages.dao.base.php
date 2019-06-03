@@ -52,7 +52,7 @@ abstract class LanguagesDAOBase {
         $params = [
             $Languages->name,
             $Languages->country_id,
-            $Languages->language_id,
+            is_null($Languages->language_id) ? null : (int)$Languages->language_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,11 +75,11 @@ abstract class LanguagesDAOBase {
         $sql = 'SELECT `Languages`.`language_id`, `Languages`.`name`, `Languages`.`country_id` FROM Languages WHERE (language_id = ?) LIMIT 1;';
         $params = [$language_id];
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = $conn->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new Languages($rs);
+        return new Languages($row);
     }
 
     /**
@@ -130,14 +130,13 @@ abstract class LanguagesDAOBase {
         $sql = 'SELECT `Languages`.`language_id`, `Languages`.`name`, `Languages`.`country_id` from Languages';
         global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
+        foreach ($conn->GetAll($sql) as $row) {
             $allData[] = new Languages($row);
         }
         return $allData;

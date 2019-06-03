@@ -505,34 +505,33 @@ let UI = {
       return tag.match(whitelist) || tag.match(imageWhitelist);
     });
 
+    // These two functions are adapted from Markdown.Converter.js. They are
+    // needed to support images with some special characters in their name.
+    function escapeCharacters(text, charsToEscape, afterBackslash) {
+      // First we have to escape the escape characters so that
+      // we can build a character class out of them
+      const regexString = `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
+
+      if (afterBackslash) {
+        regexString = `\\\\${regexString}`;
+      }
+
+      const regex = new RegExp(regexString, 'g');
+      return text.replace(/~/g, '~T')
+          .replace(/\$/g, '~D')
+          .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`)
+    }
+    function unescapeCharacters(text) {
+      //
+      // Swap back in all the special characters we've hidden.
+      //
+      return text.replace(/~E(\d+)E/g, function(wholeMatch, m1) {
+                   const charCodeToReplace = parseInt(m1);
+                   return String.fromCharCode(charCodeToReplace);
+                 }).replace(/~D/g, '$').replace(/~T/g, '~');
+    }
+
     converter.hooks.chain('postSpanGamut', function(text) {
-      // These two functions are adapted from Markdown.Converter.js. They are
-      // needed to support images with some special characters in their name.
-      function escapeCharacters(text, charsToEscape, afterBackslash) {
-        // First we have to escape the escape characters so that
-        // we can build a character class out of them
-        const regexString =
-            `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
-
-        if (afterBackslash) {
-          regexString = `\\\\${regexString}`;
-        }
-
-        const regex = new RegExp(regexString, 'g');
-        return text.replace(/~/g, '~T')
-            .replace(/\$/g, '~D')
-            .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`)
-      }
-      function unescapeCharacters(text) {
-        //
-        // Swap back in all the special characters we've hidden.
-        //
-        return text.replace(/~E(\d+)E/g, function(wholeMatch, m1) {
-                     const charCodeToReplace = parseInt(m1);
-                     return String.fromCharCode(charCodeToReplace);
-                   }).replace(/~D/g, '$').replace(/~T/g, '~');
-      }
-
       // Templates.
       text = text.replace(
           /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g, function(wholematch, m1) {
@@ -562,13 +561,43 @@ let UI = {
           });
       return text;
     });
+    converter.hooks.chain('preBlockGamut', function(text, blockGamut,
+                                                    spanGamut) {
+      // GitHub-flavored fenced code blocks
+      function fencedCodeBlock(whole, indentation, fence, infoString,
+                               contents) {
+        contents = contents.replace(/&/g, '&amp;');
+        contents = contents.replace(/</g, '&lt;');
+        contents = contents.replace(/>/g, '&gt;');
+        if (indentation != '') {
+          let lines = [];
+          let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+          for (let line of contents.split('\n')) {
+            lines.push(line.replace(stripPrefix, ''));
+          }
+          contents = lines.join('\n');
+        }
+        let className = '';
+        infoString = infoString.trim();
+        if (infoString != '') {
+          className = ` class="language-${infoString.split(/\s+/)[0]}"`;
+        }
+        return `<pre><code${className}>${contents}</code></pre>`;
+      }
+      text = text.replace(/^( {0,3})(`{3,})([^`\n]*)\n(.*?\n|) {0,3}\2`* *$/gsm,
+                          fencedCodeBlock);
+      return text.replace(
+          /^( {0,3})((?:~T){3,})(?!~)([^\n]*)\n(.*?\n|) {0,3}\2(?:~T)* *$/gsm,
+          fencedCodeBlock);
+    });
     converter.hooks.chain('preBlockGamut', function(text, blockGamut) {
       // Sample I/O table.
+      let settings = converter._settings || options.settings || {cases: {}};
       return text.replace(
-          /^( {0,3}\|\| *input *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
+          /^( {0,3}\|\| *(?:input|examplefile) *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
           function(whole, inner) {
-            var matches =
-                inner.split(/ {0,3}\|\| *(input|output|description) *\n/);
+            var matches = inner.split(
+                / {0,3}\|\| *(examplefile|input|output|description) *\n/);
             var result = '';
             var description_column = false;
             for (var i = 1; i < matches.length; i += 2) {
@@ -578,10 +607,10 @@ let UI = {
               }
             }
             result += '<thead><tr>';
-            result += '<th>Entrada</th>';
-            result += '<th>Salida</th>';
+            result += `<th>${T.wordsInput}</th>`;
+            result += `<th>${T.wordsOutput}</th>`;
             if (description_column) {
-              result += '<th>Descripción</th>';
+              result += `<th>${T.wordsDescription}</th>`;
             }
             result += '</tr></thead>';
             var first_row = true;
@@ -592,7 +621,7 @@ let UI = {
                 result += '<td>' + blockGamut(matches[i + 1]) + '</td>';
                 columns++;
               } else {
-                if (matches[i] == 'input') {
+                if (matches[i] == 'input' || matches[i] == 'examplefile') {
                   if (!first_row) {
                     while (columns < (description_column ? 3 : 2)) {
                       result += '<td></td>';
@@ -604,9 +633,26 @@ let UI = {
                   result += '<tr>';
                   columns = 0;
                 }
-                result += '<td><pre>' + matches[i + 1].replace(/\s+$/, '') +
-                          '</pre></td>';
-                columns++;
+
+                if (matches[i] == 'examplefile') {
+                  let exampleFilename = matches[i + 1].trim();
+                  let exampleFile = {
+                    'in': `{{examples/${exampleFilename}.in}}`,
+                    out: `{{examples/${exampleFilename}.out}}`,
+                  };
+                  if (settings.cases.hasOwnProperty(exampleFilename)) {
+                    exampleFile = settings.cases[exampleFilename];
+                  }
+                  result +=
+                      `<td><pre>${exampleFile['in'].replace(/\s+$/, '')}</pre></td>`;
+                  result +=
+                      `<td><pre>${exampleFile.out.replace(/\s+$/, '')}</pre></td>`;
+                  columns += 2;
+                } else {
+                  result +=
+                      `<td><pre>${matches[i + 1].replace(/\s+$/, '')}</pre></td>`;
+                  columns++;
+                }
               }
             }
             while (columns < (description_column ? 3 : 2)) {
@@ -701,12 +747,14 @@ let UI = {
               });
         });
 
-    converter.makeHtmlWithImages = function(markdown, imageMapping) {
+    converter.makeHtmlWithImages = function(markdown, imageMapping, settings) {
       try {
         converter._imageMapping = imageMapping;
+        converter._settings = settings;
         return converter.makeHtml(markdown);
       } finally {
         delete converter._imageMapping;
+        delete converter._settings;
       }
     };
 

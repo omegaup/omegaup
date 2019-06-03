@@ -10,7 +10,7 @@ try {
 }
 
 if (isset($course)
-    && (count($course['student']) != 0 || count($course['admin']) != 0)) {
+    && (!empty($course['student']) || !empty($course['admin']))) {
     die(header('Location: /course'));
 } else {
     $smarty->display('../templates/schools.intro.tpl');
