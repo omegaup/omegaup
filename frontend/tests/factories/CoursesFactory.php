@@ -82,8 +82,10 @@ class CoursesFactory {
         $course = CoursesDAO::getByAlias($courseAlias);
         $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         return [
+            'course' => $course,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
+            'problemset_id' => $assignment->problemset_id,
             'assignment' => $assignment,
             'request' => $r,
             'admin' => $admin
@@ -133,16 +135,18 @@ class CoursesFactory {
      * @param Array $courseData [from self::createCourse]
      * @param Users $student
      */
-    public static function addStudentToCourse($courseData, $student = null) {
+    public static function addStudentToCourse($courseData, $student = null, ?ScopedLoginToken $login = null) {
         if (is_null($student)) {
             $student = UserFactory::createUser();
         }
 
         $course = CoursesDAO::getByAlias($courseData['course_alias']);
         $group = GroupsDAO::getByPK($course->group_id);
-        $adminLogin = OmegaupTestCase::login($courseData['admin']);
+        if (is_null($login)) {
+            $login = OmegaupTestCase::login($courseData['admin']);
+        }
         GroupController::apiAddUser(new Request([
-            'auth_token' => $adminLogin->auth_token,
+            'auth_token' => $login->auth_token,
             'usernameOrEmail' => $student->username,
             'group_alias' => $group->alias
         ]));

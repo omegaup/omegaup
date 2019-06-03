@@ -16,7 +16,7 @@ class InterviewsDAO extends InterviewsDAOBase {
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
             return null;
         }
 
@@ -42,7 +42,7 @@ class InterviewsDAO extends InterviewsDAOBase {
         $params = [$user_id, $user_id, Authorization::ADMIN_ROLE];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $result = [];
 
@@ -75,7 +75,7 @@ class InterviewsDAO extends InterviewsDAOBase {
 
         global $conn;
         $interviews = $conn->GetRow($sql, [$problemset_id]);
-        if (count($interviews) == 0) {
+        if (empty($interviews)) {
             return null;
         }
 

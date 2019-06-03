@@ -38,13 +38,13 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
                 ON
                     i.identity_id = sl.identity_id
                 INNER JOIN
-                    Runs r
+                    Submissions s
                 ON
-                    r.run_id = sl.run_id
+                    s.submission_id = sl.submission_id
                 INNER JOIN
                     Problems p
                 ON
-                    p.problem_id = r.problem_id
+                    p.problem_id = s.problem_id
                 WHERE
                     sl.problemset_id = ?
                 ORDER BY
@@ -68,13 +68,13 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
                 ON
                     i.identity_id = sl.identity_id
                 INNER JOIN
-                    Runs r
+                    Submissions s
                 ON
-                    r.run_id = sl.run_id
+                    s.submission_id = sl.submission_id
                 INNER JOIN
                     Problems p
                 ON
-                    p.problem_id = r.problem_id
+                    p.problem_id = s.problem_id
                 INNER JOIN
                     Assignments a
                 ON

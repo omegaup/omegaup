@@ -27,22 +27,13 @@ class Runs extends VO {
             return;
         }
         if (isset($data['run_id'])) {
-            $this->run_id = $data['run_id'];
+            $this->run_id = (int)$data['run_id'];
         }
-        if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+        if (isset($data['submission_id'])) {
+            $this->submission_id = (int)$data['submission_id'];
         }
-        if (isset($data['problem_id'])) {
-            $this->problem_id = $data['problem_id'];
-        }
-        if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
-        }
-        if (isset($data['guid'])) {
-            $this->guid = $data['guid'];
-        }
-        if (isset($data['language'])) {
-            $this->language = $data['language'];
+        if (isset($data['version'])) {
+            $this->version = $data['version'];
         }
         if (isset($data['status'])) {
             $this->status = $data['status'];
@@ -51,31 +42,25 @@ class Runs extends VO {
             $this->verdict = $data['verdict'];
         }
         if (isset($data['runtime'])) {
-            $this->runtime = $data['runtime'];
+            $this->runtime = (int)$data['runtime'];
         }
         if (isset($data['penalty'])) {
-            $this->penalty = $data['penalty'];
+            $this->penalty = (int)$data['penalty'];
         }
         if (isset($data['memory'])) {
-            $this->memory = $data['memory'];
+            $this->memory = (int)$data['memory'];
         }
         if (isset($data['score'])) {
-            $this->score = $data['score'];
+            $this->score = (float)$data['score'];
         }
         if (isset($data['contest_score'])) {
-            $this->contest_score = $data['contest_score'];
+            $this->contest_score = (float)$data['contest_score'];
         }
         if (isset($data['time'])) {
             $this->time = $data['time'];
         }
-        if (isset($data['submit_delay'])) {
-            $this->submit_delay = $data['submit_delay'];
-        }
         if (isset($data['judged_by'])) {
             $this->judged_by = $data['judged_by'];
-        }
-        if (isset($data['type'])) {
-            $this->type = $data['type'];
         }
     }
 
@@ -83,11 +68,11 @@ class Runs extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**
@@ -100,39 +85,18 @@ class Runs extends VO {
     public $run_id;
 
     /**
-      * Identidad del usuario
+      * El envío
       * @access public
       * @var int(11)
       */
-    public $identity_id;
+    public $submission_id;
 
     /**
-      *  [Campo no documentado]
+      * El hash SHA1 del árbol de la rama private.
       * @access public
-      * @var int(11)
+      * @var char(40)
       */
-    public $problem_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(32)
-      */
-    public $guid;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
-      */
-    public $language;
+    public $version;
 
     /**
       *  [Campo no documentado]
@@ -193,21 +157,7 @@ class Runs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $submit_delay;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var char(32)
       */
     public $judged_by;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('normal','test','disqualified')
-      */
-    public $type;
 }

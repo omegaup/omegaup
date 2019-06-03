@@ -112,7 +112,7 @@ def annotate(f):
         driver.annotate('begin %s' % funcstring)
         try:
             return f(driver, *args, **kwargs)
-        except:
+        except:  # noqa: bare-except
             driver.annotate(
                 ''.join(traceback.format_exception(*sys.exc_info())).rstrip(),
                 level=logging.ERROR)
@@ -175,3 +175,26 @@ def is_message_whitelisted(message, message_whitelist):
             return True
 
     return False
+
+
+def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
+    '''Verifies chart is correctly generated'''
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//tr/td/a[contains(@href, "%s")][text()="%s"]' %
+                 (alias, scoreboard)))).click()
+    assert (url in driver.browser.current_url), driver.browser.current_url
+
+    series = 'highcharts-series-group'
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//*[name()="svg"]/*[contains(@class, "%s")]' % (series))))
+
+    scoreboard_events = driver.browser.find_elements_by_xpath(
+        '//*[name()="svg"]/*[contains(@class, "%s")]/*[contains(@class'
+        ', "highcharts-tracker")]' % series)
+    assert len(scoreboard_events) == num_elements, len(scoreboard_events)

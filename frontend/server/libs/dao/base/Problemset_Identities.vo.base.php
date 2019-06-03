@@ -27,28 +27,28 @@ class ProblemsetIdentities extends VO {
             return;
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = $data['problemset_id'];
+            $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['access_time'])) {
             $this->access_time = $data['access_time'];
         }
         if (isset($data['score'])) {
-            $this->score = $data['score'];
+            $this->score = (int)$data['score'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = (int)$data['time'];
         }
         if (isset($data['share_user_information'])) {
-            $this->share_user_information = $data['share_user_information'];
+            $this->share_user_information = $data['share_user_information'] == '1';
         }
         if (isset($data['privacystatement_consent_id'])) {
-            $this->privacystatement_consent_id = $data['privacystatement_consent_id'];
+            $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
         }
         if (isset($data['is_invited'])) {
-            $this->is_invited = $data['is_invited'];
+            $this->is_invited = $data['is_invited'] == '1';
         }
     }
 
@@ -56,11 +56,11 @@ class ProblemsetIdentities extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

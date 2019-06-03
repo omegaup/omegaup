@@ -4,6 +4,6 @@
 
   var statement = document.querySelector('div.statement');
   statement.innerHTML = markdownConverter.makeHtmlWithImages(
-      payload.statement.markdown, payload.statement.images);
+      payload.statement.markdown, payload.statement.images, payload.settings);
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
 })();

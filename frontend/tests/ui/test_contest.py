@@ -8,7 +8,7 @@ import urllib
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-from ui import util
+from ui import util  # pylint: disable=no-name-in-module
 
 
 @util.no_javascript_errors()
@@ -96,6 +96,32 @@ def test_user_ranking_contest(driver):
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'nav-contests'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-contests"]'
+                      '//a[@href = "/contest/mine/"]')))).click()
+
+        url = '/arena/%s/scoreboard' % (contest_alias)
+        util.check_scoreboard_events(driver, contest_alias, url,
+                                     num_elements=1, scoreboard='Public')
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'nav-contests'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-contests"]'
+                      '//a[@href = "/contest/mine/"]')))).click()
+        util.check_scoreboard_events(driver, contest_alias, url,
+                                     num_elements=1, scoreboard='Admin')
+
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
@@ -170,10 +196,11 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                     (By.XPATH,
                      '//a[starts-with(@href, "%s")]' % contest_url))).click()
 
-        # User checks the score, it should be 0 because broadcaster is turned
+        # User checks the score, it might be be 0 because broadcaster is turned
         # off in Travis, and the only way to get updated results while we are
         # on the same page is going back to the page.
-        check_ranking(driver, problem, driver.user_username, score='0')
+        check_ranking(driver, problem, driver.user_username,
+                      scores=['0', '100'])
 
         # User enters to problem in contest, the ranking for this problem
         # should update.
@@ -188,11 +215,11 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
             '//a[contains(@href, "problems/%s")]' % problem).click()
 
         # Now, user checks the score again, ranking should be 100
-        check_ranking(driver, problem, driver.user_username, score='100')
+        check_ranking(driver, problem, driver.user_username, scores=['100'])
 
 
 @util.annotate
-def check_ranking(driver, problem, user, *, score):
+def check_ranking(driver, problem, user, *, scores):
     ''' Check ranking for a contest'''
 
     driver.wait.until(
@@ -206,7 +233,7 @@ def check_ranking(driver, problem, user, *, score):
         '//tr[@class = "%s"]/td[contains(@class, "%s")]/div[@class = "points"]'
         % (user, problem))
 
-    assert ranking_problem.text == score, ranking_problem
+    assert ranking_problem.text in scores, ranking_problem
 
 
 @util.annotate

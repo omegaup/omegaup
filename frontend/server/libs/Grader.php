@@ -1,117 +1,84 @@
 <?php
 
 class Grader {
-    private $log;
+    private static $instance = null;
 
-    public function __construct() {
-        $this->log = Logger::getLogger('Grader');
+    const REQUEST_MODE_JSON = 1;
+    const REQUEST_MODE_RAW = 2;
+    const REQUEST_MODE_PASSTHRU = 3;
+
+    public static function getInstance() {
+        if (is_null(self::$instance)) {
+            self::$instance = new Grader();
+        }
+        return self::$instance;
+    }
+
+    public static function setInstanceForTesting($instance) {
+        self::$instance = $instance;
     }
 
     /**
-     * Initializes curl with JSON headers to call grader
+     * Call /run/new/ endpoint with run id as parameter.
      *
-     * @return curl_session
+     * @param Runs   $run    the run to be graded.
+     * @param string $source the source of the submission.
+     *
      * @throws Exception
      */
-    private function initGraderCall($url) {
-        // Initialize CURL
-        $curl = curl_init();
-
-        if ($curl === false) {
-            throw new Exception('curl_init failed: ' . curl_error($curl));
+    public function grade(Runs $run, string $source) {
+        if (OMEGAUP_GRADER_FAKE) {
+            $submission = SubmissionsDAO::getByPK($run->submission_id);
+            file_put_contents("/tmp/{$submission->guid}", $source);
+            return;
         }
-
-        // Set URL
-        curl_setopt($curl, CURLOPT_URL, $url);
-
-        // Get response from curl_exec() in string
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-        // Set certificate URL
-        curl_setopt($curl, CURLOPT_SSLCERT, OMEGAUP_SSLCERT_URL);
-
-        // Set certifiate to verify peer with
-        curl_setopt($curl, CURLOPT_CAINFO, OMEGAUP_CACERT_URL);
-
-        // Set curl HTTP header
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Accept: application/json', 'Content-Type: application/json']);
-
-        return $curl;
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . "/run/new/{$run->run_id}/",
+            self::REQUEST_MODE_RAW,
+            $source
+        );
     }
 
     /**
-     * Closes curl session
+     * Call /run/grade/ endpoint in rejudge mode.
      *
-     * @param curl_session $curl
-     */
-    private function terminateGraderCall($curl) {
-        // Close curl
-        curl_close($curl);
-    }
-
-    /**
-     * Error checking after curl_exec
+     * @param array $runs  the array of runs to be graded.
+     * @param bool  $debug whether this is a debug-rejudge.
      *
-     * @param curl_session $curl
-     * @param array $content
      * @throws Exception
      */
-    private function executeCurl($curl) {
-        // Execute call
-        $content = curl_exec($curl);
-
-        if ($content === false) {
-            $message = 'curl_exec failed: ' . curl_error($curl) . ' ' . curl_errno($curl);
-            $this->terminateGraderCall($curl);
-            throw new Exception($message);
-        }
-        $this->terminateGraderCall($curl);
-
-        $response_array = json_decode($content, true);
-        if ($response_array === false) {
-            throw new Exception('json_decode failed with: ' . json_last_error() . 'for : ' . $content);
-        } elseif ($response_array['status'] !== 'ok') {
-            throw new Exception('Grader did not return status OK: ' . $content);
-        }
-
-        return $response_array;
-    }
-
-    /**
-     * Call /grade endpoint with run id as parameter
-     *
-     * @param int $runId
-     * @throws Exception
-     */
-    public function Grade($runGuids, $rejudge, $debug) {
+    public function rejudge(array $runs, bool $debug) {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
-        return $this->multiCurlRequest(
-            explode(',', OMEGAUP_GRADER_URL),
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . '/run/grade/',
+            self::REQUEST_MODE_JSON,
             [
-                'id' => $runGuids,
-                'rejudge' => !!$rejudge,
+                'run_ids' => array_map(function (Runs $r) {
+                    return (int)$r->run_id;
+                }, $runs),
+                'rejudge' => true,
                 'debug' => false, // TODO(lhchavez): Reenable with ACLs.
             ]
         );
     }
 
     /**
-     * Call /reload-config endpoint
+     * Call /submission/source/ endpoint with submission guid as parameter
      *
-     * @param array $request
-     * @return string
+     * @param string $guid the submission guid.
+     *
+     * @throws Exception
      */
-    public function reloadConfig($request) {
+    public function getSource(string $guid) {
         if (OMEGAUP_GRADER_FAKE) {
-            return;
+            return file_get_contents("/tmp/{$guid}");
         }
-        $curl = $this->initGraderCall(OMEGAUP_GRADER_RELOAD_CONFIG_URL);
-        // Execute call
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request));
-
-        return $this->executeCurl($curl);
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . "/submission/source/{$guid}/",
+            self::REQUEST_MODE_RAW
+        );
     }
 
     /**
@@ -133,67 +100,149 @@ class Grader {
                 ],
             ];
         }
-        $curl = $this->initGraderCall(OMEGAUP_GRADER_STATUS_URL);
-
-        return $this->executeCurl($curl);
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . '/grader/status/',
+            self::REQUEST_MODE_JSON
+        );
     }
 
-    public function broadcast($contest_alias, $problemset_id, $problem_alias, $message, $public, $username, $user_id = -1, $user_only = false) {
+    public function broadcast(
+        /* string? */ $contestAlias,
+        /* string? */ $problemsetId,
+        /* string? */ $problemAlias,
+        string $message,
+        bool $public,
+        /* string? */ $username,
+        int $userId = -1,
+        bool $userOnly = false
+    ) {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
-        return $this->multiCurlRequest(
-            explode(',', OMEGAUP_GRADER_BROADCAST_URL),
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . '/broadcast/',
+            self::REQUEST_MODE_JSON,
             [
-                'contest' => $contest_alias,
-                'problemset' => $problemset_id,
-                'problem' => $problem_alias,
+                'contest' => $contestAlias,
+                'problemset' => $problemsetId,
+                'problem' => $problemAlias,
                 'message' => $message,
                 'public' => $public,
                 'user' => $username,
                 // TODO(lhchavez): Remove the backendv1-compat fields.
                 'broadcast' => $public,
-                'targetUser' => (int)$user_id,
-                'userOnly' => $user_only,
+                'targetUser' => $userId,
+                'userOnly' => $userOnly,
             ]
         );
     }
 
+    public function getGraderResource(
+        Runs $run,
+        string $filename,
+        bool $passthru = false,
+        bool $missingOk = false
+    ) {
+        if (OMEGAUP_GRADER_FAKE) {
+            return null;
+        }
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . '/run/resource/',
+            $passthru ? self::REQUEST_MODE_PASSTHRU : self::REQUEST_MODE_RAW,
+            [
+                'run_id' => (int)$run->run_id,
+                'filename' => $filename,
+            ],
+            $missingOk
+        );
+    }
+
     /**
-     * Sends a request to multiple URLs. Only returns the data from the first
-     * element in the list.
+     * Sends a request to the grader.
+     *
+     * @param string $url        The URL to request
+     * @param int    $mode       How to return the result.
+     * @param mixed  $postData   Optional POST data. Will convert key-value
+     *                           pair dictionaries into JSON.
+     * @param bool   $missingOk  Return null if the resource is not found.
+     *
+     * @return mixed The result of the request.
      */
-    private function multiCurlRequest($urls, $postFields) {
-        $result = null;
-        $primary = true;
-        foreach ($urls as $url) {
-            $curl = $this->initGraderCall($url);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($postFields));
+    private function curlRequest(
+        string $url,
+        int $mode,
+        $postData = null,
+        bool $missingOk = false
+    ) {
+        $curl = false;
 
-            if (!$primary) {
-                // For secondary requests, set a really short timeout.
-                curl_setopt($curl, CURLOPT_TIMEOUT, 1);
+        try {
+            $curl = curl_init();
+            if ($curl === false) {
+                throw new Exception('curl_init failed: ' . curl_error($curl));
             }
 
-            try {
-                $r = $this->executeCurl($curl);
-                if ($primary) {
-                    $result = $r;
-                }
-            } catch (Exception $e) {
-                if ($primary) {
-                    $result = $e;
-                } else {
-                    // Only log non-primary requests: primary requests will be
-                    // logged in some catch block upstream.
-                    $this->log->error("Error sending request to $url: " . $e);
-                }
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => ($mode != self::REQUEST_MODE_PASSTHRU),
+                    CURLOPT_FOLLOWLOCATION => 1,
+                    CURLOPT_SSLCERT => OMEGAUP_SSLCERT_URL,
+                    CURLOPT_CAINFO => OMEGAUP_CACERT_URL,
+                ]
+            );
+            if (!is_null($postData)) {
+                curl_setopt(
+                    $curl,
+                    CURLOPT_POSTFIELDS,
+                    is_string($postData) ? $postData : json_encode($postData)
+                );
             }
-            $primary = false;
+            if ($mode == self::REQUEST_MODE_JSON) {
+                curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                    'Accept: application/json',
+                    'Content-Type: application/json',
+                ]);
+            } else {
+                curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                    'Accept: application/octet-stream',
+                    'Content-Type: application/json',
+                ]);
+            }
+
+            // Execute call
+            $response = curl_exec($curl);
+            $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+            if ($response === false || $httpStatus != 200) {
+                if ($httpStatus == 404 && $missingOk) {
+                    return null;
+                }
+                $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
+                    curl_errno($curl) . " HTTP {$httpStatus}";
+                throw new Exception($message);
+            }
+
+            if ($mode == self::REQUEST_MODE_JSON) {
+                $responseArray = json_decode($response, true);
+                if ($responseArray === false) {
+                    throw new Exception('json_decode failed with: ' . json_last_error() . 'for : ' . $response);
+                } elseif ($responseArray['status'] !== 'ok') {
+                    throw new Exception('Grader did not return status OK: ' . $response);
+                }
+
+                return $responseArray;
+            } else {
+                return $response;
+            }
+        } catch (Exception $e) {
+            Logger::getLogger('Grader')->error("curl failed for {$url}: {$e}");
+            throw $e;
+        } finally {
+            if (is_resource($curl)) {
+                curl_close($curl);
+            }
         }
-        if (is_a($result, 'Exception')) {
-            throw $result;
-        }
-        return $result;
     }
 }

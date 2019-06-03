@@ -18,26 +18,32 @@ require_once('base/Problems.vo.base.php');
   *
   */
 class ProblemsDAO extends ProblemsDAOBase {
-    final private static function addTagFilter($identity_type, $identity_id, $tag, &$sql, &$args) {
-        $add_identity_id = false;
-        if ($identity_type === IDENTITY_ADMIN) {
-            $public_check = '';
-        } elseif ($identity_type === IDENTITY_NORMAL && !is_null($identity_id)) {
-            $public_check = '(ptp.public OR id.identity_id = ?) AND ';
-            $add_identity_id = true;
-        } else {
-            $public_check = 'ptp.public AND ';
-        }
+    final private static function addTagFilter(
+        string $identityType,
+        ?int $identityId,
+        $tag,
+        bool $requireAllTags,
+        string &$sql,
+        array &$args,
+        array &$clauses
+    ) : void {
         if (is_string($tag)) {
-            $sql .= ' INNER JOIN Problems_Tags ptp ON ptp.problem_id = p.problem_id';
-            $sql .= ' INNER JOIN Tags t ON ptp.tag_id = t.tag_id';
-            $sql .= " WHERE t.name = ? AND $public_check";
-            $args[] = $tag;
-            if ($add_identity_id) {
-                $args[] = $identity_id;
-            }
+            $sql .= '
+                INNER JOIN
+                    Problems_Tags ptp ON ptp.problem_id = p.problem_id
+                INNER JOIN
+                    Tags t ON ptp.tag_id = t.tag_id
+            ';
+            array_push(
+                $clauses,
+                [
+                    't.name = ?',
+                    [$tag],
+                ]
+            );
         } elseif (is_array($tag)) {
-            // Look for problems matching ALL tags.
+            // Look for problems matching ALL tags or not
+            $havingClause = $requireAllTags ? 'HAVING (COUNT(pt.tag_id) = ?)' : '';
             $placeholders = array_fill(0, count($tag), '?');
             $placeholders = join(',', $placeholders);
             $sql .= "
@@ -54,65 +60,116 @@ class ProblemsDAO extends ProblemsDAOBase {
                     )
                     GROUP BY
                         pt.problem_id
-                    HAVING
-                        (COUNT(pt.tag_id) = ?)
-                ) ptp ON ptp.problem_id = p.problem_id WHERE $public_check";
+                    {$havingClause}
+                ) ptp ON ptp.problem_id = p.problem_id";
             $args = array_merge($args, $tag);
-            $args[] = count($tag);
-            if ($add_identity_id) {
-                $args[] = $identity_id;
+            if ($requireAllTags) {
+                $args[] = count($tag);
             }
-        } else {
-            $sql .= ' WHERE';
+        }
+
+        if ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
+            array_push(
+                $clauses,
+                [
+                    '(ptp.public OR id.identity_id = ?)',
+                    [$identityId],
+                ]
+            );
+        } elseif ($identityType !== IDENTITY_ADMIN) {
+            array_push(
+                $clauses,
+                [
+                    'ptp.public',
+                    [],
+                ]
+            );
         }
     }
 
     final public static function byIdentityType(
-        $identity_type,
-        $language,
-        $order,
-        $mode,
-        $offset,
-        $rowcount,
-        $query,
-        $identity_id,
-        $user_id,
+        string $identityType,
+        ?string $language,
+        string $orderBy,
+        string $order,
+        int $offset,
+        int $rowcount,
+        ?string $query,
+        ?int $identityId,
+        ?int $userId,
         $tag,
-        $min_visibility,
-        &$total
+        int $minVisibility,
+        bool $requireAllTags,
+        $programmingLanguages,
+        $difficultyRange,
+        int &$total
     ) {
         global $conn;
 
         // Just in case.
-        if ($mode !== 'asc' && $mode !== 'desc') {
-            $mode = 'desc';
+        if ($order !== 'asc' && $order !== 'desc') {
+            $order = 'desc';
         }
 
-        $language_join = '';
+        $languageJoin = '';
         if (!is_null($language)) {
-            $language_join = '
+            $languageJoin = '
                 INNER JOIN
                     Problems_Languages ON Problems_Languages.problem_id = p.problem_id
                 INNER JOIN
                     Languages ON Problems_Languages.language_id = Languages.language_id
-                    AND Languages.name = \'' . $language . '\'';
+                    AND Languages.name = \'' . $language . '\'
+            ';
         }
 
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
-        $collation = ($order === 'title') ? 'COLLATE utf8_bin' : '';
-
+        $collation = ($orderBy === 'title') ? 'COLLATE utf8_bin' : '';
         $select = '';
         $sql= '';
         $args = [];
 
-        if ($identity_type === IDENTITY_ADMIN) {
-            $args = [$identity_id];
+        // Clauses is an array of 2-tuples that contains a chunk of SQL and the
+        // arguments that are needed for that chunk.
+        $clauses = [];
+        if (is_array($programmingLanguages)) {
+            foreach ($programmingLanguages as $programmingLanguage) {
+                array_push(
+                    $clauses,
+                    [
+                        'FIND_IN_SET(?, p.languages) > 0',
+                        [$programmingLanguage],
+                    ]
+                );
+            }
+        }
+        if (is_array($difficultyRange) && count($difficultyRange) == 2) {
+            array_push(
+                $clauses,
+                [
+                    'p.difficulty >= ? AND p.difficulty <= ?',
+                    $difficultyRange,
+                ]
+            );
+        }
+        if (!is_null($query)) {
+            array_push(
+                $clauses,
+                [
+                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
+                    [$query, $query],
+                ]
+            );
+        }
+
+        if ($identityType === IDENTITY_ADMIN) {
+            $args = [$identityId];
             $select = '
                 SELECT
                     ROUND(100 / LOG2(GREATEST(accepted, 1) + 1), 2)   AS points,
                     accepted / GREATEST(1, submissions)     AS ratio,
                     ROUND(100 * COALESCE(ps.score, 0))      AS score,
-                    p.*';
+                    p.*
+            ';
             $sql = '
                 FROM
                     Problems p
@@ -123,30 +180,31 @@ class ProblemsDAO extends ProblemsDAOBase {
                     FROM
                         Problems
                     INNER JOIN
-                        Runs ON Runs.problem_id = Problems.problem_id
+                        Submissions ON Submissions.problem_id = Problems.problem_id
                     INNER JOIN
-                        Identities ON Identities.identity_id = ? AND Runs.identity_id = Identities.identity_id
+                        Runs ON Runs.run_id = Submissions.current_run_id
+                    INNER JOIN
+                        Identities ON Identities.identity_id = ? AND
+                        Submissions.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
-                    ) ps ON ps.problem_id = p.problem_id' . $language_join;
+                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin;
 
-            self::addTagFilter($identity_type, $identity_id, $tag, $sql, $args);
-            if (!is_null($query)) {
-                $sql .= " (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%')) ";
-                $args[] = $query;
-                $args[] = $query;
-            } else {
-                // Finish the WHERE clause opened by addTagFilter
-                $sql .= ' p.visibility > ?';
-                $args[] = ProblemController::VISIBILITY_DELETED;
-            }
-        } elseif ($identity_type === IDENTITY_NORMAL && !is_null($identity_id)) {
+            array_push(
+                $clauses,
+                [
+                    'p.visibility > ?',
+                    [ProblemController::VISIBILITY_DELETED],
+                ]
+            );
+        } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
             $select = '
                 SELECT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                     p.accepted / GREATEST(1, p.submissions)     AS ratio,
                     ROUND(100 * COALESCE(ps.score, 0), 2)   AS score,
-                    p.*';
+                    p.*
+            ';
             $sql = '
                 FROM
                     Problems p
@@ -157,16 +215,18 @@ class ProblemsDAO extends ProblemsDAOBase {
                 LEFT JOIN (
                     SELECT
                         pi.problem_id,
-                        r.identity_id,
+                        s.identity_id,
                         MAX(r.score) AS score
                     FROM
                         Problems pi
                     INNER JOIN
-                        Runs r ON r.problem_id = pi.problem_id
+                        Submissions s ON s.problem_id = pi.problem_id
                     INNER JOIN
-                        Identities i ON i.identity_id = ? AND r.identity_id = i.identity_id
+                        Runs r ON r.run_id = s.current_run_id
+                    INNER JOIN
+                        Identities i ON i.identity_id = ? AND s.identity_id = i.identity_id
                     GROUP BY
-                        pi.problem_id
+                        pi.problem_id, s.identity_id
                 ) ps ON ps.problem_id = p.problem_id
                 LEFT JOIN
                     User_Roles ur ON ur.user_id = ? AND p.acl_id = ur.acl_id AND ur.role_id = ?
@@ -180,45 +240,76 @@ class ProblemsDAO extends ProblemsDAOBase {
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gi.group_id
                     WHERE gi.identity_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id' . $language_join;
-            $args[] = $identity_id;
-            $args[] = $user_id;
+                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin;
+            $args[] = $identityId;
+            $args[] = $userId;
             $args[] = Authorization::ADMIN_ROLE;
-            $args[] = $identity_id;
-            $args[] = $identity_id;
+            $args[] = $identityId;
+            $args[] = $identityId;
             $args[] = Authorization::ADMIN_ROLE;
 
-            self::addTagFilter($identity_type, $identity_id, $tag, $sql, $args);
-            $sql .= '
-                (p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL) AND p.visibility > ?';
-            $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
-            $args[] = $identity_id;
-            $args[] = ProblemController::VISIBILITY_DELETED;
-
-            if (!is_null($query)) {
-                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
-                $args[] = $query;
-                $args[] = $query;
-            }
-        } elseif ($identity_type === IDENTITY_ANONYMOUS) {
+            array_push(
+                $clauses,
+                [
+                    '(p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL)',
+                    [
+                        max(ProblemController::VISIBILITY_PUBLIC, $minVisibility),
+                        $identityId,
+                    ],
+                ]
+            );
+            array_push(
+                $clauses,
+                [
+                    'p.visibility > ?',
+                    [ProblemController::VISIBILITY_DELETED],
+                ]
+            );
+        } elseif ($identityType === IDENTITY_ANONYMOUS) {
             $select = '
                     SELECT
                         0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
-                        accepted / GREATEST(1, p.submissions)   AS ratio,
-                        p.*';
+                        accepted / GREATEST(1, p.submissions)  AS ratio,
+                        p.* ';
             $sql = '
                     FROM
-                        Problems p' . $language_join;
+                        Problems p ' . $languageJoin;
 
-            self::addTagFilter($identity_type, $identity_id, $tag, $sql, $args);
-            $sql .= ' p.visibility >= ? ';
-            $args[] = max(ProblemController::VISIBILITY_PUBLIC, $min_visibility);
+            array_push(
+                $clauses,
+                [
+                    'p.visibility >= ?',
+                    [max(ProblemController::VISIBILITY_PUBLIC, $minVisibility)],
+                ]
+            );
+        }
 
-            if (!is_null($query)) {
-                $sql .= " AND (p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))";
-                $args[] = $query;
-                $args[] = $query;
+        if (!empty($tag)) {
+            self::addTagFilter(
+                $identityType,
+                $identityId,
+                $tag,
+                $requireAllTags,
+                $sql,
+                $args,
+                $clauses
+            );
+        }
+
+        // Finally flatten all WHERE clauses, and add a 'WHERE' if applicable.
+        if (!empty($clauses)) {
+            $sql .= "\nWHERE\n" . implode(
+                ' AND ',
+                array_map(
+                    function ($clause) {
+                        return $clause[0];
+                    },
+                    $clauses
+                )
+            );
+            foreach ($clauses as $clause) {
+                $args = array_merge($args, $clause[1]);
             }
         }
 
@@ -229,23 +320,28 @@ class ProblemsDAO extends ProblemsDAOBase {
             $offset = 0;
         }
 
-        if ($order == 'problem_id') {
-            $sql .= " ORDER BY p.problem_id $collation $mode";
-        } elseif ($order == 'points' && $mode == 'desc') {
-            $sql .= ' ORDER BY `points` DESC, `accepted` ASC, `submissions` DESC';
+        if ($orderBy == 'problem_id') {
+            $sql .= " ORDER BY p.problem_id {$collation} {$order} ";
+        } elseif ($orderBy == 'points' && $order == 'desc') {
+            $sql .= ' ORDER BY `points` DESC, `accepted` ASC, `submissions` DESC ';
         } else {
-            $sql .= " ORDER BY `$order` $collation $mode";
+            $sql .= " ORDER BY `{$orderBy}` {$collation} {$order} ";
         }
-        $sql .= ' LIMIT ?, ?';
-        $args[] = $offset;
-        $args[] = $rowcount;
-
-        $result = $conn->Execute("$select $sql", $args);
+        $sql .= ' LIMIT ?, ? ';
+        $args[] = (int)$offset;
+        $args[] = (int)$rowcount;
+        $result = $conn->GetAll("{$select} {$sql};", $args);
+        if (is_null($result)) {
+            return [];
+        }
 
         // Only these fields (plus score, points and ratio) will be returned.
-        $filters = ['title','quality', 'difficulty', 'alias', 'visibility', 'quality_histogram', 'difficulty_histogram'];
+        $filters = [
+            'title','quality', 'difficulty', 'alias', 'visibility',
+            'quality_histogram', 'difficulty_histogram',
+        ];
         $problems = [];
-        $hiddenTags = $identity_type !== IDENTITY_ANONYMOUS ? UsersDao::getHideTags($identity_id) : false;
+        $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? UsersDao::getHideTags($identityId) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);
@@ -264,11 +360,11 @@ class ProblemsDAO extends ProblemsDAOBase {
 
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
-        $params = [  $alias ];
+        $params = [$alias];
 
         global $conn;
         $rs = $conn->GetRow($sql, $params);
-        if (count($rs)==0) {
+        if (empty($rs)) {
                 return null;
         }
 
@@ -284,7 +380,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
 
         $sql = "SELECT * FROM Problems WHERE (alias LIKE '%$quoted%' OR title LIKE '%$quoted%') LIMIT 0,10;";
-        $rs = $conn->Execute($sql);
+        $rs = $conn->GetAll($sql);
 
         $result = [];
 
@@ -312,7 +408,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
         $sql .= ';';
 
-        $rs = $conn->Execute($sql, $problem->problem_id);
+        $rs = $conn->GetAll($sql, [$problem->problem_id]);
         $result = [];
 
         foreach ($rs as $r) {
@@ -326,27 +422,37 @@ class ProblemsDAO extends ProblemsDAOBase {
         global $conn;
 
         $sql = 'SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Problemset_Problems pp USING(problemset_id) WHERE pp.problem_id = ?';
-        return $conn->GetOne($sql, $id);
+        return $conn->GetOne($sql, [$id]);
     }
 
-    final public static function getProblemsSolved($identity_id) {
+    final public static function getProblemsSolved($identityId) {
         global $conn;
 
-        $sql = "SELECT DISTINCT `Problems`.* FROM `Problems` INNER JOIN `Runs` ON `Problems`.problem_id = `Runs`.problem_id WHERE `Runs`.verdict = 'AC' and `Runs`.type = 'normal' and `Runs`.identity_id = ? ORDER BY `Problems`.problem_id DESC";
-        $val = [$identity_id];
-        $rs = $conn->Execute($sql, $val);
+        $sql = '
+            SELECT DISTINCT
+                p.*
+            FROM
+                Problems p
+            INNER JOIN
+                Submissions s ON s.problem_id = p.problem_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            WHERE
+                r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+            ORDER BY
+                p.problem_id DESC;
+        ';
+        $val = [$identityId];
 
         $result = [];
-
-        foreach ($rs as $r) {
-            array_push($result, new Problems($r));
+        foreach ($conn->GetAll($sql, $val) as $row) {
+            array_push($result, new Problems($row));
         }
-
         return $result;
     }
 
     final public static function getProblemsUnsolvedByIdentity(
-        $identity_id
+        $identityId
     ) {
         $sql = "
             SELECT DISTINCT
@@ -354,30 +460,28 @@ class ProblemsDAO extends ProblemsDAOBase {
             FROM
                 Identities i
             INNER JOIN
-                Runs r
-            ON
-                r.identity_id = i.identity_id
+                Submissions s ON s.identity_id = i.identity_id
             INNER JOIN
-                Problems p
-            ON
-                p.problem_id = r.problem_id
+                Problems p ON p.problem_id = s.problem_id
             WHERE
                 i.identity_id = ?
             AND
                 (SELECT
                     COUNT(*)
                  FROM
-                    Runs r2
+                    Submissions ss
+                 INNER JOIN
+                    Runs r ON r.run_id = ss.current_run_id
                  WHERE
-                    r2.identity_id = i.identity_id AND
-                    r2.problem_id = p.problem_id AND
-                    r2.verdict = 'AC'
+                    ss.identity_id = i.identity_id AND
+                    ss.problem_id = p.problem_id AND
+                    r.verdict = 'AC'
                 ) = 0";
 
-        $params = [$identity_id];
+        $params = [$identityId];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $r) {
@@ -410,18 +514,22 @@ class ProblemsDAO extends ProblemsDAOBase {
                     p.problem_id,
                     p.alias,
                     p.title,
-                    r.identity_id
+                    s.identity_id
                 FROM
+                    Submissions s
+                INNER JOIN
                     Runs r
+                ON
+                    r.run_id = s.current_run_id
                 INNER JOIN
                     Problems p
                 ON
-                    p.problem_id = r.problem_id
+                    p.problem_id = s.problem_id
                 WHERE
                     r.verdict = 'AC'
                     AND p.visibility = ?
                 GROUP BY
-                    p.problem_id, r.identity_id
+                    p.problem_id, s.identity_id
                 ) rp
             ON
                 rp.identity_id = i.identity_id
@@ -457,18 +565,22 @@ class ProblemsDAO extends ProblemsDAOBase {
                     pp.problem_id,
                     pp.alias,
                     pp.title,
-                    r.identity_id,
+                    s.identity_id,
                     MAX(r.score) AS max_score
                 FROM
+                    Submissions s
+                INNER JOIN
                     Runs r
+                ON
+                    r.run_id = s.current_run_id
                 INNER JOIN
                     Problems pp
                 ON
-                    pp.problem_id = r.problem_id
+                    pp.problem_id = s.problem_id
                 WHERE
                     pp.visibility = ?
                 GROUP BY
-                    pp.problem_id, r.identity_id
+                    pp.problem_id, s.identity_id
                 HAVING
                     max_score < 1
                 ) rp
@@ -489,19 +601,28 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $conn->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
     }
 
-    final public static function isProblemSolved(Problems $problem, $identity_id) {
-        $sql = 'SELECT
-            COUNT(r.run_id) as solved
-        FROM
-            Runs AS r
-        WHERE
-            r.problem_id = ? AND r.identity_id = ? AND r.verdict = "AC";';
+    final public static function isProblemSolved(
+        Problems $problem,
+        int $identityId
+    ) : bool {
+        $sql = '
+            SELECT
+                COUNT(r.run_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ? AND s.identity_id = ? AND r.verdict = "AC";
+        ';
 
         global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $identity_id])['solved'] > 0;
+        return $conn->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
 
-    public static function getPrivateCount(Users $user) {
+    public static function getPrivateCount(Users $user) : int {
         $sql = 'SELECT
             COUNT(*) as total
         FROM
@@ -546,7 +667,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         ';
 
         $params = [$problem->problem_id];
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $result = [];
         foreach ($rs as $r) {
@@ -633,12 +754,12 @@ class ProblemsDAO extends ProblemsDAOBase {
             Authorization::ADMIN_ROLE,
             $identity_id,
             ProblemController::VISIBILITY_DELETED,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -673,12 +794,12 @@ class ProblemsDAO extends ProblemsDAOBase {
         $params = [
             $user_id,
             ProblemController::VISIBILITY_DELETED,
-            $offset,
-            $pageSize,
+            (int)$offset,
+            (int)$pageSize,
         ];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -694,12 +815,12 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql = 'SELECT * from Problems where `visibility` > ? ';
         global $conn;
         if (!is_null($order)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . $conn->escape($order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
             $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
         }
-        $rs = $conn->Execute($sql, [ProblemController::VISIBILITY_DELETED]);
+        $rs = $conn->GetAll($sql, [ProblemController::VISIBILITY_DELETED]);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = new Problems($row);
@@ -718,21 +839,23 @@ class ProblemsDAO extends ProblemsDAOBase {
                 Identities i
             WHERE
                 i.identity_id
-            IN (SELECT DISTINCT
-                gi.identity_id
-            FROM
-                Runs r
-            INNER JOIN
-                Groups_Identities gi
-            ON
-                r.identity_id = gi.identity_id
-            WHERE
-                gi.group_id = ?
-                AND r.problem_id = ?)';
+            IN (
+                SELECT DISTINCT
+                    gi.identity_id
+                FROM
+                    Submissions s
+                INNER JOIN
+                    Groups_Identities gi
+                ON
+                    s.identity_id = gi.identity_id
+                WHERE
+                    gi.group_id = ?
+                    AND s.problem_id = ?
+            );';
         $params = [$group_id, $problem_id];
 
         global $conn;
-        $rs = $conn->Execute($sql, $params);
+        $rs = $conn->GetAll($sql, $params);
 
         $identities = [];
         foreach ($rs as $row) {
@@ -764,15 +887,16 @@ class ProblemsDAO extends ProblemsDAOBase {
     public static function hasBeenUsedInCoursesOrContests(Problems $problem) {
         global $conn;
 
-        $sql = 'SELECT
-                    COUNT(1)
-                FROM
-                    `Runs`
-                WHERE
-                    `problemset_id` IS NOT NULL
-                    AND `problem_id` = ?';
-
-        return $conn->GetOne($sql, $problem->problem_id);
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            WHERE
+                s.problemset_id IS NOT NULL
+                AND s.problem_id = ?;
+        ';
+        return $conn->GetOne($sql, [$problem->problem_id]);
     }
 
     final public static function getByContest($contest_id) {
@@ -792,7 +916,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     c.contest_id = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$contest_id]);
+        $rs = $conn->GetAll($sql, [$contest_id]);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -810,7 +934,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                     title = ?;';
 
         global $conn;
-        $rs = $conn->Execute($sql, [$title]);
+        $rs = $conn->GetAll($sql, [$title]);
 
         $problems = [];
         foreach ($rs as $row) {

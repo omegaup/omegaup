@@ -27,13 +27,13 @@ class PrivacyStatementConsentLog extends VO {
             return;
         }
         if (isset($data['privacystatement_consent_id'])) {
-            $this->privacystatement_consent_id = $data['privacystatement_consent_id'];
+            $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = $data['identity_id'];
+            $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['privacystatement_id'])) {
-            $this->privacystatement_id = $data['privacystatement_id'];
+            $this->privacystatement_id = (int)$data['privacystatement_id'];
         }
         if (isset($data['timestamp'])) {
             $this->timestamp = $data['timestamp'];
@@ -44,11 +44,11 @@ class PrivacyStatementConsentLog extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['timestamp']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

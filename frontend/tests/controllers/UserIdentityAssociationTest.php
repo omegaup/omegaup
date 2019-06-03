@@ -153,4 +153,52 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $this->assertEquals($e->getMessage(), 'parameterInvalid');
         }
     }
+
+    /**
+     * Trying to associate two identities of the same group to a certain user account
+     */
+    public function testAssociateDuplicatedIdentitiesOfAGroup() {
+        // Identity creator group member will upload csv file
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $password = Utils::CreateRandomString();
+
+        // Call api using identity creator group member
+        IdentityController::apiBulkCreate(new Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => IdentityFactory::getCsvData('identities.csv', $group['group']->alias, $password),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        // Getting all identity members associated to the group
+        $membersResponse = GroupController::apiMembers(new Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        // Create the user to associate
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        // Trying to associate first identity to the logged user
+        $response = UserController::apiAssociateIdentity(new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $membersResponse['identities'][0]['username'],
+            'password' => $password,
+        ]));
+
+        // Trying to associate second identity to the logged user
+        try {
+            $response = UserController::apiAssociateIdentity(new Request([
+                'auth_token' => $login->auth_token,
+                'username' => $membersResponse['identities'][1]['username'],
+                'password' => $password,
+            ]));
+            $this->fail('Identity should not be associated because user has already another identity of the same group');
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            // Exception expected
+            $this->assertEquals($e->getMessage(), 'identityAlreadyAssociated');
+        }
+    }
 }

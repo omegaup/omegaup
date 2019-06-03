@@ -1,18 +1,10 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle="{#omegaupTitleProblemStats#}"}
 
-<div class="post">
-	<div class="copy">
-		<h1>Estadísticas en vivo</h1>
-		<h2><div id="total-runs"></div> </h2>
-		<div id="verdict-chart"></div>
-		<div id="cases-distribution-chart"></div>
-		<div id="pending-runs-chart"></div>
-	</div>
-</div>
+<div id="problem-stats"></div>
 
 {if isset($smarty.get.problem)}
-<script type="text/javascript" src="{version_hash src="/js/problem.stats.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/js/dist/problem_stats.js"}"></script>
 {/if}
 
 {include file='footer.tpl'}

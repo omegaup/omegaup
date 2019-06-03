@@ -18,67 +18,64 @@ require_once('base/Auth_Tokens.vo.base.php');
  */
 class AuthTokensDAO extends AuthTokensDAOBase {
     public static function getUserByToken($auth_token) {
-        //look for it on the database
         global $conn;
-
-        $sql = 'select u.* from Users u, Auth_Tokens at where at.user_id = u.user_id and at.token = ?;';
-
-        $params = [$auth_token];
-
-        $rs = $conn->GetRow($sql, $params);
-
-        //no matches
-        if (count($rs) == 0) {
+        $sql = 'SELECT
+                    u.*
+                FROM
+                    `Users` u
+                INNER JOIN
+                    `Auth_Tokens` at
+                ON
+                    at.user_id = u.user_id
+                WHERE
+                    at.token = ?;';
+        $rs = $conn->GetRow($sql, [$auth_token]);
+        if (empty($rs)) {
             return null;
         }
-
         return new Users($rs);
     }
 
     public static function getIdentityByToken($auth_token) {
-        //look for it on the database
         global $conn;
         $sql = 'SELECT
-                  i.*
+                    i.*
                 FROM
-                  `Identities` i
+                    `Identities` i
                 INNER JOIN
-                  `Auth_Tokens` at
+                    `Auth_Tokens` at
                 ON
-                  at.identity_id = i.identity_id
+                    at.identity_id = i.identity_id
                 WHERE
-                  at.token = ?;';
-        $params = [$auth_token];
-        $rs = $conn->GetRow($sql, $params);
-        //no matches
-        if (count($rs) == 0) {
+                    at.token = ?;';
+        $rs = $conn->GetRow($sql, [$auth_token]);
+
+        if (empty($rs)) {
             return null;
         }
         return new Identities($rs);
     }
 
     public static function expireAuthTokens($identity_id) {
-        // look for it on the database
         global $conn;
+        $sql = 'DELETE FROM
+                    `Auth_Tokens`
+                WHERE
+                    identity_id = ?;';
+        $conn->Execute($sql, [$identity_id]);
 
-        $sql = 'delete from Auth_Tokens where identity_id = ?;';
-
-        $params = [$identity_id];
-
-        $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
 
     final public static function getByIdentityId($identityId) {
-        $sql = 'SELECT
-                    *
-                FROM
-                    Auth_Tokens
-                WHERE
-                    identity_id = ?;';
-
         global $conn;
-        $rs = $conn->Execute($sql, [$identityId]);
+        $sql = 'SELECT
+                    at.*
+                FROM
+                    `Auth_Tokens` at
+                WHERE
+                    at.identity_id = ?;';
+        $rs = $conn->GetAll($sql, [$identityId]);
 
         $authTokens = [];
         foreach ($rs as $row) {

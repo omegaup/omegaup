@@ -27,13 +27,13 @@ class ContestLog extends VO {
             return;
         }
         if (isset($data['public_contest_id'])) {
-            $this->public_contest_id = $data['public_contest_id'];
+            $this->public_contest_id = (int)$data['public_contest_id'];
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = $data['contest_id'];
+            $this->contest_id = (int)$data['contest_id'];
         }
         if (isset($data['user_id'])) {
-            $this->user_id = $data['user_id'];
+            $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['from_admission_mode'])) {
             $this->from_admission_mode = $data['from_admission_mode'];
@@ -50,11 +50,11 @@ class ContestLog extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime(['time']);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

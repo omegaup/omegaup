@@ -23,6 +23,8 @@ class ProblemsetController extends Controller {
     public static function addProblem(
         $problemset_id,
         Problems $problem,
+        string $commit,
+        string $currentVersion,
         $current_identity_id,
         $points,
         $order_in_contest = 1
@@ -37,6 +39,8 @@ class ProblemsetController extends Controller {
             self::updateProblemsetProblem(new ProblemsetProblems([
                 'problemset_id' => $problemset_id,
                 'problem_id' => $problem->problem_id,
+                'commit' => $commit,
+                'version' => $currentVersion,
                 'points' => $points,
                 'order' => $order_in_contest,
             ]));
@@ -49,20 +53,33 @@ class ProblemsetController extends Controller {
      * When problem is already in the problemset, it must recalculate
      * the contest_score for all the problemset and problem runs
      */
-    public static function updateProblemsetProblem(ProblemsetProblems $updatedProblemsetProblem) {
-        $problem = ProblemsetProblemsDAOBase::getByPK(
+    private static function updateProblemsetProblem(
+        ProblemsetProblems $updatedProblemsetProblem
+    ) {
+        $oldProblemsetProblem = ProblemsetProblemsDAOBase::getByPK(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id
         );
-        ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
-        if (is_null($problem) || $problem->points == $updatedProblemsetProblem->points) {
+        if (is_null($oldProblemsetProblem)) {
+            ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
             return;
+        }
+        ProblemsetProblemsDAOBase::update($updatedProblemsetProblem);
+        if ($oldProblemsetProblem->points == $updatedProblemsetProblem->points &&
+            $oldProblemsetProblem->version == $updatedProblemsetProblem->version
+        ) {
+            return;
+        }
+        if ($oldProblemsetProblem->version != $updatedProblemsetProblem->version) {
+            ProblemsetProblemsDAO::updateProblemsetProblemSubmissions(
+                $updatedProblemsetProblem
+            );
         }
         RunsDAO::recalculateScore(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id,
             $updatedProblemsetProblem->points,
-            $problem->points
+            $oldProblemsetProblem->points
         );
     }
 
@@ -71,7 +88,6 @@ class ProblemsetController extends Controller {
      * @return Array
      */
     public static function apiDetails(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
@@ -105,7 +121,6 @@ class ProblemsetController extends Controller {
      * @return Array
      */
     public static function apiScoreboard(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
@@ -138,19 +153,25 @@ class ProblemsetController extends Controller {
      * @throws NotFoundException
      */
     public static function apiScoreboardEvents(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
         $r = self::wrapRequest($r);
-
-        if ($r['problemset']['type'] != 'Contest') {
-            // Not implemented in courses nor interviews yet
-            return ['events' => []];
+        if ($r['problemset']['type'] == 'Contest') {
+            return ContestController::apiScoreboardEvents(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'contest_alias' => $r['problemset']['contest_alias'],
+                ])
+            );
+        } elseif ($r['problemset']['type'] == 'Assignment') {
+            return CourseController::apiAssignmentScoreboardEvents(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'course_alias' => $r['problemset']['course'],
+                    'assignment_alias' => $r['problemset']['assignment'],
+                ])
+            );
         }
-        return ContestController::apiScoreboardEvents(
-            new Request([
-                'auth_token' => $r['auth_token'],
-                'contest_alias' => $r['problemset']['contest_alias'],
-            ])
-        );
+        // Not implemented in interviews yet
+        return ['events' => []];
     }
 
     /**
@@ -163,7 +184,7 @@ class ProblemsetController extends Controller {
      * @throws NotFoundException
      */
     public static function wrapRequest(Request $r) {
-        Validators::isStringNonEmpty($r['problemset_id'], 'problemset_id');
+        $r->ensureInt('problemset_id');
 
         try {
             $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
@@ -192,5 +213,30 @@ class ProblemsetController extends Controller {
             return $request;
         }
         return $r;
+    }
+
+    /**
+     * Downloads all the runs of the problemset.
+     *
+     * @param $problemsetId integer The problemset ID.
+     * @param $zip ZipStream The object that represents the .zip file.
+     */
+    public static function downloadRuns(int $problemsetId, ZipStream $zip): void {
+        try {
+            $runs = RunsDAO::getByProblemset($problemsetId);
+        } catch (Exception $e) {
+            // Operation failed in the data layer
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        $table = ['guid,user,problem,verdict,points'];
+        foreach ($runs as $run) {
+            $zip->add_file(
+                "runs/{$run['guid']}.{$run['language']}",
+                SubmissionController::getSource($run['guid'])
+            );
+            $table[] = "{$run['guid']},{$run['username']},{$run['alias']},{$run['verdict']},{$run['contest_score']}";
+        }
+        $zip->add_file('summary.csv', implode("\n", $table));
     }
 }

@@ -27,7 +27,7 @@ class Permissions extends VO {
             return;
         }
         if (isset($data['permission_id'])) {
-            $this->permission_id = $data['permission_id'];
+            $this->permission_id = (int)$data['permission_id'];
         }
         if (isset($data['name'])) {
             $this->name = $data['name'];
@@ -41,11 +41,11 @@ class Permissions extends VO {
      * Converts date fields to timestamps
      */
     public function toUnixTime(array $fields = []) {
-        if (count($fields) > 0) {
-            parent::toUnixTime($fields);
-        } else {
+        if (empty($fields)) {
             parent::toUnixTime([]);
+            return;
         }
+        parent::toUnixTime($fields);
     }
 
     /**

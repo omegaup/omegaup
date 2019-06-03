@@ -9,9 +9,12 @@
 # pylint is confused by some of our imports.
 #  E1101 = Module 'x' has no 'y' member
 #
+# pycodestyle will already catch these.
+#  W0702 = No exception type(s) specified.
+#
 # TODOs are useful to locally indicate that something is not (yet) working.
 #  fixme = (warning notes in code comments; message varies).
-disable=I0011,R0903,E1101,fixme
+disable=I0011,R0903,E1101,W0702,fixme
 
 [BASIC]
 

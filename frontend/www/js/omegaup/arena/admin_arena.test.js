@@ -1,5 +1,6 @@
 'use strict';
 
+require('../../dist/commons.js');
 var omegaup = require('../../dist/omegaup.js');
 var Markdown =
     require('../../../third_party/js/pagedown/Markdown.Sanitizer.js');
@@ -17,7 +18,7 @@ describe('omegaup.arena', function() {
       }
       var arena = new omegaup.arena.Arena({contestAlias: 'test'});
       var admin = new omegaup.arena.ArenaAdmin(arena);
-      expect(arena.contestAdmin).toEqual(true);
+      expect(arena.problemsetAdmin).toEqual(true);
     });
   });
 });

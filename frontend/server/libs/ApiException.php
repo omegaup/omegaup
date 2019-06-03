@@ -1,5 +1,7 @@
 <?php
 
+require_once 'libs/Translations.php';
+
 /**
  *   ApiException
  *
@@ -33,7 +35,7 @@ abstract class ApiException extends Exception {
      *
      * @return string
      */
-    public function getHeader() {
+    final public function getHeader() : string {
         return $this->header;
     }
 
@@ -43,7 +45,7 @@ abstract class ApiException extends Exception {
      * @param string $key
      * @param type $value
      */
-    public function addCustomMessageToArray($key, $value) {
+    final public function addCustomMessageToArray($key, $value) : void {
         $this->customMessage[$key] = $value;
     }
 
@@ -51,17 +53,18 @@ abstract class ApiException extends Exception {
      *
      * @return array
      */
-    public function asArray() {
-        $arrayToReturn =  [
-            'status' => 'error',
-            'error' => $this->getErrorMessage(),
-            'errorcode' => $this->code,
-            'header' => $this->header,
-            'cause' => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : null,
-            'trace' => $this->getTraceAsString(),
-        ];
-
-        return array_merge($arrayToReturn, $this->customMessage);
+    final public function asArray() : array {
+        return array_merge(
+            [
+                'status' => 'error',
+                'error' => $this->getErrorMessage(),
+                'errorcode' => $this->code,
+                'header' => $this->header,
+                'cause' => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : null,
+                'trace' => $this->getTraceAsString(),
+            ],
+            $this->customMessage
+        );
     }
 
     /**
@@ -69,28 +72,30 @@ abstract class ApiException extends Exception {
      *
      * @return array
      */
-    public function asResponseArray() {
-        $arrayToReturn =  [
-            'status' => 'error',
-            'error' => $this->getErrorMessage(),
-            'errorname' => $this->message,
-            'errorcode' => $this->code,
-            'header' => $this->header
-        ];
-
-        return array_merge($arrayToReturn, $this->customMessage);
+    final public function asResponseArray() : array {
+        return array_merge(
+            [
+                'status' => 'error',
+                'error' => $this->getErrorMessage(),
+                'errorname' => $this->message,
+                'errorcode' => $this->code,
+                'header' => $this->header,
+            ],
+            $this->customMessage
+        );
     }
 
-    protected function getErrorMessage() {
-        // obtener el texto final (ya localizado) de smarty.
-        global $smarty;
-        $localizedText = $smarty->getConfigVars($this->message);
-        if (empty($localizedText)) {
+    protected function getErrorMessage() : string {
+        if (is_null($this->message)) {
+            self::$log->error('null error message');
+            return '{untranslated:(null)}';
+        }
+        $localizedText = Translations::getInstance()->get($this->message);
+        if (is_null($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
-        } else {
-            return $localizedText;
         }
+        return $localizedText;
     }
 }
 
@@ -115,10 +120,8 @@ class InvalidParameterException extends ApiException {
         $this->additional_parameters = $additional_parameters;
     }
 
-    protected function getErrorMessage() {
-        // Obtener el texto final (ya localizado) de smarty.
-        global $smarty;
-        $localizedText = $smarty->getConfigVars($this->message);
+    protected function getErrorMessage() : string {
+        $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
@@ -335,8 +338,21 @@ class ProblemDeploymentFailedException extends ApiException {
      * @param string $message
      * @param Exception $previous
      */
-    public function __construct($message = 'problemDeployerFailed', Exception $previous = null) {
-        parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412, $previous);
+    public function __construct($message = 'problemDeployerFailed', $context = null) {
+        parent::__construct($message, 'HTTP/1.1 412 PRECONDITION FAILED', 412);
+        $this->context = $context;
+    }
+
+    protected function getErrorMessage() : string {
+        $localizedText = Translations::getInstance()->get($this->message);
+        if (empty($localizedText)) {
+            self::$log->error("Untranslated error message: {$this->message}");
+            return "{untranslated:{$this->message}}";
+        }
+        if (!empty($this->context)) {
+            $localizedText .= ": {$this->context}";
+        }
+        return $localizedText;
     }
 }
 
@@ -344,8 +360,8 @@ class ProblemDeploymentFailedException extends ApiException {
  * LoginDisabledException
  */
 class LoginDisabledException extends ApiException {
-    public function __construct(ApiException $previous = null) {
-        parent::__construct('loginDisabled', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    public function __construct($message, ApiException $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }
 

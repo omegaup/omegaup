@@ -1,4 +1,9 @@
-omegaup.OmegaUp.on('ready', function() {
+import Vue from 'vue';
+import problem_Versions from '../components/problem/Versions.vue';
+import {OmegaUp, T, API} from '../omegaup.js';
+import UI from '../ui.js';
+
+OmegaUp.on('ready', function() {
   var chosenLanguage = null;
   var statements = {};
 
@@ -19,15 +24,14 @@ omegaup.OmegaUp.on('ready', function() {
 
   // Add typeaheads
   refreshProblemAdmins();
-  omegaup.UI.userTypeahead($('#username-admin'));
-  omegaup.UI.typeahead($('#groupalias-admin'), omegaup.API.Group.list,
-                       function(event, val) {
-                         $(event.target).attr('data-alias', val.value);
-                       });
+  UI.userTypeahead($('#username-admin'));
+  UI.typeahead($('#groupalias-admin'), API.Group.list, function(event, val) {
+    $(event.target).attr('data-alias', val.value);
+  });
 
   refreshProblemTags();
 
-  omegaup.API.Tag.list({query: ''})
+  API.Tag.list({query: ''})
       .then(function(response) {
         var tags = {};
         $('#problem-tags a')
@@ -46,24 +50,24 @@ omegaup.OmegaUp.on('ready', function() {
         $(document)
             .on('click', '.tag', function(event) {
               var tagname = $(this).html();
-              var public = $('#tag-public').val();
+              var isPublic = $('#tag-public').val();
               $(this).remove();
-              omegaup.API.Problem.addTag({
-                                   problem_alias: problemAlias,
-                                   name: tagname, public: public,
-                                 })
+              API.Problem.addTag({
+                           problem_alias: problemAlias,
+                           name: tagname, 'public': isPublic,
+                         })
                   .then(function(response) {
-                    omegaup.UI.success('Tag successfully added!');
+                    UI.success('Tag successfully added!');
                     $('div.post.footer').show();
 
                     refreshProblemTags();
                   })
-                  .fail(omegaup.UI.apiError);
+                  .fail(UI.apiError);
 
               return false;  // Prevent refresh
             });
       })
-      .fail(omegaup.UI.apiError);
+      .fail(UI.apiError);
 
   $('#tag-name')
       .typeahead(
@@ -72,7 +76,7 @@ omegaup.OmegaUp.on('ready', function() {
             highlight: true,
           },
           {
-            source: omegaup.UI.typeaheadWrapper(omegaup.API.Tag.list),
+            source: UI.typeaheadWrapper(API.Tag.list),
             async: true,
             display: 'name',
           })
@@ -84,16 +88,16 @@ omegaup.OmegaUp.on('ready', function() {
       .on('submit', function() {
         var username = $('#username-admin').val();
 
-        omegaup.API.Problem.addAdmin({
-                             problem_alias: problemAlias,
-                             usernameOrEmail: username,
-                           })
+        API.Problem.addAdmin({
+                     problem_alias: problemAlias,
+                     usernameOrEmail: username,
+                   })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T.adminAdded);
+              UI.success(T.adminAdded);
               $('div.post.footer').show();
               refreshProblemAdmins();
             })
-            .fail(omegaup.UI.apiError);
+            .fail(UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -109,17 +113,17 @@ omegaup.OmegaUp.on('ready', function() {
 
   $('#add-group-admin-form')
       .on('submit', function() {
-        omegaup.API.Problem.addGroupAdmin({
-                             problem_alias: problemAlias,
-                             group: $('#groupalias-admin').attr('data-alias'),
-                           })
+        API.Problem.addGroupAdmin({
+                     problem_alias: problemAlias,
+                     group: $('#groupalias-admin').attr('data-alias'),
+                   })
             .then(function(response) {
-              omegaup.UI.success(omegaup.T.groupAdminAdded);
+              UI.success(T.groupAdminAdded);
               $('div.post.footer').show();
 
               refreshProblemAdmins();
             })
-            .fail(omegaup.UI.apiError);
+            .fail(UI.apiError);
 
         return false;  // Prevent refresh
       });
@@ -127,18 +131,18 @@ omegaup.OmegaUp.on('ready', function() {
   $('#download form')
       .on('submit', function() {
         window.location = '/api/problem/download/problem_alias/' +
-                          omegaup.UI.escape(problemAlias) + '/';
+                          UI.escape(problemAlias) + '/';
         return false;
       });
 
   $('#delete form')
       .on('submit', (function(event) {
             event.preventDefault();
-            omegaup.API.Problem.delete({problem_alias: problemAlias})
+            API.Problem.delete({problem_alias: problemAlias})
                 .then(function(response) {
                   window.location = '/problem/mine/';
                 })
-                .fail(omegaup.UI.apiError);
+                .fail(UI.apiError);
             return false;
           }));
 
@@ -150,37 +154,37 @@ omegaup.OmegaUp.on('ready', function() {
           if (typeof statements[lang].current === 'undefined') continue;
           if (statements[lang].current === statements[lang].original) continue;
           promises.push(new Promise(function(resolve, reject) {
-            omegaup.API.Problem.updateStatement({
-                                 problem_alias: problemAlias,
-                                 statement: statements[lang].current,
-                                 message: $('#markdown-message').val(),
-                                 lang: lang
-                               })
+            API.Problem.updateStatement({
+                         problem_alias: problemAlias,
+                         statement: statements[lang].current,
+                         message: $('#markdown-message').val(),
+                         lang: lang
+                       })
                 .then(function(response) { resolve(response); })
-                .fail(omegaup.T.editFieldRequired);
+                .fail(T.editFieldRequired);
           }));
         }
 
         $('.has-error').removeClass('has-error');
         if ($('#markdown-message').val() == '') {
-          omegaup.UI.error(omegaup.T.editFieldRequired);
+          UI.error(T.editFieldRequired);
           $('#markdown-message-group').addClass('has-error');
           return false;
         }
 
         Promise.all(promises)
             .then(function(results) {
-              omegaup.UI.success(omegaup.T.problemEditUpdatedSuccessfully);
+              UI.success(T.problemEditUpdatedSuccessfully);
               for (var lang in statements) {
                 statements[lang].original = statements[lang].current;
               }
             })
-            .catch(omegaup.UI.apiError);
+            .catch(UI.apiError);
         return false;
       });
 
   function refreshProblemAdmins() {
-    omegaup.API.Problem.admins({problem_alias: problemAlias})
+    API.Problem.admins({problem_alias: problemAlias})
         .then(function(admins) {
           $('#problem-admins').empty();
           // Got the contests, lets populate the dropdown with them
@@ -205,21 +209,21 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .on('click', (function(username) {
                                           return function(e) {
-                                            omegaup.API.Problem
-                                                .removeAdmin({
-                                                  problem_alias: problemAlias,
-                                                  usernameOrEmail: username,
-                                                })
+                                            API.Problem.removeAdmin({
+                                                         problem_alias:
+                                                             problemAlias,
+                                                         usernameOrEmail:
+                                                             username,
+                                                       })
                                                 .then(function(response) {
-                                                  omegaup.UI.success(
-                                                      omegaup.T.adminRemoved);
+                                                  UI.success(T.adminRemoved);
                                                   $('div.post.footer').show();
                                                   var tr =
                                                       e.target.parentElement
                                                           .parentElement;
                                                   $(tr).remove();
                                                 })
-                                                .fail(omegaup.UI.apiError);
+                                                .fail(UI.apiError);
                                           };
                                         })(admin.username))));
           }
@@ -245,54 +249,110 @@ omegaup.OmegaUp.on('ready', function() {
                                   '&times;</button></td>')
                                     .on('click', (function(alias) {
                                           return function(e) {
-                                            omegaup.API.Problem
-                                                .removeGroupAdmin({
-                                                  problem_alias: problemAlias,
-                                                  group: alias,
-                                                })
+                                            API.Problem.removeGroupAdmin({
+                                                         problem_alias:
+                                                             problemAlias,
+                                                         group: alias,
+                                                       })
                                                 .then(function(response) {
-                                                  omegaup.UI.success(
-                                                      omegaup.T
-                                                          .groupAdminRemoved);
+                                                  UI.success(
+                                                      T.groupAdminRemoved);
                                                   $('div.post.footer').show();
                                                   var tr =
                                                       e.target.parentElement
                                                           .parentElement;
                                                   $(tr).remove();
                                                 })
-                                                .fail(omegaup.UI.apiError);
+                                                .fail(UI.apiError);
                                           };
                                         })(group_admin.alias))));
           }
 
           $('#problem-admins .site-admin').hide();
         })
-        .fail(omegaup.UI.apiError);
+        .fail(UI.apiError);
   }
+
+  const problemVersions = new Vue({
+    el: '#version div.panel div',
+    render: function(createElement) {
+      return createElement('omegaup-problem-versions', {
+        props: {
+          log: this.log,
+          publishedRevision: this.publishedRevision,
+          value: this.publishedRevision,
+          showFooter: true,
+        },
+        on: {
+          'select-version': function(selectedRevision, updatePublished) {
+            API.Problem.selectVersion({
+                         problem_alias: problemAlias,
+                         commit: selectedRevision.commit,
+                         update_published: updatePublished,
+                       })
+                .then(function(response) {
+                  problemVersions.publishedRevision = selectedRevision;
+                  UI.success(T.problemVersionUpdated);
+                })
+                .fail(UI.apiError);
+          },
+          'runs-diff': function(versions, selectedCommit) {
+            API.Problem.runsDiff({
+                         problem_alias: problemAlias,
+                         version: selectedCommit.version,
+                       })
+                .then(function(response) {
+                  Vue.set(versions.runsDiff, selectedCommit.version,
+                          response.diff);
+                })
+                .fail(UI.apiError);
+          },
+        },
+      });
+    },
+    data: {
+      log: [],
+      publishedRevision: {},
+    },
+    components: {
+      'omegaup-problem-versions': problem_Versions,
+    },
+  });
+  API.Problem.versions({problem_alias: problemAlias})
+      .then(function(result) {
+        problemVersions.log = result.log;
+        for (const revision of result.log) {
+          if (result.published == revision.commit) {
+            problemVersions.publishedRevision = revision;
+            break;
+          }
+        }
+      })
+      .fail(UI.apiError);
 
   $('#tags form')
       .on('submit', function() {
         var tagname = $('#tag-name').val();
-        var public = $('#tag-public').val();
+        var isPublic = $('#tag-public').val();
 
-        omegaup.API.Problem.addTag({
-                             problem_alias: problemAlias,
-                             name: tagname, public: public,
-                           })
+        API.Problem.addTag({
+                     problem_alias: problemAlias,
+                     name: tagname, 'public': isPublic,
+                   })
             .then(function(response) {
-              omegaup.UI.success('Tag successfully added!');
+              UI.success('Tag successfully added!');
               $('div.post.footer').show();
 
               refreshProblemTags();
             })
-            .fail(omegaup.UI.apiError);
+            .fail(UI.apiError);
 
         return false;  // Prevent refresh
       });
 
   function refreshProblemTags() {
-    omegaup.API.Problem
-        .tags({problem_alias: problemAlias, include_autogenerated: false})
+    API.Problem.tags(
+                   {problem_alias: problemAlias, include_autogenerated: false})
         .then(function(result) {
           $('#problem-tags').empty();
           // Got the contests, lets populate the dropdown with them
@@ -307,19 +367,19 @@ omegaup.OmegaUp.on('ready', function() {
                                             .attr('href',
                                                   '/problem/?tag[]=' + tag.name)
                                             .text(tag.name)))
-                        .append($('<td></td>').text(tag.public))
+                        .append($('<td></td>').text(tag['public']))
                         .append(
                             $('<td><button type="button" class="close">' +
                               '&times;</button></td>')
                                 .on('click', (function(tagname) {
                                       return function(e) {
-                                        omegaup.API.Problem.removeTag({
-                                                             problem_alias:
-                                                                 problemAlias,
-                                                             name: tagname,
-                                                           })
+                                        API.Problem.removeTag({
+                                                     problem_alias:
+                                                         problemAlias,
+                                                     name: tagname,
+                                                   })
                                             .then(function(response) {
-                                              omegaup.UI.success(
+                                              UI.success(
                                                   'Tag successfully removed!');
                                               $('div.post.footer').show();
                                               var tr = e.target.parentElement
@@ -332,17 +392,17 @@ omegaup.OmegaUp.on('ready', function() {
                                                       '</a>');
                                               $(tr).remove();
                                             })
-                                            .fail(omegaup.UI.apiError);
+                                            .fail(UI.apiError);
                                       };
                                     })(tag.name))));
           }
         })
-        .fail(omegaup.UI.apiError);
+        .fail(UI.apiError);
   }
 
   var imageMapping = {};
   var markdownConverter =
-      omegaup.UI.markdownConverter({preview: true, imageMapping: imageMapping});
+      UI.markdownConverter({preview: true, imageMapping: imageMapping});
   var markdownEditor =
       new Markdown.Editor(markdownConverter, '-statement');  // Global.
   markdownEditor.run();
@@ -361,38 +421,45 @@ omegaup.OmegaUp.on('ready', function() {
       return;
     }
 
-    omegaup.API.Problem
-        .details({problem_alias: problemAlias, statement_type: 'markdown'})
+    API.Problem.details(
+                   {problem_alias: problemAlias, statement_type: 'markdown'})
         .then(problemCallback)
-        .fail(omegaup.UI.apiError);
+        .fail(UI.apiError);
   }
 
   function problemCallback(problem) {
     $('.page-header h1 span')
-        .html(omegaup.T.problemEditEditProblem + ' ' +
-              omegaup.UI.escape(problem.title));
+        .html(T.problemEditEditProblem + ' ' + UI.escape(problem.title));
     $('.page-header h1 small')
         .html('&ndash; <a href="/arena/problem/' + problemAlias + '/">' +
-              omegaup.T.problemEditGoToProblem + '</a>');
+              T.problemEditGoToProblem + '</a>');
     $('input[name=title]').val(problem.title);
-    $('#statement-preview .title').html(omegaup.UI.escape(problem.title));
-    $('input[name=time_limit]').val(problem.time_limit);
-    $('input[name=validator_time_limit]').val(problem.validator_time_limit);
+    $('#statement-preview .title').html(UI.escape(problem.title));
+    $('input[name=time_limit]')
+        .val(UI.parseDuration(problem.settings.limits.TimeLimit));
+    if (problem.settings.validator.limits) {
+      $('input[name=validator_time_limit]')
+          .val(UI.parseDuration(problem.settings.validator.limits.TimeLimit));
+    } else {
+      $('input[name=validator_time_limit]').val(0);
+    }
     $('input[name=overall_wall_time_limit]')
-        .val(problem.overall_wall_time_limit);
-    $('input[name=extra_wall_time]').val(problem.extra_wall_time);
-    $('input[name=memory_limit]').val(problem.memory_limit);
-    $('input[name=output_limit]').val(problem.output_limit);
+        .val(UI.parseDuration(problem.settings.limits.OverallWallTimeLimit));
+    $('input[name=extra_wall_time]')
+        .val(UI.parseDuration(problem.settings.limits.ExtraWallTime));
+    $('input[name=memory_limit]')
+        .val(problem.settings.limits.MemoryLimit / 1024);
+    $('input[name=output_limit]').val(problem.settings.limits.OutputLimit);
     $('input[name=input_limit]').val(problem.input_limit);
     $('input[name=source]').val(problem.source);
-    $('#statement-preview .source').html(omegaup.UI.escape(problem.source));
+    $('#statement-preview .source').html(UI.escape(problem.source));
     $('#statement-preview .problemsetter')
         .attr('href', '/profile/' + problem.problemsetter.username + '/')
-        .html(omegaup.UI.escape(problem.problemsetter.name));
-    $('input[name=email_clarifications][value=' + problem.email_clarifications +
-      ']')
+        .html(UI.escape(problem.problemsetter.name));
+    $('input[name=email_clarifications][value=' +
+      (problem.email_clarifications ? '0' : '1') + ']')
         .attr('checked', 1);
-    $('select[name=validator]').val(problem.validator);
+    $('select[name=validator]').val(problem.settings.validator.name);
     var visibility = Math.max(0, Math.min(1, problem.visibility));
     $('input[name=visibility][value=' + visibility + ']').attr('checked', 1);
     if (visibility != problem.visibility) {
@@ -439,18 +506,25 @@ omegaup.OmegaUp.on('ready', function() {
   $('#statement-language')
       .on('change', function(e) {
         chosenLanguage = $('#statement-language').val();
-        omegaup.API.Problem.details({
-                             problem_alias: problemAlias,
-                             statement_type: 'markdown',
-                             show_solvers: false,
-                             lang: chosenLanguage
-                           })
+        API.Problem.details({
+                     problem_alias: problemAlias,
+                     statement_type: 'markdown',
+                     show_solvers: false,
+                     lang: chosenLanguage
+                   })
             .then(problemCallback)
-            .fail(omegaup.UI.apiError);
+            .fail(UI.apiError);
       });
 
   $('#wmd-input-statement')
       .on('blur', function(e) {
-        statements[$('#statement-language').val()].current = $(this).val();
+        var currentLanguage = $('#statement-language').val();
+        if (!statements.hasOwnProperty(currentLanguage)) {
+          statements[currentLanguage] = {
+            original: '',
+            current: '',
+          };
+        }
+        statements[currentLanguage].current = $(this).val();
       });
 });
