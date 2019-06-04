@@ -156,10 +156,7 @@ class ProblemsetController extends Controller {
     public static function apiScoreboardEvents(Request $r) {
         $r = self::wrapRequest($r);
 
-        if ($r['problemset']['type'] == 'Interview') {
-            // Not implemented in interviews yet
-            return ['events' => []];
-        } elseif ($r['problemset']['type'] == 'Contest') {
+        if ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiScoreboardEvents(
                 new Request([
                     'auth_token' => $r['auth_token'],
@@ -176,6 +173,8 @@ class ProblemsetController extends Controller {
                 ])
             );
         }
+        // Not implemented in interviews yet
+        return ['events' => []];
     }
 
     /**

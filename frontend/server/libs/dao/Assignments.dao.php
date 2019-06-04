@@ -116,11 +116,10 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                     ps.problemset_id = a.problemset_id
                 WHERE
                     a.assignment_id = ? LIMIT 1;';
-        $params = [$assignmentId];
 
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $rs = $conn->GetRow($sql, [$assignmentId]);
+        if (empty($rs)) {
             return null;
         }
         return $rs;
