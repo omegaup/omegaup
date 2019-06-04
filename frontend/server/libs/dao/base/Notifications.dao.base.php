@@ -8,20 +8,20 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** UsersBadges Data Access Object (DAO) Base.
+/** Notifications Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link UsersBadges}.
+ * {@link Notifications}.
  * @access public
  * @abstract
  *
  */
-abstract class UsersBadgesDAOBase {
+abstract class NotificationsDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link UsersBadges}
+     * Este metodo guarda el estado actual del objeto {@link Notifications}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,14 +30,14 @@ abstract class UsersBadgesDAOBase {
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges
+     * @param Notifications [$Notifications] El objeto de tipo Notifications
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(UsersBadges $Users_Badges) {
-        if (is_null(self::getByPK($Users_Badges->user_badge_id))) {
-            return UsersBadgesDAOBase::create($Users_Badges);
+    final public static function save(Notifications $Notifications) {
+        if (is_null(self::getByPK($Notifications->notification_id))) {
+            return NotificationsDAOBase::create($Notifications);
         }
-        return UsersBadgesDAOBase::update($Users_Badges);
+        return NotificationsDAOBase::update($Notifications);
     }
 
     /**
@@ -45,15 +45,16 @@ abstract class UsersBadgesDAOBase {
      *
      * @static
      * @return Filas afectadas
-     * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a actualizar.
+     * @param Notifications [$Notifications] El objeto de tipo Notifications a actualizar.
      */
-    final public static function update(UsersBadges $Users_Badges) {
-        $sql = 'UPDATE `Users_Badges` SET `user_id` = ?, `badge_alias` = ?, `assignation_time` = ? WHERE `user_badge_id` = ?;';
+    final public static function update(Notifications $Notifications) {
+        $sql = 'UPDATE `Notifications` SET `user_id` = ?, `timestamp` = ?, `read` = ?, `translation_string` = ? WHERE `notification_id` = ?;';
         $params = [
-            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
-            $Users_Badges->badge_alias,
-            $Users_Badges->assignation_time,
-            is_null($Users_Badges->user_badge_id) ? null : (int)$Users_Badges->user_badge_id,
+            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
+            $Notifications->timestamp,
+            is_null($Notifications->read) ? null : (int)$Notifications->read,
+            $Notifications->translation_string,
+            is_null($Notifications->notification_id) ? null : (int)$Notifications->notification_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -61,33 +62,33 @@ abstract class UsersBadgesDAOBase {
     }
 
     /**
-     * Obtener {@link UsersBadges} por llave primaria.
+     * Obtener {@link Notifications} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link UsersBadges} de la base
+     * Este metodo cargará un objeto {@link Notifications} de la base
      * de datos usando sus llaves primarias.
      *
      * @static
-     * @return @link UsersBadges Un objeto del tipo {@link UsersBadges}. NULL si no hay tal registro.
+     * @return @link Notifications Un objeto del tipo {@link Notifications}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_badge_id) {
-        if (is_null($user_badge_id)) {
+    final public static function getByPK($notification_id) {
+        if (is_null($notification_id)) {
             return null;
         }
-        $sql = 'SELECT `Users_Badges`.`user_badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`badge_alias`, `Users_Badges`.`assignation_time` FROM Users_Badges WHERE (user_badge_id = ?) LIMIT 1;';
-        $params = [$user_badge_id];
+        $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`translation_string` FROM Notifications WHERE (notification_id = ?) LIMIT 1;';
+        $params = [$notification_id];
         global $conn;
         $row = $conn->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new UsersBadges($row);
+        return new Notifications($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto UsersBadges suministrado. Una vez que se ha
+     * el objeto Notifications suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
      * {@link save()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
@@ -97,11 +98,11 @@ abstract class UsersBadgesDAOBase {
      *
      * @static
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a eliminar
+     * @param Notifications [$Notifications] El objeto de tipo Notifications a eliminar
      */
-    final public static function delete(UsersBadges $Users_Badges) {
-        $sql = 'DELETE FROM `Users_Badges` WHERE user_badge_id = ?;';
-        $params = [$Users_Badges->user_badge_id];
+    final public static function delete(Notifications $Notifications) {
+        $sql = 'DELETE FROM `Notifications` WHERE notification_id = ?;';
+        $params = [$Notifications->notification_id];
         global $conn;
 
         $conn->Execute($sql, $params);
@@ -114,7 +115,7 @@ abstract class UsersBadgesDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link UsersBadges}.
+     * y construirá un arreglo que contiene objetos de tipo {@link Notifications}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -125,10 +126,10 @@ abstract class UsersBadgesDAOBase {
      * @param $filasPorPagina Filas por página.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link UsersBadges}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link Notifications}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Users_Badges`.`user_badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`badge_alias`, `Users_Badges`.`assignation_time` from Users_Badges';
+        $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`translation_string` from Notifications';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -138,7 +139,7 @@ abstract class UsersBadgesDAOBase {
         }
         $allData = [];
         foreach ($conn->GetAll($sql) as $row) {
-            $allData[] = new UsersBadges($row);
+            $allData[] = new Notifications($row);
         }
         return $allData;
     }
@@ -147,21 +148,25 @@ abstract class UsersBadgesDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto UsersBadges suministrado.
+     * contenidos del objeto Notifications suministrado.
      *
      * @static
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a crear.
+     * @param Notifications [$Notifications] El objeto de tipo Notifications a crear.
      */
-    final public static function create(UsersBadges $Users_Badges) {
-        if (is_null($Users_Badges->assignation_time)) {
-            $Users_Badges->assignation_time = gmdate('Y-m-d H:i:s');
+    final public static function create(Notifications $Notifications) {
+        if (is_null($Notifications->timestamp)) {
+            $Notifications->timestamp = gmdate('Y-m-d H:i:s');
         }
-        $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
+        if (is_null($Notifications->read)) {
+            $Notifications->read = false;
+        }
+        $sql = 'INSERT INTO Notifications (`user_id`, `timestamp`, `read`, `translation_string`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
-            $Users_Badges->badge_alias,
-            $Users_Badges->assignation_time,
+            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
+            $Notifications->timestamp,
+            is_null($Notifications->read) ? null : (int)$Notifications->read,
+            $Notifications->translation_string,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -169,7 +174,7 @@ abstract class UsersBadgesDAOBase {
         if ($ar == 0) {
             return 0;
         }
-        $Users_Badges->user_badge_id = $conn->Insert_ID();
+        $Notifications->notification_id = $conn->Insert_ID();
 
         return $ar;
     }

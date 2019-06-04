@@ -65,17 +65,6 @@ CREATE TABLE `Auth_Tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Badges` (
-  `badge_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL DEFAULT 'MyBadge',
-  `image_url` varchar(45) NOT NULL,
-  `description` varchar(500) NOT NULL COMMENT 'La descripcion habla de como se obtuvo el badge, de forma corta.',
-  `hint` varchar(100) DEFAULT NULL COMMENT 'Tip de como desbloquear el badge.',
-  PRIMARY KEY (`badge_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Esta tabla guarda la informacion de cada uno de los badges.';
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Clarifications` (
   `clarification_id` int(11) NOT NULL AUTO_INCREMENT,
   `author_id` int(11) NOT NULL COMMENT 'Autor de la clarificación.',
@@ -385,6 +374,19 @@ CREATE TABLE `Messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Notifications` (
+  `notification_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL COMMENT 'Identificador de usuario',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `read` tinyint(1) NOT NULL DEFAULT '0',
+  `translation_string` text NOT NULL COMMENT 'JSON con el contenido de la notificacion',
+  PRIMARY KEY (`notification_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_nu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Notificaciones';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Permissions` (
   `permission_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del permiso.',
@@ -472,18 +474,6 @@ CREATE TABLE `Problems` (
   KEY `idx_problems_visibility` (`visibility`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.';
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Problems_Badges` (
-  `badge_id` int(11) NOT NULL,
-  `problem_id` int(11) NOT NULL,
-  PRIMARY KEY (`badge_id`,`problem_id`),
-  KEY `badge_id` (`badge_id`),
-  KEY `problem_id` (`problem_id`),
-  CONSTRAINT `fk_pb_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `Badges` (`badge_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_pb_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relación entre 1 badge y los problemas que lo desbloqueaan.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -913,18 +903,15 @@ CREATE TABLE `Users` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Users_Badges` (
-  `badge_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `last_problem_id` int(11) NOT NULL COMMENT 'Este campo guarda el ultimo problema que logro que se desbloqueara el badge, just for fun.',
-  PRIMARY KEY (`badge_id`,`user_id`),
-  KEY `badge_id` (`badge_id`),
+  `user_badge_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL COMMENT 'Identificador de usuario',
+  `badge_alias` varchar(32) NOT NULL COMMENT 'Identificador de badge',
+  `assignation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_badge_id`),
+  UNIQUE KEY `badge_alias` (`badge_alias`),
   KEY `user_id` (`user_id`),
-  KEY `last_problem_id` (`last_problem_id`),
-  CONSTRAINT `fk_ub_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `Badges` (`badge_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ub_last_problem_id` FOREIGN KEY (`last_problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ub_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda los badges que han sido desbloqueados.';
+  CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Badges de Usuario';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
