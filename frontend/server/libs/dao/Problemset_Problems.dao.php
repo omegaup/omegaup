@@ -31,6 +31,55 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         return $conn->GetAll($sql, $val);
     }
 
+    final public static function getProblemsAssignmentByCourseAlias($courseAlias) {
+        // Build SQL statement
+        $sql = '
+            SELECT
+                a.name, a.alias AS assignment_alias, a.description, a.start_time, a.finish_time,
+                a.assignment_type, p.alias AS problem_alias, a.publish_time_delay, p.problem_id
+            FROM
+                Problems p
+            INNER JOIN
+                Problemset_Problems pp ON pp.problem_id = p.problem_id
+            INNER JOIN
+                Assignments a ON pp.problemset_id = a.problemset_id
+            INNER JOIN
+                Courses c ON a.course_id = c.course_id
+            WHERE
+                c.alias = ?
+            ORDER BY
+                a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
+        ';
+        $val = [$courseAlias];
+
+        global $conn;
+        $problemsAssignments = $conn->GetAll($sql, $val);
+
+        $result = [];
+
+        foreach ($problemsAssignments as $assignment) {
+            $assignmentAlias = $assignment['assignment_alias'];
+            if (!isset($result[$assignmentAlias])) {
+                $result[$assignmentAlias] = [
+                    'name' => $assignment['name'],
+                    'description' => $assignment['description'],
+                    'start_time' => $assignment['start_time'],
+                    'finish_time' => $assignment['finish_time'],
+                    'assignment_alias' => $assignment['assignment_alias'],
+                    'assignment_type' => $assignment['assignment_type'],
+                    'publish_time_delay' => $assignment['publish_time_delay'],
+                ];
+                $result[$assignmentAlias]['problems'] = [];
+            }
+            array_push($result[$assignmentAlias]['problems'], [
+                'problem_alias' => $assignment['problem_alias'],
+                'problem_id' => $assignment['problem_id'],
+            ]);
+        }
+
+        return $result;
+    }
+
     /*
      * Get number of problems in problemset.
      */

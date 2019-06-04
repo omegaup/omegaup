@@ -86,9 +86,19 @@ class CourseController extends Controller {
     }
 
     /**
+     * Validates clone Courses
+     */
+    private static function validateClone(Request $r) {
+        Validators::validateStringNonEmpty($r['name'], 'name', true);
+        $r->ensureInt('start_time', null, null, true);
+        Validators::validateValidAlias($r['alias'], 'alias', true);
+    }
+
+    /**
      * Validates create or update Courses
      *
      * @throws InvalidParameterException
+     * @throws ForbiddenAccessException
      */
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = true;
@@ -195,60 +205,65 @@ class CourseController extends Controller {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
-        $original_course = CoursesDAO::getByAlias($r['course_alias']);
-        $offset = round($r['start_time']) - strtotime($original_course->start_time);
-        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
+
+        self::authenticateRequest($r);
+        self::validateCourseAlias($r);
+        self::validateClone($r);
+
+        $originalCourse = CoursesDAO::getByAlias($r['course_alias']);
+        if (is_null($originalCourse)) {
+            throw new NotFoundException('courseNotFound');
+        }
+        $offset = round($r['start_time']) - strtotime($originalCourse->start_time);
 
         DAO::transBegin();
-        $response = [];
+
         try {
             // Create the course (and group)
-            $response[] = self::apiCreate(new Request([
+            [$courseId, $aclId] = CourseController::createCourseAndGroup(new Courses([
                 'name' => $r['name'],
-                'description' => $original_course->description,
+                'description' => $originalCourse->description,
                 'alias' => $r['alias'],
-                'start_time' => $r['start_time'],
-                'finish_time' => strtotime($original_course->finish_time) + $offset,
-                'public' => 0, // All cloned courses start in private mode
-                'auth_token' => $auth_token
-            ]));
+                'school_id' => is_null($r['school']) ? null : $r['school']->school_id,
+                'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
+                'finish_time' => gmdate('Y-m-d H:i:s', strtotime($originalCourse->finish_time) + $offset),
+                'public' => 0,
+                'show_scoreboard' =>$r['show_scoreboard'] == 'true',
+                'needs_basic_information' => $r['needs_basic_information'] == 'true',
+                'requests_user_information' => $r['requests_user_information']
+            ]), $r['current_user_id']);
 
-            $assignments = self::apiListAssignments($r);
-            foreach ($assignments['assignments'] as $assignment) {
-                $problems[$assignment['alias']] = self::apiAssignmentDetails(new Request([
-                    'assignment' => $assignment['alias'],
-                    'course' => $original_course->alias,
-                    'auth_token' => $auth_token
-                ]));
-            }
+            $assignmentsProblems = ProblemsetProblemsDAO::getProblemsAssignmentByCourseAlias($originalCourse->alias);
 
-            foreach ($assignments['assignments'] as $assignment) {
+            foreach ($assignmentsProblems as $assignment => $assignmentProblems) {
                 // Create and assign homeworks and tests to new course
-                $response[] = self::apiCreateAssignment(new Request([
-                    'course_alias' => $r['alias'],
-                    'name' => $assignment['name'],
-                    'description' => $assignment['description'],
-                    'start_time' => $assignment['start_time'] + $offset,
-                    'finish_time' => $assignment['finish_time'] + $offset,
-                    'alias' => $assignment['alias'],
-                    'assignment_type' => $assignment['assignment_type'],
-                    'auth_token' => $auth_token
+                $problemsetId = self::createAssignment($r['course'], new Assignments([
+                    'course_id' => $courseId,
+                    'acl_id' => $aclId,
+                    'name' => $assignmentProblems['name'],
+                    'description' => $assignmentProblems['description'],
+                    'alias' => $assignmentProblems['assignment_alias'],
+                    'publish_time_delay' => $assignmentProblems['publish_time_delay'],
+                    'assignment_type' => $assignmentProblems['assignment_type'],
+                    'start_time' => gmdate('Y-m-d H:i:s', strtotime($assignmentProblems['start_time']) + $offset),
+                    'finish_time' => gmdate('Y-m-d H:i:s', strtotime($assignmentProblems['finish_time']) + $offset),
                 ]));
-                foreach ($problems[$assignment['alias']]['problems'] as $problem) {
+
+                foreach ($assignmentProblems['problems'] as $problem) {
                     // Create and assign problems to new course
-                    $response[] = self::apiAddProblem(new Request([
-                        'course_alias' => $r['alias'],
-                        'assignment_alias' => $assignment['alias'],
-                        'problem_alias' => $problem['alias'],
-                        'auth_token' => $auth_token
-                    ]));
+                    self::addProblemToAssignment(
+                        $problem['problem_alias'],
+                        $problemsetId,
+                        $r['current_user_id'],
+                        100,
+                        null,
+                        1,
+                        false
+                    );
                 }
             }
             DAO::transEnd();
-        } catch (InvalidParameterException $e) {
-            DAO::transRollback();
-            throw $e;
-        } catch (DuplicatedEntryInDatabaseException $e) {
+        } catch (ApiException $e) {
             DAO::transRollback();
             throw $e;
         } catch (Exception $e) {
@@ -260,7 +275,7 @@ class CourseController extends Controller {
     }
 
     /**
-     * Create new course
+     * Create new course API
      *
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
@@ -274,25 +289,48 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r);
 
-        if ($r['alias'] == 'new') {
+        self::createCourseAndGroup(new Courses([
+            'name' => $r['name'],
+            'description' => $r['description'],
+            'alias' => $r['alias'],
+            'school_id' => is_null($r['school']) ? null : $r['school']->school_id,
+            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
+            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+            'public' => is_null($r['public']) ? false : $r['public'],
+            'show_scoreboard' =>$r['show_scoreboard'] == 'true',
+            'needs_basic_information' => $r['needs_basic_information'] == 'true',
+            'requests_user_information' => $r['requests_user_information'],
+        ]), $r['current_user_id']);
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Function to create a new course with its corresponding group
+     *
+     * @param Courses $course
+     * @param $creatorUserId
+     */
+    private static function createCourseAndGroup(Courses $course, int $creatorUserId) {
+        if ($course->alias == 'new') {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
-        if (!is_null(CoursesDAO::getByAlias($r['alias']))) {
+        if (!is_null(CoursesDAO::getByAlias($course->alias))) {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
         DAO::transBegin();
 
         $group = GroupController::createGroup(
-            $r['alias'],
-            'students-' . $r['alias'],
-            'students-' . $r['alias'],
-            $r['current_user_id']
+            $course->alias,
+            'students-' . $course->alias,
+            'students-' . $course->alias,
+            $creatorUserId
         );
 
         try {
-            $acl = new ACLs(['owner_id' => $r['current_user_id']]);
+            $acl = new ACLs(['owner_id' => $creatorUserId]);
             ACLsDAO::save($acl);
 
             GroupRolesDAO::create(new GroupRoles([
@@ -301,21 +339,11 @@ class CourseController extends Controller {
                 'role_id' => Authorization::CONTESTANT_ROLE,
             ]));
 
+            $course->group_id = $group->group_id;
+            $course->acl_id = $acl->acl_id;
+
             // Create the actual course
-            CoursesDAO::save(new Courses([
-                'name' => $r['name'],
-                'description' => $r['description'],
-                'alias' => $r['alias'],
-                'group_id' => $group->group_id,
-                'acl_id' => $acl->acl_id,
-                'school_id' => is_null($r['school']) ? null : $r['school']->school_id,
-                'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-                'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
-                'public' => is_null($r['public']) ? false : $r['public'],
-                'show_scoreboard' =>$r['show_scoreboard'] == 'true',
-                'needs_basic_information' => $r['needs_basic_information'] == 'true',
-                'requests_user_information' => $r['requests_user_information'],
-            ]));
+            CoursesDAO::save($course);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -328,11 +356,91 @@ class CourseController extends Controller {
             }
         }
 
-        return ['status' => 'ok'];
+        return [$course->course_id, $course->acl_id];
     }
 
     /**
-     * Create an assignment
+     * Function to create a new assignment
+     *
+     * @param Courses $course
+     * @param Assignment $assignment
+     * @throws DuplicatedEntryInDatabaseException
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function createAssignment(Courses $course, Assignments $assignment) : int {
+        DAO::transBegin();
+        try {
+            // Create the backing problemset
+            $problemset = new Problemsets([
+                'acl_id' => $course->acl_id,
+                'type' => 'Assignment',
+                'scoreboard_url' => SecurityTools::randomString(30),
+                'scoreboard_url_admin' => SecurityTools::randomString(30),
+            ]);
+            ProblemsetsDAO::create($problemset);
+            $assignment->problemset_id = $problemset->problemset_id;
+
+            AssignmentsDAO::create($assignment);
+
+            // Update assignment_id in problemset object
+            $problemset->assignment_id = $assignment->assignment_id;
+            ProblemsetsDAO::update($problemset);
+
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            if (DAO::isDuplicateEntryException($e)) {
+                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+            } else {
+                throw new InvalidDatabaseOperationException($e);
+            }
+        }
+        return $problemset->problemset_id;
+    }
+
+    /**
+     * Function to add problems to a specific assignment
+     *
+     * @param String $problemAlias,
+     * @param int $problemsetId,
+     * @param int $userId,
+     * @param ?int $points = 100,
+     * @param ?String $commit
+     */
+    private static function addProblemToAssignment(
+        String $problemAlias,
+        int $problemsetId,
+        int $userId,
+        ?int $points = 100,
+        ?String $commit = null,
+        ?int $order = 1,
+        ?bool $validateVisibility = true
+    ) {
+        // Get this problem
+        $problem = ProblemsDAO::getByAlias($problemAlias);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
+        [$masterCommit, $currentVersion] = ProblemController::resolveCommit(
+            $problem,
+            $commit
+        );
+
+        ProblemsetController::addProblem(
+            $problemsetId,
+            $problem,
+            $masterCommit,
+            $currentVersion,
+            $userId,
+            $points,
+            $order,
+            $validateVisibility
+        );
+    }
+
+    /**
+     * API to Create an assignment
      *
      * @param  Request $r
      * @return array
@@ -350,44 +458,17 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        DAO::transBegin();
-        try {
-            // Create the backing problemset
-            $problemset = new Problemsets([
-                'acl_id' => $r['course']->acl_id,
-                'type' => 'Assignment',
-                'scoreboard_url' => SecurityTools::randomString(30),
-                'scoreboard_url_admin' => SecurityTools::randomString(30),
-            ]);
-            ProblemsetsDAO::save($problemset);
-            $assignment = new Assignments([
-                'course_id' => $r['course']->course_id,
-                'problemset_id' => $problemset->problemset_id,
-                'acl_id' => $r['course']->acl_id,
-                'name' => $r['name'],
-                'description' => $r['description'],
-                'alias' => $r['alias'],
-                'publish_time_delay' => $r['publish_time_delay'],
-                'assignment_type' => $r['assignment_type'],
-                'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-                'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
-            ]);
-
-            AssignmentsDAO::save($assignment);
-
-            // Update assignment_id in problemset object
-            $problemset->assignment_id = $assignment->assignment_id;
-            ProblemsetsDAO::save($problemset);
-
-            DAO::transEnd();
-        } catch (Exception $e) {
-            DAO::transRollback();
-            if (DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
-            }
-        }
+        self::createAssignment($r['course'], new Assignments([
+            'course_id' => $r['course']->course_id,
+            'acl_id' => $r['course']->acl_id,
+            'name' => $r['name'],
+            'description' => $r['description'],
+            'alias' => $r['alias'],
+            'publish_time_delay' => $r['publish_time_delay'],
+            'assignment_type' => $r['assignment_type'],
+            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
+            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+        ]));
 
         return ['status' => 'ok'];
     }
@@ -494,18 +575,12 @@ class CourseController extends Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = AssignmentsDAO::GetProblemset(
+        $problemset = AssignmentsDAO::GetProblemset(
             $r['course']->course_id,
             $r['assignment_alias']
         );
-        if (is_null($problemSet)) {
+        if (is_null($problemset)) {
             throw new NotFoundException('problemsetNotFound');
-        }
-
-        // Get this problem
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
         }
 
         $points = 100;
@@ -513,18 +588,12 @@ class CourseController extends Controller {
             $points = (int)$r['points'];
         }
 
-        [$masterCommit, $currentVersion] = ProblemController::resolveCommit(
-            $problem,
+        self::addProblemToAssignment(
+            $r['problem_alias'],
+            $problemset->problemset_id,
+            $r['current_user_id'],
+            $points,
             $r['commit']
-        );
-
-        ProblemsetController::addProblem(
-            $problemSet->problemset_id,
-            $problem,
-            $masterCommit,
-            $currentVersion,
-            $r['current_identity_id'],
-            $points
         );
 
         try {
