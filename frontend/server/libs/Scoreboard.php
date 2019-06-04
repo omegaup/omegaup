@@ -762,7 +762,7 @@ class Scoreboard {
                     'penalty' => 0
                 ],
                 'country' => $identity['country_id'],
-                'is_invited' => $identity['is_invited'] == '1',
+                'is_invited' => $identity['is_invited'],
             ];
 
             foreach ($identityProblemsScore[$identityId] as $problem) {
