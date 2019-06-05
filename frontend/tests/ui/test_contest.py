@@ -117,7 +117,7 @@ def test_user_ranking_contest(driver):
 
         url = '/arena/%s/scoreboard' % (contest_alias)
         util.check_scoreboard_events(driver, contest_alias, url,
-                                     num_elements=1, scoreboard='Public')
+                                     num_elements=2, scoreboard='Public')
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -129,7 +129,7 @@ def test_user_ranking_contest(driver):
                      ('//li[@id = "nav-contests"]'
                       '//a[@href = "/contest/mine/"]')))).click()
         util.check_scoreboard_events(driver, contest_alias, url,
-                                     num_elements=1, scoreboard='Admin')
+                                     num_elements=2, scoreboard='Admin')
 
         with driver.page_transition():
             driver.wait.until(
