@@ -653,6 +653,7 @@ problemVersionUpdatePublishedOwnedProblemsets = "Atualize os concursos / tarefas
 problemVersionUpdated = "Versão do problema atualizada."
 problemVersionUsername = "Nome de usuário"
 problemVersionVersion = "Versão do problema"
+problemsetIdentityNotFound = "Conjunto de problemas para a identidade selecionada não encontrada."
 problemsetNotFound = "Conjunto de problemas não encontrado."
 profile = "Nome"
 profileAddIdentitiesTooltip = "Adicionar identidades usando seu nome de usuário omegaUp"

@@ -18,11 +18,11 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     }
 
     public static function checkAndSaveFirstTimeAccess(
-        $identityId,
-        $problemsetId,
-        $windowLength,
-        $grantAccess = false,
-        $shareUserInformation = false
+        int $identityId,
+        int $problemsetId,
+        ?int $windowLength,
+        ?bool $grantAccess = false,
+        ?bool $shareUserInformation = false
     ) : ProblemsetIdentities {
         $currentTime = Time::get();
         $problemsetIdentity = self::getByPK($identityId, $problemsetId);
@@ -44,7 +44,11 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemsetIdentity->access_time = date('Y-m-d H:i:s', $currentTime);
             $problemsetIdentity->end_time = date('Y-m-d H:i:s', $currentTime + $windowLength * 60);
             $problemsetIdentity->share_user_information = $shareUserInformation;
-            self::save($problemsetIdentity);
+            if (is_null(self::getByPK($problemsetIdentity->identity_id, $problemsetIdentity->problemset_id))) {
+                self::create($problemsetIdentity);
+            } else {
+                self::update($problemsetIdentity);
+            }
         }
         return $problemsetIdentity;
     }
@@ -105,17 +109,20 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         return $conn->GetAll($sql, [$problemset_id]);
     }
 
-    public static function recalculateEndTimeForProblemsetIdentities($problemsetId, $windowLength) {
+    public static function recalculateEndTimeForProblemsetIdentities(
+        int $problemsetId,
+        int $windowLengthDifference
+    ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
-                    `end_time` = DATE_ADD(access_time, INTERVAL ? MINUTE)
+                    `end_time` = DATE_ADD(end_time, INTERVAL ? MINUTE)
                 WHERE
                     `problemset_id` = ?
                     AND `end_time` IS NOT NULL;';
 
         global $conn;
-        $conn->Execute($sql, [$windowLength, $problemsetId,]);
+        $conn->Execute($sql, [$windowLengthDifference, $problemsetId]);
 
         return $conn->Affected_Rows();
     }
@@ -126,7 +133,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 INNER JOIN
                     `Identities` `i` ON `pi`.`identity_id` = `i`.`identity_id`
                 SET
-                    `end_time` = ?
+                    `end_time` = FROM_UNIXTIME(?)
                 WHERE
                     `i`.`username` = ?
                     AND `pi`.`problemset_id` = ?;';

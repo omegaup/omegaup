@@ -355,10 +355,10 @@ class RunController extends Controller {
             // Add remaining time to the response
             try {
                 $contest_user = ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id);
-                if (isset($r['container']->finish_time)) {
-                    $response['submission_deadline'] = strtotime($r['container']->finish_time);
-                } elseif (!is_null($contest_user->end_time)) {
+                if (!is_null($contest_user) && !is_null($contest_user->end_time)) {
                     $response['submission_deadline'] = strtotime($contest_user->end_time);
+                } elseif (isset($r['container']->finish_time)) {
+                    $response['submission_deadline'] = strtotime($r['container']->finish_time);
                 }
             } catch (Exception $e) {
                 // Operation failed in the data layer

@@ -655,6 +655,7 @@ const translations = {
 	problemVersionUpdated: "Vers\u00e3o do problema atualizada.",
 	problemVersionUsername: "Nome de usu\u00e1rio",
 	problemVersionVersion: "Vers\u00e3o do problema",
+	problemsetIdentityNotFound: "Conjunto de problemas para a identidade selecionada n\u00e3o encontrada.",
 	problemsetNotFound: "Conjunto de problemas n\u00e3o encontrado.",
 	profile: "Nome",
 	profileAddIdentitiesTooltip: "Adicionar identidades usando seu nome de usu\u00e1rio omegaUp",

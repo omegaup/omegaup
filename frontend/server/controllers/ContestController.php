@@ -729,15 +729,9 @@ class ContestController extends Controller {
                     'ip' => ip2long($_SERVER['REMOTE_ADDR']),
                 ]));
                 DAO::transEnd();
-            } catch (InvalidParameterException $e) {
+            } catch (ApiException $e) {
                 DAO::transRollback();
                 throw $e;
-            } catch (ForbiddenAccessException $e) {
-                DAO::transRollback();
-                throw $e;
-            } catch (Exception $e) {
-                DAO::transRollback();
-                throw new InvalidDatabaseOperationException($e);
             }
         } else {
             $result['admin'] = $r['contest_admin'];
@@ -2399,7 +2393,7 @@ class ContestController extends Controller {
             $updatedEntries = ProblemsetIdentitiesDAO::updateEndTimeForIdentity(
                 $r['problemset']->problemset_id,
                 $r['username'],
-                gmdate('Y-m-d H:i:s', $r['end_time'])
+                $r['end_time']
             );
         } catch (Exception $e) {
             // Operation failed in the data layer
@@ -2407,7 +2401,7 @@ class ContestController extends Controller {
         }
 
         if (!$updatedEntries) {
-            throw new NotFoundException('ProblemsetIdentityNotFound');
+            throw new NotFoundException('problemsetIdentityNotFound');
         }
 
         return [
@@ -2431,9 +2425,11 @@ class ContestController extends Controller {
             $contest->last_updated = $timestamp;
         }
         if ($original_contest->window_length !== $contest->window_length) {
+            // Get the difference between new and original window length
+            $windowLengthDifference = $contest->window_length - $original_contest->window_length;
             ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
                 $contest->problemset_id,
-                $contest->window_length
+                $windowLengthDifference
             );
         }
         ContestsDAO::save($contest);

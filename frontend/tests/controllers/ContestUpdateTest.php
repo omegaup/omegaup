@@ -508,5 +508,25 @@ class UpdateContestTest extends OmegaupTestCase {
                 $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
             }
         }
+
+        // Updating window_length in the contest, to check whether user keeps the extension
+        $windowLength = 20;
+        $r['window_length'] = $windowLength;
+        $response = ContestController::apiUpdate($r);
+
+        $identities = ContestController::apiUsers(new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
+
+        foreach ($identities['users'] as $identity) {
+            if ($identity['username'] == $contestant->username) {
+                // Identity keeps extended time
+                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + 40 * 60);
+            } else {
+                // Other identities keep end time with window length
+                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
+            }
+        }
     }
 }

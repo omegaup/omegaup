@@ -655,6 +655,7 @@ const translations = {
 	problemVersionUpdated: "Problem version updated.",
 	problemVersionUsername: "Username",
 	problemVersionVersion: "Problem version",
+	problemsetIdentityNotFound: "Problemset for selected identity does not exist.",
 	problemsetNotFound: "Problemset does not exist.",
 	profile: "Name",
 	profileAddIdentitiesTooltip: "Add identities using their omegaUp username",
