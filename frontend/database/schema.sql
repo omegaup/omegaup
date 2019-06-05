@@ -379,7 +379,7 @@ CREATE TABLE `Notifications` (
   `user_id` int(11) NOT NULL COMMENT 'Identificador de usuario',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `read` tinyint(1) NOT NULL DEFAULT '0',
-  `translation_string` text NOT NULL COMMENT 'JSON con el contenido de la notificacion',
+  `contents` text NOT NULL COMMENT 'JSON con el contenido de la notificación',
   PRIMARY KEY (`notification_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_nu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION

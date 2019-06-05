@@ -38,8 +38,8 @@ class Notifications extends VO {
         if (isset($data['read'])) {
             $this->read = $data['read'] == '1';
         }
-        if (isset($data['translation_string'])) {
-            $this->translation_string = $data['translation_string'];
+        if (isset($data['contents'])) {
+            $this->contents = $data['contents'];
         }
     }
 
@@ -85,9 +85,9 @@ class Notifications extends VO {
     public $read;
 
     /**
-      * JSON con el contenido de la notificacion
+      * JSON con el contenido de la notificación
       * @access public
       * @var text
       */
-    public $translation_string;
+    public $contents;
 }
