@@ -906,6 +906,7 @@ const translations = {
 	wizardStepTwo: "Escoge el rango de dificultad",
 	wizardTitle: "Buscador de Problemas",
 	wordAccepted: "Aceptado",
+	wordSContestsResults: "Resultados",
 	wordsAccepted: "Resueltos",
 	wordsActions: "Acciones",
 	wordsActivityReport: "Reporte de actividades",

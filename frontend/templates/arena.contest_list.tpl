@@ -32,6 +32,11 @@
 							<span>{#wordsPractice#}</span>
 						</a>
 					</td>
+					<td class="col-md-2" data-bind="visible: $parent.showPractice">
+                        <a data-bind="attr:  { href: scoreboardLink }">
+                            <span>{#wordsContestsResults#}</span>
+                        </a>
+                    </td>
 					<td class="col-md-2" data-bind="visible: (!isVirtual && $parent.showVirtual)">
 						<a data-bind="attr: { href: '/arena/' + alias + '/virtual/' }">
 							<span>{#virtualContest#}</span>

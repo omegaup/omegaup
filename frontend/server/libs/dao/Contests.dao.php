@@ -132,6 +132,7 @@ class ContestsDAO extends ContestsDAOBase {
                                 Contests.problemset_id,
                                 title,
                                 description,
+                                scoreboard_url,
                                 finish_time as original_finish_time,
                                 UNIX_TIMESTAMP (start_time) as start_time,
                                 UNIX_TIMESTAMP (finish_time) as finish_time,
@@ -472,6 +473,10 @@ class ContestsDAO extends ContestsDAOBase {
                 $columns
             FROM
                 Contests
+            INNER JOIN
+                Problemsets
+            ON
+                Problemsets.problemset_id = Contests.problemset_id
             WHERE
                 $recommended_check  AND $end_check AND $query_check
                 AND `admission_mode` != 'private'
@@ -555,6 +560,10 @@ class ContestsDAO extends ContestsDAOBase {
                         Identities
                     ON
                         ACLs.owner_id = Identities.user_id
+                    INNER JOIN
+                        Problemsets
+                    ON
+                        Problemsets.problemset_id = Contests.problemset_id
                     WHERE
                         Contests.admission_mode = 'private' AND Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
@@ -574,6 +583,10 @@ class ContestsDAO extends ContestsDAOBase {
                         $columns
                     FROM
                         Contests
+                    INNER JOIN
+                        Problemsets
+                    ON
+                        Problemsets.problemset_id = Contests.problemset_id
                     INNER JOIN
                         Problemset_Identities
                     ON
@@ -695,6 +708,10 @@ class ContestsDAO extends ContestsDAOBase {
                     $columns
                 FROM
                     `Contests`
+                INNER JOIN
+                    Problemsets
+                ON
+                    Problemsets.problemset_id = Contests.problemset_id
                 WHERE
                     `admission_mode` <> 'private'
                 AND $recommended_check
@@ -739,6 +756,10 @@ class ContestsDAO extends ContestsDAOBase {
                     $columns
                 FROM
                     Contests
+                INNER JOIN
+                    Problemsets
+                ON
+                    Problemsets.problemset_id = Contests.problemset_id
                 WHERE $recommended_check AND $end_check AND $query_check
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
