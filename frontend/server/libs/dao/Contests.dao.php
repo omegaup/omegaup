@@ -848,7 +848,7 @@ class ContestsDAO extends ContestsDAOBase {
             SELECT
                 u.name,
                 u.username,
-                e.email,
+                IF(pi.share_user_information, e.email, NULL) AS email,
                 st.name as state,
                 cn.name as country,
                 sc.name as school
@@ -867,8 +867,7 @@ class ContestsDAO extends ContestsDAOBase {
             INNER JOIN
                 Contests c ON c.problemset_id = pi.problemset_id
             WHERE
-                c.contest_id = ?
-                AND pi.share_user_information = 1;
+                c.contest_id = ?;
         ';
 
         global $conn;

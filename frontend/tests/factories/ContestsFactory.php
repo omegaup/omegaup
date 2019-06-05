@@ -130,7 +130,6 @@ class ContestsFactory {
             $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
         }
         $r['languages'] = $params['languages'];
-        $r['recommended'] = 0; // This is just a default value, it is not honored by apiCreate.
         $r['basic_information'] = $params['basic_information']; // This is just a default value.
         $r['requests_user_information'] = $params['requests_user_information']; // This is just a default value.
 

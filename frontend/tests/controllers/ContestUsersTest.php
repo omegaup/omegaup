@@ -107,7 +107,11 @@ class ContestUsersTest extends OmegaupTestCase {
 
         $response = ContestController::apiContestants($r);
 
-        $this->assertEquals(1, count($response['contestants']));
+        // There are three participants in the current contest
+        $this->assertEquals(3, count($response['contestants']));
+
+        // But only one participant has accepted share user information
+        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
 
         $userLogin = self::login($user[1]);
 
@@ -122,7 +126,8 @@ class ContestUsersTest extends OmegaupTestCase {
 
         $response = ContestController::apiContestants($r);
 
-        $this->assertEquals(1, count($response['contestants']));
+        // The number of participants sharing their information still remains the same
+        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
 
         $userLogin = self::login($user[2]);
 
@@ -137,6 +142,17 @@ class ContestUsersTest extends OmegaupTestCase {
 
         $response = ContestController::apiContestants($r);
 
-        $this->assertEquals(2, count($response['contestants']));
+        // Now there are two participants sharing their information
+        $this->assertEquals(2, self::usersSharingUserInformation($response['contestants']));
+    }
+
+    private static function usersSharingUserInformation($contestants) {
+        $numberOfContestants = 0;
+        foreach ($contestants as $contestant) {
+            if ($contestant['email']) {
+                $numberOfContestants++;
+            }
+        }
+        return $numberOfContestants;
     }
 }

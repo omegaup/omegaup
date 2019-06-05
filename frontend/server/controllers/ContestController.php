@@ -1023,7 +1023,7 @@ class ContestController extends Controller {
         }
 
         $problemset = new Problemsets([
-            'needs_basic_information' => $r['needs_basic_information'] == 'true',
+            'needs_basic_information' => $r['basic_information'] == 'true',
             'requests_user_information' => $r['requests_user_information'],
             'type' => 'Contest',
             'scoreboard_url' => SecurityTools::randomString(30),
@@ -2255,6 +2255,7 @@ class ContestController extends Controller {
 
         self::forbiddenInVirtual($r['contest']);
 
+        $updateProblemset = true;
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
             // If going public
@@ -2263,6 +2264,8 @@ class ContestController extends Controller {
             }
 
             $r['contest']->admission_mode = $r['admission_mode'];
+            // Problemset does not update when admission mode change
+            $updateProblemset = false;
         }
 
         $valueProperties = [
@@ -2310,11 +2313,13 @@ class ContestController extends Controller {
             // Save the contest object with data sent by user to the database
             self::updateContest($r['contest'], $original_contest, $r['current_user_id']);
 
-            // Save the problemset object with data sent by user to the database
-            $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
-            $problemset->needs_basic_information = $r['basic_information'] ?? 0;
-            $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
-            ProblemsetsDAO::save($problemset);
+            if ($updateProblemset) {
+                // Save the problemset object with data sent by user to the database
+                $problemset = ProblemsetsDAO::getByPK($r['contest']->problemset_id);
+                $problemset->needs_basic_information = $r['basic_information'] ?? 0;
+                $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
+                ProblemsetsDAO::save($problemset);
+            }
 
             // End transaction
             DAO::transEnd();
