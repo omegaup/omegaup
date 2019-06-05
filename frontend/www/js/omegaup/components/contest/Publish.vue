@@ -5,6 +5,7 @@
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{T.contestNewFormAdmissionMode}}</label> <select class="form-control"
+               name="admission-mode"
                v-model="admissionMode">
             <option value="private">
               {{T.wordsPrivate}}
@@ -17,7 +18,7 @@
             </option>
           </select>
           <p class="help-block"><span v-html="T.contestNewFormAdmissionModeDescription"></span></p>
-        </div><button class="btn btn-primary"
+        </div><button class="btn btn-primary change-admission-mode"
               type="submit">{{T.wordsSaveChanges}}</button>
       </form>
     </div>

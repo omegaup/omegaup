@@ -32,7 +32,6 @@ let config = [
       contest_list_participant:
           './frontend/www/js/omegaup/contest/list_participant.js',
       contest_report: './frontend/www/js/omegaup/contest/report.js',
-      contest_requests: './frontend/www/js/omegaup/contest/requests.js',
       contest_scoreboardmerge:
           './frontend/www/js/omegaup/contest/scoreboardmerge.js',
       contest_stats: './frontend/www/js/omegaup/contest/stats.js',
