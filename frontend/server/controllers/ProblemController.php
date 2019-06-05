@@ -55,7 +55,6 @@ class ProblemController extends Controller {
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
-
             if (is_null($r['problem'])) {
                 throw new NotFoundException('Problem not found');
             }
@@ -265,7 +264,6 @@ class ProblemController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($r['problem'])) {
             throw new NotFoundException('problemNotFound');
         }
@@ -308,7 +306,6 @@ class ProblemController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -354,6 +351,9 @@ class ProblemController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
 
         // Only an admin can add other problem group admins
         if (!Authorization::isProblemAdmin($r['current_identity_id'], $problem)) {
@@ -382,6 +382,9 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
 
         if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
             throw new ForbiddenAccessException();
@@ -467,6 +470,9 @@ class ProblemController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
 
         // Only admin is alowed to make modifications
         if (!Authorization::isProblemAdmin($r['current_identity_id'], $problem)) {
@@ -509,6 +515,9 @@ class ProblemController extends Controller {
         } catch (Exception $e) {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -592,6 +601,9 @@ class ProblemController extends Controller {
             // Operation failed in the data layer
             throw new InvalidDatabaseOperationException($e);
         }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
 
         if (!Authorization::canEditProblem($r['current_identity_id'], $problem)) {
             throw new ForbiddenAccessException();
@@ -629,6 +641,9 @@ class ProblemController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
 
         if (!Authorization::isProblemAdmin($r['current_identity_id'], $problem)) {
             throw new ForbiddenAccessException();
@@ -658,6 +673,9 @@ class ProblemController extends Controller {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
         }
 
         $response = [];
@@ -1010,7 +1028,6 @@ class ProblemController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($problem)) {
             return null;
         }
@@ -1266,7 +1283,6 @@ class ProblemController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -1866,13 +1882,10 @@ class ProblemController extends Controller {
         // Is the problem valid?
         try {
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (ApiException $apiException) {
-            throw $apiException;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        if ($r['problem'] == null) {
+        if (is_null($r['problem'])) {
             throw new NotFoundException('problemNotFound');
         }
     }

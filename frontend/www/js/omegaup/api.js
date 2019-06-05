@@ -170,6 +170,8 @@ export default {
 
     removeUser: _call('/api/contest/removeUser/'),
 
+    requests: _call('/api/contest/requests/'),
+
     runs: _call('/api/contest/runs/', _convertRuntimes),
 
     runsDiff: _call('/api/contest/runsDiff/'),
@@ -208,9 +210,6 @@ export default {
     admins: _call('/api/course/admins/'),
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
-
-    assignmentScoreboardEvents:
-        _call('/api/course/assignmentScoreboardEvents/'),
 
     clone: _call('/api/course/clone/'),
 
