@@ -160,15 +160,15 @@ def test_user_ranking_contest(driver):
             '"user"]')
         assert run_wrong_user.text == user2, run_wrong_user
 
-        users_full_set = {user1, user2, user3, driver.user_username}
-        compare_contestants_list(driver, users_full_set)
+        users_invited_set = {user1, user2, driver.user_username}
+        compare_contestants_list(driver, users_invited_set)
 
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
 
-        users_invited_set = {user1, user2, driver.user_username}
-        compare_contestants_list(driver, users_invited_set)
+        users_full_set = {user1, user2, user3, driver.user_username}
+        compare_contestants_list(driver, users_full_set)
 
 
 @util.no_javascript_errors()
