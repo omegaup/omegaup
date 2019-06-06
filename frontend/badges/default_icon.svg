@@ -27,12 +27,12 @@
           https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient
       -->
       <linearGradient id="border">
-        <stop offset="0%" style="stop-color: #000;"/>
+        <stop offset="0%" style="stop-color: #333333;"/>
       </linearGradient>
 
       <linearGradient id="inside" gradientTransform="rotate(90)">
-        <stop offset="0%" style="stop-color:#678DD7;"/>
-        <stop offset="85%" style="stop-color:#ccc;"/>
+        <stop offset="0%" style="stop-color:#5588DD;"/>
+        <stop offset="85%" style="stop-color:#D0DEF5;"/>
       </linearGradient>
     </defs>
 
