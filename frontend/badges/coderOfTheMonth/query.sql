@@ -1,0 +1,1 @@
+SELECT DISTINCT `user_id` FROM `Coder_Of_The_Month`;
