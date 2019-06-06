@@ -849,9 +849,9 @@ class ContestsDAO extends ContestsDAOBase {
                 u.name,
                 u.username,
                 IF(pi.share_user_information, e.email, NULL) AS email,
-                st.name as state,
-                cn.name as country,
-                sc.name as school
+                IF(pi.share_user_information, st.name, NULL) AS state,
+                IF(pi.share_user_information, cn.name, NULL) AS country,
+                IF(pi.share_user_information, sc.name, NULL) AS school
             FROM
                 Users u
             INNER JOIN
