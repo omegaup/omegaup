@@ -47,7 +47,7 @@
           </td>
           <td>
             <div class="points">
-              {{ user.total.points }}
+              {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
             </div>
             <div class="penalty">
               {{ user.total.penalty }} ({{ totalRuns(user) }})
@@ -75,6 +75,10 @@ export default {
       type: Boolean,
       'default': true,
     },
+    digitsAfterDecimalPoint: {
+      type: Number,
+      'default': 2,
+    },
   },
   data: function() {
     return {
@@ -96,7 +100,10 @@ export default {
                                                     '';
     },
     renderUser: function(u) { return UI.rankingUsername(u);},
-    renderPoints: function(p) { return (p.points > 0 ? '+' : '') + p.points;},
+    renderPoints: function(p) {
+      return (p.points > 0 ? '+' : '') +
+             p.points.toFixed(this.digitsAfterDecimalPoint);
+    },
     totalRuns: function(u) {
       return u.problems.reduce((acc, val) => acc + val.runs, 0);
     },

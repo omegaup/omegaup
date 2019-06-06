@@ -221,7 +221,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
         # off in Travis, and the only way to get updated results while we are
         # on the same page is going back to the page.
         check_ranking(driver, problem, driver.user_username,
-                      scores=['0', '100'])
+                      scores=['0.00', '100.00'])
 
         # User enters to problem in contest, the ranking for this problem
         # should update.
@@ -236,7 +236,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
             '//a[contains(@href, "problems/%s")]' % problem).click()
 
         # Now, user checks the score again, ranking should be 100
-        check_ranking(driver, problem, driver.user_username, scores=['100'])
+        check_ranking(driver, problem, driver.user_username, scores=['100.00'])
 
 
 @util.annotate
