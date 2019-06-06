@@ -104,6 +104,14 @@ let config = [
           }
         },
         {
+          test: /\.tsx?$/,
+          loader: 'ts-loader',
+          exclude: /node_modules/,
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+          }
+        },
+        {
           test: /\.js$/,
           loader: 'babel-loader?cacheDirectory',
           exclude: /node_modules/
@@ -120,6 +128,7 @@ let config = [
       ],
     },
     resolve: {
+      extensions: ['.ts', '.js', '.vue', '.json'],
       alias: {
         'vue$': 'vue/dist/vue.common.js',
         'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',

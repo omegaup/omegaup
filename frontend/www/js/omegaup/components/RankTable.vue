@@ -27,7 +27,7 @@
       <template v-if="Object.keys(availableFilters).length &gt; 0">
         <select class="filter"
                   v-model="filter"
-                  v-on:change="filterChange">
+                  v-on:change="onFilterChange">
           <option value="">
             {{ T.wordsSelectFilter }}
           </option>
@@ -83,70 +83,88 @@
   </div>
 </template>
 
-<script>
-import {T} from '../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+import { T } from '../omegaup.js';
 import UI from '../ui.js';
-import {OmegaUp} from '../omegaup.js';
+import { OmegaUp } from '../omegaup.js';
 import Autocomplete from './Autocomplete.vue';
 
-export default {
-  props: {
-    page: Number,
-    length: Number,
-    isIndex: Boolean,
-    availableFilters: undefined,
-    filter: String,
-    ranking: Array,
-    resultTotal: Number,
-  },
-  data: function() {
-    return { T: T, UI: UI, searchedUsername: '', }
-  },
-  methods: {
-    onSubmit: function() {
-      window.location = `/profile/${encodeURIComponent(this.searchedUsername)}`;
-    },
+interface Rank {
+  country: string;
+  username: string;
+  name?: string;
+  score: number;
+  problemsSolvedUser: number;
+}
 
-    filterChange: function() {
-      // change url parameters with jquery
-      // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
-      var queryParameters = {}, queryString = location.search.substring(1),
-          re = /([^&=]+)=([^&]*)/g, m;
-      while (m = re.exec(queryString)) {
-        queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
-      }
-      if (this.filter !== '') {
-        queryParameters['filter'] = this.filter;
-      } else {
-        delete queryParameters['filter'];
-      }
-      const url = UI.buildURLQuery(queryParameters);
-      window.location.search = url;
-    },
-    flagURL(rank) {
-      if (!rank.country) return '';
-      return `/media/flags/${rank.country.toLowerCase()}.png`;
-    },
-  },
-  computed: {
-    nextPageFilter: function() {
-      if (this.filter)
-        return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(this.filter)}`;
-      else
-        return `/rank?page=${this.page + 1}`;
-    },
-    prevPageFilter: function() {
-      if (this.filter)
-        return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(this.filter)}`;
-      else
-        return `/rank?page=${this.page - 1}`;
-    },
-    shouldShowNextPage: function() {
-      return this.length * this.page < this.resultTotal;
-    }
-  },
+@Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
   },
-};
+})
+export default class RankTable extends Vue {
+  @Prop() page!: number;
+  @Prop() length!: number;
+  @Prop() isIndex!: boolean;
+  @Prop() availableFilters!: { [key: string]: string };
+  @Prop() filter!: string;
+  @Prop() ranking!: Rank[];
+  @Prop() resultTotal!: number;
+
+  T = T;
+  UI = UI;
+  searchedUsername = '';
+
+  onSubmit(): void {
+    window.location.href = `/profile/${encodeURIComponent(
+      this.searchedUsername,
+    )}`;
+  }
+
+  onFilterChange(): void {
+    // change url parameters with jquery
+    // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
+    let queryParameters: { [key: string]: string } = {};
+    const re = /([^&=]+)=([^&]*)/g;
+    const queryString = location.search.substring(1);
+    let m: string[] | null = null;
+    while ((m = re.exec(queryString))) {
+      queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+    }
+    if (this.filter !== '') {
+      queryParameters['filter'] = this.filter;
+    } else {
+      delete queryParameters['filter'];
+    }
+    window.location.search = UI.buildURLQuery(queryParameters);
+  }
+
+  flagURL(rank: Rank): string {
+    if (!rank.country) return '';
+    return `/media/flags/${rank.country.toLowerCase()}.png`;
+  }
+
+  get nextPageFilter(): string {
+    if (this.filter)
+      return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(
+        this.filter,
+      )}`;
+    else return `/rank?page=${this.page + 1}`;
+  }
+
+  get prevPageFilter(): string {
+    if (this.filter)
+      return `/rank?page=${this.page - 1}&filter=${encodeURIComponent(
+        this.filter,
+      )}`;
+    else return `/rank?page=${this.page - 1}`;
+  }
+
+  get shouldShowNextPage(): boolean {
+    return this.length * this.page < this.resultTotal;
+  }
+}
+
 </script>
