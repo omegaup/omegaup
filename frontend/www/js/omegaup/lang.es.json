@@ -320,7 +320,6 @@
 	"groupAdminAdded": "Grupo de administradores agregado correctamente",
 	"groupAdminRemoved": "Grupo de administradores eliminado correctamente",
 	"groupCreateIdentities": "Crear identidades",
-	"groupEditIdentity": "Editar identidad",
 	"groupEditMemberAdded": "\u00a1Miembro agregado correctamente!",
 	"groupEditMemberPasswordUpdated": "\u00a1Contrase\u00f1a de la identidad actualizada correctamente!",
 	"groupEditMemberRemoved": "\u00a1Miembro eliminado correctamente!",

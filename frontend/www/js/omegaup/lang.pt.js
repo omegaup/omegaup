@@ -321,7 +321,6 @@ const translations = {
 	groupAdminAdded: "Grupo do administradores adicionado com sucesso",
 	groupAdminRemoved: "Grupo do administradores removido com sucesso",
 	groupCreateIdentities: "Criar identidades",
-	groupEditIdentity: "Editar identidade",
 	groupEditMemberAdded: "Membro adicionado com sucesso!",
 	groupEditMemberPasswordUpdated: "Senha de identidade atualizada corretamente!",
 	groupEditMemberRemoved: "Membro removido com sucesso!",

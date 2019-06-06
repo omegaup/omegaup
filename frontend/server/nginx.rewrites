@@ -46,7 +46,6 @@ rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /coursestudents.php?course=$1 las
 rewrite ^/group/?$ /grouplist.php last;
 rewrite ^/group/new/?$ /groupnew.php last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /groupedit.php?group=$1 last;
-rewrite ^/group/([a-zA-Z0-9_+:-]+)/editidentity/([a-zA-Z0-9_+:-]+)/?$ /groupeditidentity.php?group=$1&username=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /groupscoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/stats/?$ /groupstats.php?group=$1 last;

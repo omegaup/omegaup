@@ -57,8 +57,9 @@
           <td>{{ identity.school }}</td>
           <td>
             <a class="glyphicon glyphicon-edit"
-                v-bind:href="`/group/${groupAlias}/editidentity/${identity.username}/`"
-                v-bind:title="T.groupEditMembersEdit"></a> <a class="glyphicon glyphicon-lock"
+                href="#"
+                v-bind:title="T.groupEditMembersEdit"
+                v-on:click="onEdit(identity)"></a> <a class="glyphicon glyphicon-lock"
                 href="#"
                 v-bind:title="T.groupEditMembersChangePassword"
                 v-on:click="onChangePass(identity.username)"></a> <a class=
@@ -143,7 +144,6 @@ label {
 <script>
 import {T, UI} from '../../omegaup.js';
 import user_Username from '../user/Username.vue';
-import identity_Edit from '../identity/Edit.vue';
 export default {
   props: {
     identities: Array,
@@ -180,6 +180,7 @@ export default {
       }
       this.$emit('add-member', this, this.memberUsername);
     },
+    onEdit: function(identity) { this.$emit('edit-identity', identity);},
     onChangePass: function(username) {
       this.username = username;
       $('.modal-change-password').modal();
@@ -198,7 +199,6 @@ export default {
   },
   components: {
     'omegaup-user-username': user_Username,
-    'omegaup-identity-edit': identity_Edit,
   },
 };
 </script>

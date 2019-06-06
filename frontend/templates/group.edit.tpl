@@ -21,7 +21,7 @@
 	</div>
 	{if $IS_ORGANIZER}
 		<div class="tab-pane" id="identities">
-			<div id="create_identities"></div>
+			<div id="create-identities"></div>
 			<script src="{version_hash src="/js/dist/group_identities.js"}" type="text/javascript"></script>
 		</div>
 	{/if}
