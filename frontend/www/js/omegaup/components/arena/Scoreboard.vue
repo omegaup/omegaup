@@ -83,7 +83,7 @@ export default {
   data: function() {
     return {
       UI: UI,
-      onlyShowExplicitlyInvited: false,
+      onlyShowExplicitlyInvited: true,
     };
   },
   computed: {
