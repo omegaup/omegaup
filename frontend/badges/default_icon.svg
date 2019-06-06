@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SVG por defecto para los Badges
+  Este archivo servirá como referencia para personalizar badges a criterio de los contribuidores.
+
+  Algunas de las restricciones que todo Badge SVG deberá tener son:
+  - Ancho (width)  = Alto (height) = 600px (SIEMPRE).
+  - Tamaño de archivo de 15KB como máximo.
+-->
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600px" height="600px" viewBox="0 0 737.408 737.408">
+    <defs>
+      <!--
+        GRADIENTES:
+        - "border": la primera, usada para el borde la medalla.
+        - "inside": la segunda, usada para el relleno de la medalla.
+
+        Por defecto el degradado es horizontal, sin embargo puede ser vertical usando este parámetro:
+        - gradientTransform: rotate([degrees]), degrees = [0-90].
+
+        Cada etiqueta <stop> dentro de linearGradient permite especificar los colores y el área que ocuparán dentro de la gradiente.
+        En caso se desee un color sólido en lugar de un degradado, se pueden poner: <stop offset="0%"> con el color deseado.
+        Toda la personalización de color y/o degradado queda a criterio del creador del badge.
+
+        * ALTERNATIVAMENTE se puede usar radialGradient en lugar de alguno (o ambos) linearGradient. Más información:
+          https://developer.mozilla.org/en-US/docs/Web/SVG/Element/linearGradient
+          https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient
+      -->
+      <linearGradient id="border">
+        <stop offset="0%" style="stop-color: #000;"/>
+      </linearGradient>
+
+      <linearGradient id="inside" gradientTransform="rotate(90)">
+        <stop offset="0%" style="stop-color:#678DD7;"/>
+        <stop offset="85%" style="stop-color:#ccc;"/>
+      </linearGradient>
+    </defs>
+
+	  <!-- Contorno del Badge -->
+    <g fill="url(#border)">
+      <path d="M 674.417,123.507
+        c-0.224-9.759-7.216-18.177-16.982-19.511
+        c-45.521-6.252-90.416-17.129-134.426-33.248
+        c-43.802-16.042-92.267-38.436-144.54-67.93
+        c-6.637-3.747-12.88-3.77-19.51,0
+        c-51.911,29.479-100.029,51.826-144.177,67.93
+        c-44.024,16.058-88.897,27.004-134.056,33.248
+        c-9.767,1.349-16.62,9.752-17.707,19.511
+        c-4.332,185.366,36.27,337.036,121.414,454.934
+        c46.384,64.222,104.431,116.349,174.526,156.096
+        c5.419,3.978,13.915,3.677,20.235,0
+        c69.564-40.41,127.534-92.159,173.811-156.096
+        C638.262,460.62,678.533,308.88,674.417,123.507z"/>
+    </g>
+
+    <!-- Relleno del Badge -->
+    <g fill="url(#inside)">
+      <path d=" M520.48,555.677
+        c-40.225,55.564-90.694,101.895-151.762,139.112
+        c-61.069-37.218-111.777-83.378-151.763-139.112
+        c-77.458-107.962-115.269-246.08-113.828-414.463
+        c42.637-6.868,84.92-18.432,127.195-33.972
+        c42.275-15.533,88.528-36.856,138.396-63.952
+        c49.868,27.096,95.757,48.419,138.033,63.952
+        c42.275,15.541,84.912,27.104,127.557,33.972
+        C635.75,310.684,597.699,448.995,520.48,555.677z"/>
+    </g>
+
+    <!--
+      Texto del badge
+      Cada badge PUEDE tener texto dentro, a criterio del usuario. Idealmente este texto debe ser igual al alias del badge.
+      Cada línea se define a través de un <text>, con parámetros:
+      - fill: el color
+      - font-size
+      - font-family
+      - x: la posición de inicio del texto respecto al eje X de la figura total (en % o px)
+      - y: la posición de inicio del texto respecto al eje Y de la figura total (en % o px)
+
+      Los emojis también están soportados y pueden ser incluídos.
+    -->
+    <text fill="#ffffff" font-size="115" font-family="sans-serif" x="16.25%" y="40%">omegaUp</text>
+    <text fill="#ffffff" font-size="200" font-family="sans-serif" x="32.5%" y="67.5%">💻</text>
+</svg>
