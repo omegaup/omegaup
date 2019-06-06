@@ -307,9 +307,9 @@ class CoursesDAO extends CoursesDAOBase {
         return new Courses($row);
     }
 
-    final public static function getAssignmentByAlias(int $courseId, String $assignmentAlias) {
+    final public static function getAssignmentByAlias(Courses $course, string $assignmentAlias) {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
-        $params = [$assignmentAlias, $courseId];
+        $params = [$assignmentAlias, $course->course_id];
 
         global $conn;
         $row = $conn->GetRow($sql, $params);
@@ -320,7 +320,7 @@ class CoursesDAO extends CoursesDAOBase {
         return new Assignments($row);
     }
 
-    final public static function updateAssignmentMaxPoints(Courses $course, $assignment_alias) {
+    final public static function updateAssignmentMaxPoints(Courses $course, string $assignment_alias) {
         $sql = 'UPDATE Assignments a
                 JOIN (
                     SELECT assignment_id, sum(psp.points) as max_points

@@ -39,7 +39,7 @@ class CourseController extends Controller {
      */
     private static function validateCourseAssignmentAlias(Request $r) {
         try {
-            $r['assignment'] = CoursesDAO::getAssignmentByAlias($r['course']->course_id, $r['assignment']);
+            $r['assignment'] = CoursesDAO::getAssignmentByAlias($r['course'], $r['assignment']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
