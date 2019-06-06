@@ -761,6 +761,7 @@ const translations = {
 	schoolsLearnProgBySolvProblems: "Learn programming by solving problems",
 	schoolsManageProgressOfStudents: "Manage the progress of your students",
 	schoolsStartUsingSchools: "Start using Schools",
+	scoreboardShowOnlyInvitedIdentities: "Show invited contestants only",
 	scoreboardmerge: "Merge scorboard",
 	searchUser: "Search user",
 	selectAction: "Select action",

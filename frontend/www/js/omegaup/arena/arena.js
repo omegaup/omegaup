@@ -282,6 +282,7 @@ export class Arena {
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
+              digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
             },
           });
         },
@@ -289,6 +290,7 @@ export class Arena {
           problems: [],
           ranking: [],
           lastUpdated: null,
+          digitsAfterDecimalPoint: self.digitsAfterDecimalPoint,
         },
         components: {
           'omegaup-scoreboard': arena_Scoreboard,
@@ -345,6 +347,9 @@ export class Arena {
 
     // Ephemeral grader support.
     self.ephemeralGrader = new EphemeralGrader();
+
+    // Number of digits after the decimal point to show.
+    self.digitsAfterDecimalPoint = 2;
   }
 
   installLibinteractiveHooks() {
@@ -833,8 +838,12 @@ export class Arena {
         if (self.problems[alias]) {
           if (rank.username == OmegaUp.username) {
             $('#problems .problem_' + alias + ' .solved')
-                .html('(' + problem.points + ' / ' +
-                      self.problems[alias].points + ')');
+                .html('(' +
+                      problem.points.toFixed(self.digitsAfterDecimalPoint) +
+                      ' / ' +
+                      self.problems[alias].points.toFixed(
+                          self.digitsAfterDecimalPoint) +
+                      ')');
             self.updateProblemScore(alias, self.problems[alias].points,
                                     problem.points);
           }
@@ -853,8 +862,9 @@ export class Arena {
             .html('<span title="' + UI.rankingUsername(rank) + '">' +
                   UI.rankingUsername(rank) + UI.getFlag(rank['country']) +
                   '</span>');
-        $('.points', r).html(rank.total.points);
-        $('.penalty', r).html(rank.total.penalty);
+        $('.points', r)
+            .html(rank.total.points.toFixed(self.digitsAfterDecimalPoint));
+        $('.penalty', r).html(rank.total.penalty.toFixed(0));
 
         self.elements.miniRanking.append(r);
       }
@@ -1837,11 +1847,17 @@ export class Arena {
   updateProblemScore(alias, maxScore, previousScore) {
     let self = this;
     $('.problem_' + alias + ' .solved')
-        .text('(' + self.myRuns.getMaxScore(alias, previousScore) + ' / ' +
-              maxScore + ')');
+        .text(
+            '(' +
+            self.myRuns.getMaxScore(alias, previousScore)
+                .toFixed(self.digitsAfterDecimalPoint) +
+            ' / ' +
+            parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
+            ')');
     $('.omegaup-scoreboard tr.' + OmegaUp.username + ' td.' + alias +
       ' .points')
-        .text(self.myRuns.getMaxScore(alias, previousScore))
+        .text(self.myRuns.getMaxScore(alias, previousScore)
+                  .toFixed(self.digitsAfterDecimalPoint))
   }
 }
 ;
