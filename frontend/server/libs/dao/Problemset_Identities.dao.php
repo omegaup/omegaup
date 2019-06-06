@@ -21,12 +21,14 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         int $identityId,
         int $problemsetId,
         ?int $windowLength,
-        ?bool $grantAccess = false,
+        bool $grantAccess = false,
         ?bool $shareUserInformation = false
     ) : ProblemsetIdentities {
         $currentTime = Time::get();
         $problemsetIdentity = self::getByPK($identityId, $problemsetId);
+        $isNewProblemsetIdentity = false;
         if (is_null($problemsetIdentity)) {
+            $isNewProblemsetIdentity = true;
             if (!$grantAccess) {
                 // User was not authorized to do this.
                 throw new ForbiddenAccessException();
@@ -44,7 +46,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemsetIdentity->access_time = date('Y-m-d H:i:s', $currentTime);
             $problemsetIdentity->end_time = date('Y-m-d H:i:s', $currentTime + $windowLength * 60);
             $problemsetIdentity->share_user_information = $shareUserInformation;
-            if (is_null(self::getByPK($problemsetIdentity->identity_id, $problemsetIdentity->problemset_id))) {
+            if ($isNewProblemsetIdentity) {
                 self::create($problemsetIdentity);
             } else {
                 self::update($problemsetIdentity);

@@ -2426,6 +2426,12 @@ class ContestController extends Controller {
         }
         if ($original_contest->window_length !== $contest->window_length) {
             // Get the difference between new and original window length
+            if (is_null($contest->window_length)) {
+                $contest->window_length = 0;
+            }
+            if (is_null($original_contest->window_length)) {
+                $original_contest->window_length = 0;
+            }
             $windowLengthDifference = $contest->window_length - $original_contest->window_length;
             ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
                 $contest->problemset_id,
