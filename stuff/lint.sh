@@ -19,4 +19,4 @@ fi
 exec /usr/bin/docker run --interactive --tty --rm \
 	--volume "${OMEGAUP_ROOT}:/src" \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
-	omegaup/hook_tools:20190331 -j4 $ARGS
+	omegaup/hook_tools:20190606 -j4 $ARGS
