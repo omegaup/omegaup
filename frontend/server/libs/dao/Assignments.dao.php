@@ -103,6 +103,28 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         return new Assignments($row);
     }
 
+    final public static function getByIdWithScoreboardUrls($assignmentId) {
+        $sql = '
+                SELECT
+                   ps.scoreboard_url,
+                   ps.scoreboard_url_admin
+                FROM
+                    Assignments a
+                INNER JOIN
+                    Problemsets ps
+                ON
+                    ps.problemset_id = a.problemset_id
+                WHERE
+                    a.assignment_id = ? LIMIT 1;';
+
+        global $conn;
+        $rs = $conn->GetRow($sql, [$assignmentId]);
+        if (empty($rs)) {
+            return null;
+        }
+        return $rs;
+    }
+
     /**
       * Update assignments order.
       *
