@@ -20,44 +20,50 @@ OMEGAUP_BADGES_ROOT = (os.path.abspath(os.path.join(__file__, '..', '..'))
 
 def process_badge(alias):
     '''Validates and processes badge information'''
-    logging.info('Badge %s:', alias)
+    logging.info('BADGE %s:', alias)
     try:
         path = OMEGAUP_BADGES_ROOT + alias + '/icon.svg'
         filesize = os.stat(path).st_size
-        if (filesize / 1024 > 15.0):
-            logging.warn('El tamaño de icon.svg excede los 15KB.')
+        if filesize / 1024 > 15.0:
+            logging.warning('El tamaño de icon.svg excede los 15KB.')
         return False
     except:  # noqa: bare-except
-        logging.exception('No se pudo abrir icon.svg')
+        logging.exception('No se encontró icon.svg')
         # build_svg()
     # SVG must be OK for this to pass.
 
     try:
         path = OMEGAUP_BADGES_ROOT + alias + '/localizations.json'
+        # Opens localizations json and adds the entries to:
+        # /frontend/templates/es.lang
+        # /frontend/templates/en.lang
+        # /frontend/templates/pt.lang
         with open(path, 'r') as f:
             localizations = json.load(f)
-            if (localizations['es']['name']
-                and localizations['es']['description']
-                and localizations['en']['name']
-                and localizations['en']['description']
-                and localizations['pt']['name']
-                and localizations['pt']['description']):
-                logging.info('Agregaré las localizaciones.')
-                # add_localization_entries()
-            else:
-                logging.warn('El archivo localizations.json es incorrecto.')
-            return False
+            keys = ('en', 'es', 'pt')
+            sub_keys = ('name', 'description')
+            for key in keys:
+                if key not in localizations:
+                    logging.warning('No existe localizations[%s].',
+                                    key)
+                    return False
+                for sub_key in sub_keys:
+                    if sub_key not in localizations[key]:
+                        logging.warning('No existe %s en localizations[%s]')
+                        return False
+            # add_entries_to_templates()
+            logging.info('Las entradas serán cargadas a los archivos .lang')
     except:  # noqa: bare-except
         logging.exception('No se pudo abrir localizations.json')
 
-    if not os.path.isfile(OMEGAUP_BADGES_ROOT + alias + 'tests.json'):
-        logging.warn('No ha sido encontrado el archivo test.json')
+    if not os.path.isfile(OMEGAUP_BADGES_ROOT + alias + '/query.sql'):
+        logging.warning('No ha sido encontrado el archivo query.sql')
         return False
 
-    if not os.path.isfile(OMEGAUP_BADGES_ROOT + alias + 'query.sql'):
-        logging.warn('No ha sido encontrado el archivo query.sql')
+    if not os.path.isfile(OMEGAUP_BADGES_ROOT + alias + '/test.json'):
+        logging.warning('No ha sido encontrado el archivo test.json')
         return False
-
+    # run_test_for_badge()
     return True
 
 
@@ -78,8 +84,10 @@ def main():
             logging.info('%s ha sido correctamente agregado/actualizado.\n',
                          alias)
         else:
-            logging.warn('%s no pudo ser agregado/actualizado.\n', alias)
+            logging.warning('%s no pudo ser agregado/actualizado.\n', alias)
 
 
 if __name__ == '__main__':
     main()
+
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
