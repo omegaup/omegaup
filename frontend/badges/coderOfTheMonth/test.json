@@ -27,28 +27,6 @@
           }
         },
         {
-          "api": "/problem/create",
-          "params": {
-            "visibility": 1,
-            "title": "Triangulos",
-            "problem_alias": "triangulos",
-            "validator": "token-numeric",
-            "time_limit": 1000,
-            "validator_time_limit": 0,
-            "overall_wall_time_limit": 1000,
-            "extra_wall_time": 0,
-            "memory_limit": 32768,
-            "output_limit": 10240,
-            "input_limit": 10240,
-            "source": "omegaUp classics",
-            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-            "email_clarifications": 1
-          },
-          "files": {
-            "problem_contents": "frontend/tests/resources/triangulos.zip"
-          }
-        },
-        {
           "api": "/user/create",
           "params": {
             "username": "user_0",
@@ -80,7 +58,6 @@
       "requests": [
         {
           "api": "/run/create",
-          "fail_ok": true,
           "params": {
             "problem_alias": "sumas",
             "language": "py",
