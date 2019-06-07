@@ -18,6 +18,7 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
         ContestParams::validateParameter('admission_mode', $this->params, false, 'public');
         ContestParams::validateParameter('basic_information', $this->params, false, 'false');
+        ContestParams::validateParameter('requests_user_information', $this->params, false, 'no');
         ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
         ContestParams::validateParameter('languages', $this->params, false);
         ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
@@ -128,6 +129,9 @@ class ContestsFactory {
         } else {
             $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
         }
+        $r['languages'] = $params['languages'];
+        $r['basic_information'] = $params['basic_information']; // This is just a default value.
+        $r['requests_user_information'] = $params['requests_user_information']; // This is just a default value.
 
         return [
             'request' => $r,

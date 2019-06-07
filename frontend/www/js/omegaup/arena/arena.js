@@ -640,8 +640,16 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
+    let scoreboardParams = {
+      problemset_id:
+          self.options.problemsetId || self.currentProblemset.problemset_id,
+    };
+    if (self.options.scoreboardToken) {
+      scoreboardParams.token = self.options.scoreboardToken;
+    }
+
     if (self.options.contestAlias != null) {
-      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
+      API.Problemset.scoreboard(scoreboardParams)
           .then(function(response) {
             // Differentiate ranking change between virtual and normal contest
             if (self.options.originalContestAlias != null)
@@ -653,7 +661,7 @@ export class Arena {
     } else if (self.options.problemsetAdmin ||
                self.options.contestAlias != null || self.problemsetAdmin ||
                (self.options.courseAlias && self.options.assignmentAlias)) {
-      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
+      API.Problemset.scoreboard(scoreboardParams)
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);
     }
@@ -737,14 +745,14 @@ export class Arena {
     data.ranking.forEach((rank, index) => rank.place = index + 1);
     self.onRankingChanged(data);
 
-    let params = {
+    let scoreboardEventsParams = {
       problemset_id: self.options.problemsetId,
     };
     if (self.options.scoreboardToken) {
-      params.token = self.options.scoreboardToken;
+      scoreboardEventsParams.token = self.options.scoreboardToken;
     }
 
-    API.Problemset.scoreboardEvents(params)
+    API.Problemset.scoreboardEvents(scoreboardEventsParams)
         .then(function(response) {
           // Change username to username-virtual
           for (let evt of response.events) {
@@ -788,15 +796,16 @@ export class Arena {
   rankingChange(data, rankingEvent = true) {
     let self = this;
     self.onRankingChanged(data);
-    let params = {
-      problemset_id: self.options.problemsetId,
+    let scoreboardEventsParams = {
+      problemset_id:
+          self.options.problemsetId || self.currentProblemset.problemset_id,
     };
     if (self.options.scoreboardToken) {
-      params.token = self.options.scoreboardToken;
+      scoreboardEventsParams.token = self.options.scoreboardToken;
     }
 
     if (rankingEvent) {
-      API.Problemset.scoreboardEvents(params)
+      API.Problemset.scoreboardEvents(scoreboardEventsParams)
           .then(self.onRankingEvents.bind(self))
           .fail(UI.ignoreError);
     }
@@ -947,7 +956,7 @@ export class Arena {
 
   createChart(series, navigatorSeries) {
     let self = this;
-    if (series.length == 0) return;
+    if (series.length == 0 || self.elements.ranking.length == 0) return;
 
     Highcharts.setOptions({colors: ScoreboardColors});
 
