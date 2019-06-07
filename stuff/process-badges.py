@@ -28,9 +28,8 @@ def process_badge(alias):
             logging.warning('El tamaño de icon.svg excede los 15KB.')
         return False
     except:  # noqa: bare-except
-        logging.exception('No se encontró icon.svg')
-        # build_svg()
-    # SVG must be OK for this to pass.
+        logging.exception('No se encontró icon.svg, se asignará el default')
+    # SVG must be OK or not exist for this to pass.
 
     try:
         path = OMEGAUP_BADGES_ROOT + alias + '/localizations.json'
