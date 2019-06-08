@@ -34,6 +34,8 @@ OmegaUp.on('ready', function() {
           },
           'bulk-update':
               (admissionMode) => this.changeAdmissionMode(admissionMode),
+          'download-csv-users':
+              (contestAlias) => this.downloadCsvUsers(contestAlias),
         }
       });
     },
@@ -52,6 +54,48 @@ OmegaUp.on('ready', function() {
               .then(resolve)
               .fail(reject);
         }, fillContestsTable);
+      },
+      downloadCsvUsers: function(contestAlias) {
+        API.Contest.contestants({
+                     contest_alias: contestAlias,
+                   })
+            .then(function(result) {
+              if (result.status != 'ok') {
+                return;
+              }
+              // Solution found in
+              // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+              let csvContent = "data:text/csv;charset=utf-8,";
+              result.contestants.forEach(function(rowArray, index) {
+                let row = '';
+                if (index == 0) {
+                  // Setting table headers
+                  for (let[key, value] of Object.entries(rowArray)) {
+                    if (rowArray.hasOwnProperty(key)) {
+                      row += key + ',';
+                    }
+                  }
+                  csvContent += row + "\r\n";
+                  row = '';
+                }
+                for (let[key, value] of Object.entries(rowArray)) {
+                  if (rowArray.hasOwnProperty(key)) {
+                    row += value + ',';
+                  }
+                }
+                csvContent += row + "\r\n";
+              });
+
+              var encodedUri = encodeURI(csvContent);
+              var link = document.createElement('a');
+              link.setAttribute('href', encodedUri);
+              link.setAttribute('download', 'users_' + contestAlias + '.csv');
+              document.body.appendChild(link);  // Required for FF
+
+              link.click();  // This will download the data file named
+                             // "my_data.csv".
+            })
+            .fail(omegaup.UI.apiError);
       }
     }
   });
