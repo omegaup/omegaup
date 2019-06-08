@@ -549,7 +549,8 @@ class ContestController extends Controller {
                 $r['contest']->problemset_id,
                 $r['contest']->window_length,
                 true,
-                $r['share_user_information']
+                strtotime($r['contest']->finish_time),
+                $r['share_user_information'] == true
             );
 
             // Insert into PrivacyStatement_Consent_Log whether request
@@ -695,7 +696,9 @@ class ContestController extends Controller {
                 $problemsetIdentity = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                     $r['current_identity_id'],
                     $r['contest']->problemset_id,
-                    $r['contest']->window_length
+                    $r['contest']->window_length,
+                    false,
+                    strtotime($r['contest']->finish_time)
                 );
             } catch (ApiException $e) {
                 throw $e;
@@ -2410,7 +2413,9 @@ class ContestController extends Controller {
     }
 
     /**
-     * This function reviews changes in penalty type, admission mode and window length
+     * This function reviews changes in penalty type, admission mode
+     * finish time and window length to recalcualte information
+     * previously stored
      */
     private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
         if ($original_contest->admission_mode !== $contest->admission_mode) {
@@ -2424,19 +2429,26 @@ class ContestController extends Controller {
             ]));
             $contest->last_updated = $timestamp;
         }
-        if ($original_contest->window_length !== $contest->window_length) {
-            // Get the difference between new and original window length
-            if (is_null($contest->window_length)) {
-                $contest->window_length = 0;
-            }
-            if (is_null($original_contest->window_length)) {
-                $original_contest->window_length = 0;
-            }
-            $windowLengthDifference = $contest->window_length - $original_contest->window_length;
-            ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
+        if ($original_contest->finish_time !== $contest->finish_time) {
+            ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime(
                 $contest->problemset_id,
-                $windowLengthDifference
+                strtotime($contest->finish_time)
             );
+        }
+        if ($original_contest->window_length !== $contest->window_length) {
+            // When window length is disabled, end time value is finish time of the contest
+            if (is_null($contest->window_length)) {
+                ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime(
+                    $contest->problemset_id,
+                    $contest->finish_time
+                );
+            } else {
+                // When window length is enabled, end time value is finish time of the contest + window length
+                ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
+                    $contest->problemset_id,
+                    $contest->window_length
+                );
+            }
         }
         ContestsDAO::save($contest);
         if ($original_contest->penalty_type == $contest->penalty_type) {

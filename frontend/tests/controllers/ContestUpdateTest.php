@@ -520,13 +520,8 @@ class UpdateContestTest extends OmegaupTestCase {
         ]));
 
         foreach ($identities['users'] as $identity) {
-            if ($identity['username'] == $contestant->username) {
-                // Identity keeps extended time
-                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + 40 * 60);
-            } else {
-                // Other identities keep end time with window length
-                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
-            }
+            // End time for all participants has been updated and extended time for the identity is no longer available
+            $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
         }
     }
 }

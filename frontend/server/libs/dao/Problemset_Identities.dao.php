@@ -22,7 +22,8 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         int $problemsetId,
         ?int $windowLength,
         bool $grantAccess = false,
-        ?bool $shareUserInformation = false
+        ?int $finishTime = null,
+        bool $shareUserInformation = false
     ) : ProblemsetIdentities {
         $currentTime = Time::get();
         $problemsetIdentity = self::getByPK($identityId, $problemsetId);
@@ -44,7 +45,11 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
             $problemsetIdentity->access_time = date('Y-m-d H:i:s', $currentTime);
-            $problemsetIdentity->end_time = date('Y-m-d H:i:s', $currentTime + $windowLength * 60);
+            if (is_null($windowLength)) {
+                $problemsetIdentity->end_time = date('Y-m-d H:i:s', $finishTime);
+            } else {
+                $problemsetIdentity->end_time = date('Y-m-d H:i:s', $currentTime + $windowLength * 60);
+            }
             $problemsetIdentity->share_user_information = $shareUserInformation;
             if ($isNewProblemsetIdentity) {
                 self::create($problemsetIdentity);
@@ -117,14 +122,35 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
+                INNER JOIN
+                    `Contests`
+                ON
+                    Problemset_Identities.problemset_id = Contests.problemset_id
                 SET
-                    `end_time` = DATE_ADD(end_time, INTERVAL ? MINUTE)
+                    `end_time` = DATE_ADD(access_time, INTERVAL ? MINUTE)
                 WHERE
-                    `problemset_id` = ?
-                    AND `end_time` IS NOT NULL;';
+                    Problemset_Identities.`problemset_id` = ?
+                    AND `access_time` IS NOT NULL;';
 
         global $conn;
         $conn->Execute($sql, [$windowLengthDifference, $problemsetId]);
+
+        return $conn->Affected_Rows();
+    }
+
+    public static function recalculateEndTimeAsFinishTime(
+        int $problemsetId,
+        int $endTime
+    ) : int {
+        $sql = 'UPDATE
+                    `Problemset_Identities`
+                SET
+                    `end_time` = FROM_UNIXTIME(?)
+                WHERE
+                    `problemset_id` = ?;';
+
+        global $conn;
+        $conn->Execute($sql, [$endTime, $problemsetId]);
 
         return $conn->Affected_Rows();
     }
