@@ -282,6 +282,7 @@ export class Arena {
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
+              digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
             },
           });
         },
@@ -289,6 +290,7 @@ export class Arena {
           problems: [],
           ranking: [],
           lastUpdated: null,
+          digitsAfterDecimalPoint: self.digitsAfterDecimalPoint,
         },
         components: {
           'omegaup-scoreboard': arena_Scoreboard,
@@ -345,6 +347,9 @@ export class Arena {
 
     // Ephemeral grader support.
     self.ephemeralGrader = new EphemeralGrader();
+
+    // Number of digits after the decimal point to show.
+    self.digitsAfterDecimalPoint = 2;
   }
 
   installLibinteractiveHooks() {
@@ -635,8 +640,16 @@ export class Arena {
 
   refreshRanking() {
     let self = this;
+    let scoreboardParams = {
+      problemset_id:
+          self.options.problemsetId || self.currentProblemset.problemset_id,
+    };
+    if (self.options.scoreboardToken) {
+      scoreboardParams.token = self.options.scoreboardToken;
+    }
+
     if (self.options.contestAlias != null) {
-      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
+      API.Problemset.scoreboard(scoreboardParams)
           .then(function(response) {
             // Differentiate ranking change between virtual and normal contest
             if (self.options.originalContestAlias != null)
@@ -648,7 +661,7 @@ export class Arena {
     } else if (self.options.problemsetAdmin ||
                self.options.contestAlias != null || self.problemsetAdmin ||
                (self.options.courseAlias && self.options.assignmentAlias)) {
-      API.Problemset.scoreboard({problemset_id: self.options.problemsetId})
+      API.Problemset.scoreboard(scoreboardParams)
           .then(self.rankingChange.bind(self))
           .fail(UI.ignoreError);
     }
@@ -732,14 +745,14 @@ export class Arena {
     data.ranking.forEach((rank, index) => rank.place = index + 1);
     self.onRankingChanged(data);
 
-    let params = {
+    let scoreboardEventsParams = {
       problemset_id: self.options.problemsetId,
     };
     if (self.options.scoreboardToken) {
-      params.token = self.options.scoreboardToken;
+      scoreboardEventsParams.token = self.options.scoreboardToken;
     }
 
-    API.Problemset.scoreboardEvents(params)
+    API.Problemset.scoreboardEvents(scoreboardEventsParams)
         .then(function(response) {
           // Change username to username-virtual
           for (let evt of response.events) {
@@ -783,34 +796,19 @@ export class Arena {
   rankingChange(data, rankingEvent = true) {
     let self = this;
     self.onRankingChanged(data);
-    let params = {
-      problemset_id: self.options.problemsetId,
+    let scoreboardEventsParams = {
+      problemset_id:
+          self.options.problemsetId || self.currentProblemset.problemset_id,
     };
     if (self.options.scoreboardToken) {
-      params.token = self.options.scoreboardToken;
+      scoreboardEventsParams.token = self.options.scoreboardToken;
     }
 
     if (rankingEvent) {
-      API.Problemset.scoreboardEvents(params)
+      API.Problemset.scoreboardEvents(scoreboardEventsParams)
           .then(self.onRankingEvents.bind(self))
           .fail(UI.ignoreError);
     }
-  }
-
-  rankingCourseChange(data) {
-    let self = this;
-    self.onRankingChanged(data);
-
-    let params = {
-      course_alias: self.options.courseAlias,
-      assignment_alias: self.options.assignmentAlias,
-    };
-    if (self.options.scoreboardToken) {
-      params.token = self.options.scoreboardToken;
-    }
-    API.Course.assignmentScoreboardEvents(params)
-        .then(self.onRankingEvents.bind(self))
-        .fail(UI.ignoreError);
   }
 
   onRankingChanged(data) {
@@ -849,8 +847,12 @@ export class Arena {
         if (self.problems[alias]) {
           if (rank.username == OmegaUp.username) {
             $('#problems .problem_' + alias + ' .solved')
-                .html('(' + problem.points + ' / ' +
-                      self.problems[alias].points + ')');
+                .html('(' +
+                      problem.points.toFixed(self.digitsAfterDecimalPoint) +
+                      ' / ' +
+                      self.problems[alias].points.toFixed(
+                          self.digitsAfterDecimalPoint) +
+                      ')');
             self.updateProblemScore(alias, self.problems[alias].points,
                                     problem.points);
           }
@@ -869,8 +871,9 @@ export class Arena {
             .html('<span title="' + UI.rankingUsername(rank) + '">' +
                   UI.rankingUsername(rank) + UI.getFlag(rank['country']) +
                   '</span>');
-        $('.points', r).html(rank.total.points);
-        $('.penalty', r).html(rank.total.penalty);
+        $('.points', r)
+            .html(rank.total.points.toFixed(self.digitsAfterDecimalPoint));
+        $('.penalty', r).html(rank.total.penalty.toFixed(0));
 
         self.elements.miniRanking.append(r);
       }
@@ -953,7 +956,7 @@ export class Arena {
 
   createChart(series, navigatorSeries) {
     let self = this;
-    if (series.length == 0) return;
+    if (series.length == 0 || self.elements.ranking.length == 0) return;
 
     Highcharts.setOptions({colors: ScoreboardColors});
 
@@ -1853,11 +1856,17 @@ export class Arena {
   updateProblemScore(alias, maxScore, previousScore) {
     let self = this;
     $('.problem_' + alias + ' .solved')
-        .text('(' + self.myRuns.getMaxScore(alias, previousScore) + ' / ' +
-              maxScore + ')');
+        .text(
+            '(' +
+            self.myRuns.getMaxScore(alias, previousScore)
+                .toFixed(self.digitsAfterDecimalPoint) +
+            ' / ' +
+            parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
+            ')');
     $('.omegaup-scoreboard tr.' + OmegaUp.username + ' td.' + alias +
       ' .points')
-        .text(self.myRuns.getMaxScore(alias, previousScore))
+        .text(self.myRuns.getMaxScore(alias, previousScore)
+                  .toFixed(self.digitsAfterDecimalPoint))
   }
 }
 ;

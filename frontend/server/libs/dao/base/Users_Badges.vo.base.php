@@ -26,17 +26,17 @@ class UsersBadges extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['badge_id'])) {
-            $this->badge_id = (int)$data['badge_id'];
+        if (isset($data['user_badge_id'])) {
+            $this->user_badge_id = (int)$data['user_badge_id'];
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
         }
-        if (isset($data['time'])) {
-            $this->time = $data['time'];
+        if (isset($data['badge_alias'])) {
+            $this->badge_alias = $data['badge_alias'];
         }
-        if (isset($data['last_problem_id'])) {
-            $this->last_problem_id = (int)$data['last_problem_id'];
+        if (isset($data['assignation_time'])) {
+            $this->assignation_time = $data['assignation_time'];
         }
     }
 
@@ -45,7 +45,7 @@ class UsersBadges extends VO {
      */
     public function toUnixTime(array $fields = []) {
         if (empty($fields)) {
-            parent::toUnixTime(['time']);
+            parent::toUnixTime(['assignation_time']);
             return;
         }
         parent::toUnixTime($fields);
@@ -54,30 +54,30 @@ class UsersBadges extends VO {
     /**
       *  [Campo no documentado]
       * Llave Primaria
+      * Auto Incremento
       * @access public
       * @var int(11)
       */
-    public $badge_id;
+    public $user_badge_id;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
+      * Identificador de usuario
       * @access public
       * @var int(11)
       */
     public $user_id;
 
     /**
+      * Identificador de badge
+      * @access public
+      * @var varchar(32)
+      */
+    public $badge_alias;
+
+    /**
       *  [Campo no documentado]
       * @access public
       * @var timestamp
       */
-    public $time;
-
-    /**
-      * Este campo guarda el ultimo problema que logro que se desbloqueara el badge, just for fun.
-      * @access public
-      * @var int(11)
-      */
-    public $last_problem_id;
+    public $assignation_time;
 }

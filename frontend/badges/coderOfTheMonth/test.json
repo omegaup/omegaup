@@ -1,0 +1,82 @@
+{
+  "apicalls": [
+    {
+      "username": "omegaup",
+      "password": "omegaup",
+      "requests": [
+        {
+          "api": "/problem/create",
+          "params": {
+            "visibility": 1,
+            "title": "Sumas",
+            "problem_alias": "sumas",
+            "validator": "token-numeric",
+            "time_limit": 1000,
+            "validator_time_limit": 0,
+            "overall_wall_time_limit": 1000,
+            "extra_wall_time": 0,
+            "memory_limit": 32768,
+            "output_limit": 10240,
+            "input_limit": 10240,
+            "source": "omegaUp classics",
+            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+            "email_clarifications": 1
+          },
+          "files": {
+            "problem_contents": "frontend/tests/resources/testproblem.zip"
+          }
+        },
+        {
+          "api": "/user/create",
+          "params": {
+            "username": "user_0",
+            "email": "user_0@domain.com",
+            "password": "user_0"
+          }
+        },
+        {
+          "api": "/user/create",
+          "params": {
+            "username": "user_1",
+            "email": "user_1@domain.com",
+            "password": "user_1"
+          }
+        },
+        {
+          "api": "/user/create",
+          "params": {
+            "username": "user_2",
+            "email": "user_2@domain.com",
+            "password": "user_2"
+          }
+        }
+      ]
+    },
+    {
+      "username": "user_0",
+      "password": "user_0",
+      "requests": [
+        {
+          "api": "/run/create",
+          "params": {
+            "problem_alias": "sumas",
+            "language": "py",
+            "source": "print sum(map(int, raw_input().strip().split()))"
+          }
+        }
+      ]
+    },
+    {
+      "username": "omegaup",
+      "password": "omegaup",
+      "requests": [
+        {
+          "api": "/user/coderofthemonth"
+        }
+      ]
+    }
+  ],
+  "expected_results": [
+    "user_0"
+  ]
+}
