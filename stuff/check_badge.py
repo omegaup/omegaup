@@ -22,9 +22,9 @@ QUERY_FILE = 'query.sql'
 TEST_FILE = 'test.json'
 
 
-def process_badge(alias: str):
+def verify_badge(alias: str):
     '''Validates and processes badge information'''
-    logging.info('BADGE %s', alias)
+    logging.info('Badge -> %s', alias)
     try:
         path = os.path.join(OMEGAUP_BADGES_ROOT, alias, ICON_FILE)
         filesize = os.stat(path).st_size
@@ -67,24 +67,24 @@ def process_badge(alias: str):
     if not os.path.isfile(os.path.join(OMEGAUP_BADGES_ROOT, alias,
                                        TEST_FILE)):
         raise OSError('No se encontró el archivo %s' % TEST_FILE)
-    # run_test_for_badge()
-    logging.info('%s ha sido correctamente agregado/actualizado.\n', alias)
+    logging.info('Los archivos .lang han sido actualizados')
 
 
 def main():
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--badge', help='The badge to be analyzed')
     args = parser.parse_args()
 
-    if args.verbose:
-        logging.getLogger().setLevel('DEBUG')
+    logging.basicConfig(format='%%(asctime)s:%s:%%(message)s' % parser.prog,
+                        level=(logging.DEBUG))
 
-    # Get all subfolders in /frontend/badges/
-    aliases = [f.name for f in os.scandir(OMEGAUP_BADGES_ROOT)
-               if f.is_dir()]
-    for alias in aliases:
-        process_badge(alias)
+    if args.badge is not None:
+        try:
+            verify_badge(args.badge)
+        except:  # noqa: bare-except
+            logging.exception('Failed to verify badge %s', args.badge)
+            raise
 
 
 if __name__ == '__main__':
