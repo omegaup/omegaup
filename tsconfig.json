@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "./built/",
+    "sourceMap": true,
+    "target": "es5",
+    "strict": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "experimentalDecorators": true
+  },
+  "include": [
+    "./frontend/www/js/omegaup/**/*.vue",
+    "./frontend/www/js/omegaup/**/*.ts"
+  ],
+  "exclude": [
+    "./node_modules"
+  ]
+}
