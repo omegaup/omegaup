@@ -32,7 +32,7 @@ def verify_badge(alias: str):
             raise ValueError('El tamaño de icon.svg es mayor a 15KB')
     except OSError:
         logging.warning('No se encontró %s, se usará el default.',
-                        LOCALIZATIONS_FILE)
+                        ICON_FILE)
     # SVG must be OK or not exist for this to pass.
 
     try:

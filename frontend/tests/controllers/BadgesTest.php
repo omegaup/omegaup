@@ -7,7 +7,7 @@
  */
 
 class BadgesTest extends OmegaupTestCase {
-    const OMEGAUP_BADGES_ROOT = '/opt/omegaup/frontend/badges';
+    const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
     const QUERY_FILE = 'query.sql';
     const TEST_FILE = 'test.json';
 
@@ -20,7 +20,7 @@ class BadgesTest extends OmegaupTestCase {
                 $output,
                 $return
             );
-          // If return code is 0, everythin was OK
+            // If return code is 0, everything was OK
             $this->assertEquals(0, $return);
         }
     }
