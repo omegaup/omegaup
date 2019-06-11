@@ -122,8 +122,7 @@ class Request extends ArrayObject {
         ?int $upperBound = null,
         bool $required = true
     ) {
-        $val = self::offsetGet($key);
-        if (!self::offsetExists($key)  || is_null($val)) {
+        if (!self::offsetExists($key)) {
             if (!$required) {
                 return;
             }

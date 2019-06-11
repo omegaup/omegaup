@@ -13,37 +13,16 @@ require_once 'libs/PrivacyStatement.php';
  */
 class CourseController extends Controller {
     /**
-     * Validate courseAlias exists and return Courses object
-     *
-     * @param $courseAlias
-     * @return Courses
-     * @throws InvalidDatabaseOperationException
-     * @throws NotFoundException
-     */
-    private static function validateCourseAlias(string $courseAlias) {
-        try {
-            $course = CoursesDAO::getByAlias($courseAlias);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
-        }
-        return $course;
-    }
-
-    /**
      * Validate assignment_alias existis into the course and
      * return Assignments object
      *
      * @param Courses $course
      * @param string $assignmentAlias
-     * @return array
+     * @return Assignments
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    private static function validateCourseAssignmentAlias(Courses $course, string $assignmentAlias) {
+    private static function validateCourseAssignmentAlias(Courses $course, string $assignmentAlias) : Assignments {
         try {
             $assignment = CoursesDAO::getAssignmentByAlias($course, $assignmentAlias);
         } catch (Exception $e) {
@@ -64,21 +43,13 @@ class CourseController extends Controller {
      * @param Assignments $assignment
      * @throws InvalidParameterException
      */
-    private static function validateCreateAssignment(
-        Courses $course,
-        Assignments $assignment
-    ) {
+    private static function validateCreateAssignment(Request $r, Courses $course) : void {
         $isRequired = true;
         $courseStartTime = strtotime($course->start_time);
         $courseFinishTime = strtotime($course->finish_time);
 
-        Validators::validateStringNonEmpty($assignment->name, 'name', $isRequired);
-        Validators::validateStringNonEmpty($assignment->description, 'description', $isRequired);
-
-        $r = new Request([
-            'start_time' => $assignment->start_time,
-            'finish_time' => $assignment->finish_time
-        ]);
+        Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
+        Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt(
             'start_time',
@@ -93,87 +64,101 @@ class CourseController extends Controller {
             $isRequired
         );
 
-        if ($assignment->start_time > $assignment->finish_time) {
+        if ($r['start_time'] > $r['finish_time']) {
             throw new InvalidParameterException('courseInvalidStartTime');
         }
 
-        Validators::validateInEnum($assignment->assignment_type, 'assignment_type', ['test', 'homework'], $isRequired);
-        Validators::validateValidAlias($assignment->alias, 'alias', $isRequired);
+        Validators::validateInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $isRequired);
+        Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
     }
 
     /**
-     * Validates create or update Courses
+     * Validates create Courses
      *
-     * @param ?string $courseAlias
-     * @param Courses $course
-     * @param int $currentIdentityId
+     * @param Request $r
+     * @throws InvalidParameterException
+     */
+    private static function validateCreate(
+        Request $r
+    ) : void {
+        self::validateBasicCreateOrUpdate($r);
+
+        if ($r['start_time'] > $r['finish_time']) {
+            throw new InvalidParameterException('courseInvalidStartTime');
+        }
+    }
+
+    /**
+     * Validates update Courses
+     *
+     * @param Request $r
+     * @param string $courseAlias
+     * @return Courses
+     * @throws InvalidParameterException
+     * @throws ForbiddenAccessException
+     */
+    private static function validateUpdate(
+        Request $r,
+        string $courseAlias
+    ) : Courses {
+        self::validateBasicCreateOrUpdate($r, true /*is update*/);
+
+        // Get the actual start and finish time of the course, considering that
+        // in case of update, parameters can be optional.
+        $originalCourse = self::validateCourseExists($courseAlias);
+
+        $originalCourse->toUnixTime();
+        if (is_null($r['start_time'])) {
+            $r['start_time'] = $originalCourse->start_time;
+        }
+        if (is_null($r['finish_time'])) {
+            $r['finish_time'] = $originalCourse->finish_time;
+        }
+
+        if ($r['start_time'] > $r['finish_time']) {
+            throw new InvalidParameterException('courseInvalidStartTime');
+        }
+
+        return $originalCourse;
+    }
+
+    /**
+     * Validates basic information of a course
+     * @param Request $r
      * @param bool $isUpdate
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
-    private static function validateCreateOrUpdate(
-        ?string $courseAlias,
-        Courses $course,
-        int $currentIdentityId,
-        bool $isUpdate = false
-    ) {
+    private static function validateBasicCreateOrUpdate(Request $r, bool $isUpdate = false) : void {
         $isRequired = true;
-        $originalCourse = null;
 
-        Validators::validateStringNonEmpty($course->name, 'name', $isRequired);
-        Validators::validateStringNonEmpty($course->description, 'description', $isRequired);
-
-        $r = new Request([
-            'start_time' => $course->start_time,
-            'finish_time' => $course->finish_time,
-            'show_scoreboard' => $course->show_scoreboard,
-            'public' => $course->public,
-        ]);
+        Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
+        Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
         $r->ensureInt('finish_time', null, null, !$isUpdate);
 
-        Validators::validateValidAlias($course->alias, 'alias', $isRequired);
+        Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
 
         // Show scoreboard is always optional
         $r->ensureBool('show_scoreboard', false /*isRequired*/);
         $r->ensureBool('public', false /*isRequired*/);
 
-        if (is_null($course->school_id)) {
+        if (is_null($r['school_id'])) {
             $school = null;
         } else {
-            $school = SchoolsDAO::getByPK($course->school_id);
+            $school = SchoolsDAO::getByPK($r['school_id']);
             if (is_null($school)) {
                 throw new InvalidParameterException('schoolNotFound');
             }
-            $course->school_id = $school->school_id;
-        }
-
-        // Get the actual start and finish time of the course, considering that
-        // in case of update, parameters can be optional.
-        if ($isUpdate) {
-            $originalCourse = self::validateCourseAlias($courseAlias);
-
-            $originalCourse->toUnixTime();
-            if (is_null($course->start_time)) {
-                $course->start_time = $originalCourse->start_time;
-            }
-            if (is_null($course->finish_time)) {
-                $course->finish_time = $originalCourse->finish_time;
-            }
-        }
-
-        if ($course->start_time > $course->finish_time) {
-            throw new InvalidParameterException('courseInvalidStartTime');
         }
 
         // Only curator can set public
-        if (!is_null($course->public)
-            && $course->public == true
-            && !Authorization::canCreatePublicCourse($currentIdentityId)) {
+        if (!is_null($r['public'])
+            && $r['public'] == true
+            && !Authorization::canCreatePublicCourse($r['current_identity_id'])) {
             throw new ForbiddenAccessException();
         }
-        return [$originalCourse, $course, $school];
     }
 
     /**
@@ -181,11 +166,17 @@ class CourseController extends Controller {
      * course. Throws if not found.
      * @param string $courseAlias
      * @return Courses
+     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    private static function validateCourseExists(string $courseAlias) {
+    private static function validateCourseExists(string $courseAlias) : Courses {
         Validators::validateStringNonEmpty($courseAlias, 'course_alias', true /*is_required*/);
-        $course = CoursesDAO::getByAlias($courseAlias);
+        try {
+            $course = CoursesDAO::getByAlias($courseAlias);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
         if (is_null($course)) {
             throw new NotFoundException('courseNotFound');
         }
@@ -200,9 +191,9 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    private static function resolveGroup(Courses $course, ?Groups $group) {
+    private static function resolveGroup(Courses $course, ?Groups $group) : ?Groups {
         if (!is_null($group)) {
-            return;
+            return $group;
         }
 
         try {
@@ -305,33 +296,22 @@ class CourseController extends Controller {
         }
 
         self::authenticateRequest($r);
-        [$_, $course, $school] = self::validateCreateOrUpdate(null, new Courses([
-            'name' => $r['name'],
-            'description' => $r['description'],
-            'alias' => $r['alias'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $r['finish_time'],
-            'public' => $r['public'],
-            'school_id' => $r['school_id'],
-            'needs_basic_information' => $r['needs_basic_information'],
-            'requests_user_information' => $r['requests_user_information'],
-            'show_scoreboard' => ($r['show_scoreboard'] == 'true'),
-        ]), $r['current_identity_id'], false /* isUpdated */);
+        self::validateCreate($r);
 
-        if ($course->alias == 'new') {
+        if ($r['alias'] == 'new') {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
-        if (!is_null(CoursesDAO::getByAlias($course->alias))) {
+        if (!is_null(CoursesDAO::getByAlias($r['alias']))) {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
         DAO::transBegin();
 
         $group = GroupController::createGroup(
-            $course->alias,
-            'students-' . $course->alias,
-            'students-' . $course->alias,
+            $r['alias'],
+            'students-' . $r['alias'],
+            'students-' . $r['alias'],
             $r['current_user_id']
         );
 
@@ -347,18 +327,18 @@ class CourseController extends Controller {
 
             // Create the actual course
             CoursesDAO::create(new Courses([
-                'name' => $course->name,
-                'description' => $course->description,
-                'alias' => $course->alias,
+                'name' => $r['name'],
+                'description' => $r['description'],
+                'alias' => $r['alias'],
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
-                'school_id' => $school->school_id ?? null,
-                'start_time' => gmdate('Y-m-d H:i:s', $course->start_time),
-                'finish_time' => gmdate('Y-m-d H:i:s', $course->finish_time),
-                'public' => $course->public,
-                'show_scoreboard' => $course->show_scoreboard == 'true',
-                'needs_basic_information' => $course->needs_basic_information == 'true',
-                'requests_user_information' => $course->requests_user_information,
+                'school_id' => $r['school_id'] ?? null,
+                'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
+                'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+                'public' => $r['public'],
+                'show_scoreboard' => $r['show_scoreboard'] == 'true',
+                'needs_basic_information' => $r['needs_basic_information'] == 'true',
+                'requests_user_information' => $r['requests_user_information'],
             ]));
 
             DAO::transEnd();
@@ -388,18 +368,8 @@ class CourseController extends Controller {
         }
 
         self::authenticateRequest($r);
-        $course = self::validateCourseAlias($r['course_alias']);
-        self::validateCreateAssignment($course, new Assignments([
-            'name' => $r['name'],
-            'description' => $r['description'],
-            'assignment_type' => $r['assignment_type'],
-            'alias' => $r['alias'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $r['finish_time'],
-            'publish_time_delay' => $r['publish_time_delay'],
-            'max_points' => $r['max_points'],
-            'order' => $r['order'],
-        ]));
+        $course = self::validateCourseExists($r['course_alias']);
+        self::validateCreateAssignment($r, $course);
 
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $course)) {
             throw new ForbiddenAccessException();
@@ -871,7 +841,7 @@ class CourseController extends Controller {
      * @param  Course $course
      * @return array
      */
-    private static function convertCourseToArray(Courses $course) {
+    private static function convertCourseToArray(Courses $course) : Array {
         $course->toUnixTime();
         $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
         $arr = $course->asFilteredArray($relevant_columns);
@@ -1467,7 +1437,7 @@ class CourseController extends Controller {
         Courses $course,
         int $currentIdentityId,
         bool $onlyIntroDetails
-    ) {
+    ) : Array {
         $isAdmin = Authorization::isCourseAdmin(
             $currentIdentityId,
             $course
@@ -1584,7 +1554,7 @@ class CourseController extends Controller {
         string $assignmentAlias,
         ?string $token,
         Request $r
-    ) {
+    ) : Array {
         if (is_null($token)) {
             self::authenticateRequest($r);
             [$course, $assignment] = self::validateAssignmentDetails(
@@ -1643,7 +1613,7 @@ class CourseController extends Controller {
         string $courseAlias,
         string $assignmentAlias,
         int $currentIdentityId
-    ) {
+    ) : Array {
         Validators::validateStringNonEmpty($courseAlias, 'course', true /* is_required */);
         Validators::validateStringNonEmpty($assignmentAlias, 'assignment', true /* is_required */);
         $course = CoursesDAO::getByAlias($courseAlias);
@@ -1783,7 +1753,7 @@ class CourseController extends Controller {
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
-    private static function validateRuns(Request $r) {
+    private static function validateRuns(Request $r) : void {
         // Defaults for offset and rowcount
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
@@ -1889,24 +1859,11 @@ class CourseController extends Controller {
         }
 
         self::authenticateRequest($r);
-        [$originalCourse, $course, $school] = self::validateCreateOrUpdate($r['course_alias'], new Courses([
-            'name' => $r['name'],
-            'description' => $r['description'],
-            'alias' => $r['alias'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $r['finish_time'],
-            'public' => $r['public'],
-            'school_id' => $r['school_id'],
-            'needs_basic_information' => $r['needs_basic_information'],
-            'requests_user_information' => $r['requests_user_information'],
-            'show_scoreboard' => $r['show_scoreboard'],
-        ]), $r['current_identity_id'], true /* isUpdated */);
+        $originalCourse = self::validateUpdate($r, $r['course_alias']);
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $originalCourse)) {
             throw new ForbiddenAccessException();
         }
 
-        $r['start_time'] = $course->start_time;
-        $r['finish_time'] = $course->finish_time;
         $valueProperties = [
             'alias',
             'name',
@@ -2022,7 +1979,7 @@ class CourseController extends Controller {
      */
     public static function apiListSolvedProblems(Request $r) {
         self::authenticateRequest($r);
-        $course = self::validateCourseAlias($r['course_alias']);
+        $course = self::validateCourseExists($r['course_alias']);
 
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $course)) {
             throw new ForbiddenAccessException('userNotAllowed');
@@ -2048,7 +2005,7 @@ class CourseController extends Controller {
      */
     public static function apiListUnsolvedProblems(Request $r) {
         self::authenticateRequest($r);
-        $course = self::validateCourseAlias($r['course_alias']);
+        $course = self::validateCourseExists($r['course_alias']);
 
         if (!Authorization::isCourseAdmin($r['current_identity_id'], $course)) {
             throw new ForbiddenAccessException('userNotAllowed');
