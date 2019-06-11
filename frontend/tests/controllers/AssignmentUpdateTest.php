@@ -55,6 +55,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $response = CourseController::apiUpdateAssignment(new Request([
             'auth_token' => $login->auth_token,
             'assignment' => $courseData['assignment_alias'],
+            'course' => $courseData['course_alias'],
             'name' => 'some new name'
         ]));
     }

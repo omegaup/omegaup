@@ -135,12 +135,13 @@ class ProblemsetController extends Controller {
             return CourseController::apiAssignmentScoreboard(
                 new Request([
                     'auth_token' => $r['auth_token'],
-                    'course_alias' => $r['problemset']['course'],
-                    'assignment_alias' => $r['problemset']['assignment'],
+                    'token' => $r['token'],
+                    'course' => $r['problemset']['course'],
+                    'assignment' => $r['problemset']['assignment'],
                 ])
             );
         }
-        // There in no scoreboard for interviews yet
+        // There is no scoreboard for interviews yet
         return [];
     }
 
@@ -155,16 +156,25 @@ class ProblemsetController extends Controller {
     public static function apiScoreboardEvents(Request $r) {
         $r = self::wrapRequest($r);
 
-        if ($r['problemset']['type'] != 'Contest') {
-            // Not implemented in courses nor interviews yet
-            return ['events' => []];
+        if ($r['problemset']['type'] == 'Contest') {
+            return ContestController::apiScoreboardEvents(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'contest_alias' => $r['problemset']['contest_alias'],
+                ])
+            );
+        } elseif ($r['problemset']['type'] == 'Assignment') {
+            return CourseController::apiAssignmentScoreboardEvents(
+                new Request([
+                    'auth_token' => $r['auth_token'],
+                    'course' => $r['problemset']['course'],
+                    'assignment' => $r['problemset']['assignment'],
+                    'token' => $r['token'],
+                ])
+            );
         }
-        return ContestController::apiScoreboardEvents(
-            new Request([
-                'auth_token' => $r['auth_token'],
-                'contest_alias' => $r['problemset']['contest_alias'],
-            ])
-        );
+        // Not implemented in interviews yet
+        return ['events' => []];
     }
 
     /**
