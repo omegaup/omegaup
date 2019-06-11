@@ -49,7 +49,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
             'gender' => 'female',
             'school_name' => Utils::CreateRandomString(),
             'group_alias' => $group['group']->alias,
-            'originalIdentityUsername' => $identity->username,
+            'original_username' => $identity->username,
         ]));
 
         $newIdentity = IdentityController::resolveIdentity($username);
