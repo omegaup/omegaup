@@ -1,10 +1,11 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
 import {API, OmegaUp, UI, T} from '../omegaup.js';
+import * as CSV from '../../../third_party/js/csv.js/csv.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   function fillContestsTable() {
-    var deferred =
+    let deferred =
         contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList();
     deferred.then(function(result) { contestList.contests = result.contests; })
         .fail(UI.apiError);
@@ -14,8 +15,8 @@ OmegaUp.on('ready', function() {
   let payload = {'contests': []};
   if (payloadElement) {
     payload = JSON.parse(payloadElement.innerText);
-    for (var idx in payload.contests) {
-      var contest = payload.contests[idx];
+    for (let idx in payload.contests) {
+      let contest = payload.contests[idx];
       OmegaUp.convertTimes(contest);
     }
   } else {
@@ -63,37 +64,39 @@ OmegaUp.on('ready', function() {
               if (result.status != 'ok') {
                 return;
               }
-              // Solution found in
-              // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
               let csvContent = "data:text/csv;charset=utf-8,";
-              result.contestants.forEach(function(rowArray, index) {
-                let row = '';
-                if (index == 0) {
-                  // Setting table headers
-                  for (let[key, value] of Object.entries(rowArray)) {
-                    if (rowArray.hasOwnProperty(key)) {
-                      row += key + ',';
-                    }
-                  }
-                  csvContent += row + "\r\n";
-                  row = '';
+              let dataToSerialize = {
+                fields: [
+                  {id: 'name'},
+                  {id: 'username'},
+                  {id: 'email'},
+                  {id: 'state'},
+                  {id: 'country'},
+                  {id: 'school'}
+                ],
+                records: result.contestants
+              };
+              let dialect = {
+                "dialect": {
+                  "csvddfVersion": 1.2,
+                  "delimiter": ",",
+                  "doubleQuote": true,
+                  "lineTerminator": "\r\n",
+                  "quoteChar": "\"",
+                  "skipInitialSpace": true,
+                  "header": true,
+                  "commentChar": "#"
                 }
-                for (let[key, value] of Object.entries(rowArray)) {
-                  if (rowArray.hasOwnProperty(key)) {
-                    row += value + ',';
-                  }
-                }
-                csvContent += row + "\r\n";
-              });
+              };
+              csvContent += CSV.serialize(dataToSerialize, dialect);
 
-              var encodedUri = encodeURI(csvContent);
-              var link = document.createElement('a');
+              let encodedUri = encodeURI(csvContent);
+              let link = document.createElement('a');
               link.setAttribute('href', encodedUri);
-              link.setAttribute('download', 'users_' + contestAlias + '.csv');
+              link.setAttribute('download', `users_${contestAlias}.csv`);
               document.body.appendChild(link);  // Required for FF
 
-              link.click();  // This will download the data file named
-                             // "my_data.csv".
+              link.click();  // This will download the data
             })
             .fail(omegaup.UI.apiError);
       }
