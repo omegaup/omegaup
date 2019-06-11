@@ -42,6 +42,8 @@ const translations = {
 	arenaRunSubmitUpload: "Or upload the file",
 	arenaRunSubmitWaitBetweenUploads: "You must wait %(submissionGap) seconds between submissions for a problem",
 	assignmentNotFound: "Assignment not found",
+	badgeCoderOfTheMonthDescription: "User has been Coder of The Month at least once.",
+	badgeCoderOfTheMonthName: "Coder Of The Month",
 	banProblemFormComments: "Additional comments to the problemsetter",
 	banProblemFormQuestion: "Why will this problem be banned?",
 	banningDeclinedByReviewer: "Banning declined by reviewer.",

@@ -42,6 +42,8 @@ const translations = {
 	arenaRunSubmitUpload: "(Or up10ad 7h3 fi13)",
 	arenaRunSubmitWaitBetweenUploads: "(Y0u mu57 wai7 %(submissionGap) 53c0nd5 b37w33n 5ubmi55i0n5 f0r a pr0b13m)",
 	assignmentNotFound: "(A55ignm3n7 n07 f0und)",
+	badgeCoderOfTheMonthDescription: "(U53r ha5 b33n C0d3r 0f Th3 M0n7h a7 13a57 0nc3.)",
+	badgeCoderOfTheMonthName: "(C0d3r Of Th3 M0n7h)",
 	banProblemFormComments: "(Addi7i0na1 c0mm3n75 70 7h3 pr0b13m53773r)",
 	banProblemFormQuestion: "(Why wi11 7hi5 pr0b13m b3 bann3d?)",
 	banningDeclinedByReviewer: "(Banning d3c1in3d by r3vi3w3r.)",

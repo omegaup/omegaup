@@ -5,6 +5,7 @@
 
 import collections
 import json
+import os
 import re
 import sys
 
@@ -19,6 +20,7 @@ class I18nLinter(linters.Linter):
     # Paths
     _JS_TEMPLATES_PATH = 'frontend/www/js/omegaup'
     _TEMPLATES_PATH = 'frontend/templates'
+    _BADGES_PATH = 'frontend/badges'
 
     # Colours
     _OKGREEN = git_tools.COLORS.OKGREEN
@@ -74,6 +76,54 @@ class I18nLinter(linters.Linter):
             tokens[i] = token.translate(table)
 
         return '(%s)' % ''.join(tokens)
+
+    def _add_single_badge_entry(self, alias, contents, contents_callback):
+        '''Adds entries to .lang files for a certain badge'''
+        custom_name = 'badge%s' % alias[0].upper() + alias[1:]
+        for lang in self._LANGS:
+            found_name = False
+            found_description = False
+            lang_file = '%s/%s.lang' % (self._TEMPLATES_PATH, lang)
+            file_content = ''
+            for _, line in enumerate(contents_callback(
+                    lang_file).split(b'\n')[:-1]):
+                line = line.decode('utf-8')
+                key = re.compile(r'\s+=\s+').split(line.strip(), 1)[0]
+                if key == custom_name + 'Name':
+                    file_content += ('%sName = "%s"\n' %
+                                     (custom_name, contents[lang]['name']))
+                    found_name = True
+                elif key == custom_name + 'Description':
+                    file_content += ('%sDescription = "%s"\n' % (
+                        custom_name,
+                        contents[lang]['description']))
+                    found_description = True
+                else:
+                    file_content += line + '\n'
+            if not found_name:
+                file_content += ('%sName = "%s"\n' %
+                                 (custom_name, contents[lang]['name']))
+            if not found_description:
+                file_content += ('%sDescription = "%s"\n' % (
+                    custom_name,
+                    contents[lang]['description']))
+
+            with open(lang_file, 'wb') as f:
+                f.seek(0)
+                f.truncate()  # Removes all entries from file
+                f.write(file_content.encode('utf-8'))
+
+    def _add_badges_entries(self, contents_callback):
+        '''Adds badges name and description entries to .lang files'''
+        aliases = [f.name for f in os.scandir(self._BADGES_PATH)
+                   if f.is_dir()]
+        for alias in aliases:
+            filename = ('%s/%s/localizations.json' %
+                        (self._BADGES_PATH, alias))
+            file = contents_callback(filename).decode('utf-8')
+            contents = json.loads(file)
+            self._add_single_badge_entry(alias, contents,
+                                         contents_callback)
 
     def _get_translated_strings(self, contents_callback):
         strings = {}
@@ -176,6 +226,7 @@ class I18nLinter(linters.Linter):
     def run_all(self, file_contents, contents_callback):
         '''Runs the linter against a subset of files.'''
         # pylint: disable=no-self-use, unused-argument
+        self._add_badges_entries(contents_callback)
         strings = self._get_translated_strings(contents_callback)
 
         new_contents, original_contents = self._generate_new_contents(

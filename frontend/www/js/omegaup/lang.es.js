@@ -42,6 +42,8 @@ const translations = {
 	arenaRunSubmitUpload: "O sube un archivo",
 	arenaRunSubmitWaitBetweenUploads: "Debes esperar %(submissionGap) segundos entre cada env\u00edo del mismo problema",
 	assignmentNotFound: "Tarea/examen no encontrado",
+	badgeCoderOfTheMonthDescription: "El usuario ha sido nombrado Coder del Mes al menos una vez.",
+	badgeCoderOfTheMonthName: "Coder del Mes",
 	banProblemFormComments: "Comentarios adicionales para el creador del problema",
 	banProblemFormQuestion: "\u00bfPor qu\u00e9 se suspender\u00e1 este problema?",
 	banningDeclinedByReviewer: "Suspenci\u00f3n denegada por juez.",
