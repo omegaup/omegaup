@@ -1,5 +1,4 @@
 import group_Members from '../components/group/Members.vue';
-import identity_Edit from '../components/identity/Edit.vue';
 import {OmegaUp, UI, T, API} from '../omegaup.js';
 import Vue from 'vue';
 
@@ -16,6 +15,8 @@ OmegaUp.on('ready', function() {
           identities: this.identities,
           identitiesCsv: this.identitiesCsv,
           groupAlias: this.groupAlias,
+          countries: this.countries,
+          show: this.show,
         },
         on: {
           'add-member': function(groupMembersInstance, username) {
@@ -30,11 +31,29 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
-          'edit-identity': function(identity) {
-            groupIdentities.show = true;
-            groupIdentities.identity = identity;
-            groupIdentities.username = identity.username;
-            groupIdentities.$el.scrollIntoView();
+          'edit-identity': function(groupMembersInstance, identity) {
+            groupMembersInstance.show = true;
+            groupMembersInstance.identity = identity;
+            groupMembersInstance.username = identity.username;
+          },
+          'edit-identity-member': function(identityEditInstance,
+                                           groupMembersInstance, identity,
+                                           countryId, stateId) {
+            API.Identity.update({
+                          username: identity.username,
+                          name: identity.name,
+                          country_id: countryId,
+                          state_id: stateId,
+                          school_name: identity.school,
+                          group_alias: groupAlias,
+                          original_username: identityEditInstance.username,
+                        })
+                .then(function(data) {
+                  UI.success(T.groupEditMemberUpdated);
+                  groupMembersInstance.show = false;
+                  refreshMemberList();
+                })
+                .fail(function(response) { UI.apiError(response); });
           },
           'change-password-identity-member': function(
               groupMembersInstance, username, newPassword, newPasswordRepeat) {
@@ -68,6 +87,11 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
+          cancel: function(groupMembersInstance) {
+            refreshMemberList();
+            groupMembersInstance.show = false;
+            groupMembersInstance.$el.scrollIntoView();
+          },
         },
       });
     },
@@ -75,54 +99,11 @@ OmegaUp.on('ready', function() {
       identities: [],
       identitiesCsv: [],
       groupAlias: groupAlias,
+      countries: payload.countries,
+      show: false,
     },
     components: {
       'omegaup-group-members': group_Members,
-    },
-  });
-
-  let groupIdentities = new Vue({
-    el: '#group-members div.form',
-    render: function(createElement) {
-      return createElement('omegaup-identity-edit', {
-        props: {
-          show: this.show,
-          identity: this.identity,
-          username: this.username,
-          countries: this.countries,
-        },
-        on: {
-          'edit-identity-member': function(identity, countryId, stateId) {
-            API.Identity.update({
-                          username: identity.username,
-                          name: identity.name,
-                          country_id: countryId,
-                          state_id: stateId,
-                          school_name: identity.school,
-                          group_alias: groupAlias,
-                          original_username: groupIdentities.username,
-                        })
-                .then(function(data) {
-                  UI.success(T.groupEditMemberUpdated);
-                  groupIdentities.show = false;
-                })
-                .fail(function(response) { UI.apiError(response); });
-          },
-          cancel: function() {
-            refreshMemberList();
-            groupIdentities.show = false;
-          },
-        },
-      });
-    },
-    data: {
-      show: false,
-      identity: {},
-      username: '',
-      countries: payload.countries,
-    },
-    components: {
-      'omegaup-identity-edit': identity_Edit,
     },
   });
 

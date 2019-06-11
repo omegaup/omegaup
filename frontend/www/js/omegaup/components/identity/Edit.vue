@@ -1,6 +1,5 @@
 <template>
-  <div class="omegaup-course-details panel"
-       v-show="show">
+  <div class="omegaup-course-details panel">
     <div>
       <h1><span><a class="course-header">{{ username }}</a></span></h1>
     </div>
@@ -87,78 +86,93 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-export default {
-  props: {
-    identity: {
-      type: Object,
-    },
-    countries: {
-      type: Array,
-    },
-    username: {
-      type: String,
-    },
-    show: {
-      type: Boolean,
-      'default': false,
-    },
-  },
-  data: function() {
-    return {
-      T: T,
-      selectedCountry: this.identity.country_id,
-      selectedState: this.identity.state_id,
-    };
-  },
-  watch: {
-    selectedCountry: function(newContry, oldCountry) {
-      if (this.identity.country_id == newContry) {
-        this.selectedState = this.identity.state_id;
-      } else {
-        this.selectedState = this.countryStates[0].code.split('-')[1];
-      }
-    },
-  },
-  computed: {
-    groupName: function() {
-      if (Object.entries(this.identity).length === 0) {
-        return '';
-      }
-      return `${this.identity.username.split(':')[0]}`;
-    },
-    identityName: {
-      get: function() {
-        if (Object.entries(this.identity).length === 0) {
-          return '';
-        }
-        return this.identity.username.split(':')[1];
-      },
-      set: function(username) {
-        this.identity.username = `${this.groupName}:${username}`;
-      },
-    },
-    countryStates: function() {
-      let country = iso3166.country(this.selectedCountry || 'MX');
-      let countryStates =
-          Object.keys(country.sub)
-              .map(function(code) {
-                return {code: code, name: country.sub[code].name};
-              });
+<script lang="ts">
+import { Vue, Watch, Prop } from 'vue-property-decorator';
 
-      countryStates.sort(function(a, b) {
-        return Intl.Collator().compare(a.name, b.name);
-      });
-      return countryStates;
-    },
-  },
-  methods: {
-    onEditMember: function() {
-      this.$emit('edit-identity-member', this.identity, this.selectedCountry,
-                 this.selectedState);
-    },
-    onCancel: function() { this.$emit('cancel');},
-  },
-};
+import { T } from '../../omegaup.js';
+import { iso3166 } from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
+
+interface Identity {
+  name: string;
+  username: string;
+  school: string;
+  school_id: number;
+  country_id: string;
+  state_id: string;
+}
+
+interface Country {
+  country_id: string;
+  name: string;
+}
+
+interface State {
+  code: string;
+  name: string;
+}
+
+export default class IdentityEdit extends Vue {
+  @Prop() identity!: Identity;
+  @Prop() countries!: Country[];
+
+  T = T;
+  selectedCountry = this.$attrs.selectedcountry || 'MX';
+  selectedState = this.$attrs.selectedstate;
+  username = this.$attrs.username;
+
+  @Watch('selectedCountry')
+  onPropertyChanged(newContry: string, oldCountry: string) {
+    if (this.identity.country_id == newContry) {
+      this.selectedState = this.identity.state_id;
+    } else {
+      this.selectedState = this.countryStates[0].code.split('-')[1];
+    }
+  }
+
+  get groupName(): string {
+    console.log(typeof this.identity);
+    if (typeof this.identity === 'undefined') {
+      return '';
+    }
+    return `${this.identity.username.split(':')[0]}`;
+  }
+
+  get identityName(): string {
+    if (typeof this.identity === 'undefined') {
+      return '';
+    }
+    return this.identity.username.split(':')[1];
+  }
+  set identityName(username) {
+    this.identity.username = `${this.groupName}:${username}`;
+  }
+
+  get countryStates(): State[] {
+    let country = iso3166.country(this.selectedCountry);
+    let countryStates = Object.keys(country.sub).map(function(code) {
+      return { code: code, name: country.sub[code].name };
+    });
+
+    countryStates.sort(function(a, b) {
+      return Intl.Collator().compare(a.name, b.name);
+    });
+    return [{ code: 'MX', name: 'QUE-Queretaro' }];
+  }
+
+  onEditMember(): void {
+    this.$parent.$emit(
+      'edit-identity-member',
+      this,
+      this.$parent,
+      this.identity,
+      this.selectedCountry,
+      this.selectedState,
+    );
+  }
+
+  onCancel(): void {
+    this.$parent.$emit('cancel', this.$parent);
+  }
+}
+
 </script>

@@ -70,7 +70,12 @@
           </td>
         </tr>
       </tbody>
-    </table><!-- Modal Change Password-->
+    </table><omegaup-identity-edit v-bind:countries="countries"
+         v-bind:identity="identity"
+         v-bind:selectedcountry="identity.country_id"
+         v-bind:selectedstate="identity.state_id"
+         v-bind:username="username"
+         v-if="show"></omegaup-identity-edit><!-- Modal Change Password-->
     <div class="modal fade modal-change-password"
          role="dialog">
       <div class="modal-dialog">
@@ -144,11 +149,15 @@ label {
 <script>
 import {T, UI} from '../../omegaup.js';
 import user_Username from '../user/Username.vue';
+import identity_Edit from '../identity/Edit.vue';
 export default {
   props: {
     identities: Array,
     identitiesCsv: Array,
     groupAlias: String,
+    countries: {
+      type: Array,
+    },
   },
   data: function() {
     return {
@@ -158,6 +167,7 @@ export default {
       username: '',
       newPassword: '',
       newPasswordRepeat: '',
+      show: false,
     };
   },
   mounted: function() {
@@ -180,7 +190,7 @@ export default {
       }
       this.$emit('add-member', this, this.memberUsername);
     },
-    onEdit: function(identity) { this.$emit('edit-identity', identity);},
+    onEdit: function(identity) { this.$emit('edit-identity', this, identity);},
     onChangePass: function(username) {
       this.username = username;
       $('.modal-change-password').modal();
@@ -199,6 +209,7 @@ export default {
   },
   components: {
     'omegaup-user-username': user_Username,
+    'omegaup-identity-edit': identity_Edit,
   },
 };
 </script>
