@@ -113,6 +113,7 @@ const translations = {
 	contestEditTagPublic: "Public",
 	contestEditWithTitle: "Edit contest %(title)",
 	contestFullList: "See full list",
+	contestInformationNotRequired: "User information for this contest was not required.",
 	contestIntroDifferentStarts: "Once the contest has started, its duration will be %(window_length).",
 	contestIntroPenaltyDesc: "Each incorrect submission will be penalized with a time of %(window_length).",
 	contestIntroScoreboardTimePercent: "The scoreboard will be shown live for the first %(window_length) of the contest.",
