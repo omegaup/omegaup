@@ -44,12 +44,16 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         }
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
-            $problemsetIdentity->access_time = date('Y-m-d H:i:s', $currentTime);
-            if (is_null($windowLength)) {
-                $problemsetIdentity->end_time = date('Y-m-d H:i:s', $finishTime);
-            } else {
-                $problemsetIdentity->end_time = date('Y-m-d H:i:s', $currentTime + $windowLength * 60);
+            $accessTime = new DateTime();
+            $endTime = new DateTime();
+            $accessTime->setTimestamp($currentTime);
+            $problemsetIdentity->access_time = $accessTime->format('Y-m-d H:i:s');
+            ;
+            if (!is_null($windowLength)) {
+                $finishTime = $currentTime + $windowLength * 60;
             }
+            $endTime->setTimestamp($finishTime);
+            $problemsetIdentity->end_time = $endTime->format('Y-m-d H:i:s');
             $problemsetIdentity->share_user_information = $shareUserInformation;
             if ($isNewProblemsetIdentity) {
                 self::create($problemsetIdentity);

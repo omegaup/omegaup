@@ -544,12 +544,13 @@ class ContestController extends Controller {
 
         DAO::transBegin();
         try {
+            $r['contest']->toUnixTime();
             ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r['current_identity_id'],
                 $r['contest']->problemset_id,
                 $r['contest']->window_length,
                 true,
-                strtotime($r['contest']->finish_time),
+                $r['contest']->finish_time,
                 $r['share_user_information'] == true
             );
 
@@ -693,12 +694,13 @@ class ContestController extends Controller {
             // want this to get generally cached for everybody
             // Save the time of the first access
             try {
+                $r['contest']->toUnixTime();
                 $problemsetIdentity = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                     $r['current_identity_id'],
                     $r['contest']->problemset_id,
                     $r['contest']->window_length,
                     false,
-                    strtotime($r['contest']->finish_time)
+                    $r['contest']->finish_time
                 );
             } catch (ApiException $e) {
                 throw $e;
@@ -708,12 +710,13 @@ class ContestController extends Controller {
             }
 
             // Add time left to response
-            if ($r['contest']->window_length === null) {
-                $result['submission_deadline'] = strtotime($r['contest']->finish_time);
+            if (is_null($r['contest']->window_length)) {
+                $result['submission_deadline'] = $r['contest']->finish_time;
             } else {
+                $problemsetIdentity->toUnixTime();
                 $result['submission_deadline'] = min(
-                    strtotime($r['contest']->finish_time),
-                    strtotime($problemsetIdentity->end_time)
+                    $r['contest']->finish_time,
+                    $problemsetIdentity->end_time
                 );
             }
             $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $r['contest']);

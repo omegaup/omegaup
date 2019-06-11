@@ -523,5 +523,16 @@ class UpdateContestTest extends OmegaupTestCase {
             // End time for all participants has been updated and extended time for the identity is no longer available
             $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
         }
+
+        // Updating window_length in the contest out of the valid range
+        $windowLength = 140;
+        $r['window_length'] = $windowLength;
+        try {
+            $response = ContestController::apiUpdate($r);
+            $this->fail('Window length can not greater than contest length');
+        } catch (InvalidParameterException $e) {
+            // Pass
+            $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
+        }
     }
 }
