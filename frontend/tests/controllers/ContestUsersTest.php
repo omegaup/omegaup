@@ -68,4 +68,91 @@ class ContestUsersTest extends OmegaupTestCase {
         $this->assertEquals(0, $response['events'][0]['ip']);
         $this->assertEquals('open', $response['events'][0]['event']['name']);
     }
+
+    public function testContestParticipantsReport() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(new ContestParams(['requests_user_information' => 'optional']));
+
+        for ($i = 0; $i < 3; $i++) {
+            // Create users
+            $user[$i] = UserFactory::createUser();
+
+            // Add users to our private contest
+            ContestsFactory::addUser($contestData, $user[$i]);
+        }
+
+        $userLogin = self::login($user[0]);
+
+        $showContestIntro = ContestController::showContestIntro(new Request([
+            'auth_token' => $userLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
+
+        // Explicitly join contest
+        ContestController::apiOpen(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $userLogin->auth_token,
+            'privacy_git_object_id' => $showContestIntro['git_object_id'],
+            'statement_type' => $showContestIntro['statement_type'],
+            'share_user_information' => 1,
+        ]));
+
+        // Call API
+        $directorLogin = self::login($contestData['director']);
+
+        $r = new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token
+        ]);
+
+        $response = ContestController::apiContestants($r);
+
+        // There are three participants in the current contest
+        $this->assertEquals(3, count($response['contestants']));
+
+        // But only one participant has accepted share user information
+        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
+
+        $userLogin = self::login($user[1]);
+
+        // Explicitly join contest
+        ContestController::apiOpen(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $userLogin->auth_token,
+            'privacy_git_object_id' => $showContestIntro['git_object_id'],
+            'statement_type' => $showContestIntro['statement_type'],
+            'share_user_information' => 0,
+        ]));
+
+        $response = ContestController::apiContestants($r);
+
+        // The number of participants sharing their information still remains the same
+        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
+
+        $userLogin = self::login($user[2]);
+
+        // Explicitly join contest
+        ContestController::apiOpen(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $userLogin->auth_token,
+            'privacy_git_object_id' => $showContestIntro['git_object_id'],
+            'statement_type' => $showContestIntro['statement_type'],
+            'share_user_information' => 1,
+        ]));
+
+        $response = ContestController::apiContestants($r);
+
+        // Now there are two participants sharing their information
+        $this->assertEquals(2, self::usersSharingUserInformation($response['contestants']));
+    }
+
+    private static function usersSharingUserInformation($contestants) {
+        $numberOfContestants = 0;
+        foreach ($contestants as $contestant) {
+            if ($contestant['email']) {
+                $numberOfContestants++;
+            }
+        }
+        return $numberOfContestants;
+    }
 }

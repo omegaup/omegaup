@@ -160,15 +160,15 @@ def test_user_ranking_contest(driver):
             '"user"]')
         assert run_wrong_user.text == user2, run_wrong_user
 
-        users_full_set = {user1, user2, user3, driver.user_username}
-        compare_contestants_list(driver, users_full_set)
+        users_invited_set = {user1, user2, driver.user_username}
+        compare_contestants_list(driver, users_invited_set)
 
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
 
-        users_invited_set = {user1, user2, driver.user_username}
-        compare_contestants_list(driver, users_invited_set)
+        users_full_set = {user1, user2, user3, driver.user_username}
+        compare_contestants_list(driver, users_full_set)
 
 
 @util.no_javascript_errors()
@@ -221,7 +221,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
         # off in Travis, and the only way to get updated results while we are
         # on the same page is going back to the page.
         check_ranking(driver, problem, driver.user_username,
-                      scores=['0', '100'])
+                      scores=['0.00', '100.00'])
 
         # User enters to problem in contest, the ranking for this problem
         # should update.
@@ -236,7 +236,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
             '//a[contains(@href, "problems/%s")]' % problem).click()
 
         # Now, user checks the score again, ranking should be 100
-        check_ranking(driver, problem, driver.user_username, scores=['100'])
+        check_ranking(driver, problem, driver.user_username, scores=['100.00'])
 
 
 @util.annotate
