@@ -99,6 +99,7 @@ const translations = {
 	contestDetailsValidator: "(Va1ida70r)",
 	contestDetailsWindowLength: "(Wind0w L3ng7h)",
 	contestDetailsYes: "(Y35)",
+	contestDownloadListOfUsersInContest: "(D0wn10ad 1i57 0f u53r5 in 7h3 c0n7357)",
 	contestDuration: "(C0n7357 dura7i0n)",
 	contestEdit: "(Edi7 c0n7357)",
 	contestEditAddProblems: "(Add pr0b13m5)",
