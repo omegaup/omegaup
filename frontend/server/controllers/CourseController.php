@@ -191,7 +191,7 @@ class CourseController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    private static function resolveGroup(Courses $course, ?Groups $group) : ?Groups {
+    private static function resolveGroup(Courses $course, ?Groups $group) : Groups {
         if (!is_null($group)) {
             return $group;
         }
@@ -335,7 +335,7 @@ class CourseController extends Controller {
                 'school_id' => $r['school_id'] ?? null,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
-                'public' => $r['public'],
+                'public' => boolval($r['public']),
                 'show_scoreboard' => $r['show_scoreboard'] == 'true',
                 'needs_basic_information' => $r['needs_basic_information'] == 'true',
                 'requests_user_information' => $r['requests_user_information'],
@@ -1449,7 +1449,7 @@ class CourseController extends Controller {
                 'name' => $course->name,
                 'description' => $course->description,
                 'alias' => $course->alias,
-                'basic_information_required' => $course->needs_basic_information == '1',
+                'basic_information_required' => boolval($course->needs_basic_information),
                 'requests_user_information' => $course->requests_user_information
             ];
         } else {
@@ -1464,8 +1464,8 @@ class CourseController extends Controller {
                 'finish_time' => strtotime($course->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $course->public,
-                'basic_information_required' => $course->needs_basic_information == '1',
-                'show_scoreboard' => $course->show_scoreboard == '1',
+                'basic_information_required' => boolval($course->needs_basic_information),
+                'show_scoreboard' => boolval($course->show_scoreboard),
                 'requests_user_information' => $course->requests_user_information
             ];
 
