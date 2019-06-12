@@ -60,7 +60,7 @@ OmegaUp.on('ready', function() {
         API.Contest.contestants({
                      contest_alias: contestAlias,
                    })
-            .then(function(result) {
+            .then((result) => {
               if (result.status != 'ok') {
                 return;
               }
