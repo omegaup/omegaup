@@ -90,7 +90,7 @@
 import { Vue, Watch, Prop } from 'vue-property-decorator';
 
 import { T } from '../../omegaup.js';
-import { iso3166 } from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
+import iso3166 from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
 
 interface Identity {
   name: string;
@@ -130,7 +130,6 @@ export default class IdentityEdit extends Vue {
   }
 
   get groupName(): string {
-    console.log(typeof this.identity);
     if (typeof this.identity === 'undefined') {
       return '';
     }
@@ -148,15 +147,15 @@ export default class IdentityEdit extends Vue {
   }
 
   get countryStates(): State[] {
-    let country = iso3166.country(this.selectedCountry);
-    let countryStates = Object.keys(country.sub).map(function(code) {
-      return { code: code, name: country.sub[code].name };
-    });
+    let countrySelected = iso3166.country(this.selectedCountry);
+    let countryStates = Object.keys(countrySelected.sub).map(
+      (code: string) => ({ code: code, name: countrySelected.sub[code].name }),
+    );
 
-    countryStates.sort(function(a, b) {
-      return Intl.Collator().compare(a.name, b.name);
+    countryStates.sort((a: State, b: State): any => {
+      Intl.Collator().compare(a.name, b.name);
     });
-    return [{ code: 'MX', name: 'QUE-Queretaro' }];
+    return countryStates;
   }
 
   onEditMember(): void {
