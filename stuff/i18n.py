@@ -77,53 +77,30 @@ class I18nLinter(linters.Linter):
 
         return '(%s)' % ''.join(tokens)
 
-    def _add_single_badge_entry(self, alias, contents, contents_callback):
-        '''Adds entries to .lang files for a certain badge'''
-        custom_name = 'badge%s' % alias[0].upper() + alias[1:]
-        for lang in self._LANGS:
-            found_name = False
-            found_description = False
-            lang_file = '%s/%s.lang' % (self._TEMPLATES_PATH, lang)
-            file_content = ''
-            for _, line in enumerate(contents_callback(
-                    lang_file).split(b'\n')[:-1]):
-                line = line.decode('utf-8')
-                key = re.compile(r'\s+=\s+').split(line.strip(), 1)[0]
-                if key == custom_name + 'Name':
-                    file_content += ('%sName = "%s"\n' %
-                                     (custom_name, contents[lang]['name']))
-                    found_name = True
-                elif key == custom_name + 'Description':
-                    file_content += ('%sDescription = "%s"\n' % (
-                        custom_name,
-                        contents[lang]['description']))
-                    found_description = True
-                else:
-                    file_content += line + '\n'
-            if not found_name:
-                file_content += ('%sName = "%s"\n' %
-                                 (custom_name, contents[lang]['name']))
-            if not found_description:
-                file_content += ('%sDescription = "%s"\n' % (
-                    custom_name,
-                    contents[lang]['description']))
-
-            with open(lang_file, 'wb') as f:
-                f.seek(0)
-                f.truncate()  # Removes all entries from file
-                f.write(file_content.encode('utf-8'))
-
     def _add_badges_entries(self, contents_callback):
         '''Adds badges name and description entries to .lang files'''
         aliases = [f.name for f in os.scandir(self._BADGES_PATH)
                    if f.is_dir()]
+        strings = {}
         for alias in aliases:
+            key_name = 'badge_%s_name' % alias
+            key_desc = 'badge_%s_description' % alias
             filename = ('%s/%s/localizations.json' %
                         (self._BADGES_PATH, alias))
             file = contents_callback(filename).decode('utf-8')
             contents = json.loads(file)
-            self._add_single_badge_entry(alias, contents,
-                                         contents_callback)
+            if key_name not in strings:
+                strings[key_name] = {}
+            if key_desc not in strings:
+                strings[key_desc] = {}
+            for lang in self._LANGS:
+                strings[key_name][lang] = contents[lang]['name']
+                strings[key_desc][lang] = contents[lang]['description']
+            strings[key_name]['pseudo'] = self._pseudoloc(
+                strings[key_name]['en'])
+            strings[key_desc]['pseudo'] = self._pseudoloc(
+                strings[key_desc]['en'])
+        return strings
 
     def _get_translated_strings(self, contents_callback):
         strings = {}
@@ -226,8 +203,8 @@ class I18nLinter(linters.Linter):
     def run_all(self, file_contents, contents_callback):
         '''Runs the linter against a subset of files.'''
         # pylint: disable=no-self-use, unused-argument
-        self._add_badges_entries(contents_callback)
         strings = self._get_translated_strings(contents_callback)
+        strings.update(self._add_badges_entries(contents_callback))
 
         new_contents, original_contents = self._generate_new_contents(
             strings, contents_callback)
