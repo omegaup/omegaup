@@ -1,11 +1,10 @@
 <?php
 
 /**
- * VirtualContestTest
+ * Test to ensure that all the badges are in the correct format.
  *
  * @author carlosabcs
  */
-
 class BadgesTest extends OmegaupTestCase {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
     const MAX_BADGE_SIZE = 20 * 1024;
@@ -15,36 +14,37 @@ class BadgesTest extends OmegaupTestCase {
     const TEST_FILE = 'test.json';
 
     public function testAllBadges() {
-        $aliases = glob(static::OMEGAUP_BADGES_ROOT . '/*', GLOB_ONLYDIR);
+        $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         foreach ($aliases as $alias) {
-            // Gets the string after last '/'
-            $badge = substr($alias, strrpos($alias, '/') + 1);
-
-            $icon_path = $alias . '/' . static::ICON_FILE;
-            if (file_exists($icon_path)) {
+            $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
+            if (!is_dir($badgePath)) {
+                continue;
+            }
+            $iconPath = $badgePath . '/' . static::ICON_FILE;
+            if (file_exists($iconPath)) {
                 $this->assertLessThanOrEqual(
-                    static:: MAX_BADGE_SIZE,
-                    filesize($icon_path),
-                    "$badge:> The size of icon.svg must be less than or equal to 20KB."
+                    static::MAX_BADGE_SIZE,
+                    filesize($iconPath),
+                    "$alias:> The size of icon.svg must be less than or equal to 20KB."
                 );
             }
 
-            $loc_path = $alias . '/' . static::LOCALIZATIONS_FILE;
+            $locPath = $badgePath . '/' . static::LOCALIZATIONS_FILE;
             $this->assertTrue(
-                file_exists($loc_path),
-                "$badge:> The file localizations.json doesn't exist."
+                file_exists($locPath),
+                "$alias:> The file localizations.json doesn't exist."
             );
 
-            $query_path = $alias . '/' . static::QUERY_FILE;
+            $queryPath = $badgePath . '/' . static::QUERY_FILE;
             $this->assertTrue(
-                file_exists($query_path),
-                "$badge:> The file query.sql doesn't exist."
+                file_exists($queryPath),
+                "$alias:> The file query.sql doesn't exist."
             );
 
-            $test_path = $alias . '/' . static::TEST_FILE;
+            $testPath = $badgePath . '/' . static::TEST_FILE;
             $this->assertTrue(
-                file_exists($test_path),
-                "$badge:> The file test.json doesn't exist."
+                file_exists($testPath),
+                "$alias:> The file test.json doesn't exist."
             );
 
             // From here I must run the test.json + query.sql
