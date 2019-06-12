@@ -97,6 +97,7 @@ const translations = {
 	contestDetailsValidator: "Validator",
 	contestDetailsWindowLength: "Window Length",
 	contestDetailsYes: "Yes",
+	contestDownloadListOfUsersInContest: "Download list of users in the contest",
 	contestDuration: "Contest duration",
 	contestEdit: "Edit contest",
 	contestEditAddProblems: "Add problems",
