@@ -81,25 +81,16 @@ class I18nLinter(linters.Linter):
         '''Adds badges name and description entries to .lang files'''
         aliases = [f.name for f in os.scandir(self._BADGES_PATH)
                    if f.is_dir()]
-        strings = {}
+        strings = collections.defaultdict(lambda: collections.defaultdict(str))
         for alias in aliases:
             key_name = 'badge_%s_name' % alias
             key_desc = 'badge_%s_description' % alias
-            filename = ('%s/%s/localizations.json' %
-                        (self._BADGES_PATH, alias))
-            file = contents_callback(filename).decode('utf-8')
-            contents = json.loads(file)
-            if key_name not in strings:
-                strings[key_name] = {}
-            if key_desc not in strings:
-                strings[key_desc] = {}
+            filename = os.path.join(self._BADGES_PATH, alias,
+                                    'localizations.json')
+            contents = json.loads(contents_callback(filename).decode('utf-8'))
             for lang in self._LANGS:
                 strings[key_name][lang] = contents[lang]['name']
                 strings[key_desc][lang] = contents[lang]['description']
-            strings[key_name]['pseudo'] = self._pseudoloc(
-                strings[key_name]['en'])
-            strings[key_desc]['pseudo'] = self._pseudoloc(
-                strings[key_desc]['en'])
         return strings
 
     def _get_translated_strings(self, contents_callback):
@@ -125,8 +116,11 @@ class I18nLinter(linters.Linter):
                         (row.strip(), filename, lineno + 1),
                         fixable=False)
 
-        self._check_missing_entries(strings, languages)
-        return strings
+        # Removing badges entries
+        strings_without_badges = {
+            k: v for k, v in strings.items() if not k.startswith('badge_')
+        }
+        return strings_without_badges
 
     def _check_missing_entries(self, strings, languages):
         missing_items_lang = set()
@@ -205,6 +199,7 @@ class I18nLinter(linters.Linter):
         # pylint: disable=no-self-use, unused-argument
         strings = self._get_translated_strings(contents_callback)
         strings.update(self._add_badges_entries(contents_callback))
+        self._check_missing_entries(strings, set(self._LANGS))
 
         new_contents, original_contents = self._generate_new_contents(
             strings, contents_callback)
