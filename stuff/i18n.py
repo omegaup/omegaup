@@ -117,10 +117,9 @@ class I18nLinter(linters.Linter):
                         fixable=False)
 
         # Removing badges entries
-        strings_without_badges = {
+        return {
             k: v for k, v in strings.items() if not k.startswith('badge_')
         }
-        return strings_without_badges
 
     def _check_missing_entries(self, strings, languages):
         missing_items_lang = set()
