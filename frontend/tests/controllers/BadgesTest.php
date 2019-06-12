@@ -20,7 +20,7 @@ class BadgesTest extends OmegaupTestCase {
             if (!is_dir($badgePath)) {
                 continue;
             }
-            $iconPath = $badgePath . '/' . static::ICON_FILE;
+            $iconPath = "${badgePath}/" . static::ICON_FILE;
             if (file_exists($iconPath)) {
                 $this->assertLessThanOrEqual(
                     static::MAX_BADGE_SIZE,
@@ -29,19 +29,19 @@ class BadgesTest extends OmegaupTestCase {
                 );
             }
 
-            $locPath = $badgePath . '/' . static::LOCALIZATIONS_FILE;
+            $localizationsPath = "${badgePath}/" . static::LOCALIZATIONS_FILE;
             $this->assertTrue(
-                file_exists($locPath),
+                file_exists($localizationsPath),
                 "$alias:> The file localizations.json doesn't exist."
             );
 
-            $queryPath = $badgePath . '/' . static::QUERY_FILE;
+            $queryPath = "${badgePath}/" . static::QUERY_FILE;
             $this->assertTrue(
                 file_exists($queryPath),
                 "$alias:> The file query.sql doesn't exist."
             );
 
-            $testPath = $badgePath . '/' . static::TEST_FILE;
+            $testPath = "${badgePath}/" . static::TEST_FILE;
             $this->assertTrue(
                 file_exists($testPath),
                 "$alias:> The file test.json doesn't exist."
