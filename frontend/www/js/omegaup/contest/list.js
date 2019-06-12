@@ -5,13 +5,13 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   function fillContestsTable() {
-    let deferred =
+    const deferred =
         contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList();
     deferred.then(function(result) { contestList.contests = result.contests; })
         .fail(UI.apiError);
   }
 
-  let payloadElement = document.getElementById('payload');
+  const payloadElement = document.getElementById('payload');
   let payload = {'contests': []};
   if (payloadElement) {
     payload = JSON.parse(payloadElement.innerText);
@@ -64,31 +64,31 @@ OmegaUp.on('ready', function() {
               if (result.status != 'ok') {
                 return;
               }
-              let csvContent = "data:text/csv;charset=utf-8,";
-              let dataToSerialize = {
+              const dataToSerialize = {
                 fields: [
                   {id: 'name'},
                   {id: 'username'},
                   {id: 'email'},
                   {id: 'state'},
                   {id: 'country'},
-                  {id: 'school'}
+                  {id: 'school'},
                 ],
                 records: result.contestants
               };
-              let dialect = {
-                "dialect": {
-                  "csvddfVersion": 1.2,
-                  "delimiter": ",",
-                  "doubleQuote": true,
-                  "lineTerminator": "\r\n",
-                  "quoteChar": "\"",
-                  "skipInitialSpace": true,
-                  "header": true,
-                  "commentChar": "#"
-                }
+              const dialect = {
+                dialect: {
+                  csvddfVersion: 1.2,
+                  delimiter: ",",
+                  doubleQuote: true,
+                  lineTerminator: "\r\n",
+                  quoteChar: "\"",
+                  skipInitialSpace: true,
+                  header: true,
+                  commentChar: "#",
+                },
               };
-              csvContent += CSV.serialize(dataToSerialize, dialect);
+              const csvContent = ('data:text/csv;charset=utf-8,' +
+                                  CSV.serialize(dataToSerialize, dialect));
 
               let encodedUri = encodeURI(csvContent);
               let link = document.createElement('a');
