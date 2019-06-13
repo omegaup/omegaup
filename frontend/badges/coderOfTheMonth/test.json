@@ -1,11 +1,12 @@
 {
-  "apicalls": [
+  "first_change_time": "2019-05-01",
+  "first_apicalls": [
     {
-      "username": "omegaup",
-      "password": "omegaup",
+      "username": "omegaup_admin",
+      "password": "omegaup_admin",
       "requests": [
         {
-          "api": "/problem/create",
+          "api": "ProblemController::apiCreate",
           "params": {
             "visibility": 1,
             "title": "Sumas",
@@ -27,56 +28,212 @@
           }
         },
         {
-          "api": "/user/create",
+          "api": "ProblemController::apiCreate",
           "params": {
-            "username": "user_0",
+            "visibility": 1,
+            "title": "Sumas_2",
+            "problem_alias": "sumas_2",
+            "validator": "token-numeric",
+            "time_limit": 1000,
+            "validator_time_limit": 0,
+            "overall_wall_time_limit": 1000,
+            "extra_wall_time": 0,
+            "memory_limit": 32768,
+            "output_limit": 10240,
+            "input_limit": 10240,
+            "source": "omegaUp classics",
+            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+            "email_clarifications": 1
+          },
+          "files": {
+            "problem_contents": "frontend/tests/resources/testproblem.zip"
+          }
+        },
+        {
+          "api": "ProblemController::apiCreate",
+          "params": {
+            "visibility": 1,
+            "title": "Sumas_3",
+            "problem_alias": "sumas_3",
+            "validator": "token-numeric",
+            "time_limit": 1000,
+            "validator_time_limit": 0,
+            "overall_wall_time_limit": 1000,
+            "extra_wall_time": 0,
+            "memory_limit": 32768,
+            "output_limit": 10240,
+            "input_limit": 10240,
+            "source": "omegaUp classics",
+            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+            "email_clarifications": 1
+          },
+          "files": {
+            "problem_contents": "frontend/tests/resources/testproblem.zip"
+          }
+        },
+        {
+          "api": "ProblemController::apiCreate",
+          "params": {
+            "visibility": 1,
+            "title": "Sumas_4",
+            "problem_alias": "sumas_4",
+            "validator": "token-numeric",
+            "time_limit": 1000,
+            "validator_time_limit": 0,
+            "overall_wall_time_limit": 1000,
+            "extra_wall_time": 0,
+            "memory_limit": 32768,
+            "output_limit": 10240,
+            "input_limit": 10240,
+            "source": "omegaUp classics",
+            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+            "email_clarifications": 1
+          },
+          "files": {
+            "problem_contents": "frontend/tests/resources/testproblem.zip"
+          }
+        },
+        {
+          "api": "ProblemController::apiCreate",
+          "params": {
+            "visibility": 1,
+            "title": "Sumas_5",
+            "problem_alias": "sumas_5",
+            "validator": "token-numeric",
+            "time_limit": 1000,
+            "validator_time_limit": 0,
+            "overall_wall_time_limit": 1000,
+            "extra_wall_time": 0,
+            "memory_limit": 32768,
+            "output_limit": 10240,
+            "input_limit": 10240,
+            "source": "omegaUp classics",
+            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+            "email_clarifications": 1
+          },
+          "files": {
+            "problem_contents": "frontend/tests/resources/testproblem.zip"
+          }
+        },
+        {
+          "api": "ProblemController::apiCreate",
+          "params": {
+            "visibility": 1,
+            "title": "Sumas_6",
+            "problem_alias": "sumas_6",
+            "validator": "token-numeric",
+            "time_limit": 1000,
+            "validator_time_limit": 0,
+            "overall_wall_time_limit": 1000,
+            "extra_wall_time": 0,
+            "memory_limit": 32768,
+            "output_limit": 10240,
+            "input_limit": 10240,
+            "source": "omegaUp classics",
+            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+            "email_clarifications": 1
+          },
+          "files": {
+            "problem_contents": "frontend/tests/resources/testproblem.zip"
+          }
+        },
+        {
+          "api": "UserController::apiCreate",
+          "params": {
+            "username": "test_user_0",
             "email": "user_0@domain.com",
-            "password": "user_0"
+            "password": "test_user_0"
           }
         },
         {
-          "api": "/user/create",
+          "api": "UserController::apiCreate",
           "params": {
-            "username": "user_1",
+            "username": "test_user_1",
             "email": "user_1@domain.com",
-            "password": "user_1"
+            "password": "test_user_1"
           }
         },
         {
-          "api": "/user/create",
+          "api": "UserController::apiCreate",
           "params": {
-            "username": "user_2",
+            "username": "test_user_2",
             "email": "user_2@domain.com",
-            "password": "user_2"
+            "password": "test_user_2"
           }
         }
       ]
     },
     {
-      "username": "user_0",
-      "password": "user_0",
+      "username": "test_user_0",
+      "password": "test_user_0",
       "requests": [
         {
-          "api": "/run/create",
+          "api": "RunController::apiCreate",
           "params": {
             "problem_alias": "sumas",
             "language": "py",
             "source": "print sum(map(int, raw_input().strip().split()))"
           }
+        },
+        {
+          "api": "RunController::apiCreate",
+          "params": {
+            "problem_alias": "sumas_2",
+            "language": "py",
+            "source": "print sum(map(int, raw_input().strip().split()))"
+          }
+        },
+        {
+          "api": "RunController::apiCreate",
+          "params": {
+            "problem_alias": "sumas_3",
+            "language": "py",
+            "source": "print sum(map(int, raw_input().strip().split()))"
+          }
+        },
+        {
+          "api": "RunController::apiCreate",
+          "params": {
+            "problem_alias": "sumas_4",
+            "language": "py",
+            "source": "print sum(map(int, raw_input().strip().split()))"
+          }
+        },
+        {
+          "api": "RunController::apiCreate",
+          "params": {
+            "problem_alias": "sumas_5",
+            "language": "py",
+            "source": "print sum(map(int, raw_input().strip().split()))"
+          }
+        },
+        {
+          "api": "RunController::apiCreate",
+          "params": {
+            "problem_alias": "sumas_6",
+            "language": "py",
+            "source": "print sum(map(int, raw_input().strip().split()))"
+          }
         }
       ]
-    },
+    }
+  ],
+  "scripts": [
+    "update_user_rank.py"
+  ],
+  "last_change_time": "2019-06-01",
+  "last_apicalls" : [
     {
-      "username": "omegaup",
-      "password": "omegaup",
+      "username": "omegaup_admin",
+      "password": "omegaup_admin",
       "requests": [
         {
-          "api": "/user/coderofthemonth"
+          "api": "UserController::apiCoderOfTheMonth"
         }
       ]
     }
   ],
   "expected_results": [
-    "user_0"
+    "test_user_0"
   ]
 }

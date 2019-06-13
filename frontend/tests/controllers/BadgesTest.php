@@ -1,5 +1,9 @@
 <?php
 
+require_once OMEGAUP_ROOT . '/www/api/ApiCaller.php';
+require_once 'libs/FileHandler.php';
+require_once 'libs/FileUploader.php';
+
 /**
  * Test to ensure that all the badges are in the correct format.
  *
@@ -13,7 +17,34 @@ class BadgesTest extends OmegaupTestCase {
     const QUERY_FILE = 'query.sql';
     const TEST_FILE = 'test.json';
 
+    public static function RunRequests($apicall) {
+        $identity = new stdClass();
+        $identity->username = $apicall['username'];
+        $identity->password = $apicall['password'];
+        $login = self::login($identity);
+        foreach ($apicall['requests'] as $req) {
+            $r = new Request();
+            if (array_key_exists('params', $req)) {
+                $req['params']['auth_token'] = $login->auth_token;
+                $r = new Request($req['params']);
+            }
+            if (array_key_exists('files', $req)) {
+                $_FILES['problem_contents']['tmp_name'] = $req['files']['problem_contents'];
+            }
+            $r->method = $req['api'];
+            $fullResponse = ApiCaller::call($r);
+            if ($fullResponse['status'] !== 'ok') {
+                throw new Exception($fullResponse['error']);
+            }
+            if ($r->method === 'RunController::apiCreate') {
+                $response['response']['guid'] = $fullResponse['guid'];
+                RunsFactory::gradeRun($response);
+            }
+        }
+    }
+
     public function testAllBadges() {
+        global $conn;
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         foreach ($aliases as $alias) {
             $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
@@ -47,7 +78,70 @@ class BadgesTest extends OmegaupTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            // From here I must run the test.json + query.sql
+            if (file_exists($testPath) && file_exists($queryPath)) {
+                Utils::CleanUpDb(true);
+
+                $contents = json_decode(file_get_contents($testPath), true);
+
+                // omegaUp admin user must be created always.
+                $omegaup = UserFactory::createAdminUser(new UserParams([
+                    'username' => 'omegaup_admin',
+                    'password' => 'omegaup_admin',
+                ]));
+
+                $time = strtotime($contents['first_change_time']);
+                Time::setTimeForTesting($time);
+
+                // Running the first apicalls
+                foreach ($contents['first_apicalls'] as $apicall) {
+                    FileHandler::SetFileUploader($this->createFileUploaderMock());
+                    self::runRequests($apicall);
+                }
+
+                // Running scripts
+                foreach ($contents['scripts'] as $script) {
+                    switch ($script) {
+                        case 'update_user_rank.py':
+                            Utils::RunUpdateUserRank();
+                            break;
+                        case 'aggregate_feedback.py':
+                            Utils::RunAggregateFeedback();
+                            break;
+                        default:
+                            throw new Exception('El script solicitado no existe');
+                    }
+                }
+
+                $time = strtotime($contents['last_change_time']);
+                Time::setTimeForTesting($time);
+
+                // Running the last apicalls
+                foreach ($contents['last_apicalls'] as $apicall) {
+                    FileHandler::SetFileUploader($this->createFileUploaderMock());
+                    self::RunRequests($apicall);
+                }
+
+                // Time will be automatically reset after last apicalls
+                Time::setTimeForTesting(null);
+
+                $sql = file_get_contents($queryPath);
+                $rs = $conn->GetAll($sql);
+                $results = [];
+                foreach ($rs as $user) {
+                    $results[] = $user['user_id'];
+                }
+                asort($results);
+
+                $expected = [];
+                foreach ($contents['expected_results'] as $username) {
+                    $user = UsersDAO::FindByUsername($username);
+                    $expected[] = $user->user_id;
+                }
+                asort($expected);
+
+                $this->assertEquals($results, $expected);
+            }
         }
+        Utils::CleanUpDb();
     }
 }

@@ -88,7 +88,7 @@ class Utils {
         mkdir($path, 0755, true);
     }
 
-    public static function CleanupDB() {
+    public static function CleanupDB($forBadges = false) {
         global $conn;
 
         // Tables to truncate
@@ -154,9 +154,20 @@ class Utils {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());
         } finally {
-            // Enabling them again
-            $conn->Execute('SET foreign_key_checks = 1;');
+            if (!$forBadges) {
+                // Enabling them again
+                $conn->Execute('SET foreign_key_checks = 1;');
+            }
         }
+    }
+
+    public static function RunUpdateUserRank() {
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
+        ' --quiet ' .
+        ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+        ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+        ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+        ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
     }
 
     public static function Commit() {
@@ -164,7 +175,7 @@ class Utils {
         $conn->Execute('COMMIT');
     }
 
-    public static function RunCronjobScript() {
+    public static function RunAggregateFeedback() {
         // Ensure all suggestions are written to the database before invoking
         // the external script.
         self::commit();

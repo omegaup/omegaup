@@ -163,28 +163,26 @@ class RunsFactory {
     }
 
     /**
-     * Given a run, set a score to a given run
+     * Given a run guid, set a score for its run
      *
-     * @param ?array  $runData     The run.
+     * @param ?string $runGuid     The GUID of the submission.
      * @param float   $points      The score of the run
      * @param string  $verdict     The verdict of the run.
      * @param ?int    $submitDelay The number of minutes worth of penalty.
-     * @param ?string $runGuid     The GUID of the submission.
      * @param ?int    $runID       The ID of the run.
      */
-    public static function gradeRun(
-        ?array $runData,
+    public static function pureGradeRun(
+        ?string $runGuid,
         float $points = 1,
         string $verdict = 'AC',
         ?int $submitDelay = null,
-        ?string $runGuid = null,
         ?int $runId = null
     ) : void {
         if (!is_null($runId)) {
             $run = RunsDAO::getByPK($runId);
             $submission = SubmissionsDAO::getByPK($run->submission_id);
         } else {
-            $submission = SubmissionsDAO::getByGuid($runGuid === null ? $runData['response']['guid'] : $runGuid);
+            $submission = SubmissionsDAO::getByGuid($runGuid);
             $run = RunsDAO::getByPK($submission->current_run_id);
         }
 
@@ -227,5 +225,27 @@ class RunsFactory {
             "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
             "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         );
+    }
+
+    /**
+     * Given a run, set a score to a given run
+     *
+     * @param ?array  $runData     The run.
+     * @param float   $points      The score of the run
+     * @param string  $verdict     The verdict of the run.
+     * @param ?int    $submitDelay The number of minutes worth of penalty.
+     * @param ?string $runGuid     The GUID of the submission.
+     * @param ?int    $runID       The ID of the run.
+     */
+    public static function gradeRun(
+        ?array $runData,
+        float $points = 1,
+        string $verdict = 'AC',
+        ?int $submitDelay = null,
+        ?string $runGuid = null,
+        ?int $runId = null
+    ) : void {
+        $guid = $runGuid === null ? $runData['response']['guid'] : $runGuid;
+        self::pureGradeRun($guid, $points, $verdict, $submitDelay, $runId);
     }
 }

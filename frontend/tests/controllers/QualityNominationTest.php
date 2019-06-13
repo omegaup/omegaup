@@ -904,7 +904,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         self::setUpRankForUsers($problemData, $userData, true);
 
-        Utils::runCronjobScript();
+        Utils::RunAggregateFeedback();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.971428571, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
@@ -938,8 +938,8 @@ class QualityNominationTest extends OmegaupTestCase {
         $tags3 = array_map($extractName, $tagArrayForProblem3);
         $this->assertEquals($tags3, ['dp', 'greedy', 'geometry', 'search', 'lenguaje']);
 
-        self::runUpdateUserRank();
-        Utils::runCronJobScript();
+        Utils::RunUpdateUserRank();
+        Utils::RunAggregateFeedback();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.895384615, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
@@ -1115,7 +1115,7 @@ class QualityNominationTest extends OmegaupTestCase {
     // with difficulty < 2.
     public function testUpdateProblemOfTheWeek() {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
-        Utils::runCronjobScript();
+        Utils::RunAggregateFeedback();
 
         $problemOfTheWeek = ProblemOfTheWeekDAO::getByDificulty('easy');
         $this->assertEquals(count($problemOfTheWeek), 1);
@@ -1124,15 +1124,6 @@ class QualityNominationTest extends OmegaupTestCase {
             $syntheticProblems[1]['problem']->problem_id
         );
         // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
-    }
-
-    private function runUpdateUserRank() {
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
     }
 
     public function setUpSyntheticSuggestionsForProblemOfTheWeek() {
@@ -1205,7 +1196,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ));
         $this->assertEquals($tags, ['dp', 'lenguaje']);
 
-        Utils::runCronjobScript();
+        Utils::RunAggregateFeedback();
 
         $tags = array_map(function ($tag) {
             return $tag['name'];
