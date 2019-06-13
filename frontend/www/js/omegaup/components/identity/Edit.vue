@@ -87,10 +87,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Watch, Prop } from 'vue-property-decorator';
+import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 
 import { T } from '../../omegaup.js';
-import iso3166 from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
+import * as iso3166 from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
 
 interface Identity {
   name: string;
@@ -111,6 +111,7 @@ interface State {
   name: string;
 }
 
+@Component
 export default class IdentityEdit extends Vue {
   @Prop() identity!: Identity;
   @Prop() countries!: Country[];
