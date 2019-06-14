@@ -50,94 +50,6 @@
           }
         },
         {
-          "api": "ProblemController::apiCreate",
-          "params": {
-            "visibility": 1,
-            "title": "Sumas_3",
-            "problem_alias": "sumas_3",
-            "validator": "token-numeric",
-            "time_limit": 1000,
-            "validator_time_limit": 0,
-            "overall_wall_time_limit": 1000,
-            "extra_wall_time": 0,
-            "memory_limit": 32768,
-            "output_limit": 10240,
-            "input_limit": 10240,
-            "source": "omegaUp classics",
-            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-            "email_clarifications": 1
-          },
-          "files": {
-            "problem_contents": "frontend/tests/resources/testproblem.zip"
-          }
-        },
-        {
-          "api": "ProblemController::apiCreate",
-          "params": {
-            "visibility": 1,
-            "title": "Sumas_4",
-            "problem_alias": "sumas_4",
-            "validator": "token-numeric",
-            "time_limit": 1000,
-            "validator_time_limit": 0,
-            "overall_wall_time_limit": 1000,
-            "extra_wall_time": 0,
-            "memory_limit": 32768,
-            "output_limit": 10240,
-            "input_limit": 10240,
-            "source": "omegaUp classics",
-            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-            "email_clarifications": 1
-          },
-          "files": {
-            "problem_contents": "frontend/tests/resources/testproblem.zip"
-          }
-        },
-        {
-          "api": "ProblemController::apiCreate",
-          "params": {
-            "visibility": 1,
-            "title": "Sumas_5",
-            "problem_alias": "sumas_5",
-            "validator": "token-numeric",
-            "time_limit": 1000,
-            "validator_time_limit": 0,
-            "overall_wall_time_limit": 1000,
-            "extra_wall_time": 0,
-            "memory_limit": 32768,
-            "output_limit": 10240,
-            "input_limit": 10240,
-            "source": "omegaUp classics",
-            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-            "email_clarifications": 1
-          },
-          "files": {
-            "problem_contents": "frontend/tests/resources/testproblem.zip"
-          }
-        },
-        {
-          "api": "ProblemController::apiCreate",
-          "params": {
-            "visibility": 1,
-            "title": "Sumas_6",
-            "problem_alias": "sumas_6",
-            "validator": "token-numeric",
-            "time_limit": 1000,
-            "validator_time_limit": 0,
-            "overall_wall_time_limit": 1000,
-            "extra_wall_time": 0,
-            "memory_limit": 32768,
-            "output_limit": 10240,
-            "input_limit": 10240,
-            "source": "omegaUp classics",
-            "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-            "email_clarifications": 1
-          },
-          "files": {
-            "problem_contents": "frontend/tests/resources/testproblem.zip"
-          }
-        },
-        {
           "api": "UserController::apiCreate",
           "params": {
             "username": "test_user_0",
@@ -179,38 +91,6 @@
           "api": "RunController::apiCreate",
           "params": {
             "problem_alias": "sumas_2",
-            "language": "py",
-            "source": "print sum(map(int, raw_input().strip().split()))"
-          }
-        },
-        {
-          "api": "RunController::apiCreate",
-          "params": {
-            "problem_alias": "sumas_3",
-            "language": "py",
-            "source": "print sum(map(int, raw_input().strip().split()))"
-          }
-        },
-        {
-          "api": "RunController::apiCreate",
-          "params": {
-            "problem_alias": "sumas_4",
-            "language": "py",
-            "source": "print sum(map(int, raw_input().strip().split()))"
-          }
-        },
-        {
-          "api": "RunController::apiCreate",
-          "params": {
-            "problem_alias": "sumas_5",
-            "language": "py",
-            "source": "print sum(map(int, raw_input().strip().split()))"
-          }
-        },
-        {
-          "api": "RunController::apiCreate",
-          "params": {
-            "problem_alias": "sumas_6",
             "language": "py",
             "source": "print sum(map(int, raw_input().strip().split()))"
           }
