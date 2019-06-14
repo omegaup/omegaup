@@ -893,8 +893,8 @@ class QualityNominationTest extends OmegaupTestCase {
     */
     public function testAggregateFeedback() {
         /* Previous tests create some users with their assigned ranges and forget to delete them, which affects this test */
-        self::deleteAllRanks();
-        self::deleteAllPreviousRuns();
+        Utils::deleteAllRanks();
+        Utils::deleteAllPreviousRuns();
 
         for ($i = 0; $i < 5; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem();
@@ -982,7 +982,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
 
         if ($withSuggestions) {
-            self::deleteAllSuggestions();
+            Utils::deleteAllSuggestions();
 
             QualityNominationFactory::createSuggestion(
                 $login[0],
@@ -1128,8 +1128,8 @@ class QualityNominationTest extends OmegaupTestCase {
 
     public function setUpSyntheticSuggestionsForProblemOfTheWeek() {
         // Delete existing suggestions and problems of the week.
-        self::deleteAllSuggestions();
-        self::deleteAllProblemsOfTheWeek();
+        Utils::deleteAllSuggestions();
+        Utils::deleteAllProblemsOfTheWeek();
 
         // Setup synthetic data.
         $numberOfProblems = 4;
@@ -1209,7 +1209,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     public function setUpSyntheticSuggestions($problemData) {
-        self::deleteAllSuggestions();
+        Utils::deleteAllSuggestions();
 
         // Setup synthetic data.
         $login = [];
@@ -1363,29 +1363,6 @@ class QualityNominationTest extends OmegaupTestCase {
             3,
             ['Geometry', 'Math']
         );
-    }
-
-    private static function deleteAllSuggestions() {
-        global $conn;
-        $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
-    }
-
-    private static function deleteAllRanks() {
-        global $conn;
-        $conn->Execute('DELETE FROM `User_Rank`;');
-    }
-
-    private static function deleteAllPreviousRuns() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Submission_Log`;');
-        $conn->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
-        $conn->Execute('DELETE FROM `Runs`;');
-        $conn->Execute('DELETE FROM `Submissions`;');
-    }
-
-    private static function deleteAllProblemsOfTheWeek() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
     }
 
     public function testMostVotedTags() {

@@ -88,7 +88,42 @@ class Utils {
         mkdir($path, 0755, true);
     }
 
-    public static function CleanupDB($forBadges = false) {
+    public static function deleteAllSuggestions() {
+        global $conn;
+        $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
+    }
+
+    public static function deleteAllRanks() {
+        global $conn;
+        $conn->Execute('DELETE FROM `User_Rank`;');
+    }
+
+    public static function deleteAllProblems() {
+        global $conn;
+        $conn->Execute('SET FOREIGN_KEY_CHECKS = 0;');
+        $conn->Execute('TRUNCATE TABLE `Problems`;');
+        $conn->Execute('SET FOREIGN_KEY_CHECKS = 1;');
+    }
+
+    public static function deleteAllPreviousRuns() {
+        global $conn;
+        $conn->Execute('DELETE FROM `Submission_Log`;');
+        $conn->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
+        $conn->Execute('DELETE FROM `Runs`;');
+        $conn->Execute('DELETE FROM `Submissions`;');
+    }
+
+    public static function deleteAllProblemsOfTheWeek() {
+        global $conn;
+        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
+    }
+
+    public static function deleteAllCodersOfTheMonth() {
+        global $conn;
+        $conn->Execute('DELETE FROM `Coder_Of_The_Month`;');
+    }
+
+    public static function CleanupDB() {
         global $conn;
 
         // Tables to truncate
@@ -154,10 +189,8 @@ class Utils {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());
         } finally {
-            if (!$forBadges) {
-                // Enabling them again
-                $conn->Execute('SET foreign_key_checks = 1;');
-            }
+            // Enabling them again
+            $conn->Execute('SET foreign_key_checks = 1;');
         }
     }
 

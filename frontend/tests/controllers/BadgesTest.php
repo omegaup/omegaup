@@ -17,7 +17,16 @@ class BadgesTest extends OmegaupTestCase {
     const QUERY_FILE = 'query.sql';
     const TEST_FILE = 'test.json';
 
-    public static function RunRequests($apicall) {
+    private static function cleanDb() {
+        Utils::deleteAllSuggestions();
+        Utils::deleteAllRanks();
+        Utils::deleteAllPreviousRuns();
+        Utils::deleteAllProblemsOfTheWeek();
+        Utils::deleteAllCodersOfTheMonth();
+        Utils::deleteAllProblems();
+    }
+
+    private static function RunRequests($apicall) {
         $identity = new stdClass();
         $identity->username = $apicall['username'];
         $identity->password = $apicall['password'];
@@ -79,8 +88,7 @@ class BadgesTest extends OmegaupTestCase {
             );
 
             if (file_exists($testPath) && file_exists($queryPath)) {
-                Utils::CleanUpDb(true);
-
+                self::cleanDb();
                 $contents = json_decode(file_get_contents($testPath), true);
 
                 // omegaUp admin user must be created always.
@@ -142,6 +150,6 @@ class BadgesTest extends OmegaupTestCase {
                 $this->assertEquals($results, $expected);
             }
         }
-        Utils::CleanUpDb();
+        self::cleanDb();
     }
 }
