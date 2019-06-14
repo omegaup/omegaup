@@ -88,23 +88,9 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-
 import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 import * as iso3166 from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
-
-interface Identity {
-  name: string;
-  username: string;
-  school: string;
-  school_id: number;
-  country_id: string;
-  state_id: string;
-}
-
-interface Country {
-  country_id: string;
-  name: string;
-}
 
 interface State {
   code: string;
@@ -113,13 +99,13 @@ interface State {
 
 @Component
 export default class IdentityEdit extends Vue {
-  @Prop() identity!: Identity;
-  @Prop() countries!: Country[];
+  @Prop() identity!: omegaup.Identity;
+  @Prop() countries!: iso3166.Country[];
+  @Prop({ default: 'MX' }) selectedCountry!: string;
+  @Prop() selectedState!: string;
+  @Prop() username!: string;
 
   T = T;
-  selectedCountry = this.$attrs.selectedcountry || 'MX';
-  selectedState = this.$attrs.selectedstate;
-  username = this.$attrs.username;
 
   @Watch('selectedCountry')
   onPropertyChanged(newContry: string, oldCountry: string) {

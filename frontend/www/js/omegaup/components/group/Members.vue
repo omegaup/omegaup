@@ -72,8 +72,8 @@
       </tbody>
     </table><omegaup-identity-edit v-bind:countries="countries"
          v-bind:identity="identity"
-         v-bind:selectedcountry="identity.country_id"
-         v-bind:selectedstate="identity.state_id"
+         v-bind:selected-country="identity.country_id"
+         v-bind:selected-state="identity.state_id"
          v-bind:username="username"
          v-if="show"></omegaup-identity-edit><!-- Modal Change Password-->
     <div class="modal fade modal-change-password"
