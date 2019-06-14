@@ -123,6 +123,71 @@ class Utils {
         $conn->Execute('DELETE FROM `Coder_Of_The_Month`;');
     }
 
+    /**
+     * Given a run guid, set a score for its run
+     *
+     * @param ?int    $runID       The ID of the run.
+     * @param ?string $runGuid     The GUID of the submission.
+     * @param float   $points      The score of the run
+     * @param string  $verdict     The verdict of the run.
+     * @param ?int    $submitDelay The number of minutes worth of penalty.
+     */
+    public static function gradeRun(
+        ?int $runId = null,
+        ?string $runGuid,
+        float $points = 1,
+        string $verdict = 'AC',
+        ?int $submitDelay = null
+    ) : void {
+        if (!is_null($runId)) {
+            $run = RunsDAO::getByPK($runId);
+            $submission = SubmissionsDAO::getByPK($run->submission_id);
+        } else {
+            $submission = SubmissionsDAO::getByGuid($runGuid);
+            $run = RunsDAO::getByPK($submission->current_run_id);
+        }
+
+        $run->verdict = $verdict;
+        $run->score = $points;
+        $run->contest_score = $points * 100;
+        $run->status = 'ready';
+        $run->judged_by = 'J1';
+
+        if (!is_null($submitDelay)) {
+            $submission->submit_delay = $submitDelay;
+            SubmissionsDAO::save($submission);
+            $run->submit_delay = $submitDelay;
+            $run->penalty = $submitDelay;
+        }
+
+        RunsDAO::save($run);
+
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'details.json',
+            json_encode([
+                'verdict' => $verdict,
+                'contest_score' => $points,
+                'score' => $points,
+                'judged_by' => 'RunsFactory.php',
+            ])
+        );
+        // An empty gzip file.
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'logs.txt.gz',
+            "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
+            "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        );
+        // An empty zip file.
+        Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'files.zip',
+            "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
+            "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        );
+    }
+
     public static function CleanupDB() {
         global $conn;
 

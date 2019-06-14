@@ -27,16 +27,18 @@ class BadgesTest extends OmegaupTestCase {
     }
 
     private static function RunRequests($apicall) {
-        $identity = new stdClass();
-        $identity->username = $apicall['username'];
-        $identity->password = $apicall['password'];
-        $login = self::login($identity);
+        $login = self::login(new Identities([
+            'username' => $apicall['username'],
+            'password' => $apicall['password'],
+        ]));
         foreach ($apicall['requests'] as $req) {
-            $r = new Request();
+            $params['auth_token'] = $login->auth_token;
             if (array_key_exists('params', $req)) {
-                $req['params']['auth_token'] = $login->auth_token;
-                $r = new Request($req['params']);
+                foreach ($req['params'] as $k => $v) {
+                    $params[$k] = $v;
+                }
             }
+            $r = new Request($params);
             if (array_key_exists('files', $req)) {
                 $_FILES['problem_contents']['tmp_name'] = $req['files']['problem_contents'];
             }
@@ -46,8 +48,7 @@ class BadgesTest extends OmegaupTestCase {
                 throw new Exception($fullResponse['error']);
             }
             if ($r->method === 'RunController::apiCreate') {
-                $response['response']['guid'] = $fullResponse['guid'];
-                RunsFactory::gradeRun($response);
+                Utils::gradeRun(null, $fullResponse['guid']);
             }
         }
     }
