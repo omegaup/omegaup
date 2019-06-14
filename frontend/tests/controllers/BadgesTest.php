@@ -26,17 +26,39 @@ class BadgesTest extends OmegaupTestCase {
         Utils::deleteAllProblems();
     }
 
+    private static function getSortedResults($query) {
+        global $conn;
+        $rs = $conn->GetAll($query);
+        $results = [];
+        foreach ($rs as $user) {
+            $results[] = $user['user_id'];
+        }
+        asort($results);
+        return $results;
+    }
+
+    private static function getSortedExpectedResults($expected) {
+        $results = [];
+        foreach ($expected as $username) {
+            // From each username, obtaining its ID
+            $user = UsersDAO::FindByUsername($username);
+            $results[] = $user->user_id;
+        }
+        asort($results);
+        return $results;
+    }
+
     private static function RunRequests($apicall) {
         $login = self::login(new Identities([
             'username' => $apicall['username'],
             'password' => $apicall['password'],
         ]));
         foreach ($apicall['requests'] as $req) {
-            $params['auth_token'] = $login->auth_token;
-            if (array_key_exists('params', $req)) {
-                foreach ($req['params'] as $k => $v) {
-                    $params[$k] = $v;
-                }
+            $params = [
+                'auth_token' => $login->auth_token,
+            ];
+            foreach ($req['params'] as $k => $v) {
+                $params[$k] = $v;
             }
             $r = new Request($params);
             if (array_key_exists('files', $req)) {
@@ -90,7 +112,8 @@ class BadgesTest extends OmegaupTestCase {
 
             if (file_exists($testPath) && file_exists($queryPath)) {
                 self::cleanDb();
-                $contents = json_decode(file_get_contents($testPath), true);
+                FileHandler::SetFileUploader($this->createFileUploaderMock());
+                $content = json_decode(file_get_contents($testPath), true);
 
                 // omegaUp admin user must be created always.
                 $omegaup = UserFactory::createAdminUser(new UserParams([
@@ -98,59 +121,45 @@ class BadgesTest extends OmegaupTestCase {
                     'password' => 'omegaup_admin',
                 ]));
 
-                $time = strtotime($contents['first_change_time']);
-                Time::setTimeForTesting($time);
-
-                // Running the first apicalls
-                foreach ($contents['first_apicalls'] as $apicall) {
-                    FileHandler::SetFileUploader($this->createFileUploaderMock());
-                    self::runRequests($apicall);
-                }
-
-                // Running scripts
-                foreach ($contents['scripts'] as $script) {
-                    switch ($script) {
-                        case 'update_user_rank.py':
-                            Utils::RunUpdateUserRank();
+                foreach ($content['actions'] as $action) {
+                    switch ($action['type']) {
+                        case 'changeTime':
+                            $time = strtotime($action['time']);
+                            Time::setTimeForTesting($time);
                             break;
-                        case 'aggregate_feedback.py':
-                            Utils::RunAggregateFeedback();
+
+                        case 'apicalls':
+                            foreach ($action['apicalls'] as $apicall) {
+                                self::RunRequests($apicall);
+                            }
+                            break;
+
+                        case 'scripts':
+                            foreach ($action['scripts'] as $script) {
+                                switch ($script) {
+                                    case 'update_user_rank.py':
+                                        Utils::RunUpdateUserRank();
+                                        break;
+                                    case 'aggregate_feedback.py':
+                                        Utils::RunAggregateFeedback();
+                                        break;
+                                    default:
+                                        throw new Exception('Script ' . $script . " doesn't exist.");
+                                }
+                            }
                             break;
                         default:
-                            throw new Exception('El script solicitado no existe');
+                            throw new Exception('Action ' . $action['type'] . " doesn't exist");
                     }
                 }
 
-                $time = strtotime($contents['last_change_time']);
-                Time::setTimeForTesting($time);
-
-                // Running the last apicalls
-                foreach ($contents['last_apicalls'] as $apicall) {
-                    FileHandler::SetFileUploader($this->createFileUploaderMock());
-                    self::RunRequests($apicall);
-                }
-
-                // Time will be automatically reset after last apicalls
-                Time::setTimeForTesting(null);
-
-                $sql = file_get_contents($queryPath);
-                $rs = $conn->GetAll($sql);
-                $results = [];
-                foreach ($rs as $user) {
-                    $results[] = $user['user_id'];
-                }
-                asort($results);
-
-                $expected = [];
-                foreach ($contents['expected_results'] as $username) {
-                    $user = UsersDAO::FindByUsername($username);
-                    $expected[] = $user->user_id;
-                }
-                asort($expected);
-
+                $results = self::getSortedResults(file_get_contents($queryPath));
+                $expected = self::getSortedExpectedResults($content['expectedResults']);
                 $this->assertEquals($results, $expected);
             }
         }
+        // Time will be automatically reset after last apicalls
+        Time::setTimeForTesting(null);
         self::cleanDb();
     }
 }
