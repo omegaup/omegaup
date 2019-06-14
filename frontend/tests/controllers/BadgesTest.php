@@ -70,7 +70,9 @@ class BadgesTest extends OmegaupTestCase {
                 throw new Exception($fullResponse['error']);
             }
             if ($r->method === 'RunController::apiCreate') {
-                Utils::gradeRun(null, $fullResponse['guid']);
+                $points = array_key_exists('points', $req['gradeResult']) ? $req['gradeResult']['points'] : 1;
+                $verdict = $req['gradeResult']['verdict'];
+                Utils::gradeRun(null, $fullResponse['guid'], $points, $verdict);
             }
         }
     }

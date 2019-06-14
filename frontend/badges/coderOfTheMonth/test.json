@@ -91,6 +91,9 @@
                 "problem_alias": "sumas",
                 "language": "py",
                 "source": "print sum(map(int, raw_input().strip().split()))"
+              },
+              "gradeResult": {
+                "verdict": "AC"
               }
             },
             {
@@ -99,6 +102,9 @@
                 "problem_alias": "sumas_2",
                 "language": "py",
                 "source": "print sum(map(int, raw_input().strip().split()))"
+              },
+              "gradeResult": {
+                "verdict": "AC"
               }
             }
           ]
