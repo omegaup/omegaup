@@ -69,7 +69,7 @@ class BadgesTestCase extends OmegaupTestCase {
     }
 
     public static function filesExist($test, $query) {
-      return file_exists($test) && file_exists($query);
+        return file_exists($test) && file_exists($query);
     }
 
     public static function newBadgeTest() {
@@ -104,7 +104,7 @@ class BadgesTestCase extends OmegaupTestCase {
                                 Utils::RunAggregateFeedback();
                                 break;
                             default:
-                            throw new Exception("Script {$script} doesn't exist.");
+                                throw new Exception("Script {$script} doesn't exist.");
                         }
                     }
                     break;
