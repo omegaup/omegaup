@@ -751,6 +751,9 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
+        // Hack to send info into Cahce
+        $r['contest'] = $response['contest'];
+
         $result = [];
         self::getCachedDetails($r, $result);
 
