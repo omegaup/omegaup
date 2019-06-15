@@ -805,48 +805,71 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         try {
-            $original_contest = ContestsDAO::getByAlias($r['contest_alias']);
+            $originalContest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (is_null($original_contest)) {
+        if (is_null($originalContest)) {
             throw new NotFoundException('contestNotFound');
         }
 
-        if (!Authorization::isContestAdmin($r['current_identity_id'], $original_contest)) {
+        if (!Authorization::isContestAdmin(
+            $r['current_identity_id'],
+            $originalContest
+        )) {
             throw new ForbiddenAccessException();
         }
 
-        $length = strtotime($original_contest->finish_time) - strtotime($original_contest->start_time);
+        $length = strtotime($originalContest->finish_time) -
+                  strtotime($originalContest->start_time);
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
+        $problemset = new Problemsets([
+            'needs_basic_information' => false,
+            'requests_user_information' => 'no',
+        ]);
+
+        $contest = new Contests([
+            'title' => $r['title'],
+            'description' => $r['description'],
+            'alias' => $r['alias'],
+            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
+            'finish_time' => gmdate('Y-m-d H:i:s', $r['start_time'] + $length),
+            'scoreboard' => $originalContest->scoreboard,
+            'points_decay_factor' => $originalContest->points_decay_factor,
+            'submissions_gap' => $originalContest->submissions_gap,
+            'penalty_calc_policy' => $originalContest->penalty_calc_policy,
+            'rerun_id' => $originalContest->rerun_id,
+            'feedback' => $originalContest->feedback,
+            'penalty_type' => $originalContest->penalty_type,
+            'admission_mode' => 'private', // Cloned contests start in private
+                                           // admission_mode
+        ]);
+
         DAO::transBegin();
-        $response = [];
         try {
             // Create the contest
-            $response[] = self::apiCreate(new Request([
-                'title' => $r['title'],
-                'description' => $r['description'],
-                'alias' => $r['alias'],
-                'start_time' => $r['start_time'],
-                'finish_time' => $r['start_time'] + $length,
-                'scoreboard' => $original_contest->scoreboard,
-                'points_decay_factor' => $original_contest->points_decay_factor,
-                'submissions_gap' => $original_contest->submissions_gap,
-                'feedback' => $original_contest->feedback,
-                'penalty_type' => $original_contest->penalty_type,
-                'admission_mode' => 'private', // All cloned contests start in private admission_mode
-                'auth_token' => $auth_token
-            ]));
-            $problems = self::apiProblems($r);
-            foreach ($problems['problems'] as $problem) {
-                $response[] = self::apiAddProblem(new Request([
-                        'contest_alias' => $r['alias'],
-                        'problem_alias' => $problem['alias'],
-                        'points' => $problem['points'],
-                        'auth_token' => $auth_token
-                    ]));
+            self::createContest($problemset, $contest, $r['current_user_id']);
+
+            $problemsetProblems = ProblemsetProblemsDAO::getProblemsetProblems(
+                $originalContest->problemset_id
+            );
+            foreach ($problemsetProblems as $problemsetProblem) {
+                $problem = new Problems([
+                    'problem_id' => $problemsetProblem['problem_id'],
+                    'alias' => $problemsetProblem['alias'],
+                    'visibility' => $problemsetProblem['visibility'],
+                ]);
+                ProblemsetController::addProblem(
+                    $contest->problemset_id,
+                    $problem,
+                    $problemsetProblem['commit'],
+                    $problemsetProblem['version'],
+                    $r['current_identity_id'],
+                    $problemsetProblem['points'],
+                    $problemsetProblem['order'] ?: 1
+                );
             }
             DAO::transEnd();
         } catch (InvalidParameterException $e) {
@@ -920,18 +943,26 @@ class ContestController extends Controller {
         $problemset = new Problemsets([
             'needs_basic_information' => false,
             'requests_user_information' => 'no',
-            'scoreboard_url' => SecurityTools::randomString(30),
-            'scoreboard_url_admin' => SecurityTools::randomString(30),
         ]);
 
-        self::createContest($r, $problemset, $contest, $originalContest->problemset_id);
+        self::createContest(
+            $problemset,
+            $contest,
+            $r['current_user_id'],
+            $originalContest->problemset_id
+        );
 
         return ['status' => 'ok', 'alias' => $contest->alias];
     }
 
-    private static function createContest(Request $r, Problemsets $problemset, Contests $contest, $originalProblemset = null) {
+    private static function createContest(
+        Problemsets $problemset,
+        Contests $contest,
+        int $currentUserId,
+        ?int $originalProblemsetId = null
+    ) {
         $acl = new ACLs();
-        $acl->owner_id = $r['current_user_id'];
+        $acl->owner_id = $currentUserId;
         // Push changes
         try {
             // Begin a new transaction
@@ -940,14 +971,21 @@ class ContestController extends Controller {
             ACLsDAO::save($acl);
             $problemset->acl_id = $acl->acl_id;
             $problemset->type = 'Contest';
+            $problemset->scoreboard_url = SecurityTools::randomString(30);
+            $problemset->scoreboard_url_admin = SecurityTools::randomString(30);
             $contest->acl_id = $acl->acl_id;
 
             // Save the problemset object with data sent by user to the database
             ProblemsetsDAO::save($problemset);
 
             $contest->problemset_id = $problemset->problemset_id;
-            if (!is_null($originalProblemset)) {
-                ProblemsetProblemsDAO::copyProblemset($contest->problemset_id, $originalProblemset);
+            $contest->penalty_calc_policy = $contest->penalty_calc_policy ?: 'sum';
+            $contest->rerun_id = $contest->rerun_id ?: 0;
+            if (!is_null($originalProblemsetId)) {
+                ProblemsetProblemsDAO::copyProblemset(
+                    $contest->problemset_id,
+                    $originalProblemsetId
+                );
             }
 
             // Save the contest object with data sent by user to the database
@@ -996,41 +1034,38 @@ class ContestController extends Controller {
         // Validate request
         self::validateCreateOrUpdate($r);
 
-        // Create and populate a new Contests object
-        $contest = new Contests();
         // Set private contest by default if is not sent in request
-        $contest->admission_mode = is_null($r['admission_mode']) ? 'private' : $r['admission_mode'];
-        $contest->title = $r['title'];
-        $contest->description = $r['description'];
-        $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
-        $contest->finish_time = gmdate('Y-m-d H:i:s', $r['finish_time']);
-        $contest->window_length = empty($r['window_length']) ? null : $r['window_length'];
-        $contest->rerun_id = 0;
-        $contest->alias = $r['alias'];
-        $contest->scoreboard = $r['scoreboard'];
-        $contest->points_decay_factor = $r['points_decay_factor'];
-        $contest->partial_score = $r['partial_score'] ?? true;
-        $contest->submissions_gap = $r['submissions_gap'];
-        $contest->feedback = $r['feedback'];
-        $contest->penalty = max(0, intval($r['penalty']));
-        $contest->penalty_type = $r['penalty_type'];
-        $contest->penalty_calc_policy = is_null($r['penalty_calc_policy']) ? 'sum' : $r['penalty_calc_policy'];
-        $contest->languages = empty($r['languages']) ? null : join(',', $r['languages']);
-        $contest->show_scoreboard_after = $r['show_scoreboard_after'] ?? true;
-
-        if ($contest->admission_mode != 'private') {
+        if (!is_null($r['admission_mode']) && $r['admission_mode'] != 'private') {
             throw new InvalidParameterException('contestMustBeCreatedInPrivateMode');
         }
 
         $problemset = new Problemsets([
             'needs_basic_information' => $r['basic_information'] == 'true',
             'requests_user_information' => $r['requests_user_information'],
-            'type' => 'Contest',
-            'scoreboard_url' => SecurityTools::randomString(30),
-            'scoreboard_url_admin' => SecurityTools::randomString(30),
         ]);
 
-        self::createContest($r, $problemset, $contest);
+        $languages = empty($r['languages']) ? null : join(',', $r['languages']);
+        $contest = new Contests([
+            'admission_mode' => 'private',
+            'title' => $r['title'],
+            'description' => $r['description'],
+            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
+            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+            'window_length' => $r['window_length'] ?: null,
+            'alias' => $r['alias'],
+            'scoreboard' => $r['scoreboard'],
+            'points_decay_factor' => $r['points_decay_factor'],
+            'partial_score' => $r['partial_score'] ?? true,
+            'submissions_gap' => $r['submissions_gap'],
+            'feedback' => $r['feedback'],
+            'penalty_calc_policy' => $r['penalty_calc_policy'],
+            'penalty' => max(0, intval($r['penalty'])),
+            'penalty_type' => $r['penalty_type'],
+            'languages' => $languages,
+            'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
+        ]);
+
+        self::createContest($problemset, $contest, $r['current_user_id']);
 
         return ['status' => 'ok'];
     }
@@ -1225,7 +1260,7 @@ class ContestController extends Controller {
         $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
         try {
-            $problems = ProblemsetProblemsDAO::getProblemsetProblems($problemset);
+            $problems = ProblemsetProblemsDAO::getProblemsetProblems($problemset->problemset_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
