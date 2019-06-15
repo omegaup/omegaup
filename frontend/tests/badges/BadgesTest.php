@@ -9,22 +9,13 @@ require_once 'libs/FileUploader.php';
  *
  * @author carlosabcs
  */
-class BadgesTest extends OmegaupTestCase {
+class BadgesTestCase extends OmegaupTestCase {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
     const MAX_BADGE_SIZE = 20 * 1024;
     const ICON_FILE = 'icon.svg';
     const LOCALIZATIONS_FILE = 'localizations.json';
     const QUERY_FILE = 'query.sql';
     const TEST_FILE = 'test.json';
-
-    private static function cleanDb() {
-        Utils::deleteAllSuggestions();
-        Utils::deleteAllRanks();
-        Utils::deleteAllPreviousRuns();
-        Utils::deleteAllProblemsOfTheWeek();
-        Utils::deleteAllCodersOfTheMonth();
-        Utils::deleteAllProblems();
-    }
 
     private static function getSortedResults($query) {
         global $conn;
@@ -48,7 +39,7 @@ class BadgesTest extends OmegaupTestCase {
         return $results;
     }
 
-    private static function RunRequests($apicall) {
+    private static function RunRequest($apicall) {
         $login = self::login(new Identities([
             'username' => $apicall['username'],
             'password' => $apicall['password'],
@@ -75,6 +66,55 @@ class BadgesTest extends OmegaupTestCase {
                 Utils::gradeRun(null, $fullResponse['guid'], $points, $verdict);
             }
         }
+    }
+
+    public static function filesExist($test, $query) {
+      return file_exists($test) && file_exists($query);
+    }
+
+    public static function newBadgeTest() {
+        // Creates a default admin user
+        $omegaup = UserFactory::createAdminUser(new UserParams([
+            'username' => 'omegaup_admin',
+            'password' => 'omegaup_admin',
+        ]));
+    }
+
+    public function apicallTest($actions, $expectedResults, $queryPath) {
+        foreach ($actions as $action) {
+            switch ($action['type']) {
+                case 'changeTime':
+                    $time = strtotime($action['time']);
+                    Time::setTimeForTesting($time);
+                    break;
+
+                case 'apicalls':
+                    foreach ($action['apicalls'] as $apicall) {
+                        self::RunRequest($apicall);
+                    }
+                    break;
+
+                case 'scripts':
+                    foreach ($action['scripts'] as $script) {
+                        switch ($script) {
+                            case 'update_user_rank.py':
+                                Utils::RunUpdateUserRank();
+                                break;
+                            case 'aggregate_feedback.py':
+                                Utils::RunAggregateFeedback();
+                                break;
+                            default:
+                            throw new Exception("Script {$script} doesn't exist.");
+                        }
+                    }
+                    break;
+                default:
+                    throw new Exception("Action {$action['type']} doesn't exist");
+            }
+        }
+        $results = self::getSortedResults(file_get_contents($queryPath));
+        $expected = self::getSortedExpectedResults($expectedResults);
+        $this->assertEquals($results, $expected);
     }
 
     public function testAllBadges() {
@@ -112,56 +152,23 @@ class BadgesTest extends OmegaupTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            if (file_exists($testPath) && file_exists($queryPath)) {
-                self::cleanDb();
+            if (self::filesExist($testPath, $queryPath)) {
                 FileHandler::SetFileUploader($this->createFileUploaderMock());
                 $content = json_decode(file_get_contents($testPath), true);
-
-                // omegaUp admin user must be created always.
-                $omegaup = UserFactory::createAdminUser(new UserParams([
-                    'username' => 'omegaup_admin',
-                    'password' => 'omegaup_admin',
-                ]));
-
-                foreach ($content['actions'] as $action) {
-                    switch ($action['type']) {
-                        case 'changeTime':
-                            $time = strtotime($action['time']);
-                            Time::setTimeForTesting($time);
-                            break;
-
-                        case 'apicalls':
-                            foreach ($action['apicalls'] as $apicall) {
-                                self::RunRequests($apicall);
-                            }
-                            break;
-
-                        case 'scripts':
-                            foreach ($action['scripts'] as $script) {
-                                switch ($script) {
-                                    case 'update_user_rank.py':
-                                        Utils::RunUpdateUserRank();
-                                        break;
-                                    case 'aggregate_feedback.py':
-                                        Utils::RunAggregateFeedback();
-                                        break;
-                                    default:
-                                        throw new Exception('Script ' . $script . " doesn't exist.");
-                                }
-                            }
-                            break;
-                        default:
-                            throw new Exception('Action ' . $action['type'] . " doesn't exist");
-                    }
+                self::newBadgeTest();
+                switch ($content['testType']) {
+                    case 'apicall':
+                        self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
+                        // Time will be automatically reset after last apicalls
+                        Time::setTimeForTesting(null);
+                        break;
+                    case 'phpunit':
+                        // TODO: Hacer la verificación de que exista un archivo badgeAlias.php en /frontend/tests/badges/
+                        break;
+                    default:
+                        throw new Exception("Test type {$content['testType']} doesn't exist");
                 }
-
-                $results = self::getSortedResults(file_get_contents($queryPath));
-                $expected = self::getSortedExpectedResults($content['expectedResults']);
-                $this->assertEquals($results, $expected);
             }
         }
-        // Time will be automatically reset after last apicalls
-        Time::setTimeForTesting(null);
-        self::cleanDb();
     }
 }

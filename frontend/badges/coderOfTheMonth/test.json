@@ -1,4 +1,5 @@
 {
+  "testType": "apicall",
   "actions": [
     {
       "type": "changeTime",

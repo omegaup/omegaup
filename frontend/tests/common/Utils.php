@@ -98,13 +98,6 @@ class Utils {
         $conn->Execute('DELETE FROM `User_Rank`;');
     }
 
-    public static function deleteAllProblems() {
-        global $conn;
-        $conn->Execute('SET FOREIGN_KEY_CHECKS = 0;');
-        $conn->Execute('TRUNCATE TABLE `Problems`;');
-        $conn->Execute('SET FOREIGN_KEY_CHECKS = 1;');
-    }
-
     public static function deleteAllPreviousRuns() {
         global $conn;
         $conn->Execute('DELETE FROM `Submission_Log`;');
@@ -116,11 +109,6 @@ class Utils {
     public static function deleteAllProblemsOfTheWeek() {
         global $conn;
         $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
-    }
-
-    public static function deleteAllCodersOfTheMonth() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Coder_Of_The_Month`;');
     }
 
     /**
