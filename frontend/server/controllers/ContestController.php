@@ -104,6 +104,7 @@ class ContestController extends Controller {
             'problemset_id',
             'title',
             'description',
+            'scoreboard_url',
             'start_time',
             'finish_time',
             'admission_mode',
