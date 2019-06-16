@@ -17,7 +17,7 @@ class BadgesTestCase extends OmegaupTestCase {
     const QUERY_FILE = 'query.sql';
     const TEST_FILE = 'test.json';
 
-    private static function getSortedResults($query) {
+    private static function getSortedResults(String $query) {
         global $conn;
         $rs = $conn->GetAll($query);
         $results = [];
@@ -28,7 +28,7 @@ class BadgesTestCase extends OmegaupTestCase {
         return $results;
     }
 
-    private static function getSortedExpectedResults($expected) {
+    private static function getSortedExpectedResults(Array $expected) {
         $results = [];
         foreach ($expected as $username) {
             // From each username, obtaining its ID
@@ -39,7 +39,7 @@ class BadgesTestCase extends OmegaupTestCase {
         return $results;
     }
 
-    private static function RunRequest($apicall) {
+    private static function RunRequest(Array $apicall) {
         $login = self::login(new Identities([
             'username' => $apicall['username'],
             'password' => $apicall['password'],
@@ -68,10 +68,6 @@ class BadgesTestCase extends OmegaupTestCase {
         }
     }
 
-    public static function filesExist($test, $query) {
-        return file_exists($test) && file_exists($query);
-    }
-
     public static function newBadgeTest() {
         // Creates a default admin user
         $omegaup = UserFactory::createAdminUser(new UserParams([
@@ -80,7 +76,7 @@ class BadgesTestCase extends OmegaupTestCase {
         ]));
     }
 
-    public function apicallTest($actions, $expectedResults, $queryPath) {
+    public function apicallTest(Array $actions, Array $expectedResults, String $queryPath) {
         foreach ($actions as $action) {
             switch ($action['type']) {
                 case 'changeTime':
@@ -115,6 +111,7 @@ class BadgesTestCase extends OmegaupTestCase {
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = self::getSortedExpectedResults($expectedResults);
         $this->assertEquals($results, $expected);
+        Time::setTimeForTesting(null);
     }
 
     public function testAllBadges() {
@@ -152,22 +149,18 @@ class BadgesTestCase extends OmegaupTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            if (self::filesExist($testPath, $queryPath)) {
-                FileHandler::SetFileUploader($this->createFileUploaderMock());
-                $content = json_decode(file_get_contents($testPath), true);
-                self::newBadgeTest();
-                switch ($content['testType']) {
-                    case 'apicall':
-                        self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
-                        // Time will be automatically reset after last apicalls
-                        Time::setTimeForTesting(null);
-                        break;
-                    case 'phpunit':
-                        // TODO: Hacer la verificación de que exista un archivo badgeAlias.php en /frontend/tests/badges/
-                        break;
-                    default:
-                        throw new Exception("Test type {$content['testType']} doesn't exist");
-                }
+            FileHandler::SetFileUploader($this->createFileUploaderMock());
+            $content = json_decode(file_get_contents($testPath), true);
+            self::newBadgeTest();
+            switch ($content['testType']) {
+                case 'apicall':
+                    self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
+                    break;
+                case 'phpunit':
+                    // TODO: Hacer la verificación de que exista un archivo badgeAlias.php en /frontend/tests/badges/
+                    break;
+                default:
+                    throw new Exception("Test type {$content['testType']} doesn't exist");
             }
         }
     }
