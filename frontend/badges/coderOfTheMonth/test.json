@@ -9,8 +9,8 @@
       "type": "apicalls",
       "apicalls": [
         {
-          "username": "omegaup_admin",
-          "password": "omegaup_admin",
+          "username": "admintest",
+          "password": "testtesttest",
           "requests": [
             {
               "api": "ProblemController::apiCreate",
@@ -126,8 +126,8 @@
       "type": "apicalls",
       "apicalls": [
         {
-          "username": "omegaup_admin",
-          "password": "omegaup_admin",
+          "username": "admintest",
+          "password": "testtesttest",
           "requests": [
             {
               "api": "UserController::apiCoderOfTheMonth",

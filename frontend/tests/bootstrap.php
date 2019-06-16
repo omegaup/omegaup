@@ -24,6 +24,7 @@ namespace {
     // Load test utils
     require_once(OMEGAUP_ROOT . '/tests/controllers/OmegaupTestCase.php');
     require_once(OMEGAUP_ROOT . '/tests/common/Utils.php');
+    require_once(OMEGAUP_ROOT . '/tests/badges/BadgesTestCase.php');
 
     // Load Factories
     require_once(OMEGAUP_ROOT . '/tests/factories/ProblemsFactory.php');
@@ -57,30 +58,6 @@ namespace {
 
     // Clean APC cache
     Cache::clearCacheForTesting();
-
-    // Create a test default user for manual UI operations
-    UserController::$sendEmailOnVerify = false;
-    $admin = UserFactory::createUser(new UserParams([
-        'username' => 'admintest',
-        'password' => 'testtesttest',
-    ]));
-    ACLsDAO::save(new ACLs([
-        'acl_id' => Authorization::SYSTEM_ACL,
-        'owner_id' => $admin->user_id,
-    ]));
-    UserRolesDAO::create(new UserRoles([
-        'user_id' => $admin->user_id,
-        'role_id' => Authorization::ADMIN_ROLE,
-        'acl_id' => Authorization::SYSTEM_ACL,
-    ]));
-    UserFactory::createUser(new UserParams([
-        'username' => 'test',
-        'password' => 'testtesttest',
-    ]));
-    UserController::$sendEmailOnVerify = true;
-
-    // Globally disable run wait gap.
-    RunController::$defaultSubmissionGap = 0;
 
     QualityNominationFactory::initQualityReviewers();
     QualityNominationFactory::initTags();

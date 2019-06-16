@@ -8,6 +8,6 @@
 class BadgesTestCase extends OmegaupTestCase {
     public function setUp() {
         parent::setUp();
-        Utils::cleanDb();
+        Utils::CleanupDb();
     }
 }
