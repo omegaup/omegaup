@@ -176,6 +176,32 @@ class Utils {
         );
     }
 
+    public static function setUpDefaultDataConfig() {
+        // Create a test default user for manual UI operations
+        UserController::$sendEmailOnVerify = false;
+        $admin = UserFactory::createUser(new UserParams([
+            'username' => 'admintest',
+            'password' => 'testtesttest',
+        ]));
+        ACLsDAO::save(new ACLs([
+            'acl_id' => Authorization::SYSTEM_ACL,
+            'owner_id' => $admin->user_id,
+        ]));
+        UserRolesDAO::create(new UserRoles([
+            'user_id' => $admin->user_id,
+            'role_id' => Authorization::ADMIN_ROLE,
+            'acl_id' => Authorization::SYSTEM_ACL,
+        ]));
+        UserFactory::createUser(new UserParams([
+            'username' => 'test',
+            'password' => 'testtesttest',
+        ]));
+        UserController::$sendEmailOnVerify = true;
+
+        // Globally disable run wait gap.
+        RunController::$defaultSubmissionGap = 0;
+    }
+
     public static function CleanupDB() {
         global $conn;
 
@@ -238,6 +264,7 @@ class Utils {
 
             // Make sure the user_id and identity_id never matches in tests.
             $conn->Execute('ALTER TABLE Identities auto_increment = 100000;');
+            self::setUpDefaultDataConfig();
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());
