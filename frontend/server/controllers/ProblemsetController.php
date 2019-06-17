@@ -211,8 +211,10 @@ class ProblemsetController extends Controller {
             if (isset($r['tokens']) && count($r['tokens']) >= 4) {
                 $request['token'] = $r['tokens'][3];
             }
-            ContestController::validateDetails($request);
+            $response = ContestController::validateDetails($request);
             $request['problemset'] = $r['problemset'];
+            $request['contest_alias'] = $response['contest_alias'];
+            $request['contest_admin'] = $response['contest_admin'];
             return $request;
         }
         return $r;

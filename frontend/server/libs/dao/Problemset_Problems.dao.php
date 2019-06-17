@@ -47,14 +47,27 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     /*
      * Get problemset problems including problemset alias, points, and order
      */
-    final public static function getProblemsetProblems(Problemsets $problemset) {
+    final public static function getProblemsetProblems(int $problemsetId) {
         // Build SQL statement
-        $sql = 'SELECT p.problem_id, p.alias, pp.points, pp.order, pp.commit, pp.version ' .
-               'FROM Problems p ' .
-               'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
-               'WHERE pp.problemset_id = ? ' .
-               'ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
-        $val = [$problemset->problemset_id];
+        $sql = 'SELECT
+                    p.problem_id,
+                    p.alias,
+                    p.visibility,
+                    pp.points,
+                    pp.order,
+                    pp.commit,
+                    pp.version
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problemset_Problems pp
+                ON
+                    pp.problem_id = p.problem_id
+                WHERE
+                    pp.problemset_id = ?
+                ORDER BY
+                    pp.order, pp.problem_id ASC;';
+        $val = [$problemsetId];
         global $conn;
         return $conn->GetAll($sql, $val);
     }
@@ -113,7 +126,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      * @param Number, Number
      * @return void
      */
-    public static function copyProblemset($new_problemset, $old_problemset) {
+    public static function copyProblemset($newProblemsetId, $oldProblemsetId) {
         $sql = '
             INSERT INTO
                 Problemset_Problems (problemset_id, problem_id, version, points, `order`)
@@ -125,7 +138,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 Problemset_Problems.problemset_id = ?;
         ';
         global $conn;
-        $params = [$new_problemset, $old_problemset];
+        $params = [$newProblemsetId, $oldProblemsetId];
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
