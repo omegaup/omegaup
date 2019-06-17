@@ -5,14 +5,16 @@ class ContestCloneTest extends OmegaupTestCase {
      * Create clone of a contest
      */
     public function testCreateContestClone() {
-        // Get a problem
-        $problemData = ProblemsFactory::createProblem();
-
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        // Add 3 problems to the contest
+        $numberOfProblems = 3;
+
+        for ($i = 0; $i < $numberOfProblems; $i++) {
+            $problemData[$i] = ProblemsFactory::createProblem();
+            ContestsFactory::addProblemToContest($problemData[$i], $contestData);
+        }
 
         $contestAlias = Utils::CreateRandomString();
 
@@ -30,18 +32,22 @@ class ContestCloneTest extends OmegaupTestCase {
 
         $this->assertEquals($contestAlias, $contestClonedData['alias']);
 
-        // Create request
-        $r = new Request([
+        // Call API
+        $clonedContestProblemsResponse = ContestController::apiProblems(new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestAlias,
-        ]);
+        ]));
 
-        // Call API
-        $response = ContestController::apiProblems($r);
+        $originalContestProblemsResponse = ContestController::apiProblems(new Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
 
-        foreach ($response['problems'] as $problem) {
-            $this->assertEquals($problemData['request']['problem_alias'], $problem['alias']);
-        }
+        $this->assertEquals(
+            $originalContestProblemsResponse['problems'],
+            $clonedContestProblemsResponse['problems'],
+            'Problems of the cloned contest does not match with problems of the original contest'
+        );
     }
 
     /**
