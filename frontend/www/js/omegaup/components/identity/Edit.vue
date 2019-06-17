@@ -53,9 +53,8 @@
               <select class="form-control"
                    name="stateId"
                    v-model="selectedState">
-                <option v-bind:value="state.code.split('-')[1]"
-                        v-for="state in countryStates"
-                        v-if="countryStates.length &gt; 0">
+                <option v-bind:value="code.split('-')[1]"
+                        v-for="[code, state] in Object.entries(countryStates)">
                   {{ state.name }}
                 </option>
               </select>
@@ -92,11 +91,6 @@ import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import * as iso3166 from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
 
-interface State {
-  code: string;
-  name: string;
-}
-
 @Component
 export default class IdentityEdit extends Vue {
   @Prop() identity!: omegaup.Identity;
@@ -112,7 +106,7 @@ export default class IdentityEdit extends Vue {
     if (this.identity.country_id == newContry) {
       this.selectedState = this.identity.state_id;
     } else {
-      this.selectedState = this.countryStates[0].code.split('-')[1];
+      this.selectedState = Object.keys(this.countryStates)[0].split('-')[1];
     }
   }
 
@@ -133,16 +127,9 @@ export default class IdentityEdit extends Vue {
     this.identity.username = `${this.groupName}:${username}`;
   }
 
-  get countryStates(): State[] {
+  get countryStates(): iso3166.Subdivisions {
     let countrySelected = iso3166.country(this.selectedCountry);
-    let countryStates = Object.keys(countrySelected.sub).map(
-      (code: string) => ({ code: code, name: countrySelected.sub[code].name }),
-    );
-
-    countryStates.sort((a: State, b: State): any => {
-      Intl.Collator().compare(a.name, b.name);
-    });
-    return countryStates;
+    return countrySelected.sub;
   }
 
   onEditMember(): void {
