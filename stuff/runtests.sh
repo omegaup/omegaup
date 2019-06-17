@@ -27,4 +27,9 @@ fi
 	--configuration $OMEGAUP_ROOT/frontend/tests/phpunit.xml \
 	$FILTER_ARG $OMEGAUP_ROOT/frontend/tests/controllers
 
+/usr/bin/phpunit \
+	--bootstrap frontend/tests/bootstrap.php \
+	--configuration frontend/tests/phpunit.xml \
+	$FILTER_ARG $OMEGAUP_ROOT/frontend/tests/badges
+
 /usr/bin/python3 -m pytest $OMEGAUP_ROOT/frontend/tests/ui/ -s
