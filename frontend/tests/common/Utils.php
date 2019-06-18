@@ -202,6 +202,21 @@ class Utils {
         RunController::$defaultSubmissionGap = 0;
     }
 
+    public static function CleanupFilesAndDb() {
+        // Clean previous log
+        self::CleanLog();
+        // Clean problems and runs path
+        self::CleanPath(IMAGES_PATH);
+        self::CleanPath(RUNS_PATH);
+        self::CleanPath(TEMPLATES_PATH);
+        self::CleanPath(PROBLEMS_GIT_PATH);
+        for ($i = 0; $i < 256; $i++) {
+            mkdir(RUNS_PATH . sprintf('/%02x', $i), 0775, true);
+        }
+        // Clean DB
+        self::CleanupDB();
+    }
+
     public static function CleanupDB() {
         global $conn;
 

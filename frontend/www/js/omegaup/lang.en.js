@@ -42,6 +42,8 @@ const translations = {
 	arenaRunSubmitUpload: "Or upload the file",
 	arenaRunSubmitWaitBetweenUploads: "You must wait %(submissionGap) seconds between submissions for a problem",
 	assignmentNotFound: "Assignment not found",
+	badge_500score_description: "User has achieved a score equal to or greater than 500.",
+	badge_500score_name: "500 score",
 	badge_coderOfTheMonth_description: "User has been Coder of The Month at least once.",
 	badge_coderOfTheMonth_name: "Coder Of The Month",
 	banProblemFormComments: "Additional comments to the problemsetter",
