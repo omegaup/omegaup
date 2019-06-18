@@ -5,6 +5,7 @@
 
 import collections
 import json
+import os
 import re
 import sys
 
@@ -19,6 +20,7 @@ class I18nLinter(linters.Linter):
     # Paths
     _JS_TEMPLATES_PATH = 'frontend/www/js/omegaup'
     _TEMPLATES_PATH = 'frontend/templates'
+    _BADGES_PATH = 'frontend/badges'
 
     # Colours
     _OKGREEN = git_tools.COLORS.OKGREEN
@@ -75,6 +77,22 @@ class I18nLinter(linters.Linter):
 
         return '(%s)' % ''.join(tokens)
 
+    def _add_badges_entries(self, contents_callback):
+        '''Adds badges name and description entries to .lang files'''
+        aliases = [f.name for f in os.scandir(self._BADGES_PATH)
+                   if f.is_dir()]
+        strings = collections.defaultdict(lambda: collections.defaultdict(str))
+        for alias in aliases:
+            key_name = 'badge_%s_name' % alias
+            key_desc = 'badge_%s_description' % alias
+            filename = os.path.join(self._BADGES_PATH, alias,
+                                    'localizations.json')
+            contents = json.loads(contents_callback(filename).decode('utf-8'))
+            for lang in self._LANGS:
+                strings[key_name][lang] = contents[lang]['name']
+                strings[key_desc][lang] = contents[lang]['description']
+        return strings
+
     def _get_translated_strings(self, contents_callback):
         strings = {}
         languages = set()
@@ -98,8 +116,10 @@ class I18nLinter(linters.Linter):
                         (row.strip(), filename, lineno + 1),
                         fixable=False)
 
-        self._check_missing_entries(strings, languages)
-        return strings
+        # Removing badges entries
+        return {
+            k: v for k, v in strings.items() if not k.startswith('badge_')
+        }
 
     def _check_missing_entries(self, strings, languages):
         missing_items_lang = set()
@@ -177,6 +197,8 @@ class I18nLinter(linters.Linter):
         '''Runs the linter against a subset of files.'''
         # pylint: disable=no-self-use, unused-argument
         strings = self._get_translated_strings(contents_callback)
+        strings.update(self._add_badges_entries(contents_callback))
+        self._check_missing_entries(strings, set(self._LANGS))
 
         new_contents, original_contents = self._generate_new_contents(
             strings, contents_callback)
