@@ -40,7 +40,7 @@
           <th v-if="isAdmin">{{ T.contestNewFormAdmissionMode }}</th>
           <th colspan="2"
               v-if="isAdmin">{{ T.wordsScoreboard }}</th>
-          <th colspan="6"
+          <th colspan="7"
               v-if="isAdmin"></th>
         </tr>
       </thead>
@@ -101,6 +101,12 @@
                 v-bind:href="'/arena/' + contest.alias + '/print/'"
                 v-bind:title="T.contestPrintableVersion"></a>
           </td>
+          <td v-if="isAdmin">
+            <a class="glyphicon glyphicon-download"
+                href="#download"
+                v-bind:title="T.contestDownloadListOfUsersInContest"
+                v-on:click="onDownloadCsv(contest.alias)"></a>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -131,6 +137,9 @@ export default {
     onShowAdmin: function() {
       this.$emit('toggle-show-admin',
                  this.$el.querySelector('.show-admin-contests').checked);
+    },
+    onDownloadCsv: function(contestAlias) {
+      this.$emit('download-csv-users', contestAlias);
     },
   },
 };
