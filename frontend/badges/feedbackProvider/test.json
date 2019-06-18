@@ -76,41 +76,11 @@
               }
             }
           ]
-        },
-        {
-          "username": "test_user_1",
-          "password": "test_user_1",
-          "requests": [
-            {
-              "api": "RunController::apiCreate",
-              "params": {
-                "problem_alias": "fp_problem",
-                "language": "py",
-                "source": "print sum(map(int, raw_input().strip().split()))"
-              },
-              "gradeResult": {
-                "verdict": "AC"
-              }
-            },
-            {
-              "api": "QualityNominationController::apiCreate",
-              "params": {
-                "problem_alias": "fp_problem",
-                "nomination": "suggestion",
-                "contents": {
-                  "quality": 3,
-                  "tags": [],
-                  "difficuty": 1
-                }
-              }
-            }
-          ]
         }
       ]
     }
   ],
   "expectedResults": [
-    "test_user_0",
-    "test_user_1"
+    "test_user_0"
   ]
 }
