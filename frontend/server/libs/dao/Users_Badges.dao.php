@@ -16,8 +16,8 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
 
     private static function getTimeForBadge(array $queryResults, string $badge) {
         foreach ($queryResults as $result) {
-            if ($result["alias"] === $alias) {
-                return $result["assignationTime"];
+            if ($result['alias'] === $alias) {
+                return $result['assignationTime'];
             }
         }
         return null;
@@ -25,7 +25,7 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
 
     private static function getUserOwnedBadges(string $userId) {
         global $conn;
-        $sql = "SELECT ub.badge_alias, ub.assignation_time FROM Users_Badges ub WHERE ub.user_id = ? ORDER BY ub.assignation_time ASC;";
+        $sql = 'SELECT ub.badge_alias, ub.assignation_time FROM Users_Badges ub WHERE ub.user_id = ? ORDER BY ub.assignation_time ASC;';
         $args = [$userId];
         return $conn->GetAll($sql, $args);
     }
@@ -39,8 +39,8 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                 continue;
             }
             $results[] = [
-                "alias" => $alias,
-                "assignationTime" => self::getTimeForBadge($ownedBadges, $alias),
+                'alias' => $alias,
+                'assignationTime' => self::getTimeForBadge($ownedBadges, $alias),
             ];
         }
         return $results;
@@ -53,9 +53,9 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
         $results = [];
         foreach ($ownedBadges as $badge) {
             $results[] = [
-                "alias" => $ownedBadges['badge_alias'],
-                "assignationTime" => $ownedBadges['assignation_time'],
-                "owned" => !!self::getTimeForBadge($ownedBadges, $alias),
+                'alias' => $ownedBadges['badge_alias'],
+                'assignationTime' => $ownedBadges['assignation_time'],
+                'owned' => !!self::getTimeForBadge($ownedBadges, $alias),
             ];
         }
         return $results;
@@ -63,17 +63,17 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
 
     public static function userHasBadge(string $userId, string $badgeAlias) {
         global $conn;
-        $sql = "SELECT ub.assignation_time FROM Users_Badges ub WHERE ub.user_id = ? AND ub.badge_alias = ?;";
+        $sql = 'SELECT ub.assignation_time FROM Users_Badges ub WHERE ub.user_id = ? AND ub.badge_alias = ?;';
         $args = [$userId, $badgeAlias];
         $rs = $conn->GetRow($sql, $params);
         if (empty($rs)) {
             return [
-                "hasBadge" => false,
+                'hasBadge' => false,
             ];
         }
         return [
-            "hasBadge" => true,
-            "assignationTime" => $rs["assignation_time"],
+            'hasBadge' => true,
+            'assignationTime' => $rs['assignation_time'],
         ];
     }
 }

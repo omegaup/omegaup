@@ -176,8 +176,8 @@ class BadgesTest extends BadgesTestCase {
         // Get all badges through API
         $results = BadgesController::apiList(new Request([]));
         $existingBadges = [];
-        foreach ($results["results"] as $badge) {
-            $existingBadges[] = $badge["alias"];
+        foreach ($results['results'] as $badge) {
+            $existingBadges[] = $badge['alias'];
         }
         $this->assertEquals(sizeof($badges), sizeof($existingBadges));
         $this->assertEquals($badges, $existingBadges);
