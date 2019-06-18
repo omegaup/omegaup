@@ -46,8 +46,6 @@ const translations = {
 	badge_500score_name: "500 score",
 	badge_coderOfTheMonth_description: "User has been Coder of The Month at least once.",
 	badge_coderOfTheMonth_name: "Coder Of The Month",
-	badge_feedbackProvider_description: "User has provided feedback for at least one problem.",
-	badge_feedbackProvider_name: "Feedback Provider",
 	banProblemFormComments: "Additional comments to the problemsetter",
 	banProblemFormQuestion: "Why will this problem be banned?",
 	banningDeclinedByReviewer: "Banning declined by reviewer.",
