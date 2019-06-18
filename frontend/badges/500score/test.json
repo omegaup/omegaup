@@ -133,14 +133,6 @@
                 "email": "user_1@domain.com",
                 "password": "test_user_1"
               }
-            },
-            {
-              "api": "UserController::apiCreate",
-              "params": {
-                "username": "test_user_2",
-                "email": "user_2@domain.com",
-                "password": "test_user_2"
-              }
             }
           ]
         },
