@@ -179,6 +179,7 @@ class BadgesTest extends BadgesTestCase {
         foreach ($results["results"] as $badge) {
             $existingBadges[] = $badge["alias"];
         }
+        $this->assertEquals(sizeof($badges), sizeof($existingBadges));
         $this->assertEquals($badges, $existingBadges);
     }
 }

@@ -15,12 +15,12 @@ class BadgesController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
-        // Check who is visiting, a not logged user can still view
-        // the list of badges but all in black.
+        // Check who is visiting, a not logged user can still
+        // view the list of badges.
         try {
             self::authenticateRequest($r);
             $user = self::resolveTargetUser($r);
-            $badges = UsersBadgesDAO::getAllBadges();
+            $badges = UsersBadgesDAO::getAllBadges($user->user_id);
         } catch (UnauthorizedException $e) {
             // Just show badges
             $badges = UsersBadgesDAO::getAllBadges();
@@ -29,8 +29,6 @@ class BadgesController extends Controller {
             'total_badges' => sizeof($badges),
             'results' => $badges
         ];
-        // Hay que pasárselo así
-        //  API.User.problemsSolved({username: user_profile.username})
     }
-    // TODO: profile list badges, user has badge
+    // TODO: apiListProfileBadges, apiUserHasBadge
 }
