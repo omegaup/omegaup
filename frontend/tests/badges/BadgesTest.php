@@ -109,7 +109,7 @@ class BadgesTest extends BadgesTestCase {
     public function runBadgeTest($testPath, $queryPath) {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
         $content = json_decode(file_get_contents($testPath), true);
-        Utils::CleanupDb();
+        Utils::CleanupFilesAndDb();
         switch ($content['testType']) {
             case 'apicall':
                 self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
