@@ -2151,9 +2151,9 @@ class UserController extends Controller {
                     if (count($tokens) >= 4) {
                         $r2['token'] = $tokens[3];
                     }
-                    ContestController::validateDetails($r2);
-                    if ($r2['contest_admin']) {
-                        $response['contest_admin'][] = $r2['contest_alias'];
+                    $contestResponse = ContestController::validateDetails($r2);
+                    if ($contestResponse['contest_admin']) {
+                        $response['contest_admin'][] = $contestResponse['contest_alias'];
                     }
                     break;
                 case 'problemset':
