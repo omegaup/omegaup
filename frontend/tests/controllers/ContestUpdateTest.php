@@ -535,4 +535,187 @@ class UpdateContestTest extends OmegaupTestCase {
             $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
         }
     }
+
+    /**
+     * Creates a contest with window length, and then update window_length
+     * again
+     *
+     */
+    public function testUpdateWindowLengthAtTheEndOfAContest() {
+        // Get a problem
+        $problem = ProblemsFactory::createProblem();
+
+        $originalTime = Time::get();
+
+        // Create contest with 5 hours and a window length 20 of minutes
+        $contest = ContestsFactory::createContest(
+            new ContestParams([
+                'window_length' => 20,
+                'start_time' => $originalTime,
+                'finish_time' => $originalTime + 60 * 5 * 60,
+            ])
+        );
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problem, $contest);
+
+        // Create a contestant
+        $contestant = UserFactory::createUser();
+
+        // Add contestant to contest
+        ContestsFactory::addUser($contest, $contestant);
+
+        // User joins the contest 4 hours and 50 minutes after it starts
+        $updatedTime = $originalTime + 290 * 60;
+        Time::setTimeForTesting($updatedTime);
+        ContestsFactory::openContest($contest, $contestant);
+
+        $directorLogin = self::login($contest['director']);
+
+        // Update window_length
+        $response = ContestController::apiUpdate(new Request([
+            'contest_alias' => $contest['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'window_length' => 30,
+        ]));
+
+        try {
+            // 15 minutes later User can not create a run because the contest is over
+            $updatedTime = $updatedTime + 15 * 60;
+            Time::setTimeForTesting($updatedTime);
+            $run = RunsFactory::createRun($problem, $contest, $contestant);
+            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            $this->fail('Contestant should not create a run after contest finishes');
+        } catch (NotAllowedToSubmitException $e) {
+            // Pass
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        } finally {
+            Time::setTimeForTesting($originalTime);
+        }
+    }
+
+    /**
+     * Creates a contest with window length, and then update finish_time
+     *
+     */
+    public function testUpdateFinishTimeInAContestWithWindowLength() {
+        // Get a problem
+        $problem = ProblemsFactory::createProblem();
+
+        $originalTime = Time::get();
+
+        // Create contest with 5 hours and a window length 60 of minutes
+        $contest = ContestsFactory::createContest(
+            new ContestParams([
+                'window_length' => 60,
+                'start_time' => $originalTime,
+                'finish_time' => $originalTime + 60 * 5 * 60,
+            ])
+        );
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problem, $contest);
+
+        // Create a contestant
+        $contestant = UserFactory::createUser();
+
+        // Add contestant to contest
+        ContestsFactory::addUser($contest, $contestant);
+
+        // User joins contest immediatly it was created
+        ContestsFactory::openContest($contest, $contestant);
+
+        $directorLogin = self::login($contest['director']);
+
+        // Director extends finish_time one more hour
+        $response = ContestController::apiUpdate(new Request([
+            'contest_alias' => $contest['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'finish_time' => $originalTime + 60 * 5 * 60,
+        ]));
+
+        // User creates a run 50 minutes later, it is ok
+        $updatedTime = $originalTime + 50 * 60;
+        Time::setTimeForTesting($updatedTime);
+        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+
+        try {
+            // 20 minutes later is no longer available because window_length has
+            // expired
+            $updatedTime = $updatedTime + 20 * 60;
+            Time::setTimeForTesting($updatedTime);
+            $run = RunsFactory::createRun($problem, $contest, $contestant);
+            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            $this->fail('Contestant should not create a run after window length expires');
+        } catch (NotAllowedToSubmitException $e) {
+            // Pass
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        } finally {
+            Time::setTimeForTesting($originalTime);
+        }
+    }
+
+    /**
+     * Director extends time to user that joined the contest when it is almost is
+     * over
+     *
+     */
+    public function testExtendTimeAtTheEndOfTheContest() {
+        // Get a problem
+        $problem = ProblemsFactory::createProblem();
+
+        $originalTime = Time::get();
+
+        // Create contest with 5 hours and a window length 60 of minutes
+        $contest = ContestsFactory::createContest(
+            new ContestParams([
+                'window_length' => 60,
+                'start_time' => $originalTime,
+                'finish_time' => $originalTime + 60 * 5 * 60,
+            ])
+        );
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problem, $contest);
+
+        // Create a contestant
+        $contestant = UserFactory::createUser();
+
+        // Add contestant to contest
+        ContestsFactory::addUser($contest, $contestant);
+
+        // User joins the contest 4 hours and 30 minutes after it starts
+        $updatedTime = $originalTime + 270 * 60;
+        Time::setTimeForTesting($updatedTime);
+        ContestsFactory::openContest($contest, $contestant);
+        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+
+        // User creates a run 20 minutes later, it is ok
+        $updatedTime = $updatedTime + 20 * 60;
+        Time::setTimeForTesting($updatedTime);
+        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+
+        $directorLogin = self::login($contest['director']);
+
+        $identities = ContestController::apiUsers(new Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contest['request']['alias'],
+        ]));
+
+        // Extend end_time for the user, now should be valid create runs after
+        // contest finishes
+        ContestController::apiUpdateEndTimeForIdentity(new Request([
+            'contest_alias' => $contest['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'username' => $contestant->username,
+            'end_time' => $updatedTime + 30 * 60,
+        ]));
+
+        $updatedTime = $updatedTime + 20 * 60;
+        Time::setTimeForTesting($updatedTime);
+        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+    }
 }

@@ -152,15 +152,14 @@ class RunController extends Controller {
                 throw new InvalidParameterException('parameterNotFound', 'problem_alias');
             }
 
-            // No one should submit after the deadline. Not even admins.
-            if (ProblemsetsDAO::isLateSubmission($r['container'])) {
-                throw new NotAllowedToSubmitException('runNotInsideContest');
-            }
-
             // Contest admins can skip following checks
             if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
-                if (!ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id) &&
+                $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+                    $r['current_identity_id'],
+                    $problemset_id
+                );
+                if (!$problemsetIdentity &&
                     !Authorization::canSubmitToProblemset(
                         $r['current_identity_id'],
                         $r['problemset']
@@ -170,7 +169,11 @@ class RunController extends Controller {
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_identity_id'])) {
+                if (!ProblemsetsDAO::insideSubmissionWindow(
+                    $r['container'],
+                    $r['current_identity_id'],
+                    $problemsetIdentity
+                )) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
                 }
 
@@ -182,6 +185,14 @@ class RunController extends Controller {
                     (int)$r['current_identity_id']
                 )) {
                     throw new NotAllowedToSubmitException('runWaitGap');
+                }
+            }
+
+            // No one should submit after the deadline. Not even admins.
+            if (ProblemsetsDAO::isLateSubmission($r['container'])) {
+                if (!isset($problemsetIdentity) ||
+                    Time::get() > strtotime($problemsetIdentity->end_time)) {
+                    throw new NotAllowedToSubmitException('runNotInsideContest');
                 }
             }
         } catch (ApiException $apiException) {
@@ -301,6 +312,7 @@ class RunController extends Controller {
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submit_delay,
+            'time' => gmdate('Y-m-d H:i:s', Time::get()),
             'memory' => 0,
             'score' => 0,
             'contest_score' => $problemset_id != null ? 0 : null,

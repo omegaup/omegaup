@@ -50,7 +50,8 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemsetIdentity->access_time = $accessTime->format('Y-m-d H:i:s');
             ;
             if (!is_null($windowLength)) {
-                $finishTime = $currentTime + $windowLength * 60;
+                $finishTime = $currentTime + $windowLength * 60 <= $finishTime ?
+                    $currentTime + $windowLength * 60 : $finishTime;
             }
             $endTime->setTimestamp($finishTime);
             $problemsetIdentity->end_time = $endTime->format('Y-m-d H:i:s');
@@ -120,6 +121,11 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         return $conn->GetAll($sql, [$problemset_id]);
     }
 
+    /**
+     * When end time is recalculated, it never can be greater than
+     * contest finish time
+     *
+     */
     public static function recalculateEndTimeForProblemsetIdentities(
         int $problemsetId,
         int $windowLengthDifference
@@ -131,13 +137,20 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 ON
                     Problemset_Identities.problemset_id = Contests.problemset_id
                 SET
-                    `end_time` = DATE_ADD(access_time, INTERVAL ? MINUTE)
+                    `end_time` = IF(DATE_ADD(access_time, INTERVAL ? MINUTE) >
+                            Contests.finish_time,
+                            Contests.finish_time,
+                            DATE_ADD(access_time, INTERVAL ? MINUTE)
+                        )
                 WHERE
                     Problemset_Identities.`problemset_id` = ?
                     AND `access_time` IS NOT NULL;';
 
         global $conn;
-        $conn->Execute($sql, [$windowLengthDifference, $problemsetId]);
+        $conn->Execute($sql, [
+            $windowLengthDifference,
+            $windowLengthDifference,
+            $problemsetId]);
 
         return $conn->Affected_Rows();
     }

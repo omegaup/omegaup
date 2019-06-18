@@ -25,6 +25,7 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
         ContestParams::validateParameter('last_updated', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
         ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
+        ContestParams::validateParameter('window_length', $this->params, false);
     }
 
     public function offsetGet($offset) {
@@ -58,6 +59,7 @@ class ContestParams implements ArrayAccess {
             'finish_time' => $contest->finish_time,
             'last_updated' => $contest->last_updated,
             'penalty_calc_policy' => $contest->penalty_calc_policy,
+            'window_length' => $contest->window_length,
         ]);
     }
 
@@ -110,7 +112,7 @@ class ContestsFactory {
             'start_time' => $params['start_time'],
             'finish_time' => $params['finish_time'],
             'last_updated' => $params['last_updated'],
-            'window_length' => null,
+            'window_length' => $params['window_length'],
             'admission_mode' => $params['admission_mode'],
             'alias' => substr($params['title'], 0, 20),
             'points_decay_factor' => '0.02',

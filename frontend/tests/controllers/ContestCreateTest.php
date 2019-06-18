@@ -210,4 +210,58 @@ class CreateContestTest extends OmegaupTestCase {
         // Call the API
         $response = ContestController::apiCreate($r);
     }
+
+    /**
+     * Creates a contest with window length, and review contestant
+     * only can create run inside sumbission window
+     *
+     */
+    public function testCreateContestWithWindowLength() {
+        // Get a problem
+        $problem = ProblemsFactory::createProblem();
+
+        $originalTime = Time::get();
+
+        // Create contest with 2 hours and a window length 30 of minutes
+        $contest = ContestsFactory::createContest(
+            new ContestParams([
+                'window_length' => 30,
+                'start_time' => $originalTime,
+                'finish_time' => $originalTime + 60 * 2 * 60,
+            ])
+        );
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problem, $contest);
+
+        // Create a contestant
+        $contestant = UserFactory::createUser();
+
+        // Add contestant to contest
+        ContestsFactory::addUser($contest, $contestant);
+
+        // User joins the contest 1 hour and 50 minutes after it starts
+        $updatedTime = $originalTime + 110 * 60;
+        Time::setTimeForTesting($updatedTime);
+        ContestsFactory::openContest($contest, $contestant);
+        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+
+        // User creates a run in a valid time
+        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+
+        try {
+            // User tries to create a run 5 minutes after contest has finished
+            $updatedTime = $updatedTime + 15 * 60;
+            Time::setTimeForTesting($updatedTime);
+            $run = RunsFactory::createRun($problem, $contest, $contestant);
+            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            $this->fail('Contestant should not create a run after contest finishes');
+        } catch (NotAllowedToSubmitException $e) {
+            // Pass
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        } finally {
+            Time::setTimeForTesting($originalTime);
+        }
+    }
 }
