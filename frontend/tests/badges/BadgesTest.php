@@ -51,10 +51,13 @@ class BadgesTest extends BadgesTestCase {
             foreach ($req['params'] as $k => $v) {
                 $params[$k] = $v;
             }
-            $r = new Request($params);
             if (array_key_exists('files', $req)) {
                 $_FILES['problem_contents']['tmp_name'] = $req['files']['problem_contents'];
             }
+            if ($req['api'] === 'QualityNominationController::apiCreate') {
+                $params['contents'] = json_encode($params['contents']);
+            }
+            $r = new Request($params);
             $r->method = $req['api'];
             $fullResponse = ApiCaller::call($r);
             if ($fullResponse['status'] !== 'ok') {
