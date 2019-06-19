@@ -12,44 +12,27 @@ require_once('base/Users_Badges.vo.base.php');
   *
   */
 class UsersBadgesDAO extends UsersBadgesDAOBase {
-    const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
-
-    private static function getTimeForBadge(array $queryResults, string $badge) {
-        foreach ($queryResults as $result) {
-            if ($result['alias'] === $alias) {
-                return $result['assignationTime'];
-            }
-        }
-        return null;
-    }
-
     private static function getUserOwnedBadges(string $userId) {
         global $conn;
-        $sql = 'SELECT ub.badge_alias, ub.assignation_time FROM Users_Badges ub WHERE ub.user_id = ? ORDER BY ub.assignation_time ASC;';
+        $sql = 'SELECT
+                    ub.badge_alias, ub.assignation_time
+                FROM
+                    Users_Badges ub
+                WHERE
+                    ub.user_id = ?
+                ORDER BY
+                    ub.assignation_time ASC;';
         $args = [$userId];
         return $conn->GetAll($sql, $args);
     }
 
-    public static function getAllBadges($userId = null) {
-        $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
-        $results = [];
-        $ownedBadges = $userId ? self::getUserOwnedBadges($userId) : [];
-        foreach ($aliases as $alias) {
-            if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
-                continue;
-            }
-            $results[] = [
-                'alias' => $alias,
-                'assignationTime' => self::getTimeForBadge($ownedBadges, $alias),
-            ];
-        }
-        return $results;
-    }
+    public static function getUserProfileBadges(Users $owner, Users $visitor) {
+        // Se listarán las badges del usuario y una bandera indicando si el
+        // visitante posee el badge o no
 
-    public static function getUserProfileBadges(string $profileOwnerId, string $visitorId) {
-        // Solo se listarán las badges del usuario
-        $profileBadges = self::getUserOwnedBadges($profileOwnerId);
-        $visitorBadges = $visitorId ? self::getUserOwnedBadges($visitorId) : [];
+
+        $profileBadges = self::getUserOwnedBadges($owner->user_id);
+        $visitorBadges = $visitor ? self::getUserOwnedBadges($visitor->user_id) : [];
         $results = [];
         foreach ($ownedBadges as $badge) {
             $results[] = [
@@ -61,19 +44,19 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
         return $results;
     }
 
-    public static function userHasBadge(string $userId, string $badgeAlias) {
+    public static function getBadgeAssignationTime(Users $user, string $badgeAlias) {
         global $conn;
-        $sql = 'SELECT ub.assignation_time FROM Users_Badges ub WHERE ub.user_id = ? AND ub.badge_alias = ?;';
-        $args = [$userId, $badgeAlias];
+        $sql = 'SELECT
+                    ub.assignation_time
+                FROM
+                    Users_Badges ub
+                WHERE
+                    ub.user_id = ? AND ub.badge_alias = ?;';
+        $args = [$user->user_id, $badgeAlias];
         $rs = $conn->GetRow($sql, $params);
         if (empty($rs)) {
-            return [
-                'hasBadge' => false,
-            ];
+            return null;
         }
-        return [
-            'hasBadge' => true,
-            'assignationTime' => $rs['assignation_time'],
-        ];
+        return $rs['assignation_time'];
     }
 }
