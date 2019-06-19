@@ -31,12 +31,15 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         return $conn->GetAll($sql, $val);
     }
 
-    final public static function getProblemsAssignmentByCourseAlias($courseAlias) {
+    final public static function getProblemsAssignmentByCourseAlias(
+        Courses $course
+    ) : array {
         // Build SQL statement
         $sql = '
             SELECT
-                a.name, a.alias AS assignment_alias, a.description, a.start_time, a.finish_time,
-                a.assignment_type, p.alias AS problem_alias, a.publish_time_delay, p.problem_id
+                a.name, a.alias AS assignment_alias,a.description, a.start_time,
+                a.finish_time, a.assignment_type, p.alias AS problem_alias,
+                a.publish_time_delay, p.problem_id
             FROM
                 Problems p
             INNER JOIN
@@ -50,7 +53,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             ORDER BY
                 a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
         ';
-        $val = [$courseAlias];
+        $val = [$course->alias];
 
         global $conn;
         $problemsAssignments = $conn->GetAll($sql, $val);
@@ -68,8 +71,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     'assignment_alias' => $assignment['assignment_alias'],
                     'assignment_type' => $assignment['assignment_type'],
                     'publish_time_delay' => $assignment['publish_time_delay'],
+                    'problems' => [],
                 ];
-                $result[$assignmentAlias]['problems'] = [];
             }
             array_push($result[$assignmentAlias]['problems'], [
                 'problem_alias' => $assignment['problem_alias'],
@@ -96,14 +99,27 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     /*
      * Get problemset problems including problemset alias, points, and order
      */
-    final public static function getProblemsetProblems(Problemsets $problemset) {
+    final public static function getProblemsetProblems(int $problemsetId) {
         // Build SQL statement
-        $sql = 'SELECT p.problem_id, p.alias, pp.points, pp.order, pp.commit, pp.version ' .
-               'FROM Problems p ' .
-               'INNER JOIN Problemset_Problems pp ON pp.problem_id = p.problem_id ' .
-               'WHERE pp.problemset_id = ? ' .
-               'ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
-        $val = [$problemset->problemset_id];
+        $sql = 'SELECT
+                    p.problem_id,
+                    p.alias,
+                    p.visibility,
+                    pp.points,
+                    pp.order,
+                    pp.commit,
+                    pp.version
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problemset_Problems pp
+                ON
+                    pp.problem_id = p.problem_id
+                WHERE
+                    pp.problemset_id = ?
+                ORDER BY
+                    pp.order, pp.problem_id ASC;';
+        $val = [$problemsetId];
         global $conn;
         return $conn->GetAll($sql, $val);
     }
@@ -162,7 +178,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      * @param Number, Number
      * @return void
      */
-    public static function copyProblemset($new_problemset, $old_problemset) {
+    public static function copyProblemset($newProblemsetId, $oldProblemsetId) {
         $sql = '
             INSERT INTO
                 Problemset_Problems (problemset_id, problem_id, version, points, `order`)
@@ -174,7 +190,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 Problemset_Problems.problemset_id = ?;
         ';
         global $conn;
-        $params = [$new_problemset, $old_problemset];
+        $params = [$newProblemsetId, $oldProblemsetId];
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }

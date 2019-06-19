@@ -127,6 +127,8 @@ export default {
                             return data;
                           }),
 
+    contestants: _call('/api/contest/contestants/'),
+
     create: _call('/api/contest/create/'),
 
     createVirtual: _call('/api/contest/createvirtual'),
@@ -169,6 +171,8 @@ export default {
     removeProblem: _call('/api/contest/removeProblem/'),
 
     removeUser: _call('/api/contest/removeUser/'),
+
+    requests: _call('/api/contest/requests/'),
 
     runs: _call('/api/contest/runs/', _convertRuntimes),
 
@@ -370,6 +374,8 @@ export default {
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
+
+    update: _call('/api/identity/update/'),
   },
 
   Interview: {

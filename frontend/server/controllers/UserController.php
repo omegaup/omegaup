@@ -1241,7 +1241,7 @@ class UserController extends Controller {
 
         $response = IdentityController::getProfile($r);
         if ((is_null($r['current_identity']) || $r['current_identity']->username != $r['identity']->username)
-            && (isset($r['user']) && $r['user']->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+            && (!is_null($r['user']) && $r['user']->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
                 $response['userinfo'][$k] = null;
@@ -2151,9 +2151,9 @@ class UserController extends Controller {
                     if (count($tokens) >= 4) {
                         $r2['token'] = $tokens[3];
                     }
-                    ContestController::validateDetails($r2);
-                    if ($r2['contest_admin']) {
-                        $response['contest_admin'][] = $r2['contest_alias'];
+                    $contestResponse = ContestController::validateDetails($r2);
+                    if ($contestResponse['contest_admin']) {
+                        $response['contest_admin'][] = $contestResponse['contest_alias'];
                     }
                     break;
                 case 'problemset':

@@ -2,6 +2,9 @@
   <div class="omegaup-scoreboard">
     <!-- id-lint off -->
     <div id="ranking-chart"></div><!-- id-lint on -->
+    <label><input class="toggle-contestants"
+           type="checkbox"
+           v-model="onlyShowExplicitlyInvited"> {{ T.scoreboardShowOnlyInvitedIdentities}}</label>
     <table>
       <thead>
         <tr>
@@ -17,11 +20,12 @@
       </thead>
       <tbody>
         <tr v-bind:class="user.username"
-            v-for="(user, userIndex) in ranking">
+            v-for="(user, userIndex) in ranking"
+            v-if="showUser(user.is_invited)">
           <td class="legend"
               v-bind:style="{ backgroundColor: legendColor(userIndex) }"></td>
           <td class="position">{{ user.place }}</td>
-          <td>{{ renderUser(user) }} <img alt=""
+          <td class="user">{{ renderUser(user) }} <img alt=""
                height="11"
                v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
                v-bind:title="user.country"
@@ -43,7 +47,7 @@
           </td>
           <td>
             <div class="points">
-              {{ user.total.points }}
+              {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
             </div>
             <div class="penalty">
               {{ user.total.penalty }} ({{ totalRuns(user) }})
@@ -71,10 +75,15 @@ export default {
       type: Boolean,
       'default': true,
     },
+    digitsAfterDecimalPoint: {
+      type: Number,
+      'default': 2,
+    },
   },
   data: function() {
     return {
       UI: UI,
+      onlyShowExplicitlyInvited: true,
     };
   },
   computed: {
@@ -91,7 +100,10 @@ export default {
                                                     '';
     },
     renderUser: function(u) { return UI.rankingUsername(u);},
-    renderPoints: function(p) { return (p.points > 0 ? '+' : '') + p.points;},
+    renderPoints: function(p) {
+      return (p.points > 0 ? '+' : '') +
+             p.points.toFixed(this.digitsAfterDecimalPoint);
+    },
     totalRuns: function(u) {
       return u.problems.reduce((acc, val) => acc + val.runs, 0);
     },
@@ -105,6 +117,9 @@ export default {
       } else {
         return alias;
       }
+    },
+    showUser: function(userIsInvited) {
+      return userIsInvited || !this.onlyShowExplicitlyInvited;
     },
   },
 };
