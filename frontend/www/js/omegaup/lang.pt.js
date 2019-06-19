@@ -48,6 +48,8 @@ const translations = {
 	badge_coderOfTheMonth_name: "Programador do M\u00eas",
 	badge_feedbackProvider_description: "O usu\u00e1rio tem enviado a qualifica\u00e7\u00e3o de pelo menos um problema.",
 	badge_feedbackProvider_name: "Provedor de Feedback",
+	badge_problemSetter_description: "O usu\u00e1rio tem criado pelo menos um problema.",
+	badge_problemSetter_name: "Criador de Problemas",
 	banProblemFormComments: "Coment\u00e1rios adicionais para o criador do problema",
 	banProblemFormQuestion: "Por que esse problema ser\u00e1 banido?",
 	banningDeclinedByReviewer: "Proibi\u00e7\u00e3o negada pelo revisor.",

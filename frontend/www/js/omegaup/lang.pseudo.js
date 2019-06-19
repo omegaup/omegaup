@@ -48,6 +48,8 @@ const translations = {
 	badge_coderOfTheMonth_name: "(C0d3r Of Th3 M0n7h)",
 	badge_feedbackProvider_description: "(U53r ha5 pr0vid3d f33dback f0r a7 13a57 0n3 pr0b13m.)",
 	badge_feedbackProvider_name: "(F33dback Pr0vid3r)",
+	badge_problemSetter_description: "(U53r ha5 cr3a73d a7 13a57 0n3 pr0b13m.)",
+	badge_problemSetter_name: "(Pr0b13m S3773r)",
 	banProblemFormComments: "(Addi7i0na1 c0mm3n75 70 7h3 pr0b13m53773r)",
 	banProblemFormQuestion: "(Why wi11 7hi5 pr0b13m b3 bann3d?)",
 	banningDeclinedByReviewer: "(Banning d3c1in3d by r3vi3w3r.)",
