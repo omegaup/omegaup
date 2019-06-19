@@ -89,7 +89,7 @@
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
-import * as iso3166 from '../../../../third_party/js/iso-3166-2.js/iso3166.min.js';
+import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 
 @Component
 export default class IdentityEdit extends Vue {
