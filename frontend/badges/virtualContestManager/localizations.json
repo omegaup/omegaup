@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Administrador de Concurso Virtual",
+    "description": "El usuario ha ejecutado al menos un concurso virtual."
+  },
+  "en": {
+    "name": "Virtual Contest Manager",
+    "description": "User has run at least one virtual contest."
+  },
+  "pt": {
+    "name": "Administrador de Concurso Virtual",
+    "description": "O usuário tem executado pelo menos um concurso virtual."
+  }
+}

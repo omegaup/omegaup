@@ -50,6 +50,8 @@ const translations = {
 	badge_feedbackProvider_name: "Feedback Provider",
 	badge_problemSetter_description: "User has created at least one problem.",
 	badge_problemSetter_name: "Problem Setter",
+	badge_virtualContestManager_description: "User has run at least one virtual contest.",
+	badge_virtualContestManager_name: "Virtual Contest Manager",
 	banProblemFormComments: "Additional comments to the problemsetter",
 	banProblemFormQuestion: "Why will this problem be banned?",
 	banningDeclinedByReviewer: "Banning declined by reviewer.",
