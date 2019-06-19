@@ -43,7 +43,7 @@
     "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
     "dev": "cross-env webpack --watch --mode=development",
     "build": "cross-env webpack --progress --hide-modules --mode=production",
-    "build-development": "cross-env webpack --hide-modules --mode=development --verbose --debug",
+    "build-development": "cross-env webpack --hide-modules --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
   },
   "dependencies": {
