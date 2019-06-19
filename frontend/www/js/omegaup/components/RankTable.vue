@@ -51,11 +51,7 @@
       <tbody>
         <tr v-for="rank in ranking">
           <td>{{ rank.rank }}</td>
-          <td><img height="11"
-               v-bind:src="flagURL(rank)"
-               v-bind:title="rank.country"
-               v-if="rank.country"
-               width="16"></td>
+          <td><omegaup-countryflag v-bind:country="rank.country"></omegaup-countryflag></td>
           <td class="forcebreaks forcebreaks-top-5"><strong><a v-bind:href=
           "`/profile/${rank.username}`">{{ rank.username }}</a></strong><span v-if=
           "rank.name == null || length == 5">&nbsp;</span> <span v-else=""><br>
@@ -90,6 +86,7 @@ import { T } from '../omegaup.js';
 import UI from '../ui.js';
 import { OmegaUp } from '../omegaup.js';
 import Autocomplete from './Autocomplete.vue';
+import CountryFlag from './CountryFlag.vue';
 
 interface Rank {
   country: string;
@@ -102,6 +99,7 @@ interface Rank {
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
+    'omegaup-countryflag': CountryFlag,
   },
 })
 export default class RankTable extends Vue {
