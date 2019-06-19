@@ -26,7 +26,7 @@ stage_before_script() {
 stage_script() {
 	rm -rf frontend/www/{js,css}/dist
 	yarn install
-	yarn run build
+	yarn run build-development
 	yarn test
 
 	python3 stuff/db-migrate.py validate
