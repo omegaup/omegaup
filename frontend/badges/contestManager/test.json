@@ -31,28 +31,6 @@
           "password": "test_user_0",
           "requests": [
             {
-              "api": "ProblemController::apiCreate",
-              "params": {
-                "visibility": 1,
-                "title": "Sumas",
-                "problem_alias": "sumas",
-                "validator": "token-numeric",
-                "time_limit": 1000,
-                "validator_time_limit": 0,
-                "overall_wall_time_limit": 1000,
-                "extra_wall_time": 0,
-                "memory_limit": 32768,
-                "output_limit": 10240,
-                "input_limit": 10240,
-                "source": "omegaUp classics",
-                "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-                "email_clarifications": 1
-              },
-              "files": {
-                "problem_contents": "frontend/tests/resources/testproblem.zip"
-              }
-            },
-            {
               "api": "ContestController::apiCreate",
               "params": {
                 "visibility": 1,
@@ -71,14 +49,6 @@
                 "penalty_calc_policy": "sum",
                 "admission_mode": "private",
                 "show_scoreboard_after": "true"
-              }
-            },
-            {
-              "api": "ContestController::apiAddProblem",
-              "params": {
-                "contest_alias": "prueba",
-                "problem_alias": "sumas",
-                "points": 100
               }
             }
           ]
