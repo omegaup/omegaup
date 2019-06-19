@@ -46,8 +46,6 @@ const translations = {
 	badge_500score_name: "Puntuaci\u00f3n 500",
 	badge_coderOfTheMonth_description: "El usuario ha sido nombrado Coder del Mes al menos una vez.",
 	badge_coderOfTheMonth_name: "Coder del Mes",
-	badge_problemSetter_description: "El usuario ha creado al menos un problema.",
-	badge_problemSetter_name: "Creador de Problemas",
 	banProblemFormComments: "Comentarios adicionales para el creador del problema",
 	banProblemFormQuestion: "\u00bfPor qu\u00e9 se suspender\u00e1 este problema?",
 	banningDeclinedByReviewer: "Suspenci\u00f3n denegada por juez.",

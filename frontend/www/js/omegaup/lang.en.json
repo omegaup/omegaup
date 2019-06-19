@@ -45,8 +45,6 @@
 	"badge_500score_name": "500 score",
 	"badge_coderOfTheMonth_description": "User has been Coder of The Month at least once.",
 	"badge_coderOfTheMonth_name": "Coder Of The Month",
-	"badge_problemSetter_description": "User has created at least one problem.",
-	"badge_problemSetter_name": "Problem Setter",
 	"banProblemFormComments": "Additional comments to the problemsetter",
 	"banProblemFormQuestion": "Why will this problem be banned?",
 	"banningDeclinedByReviewer": "Banning declined by reviewer.",
