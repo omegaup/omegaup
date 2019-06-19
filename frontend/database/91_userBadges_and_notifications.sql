@@ -26,7 +26,6 @@ CREATE TABLE `Users_Badges` (
   `assignation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_badge_id`),
   KEY `user_id` (`user_id`),
-  UNIQUE KEY `badge_alias` (`badge_alias`),
   CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Badges de Usuario';
 
