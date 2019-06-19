@@ -374,6 +374,8 @@ export default {
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
+
+    update: _call('/api/identity/update/'),
   },
 
   Interview: {
