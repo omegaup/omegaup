@@ -1,6 +1,6 @@
 SELECT
   DISTINCT `a`.`owner_id` AS `user_id`
 FROM
-  `ACLs` AS `a`
+  `Problems` AS `p`
 INNER JOIN
-  `Problems` AS `p` ON `p`.`acl_id` = `a`.`acl_id`;
+  `ACLs` AS `a` ON `p`.`acl_id` = `a`.`acl_id`;
