@@ -1,0 +1,92 @@
+{
+  "testType": "apicall",
+  "actions": [
+    {
+      "type": "apicalls",
+      "apicalls": [
+        {
+          "username": "admintest",
+          "password": "testtesttest",
+          "requests": [
+            {
+              "api": "UserController::apiCreate",
+              "params": {
+                "username": "test_user_0",
+                "email": "user_0@domain.com",
+                "password": "test_user_0"
+              }
+            },
+            {
+              "api": "UserController::apiCreate",
+              "params": {
+                "username": "test_user_1",
+                "email": "user_1@domain.com",
+                "password": "test_user_1"
+              }
+            }
+          ]
+        },
+        {
+          "username": "test_user_0",
+          "password": "test_user_0",
+          "requests": [
+            {
+              "api": "ProblemController::apiCreate",
+              "params": {
+                "visibility": 1,
+                "title": "Sumas",
+                "problem_alias": "sumas",
+                "validator": "token-numeric",
+                "time_limit": 1000,
+                "validator_time_limit": 0,
+                "overall_wall_time_limit": 1000,
+                "extra_wall_time": 0,
+                "memory_limit": 32768,
+                "output_limit": 10240,
+                "input_limit": 10240,
+                "source": "omegaUp classics",
+                "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+                "email_clarifications": 1
+              },
+              "files": {
+                "problem_contents": "frontend/tests/resources/testproblem.zip"
+              }
+            },
+            {
+              "api": "ContestController::apiCreate",
+              "params": {
+                "visibility": 1,
+                "title": "Prueba",
+                "alias": "prueba",
+                "description": "Concurso de prueba",
+                "start_time": "1560872590",
+                "finish_time": "1560958990",
+                "window_length": "0",
+                "scoreboard": 100,
+                "points_decay_factor": 0,
+                "partial_score": 1,
+                "submissions_gap": 1200,
+                "feedback": "yes",
+                "penalty_type": "contest_start",
+                "penalty_calc_policy": "sum",
+                "admission_mode": "private",
+                "show_scoreboard_after": "true"
+              }
+            },
+            {
+              "api": "ContestController::apiAddProblem",
+              "params": {
+                "contest_alias": "prueba",
+                "problem_alias": "sumas",
+                "points": 100
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "expectedResults": [
+    "test_user_0"
+  ]
+}
