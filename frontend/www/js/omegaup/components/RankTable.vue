@@ -86,9 +86,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import { T } from '../omegaup.js';
+import { T, OmegaUp } from '../omegaup.js';
 import UI from '../ui.js';
-import { OmegaUp } from '../omegaup.js';
 import Autocomplete from './Autocomplete.vue';
 
 interface Rank {

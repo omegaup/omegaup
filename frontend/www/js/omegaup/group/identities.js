@@ -5,7 +5,7 @@ import Vue from 'vue';
 OmegaUp.on('ready', function() {
   let groupAlias = /\/group\/([^\/]+)\/?/.exec(window.location.pathname)[1];
   let groupIdentities = new Vue({
-    el: '#create_identities',
+    el: '#create-identities',
     render: function(createElement) {
       return createElement('omegaup-group-identites', {
         props: {identities: this.identities, groupAlias: this.groupAlias},
