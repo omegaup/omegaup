@@ -17,44 +17,59 @@ class BadgesController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
-        // Check who is visiting, a not logged user can still
-        // view the list of badges.
         try {
             self::authenticateRequest($r);
-            $user = self::resolveTargetUser($r);
-            $badges = self::getAllBadges(new Users(['user_id' => $user->user_id]));
         } catch (UnauthorizedException $e) {
-            // Just show badges
-            $badges = UsersBadgesDAO::getAllBadges(null);
+            // Do nothing, we allow unauthenticated users to use this API
         }
-        return [
-            'results' => $badges
-        ];
-    }
-
-    private static function getTimeForBadge(array $queryResults, string $badge) {
-        foreach ($queryResults as $result) {
-            if ($result['alias'] === $alias) {
-                return $result['assignationTime'];
-            }
-        }
-        return null;
-    }
-
-    private static function getAllBadges(Users $user) {
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         $results = [];
-        $ownedBadges = $user ? UsersBadgesDAO::getUserOwnedBadges($user->user_id) : [];
         foreach ($aliases as $alias) {
             if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
                 continue;
             }
-            $results[] = [
-                'alias' => $alias,
-                'assignationTime' => self::getTimeForBadge($ownedBadges, $alias),
-            ];
+            $results[] = $alias;
         }
         return $results;
+    }
+
+    /**
+     * Returns a list of badges owned by current user
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyList(Request $r) {
+        self::authenticateRequest($r);
+        return UsersBadgesDAO::getUserOwnedBadges($r['current_user_id']);
+    }
+
+    /**
+     * Returns a list of badges owned by a certain user
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUserList(Request $r) {
+        try {
+            self::authenticateRequest($r);
+        } catch (UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+        }
+        try {
+            $user = UsersDAO::FindByUsername($r['target_username']);
+            if (is_null($user)) {
+                throw new NotFoundException('userNotExist');
+            }
+            return UsersBadgesDAO::getUserOwnedBadges($user->user_id);
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        return null;
     }
     // TODO: apiListProfileBadges, apiUserHasBadge
 }

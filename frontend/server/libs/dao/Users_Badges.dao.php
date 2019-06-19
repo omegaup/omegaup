@@ -12,7 +12,7 @@ require_once('base/Users_Badges.vo.base.php');
   *
   */
 class UsersBadgesDAO extends UsersBadgesDAOBase {
-    private static function getUserOwnedBadges(string $userId) {
+    private static function getUserOwnedBadges(str $userId) {
         global $conn;
         $sql = 'SELECT
                     ub.badge_alias, ub.assignation_time
@@ -24,24 +24,6 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                     ub.assignation_time ASC;';
         $args = [$userId];
         return $conn->GetAll($sql, $args);
-    }
-
-    public static function getUserProfileBadges(Users $owner, Users $visitor) {
-        // Se listarán las badges del usuario y una bandera indicando si el
-        // visitante posee el badge o no
-
-
-        $profileBadges = self::getUserOwnedBadges($owner->user_id);
-        $visitorBadges = $visitor ? self::getUserOwnedBadges($visitor->user_id) : [];
-        $results = [];
-        foreach ($ownedBadges as $badge) {
-            $results[] = [
-                'alias' => $ownedBadges['badge_alias'],
-                'assignationTime' => $ownedBadges['assignation_time'],
-                'owned' => !!self::getTimeForBadge($ownedBadges, $alias),
-            ];
-        }
-        return $results;
     }
 
     public static function getBadgeAssignationTime(Users $user, string $badgeAlias) {
