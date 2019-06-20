@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Usuario Histórico",
+    "description": "La cuenta del usuario fue creada dentro del primer año desde el despliegue de omegaUp."
+  },
+  "en": {
+    "name": "Legacy User",
+    "description": "The account was created within the first year of omegaUp launchment."
+  },
+  "pt": {
+    "name": "Usuário Histórico",
+    "description": "A conta do usuário foi criada no primeiro ano desde o lancamento de omegaUp."
+  }
+}
