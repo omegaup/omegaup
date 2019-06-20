@@ -28,7 +28,7 @@ class ProblemsetController extends Controller {
         int $current_identity_id,
         int $points,
         int $order_in_contest = 1,
-        ?bool $validateVisibility = true
+        bool $validateVisibility = true
     ) {
         if (!$validateVisibility) {
             ProblemsetController::validateAddProblemToProblemset(

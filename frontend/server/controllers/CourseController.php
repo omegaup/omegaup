@@ -150,8 +150,16 @@ class CourseController extends Controller {
 
         Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
 
-        // Show scoreboard is always optional
+        // Show scoreboard, needs basic information and request user information are always optional
+        $r->ensureBool('needs_basic_information', false /*isRequired*/);
         $r->ensureBool('show_scoreboard', false /*isRequired*/);
+        Validators::validateInEnum(
+            $r['requests_user_information'],
+            'requests_user_information',
+            ['no', 'optional', 'required'],
+            false
+        );
+
         $r->ensureBool('public', false /*isRequired*/);
 
         if (is_null($r['school_id'])) {
@@ -244,13 +252,13 @@ class CourseController extends Controller {
                 'name' => $r['name'],
                 'description' => $originalCourse->description,
                 'alias' => $r['alias'],
-                'school_id' => is_null($r['school']) ? null : $r['school']->school_id,
+                'school_id' => $originalCourse->school_id,
                 'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
                 'finish_time' => gmdate('Y-m-d H:i:s', strtotime($originalCourse->finish_time) + $offset),
                 'public' => 0,
-                'show_scoreboard' => boolval($r['show_scoreboard']),
-                'needs_basic_information' => $r->ensureBool('needs_basic_information', false /*isRequired*/),
-                'requests_user_information' => $r['requests_user_information']
+                'show_scoreboard' => $originalCourse->show_scoreboard,
+                'needs_basic_information' => $originalCourse->needs_basic_information,
+                'requests_user_information' => $originalCourse->requests_user_information
             ]), $r->user->user_id);
 
             $assignmentsProblems = ProblemsetProblemsDAO::getProblemsAssignmentByCourseAlias($originalCourse);
@@ -313,12 +321,12 @@ class CourseController extends Controller {
             'name' => $r['name'],
             'description' => $r['description'],
             'alias' => $r['alias'],
-            'school_id' => $r['school_id'] ?? null,
+            'school_id' => $r['school_id'],
             'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
             'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
             'public' => is_null($r['public']) ? false : $r['public'],
-            'show_scoreboard' => boolval($r['show_scoreboard']),
-            'needs_basic_information' => $r->ensureBool('needs_basic_information', false /*isRequired*/),
+            'show_scoreboard' => $r['show_scoreboard'],
+            'needs_basic_information' => $r['needs_basic_information'],
             'requests_user_information' => $r['requests_user_information'],
         ]), $r->user->user_id);
 
@@ -348,8 +356,8 @@ class CourseController extends Controller {
 
         $group = GroupController::createGroup(
             $course->alias,
-            'students-' . $course->alias,
-            'students-' . $course->alias,
+            "students-{$course->alias}",
+            "students-{$course->alias}",
             $creatorUserId
         );
 
