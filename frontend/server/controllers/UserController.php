@@ -384,7 +384,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         $hashedPassword = null;
-        $user = $r['current_user'];
+        $user = $r->user;
         if (isset($r['username']) && $r['username'] != $user->username) {
             // This is usable only in tests.
             if (is_null(self::$permissionKey) || self::$permissionKey != $r['permission_key']) {
@@ -463,7 +463,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSupportTeamMember($r['current_identity_id'])) {
+            if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
                 throw new ForbiddenAccessException();
             }
 
@@ -524,7 +524,7 @@ class UserController extends Controller {
     public static function apiMailingListBackfill(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
+        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -646,9 +646,9 @@ class UserController extends Controller {
 
         $response = [];
 
-        $is_system_admin = Authorization::isSystemAdmin($r['current_identity_id']);
+        $is_system_admin = Authorization::isSystemAdmin($r->identity->identity_id);
         if ($r['contest_type'] == 'OMI') {
-            if ($r['current_user']->username != 'andreasantillana'
+            if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -691,7 +691,7 @@ class UserController extends Controller {
                 'OMI2019-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMIP') {
-            if ($r['current_user']->username != 'andreasantillana'
+            if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -732,7 +732,7 @@ class UserController extends Controller {
                 'OMIP2019-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIS') {
-            if ($r['current_user']->username != 'andreasantillana'
+            if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -773,7 +773,7 @@ class UserController extends Controller {
                 'OMIS2019-ZAC' => 25,
             ];
         } elseif ($r['contest_type'] == 'OMIPN') {
-            if ($r['current_user']->username != 'andreasantillana'
+            if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -815,7 +815,7 @@ class UserController extends Controller {
                 'OMIP2019-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'OMISN') {
-            if ($r['current_user']->username != 'andreasantillana'
+            if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -857,7 +857,7 @@ class UserController extends Controller {
                 'OMIS2019-INV' => 4,
             ];
         } elseif ($r['contest_type'] == 'ORIG') {
-            if ($r['current_user']->username != 'kuko.coder'
+            if ($r->user->username != 'kuko.coder'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -876,7 +876,7 @@ class UserController extends Controller {
                 'ORIG1516-VDS' => 15,
             ];
         } elseif ($r['contest_type'] == 'OMIZAC-2018') {
-            if ($r['current_user']->username != 'rsolis'
+            if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -886,7 +886,7 @@ class UserController extends Controller {
                 'OMIZAC-2018' => 20
             ];
         } elseif ($r['contest_type'] == 'Pr8oUAIE') {
-            if ($r['current_user']->username != 'rsolis'
+            if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -896,7 +896,7 @@ class UserController extends Controller {
                 'Pr8oUAIE' => 20
             ];
         } elseif ($r['contest_type'] == 'OMIZAC') {
-            if ($r['current_user']->username != 'rsolis'
+            if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -908,7 +908,7 @@ class UserController extends Controller {
                 'OMIZAC-Prepa' => 60
             ];
         } elseif ($r['contest_type'] == 'ProgUAIE') {
-            if ($r['current_user']->username != 'rsolis'
+            if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -923,7 +923,7 @@ class UserController extends Controller {
                 'Sec-UAIE-Jalpa' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIAGS-2018') {
-            if ($r['current_user']->username != 'EfrenGonzalez'
+            if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -933,7 +933,7 @@ class UserController extends Controller {
                 'OMIAGS-2018' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIAGS-2017') {
-            if ($r['current_user']->username != 'EfrenGonzalez'
+            if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -943,7 +943,7 @@ class UserController extends Controller {
                 'OMIAGS-2017' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIP-AGS') {
-            if ($r['current_user']->username != 'EfrenGonzalez'
+            if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -953,7 +953,7 @@ class UserController extends Controller {
                 'OMIP-AGS' => 30
             ];
         } elseif ($r['contest_type'] == 'OMIS-AGS') {
-            if ($r['current_user']->username != 'EfrenGonzalez'
+            if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -963,7 +963,7 @@ class UserController extends Controller {
                 'OMIS-AGS' => 30
             ];
         } elseif ($r['contest_type'] == 'OSI') {
-            if ($r['current_user']->username != 'cope_quintana'
+            if ($r->user->username != 'cope_quintana'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -973,8 +973,8 @@ class UserController extends Controller {
                 'OSI16' => 120
             ];
         } elseif ($r['contest_type'] == 'UNAMFC') {
-            if ($r['current_user']->username != 'manuelalcantara52'
-                && $r['current_user']->username != 'manuel52'
+            if ($r->user->username != 'manuelalcantara52'
+                && $r->user->username != 'manuel52'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -983,7 +983,7 @@ class UserController extends Controller {
                 'UNAMFC16' => 65
             ];
         } elseif ($r['contest_type'] == 'OVI') {
-            if ($r['current_user']->username != 'covi.academico'
+            if ($r->user->username != 'covi.academico'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -992,7 +992,7 @@ class UserController extends Controller {
                 'OVI19' => 200
             ];
         } elseif ($r['contest_type'] == 'UDCCUP') {
-            if ($r['current_user']->username != 'Diego_Briaares'
+            if ($r->user->username != 'Diego_Briaares'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1001,7 +1001,7 @@ class UserController extends Controller {
                 'UDCCUP-2017' => 40
             ];
         } elseif ($r['contest_type'] == 'CCUPITSUR') {
-            if ($r['current_user']->username != 'licgerman-yahoo'
+            if ($r->user->username != 'licgerman-yahoo'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1011,7 +1011,7 @@ class UserController extends Controller {
                 'CCUPITSUR-16' => 50,
             ];
         } elseif ($r['contest_type'] == 'CONALEP') {
-            if ($r['current_user']->username != 'reyes811'
+            if ($r->user->username != 'reyes811'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1020,7 +1020,7 @@ class UserController extends Controller {
                 'OIC-16' => 225
             ];
         } elseif ($r['contest_type'] == 'OMIQROO') {
-            if ($r['current_user']->username != 'pablobatun'
+            if ($r->user->username != 'pablobatun'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1031,7 +1031,7 @@ class UserController extends Controller {
                 'OMIROO-Pre-20' => 300,
             ];
         } elseif ($r['contest_type'] == 'TEBAEV') {
-            if ($r['current_user']->username != 'lacj20'
+            if ($r->user->username != 'lacj20'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1040,7 +1040,7 @@ class UserController extends Controller {
                 'TEBAEV' => 250,
             ];
         } elseif ($r['contest_type'] == 'PYE-AGS') {
-            if ($r['current_user']->username != 'joemmanuel'
+            if ($r->user->username != 'joemmanuel'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1049,7 +1049,7 @@ class UserController extends Controller {
                 'PYE-AGS18' => 40,
             ];
         } elseif ($r['contest_type'] == 'CAPKnuth') {
-            if ($r['current_user']->username != 'galloska'
+            if ($r->user->username != 'galloska'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1058,7 +1058,7 @@ class UserController extends Controller {
                 'ESCOM2018' => 50,
             ];
         } elseif ($r['contest_type'] == 'CAPVirtualKnuth') {
-            if ($r['current_user']->username != 'galloska'
+            if ($r->user->username != 'galloska'
                 && !$is_system_admin
             ) {
                 throw new ForbiddenAccessException();
@@ -1239,9 +1239,11 @@ class UserController extends Controller {
         $r['identity'] = self::resolveTargetIdentity($r);
         $r['user'] = self::resolveTargetUser($r);
 
-        $response = IdentityController::getProfile($r);
-        if ((is_null($r['current_identity']) || $r['current_identity']->username != $r['identity']->username)
-            && (!is_null($r['user']) && $r['user']->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+        $response = IdentityController::getProfile($r, $r['identity'], $r['user'], boolval($r['omit_rank']));
+        if ((is_null($r->identity) || $r->identity->username != $r['identity']->username)
+            && (!is_null($r['user']) && $r['user']->is_private == 1)
+            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity->identity_id))
+        ) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
                 $response['userinfo'][$k] = null;
@@ -1271,7 +1273,7 @@ class UserController extends Controller {
     public static function apiStatusVerified(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r['current_identity_id'])) {
+        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1300,7 +1302,7 @@ class UserController extends Controller {
     public static function apiExtraInformation(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r['current_identity_id'])) {
+        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1421,7 +1423,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         $currentTimestamp = Time::get();
 
-        if (!Authorization::isMentor($r['current_identity_id'])) {
+        if (!Authorization::isMentor($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         if (!Authorization::canChooseCoder($currentTimestamp)) {
@@ -1457,7 +1459,7 @@ class UserController extends Controller {
                     'user_id' => $user['user_id'],
                     'time' => $dateToSelect,
                     'rank' => $index + 1,
-                    'selected_by' => $r['current_identity_id'],
+                    'selected_by' => $r->identity->identity_id,
                 ]));
 
                 return ['status' => 'ok'];
@@ -1499,7 +1501,7 @@ class UserController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isContestAdmin($r['current_identity_id'], $contest)) {
+        if (!Authorization::isContestAdmin($r->identity->identity_id, $contest)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1686,8 +1688,8 @@ class UserController extends Controller {
             $user = self::resolveTargetUser($r);
         }
 
-        if ((is_null($r['current_identity']) || $r['current_identity']->username != $identity->username)
-            && (!is_null($user) && $user->is_private == 1) && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+        if ((is_null($r->identity) || $r->identity->username != $identity->username)
+            && (!is_null($user) && $user->is_private == 1) && !Authorization::isSystemAdmin($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
@@ -1715,7 +1717,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
-        if ($r['username'] != $r['current_user']->username) {
+        if ($r['username'] != $r->user->username) {
             $testu = UsersDAO::FindByUsername($r['username']);
 
             if (!is_null($testu)) {
@@ -1723,18 +1725,18 @@ class UserController extends Controller {
             }
 
             Validators::validateValidUsername($r['username'], 'username');
-            $r['current_user']->username = $r['username'];
+            $r->user->username = $r['username'];
         }
 
         SecurityTools::testStrongPassword($r['password']);
         $hashedPassword = SecurityTools::hashString($r['password']);
-        $r['current_user']->password = $hashedPassword;
+        $r->user->password = $hashedPassword;
 
         try {
             DAO::transBegin();
 
-            UsersDAO::save($r['current_user']);
-            IdentityController::convertFromUser($r['current_user']);
+            UsersDAO::save($r->user);
+            IdentityController::convertFromUser($r->user);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -1743,7 +1745,7 @@ class UserController extends Controller {
         }
 
         // Expire profile cache
-        Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
+        Cache::deleteFromCache(Cache::USER_PROFILE, $r->user->username);
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
 
@@ -1770,7 +1772,7 @@ class UserController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
 
-            if ($r['username'] != $r['current_user']->username && !is_null($user)) {
+            if ($r['username'] != $r->user->username && !is_null($user)) {
                 throw new DuplicatedEntryInDatabaseException('usernameInUse');
             }
         }
@@ -1854,7 +1856,7 @@ class UserController extends Controller {
                 throw new InvalidParameterException('invalidLanguage', 'locale');
             }
 
-            $r['current_user']->language_id = $language->language_id;
+            $r->user->language_id = $language->language_id;
         }
 
         $r->ensureBool('is_private', false);
@@ -1883,14 +1885,14 @@ class UserController extends Controller {
             'hide_problem_tags',
         ];
 
-        self::updateValueProperties($r, $r['current_user'], $valueProperties);
+        self::updateValueProperties($r, $r->user, $valueProperties);
 
         try {
             DAO::transBegin();
 
-            UsersDAO::save($r['current_user']);
+            UsersDAO::save($r->user);
 
-            IdentityController::convertFromUser($r['current_user']);
+            IdentityController::convertFromUser($r->user);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -1900,7 +1902,7 @@ class UserController extends Controller {
         }
 
         // Expire profile cache
-        Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
+        Cache::deleteFromCache(Cache::USER_PROFILE, $r->user->username);
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
 
@@ -2037,20 +2039,20 @@ class UserController extends Controller {
 
         try {
             // Update email
-            $email = EmailsDAO::getByPK($r['current_user']->main_email_id);
+            $email = EmailsDAO::getByPK($r->user->main_email_id);
             $email->email = $r['email'];
             EmailsDAO::save($email);
 
             // Add verification_id if not there
-            if ($r['current_user']->verified == '0') {
+            if ($r->user->verified == '0') {
                 self::$log->info('User not verified.');
 
-                if ($r['current_user']->verification_id == null) {
+                if ($r->user->verification_id == null) {
                     self::$log->info('User does not have verification id. Generating.');
 
                     try {
-                        $r['current_user']->verification_id = SecurityTools::randomString(50);
-                        UsersDAO::save($r['current_user']);
+                        $r->user->verification_id = SecurityTools::randomString(50);
+                        UsersDAO::save($r->user);
                     } catch (Exception $e) {
                         // best effort, eat exception
                     }
@@ -2065,10 +2067,10 @@ class UserController extends Controller {
         }
 
         // Delete profile cache
-        Cache::deleteFromCache(Cache::USER_PROFILE, $r['current_user']->username);
+        Cache::deleteFromCache(Cache::USER_PROFILE, $r->user->username);
 
         // Send verification email
-        $r['user'] = $r['current_user'];
+        $r['user'] = $r->user;
         self::sendVerificationEmail($r['user']);
 
         return ['status' => 'ok'];
@@ -2204,7 +2206,7 @@ class UserController extends Controller {
     }
 
     private static function validateAddRemoveRole(Request $r) {
-        if (!Authorization::isSystemAdmin($r['current_identity_id']) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+        if (!Authorization::isSystemAdmin($r->identity->identity_id) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             throw new ForbiddenAccessException();
         }
 
@@ -2306,7 +2308,7 @@ class UserController extends Controller {
         self::validateAddRemoveGroup($r);
         try {
             GroupsIdentitiesDAO::save(new GroupsIdentities([
-                'identity_id' => $r['current_identity_id'],
+                'identity_id' => $r->identity->identity_id,
                 'group_id' => $r['group']->group_id
             ]));
         } catch (Exception $e) {
@@ -2333,7 +2335,7 @@ class UserController extends Controller {
 
         try {
             GroupsIdentitiesDAO::delete(new GroupsIdentities([
-                'identity_id' => $r['current_identity_id'],
+                'identity_id' => $r->identity->identity_id,
                 'group_id' => $r['group']->group_id
             ]));
         } catch (Exception $e) {
@@ -2348,7 +2350,7 @@ class UserController extends Controller {
     private static function validateAddRemoveExperiment(Request $r) {
         global $experiments;
 
-        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
+        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -2530,7 +2532,7 @@ class UserController extends Controller {
             throw new InvalidParameterException('parameterInvalid', 'username');
         }
 
-        if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r['current_user_id'], (int)$identity->identity_id)) {
+        if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r->user->user_id, (int)$identity->identity_id)) {
             throw new DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 
@@ -2544,7 +2546,7 @@ class UserController extends Controller {
         }
 
         try {
-            IdentitiesDAO::associateIdentityWithUser($r['current_user_id'], $identity->identity_id);
+            IdentitiesDAO::associateIdentityWithUser($r->user->user_id, $identity->identity_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -2566,7 +2568,7 @@ class UserController extends Controller {
         try {
             return [
                 'status' => 'ok',
-                'identities' => IdentitiesDAO::getAssociatedIdentities($r['current_user_id'])
+                'identities' => IdentitiesDAO::getAssociatedIdentities($r->user->user_id)
             ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
