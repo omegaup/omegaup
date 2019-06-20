@@ -46,6 +46,8 @@ const translations = {
 	badge_500score_name: "500 score",
 	badge_coderOfTheMonth_description: "User has been Coder of The Month at least once.",
 	badge_coderOfTheMonth_name: "Coder Of The Month",
+	badge_contestManager_description: "User has run at least one contest.",
+	badge_contestManager_name: "Contest Manager",
 	badge_feedbackProvider_description: "User has provided feedback for at least one problem.",
 	badge_feedbackProvider_name: "Feedback Provider",
 	badge_problemSetter_description: "User has created at least one problem.",

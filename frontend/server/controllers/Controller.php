@@ -26,18 +26,14 @@ class Controller {
     protected static function authenticateRequest(Request $r) {
         $session = SessionController::apiCurrentSession($r)['session'];
         if (is_null($session['identity'])) {
-            $r['current_user'] = null;
-            $r['current_user_id'] = null;
-            $r['current_identity'] = null;
-            $r['current_identity_id'] = null;
+            $r->user = null;
+            $r->identity = null;
             throw new UnauthorizedException();
         }
         if (!is_null($session['user'])) {
-            $r['current_user'] = $session['user'];
-            $r['current_user_id'] = $session['user']->user_id;
+            $r->user = $session['user'];
         }
-        $r['current_identity'] = $session['identity'];
-        $r['current_identity_id'] = $session['identity']->identity_id;
+        $r->identity = $session['identity'];
     }
 
     /**
@@ -73,7 +69,7 @@ class Controller {
      */
     protected static function resolveTargetUser(Request $r) {
         // By default use current user
-        $user = $r['current_user'];
+        $user = $r->user;
 
         if (!is_null($r['username'])) {
             Validators::validateStringNonEmpty($r['username'], 'username');
@@ -108,7 +104,7 @@ class Controller {
      */
     protected static function resolveTargetIdentity(Request $r) {
         // By default use current identity
-        $identity = $r['current_identity'];
+        $identity = $r->identity;
 
         if (is_null($r['username'])) {
             return $identity;

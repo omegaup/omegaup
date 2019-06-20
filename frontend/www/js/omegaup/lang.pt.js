@@ -46,6 +46,8 @@ const translations = {
 	badge_500score_name: "Pontua\u00e7\u00e3o 500",
 	badge_coderOfTheMonth_description: "O usu\u00e1rio tem sido Programador do M\u00eas pelo menos uma vez.",
 	badge_coderOfTheMonth_name: "Programador do M\u00eas",
+	badge_contestManager_description: "O usu\u00e1rio tem executado pelo menos um concurso.",
+	badge_contestManager_name: "Administrador de Concurso",
 	badge_feedbackProvider_description: "O usu\u00e1rio tem enviado a qualifica\u00e7\u00e3o de pelo menos um problema.",
 	badge_feedbackProvider_name: "Provedor de Feedback",
 	badge_problemSetter_description: "O usu\u00e1rio tem criado pelo menos um problema.",
