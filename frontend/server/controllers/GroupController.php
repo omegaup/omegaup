@@ -60,7 +60,7 @@ class GroupController extends Controller {
             $r['alias'],
             $r['name'],
             $r['description'],
-            $r['current_user_id']
+            $r->user->user_id
         );
 
         return ['status' => 'ok'];
@@ -112,7 +112,7 @@ class GroupController extends Controller {
      */
     public static function apiAddUser(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
@@ -135,7 +135,7 @@ class GroupController extends Controller {
      */
     public static function apiRemoveUser(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
@@ -172,8 +172,8 @@ class GroupController extends Controller {
 
         try {
             $groups = GroupsDAO::getAllGroupsAdminedByUser(
-                $r['current_user_id'],
-                $r['current_identity_id']
+                $r->user->user_id,
+                $r->identity->identity_id
             );
 
             foreach ($groups as $group) {
@@ -223,7 +223,7 @@ class GroupController extends Controller {
      */
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
 
         if (is_null($group)) {
             return [
@@ -259,7 +259,7 @@ class GroupController extends Controller {
      */
     public static function apiMembers(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r['current_identity_id']);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
 
         $response = [];
 
@@ -280,7 +280,7 @@ class GroupController extends Controller {
      */
     public static function apiCreateScoreboard(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroup($r['group_alias'], $r['current_identity_id']);
+        $group = self::validateGroup($r['group_alias'], $r->identity->identity_id);
 
         Validators::validateValidAlias($r['alias'], 'alias', true);
         Validators::validateStringNonEmpty($r['name'], 'name', true);

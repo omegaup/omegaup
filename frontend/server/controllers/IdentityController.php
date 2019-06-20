@@ -141,10 +141,10 @@ class IdentityController extends Controller {
      */
     private static function validateGroupOwnership(Request $r) {
         self::authenticateRequest($r);
-        if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
+        if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
-        $group = GroupController::validateGroup($r['group_alias'], $r['current_identity_id']);
+        $group = GroupController::validateGroup($r['group_alias'], $r->identity->identity_id);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -275,10 +275,10 @@ class IdentityController extends Controller {
      */
     private static function validateUpdateRequest(Request $r) {
         self::authenticateRequest($r);
-        if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
+        if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
-        GroupController::validateGroup($r['group_alias'], $r['current_identity_id']);
+        GroupController::validateGroup($r['group_alias'], $r->identity->identity_id);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -350,8 +350,13 @@ class IdentityController extends Controller {
      * @param Request $r
      * @return type
      */
-    public static function getProfile(Request $r) {
-        if (is_null($r['identity'])) {
+    public static function getProfile(
+        Request $r,
+        ?Identities $identity,
+        ?Users $user,
+        bool $omitRank
+    ) : array {
+        if (is_null($identity)) {
             throw new InvalidParameterException('parameterNotFound', 'Identity');
         }
 
@@ -359,33 +364,38 @@ class IdentityController extends Controller {
 
         Cache::getFromCacheOrSet(
             Cache::USER_PROFILE,
-            $r['identity']->username,
-            $r,
-            function (Request $r) {
-                if (!is_null($r['user'])) {
-                    return UserController::getProfileImpl($r['user'], $r['identity']);
+            $identity->username,
+            [$identity, $user],
+            function (array $params) {
+                [$identity, $user] = $params;
+                if (!is_null($user)) {
+                    return UserController::getProfileImpl($user, $identity);
                 }
-                return IdentityController::getProfileImpl($r['identity']);
+                return IdentityController::getProfileImpl($identity);
             },
             $response
         );
 
-        if (!empty($r['omit_rank'])) {
-            $response['userinfo']['rankinfo'] = UserController::getRankByProblemsSolved($r);
-        } else {
+        if ($omitRank) {
             $response['userinfo']['rankinfo'] = [];
+        } else {
+            $response['userinfo']['rankinfo'] = UserController::getRankByProblemsSolved($r);
         }
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged identity's one. Admins can see emails
-        if (Authorization::isSystemAdmin($r['current_identity_id'])
-              || $r['identity']->identity_id == $r['current_identity_id']) {
+        if (!is_null($r->identity)
+            && (Authorization::isSystemAdmin($r->identity->identity_id)
+                || $identity->identity_id == $r->identity->identity_id)
+        ) {
             return $response;
         }
 
         // Mentors can see current coder of the month email.
-        if (Authorization::canViewEmail($r['current_identity_id']) &&
-              CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['identity']->username)) {
+        if (!is_null($r->identity)
+            && Authorization::canViewEmail($r->identity->identity_id)
+            && CoderOfTheMonthDAO::isLastCoderOfTheMonth($identity->username)
+        ) {
             return $response;
         }
         unset($response['userinfo']['email']);
