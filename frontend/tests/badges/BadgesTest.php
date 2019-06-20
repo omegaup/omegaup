@@ -168,10 +168,14 @@ class BadgesTest extends BadgesTestCase {
         // Manually creates a new badge
         $newBadge = 'testBadge';
         $newBadgePath = static::OMEGAUP_BADGES_ROOT . "/${newBadge}";
-        mkdir($newBadgePath);
+        $results = [];
+        try {
+            mkdir($newBadgePath);
+            $results = BadgesController::apiList(new Request([]));
+        } finally {
+            rmdir($newBadgePath);
+        }
         // Get all badges through API
-        $results = BadgesController::apiList(new Request([]));
-        rmdir($newBadgePath);
         $this->assertTrue(in_array($newBadge, $results));
     }
 }
