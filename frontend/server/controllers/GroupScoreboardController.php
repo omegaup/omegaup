@@ -72,7 +72,7 @@ class GroupScoreboardController extends Controller {
         self::authenticateRequest($r);
         $contestScoreboard = self::validateGroupScoreboardAndContest(
             $r['group_alias'],
-            $r['current_identity_id'],
+            $r->identity->identity_id,
             $r['scoreboard_alias'],
             $r['contest_alias']
         );
@@ -109,7 +109,7 @@ class GroupScoreboardController extends Controller {
      */
     public static function apiRemoveContest(Request $r) {
         self::authenticateRequest($r);
-        $contestScoreboard = self::validateGroupScoreboardAndContest($r['group_alias'], $r['current_identity_id'], $r['scoreboard_alias'], $r['contest_alias']);
+        $contestScoreboard = self::validateGroupScoreboardAndContest($r['group_alias'], $r->identity->identity_id, $r['scoreboard_alias'], $r['contest_alias']);
 
         try {
             $gscs = GroupsScoreboardsProblemsetsDAO::getByPK(
@@ -140,7 +140,7 @@ class GroupScoreboardController extends Controller {
      */
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
-        $scoreboard = self::validateGroupScoreboard($r['group_alias'], $r['current_identity_id'], $r['scoreboard_alias']);
+        $scoreboard = self::validateGroupScoreboard($r['group_alias'], $r->identity->identity_id, $r['scoreboard_alias']);
 
         $response = [];
 
@@ -213,7 +213,7 @@ class GroupScoreboardController extends Controller {
      */
     public static function apiList(Request $r) {
         self::authenticateRequest($r);
-        $group = GroupController::validateGroup($r['group_alias'], $r['current_identity_id']);
+        $group = GroupController::validateGroup($r['group_alias'], $r->identity->identity_id);
 
         $response = [];
         $response['scoreboards'] = [];

@@ -43,7 +43,6 @@ class ProblemListCourseTest extends OmegaupTestCase {
             $userLogin[$i] = self::login($user[$i]);
             $intro_details = CourseController::apiIntroDetails(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
-                'current_user_id' => $user[$i]->user_id,
                 'course_alias' => $courseData['course_alias']
             ]));
             CourseController::apiAddStudent(new Request([
@@ -135,7 +134,6 @@ class ProblemListCourseTest extends OmegaupTestCase {
             $userLogin[$i] = self::login($user[$i]);
             $intro_details = CourseController::apiIntroDetails(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
-                'current_user_id' => $user[$i]->user_id,
                 'course_alias' => $courseData['course_alias']
             ]));
             CourseController::apiAddStudent(new Request([
@@ -161,7 +159,6 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $userLogin[2] = self::login($user[2]);
         $intro_details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin[$i]->auth_token,
-            'current_user_id' => $user[$i]->user_id,
             'course_alias' => $courseData['course_alias']
         ]));
         CourseController::apiAddStudent(new Request([

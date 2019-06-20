@@ -56,7 +56,6 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $userLogin = OmegaupTestCase::login($student);
         $intro_details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin->auth_token,
-            'current_user_id' => $student->user_id,
             'course_alias' => $courseData['request']['alias']
         ]));
         // Asserting isFirstTimeAccess
@@ -99,7 +98,6 @@ class CourseStudentAddTest extends OmegaupTestCase {
         // User agrees sharing his information
         $intro_details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin->auth_token,
-            'current_user_id' => $student->user_id,
             'course_alias' => $courseData['request']['alias']
         ]));
         // Asserting shouldShowResults is off

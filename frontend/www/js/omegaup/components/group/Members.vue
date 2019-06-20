@@ -46,7 +46,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identitiesCsv">
+        <tr v-bind:key="identity.username"
+            v-for="identity in identitiesCsv">
           <td><omegaup-user-username v-bind:classname="identity.classname"
                                  v-bind:linkify="true"
                                  v-bind:username="identity.username"></omegaup-user-username></td>
@@ -55,14 +56,26 @@
           <td>{{ identity.state }}</td>
           <td>{{ identity.school }}</td>
           <td>
-            <a class="glyphicon glyphicon-lock"
+            <a class="glyphicon glyphicon-edit"
+                href="#"
+                v-bind:title="T.groupEditMembersEdit"
+                v-on:click="onEdit(identity)"></a> <a class="glyphicon glyphicon-lock"
                 href="#"
                 v-bind:title="T.groupEditMembersChangePassword"
-                v-on:click="onChangePass(identity.username)"></a>
+                v-on:click="onChangePass(identity.username)"></a> <a class=
+                "glyphicon glyphicon-remove"
+                href="#"
+                v-bind:title="T.groupEditMembersRemove"
+                v-on:click="onRemove(identity.username)"></a>
           </td>
         </tr>
       </tbody>
-    </table><!-- Modal Change Password-->
+    </table><omegaup-identity-edit v-bind:countries="countries"
+         v-bind:identity="identity"
+         v-bind:selected-country="identity.country_id"
+         v-bind:selected-state="identity.state_id"
+         v-bind:username="username"
+         v-if="show"></omegaup-identity-edit><!-- Modal Change Password-->
     <div class="modal fade modal-change-password"
          role="dialog">
       <div class="modal-dialog">
@@ -136,18 +149,25 @@ label {
 <script>
 import {T, UI} from '../../omegaup.js';
 import user_Username from '../user/Username.vue';
+import identity_Edit from '../identity/Edit.vue';
 export default {
   props: {
     identities: Array,
     identitiesCsv: Array,
+    groupAlias: String,
+    countries: {
+      type: Array,
+    },
   },
   data: function() {
     return {
       T: T,
+      identity: {},
       memberUsername: '',
       username: '',
       newPassword: '',
       newPasswordRepeat: '',
+      show: false,
     };
   },
   mounted: function() {
@@ -170,6 +190,7 @@ export default {
       }
       this.$emit('add-member', this, this.memberUsername);
     },
+    onEdit: function(identity) { this.$emit('edit-identity', this, identity);},
     onChangePass: function(username) {
       this.username = username;
       $('.modal-change-password').modal();
@@ -188,6 +209,7 @@ export default {
   },
   components: {
     'omegaup-user-username': user_Username,
+    'omegaup-identity-edit': identity_Edit,
   },
 };
 </script>

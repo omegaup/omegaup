@@ -134,6 +134,7 @@ let config = [
         'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
         jszip: 'jszip/dist/jszip.js',
         pako: 'pako/dist/pako.min.js',
+        '@': path.resolve(__dirname, './frontend/www/'),
       }
     },
     devServer: {historyApiFallback: true, noInfo: true},
