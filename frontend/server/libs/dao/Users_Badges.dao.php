@@ -12,7 +12,7 @@ require_once('base/Users_Badges.vo.base.php');
   *
   */
 class UsersBadgesDAO extends UsersBadgesDAOBase {
-    private static function getUserOwnedBadges(str $userId) {
+    private static function getUserOwnedBadges(Users $user) {
         global $conn;
         $sql = 'SELECT
                     ub.badge_alias, ub.assignation_time
@@ -22,23 +22,7 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                     ub.user_id = ?
                 ORDER BY
                     ub.assignation_time ASC;';
-        $args = [$userId];
+        $args = [$user->user_id];
         return $conn->GetAll($sql, $args);
-    }
-
-    public static function getBadgeAssignationTime(Users $user, string $badgeAlias) {
-        global $conn;
-        $sql = 'SELECT
-                    ub.assignation_time
-                FROM
-                    Users_Badges ub
-                WHERE
-                    ub.user_id = ? AND ub.badge_alias = ?;';
-        $args = [$user->user_id, $badgeAlias];
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
-            return null;
-        }
-        return $rs['assignation_time'];
     }
 }

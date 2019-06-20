@@ -165,17 +165,13 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testListBadges() {
-        // Manually get all badges
-        $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
-        $badges = [];
-        foreach ($aliases as $alias) {
-            if (is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
-                $badges[] = $alias;
-            }
-        }
+        // Manually creates a new badge
+        $newBadge = "testBadge";
+        $newBadgePath = static::OMEGAUP_BADGES_ROOT . "/${newBadge}";
+        mkdir($newBadgePath);
         // Get all badges through API
         $results = BadgesController::apiList(new Request([]));
-        $this->assertEquals(sizeof($badges), sizeof($results));
-        $this->assertEquals($badges, $results);
+        rmdir($newBadgePath);
+        $this->assertTrue(in_array($newBadge, $results));
     }
 }

@@ -17,11 +17,6 @@ class BadgesController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
-        try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            // Do nothing, we allow unauthenticated users to use this API
-        }
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         $results = [];
         foreach ($aliases as $alias) {
@@ -42,7 +37,10 @@ class BadgesController extends Controller {
      */
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
-        return UsersBadgesDAO::getUserOwnedBadges($r['current_user_id']);
+        return [
+            'status' => 'ok',
+            'badges' => UsersBadgesDAO::getUserOwnedBadges($r->user),
+        ];
     }
 
     /**
@@ -54,22 +52,19 @@ class BadgesController extends Controller {
      */
     public static function apiUserList(Request $r) {
         try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            // Do nothing, we allow unauthenticated users to use this API
-        }
-        try {
             $user = UsersDAO::FindByUsername($r['target_username']);
             if (is_null($user)) {
                 throw new NotFoundException('userNotExist');
             }
-            return UsersBadgesDAO::getUserOwnedBadges($user->user_id);
+            return [
+                'status' => 'ok',
+                'badges' => UsersBadgesDAO::getUserOwnedBadges($user),
+            ];
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-        return null;
     }
     // TODO: apiListProfileBadges, apiUserHasBadge
 }
