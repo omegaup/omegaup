@@ -1,5 +1,4 @@
 <?php
-require_once 'libs/dao/User_Rank.dao.php';
 
 /**
  * BadgesController
