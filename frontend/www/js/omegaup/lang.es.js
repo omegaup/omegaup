@@ -52,7 +52,7 @@ const translations = {
 	badge_feedbackProvider_name: "Proveedor de Feedback",
 	badge_problemSetter_description: "El usuario ha creado al menos un problema.",
 	badge_problemSetter_name: "Creador de Problemas",
-	badge_virtualContestManager_description: "El usuario ha ejecutado al menos un concurso virtual.",
+	badge_virtualContestManager_description: "El usuario ha administrado al menos un concurso virtual.",
 	badge_virtualContestManager_name: "Administrador de Concurso Virtual",
 	banProblemFormComments: "Comentarios adicionales para el creador del problema",
 	banProblemFormQuestion: "\u00bfPor qu\u00e9 se suspender\u00e1 este problema?",
