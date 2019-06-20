@@ -46,7 +46,7 @@ const translations = {
 	badge_500score_name: "(500 5c0r3)",
 	badge_coderOfTheMonth_description: "(U53r ha5 b33n C0d3r 0f Th3 M0n7h a7 13a57 0nc3.)",
 	badge_coderOfTheMonth_name: "(C0d3r Of Th3 M0n7h)",
-	badge_contestManager_description: "(U53r ha5 run a7 13a57 0n3 c0n7357.)",
+	badge_contestManager_description: "(U53r ha5 manag3d a7 13a57 0n3 c0n7357.)",
 	badge_contestManager_name: "(C0n7357 Manag3r)",
 	badge_feedbackProvider_description: "(U53r ha5 pr0vid3d f33dback f0r a7 13a57 0n3 pr0b13m.)",
 	badge_feedbackProvider_name: "(F33dback Pr0vid3r)",
