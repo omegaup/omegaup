@@ -87,7 +87,7 @@ class QualityNominationController extends Controller {
         if ($r['nomination'] != 'demotion') {
             // All nominations types, except demotions, are only allowed for
             // uses who have already solved the problem.
-            if (!ProblemsDAO::isProblemSolved($problem, (int)$r['current_identity_id'])) {
+            if (!ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
                 throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
         }
@@ -188,7 +188,7 @@ class QualityNominationController extends Controller {
 
         // Create object
         $nomination = new QualityNominations([
-            'user_id' => $r['current_user_id'],
+            'user_id' => $r->user->user_id,
             'problem_id' => $problem->problem_id,
             'nomination' => $r['nomination'],
             'contents' => json_encode($contents), // re-encoding it for normalization.
@@ -280,7 +280,7 @@ class QualityNominationController extends Controller {
         $r['visibility'] = $newProblemVisibility;
 
         $qualitynominationlog = new QualityNominationLog([
-            'user_id' => $r['current_user_id'],
+            'user_id' => $r->user->user_id,
             'qualitynomination_id' => $qualitynomination->qualitynomination_id,
             'from_status' => $qualitynomination->status,
             'to_status' => $r['status'],
@@ -401,7 +401,7 @@ class QualityNominationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateMemberOfReviewerGroup(Request $r) {
-        if (!Authorization::isQualityReviewer($r['current_identity_id'])) {
+        if (!Authorization::isQualityReviewer($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
     }
@@ -453,7 +453,7 @@ class QualityNominationController extends Controller {
         self::authenticateRequest($r);
         self::validateMemberOfReviewerGroup($r);
 
-        return self::getListImpl($r, null /* nominator */, $r['current_user_id']);
+        return self::getListImpl($r, null /* nominator */, $r->user->user_id);
     }
 
     /**
@@ -473,7 +473,7 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
 
-        return self::getListImpl($r, $r['current_user_id'], null /* assignee */);
+        return self::getListImpl($r, $r->user->user_id, null /* assignee */);
     }
 
     /**
@@ -501,8 +501,8 @@ class QualityNominationController extends Controller {
 
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
-        $currentUserIsNominator = ($r['current_user']->username == $response['nominator']['username']);
-        $currentUserReviewer = Authorization::isQualityReviewer($r['current_identity_id']);
+        $currentUserIsNominator = ($r->user->username == $response['nominator']['username']);
+        $currentUserReviewer = Authorization::isQualityReviewer($r->identity->identity_id);
         if (!$currentUserIsNominator && !$currentUserReviewer) {
             throw new ForbiddenAccessException('userNotAllowed');
         }

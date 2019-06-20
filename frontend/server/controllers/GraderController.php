@@ -15,7 +15,7 @@ class GraderController extends Controller {
     private static function validateRequest(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
+        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
             throw new ForbiddenAccessException();
         }
     }
