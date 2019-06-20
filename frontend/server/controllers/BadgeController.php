@@ -5,7 +5,7 @@
  *
  * @author carlosabcs
  */
-class BadgesController extends Controller {
+class BadgeController extends Controller {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
     /**

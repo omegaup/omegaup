@@ -171,7 +171,7 @@ class BadgesTest extends BadgesTestCase {
         $results = [];
         try {
             mkdir($newBadgePath);
-            $results = BadgesController::apiList(new Request([]));
+            $results = BadgeController::apiList(new Request([]));
         } finally {
             rmdir($newBadgePath);
         }
