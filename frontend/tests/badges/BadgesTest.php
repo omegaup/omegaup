@@ -166,7 +166,7 @@ class BadgesTest extends BadgesTestCase {
 
     public function testListBadges() {
         // Manually creates a new badge
-        $newBadge = "testBadge";
+        $newBadge = 'testBadge';
         $newBadgePath = static::OMEGAUP_BADGES_ROOT . "/${newBadge}";
         mkdir($newBadgePath);
         // Get all badges through API
