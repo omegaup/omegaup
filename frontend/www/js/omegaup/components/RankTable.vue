@@ -139,11 +139,6 @@ export default class RankTable extends Vue {
     window.location.search = UI.buildURLQuery(queryParameters);
   }
 
-  flagURL(rank: Rank): string {
-    if (!rank.country) return '';
-    return `/media/flags/${rank.country.toLowerCase()}.png`;
-  }
-
   get nextPageFilter(): string {
     if (this.filter)
       return `/rank?page=${this.page + 1}&filter=${encodeURIComponent(

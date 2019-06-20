@@ -14,7 +14,7 @@ export default class CountryFlag extends Vue {
 
   get flagUrl(): string {
     if (this.country == null) return '';
-    return '/media/flags/' + this.country.toLowerCase() + '.png';
+    return `/media/flags/${this.country.toLowerCase()}.png`;
   }
 }
 
