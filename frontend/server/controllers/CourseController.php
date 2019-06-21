@@ -240,6 +240,10 @@ class CourseController extends Controller {
 
         self::authenticateRequest($r);
         self::validateClone($r);
+        // Unassociated identities are not allowed to clone courses
+        if (is_null($r->user)) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
         $offset = round($r['start_time']) - strtotime($originalCourse->start_time);
@@ -259,7 +263,7 @@ class CourseController extends Controller {
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
                 'requests_user_information' => $originalCourse->requests_user_information
-            ]), $r->user->user_id);
+            ]), $r->user);
 
             $assignmentsProblems = ProblemsetProblemsDAO::getProblemsAssignmentByCourseAlias($originalCourse);
 
@@ -283,7 +287,7 @@ class CourseController extends Controller {
                         $problem['problem_alias'],
                         $problemset->problemset_id,
                         $r->user->user_id,
-                        false, /* validateVisibility */
+                        false, // visbility mode validation no needed when it is a clone
                         100,
                         null,
                         1
@@ -316,6 +320,10 @@ class CourseController extends Controller {
 
         self::authenticateRequest($r);
         self::validateCreate($r);
+        // Unassociated identities are not allowed to clone courses
+        if (is_null($r->user)) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
 
         self::createCourseAndGroup(new Courses([
             'name' => $r['name'],
@@ -324,11 +332,11 @@ class CourseController extends Controller {
             'school_id' => $r['school_id'],
             'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
             'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
-            'public' => is_null($r['public']) ? false : $r['public'],
+            'public' => $r['public'] ?: false,
             'show_scoreboard' => $r['show_scoreboard'],
             'needs_basic_information' => $r['needs_basic_information'],
             'requests_user_information' => $r['requests_user_information'],
-        ]), $r->user->user_id);
+        ]), $r->user);
 
         return ['status' => 'ok'];
     }
@@ -337,12 +345,12 @@ class CourseController extends Controller {
      * Function to create a new course with its corresponding group
      *
      * @param Courses $course
-     * @param $creatorUserId
+     * @param Users $creator
      * @return Courses
      */
     private static function createCourseAndGroup(
         Courses $course,
-        int $creatorUserId
+        Users $creator
     ) : Courses {
         if ($course->alias == 'new') {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
@@ -358,11 +366,11 @@ class CourseController extends Controller {
             $course->alias,
             "students-{$course->alias}",
             "students-{$course->alias}",
-            $creatorUserId
+            $creator->user_id
         );
 
         try {
-            $acl = new ACLs(['owner_id' => $creatorUserId]);
+            $acl = new ACLs(['owner_id' => $creator->user_id]);
 
             ACLsDAO::save($acl);
 
@@ -438,11 +446,13 @@ class CourseController extends Controller {
     /**
      * Function to add problems to a specific assignment
      *
-     * @param string $problemAlias,
-     * @param int $problemsetId,
-     * @param int $userId,
-     * @param ?int $points = 100,
+     * @param string $problemAlias
+     * @param int $problemsetId
+     * @param int $userId
+     * @param bool $validateVisibility validations no needed when it is a clone
+     * @param ?int $points = 100
      * @param ?string $commit
+     * @param ?int $order = 1
      */
     private static function addProblemToAssignment(
         string $problemAlias,
