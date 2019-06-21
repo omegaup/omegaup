@@ -18,6 +18,17 @@ BADGES_PATH = os.path.abspath(os.path.join(__file__, '..', '..',
                               '..', 'frontend/badges'))
 
 
+def delete_read_notifications(cur: MySQLdb.cursors.DictCursor):
+    '''Deletes all read notifications'''
+    cur.execute("""
+        DELETE FROM
+            `Notifications`
+        WHERE
+            `read` != 0;""")
+    logging.info('Deleted all already read notifications, %s in total.',
+                 cur.rowcount)
+
+
 def get_all_owners(badge: str, cur: MySQLdb.cursors.DictCursor):
     '''Returns a set of ids of users who should receive the badge'''
     with open(os.path.join(BADGES_PATH, badge, 'query.sql')) as fd:
@@ -42,6 +53,7 @@ def get_current_owners(badge: str, cur: MySQLdb.cursors.DictCursor):
     for row in cur:
         results.append(row['user_id'])
     return set(results)
+
 
 def save_new_owners(badge: str, users: set, cur: MySQLdb.cursors.DictCursor):
     '''Adds new badge owners entries to Users_Badges table'''
@@ -70,8 +82,6 @@ def process_badges(cur: MySQLdb.cursors.DictCursor):
             all_owners = get_all_owners(badge, cur)
             current_owners = get_current_owners(badge, cur)
             new_owners = all_owners - current_owners
-            logging.info("All owners: %s", all_owners)
-            logging.info("Current owners: %s", current_owners)
             logging.info("New owners: %s", new_owners)
             if len(new_owners) > 0:
                 save_new_owners(badge, new_owners, cur)
@@ -94,6 +104,7 @@ def main():
     dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
+            delete_read_notifications(cur)
             process_badges(cur)
         dbconn.commit()
     except:  # noqa: bare-except
