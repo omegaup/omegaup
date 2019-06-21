@@ -718,4 +718,90 @@ class UpdateContestTest extends OmegaupTestCase {
         $run = RunsFactory::createRun($problem, $contest, $contestant);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
     }
+
+    public function testUpdateDisableWindowLength() {
+        // Get a problem
+        $problem = ProblemsFactory::createProblem();
+
+        $originalTime = Time::get();
+
+        // Create contest with 5 hours and a window length 60 of minutes
+        $contest = ContestsFactory::createContest(
+            new ContestParams([
+                'window_length' => 30,
+                'start_time' => $originalTime,
+                'finish_time' => $originalTime + 60 * 2 * 60,
+            ])
+        );
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problem, $contest);
+
+        // Create a contestant
+        $contestant = UserFactory::createUser();
+
+        // Add contestant to contest
+        ContestsFactory::addUser($contest, $contestant);
+
+        // User joins the contest 10 minutes after it starts
+        $updatedTime = $originalTime + 10 * 60;
+        Time::setTimeForTesting($updatedTime);
+        ContestsFactory::openContest($contest, $contestant);
+        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+
+        // User creates a run 20 minutes later, it is ok
+        $updatedTime = $updatedTime + 20 * 60;
+        Time::setTimeForTesting($updatedTime);
+        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+
+        try {
+            // User tries to create another run 20 minutes later, it should fail
+            $updatedTime = $updatedTime + 20 * 60;
+            Time::setTimeForTesting($updatedTime);
+            $run = RunsFactory::createRun($problem, $contest, $contestant);
+            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            $this->fail('User should not be able to send runs beause window_length is over');
+        } catch (NotAllowedToSubmitException $e) {
+            // Pass
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
+
+        $directorLogin = self::login($contest['director']);
+
+        $r = new Request([
+            'contest_alias' => $contest['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'window_length' => 60
+        ]);
+
+        // Call API
+        $response = ContestController::apiUpdate($r);
+
+        // User tries to create run agaian, it should works fine
+        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+
+        try {
+            // User tries to create another run 30 minutes later, it should fail
+            $updatedTime = $updatedTime + 30 * 60;
+            Time::setTimeForTesting($updatedTime);
+            $run = RunsFactory::createRun($problem, $contest, $contestant);
+            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            $this->fail('User should not be able to send runs beause window_length is over');
+        } catch (NotAllowedToSubmitException $e) {
+            // Pass
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
+
+        // Now, director disables window_length
+        $r['window_length'] = 0;
+
+        // Call API
+        $response = ContestController::apiUpdate($r);
+
+        // Now user can submit run until contest finishes
+        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+    }
 }

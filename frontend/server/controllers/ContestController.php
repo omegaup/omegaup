@@ -546,6 +546,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
 
+        $r->ensureBool('share_user_information', false);
         DAO::transBegin();
         try {
             $response['contest']->toUnixTime();
@@ -555,7 +556,7 @@ class ContestController extends Controller {
                 $response['contest']->window_length,
                 true,
                 $response['contest']->finish_time,
-                $r['share_user_information'] == true
+                $r['share_user_information'] ?: false
             );
 
             // Insert into PrivacyStatement_Consent_Log whether request
@@ -2403,10 +2404,10 @@ class ContestController extends Controller {
             if (is_null($contest->window_length)) {
                 ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime(
                     $contest->problemset_id,
-                    $contest->finish_time
+                    strtotime($contest->finish_time)
                 );
             } else {
-                // When window length is enabled, end time value is finish time of the contest + window length
+                // When window length is enabled, end time value is access time + window length
                 ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
                     $contest->problemset_id,
                     $contest->window_length
