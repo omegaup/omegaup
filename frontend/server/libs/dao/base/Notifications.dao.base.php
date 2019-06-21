@@ -156,7 +156,7 @@ abstract class NotificationsDAOBase {
      */
     final public static function create(Notifications $Notifications) {
         if (is_null($Notifications->timestamp)) {
-            $Notifications->timestamp = gmdate('Y-m-d H:i:s');
+            $Notifications->timestamp = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($Notifications->read)) {
             $Notifications->read = false;
