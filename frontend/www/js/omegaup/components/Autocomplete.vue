@@ -5,14 +5,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
 
 @Component
 export default class Autocomplete extends Vue {
-  $refs!: {
-    input: HTMLInputElement;
-  };
-
+  @Ref() input!: HTMLInputElement;
   @Prop() value!: string;
   @Prop() init!: Function;
 
@@ -22,12 +19,12 @@ export default class Autocomplete extends Vue {
 
   @Emit('input')
   onUpdateInput(): string {
-    return this.$refs.input.value;
+    return this.input.value;
   }
 
   @Watch('value')
   onPropertyChanged(newValue: string, oldValue: string) {
-    this.$refs.input.value = newValue;
+    this.input.value = newValue;
   }
 }
 

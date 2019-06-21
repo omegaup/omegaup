@@ -5916,6 +5916,14 @@ vue-property-decorator@^8.0.0:
   dependencies:
     vue-class-component "^7.0.1"
 
+vue-property-decorator@^8.2.1:
+  version "8.2.1"
+  resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-8.2.1.tgz#3791662033b20d20d098cb20e86fd23842982508"
+  integrity sha512-zgtcvzGB2JpDqnIxVhTK+6m+dv3uyhYs+tL8elL+DWiXj9kDonKcPY7f1DHYX1NlnWPCj7ht0nL/i8+S1gg76Q==
+  dependencies:
+    vue "^2.6.10"
+    vue-class-component "^7.0.1"
+
 vue-slider-component@^3.0.25:
   version "3.0.31"
   resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-3.0.31.tgz#50571bef97b988f12a25851890ef74d90be55a25"
@@ -5944,7 +5952,7 @@ vue-template-es2015-compiler@^1.9.0:
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
 
-vue@^2.5.0, vue@^2.5.22:
+vue@^2.5.0, vue@^2.5.22, vue@^2.6.10:
   version "2.6.10"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
   integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
