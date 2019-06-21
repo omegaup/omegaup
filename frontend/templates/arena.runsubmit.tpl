@@ -24,4 +24,5 @@
 				<textarea id="editor" name="code"></textarea><br/>
 				<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
 				<input type="submit" />
+				<label class="notify-user"></label>
 			</form>

@@ -356,7 +356,7 @@ class ContestController extends Controller {
 
                 // Privacy Statement Information
                 $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-                    $session['user']->language_id,
+                    $r->identity->language_id,
                     'contest',
                     $result['requests_user_information']
                 );
@@ -1568,14 +1568,14 @@ class ContestController extends Controller {
         // Check contest_alias
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
-        $user = UserController::resolveUser($usernameOrEmail);
+        $identity = IdentityController::resolveIdentity($usernameOrEmail);
 
-        if (is_null($user)) {
+        if (is_null($identity)) {
             throw new NotFoundException('userOrMailNotFound');
         }
 
         $contest = self::validateContestAdmin($contestAlias, $currentIdentityId);
-        return [$user, $contest];
+        return [$identity, $contest];
     }
 
     /**
@@ -1595,13 +1595,17 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
-        [$user, $contest] = self::validateAddRemoveUser($r['contest_alias'], $r['usernameOrEmail'], $r->identity->identity_id);
+        [$identity, $contest] = self::validateAddRemoveUser(
+            $r['contest_alias'],
+            $r['usernameOrEmail'],
+            $r->identity->identity_id
+        );
 
         // Save the contest to the DB
         try {
             ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
                 'problemset_id' => $contest->problemset_id,
-                'identity_id' => $user->main_identity_id,
+                'identity_id' => $identity->identity_id,
                 'access_time' => null,
                 'score' => '0',
                 'time' => '0',
@@ -1624,12 +1628,12 @@ class ContestController extends Controller {
     public static function apiRemoveUser(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
-        [$user, $contest] = self::validateAddRemoveUser($r['contest_alias'], $r['usernameOrEmail'], $r->identity->identity_id);
+        [$identity, $contest] = self::validateAddRemoveUser($r['contest_alias'], $r['usernameOrEmail'], $r->identity->identity_id);
 
         try {
             ProblemsetIdentitiesDAO::delete(new ProblemsetIdentities([
                 'problemset_id' => $contest->problemset_id,
-                'identity_id' => $user->main_identity_id,
+                'identity_id' => $identity->identity_id,
             ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

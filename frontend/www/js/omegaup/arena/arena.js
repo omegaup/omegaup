@@ -1452,6 +1452,12 @@ export class Arena {
           // Luckily in this case we don't require the call to refresh
           // for the display to update correctly!
           self.codeEditor.refresh();
+          if (OmegaUp.username.indexOf(':') !== -1 &&
+              self.currentProblem.runs.length === 0) {
+            $('.notify-user').html(omegaup.T.firstSumbissionWithIdentity);
+          } else {
+            $('.notify-user').html('');
+          }
         }
       }
     } else if (self.activeTab == 'problems') {
@@ -1863,8 +1869,8 @@ export class Arena {
             ' / ' +
             parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
             ')');
-    $('.omegaup-scoreboard tr.' + OmegaUp.username + ' td.' + alias +
-      ' .points')
+    $('.omegaup-scoreboard tr.' + OmegaUp.username.split(':')[1] + ' td.' +
+      alias + ' .points')
         .text(self.myRuns.getMaxScore(alias, previousScore)
                   .toFixed(self.digitsAfterDecimalPoint))
   }

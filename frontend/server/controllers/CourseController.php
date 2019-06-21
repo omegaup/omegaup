@@ -1398,7 +1398,7 @@ class CourseController extends Controller {
 
         // Privacy Statement Information
         $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-            $user_session->language_id,
+            $r->identity->language_id,
             'course',
             $result['requests_user_information']
         );
@@ -1410,7 +1410,7 @@ class CourseController extends Controller {
             $result['statement_type'] = $statement_type;
         }
 
-        $markdown = PrivacyStatement::getForConsent($user_session->language_id, 'accept_teacher');
+        $markdown = PrivacyStatement::getForConsent($r->identity->language_id, 'accept_teacher');
         if (is_null($markdown)) {
             throw new InvalidFilesystemOperationException();
         }
