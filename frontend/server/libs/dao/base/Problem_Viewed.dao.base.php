@@ -154,7 +154,7 @@ abstract class ProblemViewedDAOBase {
      */
     final public static function create(ProblemViewed $Problem_Viewed) {
         if (is_null($Problem_Viewed->view_time)) {
-            $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s');
+            $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [

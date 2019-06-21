@@ -63,7 +63,7 @@ abstract class IdentityLoginLogDAOBase {
      */
     final public static function create(IdentityLoginLog $Identity_Login_Log) {
         if (is_null($Identity_Login_Log->time)) {
-            $Identity_Login_Log->time = gmdate('Y-m-d H:i:s');
+            $Identity_Login_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
         $params = [
