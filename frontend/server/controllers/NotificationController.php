@@ -17,7 +17,9 @@ class NotificationController extends Controller {
         self::authenticateRequest($r);
         return [
             'status' => 'ok',
-            'notifications' => NotificationsDAO::getUnreadNotifications($r->user),
+            'notifications' => is_null($r->user) ?
+                [] :
+                NotificationsDAO::getUnreadNotifications($r->user),
         ];
     }
 }
