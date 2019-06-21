@@ -92,7 +92,7 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function phpUnitTest($badge) {
-        $testPath = static::BADGES_TESTS_ROOT . "/${badge}.php";
+        $testPath = static::BADGES_TESTS_ROOT . "/${badge}Test.php";
         $this->assertTrue(
             file_exists($testPath),
             "$badge:> The file ${badge}.php doesn't exist in frontend/tests/badges."

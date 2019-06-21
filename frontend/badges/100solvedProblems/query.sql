@@ -15,4 +15,4 @@ WHERE
 GROUP BY
     `u`.`user_id`
 HAVING
-    COUNT(*) >= 100;
+    COUNT(DISTINCT `p`.`problem_id`) >= 100;
