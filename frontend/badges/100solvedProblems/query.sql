@@ -13,6 +13,6 @@ INNER JOIN
 WHERE
     `r`.`verdict` = "AC" AND `s`.`type` = "normal"
 GROUP BY
-    `p`.`problem_id`
+    `u`.`user_id`
 HAVING
-    COUNT(*) >= 1;
+    COUNT(*) >= 100;
