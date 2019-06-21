@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Usuario Histórico",
+    "description": "El usuario se unió a omegaUp dentro del primer año desde el lanzamiento."
+  },
+  "en": {
+    "name": "Legacy User",
+    "description": "User has joined to omegaUp within the first year since launch."
+  },
+  "pt": {
+    "name": "Usuário Histórico",
+    "description": "O usuário entrou no omegaUp no primeiro ano desde o lançamento."
+  }
+}

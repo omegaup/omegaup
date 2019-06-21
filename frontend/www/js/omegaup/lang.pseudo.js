@@ -50,6 +50,8 @@ const translations = {
 	badge_contestManager_name: "(C0n7357 Manag3r)",
 	badge_feedbackProvider_description: "(U53r ha5 pr0vid3d f33dback f0r a7 13a57 0n3 pr0b13m.)",
 	badge_feedbackProvider_name: "(F33dback Pr0vid3r)",
+	badge_legacyUser_description: "(U53r ha5 j0in3d 70 0m3gaUp wi7hin 7h3 fir57 y3ar 5inc3 1aunch.)",
+	badge_legacyUser_name: "(L3gacy U53r)",
 	badge_problemSetter_description: "(U53r ha5 cr3a73d a7 13a57 0n3 pr0b13m.)",
 	badge_problemSetter_name: "(Pr0b13m S3773r)",
 	badge_virtualContestManager_description: "(U53r ha5 manag3d a7 13a57 0n3 vir7ua1 c0n7357.)",

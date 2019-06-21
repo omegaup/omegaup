@@ -1,0 +1,53 @@
+{
+  "testType": "apicall",
+  "actions": [
+    {
+      "type": "changeTime",
+      "time": "2011-05-01"
+    },
+    {
+      "type": "apicalls",
+      "apicalls": [
+        {
+          "username": "admintest",
+          "password": "testtesttest",
+          "requests": [
+            {
+              "api": "UserController::apiCreate",
+              "params": {
+                "username": "test_user_0",
+                "email": "user_0@domain.com",
+                "password": "test_user_0"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "changeTime",
+      "time": "2017-05-01"
+    },
+    {
+      "type": "apicalls",
+      "apicalls": [
+        {
+          "username": "test_user_0",
+          "password": "test_user_0",
+          "requests": [
+            {
+              "api": "UserController::apiLogin",
+              "params": {
+                "usernameOrEmail": "test_user_0",
+                "password": "test_user_0"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "expectedResults": [
+    "admintest"
+  ]
+}

@@ -50,6 +50,8 @@ const translations = {
 	badge_contestManager_name: "Administrador de Concurso",
 	badge_feedbackProvider_description: "O usu\u00e1rio tem enviado a qualifica\u00e7\u00e3o de pelo menos um problema.",
 	badge_feedbackProvider_name: "Provedor de Feedback",
+	badge_legacyUser_description: "O usu\u00e1rio entrou no omegaUp no primeiro ano desde o lan\u00e7amento.",
+	badge_legacyUser_name: "Usu\u00e1rio Hist\u00f3rico",
 	badge_problemSetter_description: "O usu\u00e1rio tem criado pelo menos um problema.",
 	badge_problemSetter_name: "Criador de Problemas",
 	badge_virtualContestManager_description: "O usu\u00e1rio tem administrado pelo menos um concurso virtual.",
