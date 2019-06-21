@@ -193,7 +193,7 @@ abstract class ProblemsDAOBase {
             $Problems->accepted = 0;
         }
         if (is_null($Problems->creation_date)) {
-            $Problems->creation_date = gmdate('Y-m-d H:i:s');
+            $Problems->creation_date = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($Problems->order)) {
             $Problems->order = 'normal';

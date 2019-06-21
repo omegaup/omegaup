@@ -153,4 +153,19 @@ class BadgesTest extends BadgesTestCase {
             self::runBadgeTest($testPath, $queryPath, $alias);
         }
     }
+
+    public function testListBadges() {
+        // Manually creates a new badge
+        $newBadge = 'testBadge';
+        $newBadgePath = static::OMEGAUP_BADGES_ROOT . "/${newBadge}";
+        $results = [];
+        try {
+            mkdir($newBadgePath);
+            $results = BadgeController::apiList(new Request([]));
+        } finally {
+            rmdir($newBadgePath);
+        }
+        // Get all badges through API
+        $this->assertTrue(in_array($newBadge, $results));
+    }
 }

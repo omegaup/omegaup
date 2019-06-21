@@ -155,7 +155,7 @@ abstract class AnnouncementDAOBase {
      */
     final public static function create(Announcement $Announcement) {
         if (is_null($Announcement->time)) {
-            $Announcement->time = gmdate('Y-m-d H:i:s');
+            $Announcement->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [

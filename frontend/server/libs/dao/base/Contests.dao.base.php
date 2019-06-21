@@ -181,7 +181,7 @@ abstract class ContestsDAOBase {
             $Contests->finish_time = '2000-01-01 06:00:00';
         }
         if (is_null($Contests->last_updated)) {
-            $Contests->last_updated = gmdate('Y-m-d H:i:s');
+            $Contests->last_updated = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($Contests->admission_mode)) {
             $Contests->admission_mode = 'private';
