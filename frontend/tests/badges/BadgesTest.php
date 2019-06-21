@@ -178,4 +178,21 @@ class BadgesTest extends BadgesTestCase {
         // Get all badges through API
         $this->assertTrue(in_array($newBadge, $results));
     }
+
+    public function testAssignBadgesCronjob() {
+        global $conn;
+        // Create two badge receivers:
+        // - One problem setter
+        // - One contest manager
+        $problemSetterOne = UserFactory::createUser();
+        $problemSetterTwo = UserFactory::createUser();
+        $contestManager = UserFactory::createUser();
+        $problemSetterOneLogin = self::login($problemSetterOne);
+        $problemSetterTwoLogin = self::login($problemSetterTwo);
+        $contestManagerLogin = self::login($contestManager);
+        ProblemsFactory::createProblemWithAuthor($problemSetterOne, $problemSetterOneLogin);
+        ProblemsFactory::createProblemWithAuthor($problemSetterTwo, $problemSetterTwoLogin);
+        ContestsFactory::createContest(new ContestParams(['contestDirector' => $contestManager]));
+        Utils::RunAssignBadges();
+    }
 }
