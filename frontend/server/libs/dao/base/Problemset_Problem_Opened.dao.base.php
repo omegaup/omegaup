@@ -155,7 +155,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
      */
     final public static function create(ProblemsetProblemOpened $Problemset_Problem_Opened) {
         if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s');
+            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [

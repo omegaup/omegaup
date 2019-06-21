@@ -2,12 +2,6 @@
 
 require_once('base/Users_Badges.dao.base.php');
 require_once('base/Users_Badges.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
 /** UsersBadges Data Access Object (DAO).
   *
   * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
@@ -18,4 +12,17 @@ require_once('base/Users_Badges.vo.base.php');
   *
   */
 class UsersBadgesDAO extends UsersBadgesDAOBase {
+    private static function getUserOwnedBadges(Users $user) {
+        global $conn;
+        $sql = 'SELECT
+                    ub.badge_alias, ub.assignation_time
+                FROM
+                    Users_Badges ub
+                WHERE
+                    ub.user_id = ?
+                ORDER BY
+                    ub.assignation_time ASC;';
+        $args = [$user->user_id];
+        return $conn->GetAll($sql, $args);
+    }
 }

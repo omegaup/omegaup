@@ -808,7 +808,7 @@ class QualityNominationTest extends OmegaupTestCase {
             throw new NotFoundException('problemNotFound');
         }
         $problemDismissed = QualityNominationsDAO::getByUserAndProblem(
-            $r['current_user_id'],
+            $r->user->user_id,
             $problem->problem_id,
             $r['nomination'],
             json_encode([]), // re-encoding it for normalization.
@@ -823,7 +823,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             QualityNominationController::apiCreate($r);
             $pd = QualityNominationsDAO::getByUserAndProblem(
-                $r['current_user_id'],
+                $r->user->user_id,
                 $problem->problem_id,
                 $r['nomination'],
                 json_encode([]), // re-encoding it for normalization.

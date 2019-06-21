@@ -238,6 +238,7 @@ class Utils {
             'Identities',
             'Identity_Login_Log',
             'Interviews',
+            'Notifications',
             'PrivacyStatement_Consent_Log',
             'Problems',
             'Problems_Languages',
