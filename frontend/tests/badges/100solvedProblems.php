@@ -24,7 +24,7 @@ class oneHundredSolvedProblems extends BadgesTestCase {
             $run = RunsFactory::createRunToProblem($problem, $user101);
             RunsFactory::gradeRun($run);
         }
-        $queryPath = static::OMEGAUP_BADGES_ROOT . "/100solvedProblems/" . static::QUERY_FILE;
+        $queryPath = static::OMEGAUP_BADGES_ROOT . '/100solvedProblems/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$user101->user_id];
         $this->assertEquals($expected, $results);
