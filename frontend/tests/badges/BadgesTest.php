@@ -108,7 +108,6 @@ class BadgesTest extends BadgesTestCase {
                 self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
                 break;
             case 'phpunit':
-                // TODO: Hacer la verificación de que exista un archivo badgeAlias.php en /frontend/tests/badges/
                 self::phpUnitTest($badge);
                 break;
             default:
