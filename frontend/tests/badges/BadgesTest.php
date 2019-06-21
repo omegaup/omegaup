@@ -10,24 +10,6 @@ require_once 'libs/FileUploader.php';
  * @author carlosabcs
  */
 class BadgesTest extends BadgesTestCase {
-    const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
-    const MAX_BADGE_SIZE = 20 * 1024;
-    const ICON_FILE = 'icon.svg';
-    const LOCALIZATIONS_FILE = 'localizations.json';
-    const QUERY_FILE = 'query.sql';
-    const TEST_FILE = 'test.json';
-
-    private static function getSortedResults(string $query) {
-        global $conn;
-        $rs = $conn->GetAll($query);
-        $results = [];
-        foreach ($rs as $user) {
-            $results[] = $user['user_id'];
-        }
-        asort($results);
-        return $results;
-    }
-
     private static function getSortedExpectedResults(array $expected) {
         $results = [];
         foreach ($expected as $username) {
@@ -109,7 +91,15 @@ class BadgesTest extends BadgesTestCase {
         Time::setTimeForTesting(null);
     }
 
-    public function runBadgeTest($testPath, $queryPath) {
+    public function phpUnitTest($badge) {
+        $testPath = static::BADGES_TESTS_ROOT . "/${badge}Test.php";
+        $this->assertTrue(
+            file_exists($testPath),
+            "$badge:> The file ${badge}.php doesn't exist in frontend/tests/badges."
+        );
+    }
+
+    public function runBadgeTest($testPath, $queryPath, $badge) {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
         $content = json_decode(file_get_contents($testPath), true);
         Utils::CleanupFilesAndDb();
@@ -118,7 +108,7 @@ class BadgesTest extends BadgesTestCase {
                 self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
                 break;
             case 'phpunit':
-                // TODO: Hacer la verificación de que exista un archivo badgeAlias.php en /frontend/tests/badges/
+                self::phpUnitTest($badge);
                 break;
             default:
                 throw new Exception("Test type {$content['testType']} doesn't exist");
@@ -160,7 +150,7 @@ class BadgesTest extends BadgesTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            self::runBadgeTest($testPath, $queryPath);
+            self::runBadgeTest($testPath, $queryPath, $alias);
         }
     }
 
