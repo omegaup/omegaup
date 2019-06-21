@@ -519,7 +519,7 @@ class ContestController extends Controller {
             ProblemsetIdentityRequestDAO::save(new ProblemsetIdentityRequest([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $contest->problemset_id,
-                'request_time' => gmdate('Y-m-d H:i:s'),
+                'request_time' => gmdate('Y-m-d H:i:s', Time::get()),
             ]));
         } catch (Exception $e) {
             self::$log->error('Failed to create new ProblemsetIdentityRequest: ' . $e->getMessage());
@@ -2122,7 +2122,7 @@ class ContestController extends Controller {
 
         $request->accepted = $resolution;
         $request->extra_note = $r['note'];
-        $request->last_update = gmdate('Y-m-d H:i:s');
+        $request->last_update = gmdate('Y-m-d H:i:s', Time::get());
 
         ProblemsetIdentityRequestDAO::save($request);
 

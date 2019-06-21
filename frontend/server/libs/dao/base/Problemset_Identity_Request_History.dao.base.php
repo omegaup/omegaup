@@ -157,7 +157,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      */
     final public static function create(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) {
         if (is_null($Problemset_Identity_Request_History->time)) {
-            $Problemset_Identity_Request_History->time = gmdate('Y-m-d H:i:s');
+            $Problemset_Identity_Request_History->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
         $params = [
