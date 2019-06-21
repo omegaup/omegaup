@@ -3,7 +3,6 @@
 ''' Assigns users badges and creates the notifications.'''
 
 import argparse
-import collections
 import json
 import logging
 import os
@@ -15,7 +14,7 @@ import lib.logs
 
 
 BADGES_PATH = os.path.abspath(os.path.join(__file__, '..', '..',
-                              '..', 'frontend/badges'))
+                                           '..', 'frontend/badges'))
 
 
 def delete_read_notifications(cur: MySQLdb.cursors.DictCursor):
@@ -83,16 +82,17 @@ def process_badges(cur: MySQLdb.cursors.DictCursor):
             current_owners = get_current_owners(badge, cur)
             new_owners = all_owners - current_owners
             logging.info("New owners: %s", new_owners)
-            if len(new_owners) > 0:
+            if new_owners:
                 save_new_owners(badge, new_owners, cur)
-        except: # noqa: bare-except
+        except:  # noqa: bare-except
             logging.exception('Something went wrong with badge: %s.', badge)
             raise
 
 
 def main():
     '''Main entrypoint.'''
-    parser = argparse.ArgumentParser(description="Assign badges and create notifications.")
+    parser = argparse.ArgumentParser(
+        description="Assign badges and create notifications.")
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -108,7 +108,8 @@ def main():
             process_badges(cur)
         dbconn.commit()
     except:  # noqa: bare-except
-        logging.exception('Failed to assign all badges and create notifications.')
+        logging.exception(
+            'Failed to assign all badges and create notifications.')
     finally:
         dbconn.close()
         logging.info('Finished')
