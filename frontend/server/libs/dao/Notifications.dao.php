@@ -12,7 +12,7 @@ require_once('base/Notifications.vo.base.php');
   *
   */
 class NotificationsDAO extends NotificationsDAOBase {
-    private static function getUserNotifications(Users $user) {
+    public static function getUnreadNotifications(Users $user) {
         global $conn;
         $sql = 'SELECT
                     n.contents, n.timestamp
