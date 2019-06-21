@@ -10,24 +10,6 @@ require_once 'libs/FileUploader.php';
  * @author carlosabcs
  */
 class BadgesTest extends BadgesTestCase {
-    const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
-    const MAX_BADGE_SIZE = 20 * 1024;
-    const ICON_FILE = 'icon.svg';
-    const LOCALIZATIONS_FILE = 'localizations.json';
-    const QUERY_FILE = 'query.sql';
-    const TEST_FILE = 'test.json';
-
-    private static function getSortedResults(string $query) {
-        global $conn;
-        $rs = $conn->GetAll($query);
-        $results = [];
-        foreach ($rs as $user) {
-            $results[] = $user['user_id'];
-        }
-        asort($results);
-        return $results;
-    }
-
     private static function getSortedExpectedResults(array $expected) {
         $results = [];
         foreach ($expected as $username) {
@@ -60,8 +42,6 @@ class BadgesTest extends BadgesTestCase {
             $r = new Request($params);
             $r->method = $req['api'];
             $fullResponse = ApiCaller::call($r);
-            print_r("\nPara el API: $r->method");
-            print_r($fullResponse);
             if ($fullResponse['status'] !== 'ok') {
                 throw new Exception($fullResponse['error']);
             }
@@ -106,14 +86,20 @@ class BadgesTest extends BadgesTestCase {
             }
         }
         $results = self::getSortedResults(file_get_contents($queryPath));
-        print_r("\nResultados: \n");
-        print_r($results);
         $expected = self::getSortedExpectedResults($expectedResults);
         $this->assertEquals($results, $expected);
         Time::setTimeForTesting(null);
     }
 
-    public function runBadgeTest($testPath, $queryPath) {
+    public function phpUnitTest($badge) {
+        $testPath = static::BADGES_TESTS_ROOT . "/${badge}.php";
+        $this->assertTrue(
+            file_exists($testPath),
+            "$badge:> The file ${badge}.php doesn't exist in frontend/tests/badges."
+        );
+    }
+
+    public function runBadgeTest($testPath, $queryPath, $badge) {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
         $content = json_decode(file_get_contents($testPath), true);
         Utils::CleanupFilesAndDb();
@@ -123,6 +109,7 @@ class BadgesTest extends BadgesTestCase {
                 break;
             case 'phpunit':
                 // TODO: Hacer la verificación de que exista un archivo badgeAlias.php en /frontend/tests/badges/
+                self::phpUnitTest($badge);
                 break;
             default:
                 throw new Exception("Test type {$content['testType']} doesn't exist");
@@ -133,7 +120,6 @@ class BadgesTest extends BadgesTestCase {
         global $conn;
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         foreach ($aliases as $alias) {
-            print_r("\nOn Badge $alias");
             $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
             if (!is_dir($badgePath)) {
                 continue;
@@ -165,7 +151,7 @@ class BadgesTest extends BadgesTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            self::runBadgeTest($testPath, $queryPath);
+            self::runBadgeTest($testPath, $queryPath, $alias);
         }
     }
 }
