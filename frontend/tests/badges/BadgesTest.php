@@ -10,24 +10,6 @@ require_once 'libs/FileUploader.php';
  * @author carlosabcs
  */
 class BadgesTest extends BadgesTestCase {
-    const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
-    const MAX_BADGE_SIZE = 20 * 1024;
-    const ICON_FILE = 'icon.svg';
-    const LOCALIZATIONS_FILE = 'localizations.json';
-    const QUERY_FILE = 'query.sql';
-    const TEST_FILE = 'test.json';
-
-    private static function getSortedResults(string $query) {
-        global $conn;
-        $rs = $conn->GetAll($query);
-        $results = [];
-        foreach ($rs as $user) {
-            $results[] = $user['user_id'];
-        }
-        asort($results);
-        return $results;
-    }
-
     private static function getSortedExpectedResults(array $expected) {
         $results = [];
         foreach ($expected as $username) {
@@ -109,7 +91,15 @@ class BadgesTest extends BadgesTestCase {
         Time::setTimeForTesting(null);
     }
 
-    public function runBadgeTest($testPath, $queryPath) {
+    public function phpUnitTest($badge) {
+        $testPath = static::BADGES_TESTS_ROOT . "/${badge}Test.php";
+        $this->assertTrue(
+            file_exists($testPath),
+            "$badge:> The file ${badge}.php doesn't exist in frontend/tests/badges."
+        );
+    }
+
+    public function runBadgeTest($testPath, $queryPath, $badge) {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
         $content = json_decode(file_get_contents($testPath), true);
         Utils::CleanupFilesAndDb();
@@ -118,7 +108,7 @@ class BadgesTest extends BadgesTestCase {
                 self::apicallTest($content['actions'], $content['expectedResults'], $queryPath);
                 break;
             case 'phpunit':
-                // TODO: Hacer la verificación de que exista un archivo badgeAlias.php en /frontend/tests/badges/
+                self::phpUnitTest($badge);
                 break;
             default:
                 throw new Exception("Test type {$content['testType']} doesn't exist");
@@ -160,8 +150,24 @@ class BadgesTest extends BadgesTestCase {
                 "$alias:> The file test.json doesn't exist."
             );
 
-            self::runBadgeTest($testPath, $queryPath);
+            self::runBadgeTest($testPath, $queryPath, $alias);
         }
+    }
+
+    private static function getBadgesFromArray(array $badgesResults): array {
+        $badges = [];
+        foreach ($badgesResults as $badge) {
+            $badges[] = $badge['badge_alias'];
+        }
+        return $badges;
+    }
+
+    private static function getBadgesFromNotificationContents(array $notifications): array {
+        $badges = [];
+        foreach ($notifications as $notification) {
+            $badges[] = json_decode($notification['contents'])->badge;
+        }
+        return $badges;
     }
 
     public function testListBadges() {
@@ -177,5 +183,68 @@ class BadgesTest extends BadgesTestCase {
         }
         // Get all badges through API
         $this->assertTrue(in_array($newBadge, $results));
+    }
+
+    public function testAssignBadgesCronjob() {
+        global $conn;
+        // Create two badge receivers:
+        // - User 1 will receive: Problem Setter badge
+        // - User 2 will receive: Problem Setter and Contest Manager badges
+        $userOne = UserFactory::createUser();
+        $userTwo = UserFactory::createUser();
+        ProblemsFactory::createProblemWithAuthor($userOne);
+        ProblemsFactory::createProblemWithAuthor($userTwo);
+        ContestsFactory::createContest(new ContestParams(['contestDirector' => $userTwo]));
+        $expectedUserOneResults = ['problemSetter'];
+        $expectedUserTwoResults = ['contestManager', 'problemSetter'];
+        Utils::RunAssignBadges();
+        {
+            $login = self::login($userOne);
+            // Fetch badges through apiMyList
+            $userOneBadges = BadgeController::apiMyList(new Request([
+                'auth_token' => $login->auth_token,
+                'user' => $userOne,
+            ]));
+            $results = self::getBadgesFromArray($userOneBadges['badges']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserOneResults, $results)),
+                count($expectedUserOneResults)
+            );
+            $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
+
+            // Fetch badges through apiUserList
+            $userTwoBadges = BadgeController::apiUserList(new Request([
+                'target_username' => $userTwo->username,
+            ]));
+            $results = self::getBadgesFromArray($userTwoBadges['badges']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserTwoResults, $results)),
+                count($expectedUserTwoResults)
+            );
+
+            // Now check if notifications have been created for both users
+            $userOneNotifications = NotificationController::apiMyList(new Request([
+                'auth_token' => $login->auth_token,
+                'user' => $userOne,
+            ]));
+            $results = self::getBadgesFromNotificationContents($userOneNotifications['notifications']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserOneResults, $results)),
+                count($expectedUserOneResults)
+            );
+            $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
+        }
+        {
+            $login = self::login($userTwo);
+            $userTwoNotifications = NotificationController::apiMyList(new Request([
+                'auth_token' => $login->auth_token,
+                'user' => $userOne,
+            ]));
+            $results = self::getBadgesFromNotificationContents($userTwoNotifications['notifications']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserTwoResults, $results)),
+                count($expectedUserTwoResults)
+            );
+        }
     }
 }

@@ -38,7 +38,9 @@ class BadgeController extends Controller {
         self::authenticateRequest($r);
         return [
             'status' => 'ok',
-            'badges' => UsersBadgesDAO::getUserOwnedBadges($r->user),
+            'badges' => is_null($r->user) ?
+                [] :
+                UsersBadgesDAO::getUserOwnedBadges($r->user),
         ];
     }
 
@@ -65,5 +67,5 @@ class BadgeController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
-    // TODO: apiListProfileBadges, apiUserHasBadge
+    // TODO: apiUserHasBadge
 }

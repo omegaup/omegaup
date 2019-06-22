@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "100 Problemas resueltos",
+    "description": "El usuario ha resuelto 100 problemas o más."
+  },
+  "en": {
+    "name": "100 solved Problems",
+    "description": "User has solved 100 or more problems."
+  },
+  "pt": {
+    "name": "100 Problemas Resolvidos",
+    "description": "O usuário tem resolvido 100 ou mais problemas."
+  }
+}

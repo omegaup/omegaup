@@ -22,4 +22,6 @@ class NotificationController extends Controller {
                 NotificationsDAO::getUnreadNotifications($r->user),
         ];
     }
+
+    //TODO: apiReadNotifications
 }
