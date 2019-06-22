@@ -1,14 +1,14 @@
 {
   "es": {
     "name": "Usuario Histórico",
-    "description": "El usuario se unió a omegaUp dentro del primer año desde el lanzamiento."
+    "description": "El usuario realizó algún envío dentro del primer año desde el lanzamiento de omegaUp."
   },
   "en": {
     "name": "Legacy User",
-    "description": "User has joined to omegaUp within the first year since launch."
+    "description": "User made a submission within the first year since omegaUp launchment."
   },
   "pt": {
     "name": "Usuário Histórico",
-    "description": "O usuário entrou no omegaUp no primeiro ano desde o lançamento."
+    "description": "O usuário realizou um envio no primeiro ano desde o lançamento de omegaUp."
   }
 }
