@@ -155,7 +155,7 @@ abstract class AuthTokensDAOBase {
      */
     final public static function create(AuthTokens $Auth_Tokens) {
         if (is_null($Auth_Tokens->create_time)) {
-            $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s');
+            $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
         $params = [

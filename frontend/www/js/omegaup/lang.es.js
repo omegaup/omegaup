@@ -42,6 +42,8 @@ const translations = {
 	arenaRunSubmitUpload: "O sube un archivo",
 	arenaRunSubmitWaitBetweenUploads: "Debes esperar %(submissionGap) segundos entre cada env\u00edo del mismo problema",
 	assignmentNotFound: "Tarea/examen no encontrado",
+	badge_100solvedProblems_description: "El usuario ha resuelto 100 problemas o m\u00e1s.",
+	badge_100solvedProblems_name: "100 Problemas resueltos",
 	badge_500score_description: "El usuario ha conseguido una puntuaci\u00f3n igual o mayor que 500.",
 	badge_500score_name: "Puntuaci\u00f3n 500",
 	badge_coderOfTheMonth_description: "El usuario ha sido nombrado Coder del Mes al menos una vez.",
