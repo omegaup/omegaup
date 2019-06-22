@@ -164,7 +164,7 @@ class BadgesTest extends BadgesTestCase {
         }
     }
 
-    private static function getBadgesFromArray(array $badgesResults) {
+    private static function getBadgesFromArray(array $badgesResults): array {
         $badges = [];
         foreach ($badgesResults as $badge) {
             $badges[] = $badge['badge_alias'];
@@ -172,7 +172,7 @@ class BadgesTest extends BadgesTestCase {
         return $badges;
     }
 
-    private static function getBadgesFromNotificationContents(array $notifications) {
+    private static function getBadgesFromNotificationContents(array $notifications): array {
         $badges = [];
         foreach ($notifications as $notification) {
             $badges[] = json_decode($notification['contents'])->badge;
@@ -202,8 +202,6 @@ class BadgesTest extends BadgesTestCase {
         // - User 2 will receive: Problem Setter and Contest Manager badges
         $userOne = UserFactory::createUser();
         $userTwo = UserFactory::createUser();
-
-        $loginTwo = self::login($userTwo);
         ProblemsFactory::createProblemWithAuthor($userOne);
         ProblemsFactory::createProblemWithAuthor($userTwo);
         ContestsFactory::createContest(new ContestParams(['contestDirector' => $userTwo]));
@@ -247,7 +245,7 @@ class BadgesTest extends BadgesTestCase {
             $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
         }
         {
-            $login = self::login($userTwo); // Need to re-login after last apicall
+            $login = self::login($userTwo);
             $userTwoNotifications = NotificationController::apiMyList(new Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
