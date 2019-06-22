@@ -81,7 +81,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
               contest.contestLink = '/arena/' + contest.alias;
               contest.isVirtual = omegaup.UI.isVirtual(contest);
               contest.scoreboardLink =
-                  contest.contestLink + '/scoreboard/' + contest.scoreboard_url;
+                  contest.contestLink + '#ranking'
               contest.practiceLink = contest.contestLink + '/practice/';
               contest.duration = omegaup.UI.toDDHHMM(contest.duration);
               contest.startLink =
