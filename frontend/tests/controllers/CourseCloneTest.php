@@ -134,4 +134,109 @@ class CourseCloneTest extends OmegaupTestCase {
             'start_time' => Time::get()
         ]));
     }
+
+    /**
+     * Create clone of a course with problems that have been changed their
+     * visibility mode from public to private
+     */
+    public function testCreateCourseCloneWithPrivateProblems() {
+        $homeworkCount = 2;
+        $testCount = 2;
+        $problemsPerAssignment = 2;
+        $studentCount = 2;
+        $problemAssignmentsMap = [];
+
+        // Create course with assignments
+        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
+            'homework' => $homeworkCount,
+            'test' => $testCount
+        ]);
+
+        // Add problems to assignments
+        $adminLogin = self::login($courseData['admin']);
+        for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
+            $assignmentAlias = $courseData['assignment_aliases'][$i];
+            $problemAssignmentsMap[$assignmentAlias] = [];
+
+            for ($j = 0; $j < $problemsPerAssignment; $j++) {
+                $problemData = ProblemsFactory::createProblem();
+                CourseController::apiAddProblem(new Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $assignmentAlias,
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                ]));
+                $problemAssignmentsMap[$assignmentAlias][] = $problemData;
+            }
+        }
+        foreach ($problemAssignmentsMap as $assignment => $problems) {
+            foreach ($problems as $key => $problem) {
+                // Let's update visibility mode to private for some problems
+                $authorLogin = self::login($problem['author']);
+                if ($key == 0) {
+                    ProblemController::apiUpdate(new Request([
+                        'auth_token' => $authorLogin->auth_token,
+                        'problem_alias' => $problem['problem']->alias,
+                        'visibility' => ProblemController::VISIBILITY_PRIVATE,
+                        'message' => 'public -> private',
+                    ]));
+
+                    try {
+                        $problem = ProblemController::apiDetails(new Request([
+                            'auth_token' => $adminLogin->auth_token,
+                            'problem_alias' => $problem['problem']->alias,
+                        ]));
+                        $this->fail('Only problem creator can see private problem');
+                    } catch (ForbiddenAccessException $e) {
+                        // Expected
+                        $this->assertEquals('problemIsPrivate', $e->getMessage());
+                    }
+
+                    $problem = ProblemController::apiDetails(new Request([
+                        'auth_token' => $authorLogin->auth_token,
+                        'problem_alias' => $problem['problem']->alias,
+                    ]));
+
+                    $this->assertEquals(0, $problem['visibility'], 'Problem visibility must be private');
+
+                    continue;
+                }
+                // All users can see public problems
+                $problem = ProblemController::apiDetails(new Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'problem_alias' => $problem['problem']->alias,
+                ]));
+
+                $this->assertEquals(1, $problem['visibility'], 'Problem visibility must be public');
+            }
+        }
+
+        $courseAlias = Utils::CreateRandomString();
+
+        $clonedCourseData = CourseController::apiClone(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'name' => Utils::CreateRandomString(),
+            'alias' => $courseAlias,
+            'start_time' => Time::get()
+        ]));
+
+        $this->assertEquals($courseAlias, $clonedCourseData['alias']);
+
+        $response = CourseController::apiDetails(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'alias' => $courseAlias
+        ]));
+
+        foreach ($response['assignments'] as $assignment) {
+            $problems = CourseController::apiAssignmentDetails(new Request([
+                'auth_token' => $adminLogin->auth_token,
+                'assignment' => $assignment['alias'],
+                'course' => $courseAlias
+            ]));
+
+            // All cloned assignments must have the same number of problems than the original ones
+            $this->assertEquals($problemsPerAssignment, count($problems['problems']));
+        }
+    }
 }

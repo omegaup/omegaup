@@ -30,7 +30,7 @@ class ProblemsetController extends Controller {
         int $order_in_contest = 1,
         bool $validateVisibility = true
     ) {
-        if (!$validateVisibility) {
+        if ($validateVisibility) {
             ProblemsetController::validateAddProblemToProblemset(
                 $problemset_id,
                 $problem,
