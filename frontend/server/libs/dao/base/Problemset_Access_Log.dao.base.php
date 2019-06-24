@@ -63,7 +63,7 @@ abstract class ProblemsetAccessLogDAOBase {
      */
     final public static function create(ProblemsetAccessLog $Problemset_Access_Log) {
         if (is_null($Problemset_Access_Log->time)) {
-            $Problemset_Access_Log->time = gmdate('Y-m-d H:i:s');
+            $Problemset_Access_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
         $params = [

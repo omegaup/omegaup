@@ -157,7 +157,7 @@ abstract class GroupsDAOBase {
      */
     final public static function create(Groups $Groups) {
         if (is_null($Groups->create_time)) {
-            $Groups->create_time = gmdate('Y-m-d H:i:s');
+            $Groups->create_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [

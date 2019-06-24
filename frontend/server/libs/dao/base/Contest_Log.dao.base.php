@@ -157,7 +157,7 @@ abstract class ContestLogDAOBase {
      */
     final public static function create(ContestLog $Contest_Log) {
         if (is_null($Contest_Log->time)) {
-            $Contest_Log->time = gmdate('Y-m-d H:i:s');
+            $Contest_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [

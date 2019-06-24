@@ -7,7 +7,7 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::isSystemAdmin($r['current_identity_id']) && !UsersDAO::IsUserInterviewer($r['current_user']->user_id)) {
+        if (!Authorization::isSystemAdmin($r->identity->identity_id) && !UsersDAO::IsUserInterviewer($r->user->user_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -27,7 +27,7 @@ class InterviewController extends Controller {
         self::validateCreateOrUpdate($r, false);
 
         $acl = new ACLs([
-            'owner_id' => $r['current_user']->user_id,
+            'owner_id' => $r->user->user_id,
         ]);
         $interview = new Interviews([
             'alias' => $r['alias'],
@@ -87,6 +87,8 @@ class InterviewController extends Controller {
         foreach ($usersToAdd as $addThisUser) {
             $requestToInternal = new Request($r);
             $requestToInternal['usernameOrEmail'] = $addThisUser;
+            $requestToInternal->user = $r->user;
+            $requestToInternal->identity = $r->identity;
 
             self::addUserInternal($requestToInternal);
         }
@@ -162,7 +164,9 @@ class InterviewController extends Controller {
         }
 
         // Only director is allowed to add people to interview
-        if (!Authorization::isInterviewAdmin($r['current_identity_id'], $r['interview'])) {
+        if (is_null($r->identity)
+            || !Authorization::isInterviewAdmin($r->identity->identity_id, $r['interview'])
+        ) {
             throw new ForbiddenAccessException();
         }
 
@@ -207,7 +211,7 @@ class InterviewController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isInterviewAdmin($r['current_identity_id'], $interview)) {
+        if (!Authorization::isInterviewAdmin($r->identity->identity_id, $interview)) {
             throw new ForbiddenAccessException();
         }
 
@@ -248,7 +252,7 @@ class InterviewController extends Controller {
         $interviews = null;
 
         try {
-            $interviews = InterviewsDAO::getMyInterviews($r['current_user_id']);
+            $interviews = InterviewsDAO::getMyInterviews($r->user->user_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

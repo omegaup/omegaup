@@ -157,7 +157,7 @@ abstract class GroupsScoreboardsDAOBase {
      */
     final public static function create(GroupsScoreboards $Groups_Scoreboards) {
         if (is_null($Groups_Scoreboards->create_time)) {
-            $Groups_Scoreboards->create_time = gmdate('Y-m-d H:i:s');
+            $Groups_Scoreboards->create_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Groups_Scoreboards (`group_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [

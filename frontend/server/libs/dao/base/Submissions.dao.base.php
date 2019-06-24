@@ -161,7 +161,7 @@ abstract class SubmissionsDAOBase {
      */
     final public static function create(Submissions $Submissions) {
         if (is_null($Submissions->time)) {
-            $Submissions->time = gmdate('Y-m-d H:i:s');
+            $Submissions->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($Submissions->submit_delay)) {
             $Submissions->submit_delay = 0;
