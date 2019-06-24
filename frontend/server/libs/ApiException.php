@@ -85,7 +85,7 @@ abstract class ApiException extends Exception {
         );
     }
 
-    protected function getErrorMessage() : string {
+    public function getErrorMessage() : string {
         if (is_null($this->message)) {
             self::$log->error('null error message');
             return '{untranslated:(null)}';
@@ -120,7 +120,7 @@ class InvalidParameterException extends ApiException {
         $this->additional_parameters = $additional_parameters;
     }
 
-    protected function getErrorMessage() : string {
+    public function getErrorMessage() : string {
         $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
@@ -343,7 +343,7 @@ class ProblemDeploymentFailedException extends ApiException {
         $this->context = $context;
     }
 
-    protected function getErrorMessage() : string {
+    public function getErrorMessage() : string {
         $localizedText = Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");

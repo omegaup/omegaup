@@ -559,6 +559,7 @@ const translations = {
 	problemDeployerSlowRejected: "El problema podr\u00eda correr por m\u00e1s de 5 minutos en caso de TLE. Reduce el n\u00famero de casos o disminuye el tiempo l\u00edmite.",
 	problemDeployerTestplanCaseMissing: "Un caso en testplan falta en la carpeta de casos (%(file))",
 	problemDeployerTestplanEmpty: "El archivo testplan est\u00e1 vac\u00edo o no se reconoci\u00f3 el formato. Por favor aseg\u00farate de guardarlo en ASCII o UTF-8.",
+	problemDeployerTestsBadLayout: "El directorio tests/ tiene una estructura inv\u00e1lida.",
 	problemDeployerTooManyObjectsInPackfile: "Hay demasiados objetos en el packfile.",
 	problemDeployerValidatorRequired: "El problema require un validador personalizado pero no se encontr\u00f3 un validador en el .zip",
 	problemDeprecated: "El problema est\u00e1 deprecado",

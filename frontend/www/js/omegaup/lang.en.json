@@ -558,6 +558,7 @@
 	"problemDeployerSlowRejected": "Problem would run for more than 5 minutes in case of TLE. Rejected.",
 	"problemDeployerTestplanCaseMissing": "Case in testplan missing from case list \"%(file)\".",
 	"problemDeployerTestplanEmpty": "No cases found in testplan or format not recognized. Please make sure to save the file in ASCII or UTF-8 format.",
+	"problemDeployerTestsBadLayout": "The tests/ directory's layout is not valid.",
 	"problemDeployerTooManyObjectsInPackfile": "There were too many objects in the packfile.",
 	"problemDeployerValidatorRequired": "Problem requested custom validator but has no validator.",
 	"problemDeprecated": "Problem is deprecated.",
