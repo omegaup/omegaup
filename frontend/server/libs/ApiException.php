@@ -372,7 +372,7 @@ class UnimplementedException extends ApiException {
 }
 
 class CSRFException extends ApiException {
-    public function __construct(ApiException $previous = null) {
-        parent::__construct('csrfException', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    public function __construct($message = 'csrfException', ApiException $previous = null) {
+        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }
