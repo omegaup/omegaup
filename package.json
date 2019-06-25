@@ -54,6 +54,7 @@
     "@babel/plugin-transform-async-to-generator": "^7.2.0",
     "@babel/polyfill": "^7.2.5",
     "codemirror": "^5.38.0",
+    "copy-webpack-plugin": "^5.0.3",
     "jszip": "^3.1.5",
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",

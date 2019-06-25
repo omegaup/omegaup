@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
@@ -216,6 +217,16 @@ let config = [
       new MonacoWebpackPlugin({
         output: './js/dist',
       }),
+      new CopyWebpackPlugin([{
+        from: './frontend/badges/**/*.svg',
+        to: path.resolve(__dirname, './frontend/www/img/badges'),
+        transformPath(targetPath, absolutePath) {
+          if (path.basename(absolutePath, '.svg') !== 'icon') {
+            return `badges/${path.basename(absolutePath)}`;
+          }
+          return `badges/${path.basename(path.dirname(absolutePath))}.svg`;
+        },
+      }]),
     ],
     output: {
       path: path.resolve(__dirname, './frontend/www/'),

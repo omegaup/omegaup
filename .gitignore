@@ -70,6 +70,7 @@ frontend/.DS_Store
 
 # Ignore stuff in www
 frontend/www/apc.php
+frontend/www/badges/
 frontend/www/coverage/
 frontend/www/img/
 frontend/www/js/google-analytics.js
