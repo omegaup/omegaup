@@ -25,6 +25,7 @@ stage_before_script() {
 
 stage_script() {
 	rm -rf frontend/www/{js,css}/dist
+	rm -rf frontend/www/media/dist/badges
 	yarn install
 	yarn run build
 	yarn test
@@ -39,7 +40,7 @@ stage_after_success() {
 
 		# Upload a tarball with the build artifacts.
 		local tarball="build/webpack-artifacts/${TRAVIS_COMMIT}.tar.xz"
-		tar --xz --create --file "${tarball}" -C frontend/www js/dist css/dist
+		tar --xz --create --file "${tarball}" -C frontend/www js/dist css/dist media/dist/badges
 		aws s3 cp "${tarball}" "s3://omegaup-build-artifacts/webpack-artifacts/${TRAVIS_COMMIT}.tar.xz"
 
 		# Start a deployment now that the build artifacts are done.

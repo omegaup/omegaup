@@ -11,6 +11,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const WrapperPlugin = require('wrapper-webpack-plugin');
 
 const omegaupStylesRegExp = /omegaup_styles\.js/;
+const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
 let config = [
   {
@@ -218,13 +219,14 @@ let config = [
         output: './js/dist',
       }),
       new CopyWebpackPlugin([{
-        from: './frontend/badges/**/*.svg',
-        to: path.resolve(__dirname, './frontend/www/img/badges'),
+        from: './frontend/badges/**/query.sql',
+        to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
+        transform(content, filepath) {
+          const iconPath = `${path.dirname(filepath)}/icon.svg`;
+          return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) : defaultBadgeIcon;
+        },
         transformPath(targetPath, absolutePath) {
-          if (path.basename(absolutePath, '.svg') !== 'icon') {
-            return `badges/${path.basename(absolutePath)}`;
-          }
-          return `badges/${path.basename(path.dirname(absolutePath))}.svg`;
+          return `media/dist/badges/${path.basename(path.dirname(absolutePath))}.svg`;
         },
       }]),
     ],
