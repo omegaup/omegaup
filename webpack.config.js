@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
@@ -10,6 +11,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const WrapperPlugin = require('wrapper-webpack-plugin');
 
 const omegaupStylesRegExp = /omegaup_styles\.js/;
+const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
 let config = [
   {
@@ -216,6 +218,17 @@ let config = [
       new MonacoWebpackPlugin({
         output: './js/dist',
       }),
+      new CopyWebpackPlugin([{
+        from: './frontend/badges/**/query.sql',
+        to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
+        transform(content, filepath) {
+          const iconPath = `${path.dirname(filepath)}/icon.svg`;
+          return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) : defaultBadgeIcon;
+        },
+        transformPath(targetPath, absolutePath) {
+          return `media/dist/badges/${path.basename(path.dirname(absolutePath))}.svg`;
+        },
+      }]),
     ],
     output: {
       path: path.resolve(__dirname, './frontend/www/'),
