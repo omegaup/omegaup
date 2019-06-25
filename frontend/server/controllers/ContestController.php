@@ -343,7 +343,7 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
         $result = ContestsDAO::getNeedsInformation($contest->problemset_id);
-
+        $result['contest'] = $contest;
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];

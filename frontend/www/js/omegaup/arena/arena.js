@@ -1452,11 +1452,12 @@ export class Arena {
           // Luckily in this case we don't require the call to refresh
           // for the display to update correctly!
           self.codeEditor.refresh();
-          if (OmegaUp.username.indexOf(':') !== -1 &&
-              self.currentProblem.runs.length === 0) {
-            $('.notify-user').html(omegaup.T.firstSumbissionWithIdentity);
+          let key = `${self.options.contestAlias}-${OmegaUp.username}`;
+          let showMessage = localStorage.getItem(key);
+          if (showMessage == 'true') {
+            $('.notify-user').show();
           } else {
-            $('.notify-user').html('');
+            $('.notify-user').hide();
           }
         }
       }
@@ -1748,6 +1749,9 @@ export class Arena {
           self.hideOverlay();
           self.clearInputFile();
           self.initSubmissionCountdown();
+          // When user submits a run, message is no longer visible
+          let key = `${self.options.contestAlias}-${OmegaUp.username}`;
+          localStorage.setItem(key, false);
         })
         .fail(function(run) {
           alert(run.error);

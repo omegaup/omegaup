@@ -1392,7 +1392,6 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $user_session = SessionController::apiCurrentSession($r)['session']['user'];
         $result = self::getCommonCourseDetails($course, $r->identity->identity_id, true /*onlyIntroDetails*/);
         $result['showAcceptTeacher'] = $showAcceptTeacher;
 

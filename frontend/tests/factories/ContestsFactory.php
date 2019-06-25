@@ -246,11 +246,11 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
-    public static function addUser($contestData, $user) {
+    public static function addUser(array $contestData, Object $userOrIdentity) {
         // Prepare our request
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $user->username;
+        $r['usernameOrEmail'] = $userOrIdentity->username;
 
         // Log in the contest director
         $login = OmegaupTestCase::login($contestData['director']);

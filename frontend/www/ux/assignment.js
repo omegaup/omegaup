@@ -1,4 +1,5 @@
 omegaup.OmegaUp.on('ready', function() {
+  var payload = JSON.parse(document.getElementById('payload').innerText);
   var options = omegaup.arena.GetOptionsFromLocation(window.location);
   var assignmentMatch = /\/course\/([^\/]+)(?:\/assignment\/([^\/]+)\/?)?/.exec(
       window.location.pathname);
@@ -8,6 +9,8 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   var arena = new omegaup.arena.Arena(options);
+  var key = `${arena.options.courseAlias}-${payload.username}`;
+  localStorage.setItem(key, payload.showMessage);
   Highcharts.setOptions({global: {useUTC: false}});
   omegaup.API.Course.getAssignment({
                       course: arena.options.courseAlias,

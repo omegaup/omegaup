@@ -104,4 +104,59 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
 
         return $problemset;
     }
+
+    /**
+     * validates identity has made submissions in a problemset, and whether this
+     * identity is not the main identity of a user when it has been
+     * associated with a user account berfore
+     *
+     */
+    public static function shouldShowMessage(
+        int $identityId,
+        Object $problemset
+    ) : bool {
+        // It means user is in a Course, then we need to get all the problemsets
+        if (!isset($problemset->problemset_id)) {
+            $problemsets = '';
+            $assignments = CoursesDAO::getAllAssignments($problemset->alias, false);
+            foreach ($assignments as $assignment) {
+                $problemsets .= $assignment['problemset_id'] . ',';
+            }
+            $problemsets = substr($problemsets, 0, -1);
+        } else {
+            $problemsets = $problemset->problemset_id;
+        }
+        $sql = "SELECT
+                    u.main_identity_id,
+                    i.identity_id,
+                    i.user_id,
+                    (SELECT
+                        COUNT(*)
+                    FROM
+                        Submissions
+                    WHERE
+                        problemset_id IN ($problemsets)
+                        AND identity_id = i.identity_id
+                    ) AS totalRunsInProblemset
+                FROM
+                    Identities i
+                LEFT JOIN
+                    Users u
+                ON
+                    u.user_id = i.user_id
+                WHERE
+                    i.identity_id = ?
+                LIMIT
+                    1;";
+
+        global $conn;
+        $row = $conn->GetRow($sql, [$identityId]);
+
+        if (empty($row)) {
+            return false;
+        }
+
+        return !is_null($row['user_id']) && $row['totalRunsInProblemset'] == 0
+                 && $row['identity_id'] != $row['main_identity_id'];
+    }
 }

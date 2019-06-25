@@ -24,5 +24,6 @@
 				<textarea id="editor" name="code"></textarea><br/>
 				<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
 				<input type="submit" />
-				<label class="notify-user"></label>
+				<label class="notify-user">{#firstSumbissionWithIdentity#}</label>
+				<script type="text/json" id="payload">{$payload|json_encode}</script>
 			</form>

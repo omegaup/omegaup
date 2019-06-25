@@ -1,8 +1,10 @@
 omegaup.OmegaUp.on('ready', function() {
+  var payload = JSON.parse(document.getElementById('payload').innerText);
   var arena = new omegaup.arena.Arena(
       omegaup.arena.GetOptionsFromLocation(window.location));
   var admin = null;
-
+  var key = `${arena.options.contestAlias}-${payload.username}`;
+  localStorage.setItem(key, payload.showMessage);
   Highcharts.setOptions({global: {useUTC: false}});
 
   function onlyProblemLoaded(problem) {
