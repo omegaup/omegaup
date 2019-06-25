@@ -152,14 +152,14 @@ class RunController extends Controller {
                 throw new InvalidParameterException('parameterNotFound', 'problem_alias');
             }
 
+            $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+                $r->identity->identity_id,
+                $problemset_id
+            );
             // Contest admins can skip following checks
             if (!Authorization::isAdmin($r->identity->identity_id, $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
-                $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
-                    $r->identity->identity_id,
-                    $problemset_id
-                );
-                if (!$problemsetIdentity &&
+                if (is_null($problemsetIdentity) &&
                     !Authorization::canSubmitToProblemset(
                         $r->identity->identity_id,
                         $r['problemset']
@@ -169,11 +169,7 @@ class RunController extends Controller {
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ProblemsetsDAO::insideSubmissionWindow(
-                    $r['container'],
-                    $r->identity->identity_id,
-                    $problemsetIdentity
-                )) {
+                if (!ProblemsetsDAO::isSubmissionWindowOpen($r['container'])) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
                 }
 
@@ -189,11 +185,11 @@ class RunController extends Controller {
             }
 
             // No one should submit after the deadline. Not even admins.
-            if (ProblemsetsDAO::isLateSubmission($r['container'])) {
-                if (!isset($problemsetIdentity) ||
-                    Time::get() > strtotime($problemsetIdentity->end_time)) {
-                    throw new NotAllowedToSubmitException('runNotInsideContest');
-                }
+            if (ProblemsetsDAO::isLateSubmission(
+                $r['container'],
+                $problemsetIdentity
+            )) {
+                throw new NotAllowedToSubmitException('runNotInsideContest');
             }
         } catch (ApiException $apiException) {
             // Propagate ApiException

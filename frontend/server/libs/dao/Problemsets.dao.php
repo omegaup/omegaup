@@ -39,35 +39,20 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
      *  Check if a submission is before the deadline.
      *  No one, including admins, can submit after the deadline.
      */
-    public static function isLateSubmission(Object $container) : bool {
-        return isset($container->finish_time) &&
-               (Time::get() > strtotime($container->finish_time));
+    public static function isLateSubmission(
+        Object $container,
+        ?ProblemsetIdentities $problemsetIdentity
+    ) : bool {
+        if (is_null($problemsetIdentity)) {
+            return isset($container->finish_time) &&
+                   (Time::get() > strtotime($container->finish_time));
+        }
+        return Time::get() > strtotime($problemsetIdentity->end_time);
     }
 
-    public static function insideSubmissionWindow(
-        Object $container,
-        int $identityId,
-        ?ProblemsetIdentities $problemsetIdentities = null
-    ) : bool {
-        if (isset($container->finish_time)) {
-            if (Time::get() > strtotime($container->finish_time) ||
-                Time::get() < strtotime($container->start_time)) {
-                if (is_null($problemsetIdentities)) {
-                    return false;
-                }
-                return Time::get() <= strtotime($problemsetIdentities->end_time);
-            }
-        }
-
-        if (!isset($container->window_length)) {
-            return true;
-        }
-
-        if (is_null($problemsetIdentities)) {
-            return false;
-        }
-        return is_null($problemsetIdentities) ?:
-                    Time::get() <= strtotime($problemsetIdentities->end_time);
+    public static function isSubmissionWindowOpen(Object $container) : bool {
+        return isset($container->start_time) &&
+                Time::get() >= strtotime($container->start_time);
     }
 
     public static function getWithTypeByPK($problemset_id) {

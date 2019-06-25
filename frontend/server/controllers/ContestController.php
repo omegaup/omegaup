@@ -2393,27 +2393,16 @@ class ContestController extends Controller {
             ]));
             $contest->last_updated = $timestamp;
         }
-        if ($original_contest->finish_time !== $contest->finish_time) {
-            ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime(
-                $contest->problemset_id,
-                strtotime($contest->finish_time)
-            );
-        }
-        if ($original_contest->window_length !== $contest->window_length) {
-            // When window length is disabled, end time value is finish time of the contest
-            if (is_null($contest->window_length)) {
-                ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime(
-                    $contest->problemset_id,
-                    strtotime($contest->finish_time)
-                );
-            } else {
+        if (($original_contest->finish_time !== $contest->finish_time) || ($original_contest->window_length !== $contest->window_length)) {
+            ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime($contest);
+            if (!is_null($contest->window_length)) {
                 // When window length is enabled, end time value is access time + window length
                 ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
-                    $contest->problemset_id,
-                    $contest->window_length
+                    $contest
                 );
             }
         }
+
         ContestsDAO::save($contest);
         if ($original_contest->penalty_type == $contest->penalty_type) {
             return;

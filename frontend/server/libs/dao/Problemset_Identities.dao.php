@@ -121,8 +121,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
      *
      */
     public static function recalculateEndTimeForProblemsetIdentities(
-        int $problemsetId,
-        int $windowLengthDifference
+        Contests $contest
     ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
@@ -131,37 +130,32 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 ON
                     Problemset_Identities.problemset_id = Contests.problemset_id
                 SET
-                    `end_time` = IF(DATE_ADD(access_time, INTERVAL ? MINUTE) >
-                            Contests.finish_time,
-                            Contests.finish_time,
-                            DATE_ADD(access_time, INTERVAL ? MINUTE)
-                        )
+                    `end_time` = LEAST(
+                        `finish_time`,
+                        DATE_ADD(`access_time`, INTERVAL ? MINUTE)
+                     )
                 WHERE
                     Problemset_Identities.`problemset_id` = ?
                     AND `access_time` IS NOT NULL;';
 
         global $conn;
-        $conn->Execute($sql, [
-            $windowLengthDifference,
-            $windowLengthDifference,
-            $problemsetId]);
+        $conn->Execute($sql, [$contest->window_length, $contest->problemset_id]);
 
         return $conn->Affected_Rows();
     }
 
     public static function recalculateEndTimeAsFinishTime(
-        int $problemsetId,
-        int $endTime
+        Contests $contest
     ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
-                    `end_time` = FROM_UNIXTIME(?)
+                    `end_time` = ?
                 WHERE
                     `problemset_id` = ?;';
 
         global $conn;
-        $conn->Execute($sql, [$endTime, $problemsetId]);
+        $conn->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
 
         return $conn->Affected_Rows();
     }

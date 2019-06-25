@@ -237,19 +237,21 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Cannot submit run when contest not started yet
      *
-     * @expectedException PreconditionFailedException
      */
     public function testRunWhenContestNotStarted() {
-        $startTime = Time::get() + 10 * 60;
+        $startTime = Time::get();
         $finishTime = Time::get() + 60 * 60;
         $r = $this->setValidRequest('public', $startTime, $finishTime);
+
+        // get back in time ten minutes before Contest starts
+        Time::setTimeForTesting(Time::get() - (10 * 60));
 
         try {
             // Call API
             RunController::apiCreate($r);
-            $this->fail('api should not create run, because contest does not have started yet.');
-        } catch (PreconditionFailedException $e) {
-            $this->assertEquals('contestNotStarted', $e->getMessage());
+            $this->fail('api should have not created run, because contest has not started yet.');
+        } catch (NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
     }
 
