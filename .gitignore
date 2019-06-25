@@ -70,7 +70,6 @@ frontend/.DS_Store
 
 # Ignore stuff in www
 frontend/www/apc.php
-frontend/www/media/dist/badges/
 frontend/www/coverage/
 frontend/www/img/
 frontend/www/js/google-analytics.js
@@ -92,6 +91,9 @@ frontend/www/js/dist/
 
 # Ignore SASS-CSS build files.
 frontend/www/css/dist/
+
+# Ignore media/dist folder
+frontend/www/media/dist/
 
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp
