@@ -93,27 +93,7 @@ omegaup.OmegaUp.on('ready', function() {
 
         if (arena.options.isTutorial) {
           window.scrollTo(0, 0);
-          introJs()
-              .addSteps([
-                {
-                  element:
-                      document.querySelector('#submit select[name=language]'),
-                  intro: omegaup.T.helpIntroLanguage,
-                },
-                {
-                  element: document.querySelector('.vue-codemirror-wrap'),
-                  intro: omegaup.T.arenaRunSubmitPaste,
-                },
-                {
-                  element: document.querySelector('#submit input[type=file]'),
-                  intro: omegaup.T.arenaRunSubmitUpload,
-                },
-                {
-                  element: document.querySelector('#submit input[type=submit]'),
-                  intro: omegaup.T.helpIntroSubmit,
-                },
-              ])
-              .start();
+          self.options.introJs.start();
         }
       }
     }

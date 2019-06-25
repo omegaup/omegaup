@@ -30,6 +30,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     isPractice: false,
     isOnlyProblem: false,
     isTutorial: false,
+    introJs: null,
     disableClarifications: false,
     disableSockets: false,
     contestAlias: null,
@@ -44,6 +45,33 @@ export function GetOptionsFromLocation(arenaLocation) {
       return e.returnValue;
     };
   }
+
+  options.introJs =
+      introJs()
+          .setOptions({
+            doneLabel: omegaup.T.wordsDone,
+            nextLabel: omegaup.T.wordsNext,
+            prevLabel: omegaup.T.wordsPrev,
+            skipLabel: omegaup.T.wordsSkip,
+          })
+          .addSteps([
+            {
+              element: document.querySelector('#submit select[name=language]'),
+              intro: T.helpIntroLanguage,
+            },
+            {
+              element: document.querySelector('.vue-codemirror-wrap'),
+              intro: T.arenaRunSubmitPaste,
+            },
+            {
+              element: document.querySelector('#submit input[type=file]'),
+              intro: T.arenaRunSubmitUpload,
+            },
+            {
+              element: document.querySelector('#submit input[type=submit]'),
+              intro: T.helpIntroSubmit,
+            },
+          ]);
 
   $('#submissions-help')
       .on('click', function(e) {
@@ -1474,34 +1502,7 @@ export class Arena {
           if (self.options.isTutorial) {
             self.options.isTutorial = false;
             window.scrollTo(0, 0);
-            introJs()
-                .setOptions({
-                  doneLabel: omegaup.T.wordsDone,
-                  nextLabel: omegaup.T.wordsNext,
-                  prevLabel: omegaup.T.wordsPrev,
-                  skipLabel: omegaup.T.wordsSkip,
-                })
-                .addSteps([
-                  {
-                    element:
-                        document.querySelector('#submit select[name=language]'),
-                    intro: T.helpIntroLanguage,
-                  },
-                  {
-                    element: document.querySelector('.vue-codemirror-wrap'),
-                    intro: T.arenaRunSubmitPaste,
-                  },
-                  {
-                    element: document.querySelector('#submit input[type=file]'),
-                    intro: T.arenaRunSubmitUpload,
-                  },
-                  {
-                    element:
-                        document.querySelector('#submit input[type=submit]'),
-                    intro: T.helpIntroSubmit,
-                  },
-                ])
-                .start();
+            self.options.introJs.start();
           }
         }
       }
