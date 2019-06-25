@@ -144,7 +144,7 @@ class CourseCloneTest extends OmegaupTestCase {
         $testCount = 2;
         $problemsPerAssignment = 2;
         $studentCount = 2;
-        $problemAssignmentsMap = [];
+        $assignmentProblemsMap = [];
 
         // Create course with assignments
         $courseData = CoursesFactory::createCourseWithNAssignmentsPerType([
@@ -156,7 +156,7 @@ class CourseCloneTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
             $assignmentAlias = $courseData['assignment_aliases'][$i];
-            $problemAssignmentsMap[$assignmentAlias] = [];
+            $assignmentProblemsMap[$assignmentAlias] = [];
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
                 $problemData = ProblemsFactory::createProblem();
@@ -166,41 +166,11 @@ class CourseCloneTest extends OmegaupTestCase {
                     'assignment_alias' => $assignmentAlias,
                     'problem_alias' => $problemData['request']['problem_alias'],
                 ]));
-                $problemAssignmentsMap[$assignmentAlias][] = $problemData;
+                $assignmentProblemsMap[$assignmentAlias][] = $problemData;
             }
         }
-        foreach ($problemAssignmentsMap as $assignment => $problems) {
-            foreach ($problems as $key => $problem) {
-                // Let's update visibility mode to private for some problems
-                $authorLogin = self::login($problem['author']);
-                if ($key == 0) {
-                    ProblemController::apiUpdate(new Request([
-                        'auth_token' => $authorLogin->auth_token,
-                        'problem_alias' => $problem['problem']->alias,
-                        'visibility' => ProblemController::VISIBILITY_PRIVATE,
-                        'message' => 'public -> private',
-                    ]));
-
-                    try {
-                        $problem = ProblemController::apiDetails(new Request([
-                            'auth_token' => $adminLogin->auth_token,
-                            'problem_alias' => $problem['problem']->alias,
-                        ]));
-                        $this->fail('Only problem creator can see private problem');
-                    } catch (ForbiddenAccessException $e) {
-                        // Expected
-                        $this->assertEquals('problemIsPrivate', $e->getMessage());
-                    }
-
-                    $problem = ProblemController::apiDetails(new Request([
-                        'auth_token' => $authorLogin->auth_token,
-                        'problem_alias' => $problem['problem']->alias,
-                    ]));
-
-                    $this->assertEquals(0, $problem['visibility'], 'Problem visibility must be private');
-
-                    continue;
-                }
+        foreach ($assignmentProblemsMap as $assignment => $problems) {
+            foreach ($problems as $problem) {
                 // All users can see public problems
                 $problem = ProblemController::apiDetails(new Request([
                     'auth_token' => $adminLogin->auth_token,
@@ -209,6 +179,34 @@ class CourseCloneTest extends OmegaupTestCase {
 
                 $this->assertEquals(1, $problem['visibility'], 'Problem visibility must be public');
             }
+
+            // Update visibility mode to private for some problems
+            $authorLogin = self::login($problems[0]['author']);
+
+            ProblemController::apiUpdate(new Request([
+                'auth_token' => $authorLogin->auth_token,
+                'problem_alias' => $problems[0]['problem']->alias,
+                'visibility' => ProblemController::VISIBILITY_PRIVATE,
+                'message' => 'public -> private',
+            ]));
+
+            try {
+                $problem = ProblemController::apiDetails(new Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'problem_alias' => $problems[0]['problem']->alias,
+                ]));
+                $this->fail('Only creator can see private problem');
+            } catch (ForbiddenAccessException $e) {
+                // Expected
+                $this->assertEquals('problemIsPrivate', $e->getMessage());
+            }
+
+            $problem = ProblemController::apiDetails(new Request([
+                'auth_token' => $authorLogin->auth_token,
+                'problem_alias' => $problems[0]['problem']->alias,
+            ]));
+
+            $this->assertEquals(0, $problem['visibility'], 'Problem visibility must be private');
         }
 
         $courseAlias = Utils::CreateRandomString();
