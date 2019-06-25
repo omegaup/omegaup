@@ -154,6 +154,22 @@ class BadgesTest extends BadgesTestCase {
         }
     }
 
+    private static function getBadgesFromArray(array $badgesResults): array {
+        $badges = [];
+        foreach ($badgesResults as $badge) {
+            $badges[] = $badge['badge_alias'];
+        }
+        return $badges;
+    }
+
+    private static function getBadgesFromNotificationContents(array $notifications): array {
+        $badges = [];
+        foreach ($notifications as $notification) {
+            $badges[] = json_decode($notification['contents'])->badge;
+        }
+        return $badges;
+    }
+
     public function testListBadges() {
         // Manually creates a new badge
         $newBadge = 'testBadge';
@@ -167,5 +183,68 @@ class BadgesTest extends BadgesTestCase {
         }
         // Get all badges through API
         $this->assertTrue(in_array($newBadge, $results));
+    }
+
+    public function testAssignBadgesCronjob() {
+        global $conn;
+        // Create two badge receivers:
+        // - User 1 will receive: Problem Setter badge
+        // - User 2 will receive: Problem Setter and Contest Manager badges
+        $userOne = UserFactory::createUser();
+        $userTwo = UserFactory::createUser();
+        ProblemsFactory::createProblemWithAuthor($userOne);
+        ProblemsFactory::createProblemWithAuthor($userTwo);
+        ContestsFactory::createContest(new ContestParams(['contestDirector' => $userTwo]));
+        $expectedUserOneResults = ['problemSetter'];
+        $expectedUserTwoResults = ['contestManager', 'problemSetter'];
+        Utils::RunAssignBadges();
+        {
+            $login = self::login($userOne);
+            // Fetch badges through apiMyList
+            $userOneBadges = BadgeController::apiMyList(new Request([
+                'auth_token' => $login->auth_token,
+                'user' => $userOne,
+            ]));
+            $results = self::getBadgesFromArray($userOneBadges['badges']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserOneResults, $results)),
+                count($expectedUserOneResults)
+            );
+            $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
+
+            // Fetch badges through apiUserList
+            $userTwoBadges = BadgeController::apiUserList(new Request([
+                'target_username' => $userTwo->username,
+            ]));
+            $results = self::getBadgesFromArray($userTwoBadges['badges']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserTwoResults, $results)),
+                count($expectedUserTwoResults)
+            );
+
+            // Now check if notifications have been created for both users
+            $userOneNotifications = NotificationController::apiMyList(new Request([
+                'auth_token' => $login->auth_token,
+                'user' => $userOne,
+            ]));
+            $results = self::getBadgesFromNotificationContents($userOneNotifications['notifications']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserOneResults, $results)),
+                count($expectedUserOneResults)
+            );
+            $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
+        }
+        {
+            $login = self::login($userTwo);
+            $userTwoNotifications = NotificationController::apiMyList(new Request([
+                'auth_token' => $login->auth_token,
+                'user' => $userOne,
+            ]));
+            $results = self::getBadgesFromNotificationContents($userTwoNotifications['notifications']);
+            $this->assertEquals(
+                count(array_intersect($expectedUserTwoResults, $results)),
+                count($expectedUserTwoResults)
+            );
+        }
     }
 }

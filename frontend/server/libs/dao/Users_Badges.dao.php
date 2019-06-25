@@ -12,7 +12,7 @@ require_once('base/Users_Badges.vo.base.php');
   *
   */
 class UsersBadgesDAO extends UsersBadgesDAOBase {
-    private static function getUserOwnedBadges(Users $user) {
+    public static function getUserOwnedBadges(Users $user) {
         global $conn;
         $sql = 'SELECT
                     ub.badge_alias, ub.assignation_time
