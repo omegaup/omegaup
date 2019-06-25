@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
@@ -10,6 +11,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const WrapperPlugin = require('wrapper-webpack-plugin');
 
 const omegaupStylesRegExp = /omegaup_styles\.js/;
+const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
 let config = [
   {
@@ -32,7 +34,6 @@ let config = [
       contest_list_participant:
           './frontend/www/js/omegaup/contest/list_participant.js',
       contest_report: './frontend/www/js/omegaup/contest/report.js',
-      contest_requests: './frontend/www/js/omegaup/contest/requests.js',
       contest_scoreboardmerge:
           './frontend/www/js/omegaup/contest/scoreboardmerge.js',
       contest_stats: './frontend/www/js/omegaup/contest/stats.js',
@@ -105,6 +106,14 @@ let config = [
           }
         },
         {
+          test: /\.tsx?$/,
+          loader: 'ts-loader',
+          exclude: /node_modules/,
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+          }
+        },
+        {
           test: /\.js$/,
           loader: 'babel-loader?cacheDirectory',
           exclude: /node_modules/
@@ -121,11 +130,13 @@ let config = [
       ],
     },
     resolve: {
+      extensions: ['.ts', '.js', '.vue', '.json'],
       alias: {
         'vue$': 'vue/dist/vue.common.js',
         'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
         jszip: 'jszip/dist/jszip.js',
         pako: 'pako/dist/pako.min.js',
+        '@': path.resolve(__dirname, './frontend/www/'),
       }
     },
     devServer: {historyApiFallback: true, noInfo: true},
@@ -207,6 +218,17 @@ let config = [
       new MonacoWebpackPlugin({
         output: './js/dist',
       }),
+      new CopyWebpackPlugin([{
+        from: './frontend/badges/**/query.sql',
+        to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
+        transform(content, filepath) {
+          const iconPath = `${path.dirname(filepath)}/icon.svg`;
+          return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) : defaultBadgeIcon;
+        },
+        transformPath(targetPath, absolutePath) {
+          return `media/dist/badges/${path.basename(path.dirname(absolutePath))}.svg`;
+        },
+      }]),
     ],
     output: {
       path: path.resolve(__dirname, './frontend/www/'),

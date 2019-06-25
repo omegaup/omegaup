@@ -182,7 +182,7 @@ abstract class {{ table.class_name }}DAOBase {
 {%- for column in table.columns|selectattr('default') %}
         if (is_null(${{ table.name }}->{{ column.name }})) {
 {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s');
+            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
 {%- elif 'tinyint' in column.type %}
             ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
 {%- elif 'int' in column.type %}

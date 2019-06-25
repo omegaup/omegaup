@@ -17,6 +17,7 @@ init_submodules() {
 init_frontend_submodules() {
 	git submodule update --init --recursive \
 		frontend/www/third_party/js/csv.js \
+		frontend/www/third_party/js/iso-3166-2.js \
 		frontend/www/third_party/js/mathjax \
 		frontend/www/third_party/js/pagedown \
 		frontend/www/third_party/wenk

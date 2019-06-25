@@ -437,9 +437,11 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .title').html(UI.escape(problem.title));
     $('input[name=time_limit]')
         .val(UI.parseDuration(problem.settings.limits.TimeLimit));
-    if (problem.settings.validator.limits) {
+    if (problem.settings.validator.custom_validator &&
+        problem.settings.validator.custom_validator.limits) {
       $('input[name=validator_time_limit]')
-          .val(UI.parseDuration(problem.settings.validator.limits.TimeLimit));
+          .val(UI.parseDuration(
+              problem.settings.validator.custom_validator.limits.TimeLimit));
     } else {
       $('input[name=validator_time_limit]').val(0);
     }
@@ -456,8 +458,8 @@ OmegaUp.on('ready', function() {
     $('#statement-preview .problemsetter')
         .attr('href', '/profile/' + problem.problemsetter.username + '/')
         .html(UI.escape(problem.problemsetter.name));
-    $('input[name=email_clarifications][value=' + problem.email_clarifications +
-      ']')
+    $('input[name=email_clarifications][value=' +
+      (problem.email_clarifications ? '1' : '0') + ']')
         .attr('checked', 1);
     $('select[name=validator]').val(problem.settings.validator.name);
     var visibility = Math.max(0, Math.min(1, problem.visibility));

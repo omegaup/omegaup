@@ -157,7 +157,7 @@ abstract class SubmissionLogDAOBase {
      */
     final public static function create(SubmissionLog $Submission_Log) {
         if (is_null($Submission_Log->time)) {
-            $Submission_Log->time = gmdate('Y-m-d H:i:s');
+            $Submission_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [

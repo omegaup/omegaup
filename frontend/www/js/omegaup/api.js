@@ -127,6 +127,8 @@ export default {
                             return data;
                           }),
 
+    contestants: _call('/api/contest/contestants/'),
+
     create: _call('/api/contest/create/'),
 
     createVirtual: _call('/api/contest/createvirtual'),
@@ -170,6 +172,8 @@ export default {
 
     removeUser: _call('/api/contest/removeUser/'),
 
+    requests: _call('/api/contest/requests/'),
+
     runs: _call('/api/contest/runs/', _convertRuntimes),
 
     runsDiff: _call('/api/contest/runsDiff/'),
@@ -208,9 +212,6 @@ export default {
     admins: _call('/api/course/admins/'),
 
     assignmentScoreboard: _call('/api/course/assignmentScoreboard/'),
-
-    assignmentScoreboardEvents:
-        _call('/api/course/assignmentScoreboardEvents/'),
 
     clone: _call('/api/course/clone/'),
 
@@ -373,6 +374,8 @@ export default {
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
+
+    update: _call('/api/identity/update/'),
   },
 
   Interview: {
@@ -591,6 +594,8 @@ export default {
     removeRole: _call('/api/user/removerole/'),
 
     stats: _call('/api/user/stats/'),
+
+    selectCoderOfTheMonth: _call('/api/user/selectCoderOfTheMonth/'),
 
     update: _call('/api/user/update/'),
 

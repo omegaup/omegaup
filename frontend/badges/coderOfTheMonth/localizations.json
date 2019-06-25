@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Coder del Mes",
+    "description": "El usuario ha sido nombrado Coder del Mes al menos una vez."
+  },
+  "en": {
+    "name": "Coder Of The Month",
+    "description": "User has been Coder of The Month at least once."
+  },
+  "pt": {
+    "name": "Programador do Mês",
+    "description": "O usuário tem sido Programador do Mês pelo menos uma vez."
+  }
+}
