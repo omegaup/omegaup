@@ -1329,7 +1329,7 @@ class ContestController extends Controller {
             $currentVersion,
             $r->identity->identity_id,
             $r['points'],
-            is_null($r['order_in_contest']) ? 1 : $r['order_in_contest']
+            $r['order_in_contest'] ?: 1
         );
 
         // Invalidar cache
