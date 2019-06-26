@@ -48,6 +48,11 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             if (!is_null($windowLength)) {
                 $finishTime = min($currentTime + $windowLength * 60, $finishTime);
             }
+            if (is_null($finishTime)) {
+                $finishTime = AssignmentsDAO::getFinishTimeByProblemsetId(
+                    $problemsetId
+                );
+            }
             $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $finishTime);
             $problemsetIdentity->share_user_information = $shareUserInformation;
             if ($isNewProblemsetIdentity) {

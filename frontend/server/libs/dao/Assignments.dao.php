@@ -177,4 +177,23 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         }
         return $ar;
     }
+
+    public static function getFinishTimeByProblemsetId(int $problemsetId) : int {
+        $sql = '
+            SELECT
+                UNIX_TIMESTAMP(finish_time)
+            FROM
+                Assignments AS a
+            WHERE
+                a.problemset_id = ?
+            LIMIT
+                1';
+        global $conn;
+        $result = $conn->GetOne($sql, [$problemsetId]);
+        if (empty($result)) {
+            return null;
+        }
+
+        return $result;
+    }
 }
