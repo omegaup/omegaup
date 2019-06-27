@@ -59,15 +59,12 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         die();
     }
     $showScoreboard = $session['valid'] && CourseController::shouldShowScoreboard(
-        intval($session['identity']->identity_id),
+        $session['identity']->identity_id,
         $course,
         $group
     );
     $showMessageFirstSubmission = $session['valid'] &&
-                                    ProblemsetsDAO::shouldShowMessage(
-                                        intval($session['identity']->identity_id),
-                                        $course
-                                    );
+           ProblemsetsDAO::shouldShowMessage($session['identity']->identity_id);
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->assign('payload', [
         'showMessage' => $showMessageFirstSubmission,

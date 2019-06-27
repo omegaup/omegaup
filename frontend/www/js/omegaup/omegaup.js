@@ -94,6 +94,8 @@ export let T = (function() {
 export let OmegaUp = {
   loggedIn: false,
 
+      showMessage: false,
+
       username: null,
 
       ready: false,

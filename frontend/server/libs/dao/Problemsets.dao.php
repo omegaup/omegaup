@@ -106,27 +106,16 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     }
 
     /**
-     * validates identity has made submissions in a problemset, and whether this
-     * identity is not the main identity of a user when it has been
-     * associated with a user account berfore
+     * Validates an identity doesn't have made submissions in any problemset,
+     * and whether this identity is not the main identity of a user when it has
+     * been associated with a user account berfore
      *
+     * @param int $identityId
      */
     public static function shouldShowMessage(
-        int $identityId,
-        Object $problemset
+        int $identityId
     ) : bool {
-        // It means user is in a Course, then we need to get all the problemsets
-        if (!isset($problemset->problemset_id)) {
-            $problemsets = '';
-            $assignments = CoursesDAO::getAllAssignments($problemset->alias, false);
-            foreach ($assignments as $assignment) {
-                $problemsets .= $assignment['problemset_id'] . ',';
-            }
-            $problemsets = substr($problemsets, 0, -1);
-        } else {
-            $problemsets = $problemset->problemset_id;
-        }
-        $sql = "SELECT
+        $sql = 'SELECT
                     u.main_identity_id,
                     i.identity_id,
                     i.user_id,
@@ -135,8 +124,8 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                     FROM
                         Submissions
                     WHERE
-                        problemset_id IN ($problemsets)
-                        AND identity_id = i.identity_id
+                        identity_id = i.identity_id
+                        AND problemset_id IS NOT NULL
                     ) AS totalRunsInProblemset
                 FROM
                     Identities i
@@ -147,7 +136,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                 WHERE
                     i.identity_id = ?
                 LIMIT
-                    1;";
+                    1;';
 
         global $conn;
         $row = $conn->GetRow($sql, [$identityId]);

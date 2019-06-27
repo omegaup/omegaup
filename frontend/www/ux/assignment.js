@@ -9,8 +9,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   var arena = new omegaup.arena.Arena(options);
-  var key = `${arena.options.courseAlias}-${payload.username}`;
-  localStorage.setItem(key, payload.showMessage);
+  omegaup.OmegaUp.showMessage = payload.showMessage;
   Highcharts.setOptions({global: {useUTC: false}});
   omegaup.API.Course.getAssignment({
                       course: arena.options.courseAlias,

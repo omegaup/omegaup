@@ -249,8 +249,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ContestsFactory::openContest($contestData, $identity);
 
         $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $identity->identity_id,
-            $contestData['contest']
+            $identity->identity_id
         );
 
         $this->assertFalse($shouldShowMessage, 'Message should not be shown ' .
@@ -268,16 +267,14 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ]));
 
         $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $user->main_identity_id,
-            $contestData['contest']
+            $user->main_identity_id
         );
 
         $this->assertFalse($shouldShowMessage, 'Message should not be shown ' .
                         'because identity is the same that main user identity');
 
         $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $identity->identity_id,
-            $contestData['contest']
+            $identity->identity_id
         );
 
         $this->assertTrue($shouldShowMessage, 'Message should be shown because' .
@@ -291,8 +288,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $identity->identity_id,
-            $contestData['contest']
+            $identity->identity_id
         );
 
         $this->assertFalse($shouldShowMessage, 'Message should not be shown ' .

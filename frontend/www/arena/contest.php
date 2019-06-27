@@ -35,10 +35,8 @@ if ($showIntro['shouldShowIntro']) {
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->assign('payload', [
-        'showMessage' => $session['valid'] && ProblemsetsDAO::shouldShowMessage(
-            intval($session['identity']->identity_id),
-            $showIntro['contest']
-        ),
+        'showMessage' => $session['valid'] &&
+            ProblemsetsDAO::shouldShowMessage($session['identity']->identity_id),
         'username' => $session['identity']->username,
     ]);
     $smarty->display('../../templates/arena.contest.contestant.tpl');

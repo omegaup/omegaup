@@ -1258,6 +1258,11 @@ export class Arena {
           // It's possible for codeMirror not to have been set yet
           // if this method is used before the mounted event handler
           // is called.
+          if (OmegaUp.showMessage) {
+            $('.notify-user').show();
+          } else {
+            $('.notify-user').hide();
+          }
           if (this.codeMirror) {
             this.codeMirror.refresh();
           }
@@ -1452,13 +1457,6 @@ export class Arena {
           // Luckily in this case we don't require the call to refresh
           // for the display to update correctly!
           self.codeEditor.refresh();
-          let key = `${self.options.contestAlias}-${OmegaUp.username}`;
-          let showMessage = localStorage.getItem(key);
-          if (showMessage == 'true') {
-            $('.notify-user').show();
-          } else {
-            $('.notify-user').hide();
-          }
         }
       }
     } else if (self.activeTab == 'problems') {
@@ -1750,8 +1748,7 @@ export class Arena {
           self.clearInputFile();
           self.initSubmissionCountdown();
           // When user submits a run, message is no longer visible
-          let key = `${self.options.contestAlias}-${OmegaUp.username}`;
-          localStorage.setItem(key, false);
+          OmegaUp.showMessage = false;
         })
         .fail(function(run) {
           alert(run.error);
