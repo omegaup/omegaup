@@ -90,6 +90,21 @@
         </table>
         <div v-show="!groupedUnsolvedProblems"><img src="/media/wait.gif"></div>
       </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 class="panel-title">{{ T.wordsBadgesObtained }} <span class="badge">{{ badges.length
+          }}</span></h2>
+        </div>
+        <div class="panel-body">
+          <div class="badges-container">
+            <omegaup-badge v-bind:alias="badge.badge_alias"
+                 v-bind:key="badge.badge_alias"
+                 v-bind:unlocked="badge.unlocked"
+                 v-for="badge in badges"></omegaup-badge>
+          </div>
+        </div>
+        <div v-show="!badges"><img src="/media/wait.gif"></div>
+      </div>
       <div class="panel panel-default no-bottom-margin">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileStatistics }}</h2>
@@ -101,44 +116,81 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<style>
+.badges-container {
+  display: grid;
+  justify-content: space-between;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-auto-rows: 180px;
+}
+</style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
-export default {
-  props: {
-    profile: Object,
-    contests: Array,
-    solvedProblems: Array,
-    unsolvedProblems: Array,
-    rank: String,
-    charts: Object,
-  },
-  computed: {
-    groupedSolvedProblems: function() {
-      return this.groupElements(this.solvedProblems, this.columns);
-    },
-    groupedUnsolvedProblems: function() {
-      return this.groupElements(this.unsolvedProblems, this.columns);
-    },
-  },
-  methods: {
-    groupElements(elements, columns) {
-      let groups = [];
-      for (let i = 0; i < elements.length; i += columns) {
-        groups.push(elements.slice(i, i + columns));
-      }
-      return groups;
-    },
-  },
-  data: function() {
-    return { T: T, columns: 3, }
-  },
+import Badge from '../badge/Badge.vue';
+
+interface ContestResult {
+  data: omegaup.Contest;
+  length?: string;
+  place: number;
+}
+
+@Component({
   components: {
     'omegaup-user-basicinfo': user_BasicInfo,
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
+    'omegaup-badge': Badge,
+  },
+})
+export default class UserProfile extends Vue {
+  @Prop() profile!: omegaup.Profile;
+  @Prop() contests!: ContestResult[];
+  @Prop() solvedProblems!: omegaup.Problem[];
+  @Prop() unsolvedProblems!: omegaup.Problem[];
+  @Prop() rank!: string;
+  @Prop() charts!: any;
+  @Prop() profileBadges!: omegaup.Badge[];
+  @Prop() visitorBadges!: omegaup.Badge[];
+
+  T = T;
+  columns = 3;
+
+  get groupedSolvedProblems(): omegaup.Problem[][] {
+    return this.groupElements(this.solvedProblems, this.columns);
+  }
+
+  get groupedUnsolvedProblems(): omegaup.Problem[][] {
+    return this.groupElements(this.unsolvedProblems, this.columns);
+  }
+
+  get badges(): omegaup.Badge[] {
+    let badges: omegaup.Badge[] = [];
+    this.profileBadges.forEach((profileBadge: omegaup.Badge) => {
+      let exists = this.visitorBadges.find((visitorBadge: omegaup.Badge) => {
+        return visitorBadge.badge_alias === profileBadge.badge_alias;
+      });
+      profileBadge.unlocked = !!exists;
+      badges.push(profileBadge);
+    });
+    return badges;
+  }
+
+  groupElements(
+    elements: omegaup.Problem[],
+    columns: number,
+  ): omegaup.Problem[][] {
+    let groups = [];
+    for (let i = 0; i < elements.length; i += columns) {
+      groups.push(elements.slice(i, i + columns));
+    }
+    return groups;
   }
 }
+
 </script>
