@@ -247,4 +247,27 @@ class BadgesTest extends BadgesTestCase {
             );
         }
     }
+
+    public function testBadgeDetails() {
+        // Creates three users:
+        // - 1 problem setter
+        // - 2 regular users
+        $problemSetter = UserFactory::createUser();
+        UserFactory::createUser();
+        UserFactory::createUser();
+        ProblemsFactory::createProblemWithAuthor($problemSetter);
+        Utils::RunAssignBadges();
+        $badgeProblemSetterDetails = BadgeController::apiBadgeDetails(new Request([
+            'badge_alias' => 'problemSetter',
+        ]));
+        print_r($badgeProblemSetterDetails);
+        $badgeContestManager = BadgeController::apiBadgeDetails(new Request([
+            'badge_alias' => 'contestManager',
+        ]));
+        print_r($badgeContestManager);
+        $badgeHeehee = BadgeController::apiBadgeDetails(new Request([
+            'badge_alias' => 'blabla',
+        ]));
+        print_r($badgeHeehee);
+    }
 }

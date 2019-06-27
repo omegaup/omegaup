@@ -25,4 +25,32 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
         $args = [$user->user_id];
         return $conn->GetAll($sql, $args);
     }
+
+    public static function getBadgeOwnersCount(string $badge) {
+        global $conn;
+        $sql = 'SELECT
+                    COUNT(*) AS total
+                FROM
+                    Users_Badges
+                WHERE
+                    badge_alias = ?;';
+        $args = [$badge];
+        return $conn->GetRow($sql, $args)['total'];
+    }
+
+    public static function getBadgeFirstAssignationTime(string $badge) {
+        global $conn;
+        $sql = 'SELECT
+                    ub.assignation_time
+                FROM
+                    Users_Badges ub
+                WHERE
+                    ub.badge_alias = ?
+                ORDER BY
+                    ub.assignation_time
+                LIMIT 1;';
+        $args = [$badge];
+        $assignationTime = $conn->getRow($sql, $args);
+        return empty($firstAssignation) ? null : $firstAssignation['assignation_time'];
+    }
 }
