@@ -170,9 +170,9 @@ export default class UserProfile extends Vue {
   }
 
   get badges(): omegaup.Badge[] {
-    let badges: omegaup.Badge[] = [];
+    const badges: omegaup.Badge[] = [];
     this.profileBadges.forEach((profileBadge: omegaup.Badge) => {
-      let exists = this.visitorBadges.find((visitorBadge: omegaup.Badge) => {
+      const exists = this.visitorBadges.find((visitorBadge: omegaup.Badge) => {
         return visitorBadge.badge_alias === profileBadge.badge_alias;
       });
       profileBadge.unlocked = !!exists;
@@ -185,8 +185,8 @@ export default class UserProfile extends Vue {
     elements: omegaup.Problem[],
     columns: number,
   ): omegaup.Problem[][] {
-    let groups = [];
-    for (let i = 0; i < elements.length; i += columns) {
+    const groups = [];
+    for (const i = 0; i < elements.length; i += columns) {
       groups.push(elements.slice(i, i + columns));
     }
     return groups;

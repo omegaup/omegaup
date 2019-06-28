@@ -1,11 +1,11 @@
 <template>
-  <div class="badge-container"
+  <figure class="badge-container"
        v-tooltip="description">
     <img class="badge-icon"
          v-bind:alt="`badge_${this.alias}`"
          v-bind:src="this.iconUrl">
-    <p class="badge-name">{{ this.name }}</p>
-  </div>
+    <figcaption class="badge-name">{{ this.name }}</figcaption>
+  </figure>
 </template>
 
 <style>
@@ -22,9 +22,7 @@
   height: 70%;
 }
 .badge-name {
-  margin: 0;
   padding-top: 5px;
-  height: 30%;
 }
 </style>
 
