@@ -116,7 +116,6 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testAllBadges() {
-        global $conn;
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         foreach ($aliases as $alias) {
             $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
@@ -186,7 +185,6 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testAssignBadgesCronjob() {
-        global $conn;
         // Create two badge receivers:
         // - User 1 will receive: Problem Setter badge
         // - User 2 will receive: Problem Setter and Contest Manager badges
@@ -246,5 +244,29 @@ class BadgesTest extends BadgesTestCase {
                 count($expectedUserTwoResults)
             );
         }
+    }
+
+    public function testGetAssignationTime() {
+        $user = UserFactory::createUser();
+        ProblemsFactory::createProblemWithAuthor($user);
+
+        $previousTime = Time::get();
+        Utils::RunAssignBadges();
+
+        $login = self::login($user);
+        $problemSetterResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+            'auth_token' => $login->auth_token,
+            'user' => $user,
+            'badge_alias' => 'problemSetter',
+        ]));
+        $timeDifference = (strtotime($problemSetterResult['assignation_time']) - $previousTime) / 60;
+        $this->assertTrue($timeDifference < 10);
+
+        $contestManagerResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+            'auth_token' => $login->auth_token,
+            'user' => $user,
+            'badge_alias' => 'contestManager',
+        ]));
+        $this->assertNull($contestManagerResult['assignation_time']);
     }
 }

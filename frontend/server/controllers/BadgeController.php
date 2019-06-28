@@ -67,5 +67,34 @@ class BadgeController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
-    // TODO: apiUserHasBadge
+
+    /**
+     * Returns a the assignation timestamp of a badge
+     * for current user.
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyBadgeAssignationTime(Request $r) {
+        self::authenticateRequest($r);
+        try {
+            if (is_null($r->user)) {
+                throw new NotFoundException('userNotExist');
+            }
+            $allBadges = BadgeController::apiList($r);
+            $badge = $r['badge_alias'];
+            if (!in_array($badge, $allBadges)) {
+                throw new notFoundException('badgeNotExist');
+            }
+            return [
+                'status' => 'ok',
+                'assignation_time' => UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $badge),
+            ];
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
 }
