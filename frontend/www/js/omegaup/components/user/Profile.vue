@@ -109,12 +109,6 @@ import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 
-interface ContestResult {
-  data: omegaup.Contest;
-  length?: string;
-  place: number;
-}
-
 @Component({
   components: {
     'omegaup-user-basicinfo': user_BasicInfo,
@@ -124,7 +118,7 @@ interface ContestResult {
 })
 export default class UserProfile extends Vue {
   @Prop() profile!: omegaup.Profile;
-  @Prop() contests!: ContestResult[];
+  @Prop() contests!: omegaup.ContestResult[];
   @Prop() solvedProblems!: omegaup.Problem[];
   @Prop() unsolvedProblems!: omegaup.Problem[];
   @Prop() rank!: string;
@@ -144,9 +138,9 @@ export default class UserProfile extends Vue {
   }
 
   get badges(): omegaup.Badge[] {
-    let badges: omegaup.Badge[] = [];
+    const badges: omegaup.Badge[] = [];
     this.profileBadges.forEach((profileBadge: omegaup.Badge) => {
-      let exists = this.visitorBadges.find((visitorBadge: omegaup.Badge) => {
+      const exists = this.visitorBadges.find((visitorBadge: omegaup.Badge) => {
         return visitorBadge.badge_alias === profileBadge.badge_alias;
       });
       profileBadge.unlocked = !!exists;
@@ -159,7 +153,7 @@ export default class UserProfile extends Vue {
     elements: omegaup.Problem[],
     columns: number,
   ): omegaup.Problem[][] {
-    let groups = [];
+    const groups = [];
     for (let i = 0; i < elements.length; i += columns) {
       groups.push(elements.slice(i, i + columns));
     }
