@@ -46,8 +46,10 @@ class ContestRunsTest extends OmegaupTestCase {
         $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Contest admin should be able to view run, even if not problem admin.
+        $identity = IdentitiesDAO::getByPK($contestData['director']->main_identity_id);
         $this->assertFalse(Authorization::isProblemAdmin(
-            $contestData['director']->main_identity_id,
+            $identity,
+            $contestData['director'],
             $problemData['problem']
         ));
         $response = RunController::apiDetails(new Request([

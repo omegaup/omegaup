@@ -89,7 +89,7 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['user'] = $r->user;
+        $r['identity'] = $r->identity;
         self::clarificationUpdated($r, $time);
 
         return [
@@ -122,7 +122,11 @@ class ClarificationController extends Controller {
 
         // If the clarification is private, verify that our user is invited or is contest director
         if ($r['clarification']->public != 1) {
-            if (!(Authorization::canViewClarification($r->identity->identity_id, $r['clarification']))) {
+            if (!Authorization::canViewClarification(
+                $r->user,
+                $r->identity,
+                $r['clarification']
+            )) {
                 throw new ForbiddenAccessException();
             }
         }
@@ -171,7 +175,11 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::canEditClarification($r->identity->identity_id, $r['clarification'])) {
+        if (!Authorization::canEditClarification(
+            $r->identity,
+            $r->user,
+            $r['clarification']
+        )) {
             throw new ForbiddenAccessException();
         }
     }
@@ -212,7 +220,7 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['problem'] = $r['contest'] = $r['user'] = null;
+        $r['problem'] = $r['contest'] = $r['identity'] = null;
         self::clarificationUpdated($r, $time);
 
         $response = [];
@@ -229,8 +237,8 @@ class ClarificationController extends Controller {
             if (is_null($r['contest']) && !is_null($r['clarification']->problemset_id)) {
                 $r['contest'] = ContestsDAO::getByProblemset($r['clarification']->problemset_id);
             }
-            if (is_null($r['user'])) {
-                $r['user'] = IdentitiesDAO::GetByPK($r['clarification']->author_id);
+            if (is_null($r['identity'])) {
+                $r['identity'] = IdentitiesDAO::GetByPK($r['clarification']->author_id);
             }
         } catch (Exception $e) {
             self::$log->error('Failed to broadcast clarification: ' . $e);

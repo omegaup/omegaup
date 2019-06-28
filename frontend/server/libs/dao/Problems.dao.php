@@ -622,7 +622,10 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $conn->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
 
-    public static function getPrivateCount(Users $user) : int {
+    public static function getPrivateCount(?Users $user) : int {
+        if (is_null($user)) {
+            return 0;
+        }
         $sql = 'SELECT
             COUNT(*) as total
         FROM

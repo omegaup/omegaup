@@ -5,16 +5,16 @@ require_once('libs/dao/Problemset_Problems.dao.php');
 
 class ProblemsetController extends Controller {
     public static function validateAddProblemToProblemset(
-        $problemset_id,
         Problems $problem,
-        $current_identity_id
+        Identities $identity,
+        ?Users $user
     ) {
         if ($problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
             $problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem)
-            && !Authorization::isProblemAdmin($current_identity_id, $problem)
+            && !Authorization::isProblemAdmin($identity, $user, $problem)
         ) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
@@ -25,16 +25,17 @@ class ProblemsetController extends Controller {
         Problems $problem,
         string $commit,
         string $currentVersion,
-        int $current_identity_id,
+        Identities $identity,
+        ?Users $user,
         int $points,
         int $order_in_contest = 1,
         bool $validateVisibility = true
     ) {
         if ($validateVisibility) {
             ProblemsetController::validateAddProblemToProblemset(
-                $problemset_id,
                 $problem,
-                $current_identity_id
+                $identity,
+                $user
             );
         }
 

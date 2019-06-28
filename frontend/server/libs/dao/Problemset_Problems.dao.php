@@ -393,9 +393,10 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             foreach ($rs as $row) {
                 array_push($problemsets, new Problemsets($row));
             }
+            $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
-            $problemsets = array_filter($problemsets, function (Problemsets $p) use ($user) {
-                return Authorization::isAdmin($user->main_identity_id, $p);
+            $problemsets = array_filter($problemsets, function (Problemsets $p) use ($identity, $user) {
+                return Authorization::isAdmin($identity, $user, $p);
             });
 
             if (!empty($problemsets)) {

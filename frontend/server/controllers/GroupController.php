@@ -69,13 +69,17 @@ class GroupController extends Controller {
     /**
      * Validate group param
      *
-     * @param $groupAlias
-     * @param $identityId
+     * @param string $groupAlias
+     * @param Users $user
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
-    public static function validateGroup($groupAlias, $identityId) {
+    public static function validateGroup(
+        string $groupAlias,
+        Identities $identity,
+        ?Users $user
+    ) : Groups {
         Validators::validateStringNonEmpty($groupAlias, 'group_alias');
         try {
             $group = GroupsDAO::FindByAlias($groupAlias);
@@ -89,7 +93,7 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        if (!Authorization::isGroupAdmin($identityId, $group)) {
+        if (!Authorization::isGroupAdmin($identity, $user, $group)) {
             throw new ForbiddenAccessException();
         }
         return $group;
@@ -98,11 +102,15 @@ class GroupController extends Controller {
     /**
      * Validate common params for these APIs
      *
-     * @param $groupAlias
-     * @param $identityId
+     * @param string $groupAlias
+     * @param Users $user
      */
-    private static function validateGroupAndOwner($groupAlias, $identityId) {
-        return self::validateGroup($groupAlias, $identityId);
+    private static function validateGroupAndOwner(
+        string $groupAlias,
+        Identities $identity,
+        ?Users $user
+    ) : Groups {
+        return self::validateGroup($groupAlias, $identity, $user);
     }
 
     /**
@@ -112,7 +120,7 @@ class GroupController extends Controller {
      */
     public static function apiAddUser(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity, $r->user);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
@@ -135,7 +143,7 @@ class GroupController extends Controller {
      */
     public static function apiRemoveUser(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity, $r->user);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
@@ -166,7 +174,7 @@ class GroupController extends Controller {
      */
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
-
+        UserController::validateIdentityIsAssociatedWithUser($r->user);
         $response = [];
         $response['groups'] = [];
 
@@ -223,7 +231,7 @@ class GroupController extends Controller {
      */
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity, $r->user);
 
         if (is_null($group)) {
             return [
@@ -259,7 +267,7 @@ class GroupController extends Controller {
      */
     public static function apiMembers(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity, $r->user);
 
         $response = [];
 
@@ -280,7 +288,7 @@ class GroupController extends Controller {
      */
     public static function apiCreateScoreboard(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroup($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroup($r['group_alias'], $r->identity, $r->user);
 
         Validators::validateValidAlias($r['alias'], 'alias', true);
         Validators::validateStringNonEmpty($r['name'], 'name', true);
