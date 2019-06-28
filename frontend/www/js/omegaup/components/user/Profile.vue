@@ -134,12 +134,6 @@ import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import Badge from '../badge/Badge.vue';
 
-interface ContestResult {
-  data: omegaup.Contest;
-  length?: string;
-  place: number;
-}
-
 @Component({
   components: {
     'omegaup-user-basicinfo': user_BasicInfo,
@@ -150,7 +144,7 @@ interface ContestResult {
 })
 export default class UserProfile extends Vue {
   @Prop() profile!: omegaup.Profile;
-  @Prop() contests!: ContestResult[];
+  @Prop() contests!: omegaup.ContestResult[];
   @Prop() solvedProblems!: omegaup.Problem[];
   @Prop() unsolvedProblems!: omegaup.Problem[];
   @Prop() rank!: string;
@@ -186,7 +180,7 @@ export default class UserProfile extends Vue {
     columns: number,
   ): omegaup.Problem[][] {
     const groups = [];
-    for (const i = 0; i < elements.length; i += columns) {
+    for (let i = 0; i < elements.length; i += columns) {
       groups.push(elements.slice(i, i + columns));
     }
     return groups;
