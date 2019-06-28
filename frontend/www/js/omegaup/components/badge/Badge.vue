@@ -1,10 +1,12 @@
 <template>
   <figure class="badge-container"
-       v-tooltip="description">
+          v-tooltip="description">
     <img class="badge-icon"
-         v-bind:alt="`badge_${this.alias}`"
-         v-bind:src="this.iconUrl">
-    <figcaption class="badge-name">{{ this.name }}</figcaption>
+            v-bind:alt="`badge_${this.alias}`"
+            v-bind:src="this.iconUrl">
+    <figcaption class="badge-name">
+      {{ this.name }}
+    </figcaption>
   </figure>
 </template>
 
