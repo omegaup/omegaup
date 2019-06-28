@@ -343,7 +343,7 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
         $result = ContestsDAO::getNeedsInformation($contest->problemset_id);
-        $result['contest'] = $contest;
+
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
@@ -356,7 +356,7 @@ class ContestController extends Controller {
 
                 // Privacy Statement Information
                 $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-                    $r->identity->language_id,
+                    $session['user']->language_id,
                     'contest',
                     $result['requests_user_information']
                 );
