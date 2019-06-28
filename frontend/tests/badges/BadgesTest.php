@@ -249,25 +249,39 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testBadgeDetails() {
-        // Creates three users:
-        // - 1 problem setter
-        // - 2 regular users
-        $problemSetter = UserFactory::createUser();
-        UserFactory::createUser();
-        UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($problemSetter);
+        // Creates one owner for ContestManager Badge and no owner for
+        // ContestManager, then checks badge details results.
+        $user = UserFactory::createUser();
+        // For some reason, this method creates a new user also.
+        ProblemsFactory::createProblemWithAuthor($user);
+
+        $previousTime = Time::get();
         Utils::RunAssignBadges();
-        $badgeProblemSetterDetails = BadgeController::apiBadgeDetails(new Request([
+
+        // In total they must exist 4 users: admintest, test,
+        // the user created by createProblemWithAuthor and $user
+
+        $details = BadgeController::apiBadgeDetails(new Request([
             'badge_alias' => 'problemSetter',
         ]));
-        print_r($badgeProblemSetterDetails);
-        $badgeContestManager = BadgeController::apiBadgeDetails(new Request([
+        $timeDifference = (strtotime($details['first_assignation']) - $previousTime) / 60;
+        $this->assertTrue($timeDifference < 10);
+        $this->assertEquals(25, $details['owners_percentage']);
+
+        $details = BadgeController::apiBadgeDetails(new Request([
             'badge_alias' => 'contestManager',
         ]));
-        print_r($badgeContestManager);
-        $badgeHeehee = BadgeController::apiBadgeDetails(new Request([
-            'badge_alias' => 'blabla',
+        $this->assertEquals(0, $details['owners_percentage']);
+        $this->assertNull($details['first_assignation']);
+    }
+
+    /**
+     * @expectedException NotFoundException
+     */
+    public function testBadgeDetailsException() {
+        BadgeController::apiBadgeDetails(new Request([
+            'badge_alias' => 'esteBadgeNoExiste',
         ]));
-        print_r($badgeHeehee);
+        $this->expectException(NotFoundException::class);
     }
 }

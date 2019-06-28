@@ -229,7 +229,6 @@ class UsersDAO extends UsersDAOBase {
                     COUNT(*) AS total
                 FROM
                     Users;';
-
         global $conn;
         return $conn->GetRow($sql)['total'];
     }

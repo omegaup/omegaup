@@ -50,7 +50,7 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                     ub.assignation_time
                 LIMIT 1;';
         $args = [$badge];
-        $assignationTime = $conn->getRow($sql, $args);
+        $firstAssignation = $conn->getRow($sql, $args);
         return empty($firstAssignation) ? null : $firstAssignation['assignation_time'];
     }
 }
