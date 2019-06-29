@@ -123,8 +123,6 @@ export default class UserProfile extends Vue {
   @Prop() unsolvedProblems!: omegaup.Problem[];
   @Prop() rank!: string;
   @Prop() charts!: any;
-  @Prop() profileBadges!: omegaup.Badge[];
-  @Prop() visitorBadges!: omegaup.Badge[];
 
   T = T;
   columns = 3;
@@ -135,18 +133,6 @@ export default class UserProfile extends Vue {
 
   get groupedUnsolvedProblems(): omegaup.Problem[][] {
     return this.groupElements(this.unsolvedProblems, this.columns);
-  }
-
-  get badges(): omegaup.Badge[] {
-    const badges: omegaup.Badge[] = [];
-    this.profileBadges.forEach((profileBadge: omegaup.Badge) => {
-      const exists = this.visitorBadges.find((visitorBadge: omegaup.Badge) => {
-        return visitorBadge.badge_alias === profileBadge.badge_alias;
-      });
-      profileBadge.unlocked = !!exists;
-      badges.push(profileBadge);
-    });
-    return badges;
   }
 
   groupElements(
