@@ -33,7 +33,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     disableSockets: false,
     contestAlias: null,
     scoreboardToken: null,
-    showWarning: false,
+    shouldShowFirstAssociatedIdentityRunWarning: false,
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -43,6 +43,10 @@ export function GetOptionsFromLocation(arenaLocation) {
       e.returnValue = dialogText;
       return e.returnValue;
     };
+  }
+
+  if (options.shouldShowFirstAssociatedIdentityRunWarning) {
+    UI.warning(T.firstSumbissionWithIdentity);
   }
 
   if (arenaLocation.pathname.indexOf('/practice') !== -1) {
@@ -1743,8 +1747,6 @@ export class Arena {
           self.hideOverlay();
           self.clearInputFile();
           self.initSubmissionCountdown();
-          // When user submits a run, message is no longer visible
-          OmegaUp.showMessage = false;
         })
         .fail(function(run) {
           alert(run.error);
