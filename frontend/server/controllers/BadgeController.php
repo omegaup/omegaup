@@ -8,14 +8,7 @@
 class BadgeController extends Controller {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
-    /**
-     * Returns a list of existing badges
-     *
-     * @param Request $r
-     * @return array
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiList(Request $r) {
+    public static function getAllBadges() {
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         $results = [];
         foreach ($aliases as $alias) {
@@ -25,6 +18,17 @@ class BadgeController extends Controller {
             $results[] = $alias;
         }
         return $results;
+    }
+
+    /**
+     * Returns a list of existing badges
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiList(Request $r) {
+        return self::getAllBadges();
     }
 
     /**
@@ -78,18 +82,18 @@ class BadgeController extends Controller {
      */
     public static function apiMyBadgeAssignationTime(Request $r) {
         self::authenticateRequest($r);
+        if (is_null($r->user)) {
+            throw new NotFoundException('userNotExist');
+        }
+        $allBadges = self::getAllBadges();
         try {
-            if (is_null($r->user)) {
-                throw new NotFoundException('userNotExist');
-            }
-            $allBadges = BadgeController::apiList($r);
             $badge = $r['badge_alias'];
             if (!in_array($badge, $allBadges)) {
-                throw new notFoundException('badgeNotExist');
+                throw new NotFoundException('badgeNotExist');
             }
             return [
                 'status' => 'ok',
-                'assignation_time' => UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $badge),
+                'assignation_time' => strtotime(UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $badge)),
             ];
         } catch (ApiException $e) {
             throw $e;
