@@ -71,6 +71,10 @@ $result['histogram'] = [
     'quality_histogram' => $problem->quality_histogram,
     'quality' => floatval($problem->quality),
     'difficulty' => floatval($problem->difficulty)];
+$result['shouldShowFirstAssociatedIdentityRunWarning'] = $session['valid'] &&
+            ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                $session['user']
+            );
 $smarty->assign('payload', $result);
 
 $smarty->display('../../templates/arena.problem.tpl');

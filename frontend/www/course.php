@@ -63,13 +63,14 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         $course,
         $group
     );
-    $showMessageFirstSubmission = $session['valid'] &&
-           ProblemsetsDAO::shouldShowMessage($session['identity']->identity_id);
+    $showWarning = $session['valid'] &&
+        ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            $session['user']
+        );
     $smarty->assign('showRanking', $showScoreboard);
-    $smarty->assign('payload', [
-        'showMessage' => $showMessageFirstSubmission,
-        'username' => $session['identity']->username,
-    ]);
+    $smarty->assign('payload', ['shouldShowFirstAssociatedIdentityRunWarning' =>
+         $showWarning,
+     ]);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);

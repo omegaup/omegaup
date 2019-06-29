@@ -35,9 +35,10 @@ if ($showIntro['shouldShowIntro']) {
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->assign('payload', [
-        'showMessage' => $session['valid'] &&
-            ProblemsetsDAO::shouldShowMessage($session['identity']->identity_id),
-        'username' => $session['identity']->username,
+        'shouldShowFirstAssociatedIdentityRunWarning' => $session['valid'] &&
+            ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                $session['user']
+            )
     ]);
     $smarty->display('../../templates/arena.contest.contestant.tpl');
 }

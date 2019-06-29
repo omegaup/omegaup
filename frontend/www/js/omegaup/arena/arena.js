@@ -32,7 +32,8 @@ export function GetOptionsFromLocation(arenaLocation) {
     disableClarifications: false,
     disableSockets: false,
     contestAlias: null,
-    scoreboardToken: null
+    scoreboardToken: null,
+    showWarning: false,
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -1258,11 +1259,6 @@ export class Arena {
           // It's possible for codeMirror not to have been set yet
           // if this method is used before the mounted event handler
           // is called.
-          if (OmegaUp.showMessage) {
-            $('.notify-user').show();
-          } else {
-            $('.notify-user').hide();
-          }
           if (this.codeMirror) {
             this.codeMirror.refresh();
           }
@@ -1756,6 +1752,7 @@ export class Arena {
         }
 
               );
+    UI.dismissNotifications();
   }
 
   updateSummary(contest) {

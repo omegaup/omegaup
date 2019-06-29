@@ -6,10 +6,14 @@ omegaup.OmegaUp.on('ready', function() {
   if (assignmentMatch) {
     options.courseAlias = assignmentMatch[1];
     options.assignmentAlias = assignmentMatch[2];
+    options.showWarning = payload.shouldShowFirstAssociatedIdentityRunWarning;
+  }
+
+  if (options.showWarning) {
+    omegaup.UI.warning(omegaup.T.firstSumbissionWithIdentity);
   }
 
   var arena = new omegaup.arena.Arena(options);
-  omegaup.OmegaUp.showMessage = payload.showMessage;
   Highcharts.setOptions({global: {useUTC: false}});
   omegaup.API.Course.getAssignment({
                       course: arena.options.courseAlias,

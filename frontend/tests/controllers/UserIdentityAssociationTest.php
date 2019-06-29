@@ -230,7 +230,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             'group_alias' => $group['group']->alias,
         ]));
         $identity = IdentitiesDAO::FindByUsername($username);
-        //$identityLogin = self::login($identity);
+        $user = UsersDAO::FindByUsername($username);
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
@@ -248,12 +248,12 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $identity->password = $password;
         ContestsFactory::openContest($contestData, $identity);
 
-        $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $identity->identity_id
+        $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            $user
         );
 
-        $this->assertFalse($shouldShowMessage, 'Message should not be shown ' .
-                                     'because identity has no associated user');
+        $this->assertFalse($result, 'Message should not be shown because' .
+                                    ' identity has no associated user');
 
         // Create the user to associate
         $user = UserFactory::createUser();
@@ -266,20 +266,13 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             'password' => $password,
         ]));
 
-        $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $user->main_identity_id
+        $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            $user
         );
 
-        $this->assertFalse($shouldShowMessage, 'Message should not be shown ' .
-                        'because identity is the same that main user identity');
-
-        $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $identity->identity_id
-        );
-
-        $this->assertTrue($shouldShowMessage, 'Message should be shown because' .
-                                ' identity has associated with user and it' .
-                                ' does not have submissions in the problemset');
+        $this->assertTrue($result, 'Message should be shown because identity' .
+                                ' has associated with user and it does not' .
+                                ' have submissions in the problemset');
 
         // Create a run
         $runData = RunsFactory::createRun($problemData, $contestData, $identity);
@@ -287,11 +280,11 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         // Grade the run
         RunsFactory::gradeRun($runData);
 
-        $shouldShowMessage = ProblemsetsDAO::shouldShowMessage(
-            $identity->identity_id
+        $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            $user
         );
 
-        $this->assertFalse($shouldShowMessage, 'Message should not be shown ' .
-                             'because identity already has made a submissions');
+        $this->assertFalse($result, 'Message should not be shown because' .
+                             ' identity has already made a submission');
     }
 }

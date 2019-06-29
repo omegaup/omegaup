@@ -702,6 +702,13 @@ td.forcebreaks-arena {
   text-align: center;
 }
 
-.notify-user {
-	color: #A94442;
+#status {
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	z-index: 1;
+	max-width: 900px;
+	margin-right: auto;
+	margin-left: auto;
+	top: 50px;
+	width: 100%;
 }

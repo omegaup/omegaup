@@ -3,7 +3,8 @@ omegaup.OmegaUp.on('ready', function() {
   var arena = new omegaup.arena.Arena(
       omegaup.arena.GetOptionsFromLocation(window.location));
   var admin = null;
-  omegaup.OmegaUp.showMessage = payload.showMessage;
+  arena.options.showWarning =
+      payload.shouldShowFirstAssociatedIdentityRunWarning;
   Highcharts.setOptions({global: {useUTC: false}});
 
   function onlyProblemLoaded(problem) {
@@ -138,6 +139,10 @@ omegaup.OmegaUp.on('ready', function() {
           // Refresh with previous page
           arena.refreshClarifications();
         });
+  }
+
+  if (arena.options.showWarning) {
+    omegaup.UI.warning(omegaup.T.firstSumbissionWithIdentity);
   }
 
   $('#clarification')

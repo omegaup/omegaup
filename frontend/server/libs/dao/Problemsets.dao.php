@@ -106,46 +106,39 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     }
 
     /**
-     * Validates an identity doesn't have made submissions in any problemset,
-     * and whether this identity is not the main identity of a user when it has
-     * been associated with a user account berfore
+     * Validates that users don't have made submissions with any of their
+     * associated identities and are currently logged in with one of them.
+     * In this case a flag is turned on and a message will be displayed in arena
      *
-     * @param int $identityId
+     * @param Users $user
      */
-    public static function shouldShowMessage(
-        int $identityId
+    public static function shouldShowFirstAssociatedIdentityRunWarning(
+        ?Users $user
     ) : bool {
+        if (is_null($user)) {
+            return false;
+        }
         $sql = 'SELECT
-                    u.main_identity_id,
-                    i.identity_id,
-                    i.user_id,
-                    (SELECT
-                        COUNT(*)
-                    FROM
-                        Submissions
-                    WHERE
-                        identity_id = i.identity_id
-                        AND problemset_id IS NOT NULL
-                    ) AS totalRunsInProblemset
+                    COUNT(*)
                 FROM
+                    Submissions s
+                INNER JOIN
                     Identities i
-                LEFT JOIN
+                ON
+                    i.identity_id = s.identity_id
+                INNER JOIN
                     Users u
                 ON
                     u.user_id = i.user_id
+                    AND u.main_identity_id != s.identity_id
                 WHERE
-                    i.identity_id = ?
+                    u.user_id = ?
                 LIMIT
                     1;';
 
         global $conn;
-        $row = $conn->GetRow($sql, [$identityId]);
+        $result = $conn->GetOne($sql, [$user->user_id]);
 
-        if (empty($row)) {
-            return false;
-        }
-
-        return !is_null($row['user_id']) && $row['totalRunsInProblemset'] == 0
-                 && $row['identity_id'] != $row['main_identity_id'];
+        return $result == '0';
     }
 }
