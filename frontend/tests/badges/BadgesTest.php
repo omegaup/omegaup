@@ -247,41 +247,4 @@ class BadgesTest extends BadgesTestCase {
             );
         }
     }
-
-    public function testBadgeDetails() {
-        // Creates one owner for ContestManager Badge and no owner for
-        // ContestManager, then checks badge details results.
-        $user = UserFactory::createUser();
-        // For some reason, this method creates a new user also.
-        ProblemsFactory::createProblemWithAuthor($user);
-
-        $previousTime = Time::get();
-        Utils::RunAssignBadges();
-
-        // In total they must exist 4 users: admintest, test,
-        // the user created by createProblemWithAuthor and $user
-
-        $details = BadgeController::apiBadgeDetails(new Request([
-            'badge_alias' => 'problemSetter',
-        ]));
-        $timeDifference = (strtotime($details['first_assignation']) - $previousTime) / 60;
-        $this->assertTrue($timeDifference < 10);
-        $this->assertEquals(25, $details['owners_percentage']);
-
-        $details = BadgeController::apiBadgeDetails(new Request([
-            'badge_alias' => 'contestManager',
-        ]));
-        $this->assertEquals(0, $details['owners_percentage']);
-        $this->assertNull($details['first_assignation']);
-    }
-
-    /**
-     * @expectedException NotFoundException
-     */
-    public function testBadgeDetailsException() {
-        BadgeController::apiBadgeDetails(new Request([
-            'badge_alias' => 'esteBadgeNoExiste',
-        ]));
-        $this->expectException(NotFoundException::class);
-    }
 }
