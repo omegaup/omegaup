@@ -10,7 +10,7 @@ require_once 'libs/FileUploader.php';
  * @author carlosabcs
  */
 class BadgesTest extends BadgesTestCase {
-    private static function getSortedExpectedResults(array $expected) {
+    private static function getSortedExpectedResults(array $expected): array {
         $results = [];
         foreach ($expected as $username) {
             // From each username, obtaining its ID
@@ -21,7 +21,7 @@ class BadgesTest extends BadgesTestCase {
         return $results;
     }
 
-    private static function RunRequest(array $apicall) {
+    private static function RunRequest(array $apicall): void {
         $login = self::login(new Identities([
             'username' => $apicall['username'],
             'password' => $apicall['password'],
@@ -53,7 +53,7 @@ class BadgesTest extends BadgesTestCase {
         }
     }
 
-    public function apicallTest(array $actions, array $expectedResults, string $queryPath) {
+    public function apicallTest(array $actions, array $expectedResults, string $queryPath): void {
         foreach ($actions as $action) {
             switch ($action['type']) {
                 case 'changeTime':
@@ -91,7 +91,7 @@ class BadgesTest extends BadgesTestCase {
         Time::setTimeForTesting(null);
     }
 
-    public function phpUnitTest($badge) {
+    public function phpUnitTest($badge): void {
         $testPath = static::BADGES_TESTS_ROOT . "/${badge}Test.php";
         $this->assertTrue(
             file_exists($testPath),
@@ -99,7 +99,7 @@ class BadgesTest extends BadgesTestCase {
         );
     }
 
-    public function runBadgeTest($testPath, $queryPath, $badge) {
+    public function runBadgeTest($testPath, $queryPath, $badge): void {
         FileHandler::SetFileUploader($this->createFileUploaderMock());
         $content = json_decode(file_get_contents($testPath), true);
         Utils::CleanupFilesAndDb();
@@ -116,7 +116,6 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testAllBadges() {
-        global $conn;
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         foreach ($aliases as $alias) {
             $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
@@ -186,7 +185,6 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testAssignBadgesCronjob() {
-        global $conn;
         // Create two badge receivers:
         // - User 1 will receive: Problem Setter badge
         // - User 2 will receive: Problem Setter and Contest Manager badges
@@ -246,5 +244,30 @@ class BadgesTest extends BadgesTestCase {
                 count($expectedUserTwoResults)
             );
         }
+    }
+
+    public function testGetAssignationTime() {
+        $user = UserFactory::createUser();
+        ProblemsFactory::createProblemWithAuthor($user);
+
+        $previousTime = Time::get();
+        Utils::RunAssignBadges();
+
+        $login = self::login($user);
+        $problemSetterResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+            'auth_token' => $login->auth_token,
+            'user' => $user,
+            'badge_alias' => 'problemSetter',
+        ]));
+        $this->assertNotNull($problemSetterResult['assignation_time']);
+        $timeDifference = ($problemSetterResult['assignation_time'] - $previousTime) / 60;
+        $this->assertTrue($timeDifference < 10);
+
+        $contestManagerResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+            'auth_token' => $login->auth_token,
+            'user' => $user,
+            'badge_alias' => 'contestManager',
+        ]));
+        $this->assertNull($contestManagerResult['assignation_time']);
     }
 }
