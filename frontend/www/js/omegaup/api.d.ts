@@ -10,7 +10,7 @@ declare namespace omegaup {
     title: string;
   }
 
-  export interface ContestResult {
+  interface ContestResult {
     data: omegaup.Contest;
     length?: string;
     place: number;
