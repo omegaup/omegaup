@@ -8,14 +8,7 @@
 class BadgeController extends Controller {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
-    /**
-     * Returns a list of existing badges
-     *
-     * @param Request $r
-     * @return array
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiList(Request $r) {
+    public static function getAllBadges(): array {
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         $results = [];
         foreach ($aliases as $alias) {
@@ -25,6 +18,17 @@ class BadgeController extends Controller {
             $results[] = $alias;
         }
         return $results;
+    }
+
+    /**
+     * Returns a list of existing badges
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiList(Request $r) {
+        return self::getAllBadges();
     }
 
     /**
@@ -67,5 +71,34 @@ class BadgeController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
-    // TODO: apiUserHasBadge
+
+    /**
+     * Returns a the assignation timestamp of a badge
+     * for current user.
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyBadgeAssignationTime(Request $r) {
+        self::authenticateRequest($r);
+        Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
+        $allBadges = self::getAllBadges();
+        $badge = $r['badge_alias'];
+        if (!in_array($badge, $allBadges)) {
+            throw new NotFoundException('badgeNotExist');
+        }
+        try {
+            return [
+                'status' => 'ok',
+                'assignation_time' => is_null($r->user) ?
+                    null :
+                    UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $badge),
+            ];
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
 }
