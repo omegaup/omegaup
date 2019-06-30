@@ -269,11 +269,5 @@ class BadgesTest extends BadgesTestCase {
             'badge_alias' => 'contestManager',
         ]));
         $this->assertNull($contestManagerResult['assignation_time']);
-
-        $nonLoggedUser = BadgeController::apiMyBadgeAssignationTime(new Request([
-            'user' => UserFactory::createUser(),
-            'badge_alias' => 'contestManager',
-        ]));
-        $this->assertNull($nonLoggedUser['assignation_time']);
     }
 }

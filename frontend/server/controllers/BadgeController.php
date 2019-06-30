@@ -39,11 +39,7 @@ class BadgeController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
-        try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            // Do nothing
-        }
+        self::authenticateRequest($r);
         return [
             'status' => 'ok',
             'badges' => is_null($r->user) ?
@@ -85,11 +81,7 @@ class BadgeController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyBadgeAssignationTime(Request $r) {
-        try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            // Do nothing
-        }
+        self::authenticateRequest($r);
         Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
         $allBadges = self::getAllBadges();
         $badge = $r['badge_alias'];
