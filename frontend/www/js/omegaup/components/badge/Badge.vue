@@ -31,12 +31,11 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import 'v-tooltip/dist/v-tooltip.css';
-import * as VTooltip from 'v-tooltip';
-// import VTooltip from 'v-tooltip';
+import { VTooltip } from 'v-tooltip';
 
 @Component({
   directives: {
-    tooltip: VTooltip.VTooltip,
+    tooltip: VTooltip,
   },
 })
 export default class Badge extends Vue {
