@@ -55,13 +55,17 @@ OmegaUp.on('ready', function() {
       if (payload.logged_in) {
         API.Badge.myList({})
             .then(function(data) {
-              viewProfile.visitorBadges = data['badges'];
+              viewProfile.visitorBadges =
+                  new Set(data['badges'].map(badge => badge.badge_alias));
             })
             .fail(UI.apiError);
       }
 
       API.Badge.userList({target_username: profile.username})
-          .then(function(data) { viewProfile.profileBadges = data['badges']; })
+          .then(function(data) {
+            viewProfile.profileBadges =
+                new Set(data['badges'].map(badge => badge.badge_alias));
+          })
           .fail(UI.apiError);
 
       API.User.stats({username: profile.username})
@@ -71,10 +75,10 @@ OmegaUp.on('ready', function() {
     data: {
       profile: profile,
       contests: [],
-      profileBadges: [],
+      profileBadges: new Set(),
       solvedProblems: [],
       unsolvedProblems: [],
-      visitorBadges: [],
+      visitorBadges: new Set(),
       charts: null,
     },
     computed: {

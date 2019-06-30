@@ -149,8 +149,8 @@ export default class UserProfile extends Vue {
   @Prop() unsolvedProblems!: omegaup.Problem[];
   @Prop() rank!: string;
   @Prop() charts!: any;
-  @Prop() profileBadges!: omegaup.Badge[];
-  @Prop() visitorBadges!: omegaup.Badge[];
+  @Prop() profileBadges!: Set<string>;
+  @Prop() visitorBadges!: Set<string>;
 
   T = T;
   columns = 3;
@@ -165,14 +165,27 @@ export default class UserProfile extends Vue {
 
   get badges(): omegaup.Badge[] {
     const badges: omegaup.Badge[] = [];
-    this.profileBadges.forEach((profileBadge: omegaup.Badge) => {
-      const exists = this.visitorBadges.find((visitorBadge: omegaup.Badge) => {
-        return visitorBadge.badge_alias === profileBadge.badge_alias;
+    const unlockedBadges: omegaup.Badge[] = Array.from(this.profileBadges)
+      .filter(x => this.visitorBadges.has(x))
+      .map(x => {
+        return { badge_alias: x, unlocked: true };
       });
-      profileBadge.unlocked = !!exists;
-      badges.push(profileBadge);
-    });
-    return badges;
+    const lockedBadges: omegaup.Badge[] = Array.from(this.profileBadges)
+      .filter(x => !this.visitorBadges.has(x))
+      .map(x => {
+        return { badge_alias: x, unlocked: false };
+      });
+    return unlockedBadges
+      .concat(lockedBadges)
+      .sort((a: omegaup.Badge, b: omegaup.Badge) => {
+        if (a.badge_alias > b.badge_alias) {
+          return 1;
+        }
+        if (a.badge_alias < b.badge_alias) {
+          return -1;
+        }
+        return 0;
+      });
   }
 
   groupElements(

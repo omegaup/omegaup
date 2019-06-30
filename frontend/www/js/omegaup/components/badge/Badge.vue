@@ -2,7 +2,6 @@
   <figure class="badge-container"
           v-tooltip="description">
     <img class="badge-icon"
-            v-bind:alt="`badge_${this.alias}`"
             v-bind:src="this.iconUrl">
     <figcaption class="badge-name">
       {{ this.name }}
@@ -12,7 +11,6 @@
 
 <style>
 .badge-container {
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -34,6 +32,7 @@ import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import 'v-tooltip/dist/v-tooltip.css';
 import * as VTooltip from 'v-tooltip';
+// import VTooltip from 'v-tooltip';
 
 @Component({
   directives: {
