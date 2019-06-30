@@ -8,7 +8,7 @@
 class BadgeController extends Controller {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
-    public static function getAllBadges() {
+    public static function getAllBadges(): array {
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         $results = [];
         foreach ($aliases as $alias) {
@@ -39,7 +39,11 @@ class BadgeController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
-        self::authenticateRequest($r);
+        try {
+            self::authenticateRequest($r);
+        } catch (UnauthorizedException $e) {
+            // Do nothing
+        }
         return [
             'status' => 'ok',
             'badges' => is_null($r->user) ?
@@ -81,19 +85,23 @@ class BadgeController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyBadgeAssignationTime(Request $r) {
-        self::authenticateRequest($r);
-        if (is_null($r->user)) {
-            throw new NotFoundException('userNotExist');
-        }
-        $allBadges = self::getAllBadges();
         try {
-            $badge = $r['badge_alias'];
-            if (!in_array($badge, $allBadges)) {
-                throw new NotFoundException('badgeNotExist');
-            }
+            self::authenticateRequest($r);
+        } catch (UnauthorizedException $e) {
+            // Do nothing
+        }
+        Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
+        $allBadges = self::getAllBadges();
+        $badge = $r['badge_alias'];
+        if (!in_array($badge, $allBadges)) {
+            throw new NotFoundException('badgeNotExist');
+        }
+        try {
             return [
                 'status' => 'ok',
-                'assignation_time' => strtotime(UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $badge)),
+                'assignation_time' => is_null($r->user) ?
+                    null :
+                    UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $badge),
             ];
         } catch (ApiException $e) {
             throw $e;

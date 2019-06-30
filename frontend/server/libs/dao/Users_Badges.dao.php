@@ -29,7 +29,7 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
     public static function getUserBadgeAssignationTime(Users $user, string $badge) {
         global $conn;
         $sql = 'SELECT
-                    ub.assignation_time
+                    UNIX_TIMESTAMP(ub.assignation_time) AS assignation_time
                 FROM
                     Users_Badges ub
                 WHERE
