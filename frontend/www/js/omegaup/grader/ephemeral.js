@@ -860,14 +860,11 @@ if (window.ResizeObserver) {
 onResized();
 
 document.getElementById('language')
-    .addEventListener(
-        'change', function() { store.commit('request.language', this.value); });
-store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'request.language').get,
-    (value) => {
-      document.getElementById('language').value = value;
-      if (!Util.languageExtensionMapping.hasOwnProperty(value)) return;
-      let language = Util.languageExtensionMapping[value];
+    .addEventListener('change', function() {
+      store.commit('request.language', this.value);
+      document.getElementById('language').value = this.value;
+      if (!Util.languageExtensionMapping.hasOwnProperty(this.value)) return;
+      let language = Util.languageExtensionMapping[this.value];
       if (store.getters.isInteractive) {
         if (!interactiveTemplates.hasOwnProperty(language)) return;
         store.commit('request.source', interactiveTemplates[language]);

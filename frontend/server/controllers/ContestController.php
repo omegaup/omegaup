@@ -294,7 +294,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    private static function validateBasicDetails(string $contestAlias) : Array {
+    private static function validateBasicDetails(?string $contestAlias) : array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         // If the contest is private, verify that our user is invited
         try {
@@ -1329,7 +1329,7 @@ class ContestController extends Controller {
             $currentVersion,
             $r->identity->identity_id,
             $r['points'],
-            is_null($r['order_in_contest']) ? 1 : $r['order_in_contest']
+            $r['order_in_contest'] ?: 1
         );
 
         // Invalidar cache

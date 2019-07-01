@@ -25,15 +25,18 @@ class ProblemsetController extends Controller {
         Problems $problem,
         string $commit,
         string $currentVersion,
-        $current_identity_id,
-        $points,
-        $order_in_contest = 1
+        int $current_identity_id,
+        int $points,
+        int $order_in_contest = 1,
+        bool $validateVisibility = true
     ) {
-        ProblemsetController::validateAddProblemToProblemset(
-            $problemset_id,
-            $problem,
-            $current_identity_id
-        );
+        if ($validateVisibility) {
+            ProblemsetController::validateAddProblemToProblemset(
+                $problemset_id,
+                $problem,
+                $current_identity_id
+            );
+        }
 
         try {
             self::updateProblemsetProblem(new ProblemsetProblems([
