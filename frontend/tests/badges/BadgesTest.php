@@ -260,8 +260,13 @@ class BadgesTest extends BadgesTestCase {
             'badge_alias' => 'problemSetter',
         ]));
         $this->assertNotNull($problemSetterResult['assignation_time']);
-        $timeDifference = ($problemSetterResult['assignation_time'] - $previousTime) / 60;
-        $this->assertTrue($timeDifference < 10);
+        $this->assertThat(
+            $problemSetterResult['assignation_time'],
+            $this->logicalAnd(
+                $this->greaterThan($previousTime - 1),
+                $this->lessThan(Time::get() + 1)
+            )
+        );
 
         $contestManagerResult = BadgeController::apiMyBadgeAssignationTime(new Request([
             'auth_token' => $login->auth_token,
@@ -289,8 +294,13 @@ class BadgesTest extends BadgesTestCase {
             'badge_alias' => 'problemSetter',
         ]));
         $this->assertNotNull($details['first_assignation']);
-        $timeDifference = ($details['first_assignation'] - $previousTime) / 60;
-        $this->assertTrue($timeDifference < 10);
+        $this->assertThat(
+            $details['first_assignation'],
+            $this->logicalAnd(
+                $this->greaterThan($previousTime - 1),
+                $this->lessThan(Time::get() + 1)
+            )
+        );
         $this->assertEquals(25, $details['owners_percentage']);
 
         $details = BadgeController::apiBadgeDetails(new Request([
