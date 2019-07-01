@@ -164,27 +164,18 @@ export default class UserProfile extends Vue {
   }
 
   get badges(): omegaup.Badge[] {
-    const badges: omegaup.Badge[] = [];
-    const unlockedBadges: omegaup.Badge[] = Array.from(this.profileBadges)
-      .filter(x => this.visitorBadges.has(x))
-      .map(x => {
-        return { badge_alias: x, unlocked: true };
-      });
-    const lockedBadges: omegaup.Badge[] = Array.from(this.profileBadges)
-      .filter(x => !this.visitorBadges.has(x))
-      .map(x => {
-        return { badge_alias: x, unlocked: false };
-      });
-    return unlockedBadges
-      .concat(lockedBadges)
+    return Array.from(this.profileBadges)
+      .map((badge: string) => {
+        return {
+          badge_alias: badge,
+          unlocked: this.visitorBadges.has(badge),
+        };
+      })
       .sort((a: omegaup.Badge, b: omegaup.Badge) => {
-        if (a.badge_alias > b.badge_alias) {
-          return 1;
+        if (a.badge_alias == b.badge_alias) {
+          return 0;
         }
-        if (a.badge_alias < b.badge_alias) {
-          return -1;
-        }
-        return 0;
+        return a.badge_alias < b.badge_alias ? -1 : 1;
       });
   }
 
