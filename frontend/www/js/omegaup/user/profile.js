@@ -15,6 +15,8 @@ OmegaUp.on('ready', function() {
           contests: this.contests,
           solvedProblems: this.solvedProblems,
           unsolvedProblems: this.unsolvedProblems,
+          visitorBadges: this.visitorBadges,
+          profileBadges: this.profileBadges,
           rank: this.rank,
           charts: this.charts,
         }
@@ -50,6 +52,22 @@ OmegaUp.on('ready', function() {
           })
           .fail(UI.apiError);
 
+      if (payload.logged_in) {
+        API.Badge.myList({})
+            .then(function(data) {
+              viewProfile.visitorBadges =
+                  new Set(data['badges'].map(badge => badge.badge_alias));
+            })
+            .fail(UI.apiError);
+      }
+
+      API.Badge.userList({target_username: profile.username})
+          .then(function(data) {
+            viewProfile.profileBadges =
+                new Set(data['badges'].map(badge => badge.badge_alias));
+          })
+          .fail(UI.apiError);
+
       API.User.stats({username: profile.username})
           .then(function(data) { viewProfile.charts = data; })
           .fail(omegaup.UI.apiError);
@@ -57,8 +75,10 @@ OmegaUp.on('ready', function() {
     data: {
       profile: profile,
       contests: [],
+      profileBadges: new Set(),
       solvedProblems: [],
       unsolvedProblems: [],
+      visitorBadges: new Set(),
       charts: null,
     },
     computed: {

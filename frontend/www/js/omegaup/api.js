@@ -66,6 +66,14 @@ function _normalizeContestFields(contest) {
 }
 
 export default {
+  Badge: {
+    list: _call('/api/badge/list/'),
+
+    myList: _call('/api/badge/myList/'),
+
+    userList: _call('/api/badge/userList/'),
+  },
+
   Clarification: {
     create: _call('/api/clarification/create/'),
 
