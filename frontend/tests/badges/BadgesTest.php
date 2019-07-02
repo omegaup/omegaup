@@ -263,8 +263,8 @@ class BadgesTest extends BadgesTestCase {
         $this->assertThat(
             $problemSetterResult['assignation_time'],
             $this->logicalAnd(
-                $this->greaterThan($previousTime - 1),
-                $this->lessThan(Time::get() + 1)
+                $this->greaterThanOrEqual($previousTime),
+                $this->lessThanOrEqual(Time::get())
             )
         );
 
@@ -297,8 +297,8 @@ class BadgesTest extends BadgesTestCase {
         $this->assertThat(
             $details['first_assignation'],
             $this->logicalAnd(
-                $this->greaterThan($previousTime - 1),
-                $this->lessThan(Time::get() + 1)
+                $this->greaterThanOrEqual($previousTime),
+                $this->lessThanOrEqual(Time::get())
             )
         );
         $this->assertEquals(25, $details['owners_percentage']);
