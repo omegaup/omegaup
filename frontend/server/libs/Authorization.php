@@ -59,14 +59,20 @@ class Authorization {
     // Group identities creators.
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
-    public static function canViewSubmission($identity_id, Submissions $submission) {
+    public static function canViewSubmission(
+        Identities $identity,
+        Submissions $submission
+    ) : bool {
         return (
-            $submission->identity_id === $identity_id ||
-            Authorization::canEditSubmission($identity_id, $submission)
+            $submission->identity_id === $identity->identity_id  ||
+            Authorization::canEditSubmission($identity, $submission)
         );
     }
 
-    public static function canEditSubmission($identity_id, Submissions $submission) {
+    public static function canEditSubmission(
+        Identities $identity,
+        Submissions $submission
+    ) : bool {
         try {
             $problem = ProblemsDAO::getByPK($submission->problem_id);
         } catch (Exception $e) {
@@ -82,18 +88,22 @@ class Authorization {
         }
 
         $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
         if (!is_null($problemset) && Authorization::isAdmin($identity_id, $problemset)) {
             return true;
         }
 
+        // TODO Temporary until isAdmin function is fixed
         return Authorization::isProblemAdmin($identity_id, $problem);
     }
 
-    public static function canViewClarification($identity_id, Clarifications $clarification) {
-        if (is_null($clarification) || !is_a($clarification, 'Clarifications')) {
-            return false;
-        }
-
+    public static function canViewClarification(
+        Identities $identity,
+        Clarifications $clarification
+    ) : bool {
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
         if ($clarification->author_id === $identity_id) {
             return true;
         }
@@ -107,11 +117,10 @@ class Authorization {
         return Authorization::isAdmin($identity_id, $problemset);
     }
 
-    public static function canEditClarification($identity_id, Clarifications $clarification) {
-        if (is_null($clarification) || !is_a($clarification, 'Clarifications')) {
-            return false;
-        }
-
+    public static function canEditClarification(
+        Identities $identity,
+        Clarifications $clarification
+    ) : bool {
         $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
@@ -123,6 +132,8 @@ class Authorization {
             return false;
         }
 
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
         return (self::isOwner($identity_id, $problem->acl_id)
                 || Authorization::isAdmin($identity_id, $problemset));
     }
@@ -131,10 +142,19 @@ class Authorization {
      * Returns whether the identity can edit the problem. Only problem admins and
      * reviewers can do so.
      */
-    public static function canEditProblem($identity_id, Problems $problem) {
+    public static function canEditProblem(
+        Identities $identity,
+        Problems $problem
+    ) : bool {
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
         return self::isProblemAdmin($identity_id, $problem) ||
-            self::isQualityReviewer($identity_id) ||
-            self::hasRole($identity_id, $problem->acl_id, Authorization::REVIEWER_ROLE);
+            self::isQualityReviewer($identity->identity_id) ||
+            self::hasRole(
+                $identity->identity_id,
+                $problem->acl_id,
+                Authorization::REVIEWER_ROLE
+            );
     }
 
     /**
@@ -142,14 +162,14 @@ class Authorization {
      * admins and identities that have solved the problem can do so.
      */
     public static function canViewProblemSolution(
-        ?int $identityId,
+        Identities $identity,
         Problems $problem
     ) : bool {
-        if (is_null($identityId)) {
+        if (is_null($identity->identity_id)) {
             return false;
         }
-        return Authorization::canEditProblem($identityId, $problem) ||
-            ProblemsDAO::isProblemSolved($problem, $identityId);
+        return Authorization::canEditProblem($identity, $problem) ||
+            ProblemsDAO::isProblemSolved($problem, $identity->identity_id);
     }
 
     public static function canViewEmail($identity_id) {
