@@ -223,4 +223,13 @@ class UsersDAO extends UsersDAOBase {
         }
         return $users;
     }
+
+    public static function getUsersCount() {
+        $sql = 'SELECT
+                    COUNT(*) AS total
+                FROM
+                    Users;';
+        global $conn;
+        return $conn->GetRow($sql)['total'];
+    }
 }
