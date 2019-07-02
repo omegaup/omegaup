@@ -260,8 +260,13 @@ class BadgesTest extends BadgesTestCase {
             'badge_alias' => 'problemSetter',
         ]));
         $this->assertNotNull($problemSetterResult['assignation_time']);
-        $timeDifference = ($problemSetterResult['assignation_time'] - $previousTime) / 60;
-        $this->assertTrue($timeDifference < 10);
+        $this->assertThat(
+            $problemSetterResult['assignation_time'],
+            $this->logicalAnd(
+                $this->greaterThanOrEqual($previousTime),
+                $this->lessThanOrEqual(Time::get())
+            )
+        );
 
         $contestManagerResult = BadgeController::apiMyBadgeAssignationTime(new Request([
             'auth_token' => $login->auth_token,
@@ -269,5 +274,50 @@ class BadgesTest extends BadgesTestCase {
             'badge_alias' => 'contestManager',
         ]));
         $this->assertNull($contestManagerResult['assignation_time']);
+    }
+
+    public function testBadgeDetails() {
+        // Creates one owner for ContestManager Badge and no owner for
+        // ContestManager, then checks badge details results.
+        $user = UserFactory::createUser();
+
+        // For some reason, this method creates a new user also.
+        ProblemsFactory::createProblemWithAuthor($user);
+
+        $previousTime = Time::get();
+        Utils::RunAssignBadges();
+
+        // In total they must exist 4 users: admintest, test,
+        // the user created by createProblemWithAuthor and $user
+
+        $details = BadgeController::apiBadgeDetails(new Request([
+            'badge_alias' => 'problemSetter',
+        ]));
+        $this->assertNotNull($details['first_assignation']);
+        $this->assertThat(
+            $details['first_assignation'],
+            $this->logicalAnd(
+                $this->greaterThanOrEqual($previousTime),
+                $this->lessThanOrEqual(Time::get())
+            )
+        );
+        $this->assertEquals(25, $details['owners_percentage']);
+
+        $details = BadgeController::apiBadgeDetails(new Request([
+            'badge_alias' => 'contestManager',
+        ]));
+        $this->assertEquals(0, $details['owners_percentage']);
+        $this->assertNull($details['first_assignation']);
+    }
+
+    public function testBadgeDetailsException() {
+        try {
+            BadgeController::apiBadgeDetails(new Request([
+                'badge_alias' => 'esteBadgeNoExiste',
+            ]));
+            $this->fail('Should have thrown a NotFoundException');
+        } catch (NotFoundException $e) {
+            $this->assertEquals($e->getMessage(), 'badgeNotExist');
+        }
     }
 }

@@ -101,4 +101,35 @@ class BadgeController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
+
+    /**
+     * Returns the number of owners and the first
+     * assignation timestamp for a certain badge
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiBadgeDetails(Request $r) {
+        Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
+        $allBadges = self::getAllBadges();
+        $badge = $r['badge_alias'];
+        if (!in_array($badge, $allBadges)) {
+            throw new NotFoundException('badgeNotExist');
+        }
+        try {
+            $totalUsers = max(UsersDAO::getUsersCount(), 1);
+            $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($badge);
+            $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($badge);
+            return [
+                'status' => 'ok',
+                'first_assignation' => $firstAssignation,
+                'owners_percentage' => (($ownersCount / $totalUsers) * 100)
+            ];
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
 }
