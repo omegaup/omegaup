@@ -958,6 +958,7 @@ const translations = {
 	wordsAssignments: "Assignments",
 	wordsAuthor: "Author",
 	wordsBack: "Back",
+	wordsBadgesObtained: "Badges obtained",
 	wordsBanProblem: "Ban problem",
 	wordsBannedProblem: "Banned problem",
 	wordsBestSolvers: "Best accepted solvers",
