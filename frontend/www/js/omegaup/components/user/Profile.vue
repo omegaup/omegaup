@@ -89,22 +89,9 @@
           </tbody>
         </table>
         <div v-show="!groupedUnsolvedProblems"><img src="/media/wait.gif"></div>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.wordsBadgesObtained }} <span class="badge">{{ badges.length
-          }}</span></h2>
-        </div>
-        <div class="panel-body">
-          <div class="badges-container">
-            <omegaup-badge v-bind:alias="badge.badge_alias"
-                 v-bind:key="badge.badge_alias"
-                 v-bind:unlocked="badge.unlocked"
-                 v-for="badge in badges"></omegaup-badge>
-          </div>
-        </div>
-        <div v-show="!badges"><img src="/media/wait.gif"></div>
-      </div>
+      </div><omegaup-badge-list v-bind:all-badges="profileBadges"
+           v-bind:for-profile="true"
+           v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileStatistics }}</h2>
@@ -132,14 +119,14 @@ import omegaup from '../../api.js';
 import user_BasicInfo from './BasicInfo.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
-import Badge from '../badge/Badge.vue';
+import badge_List from '../badge/List.vue';
 
 @Component({
   components: {
     'omegaup-user-basicinfo': user_BasicInfo,
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
-    'omegaup-badge': Badge,
+    'omegaup-badge-list': badge_List,
   },
 })
 export default class UserProfile extends Vue {
@@ -161,22 +148,6 @@ export default class UserProfile extends Vue {
 
   get groupedUnsolvedProblems(): omegaup.Problem[][] {
     return this.groupElements(this.unsolvedProblems, this.columns);
-  }
-
-  get badges(): omegaup.Badge[] {
-    return Array.from(this.profileBadges)
-      .map((badge: string) => {
-        return {
-          badge_alias: badge,
-          unlocked: this.visitorBadges.has(badge),
-        };
-      })
-      .sort((a: omegaup.Badge, b: omegaup.Badge) => {
-        if (a.badge_alias == b.badge_alias) {
-          return 0;
-        }
-        return a.badge_alias < b.badge_alias ? -1 : 1;
-      });
   }
 
   groupElements(
