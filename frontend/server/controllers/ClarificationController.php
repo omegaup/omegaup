@@ -89,7 +89,6 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['user'] = $r->user;
         self::clarificationUpdated($r, $time);
 
         return [
