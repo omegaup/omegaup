@@ -857,7 +857,7 @@ class ContestController extends Controller {
                     $problem,
                     $problemsetProblem['commit'],
                     $problemsetProblem['version'],
-                    $r->identity->identity_id,
+                    $r->identity,
                     $problemsetProblem['points'],
                     $problemsetProblem['order'] ?: 1
                 );
@@ -1327,7 +1327,7 @@ class ContestController extends Controller {
             $params['problem'],
             $masterCommit,
             $currentVersion,
-            $r->identity->identity_id,
+            $r->identity,
             $r['points'],
             $r['order_in_contest'] ?: 1
         );

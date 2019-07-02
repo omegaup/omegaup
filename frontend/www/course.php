@@ -67,7 +67,7 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);
-    $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['user']->user_id, $course);
+    $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['identity'], $course);
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->display('../templates/course.details.tpl');
 }
