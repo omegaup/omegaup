@@ -623,9 +623,6 @@ class ProblemsDAO extends ProblemsDAOBase {
     }
 
     public static function getPrivateCount(Users $user) : int {
-        if (is_null($user)) {
-            return 0;
-        }
         $sql = 'SELECT
             COUNT(*) as total
         FROM

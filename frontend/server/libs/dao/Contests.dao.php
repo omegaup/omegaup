@@ -206,9 +206,6 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     public static function getPrivateContestsCount(Users $user) {
-        if (is_null($user)) {
-            return 0;
-        }
         $sql = 'SELECT
            COUNT(c.contest_id) as total
         FROM

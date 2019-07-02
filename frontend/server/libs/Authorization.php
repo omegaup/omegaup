@@ -99,14 +99,9 @@ class Authorization {
     }
 
     public static function canViewClarification(
-        ?Users $user,
         Identities $identity,
-        ?Clarifications $clarification
+        Clarifications $clarification
     ) : bool {
-        if (is_null($clarification)) {
-            return false;
-        }
-
         // TODO Temporary until isAdmin function is fixed
         $identity_id = $identity->identity_id;
         if ($clarification->author_id === $identity_id) {
@@ -124,13 +119,8 @@ class Authorization {
 
     public static function canEditClarification(
         Identities $identity,
-        ?Users $user,
-        ?Clarifications $clarification
+        Clarifications $clarification
     ) : bool {
-        if (is_null($clarification) || is_null($user)) {
-            return false;
-        }
-
         $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         try {
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
@@ -154,7 +144,6 @@ class Authorization {
      */
     public static function canEditProblem(
         Identities $identity,
-        ?Users $user,
         Problems $problem
     ) : bool {
         // TODO Temporary until isAdmin function is fixed
@@ -174,13 +163,12 @@ class Authorization {
      */
     public static function canViewProblemSolution(
         Identities $identity,
-        ?Users $user,
         Problems $problem
     ) : bool {
         if (is_null($identity->identity_id)) {
             return false;
         }
-        return Authorization::canEditProblem($identity, $user, $problem) ||
+        return Authorization::canEditProblem($identity, $problem) ||
             ProblemsDAO::isProblemSolved($problem, $identity->identity_id);
     }
 

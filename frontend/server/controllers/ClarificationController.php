@@ -122,7 +122,6 @@ class ClarificationController extends Controller {
         // If the clarification is private, verify that our user is invited or is contest director
         if ($r['clarification']->public != 1) {
             if (!Authorization::canViewClarification(
-                $r->user,
                 $r->identity,
                 $r['clarification']
             )) {
@@ -176,7 +175,6 @@ class ClarificationController extends Controller {
 
         if (!Authorization::canEditClarification(
             $r->identity,
-            $r->user,
             $r['clarification']
         )) {
             throw new ForbiddenAccessException();
