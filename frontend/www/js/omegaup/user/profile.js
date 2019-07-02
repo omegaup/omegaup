@@ -4,7 +4,8 @@ import {OmegaUp, T, API} from '../omegaup.js';
 import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
-  const user_profile = JSON.parse(document.getElementById('profile').innerText);
+  const payload = JSON.parse(document.getElementById('payload').innerText);
+  const profile = payload.profile;
   let viewProfile = new Vue({
     el: '#user-profile',
     render: function(createElement) {
@@ -14,13 +15,15 @@ OmegaUp.on('ready', function() {
           contests: this.contests,
           solvedProblems: this.solvedProblems,
           unsolvedProblems: this.unsolvedProblems,
+          visitorBadges: this.visitorBadges,
+          profileBadges: this.profileBadges,
           rank: this.rank,
           charts: this.charts,
         }
       });
     },
     mounted: function() {
-      API.User.contestStats({username: user_profile.username})
+      API.User.contestStats({username: profile.username})
           .then(function(data) {
             let contests = [];
             for (var contest_alias in data['contests']) {
@@ -37,32 +40,50 @@ OmegaUp.on('ready', function() {
           })
           .fail(UI.apiError);
 
-      API.User.problemsSolved({username: user_profile.username})
+      API.User.problemsSolved({username: profile.username})
           .then(function(data) {
             viewProfile.solvedProblems = data['problems'];
           })
           .fail(UI.apiError);
 
-      API.User.listUnsolvedProblems({username: user_profile.username})
+      API.User.listUnsolvedProblems({username: profile.username})
           .then(function(data) {
             viewProfile.unsolvedProblems = data['problems'];
           })
           .fail(UI.apiError);
 
-      API.User.stats({username: user_profile.username})
+      if (payload.logged_in) {
+        API.Badge.myList({})
+            .then(function(data) {
+              viewProfile.visitorBadges =
+                  new Set(data['badges'].map(badge => badge.badge_alias));
+            })
+            .fail(UI.apiError);
+      }
+
+      API.Badge.userList({target_username: profile.username})
+          .then(function(data) {
+            viewProfile.profileBadges =
+                new Set(data['badges'].map(badge => badge.badge_alias));
+          })
+          .fail(UI.apiError);
+
+      API.User.stats({username: profile.username})
           .then(function(data) { viewProfile.charts = data; })
           .fail(omegaup.UI.apiError);
     },
     data: {
-      profile: user_profile,
+      profile: profile,
       contests: [],
+      profileBadges: new Set(),
       solvedProblems: [],
       unsolvedProblems: [],
+      visitorBadges: new Set(),
       charts: null,
     },
     computed: {
       rank: function() {
-        switch (user_profile.classname) {
+        switch (profile.classname) {
           case 'user-rank-unranked':
             return T.profileRankUnrated;
           case 'user-rank-beginner':
