@@ -1501,7 +1501,7 @@ class UserController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isContestAdmin($r->user, $contest)) {
+        if (!Authorization::isContestAdmin($r->identity->identity_id, $contest)) {
             throw new ForbiddenAccessException();
         }
 
@@ -2112,7 +2112,6 @@ class UserController extends Controller {
 
         $session = SessionController::apiCurrentSession($r)['session'];
         $identity = $session['identity'];
-        $user = $session['user'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
             $response['admin'] = $session['is_admin'];
@@ -2180,11 +2179,7 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($identity) && Authorization::isProblemAdmin(
-                        $identity,
-                        $user,
-                        $problem
-                    )) {
+                    if (!is_null($identity) && Authorization::isProblemAdmin($identity->identity_id, $problem)) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif (!ProblemsDAO::isVisible($problem)) {
                         throw new ForbiddenAccessException('problemIsPrivate');
@@ -2573,25 +2568,10 @@ class UserController extends Controller {
         try {
             return [
                 'status' => 'ok',
-                'identities' => IdentitiesDAO::getAssociatedIdentities($r->user)
+                'identities' => IdentitiesDAO::getAssociatedIdentities($r->user->user_id)
             ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
-        }
-    }
-
-    /**
-     * This function validates that logged user into the platform with an
-     * unassociated identity is not be able to make any operations. Instead it
-     * throws a ForbiddenAccessException. This function can be only called after
-     * authenticateRequest
-     *
-     * @param Users $user;
-     * @throws ForbiddenAccessException
-     */
-    public static function validateIdentityIsAssociatedWithUser(?Users $user) {
-        if (is_null($user)) {
-            throw new ForbiddenAccessException('userNotAllowed');
         }
     }
 }

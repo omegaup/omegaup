@@ -205,7 +205,7 @@ class ContestsDAO extends ContestsDAOBase {
         return new Contests($row);
     }
 
-    public static function getPrivateContestsCount(?Users $user) : int {
+    public static function getPrivateContestsCount(Users $user) {
         if (is_null($user)) {
             return 0;
         }

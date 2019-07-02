@@ -164,7 +164,9 @@ class InterviewController extends Controller {
         }
 
         // Only director is allowed to add people to interview
-        if (!Authorization::isInterviewAdmin($r->identity, $r->user, $r['interview'])) {
+        if (is_null($r->identity)
+            || !Authorization::isInterviewAdmin($r->identity->identity_id, $r['interview'])
+        ) {
             throw new ForbiddenAccessException();
         }
 
@@ -209,7 +211,7 @@ class InterviewController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isInterviewAdmin($r->identity, $r->user, $interview)) {
+        if (!Authorization::isInterviewAdmin($r->identity->identity_id, $interview)) {
             throw new ForbiddenAccessException();
         }
 

@@ -161,7 +161,6 @@ class ProblemController extends Controller {
      */
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
-        UserController::validateIdentityIsAssociatedWithUser($r->user);
 
         // Validates request
         self::validateCreateOrUpdate($r);
@@ -275,7 +274,7 @@ class ProblemController extends Controller {
 
         // We need to check that the user actually has admin privileges over
         // the problem.
-        if (!Authorization::isProblemAdmin($r->identity, $r->user, $r['problem'])) {
+        if (!Authorization::isProblemAdmin($r->identity->identity_id, $r['problem'])) {
             throw new ForbiddenAccessException();
         }
     }
@@ -312,7 +311,7 @@ class ProblemController extends Controller {
         }
 
         // Only an admin can add other problem admins
-        if (!Authorization::isProblemAdmin($r->identity, $r->user, $problem)) {
+        if (!Authorization::isProblemAdmin($r->identity->identity_id, $problem)) {
             throw new ForbiddenAccessException();
         }
 
@@ -357,7 +356,7 @@ class ProblemController extends Controller {
         }
 
         // Only an admin can add other problem group admins
-        if (!Authorization::isProblemAdmin($r->identity, $r->user, $problem)) {
+        if (!Authorization::isProblemAdmin($r->identity->identity_id, $problem)) {
             throw new ForbiddenAccessException();
         }
 
@@ -464,7 +463,6 @@ class ProblemController extends Controller {
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
-        $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -477,12 +475,12 @@ class ProblemController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isProblemAdmin($r->identity, $r->user, $problem)) {
+        if (!Authorization::isProblemAdmin($r->identity->identity_id, $problem)) {
             throw new ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isProblemAdmin($identity, $user, $problem)) {
+        if (!Authorization::isProblemAdmin($user->main_identity_id, $problem)) {
             throw new NotFoundException();
         }
 
@@ -523,7 +521,7 @@ class ProblemController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isProblemAdmin($r->identity, $r->user, $problem)) {
+        if (!Authorization::isProblemAdmin($r->identity->identity_id, $problem)) {
             throw new ForbiddenAccessException();
         }
 
@@ -647,7 +645,7 @@ class ProblemController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::isProblemAdmin($r->identity, $r->user, $problem)) {
+        if (!Authorization::isProblemAdmin($r->identity->identity_id, $problem)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1041,11 +1039,7 @@ class ProblemController extends Controller {
         // If we request a problem inside a contest
         $problemset = self::validateProblemset($problem, $r['problemset_id'], $r['contest_alias']);
         if (!is_null($problemset) && isset($problemset['problemset'])) {
-            if (!Authorization::isAdmin(
-                $r->identity,
-                $r->user,
-                $problemset['problemset']
-            )) {
+            if (!Authorization::isAdmin($r->identity->identity_id, $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
                     if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
@@ -1059,8 +1053,7 @@ class ProblemController extends Controller {
                     }
                 } else {    // Not a contest, but we still have a problemset
                     if (!Authorization::canSubmitToProblemset(
-                        $r->user,
-                        $r->identity,
+                        $r->identity->identity_id,
                         $problemset['problemset']
                     )
                     ) {
@@ -1451,11 +1444,7 @@ class ProblemController extends Controller {
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
         if (ProblemsDAO::isVisible($problem['problem']) ||
-            Authorization::isProblemAdmin(
-                $r->identity,
-                $r->user,
-                $problem['problem']
-            )) {
+            Authorization::isProblemAdmin($r->identity->identity_id, $problem['problem'])) {
             $acl = ACLsDAO::getByPK($problem['problem']->acl_id);
             $problemsetter = UsersDAO::getByPK($acl->owner_id);
             $response['problemsetter'] = [
@@ -1497,11 +1486,7 @@ class ProblemController extends Controller {
         }
 
         if (!is_null($problemset)) {
-            $result['admin'] = Authorization::isAdmin(
-                $r->identity,
-                $r->user,
-                $problemset
-            );
+            $result['admin'] = Authorization::isAdmin($r->identity->identity_id, $problemset);
             if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
                 // At this point, contestant_user relationship should be established.
                 try {
@@ -1509,8 +1494,7 @@ class ProblemController extends Controller {
                         $r->identity->identity_id,
                         $problemset->problemset_id,
                         Authorization::canSubmitToProblemset(
-                            $r->user,
-                            $r->identity,
+                            $r->identity->identity_id,
                             $problem['problemset']
                         )
                     );
@@ -1932,11 +1916,7 @@ class ProblemController extends Controller {
         $response = [];
 
         if ($r['show_all']) {
-            if (!Authorization::isProblemAdmin(
-                $r->identity,
-                $r->user,
-                $r['problem']
-            )) {
+            if (!Authorization::isProblemAdmin($r->identity->identity_id, $r['problem'])) {
                 throw new ForbiddenAccessException();
             }
             if (!is_null($r['username'])) {
@@ -1989,7 +1969,7 @@ class ProblemController extends Controller {
                     foreach ($runsArray as $run) {
                         $run['time'] = (int)$run['time'];
                         $run['contest_score'] = (float)$run['contest_score'];
-                        $run['username'] = $r->identity->username;
+                        $run['username'] = $r->user->username;
                         $run['alias'] = $r['problem']->alias;
                         array_push($response['runs'], $run);
                     }
@@ -2016,11 +1996,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateRuns($r);
 
-        $isProblemAdmin = Authorization::isProblemAdmin(
-            $r->identity,
-            $r->user,
-            $r['problem']
-        );
+        $is_problem_admin = Authorization::isProblemAdmin($r->identity->identity_id, $r['problem']);
 
         try {
             $clarifications = ClarificationsDAO::GetProblemClarifications(
@@ -2062,8 +2038,8 @@ class ProblemController extends Controller {
         // Validate request
         self::validateRuns($r);
 
-        // We need to check that the user has privileges on the problem
-        if (!Authorization::isProblemAdmin($r->identity, $r->user, $r['problem'])) {
+        // We need to check that the user has priviledges on the problem
+        if (!Authorization::isProblemAdmin($r->identity->identity_id, $r['problem'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -2325,7 +2301,7 @@ class ProblemController extends Controller {
 
         $addedProblems = [];
 
-        $hiddenTags = UsersDAO::getHideTags($r->identity->identity_id);
+        $hiddenTags = UsersDao::getHideTags($r->identity->identity_id);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
@@ -2345,7 +2321,6 @@ class ProblemController extends Controller {
      */
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
-        UserController::validateIdentityIsAssociatedWithUser($r->user);
         self::validateList($r);
 
         $r->ensureInt('page', null, null, false);

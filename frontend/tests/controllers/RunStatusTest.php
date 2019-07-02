@@ -40,26 +40,23 @@ class RunStatusTest extends OmegaupTestCase {
     public function testDownload() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
         $runData = RunsFactory::createRunToProblem($problemData, $user);
         RunsFactory::gradeRun($runData);
 
         try {
             RunController::downloadSubmission(
                 $runData['response']['guid'],
-                $identity,
-                $user,
+                $user->main_identity_id,
                 false
             );
             $this->fail('Should not have allowed to download submission');
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
-        $identity = IdentitiesDAO::getByPK($problemData['author']->main_identity_id);
+
         $submissionZip = RunController::downloadSubmission(
             $runData['response']['guid'],
-            $identity,
-            $problemData['author'],
+            $problemData['author']->main_identity_id,
             false
         );
         $this->assertNotNull($submissionZip);

@@ -814,10 +814,8 @@ class RunCreateTest extends OmegaupTestCase {
         RunsFactory::gradeRun($waRunData, 0, 'WA', 60);
 
         // Contestant should be able to view run (but not the run details).
-        $identity = IdentitiesDAO::getByPK($contestant->main_identity_id);
         $this->assertFalse(Authorization::isProblemAdmin(
-            $identity,
-            $contestant,
+            $contestant->main_identity_id,
             $problemData['problem']
         ));
         $response = RunController::apiDetails(new Request([

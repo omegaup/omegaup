@@ -54,10 +54,8 @@ class CourseRunsTest extends OmegaupTestCase {
         $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Course admin should be able to view run, even if not problem admin.
-        $identity = IdentitiesDAO::getByPK($courseData['admin']->main_identity_id);
         $this->assertFalse(Authorization::isProblemAdmin(
-            $identity,
-            $courseData['admin'],
+            $courseData['admin']->main_identity_id,
             $problemData['problem']
         ));
         $response = RunController::apiDetails(new Request([

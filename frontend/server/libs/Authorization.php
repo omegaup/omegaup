@@ -60,31 +60,19 @@ class Authorization {
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
     public static function canViewSubmission(
-        ?Users $user,
         Identities $identity,
         Submissions $submission
     ) : bool {
-        $identities = [];
-        if (is_null($user)) {
-            // Identity is not associated with any user
-            array_push($identities, $identity->identity_id);
-        } else {
-            $identities = IdentitiesDAO::getAssociatedIdentities($user, true);
-        }
         return (
-            in_array($submission->identity_id, $identities) ||
-            Authorization::canEditSubmission($user, $identity, $submission)
+            $submission->identity_id === $identity->identity_id  ||
+            Authorization::canEditSubmission($identity, $submission)
         );
     }
 
     public static function canEditSubmission(
-        ?Users $user,
         Identities $identity,
         Submissions $submission
     ) : bool {
-        if (is_null($user)) {
-            return false;
-        }
         try {
             $problem = ProblemsDAO::getByPK($submission->problem_id);
         } catch (Exception $e) {
@@ -100,11 +88,14 @@ class Authorization {
         }
 
         $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
-        if (!is_null($problemset) && self::isAdmin($identity, $user, $problemset)) {
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
+        if (!is_null($problemset) && Authorization::isAdmin($identity_id, $problemset)) {
             return true;
         }
 
-        return Authorization::isProblemAdmin($identity, $user, $problem);
+        // TODO Temporary until isAdmin function is fixed
+        return Authorization::isProblemAdmin($identity_id, $problem);
     }
 
     public static function canViewClarification(
@@ -115,15 +106,10 @@ class Authorization {
         if (is_null($clarification)) {
             return false;
         }
-        $identities = [];
-        if (is_null($user)) {
-            // Identity is not associated with any user
-            array_push($identities, $identity->identity_id);
-        } else {
-            $identities = IdentitiesDAO::getAssociatedIdentities($user, true);
-        }
 
-        if (in_array($clarification->author_id, $identities)) {
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
+        if ($clarification->author_id === $identity_id) {
             return true;
         }
 
@@ -133,7 +119,7 @@ class Authorization {
             return false;
         }
 
-        return self::isAdmin($identity, $user, $problemset);
+        return Authorization::isAdmin($identity_id, $problemset);
     }
 
     public static function canEditClarification(
@@ -156,8 +142,10 @@ class Authorization {
             return false;
         }
 
-        return (self::isOwner($user, $problem->acl_id)
-                || self::isAdmin($identity, $user, $problemset));
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
+        return (self::isOwner($identity_id, $problem->acl_id)
+                || Authorization::isAdmin($identity_id, $problemset));
     }
 
     /**
@@ -169,7 +157,9 @@ class Authorization {
         ?Users $user,
         Problems $problem
     ) : bool {
-        return self::isProblemAdmin($identity, $user, $problem) ||
+        // TODO Temporary until isAdmin function is fixed
+        $identity_id = $identity->identity_id;
+        return self::isProblemAdmin($identity_id, $problem) ||
             self::isQualityReviewer($identity->identity_id) ||
             self::hasRole(
                 $identity->identity_id,
@@ -202,58 +192,33 @@ class Authorization {
         return self::isGroupIdentityCreator($identity_id);
     }
 
-    public static function canViewCourse(
-        ?Users $user,
-        Identities $identity,
-        Courses $course,
-        Groups $group
-    ) : bool {
-        if (!Authorization::isCourseAdmin($identity, $user, $course) &&
-            !Authorization::isGroupMember($identity->identity_id, $group)) {
+    public static function canViewCourse($identity_id, Courses $course, Groups $group) {
+        if (!Authorization::isCourseAdmin($identity_id, $course) &&
+            !Authorization::isGroupMember($identity_id, $group)) {
             return false;
         }
 
         return true;
     }
 
-    public static function isAdmin(
-        Identities $identity,
-        ?Users $user,
-        Object $entity
-    ) : bool {
-        if (is_null($entity) || is_null($user)) {
+    public static function isAdmin($identity_id, $entity) {
+        if (is_null($entity)) {
             return false;
         }
-        return self::isOwner($user, $entity->acl_id) ||
-            self::hasRole(
-                $identity->identity_id,
-                $entity->acl_id,
-                Authorization::ADMIN_ROLE
-            );
+        return self::isOwner($identity_id, $entity->acl_id) ||
+            self::hasRole($identity_id, $entity->acl_id, Authorization::ADMIN_ROLE);
     }
 
-    public static function isContestAdmin(
-        Identities $identity,
-        ?Users $user,
-        Contests $contest
-    ) : bool {
-        return self::isAdmin($identity, $user, $contest);
+    public static function isContestAdmin($identity_id, Contests $contest) {
+        return self::isAdmin($identity_id, $contest);
     }
 
-    public static function isInterviewAdmin(
-        Identities $identity,
-        ?Users $user,
-        Interviews $interview
-    ) : bool {
-        return self::isAdmin($identity, $user, $interview);
+    public static function isInterviewAdmin($identity_id, Interviews $interview) {
+        return self::isAdmin($identity_id, $interview);
     }
 
-    public static function isProblemAdmin(
-        Identities $identity,
-        ?Users $user,
-        Problems $problem
-    ) : bool {
-        return self::isAdmin($identity, $user, $problem);
+    public static function isProblemAdmin($identity_id, Problems $problem) {
+        return self::isAdmin($identity_id, $problem);
     }
 
     public static function hasRole($identity_id, $acl_id, $role_id) {
@@ -261,10 +226,10 @@ class Authorization {
             UserRolesDAO::hasRole($identity_id, $acl_id, $role_id);
     }
 
-    public static function isSystemAdmin(string $identityId) : bool {
+    public static function isSystemAdmin($identity_id) {
         if (self::$is_system_admin == null) {
-            self::$is_system_admin = self::hasRole(
-                $identityId,
+            self::$is_system_admin = Authorization::hasRole(
+                $identity_id,
                 Authorization::SYSTEM_ACL,
                 Authorization::ADMIN_ROLE
             );
@@ -334,28 +299,21 @@ class Authorization {
         );
     }
 
-    public static function isGroupAdmin(
-        Identities $identity,
-        ?Users $user,
-        Groups $group
-    ) : bool {
-        return self::isAdmin($identity, $user, $group);
+    public static function isGroupAdmin($identity_id, Groups $group) {
+        return self::isAdmin($identity_id, $group);
     }
 
-    private static function isOwner(Users $user, int $aclId) : bool {
-        $acl = ACLsDAO::getByPK($aclId);
-        return $acl->owner_id == $user->user_id;
+    private static function isOwner($identity_id, $acl_id) {
+        // TODO: Remove this when ACL is migrated
+        $owner_id = ACLsDAO::getACLIdentityByPK($acl_id);
+        return $owner_id == $identity_id;
     }
 
     /**
      * An admin is either the group owner or a member of the admin group.
      */
-    public static function isCourseAdmin(
-        Identities $identity,
-        ?Users $user,
-        Courses $course
-    ) : bool {
-        return self::isAdmin($identity, $user, $course);
+    public static function isCourseAdmin($identity_id, Courses $course) {
+        return self::isAdmin($identity_id, $course);
     }
 
     public static function isGroupMember($identity_id, Groups $group) {
@@ -391,16 +349,12 @@ class Authorization {
         self::$groupIdentityCreator = null;
     }
 
-    public static function canSubmitToProblemset(
-        ?Users $user,
-        Identities $identity,
-        ?Problemsets $problemset
-    ) : bool {
+    public static function canSubmitToProblemset($identity_id, $problemset) {
         if (is_null($problemset)) {
             return false;
         }
-        return self::isAdmin($identity, $user, $problemset) ||
-            GroupRolesDAO::isContestant($identity->identity_id, $problemset->acl_id);
+        return self::isAdmin($identity_id, $problemset) ||
+               GroupRolesDAO::isContestant($identity_id, $problemset->acl_id);
     }
 
     public static function canCreatePublicCourse($identity_id) {

@@ -17,7 +17,7 @@ class Broadcaster {
                 'clarification' => [
                     'clarification_id' => (int)$r['clarification']->clarification_id,
                     'problem_alias' => $r['problem']->alias,
-                    'author' => $r['identity']->username,
+                    'author' => $r['user']->username,
                     'message' => $r['clarification']->message,
                     'answer' => $r['clarification']->answer,
                     'time' => $time,
@@ -32,7 +32,7 @@ class Broadcaster {
                 is_null($r['problem']) ? null : $r['problem']->alias,
                 $message,
                 $r['clarification']->public != '0',
-                $r['identity']->username,
+                $r['user']->username,
                 (int)$r['clarification']->author_id,
                 false  // user_only
             );
@@ -58,7 +58,7 @@ class Broadcaster {
                 'url' => is_null($r['contest']) ?
                     ('https://omegaup.com/arena/problem/' . $r['problem']->alias . '#clarifications') :
                     ('https://omegaup.com/arena/' . $r['contest']->alias . '#clarifications'),
-                'user_name' => $r['identity']->username
+                'user_name' => $r['user']->username
             ];
             $subject = ApiUtils::FormatString(
                 Translations::getInstance()->get('clarificationEmailSubject'),

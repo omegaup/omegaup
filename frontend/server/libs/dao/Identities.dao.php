@@ -220,10 +220,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return new Identities($rs);
     }
 
-    public static function getAssociatedIdentities(
-        Users $user,
-        bool $getIdsOnly = false
-    ) : array {
+    public static function getAssociatedIdentities($userId) {
         global  $conn;
         $sql = '
             SELECT
@@ -240,13 +237,9 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 i.user_id = ?
                 ';
 
-        $rs = $conn->GetAll($sql, [$user->user_id]);
+        $rs = $conn->GetAll($sql, [$userId]);
         $result = [];
         foreach ($rs as $identity) {
-            if ($getIdsOnly) {
-                array_push($result, $identity['identity_id']);
-                continue;
-            }
             array_push($result, [
                 'username' => $identity['username'],
                 'default' => $identity['identity_id'] == $identity['main_identity_id'],

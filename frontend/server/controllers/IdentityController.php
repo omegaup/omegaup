@@ -144,11 +144,7 @@ class IdentityController extends Controller {
         if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
-        $group = GroupController::validateGroup(
-            $r['group_alias'],
-            $r->identity,
-            $r->user
-        );
+        $group = GroupController::validateGroup($r['group_alias'], $r->identity->identity_id);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -282,7 +278,7 @@ class IdentityController extends Controller {
         if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
-        GroupController::validateGroup($r['group_alias'], $r->identity, $r->user);
+        GroupController::validateGroup($r['group_alias'], $r->identity->identity_id);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }

@@ -89,7 +89,7 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['identity'] = $r->identity;
+        $r['user'] = $r->user;
         self::clarificationUpdated($r, $time);
 
         return [
@@ -220,7 +220,7 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['problem'] = $r['contest'] = $r['identity'] = null;
+        $r['problem'] = $r['contest'] = $r['user'] = null;
         self::clarificationUpdated($r, $time);
 
         $response = [];
@@ -237,8 +237,8 @@ class ClarificationController extends Controller {
             if (is_null($r['contest']) && !is_null($r['clarification']->problemset_id)) {
                 $r['contest'] = ContestsDAO::getByProblemset($r['clarification']->problemset_id);
             }
-            if (is_null($r['identity'])) {
-                $r['identity'] = IdentitiesDAO::GetByPK($r['clarification']->author_id);
+            if (is_null($r['user'])) {
+                $r['user'] = IdentitiesDAO::GetByPK($r['clarification']->author_id);
             }
         } catch (Exception $e) {
             self::$log->error('Failed to broadcast clarification: ' . $e);
