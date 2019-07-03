@@ -4,13 +4,12 @@
       <h2 class="panel-title">{{ title }} <span class="badge">{{ badges.length }}</span> <a class=
       "badges-link"
          href="/badge/list/"
-         v-if="this.forProfile">{{ this.T.wordsBadgesSeeAll }}</a></h2>
+         v-if="this.showAllBadgesLink">{{ this.T.wordsBadgesSeeAll }}</a></h2>
     </div>
     <div class="panel-body">
       <div class="badges-container">
-        <omegaup-badge v-bind:alias="badge.badge_alias"
+        <omegaup-badge v-bind:badge="badge"
              v-bind:key="badge.badge_alias"
-             v-bind:unlocked="badge.unlocked"
              v-for="badge in badges"></omegaup-badge>
       </div>
     </div>
@@ -46,7 +45,7 @@ import Badge from '../badge/Badge.vue';
 export default class BadgeList extends Vue {
   @Prop() allBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
-  @Prop() forProfile!: boolean;
+  @Prop() showAllBadgesLink!: boolean;
 
   T = T;
 
@@ -70,7 +69,9 @@ export default class BadgeList extends Vue {
   }
 
   get title(): string {
-    return this.forProfile ? T.wordsBadgesObtained : T.omegaupTitleBadges;
+    return this.showAllBadgesLink
+      ? T.wordsBadgesObtained
+      : T.omegaupTitleBadges;
   }
 
   getBadgeName(alias: string): string {

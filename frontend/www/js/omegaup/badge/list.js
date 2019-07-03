@@ -12,23 +12,9 @@ OmegaUp.on('ready', function() {
         props: {
           allBadges: this.allBadges,
           visitorBadges: this.visitorBadges,
-          forProfile: false,
+          showAllBadgesLink: false,
         }
       });
-    },
-    mounted: function() {
-      if (payload.logged_in) {
-        API.Badge.myList({})
-            .then(function(data) {
-              badgeList.visitorBadges =
-                  new Set(data['badges'].map(badge => badge.badge_alias));
-            })
-            .fail(UI.apiError);
-      }
-
-      API.Badge.list({})
-          .then(function(data) { badgeList.allBadges = new Set(data); })
-          .fail(UI.apiError);
     },
     data: {
       allBadges: new Set(),
@@ -38,4 +24,16 @@ OmegaUp.on('ready', function() {
       'omegaup-badge-list': badge_List,
     },
   });
+  if (payload.logged_in) {
+    API.Badge.myList({})
+        .then(function(data) {
+          badgeList.visitorBadges =
+              new Set(data['badges'].map(badge => badge.badge_alias));
+        })
+        .fail(UI.apiError);
+  }
+
+  API.Badge.list({})
+      .then(function(data) { badgeList.allBadges = new Set(data); })
+      .fail(UI.apiError);
 });

@@ -90,7 +90,7 @@
         </table>
         <div v-show="!groupedUnsolvedProblems"><img src="/media/wait.gif"></div>
       </div><omegaup-badge-list v-bind:all-badges="profileBadges"
-           v-bind:for-profile="true"
+           v-bind:show-all-badges-link="true"
            v-bind:visitor-badges="visitorBadges"></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
         <div class="panel-heading">
