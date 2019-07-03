@@ -39,22 +39,21 @@ import { VTooltip } from 'v-tooltip';
   },
 })
 export default class Badge extends Vue {
-  @Prop() alias!: string;
-  @Prop() unlocked!: boolean;
+  @Prop() badge!: omegaup.Badge;
 
   T = T;
 
   get name(): string {
-    return this.T[`badge_${this.alias}_name`];
+    return this.T[`badge_${this.badge.badge_alias}_name`];
   }
 
   get description(): string {
-    return this.T[`badge_${this.alias}_description`];
+    return this.T[`badge_${this.badge.badge_alias}_description`];
   }
 
   get iconUrl(): string {
-    return this.unlocked
-      ? `/media/dist/badges/${this.alias}.svg`
+    return this.badge.unlocked
+      ? `/media/dist/badges/${this.badge.badge_alias}.svg`
       : '/media/locked_badge.svg';
   }
 }
