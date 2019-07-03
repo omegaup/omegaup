@@ -5,7 +5,6 @@ require_once('libs/dao/Problemset_Problems.dao.php');
 
 class ProblemsetController extends Controller {
     public static function validateAddProblemToProblemset(
-        $problemset_id,
         Problems $problem,
         Identities $identity
     ) {
@@ -32,7 +31,6 @@ class ProblemsetController extends Controller {
     ) {
         if ($validateVisibility) {
             ProblemsetController::validateAddProblemToProblemset(
-                $problemset_id,
                 $problem,
                 $identity
             );

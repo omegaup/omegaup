@@ -205,9 +205,13 @@ class Authorization {
             );
     }
 
-    public static function isContestAdmin($identity_id, Contests $contest) {
-        // TODO: Remove this when isAdmin has been merged
-        $identity = IdentitiesDAO::getByPK($identity_id);
+    public static function isContestAdmin(
+        Identities $identity,
+        Contests $contest
+    ) {
+        if (is_null($identity->user_id)) {
+            return false;
+        }
         return self::isAdmin($identity, $contest);
     }
 
@@ -215,6 +219,9 @@ class Authorization {
         Identities $identity,
         Interviews $interview
     ) : bool {
+        if (is_null($identity->user_id)) {
+            return false;
+        }
         return self::isAdmin($identity, $interview);
     }
 
@@ -307,6 +314,9 @@ class Authorization {
     }
 
     public static function isGroupAdmin(Identities $identity, Groups $group) {
+        if (is_null($identity->user_id)) {
+            return false;
+        }
         return self::isAdmin($identity, $group);
     }
 
