@@ -162,7 +162,7 @@ class RunController extends Controller {
                 // Before submit something, user had to open the problem/problemset.
                 if (!ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset_id) &&
                     !Authorization::canSubmitToProblemset(
-                        $r->identity->identity_id,
+                        $r->identity,
                         $r['problemset']
                     )
                 ) {

@@ -25,7 +25,7 @@ class ProblemsetController extends Controller {
         Problems $problem,
         string $commit,
         string $currentVersion,
-        int $current_identity_id,
+        Identities $identity,
         int $points,
         int $order_in_contest = 1,
         bool $validateVisibility = true
@@ -34,7 +34,7 @@ class ProblemsetController extends Controller {
             ProblemsetController::validateAddProblemToProblemset(
                 $problemset_id,
                 $problem,
-                $current_identity_id
+                $identity->identity_id
             );
         }
 
