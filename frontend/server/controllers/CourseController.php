@@ -286,7 +286,7 @@ class CourseController extends Controller {
                     self::addProblemToAssignment(
                         $problem['problem_alias'],
                         $problemset->problemset_id,
-                        $r->user->user_id,
+                        $r->identity,
                         false, // visbility mode validation no needed when it is a clone
                         100,
                         null,
@@ -457,7 +457,7 @@ class CourseController extends Controller {
     private static function addProblemToAssignment(
         string $problemAlias,
         int $problemsetId,
-        int $userId,
+        Identities $identity,
         bool $validateVisibility,
         ?int $points = 100,
         ?string $commit = null,
@@ -479,7 +479,7 @@ class CourseController extends Controller {
             $problem,
             $masterCommit,
             $currentVersion,
-            $userId,
+            $identity,
             $points,
             $order,
             $validateVisibility
@@ -643,7 +643,7 @@ class CourseController extends Controller {
         self::addProblemToAssignment(
             $r['problem_alias'],
             $problemset->problemset_id,
-            $r->identity->identity_id,
+            $r->identity,
             true, /* validateVisibility */
             $points,
             $r['commit']

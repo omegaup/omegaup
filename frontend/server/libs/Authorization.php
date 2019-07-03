@@ -197,8 +197,14 @@ class Authorization {
             self::hasRole($identity_id, $entity->acl_id, Authorization::ADMIN_ROLE);
     }
 
-    public static function isContestAdmin($identity_id, Contests $contest) {
-        return self::isAdmin($identity_id, $contest);
+    public static function isContestAdmin(
+        Identities $identity,
+        Contests $contest
+    ) {
+        if (is_null($identity->user_id)) {
+            return false;
+        }
+        return self::isAdmin($identity->identity_id, $contest);
     }
 
     public static function isInterviewAdmin($identity_id, Interviews $interview) {
