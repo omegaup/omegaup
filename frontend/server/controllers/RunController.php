@@ -430,7 +430,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -472,7 +472,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canEditSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -511,7 +511,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canEditSubmission($r->identity->identity_id, $r['submission'])) {
+        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -575,7 +575,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::canViewSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -616,7 +616,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
