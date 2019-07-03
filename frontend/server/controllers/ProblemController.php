@@ -161,6 +161,7 @@ class ProblemController extends Controller {
      */
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
+        UserController::validateIdentityIsAssociatedWithUser($r->user);
 
         // Validates request
         self::validateCreateOrUpdate($r);
@@ -2323,6 +2324,7 @@ class ProblemController extends Controller {
      */
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
+        UserController::validateIdentityIsAssociatedWithUser($r->user);
         self::validateList($r);
 
         $r->ensureInt('page', null, null, false);

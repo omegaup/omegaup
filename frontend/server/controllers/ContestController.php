@@ -182,7 +182,9 @@ class ContestController extends Controller {
      */
     public static function getContestListInternal(Request $r, $callback_user_function) : Array {
         self::authenticateRequest($r);
-
+        if ($callback_user_function == 'ContestsDAO::getAllContestsOwnedByUser') {
+            UserController::validateIdentityIsAssociatedWithUser($r->user);
+        }
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
@@ -808,6 +810,7 @@ class ContestController extends Controller {
 
         // Authenticate user
         self::authenticateRequest($r);
+        UserController::validateIdentityIsAssociatedWithUser($r->user);
 
         $originalContest = self::validateContestAdmin($r['contest_alias'], $r->identity->identity_id);
 
@@ -885,6 +888,7 @@ class ContestController extends Controller {
 
         // Authenticate user
         self::authenticateRequest($r);
+        UserController::validateIdentityIsAssociatedWithUser($r->user);
 
         try {
             $originalContest = ContestsDAO::getByAlias($r['alias']);
@@ -1031,6 +1035,7 @@ class ContestController extends Controller {
 
         // Authenticate user
         self::authenticateRequest($r);
+        UserController::validateIdentityIsAssociatedWithUser($r->user);
 
         // Validate request
         self::validateCreate($r);

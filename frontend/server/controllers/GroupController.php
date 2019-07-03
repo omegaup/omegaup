@@ -172,6 +172,7 @@ class GroupController extends Controller {
      */
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
+        UserController::validateIdentityIsAssociatedWithUser($r->user);
 
         $response = [];
         $response['groups'] = [];

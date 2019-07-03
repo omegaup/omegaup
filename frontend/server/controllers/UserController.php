@@ -2577,6 +2577,21 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
+
+    /**
+     * This function validates that logged user into the platform with an
+     * unassociated identity is not be able to make any operations. Instead it
+     * throws a ForbiddenAccessException. This function can be only called after
+     * authenticateRequest
+     *
+     * @param Users $user;
+     * @throws ForbiddenAccessException
+     */
+    public static function validateIdentityIsAssociatedWithUser(?Users $user) {
+        if (is_null($user)) {
+            throw new ForbiddenAccessException('userNotAllowed');
+        }
+    }
 }
 
 UserController::$urlHelper = new UrlHelper();
