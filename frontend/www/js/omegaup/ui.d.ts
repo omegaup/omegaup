@@ -5,6 +5,7 @@ declare namespace omegaup {
     formatString: (template: string, values: { [key: string]: string; }) => string;
     navigateTo: (url: string) => void;
     userTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
+    formatDate: (date: Date) => string;
   };
 }
 

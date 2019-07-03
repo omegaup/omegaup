@@ -79,7 +79,7 @@ class BadgeController extends Controller {
      * @param string
      * @throws NotFoundException
      */
-    public static function badgeExists($badge): void {
+    public static function badgeExists(string $badge): void {
         $allBadges = self::getAllBadges();
         if (!in_array($badge, $allBadges)) {
             throw new NotFoundException('badgeNotExist');
