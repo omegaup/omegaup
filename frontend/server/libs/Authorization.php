@@ -187,14 +187,15 @@ class Authorization {
     ) : bool {
         $isCourseAdmin = Authorization::isCourseAdmin(
             $identity,
-            $course,
-            $identity->user_id
+            $course
         );
         $isGroupMember = Authorization::isGroupMember(
             $identity->identity_id,
             $group
         );
-        if (!$isCourseAdmin && !$isGroupMember) {
+        if (!Authorization::isCourseAdmin($identity, $course) &&
+            !Authorization::isGroupMember($identity->identity_id, $group)
+        ) {
             return false;
         }
 

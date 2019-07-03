@@ -59,7 +59,7 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         die();
     }
     $showScoreboard = $session['valid'] && CourseController::shouldShowScoreboard(
-        intval($session['identity']->identity_id),
+        $session['identity'],
         $course,
         $group
     );

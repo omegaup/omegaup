@@ -882,8 +882,8 @@ class CourseController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
             unset($assignment['problemset_id']);
-            if (!Authorization::isCourseAdmin($r->identity, $course) &&
-                $assignment['start_time'] > $time
+            if ($assignment['start_time'] > $time &&
+                !Authorization::isCourseAdmin($r->identity, $course)
             ) {
                 // Non-admins should not be able to see the assignments ahead
                 // of time.
