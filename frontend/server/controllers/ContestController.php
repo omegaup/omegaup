@@ -1152,7 +1152,11 @@ class ContestController extends Controller {
                 if (is_null($p)) {
                     throw new InvalidParameterException('parameterNotFound', 'problems');
                 }
-                ProblemsetController::validateAddProblemToProblemset(null, $p, $r->identity->identity_id);
+                ProblemsetController::validateAddProblemToProblemset(
+                    null,
+                    $p,
+                    $r->identity
+                );
                 array_push($problems, [
                     'id' => $p->problem_id,
                     'alias' => $problem->problem,
@@ -1306,7 +1310,12 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Validate the request and get the problem and the contest in an array
-        $params = self::validateAddToContestRequest($r, $r['contest_alias'], $r['problem_alias'], $r->identity->identity_id);
+        $params = self::validateAddToContestRequest(
+            $r,
+            $r['contest_alias'],
+            $r['problem_alias'],
+            $r->identity
+        );
 
         self::forbiddenInVirtual($params['contest']);
 
@@ -1355,8 +1364,7 @@ class ContestController extends Controller {
     private static function validateAddToContestRequest(
         Request $r,
         string $contestAlias,
-        ?string $problemAlias,
-        int $currentIdentityId
+        ?string $problemAlias
     ) : Array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
@@ -1392,7 +1400,10 @@ class ContestController extends Controller {
             || $problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
-        if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin($currentIdentityId, $problem)) {
+        if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin(
+            $r->identity,
+            $problem
+        )) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
 
