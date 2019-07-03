@@ -1053,7 +1053,7 @@ class ProblemController extends Controller {
                     }
                 } else {    // Not a contest, but we still have a problemset
                     if (!Authorization::canSubmitToProblemset(
-                        $r->identity->identity_id,
+                        $r->identity,
                         $problemset['problemset']
                     )
                     ) {
@@ -1494,7 +1494,7 @@ class ProblemController extends Controller {
                         $r->identity->identity_id,
                         $problemset->problemset_id,
                         Authorization::canSubmitToProblemset(
-                            $r->identity->identity_id,
+                            $r->identity,
                             $problem['problemset']
                         )
                     );

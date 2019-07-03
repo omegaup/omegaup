@@ -14,8 +14,12 @@ class GroupScoreboardController extends Controller {
      * @param $identityId
      * @param $scoreboardAlias
      */
-    private static function validateGroupScoreboard($groupAlias, $identityId, $scoreboardAlias) {
-        GroupController::validateGroup($groupAlias, $identityId);
+    private static function validateGroupScoreboard(
+        string $groupAlias,
+        Identities $identity,
+        string $scoreboardAlias
+    ) {
+        GroupController::validateGroup($groupAlias, $identity);
 
         Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
         try {
@@ -48,7 +52,7 @@ class GroupScoreboardController extends Controller {
     ) {
         $scoreboard = self::validateGroupScoreboard(
             $groupAlias,
-            $identity->identity_id,
+            $identity,
             $scoreboardAlias
         );
 
@@ -155,7 +159,11 @@ class GroupScoreboardController extends Controller {
      */
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
-        $scoreboard = self::validateGroupScoreboard($r['group_alias'], $r->identity->identity_id, $r['scoreboard_alias']);
+        $scoreboard = self::validateGroupScoreboard(
+            $r['group_alias'],
+            $r->identity,
+            $r['scoreboard_alias']
+        );
 
         $response = [];
 
@@ -228,7 +236,7 @@ class GroupScoreboardController extends Controller {
      */
     public static function apiList(Request $r) {
         self::authenticateRequest($r);
-        $group = GroupController::validateGroup($r['group_alias'], $r->identity->identity_id);
+        $group = GroupController::validateGroup($r['group_alias'], $r->identity);
 
         $response = [];
         $response['scoreboards'] = [];

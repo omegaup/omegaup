@@ -180,9 +180,14 @@ class Authorization {
         return self::isGroupIdentityCreator($identity_id);
     }
 
-    public static function canViewCourse($identity_id, Courses $course, Groups $group) {
-        if (!Authorization::isCourseAdmin($identity_id, $course) &&
-            !Authorization::isGroupMember($identity_id, $group)) {
+    public static function canViewCourse(
+        Identities $identity,
+        Courses $course,
+        Groups $group
+    ) : bool {
+        if (!Authorization::isCourseAdmin($identity, $course) &&
+            !Authorization::isGroupMember($identity->identity_id, $group)
+        ) {
             return false;
         }
 
@@ -207,8 +212,11 @@ class Authorization {
         return self::isAdmin($identity->identity_id, $contest);
     }
 
-    public static function isInterviewAdmin($identity_id, Interviews $interview) {
-        return self::isAdmin($identity_id, $interview);
+    public static function isInterviewAdmin(
+        Identities $identity,
+        Interviews $interview
+    ) : bool {
+        return self::isAdmin($identity->identity_id, $interview);
     }
 
     public static function isProblemAdmin($identity_id, Problems $problem) {
@@ -293,8 +301,8 @@ class Authorization {
         );
     }
 
-    public static function isGroupAdmin($identity_id, Groups $group) {
-        return self::isAdmin($identity_id, $group);
+    public static function isGroupAdmin(Identities $identity, Groups $group) {
+        return self::isAdmin($identity->identity_id, $group);
     }
 
     private static function isOwner($identity_id, $acl_id) {
@@ -306,8 +314,14 @@ class Authorization {
     /**
      * An admin is either the group owner or a member of the admin group.
      */
-    public static function isCourseAdmin($identity_id, Courses $course) {
-        return self::isAdmin($identity_id, $course);
+    public static function isCourseAdmin(
+        Identities $identity,
+        Courses $course
+    ) : bool {
+        if (is_null($identity->user_id)) {
+            return false;
+        }
+        return self::isAdmin($identity->identity_id, $course);
     }
 
     public static function isGroupMember($identity_id, Groups $group) {
@@ -343,12 +357,18 @@ class Authorization {
         self::$groupIdentityCreator = null;
     }
 
-    public static function canSubmitToProblemset($identity_id, $problemset) {
+    public static function canSubmitToProblemset(
+        Identities $identity,
+        ?Problemsets $problemset
+    ) : bool {
         if (is_null($problemset)) {
             return false;
         }
-        return self::isAdmin($identity_id, $problemset) ||
-               GroupRolesDAO::isContestant($identity_id, $problemset->acl_id);
+        return self::isAdmin($identity->identity_id, $problemset) ||
+               GroupRolesDAO::isContestant(
+                   $identity->identity_id,
+                   $problemset->acl_id
+               );
     }
 
     public static function canCreatePublicCourse($identity_id) {

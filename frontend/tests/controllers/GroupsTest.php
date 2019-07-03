@@ -30,7 +30,7 @@ class GroupsTest extends OmegaupTestCase {
         $group = GroupsDAO::getByName($name);
         $this->assertNotNull($group);
         $this->assertEquals($description, $group->description);
-        $this->assertTrue(Authorization::isGroupAdmin($identity->identity_id, $group));
+        $this->assertTrue(Authorization::isGroupAdmin($identity, $group));
     }
 
     /**
