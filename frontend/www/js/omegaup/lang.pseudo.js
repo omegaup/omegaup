@@ -42,6 +42,7 @@ const translations = {
 	arenaRunSubmitUpload: "(Or up10ad 7h3 fi13)",
 	arenaRunSubmitWaitBetweenUploads: "(Y0u mu57 wai7 %(submissionGap) 53c0nd5 b37w33n 5ubmi55i0n5 f0r a pr0b13m)",
 	assignmentNotFound: "(A55ignm3n7 n07 f0und)",
+	badgeNotExist: "(Th3 pr0vid3d badg3 d035n'7 3xi57.)",
 	badge_100solvedProblems_description: "(U53r ha5 501v3d 100 0r m0r3 pr0b13m5.)",
 	badge_100solvedProblems_name: "(100 501v3d Pr0b13m5)",
 	badge_500score_description: "(U53r ha5 achi3v3d a 5c0r3 3qua1 70 0r gr3a73r 7han 500.)",

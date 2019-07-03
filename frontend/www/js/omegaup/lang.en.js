@@ -42,6 +42,7 @@ const translations = {
 	arenaRunSubmitUpload: "Or upload the file",
 	arenaRunSubmitWaitBetweenUploads: "You must wait %(submissionGap) seconds between submissions for a problem",
 	assignmentNotFound: "Assignment not found",
+	badgeNotExist: "The provided badge doesn't exist.",
 	badge_100solvedProblems_description: "User has solved 100 or more problems.",
 	badge_100solvedProblems_name: "100 solved Problems",
 	badge_500score_description: "User has achieved a score equal to or greater than 500.",

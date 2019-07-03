@@ -73,6 +73,20 @@ class BadgeController extends Controller {
     }
 
     /**
+     * Checks if badge exists in the all badges array,
+     * if not, it throws an exception.
+     *
+     * @param string
+     * @throws NotFoundException
+     */
+    public static function badgeExists($badge): void {
+        $allBadges = self::getAllBadges();
+        if (!in_array($badge, $allBadges)) {
+            throw new NotFoundException('badgeNotExist');
+        }
+    }
+
+    /**
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
@@ -83,11 +97,8 @@ class BadgeController extends Controller {
     public static function apiMyBadgeAssignationTime(Request $r) {
         self::authenticateRequest($r);
         Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
-        $allBadges = self::getAllBadges();
         $badge = $r['badge_alias'];
-        if (!in_array($badge, $allBadges)) {
-            throw new NotFoundException('badgeNotExist');
-        }
+        self::badgeExists($badge);
         try {
             return [
                 'status' => 'ok',
@@ -112,11 +123,8 @@ class BadgeController extends Controller {
      */
     public static function apiBadgeDetails(Request $r) {
         Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
-        $allBadges = self::getAllBadges();
         $badge = $r['badge_alias'];
-        if (!in_array($badge, $allBadges)) {
-            throw new NotFoundException('badgeNotExist');
-        }
+        self::badgeExists($badge);
         try {
             $totalUsers = max(UsersDAO::getUsersCount(), 1);
             $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($badge);
