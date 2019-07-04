@@ -360,7 +360,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         user_id = util.database_utils.mysql(
             ('''
             INSERT INTO
-                Users(`username`, `password`, `verified`, `name`)
+                Users(`username`, `password`, `verified`)
             VALUES
                 ('%s', '%s', 1, '%s');
             SELECT LAST_INSERT_ID();
