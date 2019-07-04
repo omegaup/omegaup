@@ -17,7 +17,7 @@ OmegaUp.on('ready', function() {
     data: {
       badge: {
         badge_alias: payload.badge,
-        assignation_time: -1,
+        assignation_time: null,
         first_assignation: null,
         owners_percentage: null,
       }

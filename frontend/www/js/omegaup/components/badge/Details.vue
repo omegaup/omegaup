@@ -114,26 +114,26 @@ export default class BadgeDetails extends Vue {
   }
 
   get iconUrl(): string {
-    return this.unlockedBadge()
+    return !!this.badge.assignation_time
       ? `/media/dist/badges/${this.badge.badge_alias}.svg`
       : '/media/locked_badge.svg';
   }
 
   get ownedMessage(): string {
-    return this.unlockedBadge()
+    return !!this.badge.assignation_time
       ? `<span class="badge-detail-text-icon">😁</span> ${this.T['badgeAssignationTimeMessage']}`
       : `<span class="badge-detail-text-icon">😞</span> ${this.T['badgeNotAssignedMessage']}`;
   }
 
   get firstAssignationDate(): string {
     return this.badge.first_assignation
-      ? this.UI.formatDate(new Date(this.badge.first_assignation * 1000))
+      ? this.UI.formatDate(this.badge.first_assignation)
       : '';
   }
 
   get assignationDate(): string {
-    return this.unlockedBadge() && this.badge.assignation_time
-      ? this.UI.formatDate(new Date(this.badge.assignation_time * 1000))
+    return !!this.badge.assignation_time
+      ? this.UI.formatDate(this.badge.assignation_time)
       : '';
   }
 
@@ -141,10 +141,6 @@ export default class BadgeDetails extends Vue {
     return this.badge.owners_percentage
       ? `${this.badge.owners_percentage.toFixed(2)}%`
       : '';
-  }
-
-  unlockedBadge(): boolean {
-    return this.badge.assignation_time !== -1 && !!this.badge.assignation_time;
   }
 }
 

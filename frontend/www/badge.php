@@ -9,7 +9,7 @@ if (empty($_REQUEST['badge'])) {
 
 $badgeAlias = $_REQUEST['badge'];
 try {
-    BadgeController::badgeExists($_REQUEST['badge']);
+    Validators::validateBadgeExists($_REQUEST['badge'], BadgeController::getAllBadges());
     $smarty->assign('badge', $_REQUEST['badge']);
 } catch (NotFoundException $e) {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
