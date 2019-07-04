@@ -73,20 +73,6 @@ class BadgeController extends Controller {
     }
 
     /**
-     * Checks if badge exists in the all badges array,
-     * if not, it throws an exception.
-     *
-     * @param string
-     * @throws NotFoundException
-     */
-    public static function badgeExists(string $badge): void {
-        $allBadges = self::getAllBadges();
-        if (!in_array($badge, $allBadges)) {
-            throw new NotFoundException('badgeNotExist');
-        }
-    }
-
-    /**
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
@@ -96,15 +82,14 @@ class BadgeController extends Controller {
      */
     public static function apiMyBadgeAssignationTime(Request $r) {
         self::authenticateRequest($r);
-        Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
-        $badge = $r['badge_alias'];
-        self::badgeExists($badge);
+        Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
+        Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
         try {
             return [
                 'status' => 'ok',
                 'assignation_time' => is_null($r->user) ?
                     null :
-                    UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $badge),
+                    UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $r['badge_alias']),
             ];
         } catch (ApiException $e) {
             throw $e;
@@ -122,13 +107,12 @@ class BadgeController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiBadgeDetails(Request $r) {
-        Validators::validateStringNonEmpty($r['badge_alias'], 'badge_alias');
-        $badge = $r['badge_alias'];
-        self::badgeExists($badge);
+        Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
+        Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
         try {
             $totalUsers = max(UsersDAO::getUsersCount(), 1);
-            $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($badge);
-            $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($badge);
+            $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($r['badge_alias']);
+            $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($r['badge_alias']);
             return [
                 'status' => 'ok',
                 'first_assignation' => $firstAssignation,
