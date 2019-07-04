@@ -1446,7 +1446,7 @@ class ProblemController extends Controller {
         if (ProblemsDAO::isVisible($problem['problem']) ||
             Authorization::isProblemAdmin($r->identity->identity_id, $problem['problem'])) {
             $acl = ACLsDAO::getByPK($problem['problem']->acl_id);
-            $problemsetter = UsersDAO::getByPK($acl->owner_id);
+            $problemsetter = IdentitiesDAO::findByUserId($acl->owner_id);
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
                 'name' => is_null($problemsetter->name) ?

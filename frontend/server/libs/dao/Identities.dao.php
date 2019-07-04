@@ -50,18 +50,21 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return new Identities($rs);
     }
 
-    public static function FindByUserId($user_id) {
+    public static function findByUserId($userId) : Identities {
         global  $conn;
         $sql = 'SELECT
                   i.*
                 FROM
                   `Identities` i
+                INNER JOIN
+                  `Users` u
+                ON
+                  i.identity_id = u.main_identity_id
                 WHERE
                   i.user_id = ?
                 LIMIT
                   0, 1';
-        $params = [ $user_id ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = $conn->GetRow($sql, [$userId]);
         if (empty($rs)) {
             return null;
         }

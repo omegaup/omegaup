@@ -93,8 +93,9 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
 
-        $this->assertEquals($r['name'], $userDb->name);
+        $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $userDb->country_id);
         $this->assertEquals($r['state_id'], $userDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
@@ -120,7 +121,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($r['name'], $userDb->name);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
+        $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $userDb->country_id);
         $this->assertEquals($r['state_id'], $userDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
@@ -134,8 +136,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         ])));
 
         $identity = IdentitiesDAO::getByPK($userDb->main_identity_id);
-        $this->assertEquals($identity->username, $userDb->username);
-        $this->assertEquals($identity->password, $userDb->password);
+        $this->assertEquals($identity->username, $identityDb->username);
+        $this->assertEquals($identity->password, $identityDb->password);
     }
 
     /**
@@ -156,10 +158,11 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
 
         // Getting identity data from db
         $identity = IdentitiesDAO::getByPK($userDb->main_identity_id);
-        $this->assertEquals($identity->username, $userDb->username);
-        $this->assertEquals($identity->password, $userDb->password);
+        $this->assertEquals($identity->username, $identityDb->username);
+        $this->assertEquals($identity->password, $identityDb->password);
     }
 }
