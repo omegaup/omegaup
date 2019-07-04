@@ -7,7 +7,7 @@
 
   & .caret {
     border-top-color: $white;
-    border-bottom-color: $white; 
+    border-bottom-color: $white;
   }
 
   & .active {
@@ -17,6 +17,8 @@
   }
 
   & .navbar-header {
+    margin: 0;
+
     img {
       height: 20px;
     }
@@ -47,7 +49,7 @@
     img {
       width: 51px;
       height: 51px;
-      margin-right: 10px; 
+      margin-right: 10px;
     }
   }
 
@@ -56,6 +58,7 @@
   }
 
   & .navbar-nav {
+    margin: 0;
     li {
       a {
         color: $header-font-primary-color;
@@ -85,7 +88,7 @@
         li {
           a {
             color: $header-font-secondary-color;
-            
+
             &:hover {
               background-color: $header-dropdown-active-item;
             }
@@ -101,6 +104,14 @@
     margin-right: auto;
     padding-left: 0;
     padding-right: 0;
+  }
+
+  .navbar-collapse {
+    max-height: none;
+
+    &.in {
+      overflow-y: visible;
+    }
   }
 
   #grader-status {
