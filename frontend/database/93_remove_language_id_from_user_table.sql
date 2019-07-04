@@ -6,3 +6,4 @@ ALTER TABLE `Identities`
 -- Removing Keys, Foreign keys and columns in Users table in order to maintain data integrity
 ALTER TABLE `Users`
   DROP COLUMN `language_id`;
+  

@@ -1660,7 +1660,7 @@ class UserController extends Controller {
             DAO::transBegin();
 
             UsersDAO::save($r->user);
-            IdentityController::convertFromUser($r->identity);
+            IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -1826,7 +1826,7 @@ class UserController extends Controller {
 
             UsersDAO::save($r->user);
 
-            IdentityController::convertFromUser($r->identity);
+            IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
         } catch (Exception $e) {

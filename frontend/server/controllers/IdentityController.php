@@ -6,21 +6,6 @@
  * @author juan.pablo
  */
 class IdentityController extends Controller {
-    public static function convertFromUser(Identities $identity) {
-        return IdentitiesDAO::update(new Identities([
-            'identity_id' => $identity->identity_id,
-            'username' => $identity->username,
-            'password' => $identity->password,
-            'name' => $identity->name,
-            'user_id' => $identity->user_id,
-            'language_id' => $identity->language_id,
-            'country_id' => $identity->country_id,
-            'state_id' => $identity->state_id,
-            'school_id' => $identity->school_id,
-            'gender' => $identity->gender,
-        ]));
-    }
-
     /**
      * Given a username or a email, returns the identity object
      *
