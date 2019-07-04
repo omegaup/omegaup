@@ -160,8 +160,7 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiCreate(Request $r) {
-        self::authenticateRequest($r);
-        UserController::validateIdentityIsAssociatedWithUser($r->user);
+        self::authenticateRequest($r, true /* validateRealUser */);
 
         // Validates request
         self::validateCreateOrUpdate($r);
@@ -2323,8 +2322,7 @@ class ProblemController extends Controller {
      * @param Request $r
      */
     public static function apiMyList(Request $r) {
-        self::authenticateRequest($r);
-        UserController::validateIdentityIsAssociatedWithUser($r->user);
+        self::authenticateRequest($r, true /* validateRealUser */);
         self::validateList($r);
 
         $r->ensureInt('page', null, null, false);

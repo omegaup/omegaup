@@ -814,11 +814,11 @@ class RunCreateTest extends OmegaupTestCase {
         RunsFactory::gradeRun($waRunData, 0, 'WA', 60);
 
         // Contestant should be able to view run (but not the run details).
-        $identity = IdentityController::resolveIdentity(
+        $contestantIdentity = IdentityController::resolveIdentity(
             $contestant->username
         );
         $this->assertFalse(Authorization::isProblemAdmin(
-            $identity,
+            $contestantIdentity,
             $problemData['problem']
         ));
         $response = RunController::apiDetails(new Request([

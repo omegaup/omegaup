@@ -180,11 +180,7 @@ class ContestController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getContestListInternal(Request $r, $callback_user_function) : Array {
-        self::authenticateRequest($r);
-        if ($callback_user_function == 'ContestsDAO::getAllContestsOwnedByUser') {
-            UserController::validateIdentityIsAssociatedWithUser($r->user);
-        }
+    private static function getContestListInternal(Request $r, $callback_user_function) : Array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
@@ -232,6 +228,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
+        self::authenticateRequest($r, true /* validateRealUser */);
         return self::getContestListInternal($r, 'ContestsDAO::getAllContestsOwnedByUser');
     }
 
@@ -243,6 +240,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListParticipating(Request $r) {
+        self::authenticateRequest($r);
         return self::getContestListInternal($r, 'ContestsDAO::getContestsParticipating');
     }
 
@@ -822,8 +820,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
-        UserController::validateIdentityIsAssociatedWithUser($r->user);
+        self::authenticateRequest($r, true /* validateRealUser */);
 
         $originalContest = self::validateContestAdmin(
             $r['contest_alias'],
@@ -903,8 +900,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
-        UserController::validateIdentityIsAssociatedWithUser($r->user);
+        self::authenticateRequest($r, true /* validateRealUser */);
 
         try {
             $originalContest = ContestsDAO::getByAlias($r['alias']);
@@ -1050,8 +1046,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
-        UserController::validateIdentityIsAssociatedWithUser($r->user);
+        self::authenticateRequest($r, true /* validateRealUser */);
 
         // Validate request
         self::validateCreate($r);
