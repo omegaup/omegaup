@@ -362,9 +362,9 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             INSERT INTO
                 Users(`username`, `password`, `verified`)
             VALUES
-                ('%s', '%s', 1, '%s');
+                ('%s', '%s', 1);
             SELECT LAST_INSERT_ID();
-            ''') % (username, password, username),
+            ''') % (username, password),
             dbname='omegaup', auth=self.mysql_auth())
         identity_id = util.database_utils.mysql(
             ('''

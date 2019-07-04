@@ -1672,14 +1672,17 @@ class UserController extends Controller {
         }
 
         try {
-            $users = UsersDAO::FindByUsernameOrName($r[$param]);
+            $identities = UsersDAO::findByUsernameOrName($r[$param]);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         $response = [];
-        foreach ($users as $user) {
-            $entry = ['label' => $user->username, 'value' => $user->username];
+        foreach ($identities as $identity) {
+            $entry = [
+                'label' => $identity->username,
+                'value' => $identity->username
+            ];
             array_push($response, $entry);
         }
 
