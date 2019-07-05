@@ -2,7 +2,7 @@
   <figure class="badge-container"
           v-tooltip="description">
     <a class="badge-icon"
-            v-bind:href="`/badge/${this.badge.badge_alias}`"><img v-bind:src="this.iconUrl"></a>
+            v-bind:href="`/badge/${this.badge.badge_alias}/`"><img v-bind:src="this.iconUrl"></a>
     <figcaption class="badge-name">
       {{ this.name }}
     </figcaption>
