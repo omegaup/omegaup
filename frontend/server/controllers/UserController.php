@@ -1648,19 +1648,21 @@ class UserController extends Controller {
 
             Validators::validateValidUsername($r['username'], 'username');
             $r->user->username = $r['username'];
-            $r->identity->password = $r['username'];
         }
 
         SecurityTools::testStrongPassword($r['password']);
         $hashedPassword = SecurityTools::hashString($r['password']);
         $r->user->password = $hashedPassword;
-        $r->identity->password = $hashedPassword;
 
         try {
             DAO::transBegin();
 
-            UsersDAO::save($r->user);
-            IdentityController::convertFromUser($r->user);
+            // Update username and password for user object
+            UsersDAO::update($r->user);
+
+            // Update username and password for identity object
+            $r->identity->username = $r['username'];
+            $r->identity->password = $hashedPassword;
             IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
@@ -1704,7 +1706,6 @@ class UserController extends Controller {
 
         if (!is_null($r['name'])) {
             Validators::validateStringOfLengthInRange($r['name'], 'name', 1, 50);
-            $r->identity->name = $r['name'];
         }
 
         $state = null;
@@ -1722,8 +1723,6 @@ class UserController extends Controller {
             if (is_null($state)) {
                 throw new InvalidParameterException('parameterInvalid', 'state_id');
             }
-            $r->identity->state_id = $state->state_id;
-            $r->identity->country_id = $state->country_id;
         }
 
         if (!is_null($r['school_id'])) {
@@ -1737,7 +1736,6 @@ class UserController extends Controller {
                 if (is_null($r['school'])) {
                     throw new InvalidParameterException('parameterInvalid', 'school');
                 }
-                $r->identity->school_id = $r['school']->school_id;
             } elseif (empty($r['school_name'])) {
                 $r['school_id'] = null;
             } else {
@@ -1749,7 +1747,6 @@ class UserController extends Controller {
                         'auth_token' => $r['auth_token'],
                     ]));
                     $r['school_id'] = $response['school_id'];
-                    $r->identity->school_id = $response['school_id'];
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
@@ -1825,8 +1822,15 @@ class UserController extends Controller {
         try {
             DAO::transBegin();
 
-            UsersDAO::save($r->user);
-            IdentityController::convertFromUser($r->user);
+            // Update user object
+            UsersDAO::update($r->user);
+
+            // Update identity object, because these parameters eventually will
+            // be no longer available in user object
+            $r->identity->name = $r['name'];
+            $r->identity->state_id = $r['state_id'];
+            $r->identity->country_id = $r['country_id'];
+            $r->identity->school_id = $r['school_id'];
             IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
