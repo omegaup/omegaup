@@ -16,8 +16,7 @@
     </div>
     <div class="navbar-collapse collapse" id="collapsible-navbar" aria-expanded="false" >
       <ul class="nav navbar-nav">
-      {if !$smarty.const.OMEGAUP_LOCKDOWN}
-      {* {if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)} *}
+      {if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
           <li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
           {if $LOGGED_IN eq '1'}
             <li class="dropdown" id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
@@ -59,7 +58,7 @@
                 {$CURRENT_USER_GRAVATAR_URL_51}
                 <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <span id="grader-count" class="badge">
+                  <span class="grader-count badge">
                     <img src="/media/waitcircle.gif" />
                   </span>
                 {/if}
@@ -68,12 +67,9 @@
               <ul class="dropdown-menu">
                 <li><a href='/profile/'><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
                 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
-                <hr class="dropdown-separator">
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <li id="grader-status" class="dropdown">
-                    <ul class="grader-status-dropdown">
-                    </ul>
-                  </li>
+                  <hr class="dropdown-separator">
+                  <li class="dropdown grader-status"></li>
                 {/if}
               </ul>
             </li>

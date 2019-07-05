@@ -114,7 +114,7 @@
     }
   }
 
-  #grader-count {
+  .grader-count {
     &.grader-error {
       color: $status-error;
       background-image: linear-gradient(rgb(242, 222, 222) 0px, rgb(231, 195, 195) 100%);
@@ -134,15 +134,18 @@
     }
   }
 
-  #grader-status {
-    a {
+  .grader-status {
+    a.grader-status-link {
       background-color: $white;
       color: $black;
       text-decoration: none;
+      &:hover {
+        background-color: $white;
+      }
     }
-
-    .grader-status-dropdown {
-      padding: 4px 20px 0;
+    p, pre {
+      margin: 0;
+      padding: 3px 20px;
     }
   }
 

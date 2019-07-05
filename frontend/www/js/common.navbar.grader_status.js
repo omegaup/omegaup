@@ -1,13 +1,13 @@
 (function() {
-  var graderCount = $('#grader-count');
-  var graderDropDown = $('#grader-status .grader-status-dropdown');
+  var graderCount = $('.grader-count');
+  var graderDropDown = $('.grader-status');
 
   function updateGraderStatus() {
     graderCount.removeClass(
         'grader-error grader-ok grader-warning grader-unknown');
     graderCount.html("<img src='/media/waitcircle.gif' />");
-    var html = '<li><a href="/arena/admin/">' +
-               omegaup.T.wordsLatestSubmissions + '</a></li>';
+    var html = '<a class="grader-status-link" href="/arena/admin/">' +
+               omegaup.T.wordsLatestSubmissions + '</a>';
     omegaup.API.Grader.status()
         .then(function(stats) {
           var graderInfo = stats.grader;
@@ -22,17 +22,17 @@
             } else {
               graderCount.addClass('grader-warning');
             }
-            html += '<li><a>Grader OK</a></li>';
-            html += '<li><a>Broadcaster sockets: ' +
-                    graderInfo.broadcaster_sockets + '</a></li>';
-            html += '<li><a>Embedded runner: ' + graderInfo.embedded_runner +
-                    '</a></li>';
-            html += '<li><a>Queues: <pre style="width: 50em;">' +
+            html += '<p>Grader OK</p>';
+            html += '<p>Broadcaster sockets: ' +
+                    graderInfo.broadcaster_sockets + '</p>';
+            html += '<p>Embedded runner: ' + graderInfo.embedded_runner +
+                    '</p>';
+            html += '<p>Queues: <pre style="width: 50em;">' +
                     omegaup.UI.prettyPrintJSON(graderInfo.queue) +
-                    '</pre></a></li>';
+                    '</pre></p>';
           } else {
             graderCount.addClass('grader-error');
-            html += '<li><a>Grader DOWN</a></li>';
+            html += '<p>Grader DOWN</p>';
           }
 
           graderCount.text(queueLength);
@@ -40,10 +40,10 @@
         })
         .fail(function(stats) {
           graderCount.addClass('grader-error');
-          html += '<li><a>Grader DOWN</a></li>';
-          html += '<li><a>API api/grader/status call failed:';
+          html += '<p>Grader DOWN</p>';
+          html += '<p>API api/grader/status call failed:';
           html += omegaup.UI.escape(stats.error);
-          html += '</a></li>';
+          html += '</p>';
           graderCount.text('?');
           graderDropDown.html(html);
         });
