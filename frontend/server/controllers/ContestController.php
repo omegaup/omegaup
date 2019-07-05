@@ -228,7 +228,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
-        self::authenticateRequest($r, true /* validateRealUser */);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         return self::getContestListInternal($r, 'ContestsDAO::getAllContestsOwnedByUser');
     }
 
@@ -820,7 +820,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r, true /* validateRealUser */);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         $originalContest = self::validateContestAdmin(
             $r['contest_alias'],
@@ -900,7 +900,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r, true /* validateRealUser */);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         try {
             $originalContest = ContestsDAO::getByAlias($r['alias']);
@@ -1046,7 +1046,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r, true /* validateRealUser */);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         // Validate request
         self::validateCreate($r);

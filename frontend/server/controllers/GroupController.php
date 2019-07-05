@@ -171,7 +171,7 @@ class GroupController extends Controller {
      * @param Request $r
      */
     public static function apiMyList(Request $r) {
-        self::authenticateRequest($r, true /* validateRealUser */);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         $response = [];
         $response['groups'] = [];

@@ -238,7 +238,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r, true /* validateRealUser */);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateClone($r);
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
@@ -314,7 +314,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r, true /* validateRealUser */);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateCreate($r);
 
         self::createCourseAndGroup(new Courses([
