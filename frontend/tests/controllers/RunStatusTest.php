@@ -40,13 +40,17 @@ class RunStatusTest extends OmegaupTestCase {
     public function testDownload() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
+        $contestantIdentity = IdentityController::resolveIdentity($user->username);
+        $authorIdentity = IdentityController::resolveIdentity(
+            $problemData['author']->username
+        );
         $runData = RunsFactory::createRunToProblem($problemData, $user);
         RunsFactory::gradeRun($runData);
 
         try {
             RunController::downloadSubmission(
                 $runData['response']['guid'],
-                $user->main_identity_id,
+                $contestantIdentity,
                 false
             );
             $this->fail('Should not have allowed to download submission');
@@ -56,7 +60,7 @@ class RunStatusTest extends OmegaupTestCase {
 
         $submissionZip = RunController::downloadSubmission(
             $runData['response']['guid'],
-            $problemData['author']->main_identity_id,
+            $authorIdentity,
             false
         );
         $this->assertNotNull($submissionZip);
