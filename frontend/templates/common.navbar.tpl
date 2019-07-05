@@ -68,25 +68,18 @@
               <ul class="dropdown-menu">
                 <li><a href='/profile/'><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
                 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
-                {* {if $CURRENT_USER_IS_ADMIN eq '1'}
+                <hr class="dropdown-separator">
+                {if $CURRENT_USER_IS_ADMIN eq '1'}
                   <li id="grader-status" class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="grader-count"><img src="/media/waitcircle.gif" /></span> <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
+                    <ul class="grader-status-dropdown">
                     </ul>
-                  </li> *}
-                {* {/if} CURRENT_USER_IS_ADMIN *}
+                  </li>
+                {/if}
               </ul>
             </li>
           {else} {* LOGGED_IN *}
             <li><a href="/login/?redirect={$smarty.server.REQUEST_URI|escape:'url'}">{#navLogIn#}</a></li>
           {/if}
-          {if $CURRENT_USER_IS_ADMIN eq '1'}
-            <li id="grader-status" class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="grader-count"><img src="/media/waitcircle.gif" /></span> <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-              </ul>
-            </li>
-          {/if} {* CURRENT_USER_IS_ADMIN *}
         {else} {* OMEGAUP_LOCKDOWN *}
           </ul>
           <ul class="nav navbar-nav navbar-right">

@@ -1,11 +1,10 @@
 (function() {
-  var graderStatus = $('#grader-status > a');
   var graderCount = $('#grader-count');
-  var graderDropDown = $('#grader-status .dropdown-menu');
+  var graderDropDown = $('#grader-status .grader-status-dropdown');
 
   function updateGraderStatus() {
     graderCount.removeClass(
-      'grader-error grader-ok grader-warning grader-unknown');
+        'grader-error grader-ok grader-warning grader-unknown');
     graderCount.html("<img src='/media/waitcircle.gif' />");
     var html = '<li><a href="/arena/admin/">' +
                omegaup.T.wordsLatestSubmissions + '</a></li>';
