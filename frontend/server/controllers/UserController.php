@@ -1204,14 +1204,14 @@ class UserController extends Controller {
         }
 
         try {
-            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
+            $userDb = UsersDAO::getExtendedProfileDataByPk($user->user_id);
 
-            $response['userinfo']['email'] = $user_db['email'];
-            $response['userinfo']['country'] = $user_db['country'];
-            $response['userinfo']['country_id'] = $user->country_id ?? 'xx';
-            $response['userinfo']['state'] = $user_db['state'];
-            $response['userinfo']['state_id'] = $user->state_id;
-            $response['userinfo']['school'] = $user_db['school'];
+            $response['userinfo']['email'] = $userDb['email'];
+            $response['userinfo']['country'] = $userDb['country'];
+            $response['userinfo']['country_id'] = $userDb['country_id'];
+            $response['userinfo']['state'] = $userDb['state'];
+            $response['userinfo']['state_id'] = $userDb['state_id'];
+            $response['userinfo']['school'] = $userDb['school'];
             $response['userinfo']['school_id'] = $user->school_id;
 
             if (!is_null($user->language_id)) {
@@ -1737,6 +1737,7 @@ class UserController extends Controller {
 
             UsersDAO::save($r->user);
             IdentityController::convertFromUser($r->user);
+            IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -1779,6 +1780,7 @@ class UserController extends Controller {
 
         if (!is_null($r['name'])) {
             Validators::validateStringOfLengthInRange($r['name'], 'name', 1, 50);
+            $r->identity->name = $r['name'];
         }
 
         $state = null;
@@ -1796,6 +1798,8 @@ class UserController extends Controller {
             if (is_null($state)) {
                 throw new InvalidParameterException('parameterInvalid', 'state_id');
             }
+            $r->identity->state_id = $state->state_id;
+            $r->identity->country_id = $state->country_id;
         }
 
         if (!is_null($r['school_id'])) {
@@ -1809,6 +1813,7 @@ class UserController extends Controller {
                 if (is_null($r['school'])) {
                     throw new InvalidParameterException('parameterInvalid', 'school');
                 }
+                $r->identity->school_id = $r['school']->school_id;
             } elseif (empty($r['school_name'])) {
                 $r['school_id'] = null;
             } else {
@@ -1820,6 +1825,7 @@ class UserController extends Controller {
                         'auth_token' => $r['auth_token'],
                     ]));
                     $r['school_id'] = $response['school_id'];
+                    $r->identity->school_id = $r['school']->school_id;
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
@@ -1855,7 +1861,7 @@ class UserController extends Controller {
             if (is_null($language)) {
                 throw new InvalidParameterException('invalidLanguage', 'locale');
             }
-
+            $r->identity->language_id = $language->language_id;
             $r->user->language_id = $language->language_id;
         }
 
@@ -1864,13 +1870,12 @@ class UserController extends Controller {
 
         if (!is_null($r['gender'])) {
             Validators::validateInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
+            $r->identity->gender = $r['gender'];
         }
 
         $valueProperties = [
             'username',
             'name',
-            'country_id',
-            'state_id',
             'scholar_degree',
             'school_id',
             'preferred_language',
@@ -1893,6 +1898,7 @@ class UserController extends Controller {
             UsersDAO::save($r->user);
 
             IdentityController::convertFromUser($r->user);
+            IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -2450,16 +2456,25 @@ class UserController extends Controller {
         if (!$session['valid']) {
             return ['filteredBy' => null, 'value' => null];
         }
-        $user = $session['user'];
+        $identity = $session['identity'];
         $filteredBy = $r['filter'];
         if ($filteredBy == 'country') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->country_id];
+            return [
+                'filteredBy' => $filteredBy,
+                'value' => $identity->country_id
+            ];
         }
         if ($filteredBy == 'state') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->country_id . '-' . $user->state_id];
+            return [
+                'filteredBy' => $filteredBy,
+                'value' => "{$identity->country_id}-{$identity->state_id}"
+            ];
         }
         if ($filteredBy == 'school') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
+            return [
+                'filteredBy' => $filteredBy,
+                'value' => $identity->school_id
+            ];
         }
         return ['filteredBy' => null, 'value' => null];
     }

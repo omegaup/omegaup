@@ -93,10 +93,11 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
 
         $this->assertEquals($r['name'], $userDb->name);
-        $this->assertEquals($r['country_id'], $userDb->country_id);
-        $this->assertEquals($r['state_id'], $userDb->state_id);
+        $this->assertEquals($r['country_id'], $identityDb->country_id);
+        $this->assertEquals($r['state_id'], $identityDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
@@ -105,9 +106,10 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Edit all fields again with diff values
         $locale = LanguagesDAO::getByName('pseudo');
         $states = StatesDAO::getByCountry('US');
+        $newName = Utils::CreateRandomString();
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => $newName,
             'country_id' => $states[0]->country_id,
             'state_id' => $states[0]->state_id,
             'scholar_degree' => 'primary',
@@ -120,9 +122,10 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
         $this->assertEquals($r['name'], $userDb->name);
-        $this->assertEquals($r['country_id'], $userDb->country_id);
-        $this->assertEquals($r['state_id'], $userDb->state_id);
+        $this->assertEquals($r['country_id'], $identityDb->country_id);
+        $this->assertEquals($r['state_id'], $identityDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
@@ -134,8 +137,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         ])));
 
         $identity = IdentitiesDAO::getByPK($userDb->main_identity_id);
-        $this->assertEquals($identity->username, $userDb->username);
-        $this->assertEquals($identity->password, $userDb->password);
+        $this->assertEquals($identity->username, $identityDb->username);
+        $this->assertEquals($identity->password, $identityDb->password);
     }
 
     /**
@@ -146,20 +149,23 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
+        $newUsername = 'new_username_basic_info';
+        $newPassword = Utils::CreateRandomString();
         $r = new Request([
             'auth_token' => $login->auth_token,
-            'username' => 'new_username_basic_info',
-            'password' => Utils::CreateRandomString(),
+            'username' => $newUsername,
+            'password' => $newPassword,
         ]);
 
         UserController::apiUpdateBasicInfo($r);
 
         // Check user from db
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
 
         // Getting identity data from db
         $identity = IdentitiesDAO::getByPK($userDb->main_identity_id);
-        $this->assertEquals($identity->username, $userDb->username);
-        $this->assertEquals($identity->password, $userDb->password);
+        $this->assertEquals($identity->username, $identityDb->username);
+        $this->assertEquals($identity->password, $identityDb->password);
     }
 }

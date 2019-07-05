@@ -14,8 +14,6 @@ class IdentityController extends Controller {
             'name' => $user->name,
             'user_id' => $user->user_id,
             'language_id' => $user->language_id,
-            'country_id' => $user->country_id,
-            'state_id' => $user->state_id,
             'school_id' => $user->school_id,
             'gender' => $user->gender,
         ]));

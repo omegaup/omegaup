@@ -47,12 +47,6 @@ class Users extends VO {
         if (isset($data['name'])) {
             $this->name = $data['name'];
         }
-        if (isset($data['country_id'])) {
-            $this->country_id = $data['country_id'];
-        }
-        if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
-        }
         if (isset($data['school_id'])) {
             $this->school_id = (int)$data['school_id'];
         }
@@ -158,20 +152,6 @@ class Users extends VO {
       * @var varchar(256)
       */
     public $name;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $country_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $state_id;
 
     /**
       *  [Campo no documentado]
