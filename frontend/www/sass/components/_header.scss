@@ -134,19 +134,17 @@
     }
   }
 
-  .grader-status {
-    a.grader-status-link {
+  .grader-submissions a.grader-submissions-link {
+    background-color: $white;
+    color: $black;
+    text-decoration: none;
+    &:hover {
       background-color: $white;
-      color: $black;
-      text-decoration: none;
-      &:hover {
-        background-color: $white;
-      }
     }
-    p, pre {
-      margin: 0;
-      padding: 3px 20px;
-    }
+  }
+
+  .grader {
+    padding: 3px 20px;
   }
 
   hr.dropdown-separator {

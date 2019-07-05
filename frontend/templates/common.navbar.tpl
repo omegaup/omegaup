@@ -69,7 +69,11 @@
                 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
                   <hr class="dropdown-separator">
-                  <li class="dropdown grader-status"></li>
+                  <li class="grader-submissions"><a class="grader-submissions-link" href="/arena/admin/">{#wordsLatestSubmissions#}</a></li>
+                  <li class="grader grader-status"></li>
+                  <li class="grader grader-broadcaster-sockets"></li>
+                  <li class="grader grader-embedded-runner"></li>
+                  <li class="grader grader-queues"></li>
                 {/if}
               </ul>
             </li>
