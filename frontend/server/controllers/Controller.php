@@ -17,16 +17,18 @@ class Controller {
 
     /**
      * Given the request, returns what user is performing the request by
-     * looking at the auth_token, when validateRealUser flag is true, we need to
-     * ensure that the request is made by the main identity of the logged user
+     * looking at the auth_token, when requireMainUserIdentity flag is true, we
+     * need to ensure that the request is made by the main identity of the
+     * logged user
      *
      * @param Request $r
+     * @param bool $requireMainUserIdentity
      * @throws InvalidDatabaseOperationException
      * @throws UnauthorizedException
      */
     protected static function authenticateRequest(
         Request $r,
-        bool $validateRealUser = false
+        bool $requireMainUserIdentity = false
     ) {
         $r->user = null;
         $session = SessionController::apiCurrentSession($r)['session'];
@@ -35,17 +37,15 @@ class Controller {
             $r->identity = null;
             throw new UnauthorizedException();
         }
-        if ($validateRealUser) {
-            if (is_null($session['user']) || $session['user']->main_identity_id
-                != $session['identity']->identity_id
-            ) {
-                throw new UnauthorizedException();
-            }
-        }
         if (!is_null($session['user'])) {
             $r->user = $session['user'];
         }
         $r->identity = $session['identity'];
+        if ($requireMainUserIdentity && (is_null($r->user) ||
+            $r->user->main_identity_id != $r->identity->identity_id)
+        ) {
+            throw new ForbiddenException();
+        }
     }
 
     /**
