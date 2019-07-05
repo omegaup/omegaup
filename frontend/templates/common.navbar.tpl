@@ -55,7 +55,16 @@
               {include file='common.navbar.notifications.tpl'}
             {/if}
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">
+                {$CURRENT_USER_GRAVATAR_URL_51}
+                <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
+                {if $CURRENT_USER_IS_ADMIN eq '1'}
+                  <span id="grader-count" class="badge">
+                    <img src="/media/waitcircle.gif" />
+                  </span>
+                {/if}
+                <span class="caret"></span>
+              </a>
               <ul class="dropdown-menu">
                 <li><a href='/profile/'><span class="glyphicon glyphicon-user"></span> {#navViewProfile#}</a></li>
                 <li><a href='/logout/'><span class="glyphicon glyphicon-log-out"></span> {#navLogOut#}</a></li>
