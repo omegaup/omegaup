@@ -112,7 +112,7 @@ class Validators {
      * @param string $parameter
      * @return boolean
      */
-    public static function isValidAlias($parameter) : bool {
+    public static function isValidAlias(string $parameter) : bool {
         return preg_match('/^[a-zA-Z0-9_-]+$/', $parameter) === 1;
     }
 
