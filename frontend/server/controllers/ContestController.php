@@ -180,9 +180,7 @@ class ContestController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getContestListInternal(Request $r, $callback_user_function) : Array {
-        self::authenticateRequest($r);
-
+    private static function getContestListInternal(Request $r, $callback_user_function) : Array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
@@ -230,6 +228,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         return self::getContestListInternal($r, 'ContestsDAO::getAllContestsOwnedByUser');
     }
 
@@ -241,6 +240,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListParticipating(Request $r) {
+        self::authenticateRequest($r);
         return self::getContestListInternal($r, 'ContestsDAO::getContestsParticipating');
     }
 
@@ -820,7 +820,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         $originalContest = self::validateContestAdmin(
             $r['contest_alias'],
@@ -900,7 +900,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         try {
             $originalContest = ContestsDAO::getByAlias($r['alias']);
@@ -1046,7 +1046,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         // Validate request
         self::validateCreate($r);
@@ -1156,14 +1156,14 @@ class ContestController extends Controller {
 
         // Problems is optional
         if (!is_null($r['problems'])) {
-            $request_problems = json_decode($r['problems']);
-            if (is_null($request_problems)) {
+            $requestProblems = json_decode($r['problems']);
+            if (is_null($requestProblems)) {
                 throw new InvalidParameterException('invalidParameters', 'problems');
             }
 
             $problems = [];
 
-            foreach ($request_problems as $requestProblem) {
+            foreach ($requestProblems as $requestProblem) {
                 $problem = ProblemsDAO::getByAlias($requestProblem->problem);
                 if (is_null($problem)) {
                     throw new InvalidParameterException('parameterNotFound', 'problems');
@@ -1421,7 +1421,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin(
-            $r->identity->identity_id,
+            $r->identity,
             $problem
         )) {
             throw new ForbiddenAccessException('problemIsPrivate');
