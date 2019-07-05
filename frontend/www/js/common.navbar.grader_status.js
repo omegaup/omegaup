@@ -25,11 +25,10 @@
             html += '<p>Grader OK</p>';
             html += '<p>Broadcaster sockets: ' +
                     graderInfo.broadcaster_sockets + '</p>';
-            html += '<p>Embedded runner: ' + graderInfo.embedded_runner +
-                    '</p>';
+            html +=
+                '<p>Embedded runner: ' + graderInfo.embedded_runner + '</p>';
             html += '<p>Queues: <pre style="width: 50em;">' +
-                    omegaup.UI.prettyPrintJSON(graderInfo.queue) +
-                    '</pre></p>';
+                    omegaup.UI.prettyPrintJSON(graderInfo.queue) + '</pre></p>';
           } else {
             graderCount.addClass('grader-error');
             html += '<p>Grader DOWN</p>';
