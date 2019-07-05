@@ -2181,7 +2181,10 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($identity) && Authorization::isProblemAdmin($identity->identity_id, $problem)) {
+                    if (!is_null($identity) && Authorization::isProblemAdmin(
+                        $identity,
+                        $problem
+                    )) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif (!ProblemsDAO::isVisible($problem)) {
                         throw new ForbiddenAccessException('problemIsPrivate');
