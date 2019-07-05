@@ -47,30 +47,30 @@ class UsersDAO extends UsersDAOBase {
         return $conn->GetOne($sql, $params) > 0;
     }
 
-    public static function FindByUsernameOrName($usernameOrName) {
+    public static function findByUsernameOrName($usernameOrName) {
         global  $conn;
         $sql = "
             SELECT
-                u.*
+                i.*
             FROM
-                Users u
+                Identities i
             WHERE
-                u.username = ? OR u.name = ?
+                i.username = ? OR i.name = ?
             UNION DISTINCT
             SELECT DISTINCT
-                u.*
+                i.*
             FROM
-                Users u
+                Identities i
             WHERE
-                u.username LIKE CONCAT('%', ?, '%') OR
-                u.username LIKE CONCAT('%', ?, '%')
-            LIMIT 10";
+                i.username LIKE CONCAT('%', ?, '%') OR
+                i.username LIKE CONCAT('%', ?, '%')
+            LIMIT 50";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
         $rs = $conn->GetAll($sql, $args);
         $result = [];
-        foreach ($rs as $user_data) {
-            array_push($result, new Users($user_data));
+        foreach ($rs as $identityData) {
+            array_push($result, new Users($identityData));
         }
         return $result;
     }
