@@ -335,7 +335,7 @@ class RunController extends Controller {
             }
 
             SubmissionLogDAO::create(new SubmissionLog([
-                'user_id' => $r->user->user_id,
+                'user_id' => !is_null($r->user) ? $r->user->user_id : null,
                 'identity_id' => $r->identity->identity_id,
                 'submission_id' => $submission->submission_id,
                 'problemset_id' => $submission->problemset_id,

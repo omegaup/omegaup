@@ -8,24 +8,6 @@
 
 class ContestDetailsTest extends OmegaupTestCase {
     /**
-     * Insert problems in a contest
-     *
-     * @param type $contestData
-     * @param type $numOfProblems
-     * @return array array of problemData
-     */
-    private function insertProblemsInContest($contestData, $numOfProblems = 3) {
-        // Create problems
-        $problems = [];
-        for ($i = 0; $i < $numOfProblems; $i++) {
-            $problems[$i] = ProblemsFactory::createProblem();
-            ContestsFactory::addProblemToContest($problems[$i], $contestData);
-        }
-
-        return $problems;
-    }
-
-    /**
      * Checks the contest details response
      *
      * @param type $contestData
@@ -87,8 +69,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get some problems into the contest
-        $numOfProblems = 3;
-        $problems = $this->insertProblemsInContest($contestData, $numOfProblems);
+        $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -165,8 +146,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         // Get some problems into the contest
-        $numOfProblems = 3;
-        $problems = $this->insertProblemsInContest($contestData, $numOfProblems);
+        $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -197,8 +177,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         // Get some problems into the contest
-        $numOfProblems = 3;
-        $problems = $this->insertProblemsInContest($contestData, $numOfProblems);
+        $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -586,8 +565,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         // Get some problems into the contest
-        $numOfProblems = 3;
-        $problems = $this->insertProblemsInContest($contestData, $numOfProblems);
+        $problems = ContestsFactory::insertProblemsInContest($contestData);
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
