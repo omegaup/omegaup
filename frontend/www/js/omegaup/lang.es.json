@@ -462,6 +462,7 @@
 	"navViewProfile": "Mi perfil",
 	"noCoders": "No hay coders",
 	"notRegisteredInContest": "No estas registrado en este concurso.",
+	"notificationNewBadge": "Has recibido una nueva insignia: %(badgeName)",
 	"notificationsMarkAllAsRead": "Macar todo como le\u00eddo",
 	"notificationsNoNewNotifications": "No hay nuevas notificaciones.",
 	"oldPassword": "Contrase\u00f1a anterior",

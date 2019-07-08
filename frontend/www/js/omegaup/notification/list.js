@@ -9,12 +9,12 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-notification-list', {
         props: {
-
+          notifications: this.notifications,
         }
       });
     },
     data: {
-
+      notifications: [],
     },
     components: {
       'omegaup-notification-list': notifications_List,
@@ -23,7 +23,7 @@ OmegaUp.on('ready', function() {
 
   API.Notification.myList({})
       .then(function(data) {
-        console.log(data);
+        notificationsList.notifications = data.notifications;
       })
       .fail(UI.apiError);
 });

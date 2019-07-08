@@ -432,9 +432,11 @@ export default {
   Notification: {
     myList: _call('/api/notification/myList/',
                   function(result) {
-                    // result.notifications.forEach(notification => {
-                    //   notification.
-                    // });
+                    result.notifications.forEach(notification => {
+                      notification.timestamp =
+                          new Date(notification.timestamp * 1000);
+                      notification.contents = JSON.parse(notification.contents);
+                    });
                     return result;
                   }),
   },

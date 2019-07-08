@@ -463,6 +463,7 @@ const translations = {
 	navViewProfile: "Meu perfil",
 	noCoders: "Nenhum programador.",
 	notRegisteredInContest: "Voc\u00ea n\u00e3o est\u00e1 registrado para este concurso.",
+	notificationNewBadge: "Voc\u00ea tem recebido um novo distintivo: %(badgeName)",
 	notificationsMarkAllAsRead: "Marcar tudo como lido",
 	notificationsNoNewNotifications: "N\u00e3o h\u00e1 novas notifica\u00e7\u00f5es.",
 	oldPassword: "Senha antiga",
