@@ -51,9 +51,9 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        $associatedIdentities = UserController::apiListAssociatedIdentities(
-            new Request(['auth_token' => $login->auth_token,])
-        );
+        $associatedIdentities = UserController::apiListAssociatedIdentities(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         // User has one default associated identity when joins omegaUp
         $this->assertEquals(1, count($associatedIdentities['identities']));
@@ -68,9 +68,9 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             'password' => $password,
         ]));
 
-        $associatedIdentities = UserController::apiListAssociatedIdentities(
-            new Request(['auth_token' => $login->auth_token,])
-        );
+        $associatedIdentities = UserController::apiListAssociatedIdentities(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
 
         // User now has two associated identities
         $this->assertEquals(2, count($associatedIdentities['identities']));

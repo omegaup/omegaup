@@ -6,6 +6,41 @@
  * @author juan.pablo
  */
 class IdentityContestsTest extends OmegaupTestCase {
+    private function createRunWithIdentity(
+        array $contestData,
+        array $problemData,
+        string $username,
+        string $password
+    ) : array {
+        // Get an invited identity to login and join the private contest
+        $contestant = IdentityController::resolveIdentity($username);
+        $contestant->password = $password;
+
+        // Our contestant has to open the contest before sending a run
+        ContestsFactory::openContest($contestData, $contestant);
+
+        // Then we need to open the problem
+        ContestsFactory::openProblemInContest(
+            $contestData,
+            $problemData,
+            $contestant
+        );
+
+        $detourGrader = new ScopedGraderDetour();
+
+        // Create valid run
+        $contestantLogin = self::login($contestant);
+        $runRequest = new Request([
+            'auth_token' => $contestantLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'language' => 'c',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ]);
+
+        return RunController::apiCreate($runRequest);
+    }
+
     /**
      * Test identity joins public contest
      */
@@ -52,37 +87,14 @@ class IdentityContestsTest extends OmegaupTestCase {
             $invitedIdentityPrivateContest
         ] = $members['identities'];
 
-        // Get an uninvited identity to login and join the public contest
-        $contestant = IdentityController::resolveIdentity(
-            $identityPublicContest['username']
-        );
-        $contestant->password = $password;
-
-        // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest($contestData, $contestant);
-
-        // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        $runResponse = $this->createRunWithIdentity(
             $contestData,
             $problemData,
-            $contestant
+            $identityPublicContest['username'],
+            $password
         );
 
-        $runRequest = new Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c',
-            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-        ]);
-
-        $detourGrader = new ScopedGraderDetour();
-
-        // Call API
-        $contestantLogin = self::login($contestant);
-        $runRequest['auth_token'] = $contestantLogin->auth_token;
-        $response = RunController::apiCreate($runRequest);
-
-        $this->assertEquals('ok', $response['status']);
+        $this->assertEquals('ok', $runResponse['status']);
 
         // Updating admission_mode for the contest
         $directorLogin = self::login($contestData['director']);
@@ -99,40 +111,23 @@ class IdentityContestsTest extends OmegaupTestCase {
             'usernameOrEmail' => $invitedIdentityPrivateContest['username'],
         ]));
 
-        // Get an invited identity to login and join the private contest
-        $contestant = IdentityController::resolveIdentity(
-            $invitedIdentityPrivateContest['username']
-        );
-        $contestant->password = $password;
-
-        // Our contestant has to open the contest before sending a run
-        ContestsFactory::openContest($contestData, $contestant);
-
-        // Then we need to open the problem
-        ContestsFactory::openProblemInContest(
+        $runResponse = $this->createRunWithIdentity(
             $contestData,
             $problemData,
-            $contestant
+            $invitedIdentityPrivateContest['username'],
+            $password
         );
 
-        $detourGrader = new ScopedGraderDetour();
-
-        // Create valid run
-        $contestantLogin = self::login($contestant);
-        $runRequest['auth_token'] = $contestantLogin->auth_token;
-        $response = RunController::apiCreate($runRequest);
-
-        $this->assertEquals('ok', $response['status']);
-
-        // Get an uninvited identity to try to join the private contest
-        $contestant = IdentityController::resolveIdentity(
-            $uninvitedIdentityPrivateContest['username']
-        );
-        $contestant->password = $password;
+        $this->assertEquals('ok', $runResponse['status']);
 
         try {
             // Our contestant tries to open a private contest
-            ContestsFactory::openContest($contestData, $contestant);
+            $runResponse = $this->createRunWithIdentity(
+                $contestData,
+                $problemData,
+                $uninvitedIdentityPrivateContest['username'],
+                $password
+            );
             $this->fail('Only invited identities can access to private contest');
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
