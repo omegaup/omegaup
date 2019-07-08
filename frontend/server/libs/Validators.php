@@ -102,10 +102,18 @@ class Validators {
         if (!is_string($parameter) ||
             empty($parameter) ||
             strlen($parameter) > 32 ||
-            preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) !== 1
+            !self::isValidAlias($parameter)
         ) {
             throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
+    }
+
+    /**
+     * @param string $parameter
+     * @return boolean
+     */
+    public static function isValidAlias(string $parameter) : bool {
+        return preg_match('/^[a-zA-Z0-9_-]+$/', $parameter) === 1;
     }
 
     /**
@@ -317,5 +325,22 @@ class Validators {
             throw new InvalidParameterException('parameterEmpty', $parameterName);
         }
         return false;
+    }
+
+    /**
+     * Checks if badge exists in the allExistingBadges array,
+     * if not, it throws an exception.
+     *
+     * @param string $badgeAlias
+     * @param array $allExistingBadges
+     * @throws NotFoundException
+     */
+    public static function validateBadgeExists(
+        string $badgeAlias,
+        array $allExistingBadges
+    ) : void {
+        if (!in_array($badgeAlias, $allExistingBadges)) {
+            throw new NotFoundException('badgeNotExist');
+        }
     }
 }
