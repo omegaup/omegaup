@@ -429,6 +429,16 @@ export default {
     list: _call('/api/interview/list/'),
   },
 
+  Notification: {
+    myList: _call('/api/notification/myList/',
+                  function(result) {
+                    // result.notifications.forEach(notification => {
+                    //   notification.
+                    // });
+                    return result;
+                  }),
+  },
+
   Problem: {
     addAdmin: _call('/api/problem/addAdmin/'),
 
