@@ -238,12 +238,8 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateClone($r);
-        // Unassociated identities are not allowed to clone courses
-        if (is_null($r->user)) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
         $offset = round($r['start_time']) - strtotime($originalCourse->start_time);
@@ -286,7 +282,7 @@ class CourseController extends Controller {
                     self::addProblemToAssignment(
                         $problem['problem_alias'],
                         $problemset->problemset_id,
-                        $r->user->user_id,
+                        $r->identity,
                         false, // visbility mode validation no needed when it is a clone
                         100,
                         null,
@@ -318,12 +314,8 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateCreate($r);
-        // Unassociated identities are not allowed to clone courses
-        if (is_null($r->user)) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
 
         self::createCourseAndGroup(new Courses([
             'name' => $r['name'],
@@ -457,7 +449,7 @@ class CourseController extends Controller {
     private static function addProblemToAssignment(
         string $problemAlias,
         int $problemsetId,
-        int $userId,
+        Identities $identity,
         bool $validateVisibility,
         ?int $points = 100,
         ?string $commit = null,
@@ -479,7 +471,7 @@ class CourseController extends Controller {
             $problem,
             $masterCommit,
             $currentVersion,
-            $userId,
+            $identity,
             $points,
             $order,
             $validateVisibility
@@ -502,7 +494,7 @@ class CourseController extends Controller {
         $course = self::validateCourseExists($r['course_alias']);
         self::validateCreateAssignment($r, $course);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -537,9 +529,9 @@ class CourseController extends Controller {
         [$course, $assignment] = self::validateAssignmentDetails(
             $r['course'],
             $r['assignment'],
-            $r->identity->identity_id
+            $r->identity
         );
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -622,7 +614,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -643,7 +635,7 @@ class CourseController extends Controller {
         self::addProblemToAssignment(
             $r['problem_alias'],
             $problemset->problemset_id,
-            $r->identity->identity_id,
+            $r->identity,
             true, /* validateVisibility */
             $points,
             $r['commit']
@@ -676,7 +668,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -726,7 +718,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -755,7 +747,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -788,7 +780,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -853,7 +845,7 @@ class CourseController extends Controller {
 
         // Only Course Admins or Group Members (students) can see these results
         if (!Authorization::canViewCourse(
-            $r->identity->identity_id,
+            $r->identity,
             $course,
             $group
         )) {
@@ -867,11 +859,6 @@ class CourseController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        $isAdmin = Authorization::isCourseAdmin(
-            $r->identity->identity_id,
-            $course
-        );
 
         $response = [
             'status' => 'ok',
@@ -887,7 +874,9 @@ class CourseController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
             unset($assignment['problemset_id']);
-            if (!$isAdmin && $assignment['start_time'] > $time) {
+            if ($assignment['start_time'] > $time &&
+                !Authorization::isCourseAdmin($r->identity, $course)
+            ) {
                 // Non-admins should not be able to see the assignments ahead
                 // of time.
                 continue;
@@ -913,7 +902,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1025,7 +1014,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1053,7 +1042,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1125,7 +1114,7 @@ class CourseController extends Controller {
 
         // Only Course Admins or Group Members (students) can see these results
         if (!Authorization::canViewCourse(
-            $r->identity->identity_id,
+            $r->identity,
             $course,
             $group
         )) {
@@ -1169,7 +1158,7 @@ class CourseController extends Controller {
         }
 
         // Only course admins or users adding themselves when the course is public
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)
+        if (!Authorization::isCourseAdmin($r->identity, $course)
             && ($course->public == false
             || $r['identity']->identity_id !== $r->identity->identity_id)
             && $course->requests_user_information == 'no'
@@ -1243,7 +1232,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1290,7 +1279,7 @@ class CourseController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1330,7 +1319,7 @@ class CourseController extends Controller {
         }
 
         // Only director is allowed to make modifications
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1355,6 +1344,11 @@ class CourseController extends Controller {
         Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
+        // Unassociated identities can't be course admins
+        if (is_null($user)) {
+            throw new ForbiddenAccessException();
+        }
+        $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
             $course = CoursesDAO::getByAlias($r['course_alias']);
@@ -1364,12 +1358,12 @@ class CourseController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isCourseAdmin($user->main->user_id, $course)) {
+        if (!Authorization::isCourseAdmin($identity, $course)) {
             throw new NotFoundException();
         }
 
@@ -1411,7 +1405,7 @@ class CourseController extends Controller {
         }
 
         // Only admins are allowed to modify course
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1449,7 +1443,7 @@ class CourseController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1473,10 +1467,14 @@ class CourseController extends Controller {
         $course = self::validateCourseExists($r['course_alias']);
         $group = self::resolveGroup($course, $r['group']);
 
-        $shouldShowIntro = !Authorization::canViewCourse($r->identity->identity_id, $course, $group);
+        $shouldShowIntro = !Authorization::canViewCourse(
+            $r->identity,
+            $course,
+            $group
+        );
         $isFirstTimeAccess = false;
         $showAcceptTeacher = false;
-        if (!Authorization::isGroupAdmin($r->identity->identity_id, $group)) {
+        if (!Authorization::isGroupAdmin($r->identity, $group)) {
             $sharingInformation = CoursesDAO::getSharingInformation($r->identity->identity_id, $course, $group);
             $isFirstTimeAccess = $sharingInformation['share_user_information'] == null;
             $showAcceptTeacher = $sharingInformation['accept_teacher'] == null;
@@ -1485,13 +1483,16 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $user_session = SessionController::apiCurrentSession($r)['session']['user'];
-        $result = self::getCommonCourseDetails($course, $r->identity->identity_id, true /*onlyIntroDetails*/);
+        $result = self::getCommonCourseDetails(
+            $course,
+            $r->identity,
+            true  /*onlyIntroDetails*/
+        );
         $result['showAcceptTeacher'] = $showAcceptTeacher;
 
         // Privacy Statement Information
         $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-            $user_session->language_id,
+            $r->identity->language_id,
             'course',
             $result['requests_user_information']
         );
@@ -1503,7 +1504,7 @@ class CourseController extends Controller {
             $result['statement_type'] = $statement_type;
         }
 
-        $markdown = PrivacyStatement::getForConsent($user_session->language_id, 'accept_teacher');
+        $markdown = PrivacyStatement::getForConsent($r->identity->language_id, 'accept_teacher');
         if (is_null($markdown)) {
             throw new InvalidFilesystemOperationException();
         }
@@ -1522,19 +1523,16 @@ class CourseController extends Controller {
     /**
      * Returns course details common between admin & non-admin
      * @param Courses $course
-     * @param int $currentIdentityId
+     * @param Identities $identity
      * @param bool $onlyIntroDetails
      * @return array
      */
     private static function getCommonCourseDetails(
         Courses $course,
-        int $currentIdentityId,
+        Identities $identity,
         bool $onlyIntroDetails
     ) : array {
-        $isAdmin = Authorization::isCourseAdmin(
-            $currentIdentityId,
-            $course
-        );
+        $isAdmin = Authorization::isCourseAdmin($identity, $course);
 
         if ($onlyIntroDetails) {
             $result = [
@@ -1600,11 +1598,11 @@ class CourseController extends Controller {
         $course = self::validateCourseExists($r['alias']);
         $group = self::resolveGroup($course, $r['group']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($course, $r->identity->identity_id, false /*onlyIntroDetails*/);
+        return self::getCommonCourseDetails($course, $r->identity, false /*onlyIntroDetails*/);
     }
 
     /**
@@ -1618,7 +1616,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1653,12 +1651,15 @@ class CourseController extends Controller {
             [$course, $assignment] = self::validateAssignmentDetails(
                 $courseAlias,
                 $assignmentAlias,
-                $r->identity->identity_id
+                $r->identity
             );
 
             return [
                 'hasToken' => false,
-                'courseAdmin' => Authorization::isCourseAdmin($r->identity->identity_id, $course),
+                'courseAdmin' => Authorization::isCourseAdmin(
+                    $r->identity,
+                    $course
+                ),
                 'assignment' => $assignment,
                 'course' => $course,
             ];
@@ -1699,13 +1700,13 @@ class CourseController extends Controller {
      * Validates assignment by course alias and assignment alias given
      * @param  string $courseAlias
      * @param  string $assignmentAlias
-     * @param  int $currentIdentityId
+     * @param  Identities $identity
      * @return array
      */
     private static function validateAssignmentDetails(
         string $courseAlias,
         string $assignmentAlias,
-        int $currentIdentityId
+        Identities $identity
     ) : array {
         Validators::validateStringNonEmpty($courseAlias, 'course', true /* is_required */);
         Validators::validateStringNonEmpty($assignmentAlias, 'assignment', true /* is_required */);
@@ -1721,12 +1722,12 @@ class CourseController extends Controller {
         $assignment->toUnixTime();
 
         // Admins are almighty, no need to check anything else.
-        if (Authorization::isCourseAdmin($currentIdentityId, $course)) {
+        if (Authorization::isCourseAdmin($identity, $course)) {
             return [$course, $assignment];
         }
 
         if ($assignment->start_time > Time::get() ||
-            !GroupRolesDAO::isContestant($currentIdentityId, $assignment->acl_id)
+            !GroupRolesDAO::isContestant($identity->identity_id, $assignment->acl_id)
         ) {
             throw new ForbiddenAccessException();
         }
@@ -1871,7 +1872,7 @@ class CourseController extends Controller {
             throw new NotFoundException('assignmentNotFound');
         }
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -1919,15 +1920,15 @@ class CourseController extends Controller {
         $group = self::resolveGroup($course, $r['group']);
 
         // Only Course Admins or Group Members (students) can see these results
-        if (!Authorization::canViewCourse(
-            $r->identity->identity_id,
-            $course,
-            $group
-        )) {
+        if (!Authorization::canViewCourse($r->identity, $course, $group)) {
             throw new ForbiddenAccessException();
         }
 
-        return self::getCommonCourseDetails($course, $r->identity->identity_id, false /*onlyIntroDetails*/);
+        return self::getCommonCourseDetails(
+            $course,
+            $r->identity,
+            false /*onlyIntroDetails*/
+        );
     }
 
     /**
@@ -1943,7 +1944,7 @@ class CourseController extends Controller {
 
         self::authenticateRequest($r);
         $originalCourse = self::validateUpdate($r, $r['course_alias']);
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $originalCourse)) {
+        if (!Authorization::isCourseAdmin($r->identity, $originalCourse)) {
             throw new ForbiddenAccessException();
         }
 
@@ -2000,7 +2001,11 @@ class CourseController extends Controller {
         $group = self::resolveGroup($tokenAuthenticationResult['course'], $r['group']);
 
         if (!$tokenAuthenticationResult['hasToken'] &&
-            !Authorization::canViewCourse($r->identity->identity_id, $tokenAuthenticationResult['course'], $group)) {
+            !Authorization::canViewCourse(
+                $r->identity,
+                $tokenAuthenticationResult['course'],
+                $group
+            )) {
             throw new ForbiddenAccessException();
         }
 
@@ -2064,7 +2069,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         try {
@@ -2090,7 +2095,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity->identity_id, $course)) {
+        if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -2112,11 +2117,11 @@ class CourseController extends Controller {
      * @param Groups $group
      */
     public static function shouldShowScoreboard(
-        int $identityId,
+        Identities $identity,
         Courses $course,
         Groups $group
     ) : bool {
-        return Authorization::canViewCourse($identityId, $course, $group) &&
-            $course->show_scoreboard;
+        return Authorization::canViewCourse($identity, $course, $group) &&
+               $course->show_scoreboard;
     }
 }

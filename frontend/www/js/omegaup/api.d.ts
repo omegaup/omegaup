@@ -1,8 +1,10 @@
 declare namespace omegaup {
   export interface Badge {
     badge_alias: string;
-    assignation_time: string;
+    assignation_time?: Date;
     unlocked?: boolean;
+    first_assignation?: Date;
+    owners_percentage?: number;
   }
 
   export interface Contest {

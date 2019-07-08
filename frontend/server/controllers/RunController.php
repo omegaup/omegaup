@@ -107,7 +107,7 @@ class RunController extends Controller {
                 // Check for practice or public problem, there is no contest info
                 // in this scenario.
                 if (ProblemsDAO::isVisible($r['problem']) ||
-                      Authorization::isProblemAdmin($r->identity->identity_id, $r['problem']) ||
+                      Authorization::isProblemAdmin($r->identity, $r['problem']) ||
                       Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::isRunInsideSubmissionGap(
                         null,
@@ -158,11 +158,11 @@ class RunController extends Controller {
             }
 
             // Contest admins can skip following checks
-            if (!Authorization::isAdmin($r->identity->identity_id, $r['problemset'])) {
+            if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
                 if (!ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset_id) &&
                     !Authorization::canSubmitToProblemset(
-                        $r->identity->identity_id,
+                        $r->identity,
                         $r['problemset']
                     )
                 ) {
@@ -279,7 +279,7 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $type = (Authorization::isAdmin($r->identity->identity_id, $r['problemset']) &&
+            $type = (Authorization::isAdmin($r->identity, $r['problemset']) &&
                 !is_null($r['contest']) &&
                 !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
         }
@@ -430,7 +430,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -472,7 +472,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canEditSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -511,7 +511,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canEditSubmission($r->identity->identity_id, $r['submission'])) {
+        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -575,14 +575,14 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::canViewSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
         // Get the source
         $response = [
             'status' => 'ok',
-            'admin' => Authorization::isProblemAdmin($r->identity->identity_id, $r['problem']),
+            'admin' => Authorization::isProblemAdmin($r->identity, $r['problem']),
             'guid' => $r['submission']->guid,
             'language' => $r['submission']->language,
         ];
@@ -616,7 +616,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewSubmission($r->identity->identity_id, $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -668,13 +668,21 @@ class RunController extends Controller {
         self::authenticateRequest($r);
 
         Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
-        if (!RunController::downloadSubmission($r['run_alias'], $r->identity->identity_id, /*passthru=*/true)) {
+        if (!RunController::downloadSubmission(
+            $r['run_alias'],
+            $r->identity,
+            /*passthru=*/true
+        )) {
             http_response_code(404);
         }
         exit;
     }
 
-    public static function downloadSubmission(string $guid, int $identityId, bool $passthru) {
+    public static function downloadSubmission(
+        string $guid,
+        Identities $identity,
+        bool $passthru
+    ) {
         try {
             $submission = SubmissionsDAO::getByGuid($guid);
         } catch (Exception $e) {
@@ -703,7 +711,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::isProblemAdmin($identityId, $problem))) {
+        if (!Authorization::isProblemAdmin($identity, $problem)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
