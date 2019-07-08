@@ -2579,6 +2579,26 @@ class UserController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
+
+    /**
+     * Generate a new gitserver token. This token can be used to authenticate
+     * against the gitserver.
+     */
+    public static function apiGenerateGitToken(Request $r) {
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+
+        $r->user->git_token = SecurityTools::randomHexString(40);
+        try {
+            UsersDAO::update($r->user);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'token' => $r->user->git_token,
+        ];
+    }
 }
 
 UserController::$urlHelper = new UrlHelper();
