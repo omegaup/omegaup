@@ -38,6 +38,9 @@ class Users extends VO {
         if (isset($data['password'])) {
             $this->password = $data['password'];
         }
+        if (isset($data['git_token'])) {
+            $this->git_token = $data['git_token'];
+        }
         if (isset($data['main_email_id'])) {
             $this->main_email_id = (int)$data['main_email_id'];
         }
@@ -137,6 +140,13 @@ class Users extends VO {
       * @var varchar(100)
       */
     public $password;
+
+    /**
+      * Token de acceso para git
+      * @access public
+      * @var char(40)
+      */
+    public $git_token;
 
     /**
       *  [Campo no documentado]
