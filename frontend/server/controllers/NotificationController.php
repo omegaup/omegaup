@@ -40,6 +40,9 @@ class NotificationController extends Controller {
             if ($notification === null) {
                 throw new NotFoundException('notificationDoesntExist');
             }
+            if ($notification->user_id !== $r->user->user_id) {
+                throw new ForbiddenAccessException('userNotAllowed');
+            }
             $notification->read = 1;
             NotificationsDAO::update($notification);
         }

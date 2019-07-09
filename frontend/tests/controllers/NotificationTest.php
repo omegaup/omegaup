@@ -72,7 +72,7 @@ class NotificationTest extends OmegaupTestCase {
             'user' => $user,
         ]));
         $notifications = $results['notifications'];
-        $this->assertEquals(1, sizeof($notifications));
+        $this->assertCount(1, $notifications);
     }
 
     public function testReadNotificationsExceptions() {
@@ -97,6 +97,33 @@ class NotificationTest extends OmegaupTestCase {
             $this->fail('Should have thrown NotFoundException');
         } catch (NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'notificationDoesntExist');
+        }
+    }
+
+    public function testReadNotificationsForbbidenAccessException() {
+        $user = UserFactory::createUser();
+        NotificationsDAO::create(new Notifications([
+            'user_id' => $user->user_id,
+            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
+        ]));
+
+        $maliciousUser = UserFactory::createUser();
+        $login = self::login($maliciousUser);
+
+        $maliciousIds = [];
+        for ($i = 1; $i <= 100; $i++) {
+            $maliciousIds[] = $i;
+        }
+
+        try {
+            NotificationController::apiReadNotifications(new Request([
+                'auth_token' => $login->auth_token,
+                'user' => $maliciousUser,
+                'notifications' => $maliciousIds,
+            ]));
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }
 }
