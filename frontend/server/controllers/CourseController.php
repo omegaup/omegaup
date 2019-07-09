@@ -238,12 +238,8 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateClone($r);
-        // Unassociated identities are not allowed to clone courses
-        if (is_null($r->user)) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
         $offset = round($r['start_time']) - strtotime($originalCourse->start_time);
@@ -318,12 +314,8 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateCreate($r);
-        // Unassociated identities are not allowed to clone courses
-        if (is_null($r->user)) {
-            throw new ForbiddenAccessException('userNotAllowed');
-        }
 
         self::createCourseAndGroup(new Courses([
             'name' => $r['name'],

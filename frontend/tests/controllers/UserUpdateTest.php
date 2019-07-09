@@ -279,4 +279,21 @@ class UserUpdateTest extends OmegaupTestCase {
             // OK!
         }
     }
+
+    /**
+     * Tests that the user can generate a git token.
+     */
+    public function testGenerateGitToken() {
+        $user = UserFactory::createUser();
+        $this->assertNull($user->git_token);
+        $login = self::login($user);
+        $response = UserController::apiGenerateGitToken(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertNotEquals($response['token'], '');
+
+        $dbUser = UsersDAO::FindByUsername($user->username);
+        $this->assertNotNull($dbUser->git_token);
+        $this->assertEquals($response['token'], $dbUser->git_token);
+    }
 }
