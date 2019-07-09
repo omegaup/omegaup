@@ -9,7 +9,7 @@ class QualityNominationFactory {
     public static $reviewers = [];
 
     public static function initQualityReviewers() {
-        $qualityReviewerGroup = GroupsDAO::FindByAlias(
+        $qualityReviewerGroup = GroupsDAO::findByAlias(
             Authorization::QUALITY_REVIEWER_GROUP_ALIAS
         );
         for ($i = 0; $i < 5; $i++) {

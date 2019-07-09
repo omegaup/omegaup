@@ -1391,7 +1391,7 @@ class CourseController extends Controller {
         // Check course_alias
         Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        $group = GroupsDAO::FindByAlias($r['group']);
+        $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
             throw new InvalidParameterException('invalidParameters');
@@ -1429,7 +1429,7 @@ class CourseController extends Controller {
         // Check course_alias
         Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        $group = GroupsDAO::FindByAlias($r['group']);
+        $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
             throw new InvalidParameterException('invalidParameters');
