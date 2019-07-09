@@ -1,8 +1,8 @@
 <template>
   <figure class="badge-container"
           v-tooltip="description">
-    <img class="badge-icon"
-            v-bind:src="this.iconUrl">
+    <a class="badge-icon"
+            v-bind:href="`/badge/${this.badge.badge_alias}/`"><img v-bind:src="this.iconUrl"></a>
     <figcaption class="badge-name">
       {{ this.name }}
     </figcaption>
@@ -18,8 +18,11 @@
   text-align: center;
 }
 .badge-icon {
-  max-width: 100%;
+  display: block;
   height: 70%;
+}
+.badge-icon img {
+  max-height: 100%;
 }
 .badge-name {
   padding-top: 5px;

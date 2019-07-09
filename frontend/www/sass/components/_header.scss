@@ -114,34 +114,40 @@
     }
   }
 
-  #grader-status {
-    a {
+  .grader-count {
+    &.grader-error {
+      color: $status-error;
+      background-image: linear-gradient(rgb(242, 222, 222) 0px, rgb(231, 195, 195) 100%);
+      background-color: rgb(242, 222, 222);
+    }
+
+    &.grader-ok {
+      color: $status-success;
+      background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%);
+      background-color: rgb(223, 240, 216);
+    }
+
+    &.grader-warning {
+      color: $status-warning;
+      background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%);
+      border-color: #f5e79e;
+    }
+  }
+
+  .grader-submissions a.grader-submissions-link {
+    background-color: $white;
+    color: $black;
+    text-decoration: none;
+    &:hover {
       background-color: $white;
-      color: $black;
-
-      &.grader-error {
-        color: $status-error;
-        background-image: linear-gradient(rgb(242, 222, 222) 0px, rgb(231, 195, 195) 100%);
-        background-color: rgb(242, 222, 222);
-      }
-
-      &.grader-ok {
-        color: $status-success;
-        background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%);
-        background-color: rgb(223, 240, 216);
-      }
-
-      &.grader-warning {
-        color: $status-warning;
-        background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%);
-        border-color: #f5e79e;
-      }
     }
+  }
 
-    & .caret {
-      border-top-color: $black;
-      border-bottom-color: $black;
-    }
+  .grader {
+    padding: 3px 20px;
+  }
 
+  hr.dropdown-separator {
+    margin: 0;
   }
 }
