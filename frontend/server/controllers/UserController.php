@@ -1650,11 +1650,13 @@ class UserController extends Controller {
 
             Validators::validateValidUsername($r['username'], 'username');
             $r->user->username = $r['username'];
+            $r->identity->username = $r['username'];
         }
 
         SecurityTools::testStrongPassword($r['password']);
         $hashedPassword = SecurityTools::hashString($r['password']);
         $r->user->password = $hashedPassword;
+        $r->identity->password = $hashedPassword;
 
         try {
             DAO::transBegin();
@@ -1663,8 +1665,6 @@ class UserController extends Controller {
             UsersDAO::update($r->user);
 
             // Update username and password for identity object
-            $r->identity->username = $r['username'];
-            $r->identity->password = $hashedPassword;
             IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
