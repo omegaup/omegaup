@@ -44,7 +44,7 @@ class Controller {
         if ($requireMainUserIdentity && (is_null($r->user) ||
             $r->user->main_identity_id != $r->identity->identity_id)
         ) {
-            throw new ForbiddenException();
+            throw new ForbiddenAccessException();
         }
     }
 
