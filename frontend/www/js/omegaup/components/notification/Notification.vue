@@ -61,7 +61,7 @@ export default class Notification extends Vue {
       case 'badge':
         return `/media/dist/badges/${this.notification.contents.badge}.svg`;
       default:
-        return `media/info.png`;
+        return 'media/info.png';
     }
   }
 
