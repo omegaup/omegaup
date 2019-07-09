@@ -1795,10 +1795,9 @@ class UserController extends Controller {
                 UserController::ALLOWED_GENDER_OPTIONS,
                 true
             );
-            $r->identity->gender = $r['gender'];
         }
 
-        $valueProperties = [
+        $userValueProperties = [
             'username',
             'name',
             'country_id',
@@ -1817,7 +1816,17 @@ class UserController extends Controller {
             'hide_problem_tags',
         ];
 
-        self::updateValueProperties($r, $r->user, $valueProperties);
+        $identityValueProperties = [
+            'username',
+            'name',
+            'country_id',
+            'state_id',
+            'school_id',
+            'gender',
+        ];
+
+        self::updateValueProperties($r, $r->user, $userValueProperties);
+        self::updateValueProperties($r, $r->identity, $identityValueProperties);
 
         try {
             DAO::transBegin();
@@ -1825,12 +1834,7 @@ class UserController extends Controller {
             // Update user object
             UsersDAO::update($r->user);
 
-            // Update identity object, because these parameters eventually will
-            // be no longer available in user object
-            $r->identity->name = $r['name'];
-            $r->identity->state_id = $r['state_id'];
-            $r->identity->country_id = $r['country_id'];
-            $r->identity->school_id = $r['school_id'];
+            // Update identity object
             IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
