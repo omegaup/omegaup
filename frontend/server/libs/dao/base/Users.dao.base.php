@@ -48,11 +48,12 @@ abstract class UsersDAOBase {
      * @param Users [$Users] El objeto de tipo Users a actualizar.
      */
     final public static function update(Users $Users) {
-        $sql = 'UPDATE `Users` SET `username` = ?, `facebook_user_id` = ?, `password` = ?, `main_email_id` = ?, `main_identity_id` = ?, `country_id` = ?, `state_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `hide_problem_tags` = ?, `in_mailing_list` = ?, `is_private` = ?, `preferred_language` = ? WHERE `user_id` = ?;';
+        $sql = 'UPDATE `Users` SET `username` = ?, `facebook_user_id` = ?, `password` = ?, `git_token` = ?, `main_email_id` = ?, `main_identity_id` = ?, `country_id` = ?, `state_id` = ?, `scholar_degree` = ?, `language_id` = ?, `graduation_date` = ?, `birth_date` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `hide_problem_tags` = ?, `in_mailing_list` = ?, `is_private` = ?, `preferred_language` = ? WHERE `user_id` = ?;';
         $params = [
             $Users->username,
             $Users->facebook_user_id,
             $Users->password,
+            $Users->git_token,
             is_null($Users->main_email_id) ? null : (int)$Users->main_email_id,
             is_null($Users->main_identity_id) ? null : (int)$Users->main_identity_id,
             $Users->country_id,
@@ -89,7 +90,7 @@ abstract class UsersDAOBase {
         if (is_null($user_id)) {
             return null;
         }
-        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` FROM Users WHERE (user_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`git_token`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` FROM Users WHERE (user_id = ?) LIMIT 1;';
         $params = [$user_id];
         global $conn;
         $row = $conn->GetRow($sql, $params);
@@ -144,7 +145,7 @@ abstract class UsersDAOBase {
      * @return Array Un arreglo que contiene objetos del tipo {@link Users}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` from Users';
+        $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`git_token`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`country_id`, `Users`.`state_id`, `Users`.`scholar_degree`, `Users`.`language_id`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` from Users';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -179,11 +180,12 @@ abstract class UsersDAOBase {
         if (is_null($Users->is_private)) {
             $Users->is_private = false;
         }
-        $sql = 'INSERT INTO Users (`username`, `facebook_user_id`, `password`, `main_email_id`, `main_identity_id`, `country_id`, `state_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `hide_problem_tags`, `in_mailing_list`, `is_private`, `preferred_language`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Users (`username`, `facebook_user_id`, `password`, `git_token`, `main_email_id`, `main_identity_id`, `country_id`, `state_id`, `scholar_degree`, `language_id`, `graduation_date`, `birth_date`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `hide_problem_tags`, `in_mailing_list`, `is_private`, `preferred_language`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Users->username,
             $Users->facebook_user_id,
             $Users->password,
+            $Users->git_token,
             is_null($Users->main_email_id) ? null : (int)$Users->main_email_id,
             is_null($Users->main_identity_id) ? null : (int)$Users->main_identity_id,
             $Users->country_id,

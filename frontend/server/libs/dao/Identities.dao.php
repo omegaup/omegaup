@@ -50,7 +50,35 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return new Identities($rs);
     }
 
-    public static function findByUserId($userId) : Identities {
+    public static function findByUsernameOrName(string $usernameOrName) : array {
+        global  $conn;
+        $sql = "
+            SELECT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                i.username = ? OR i.name = ?
+            UNION DISTINCT
+            SELECT DISTINCT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                i.username LIKE CONCAT('%', ?, '%') OR
+                i.username LIKE CONCAT('%', ?, '%')
+            LIMIT 20";
+        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
+
+        $rs = $conn->GetAll($sql, $args);
+        $result = [];
+        foreach ($rs as $identityData) {
+            array_push($result, new Identities($identityData));
+        }
+        return $result;
+    }
+
+    public static function findByUserId(int $userId) : Identities {
         global  $conn;
         $sql = 'SELECT
                   i.*

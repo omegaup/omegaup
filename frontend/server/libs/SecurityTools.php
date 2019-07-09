@@ -85,6 +85,16 @@ class SecurityTools {
         return $str;
     }
 
+    /**
+     * Returns a random hexadecimal string.
+     *
+     * @param int $length The length of the string.
+     * @return string The string.
+     */
+    public static function randomHexString(int $length) : string {
+        return bin2hex(random_bytes($length / 2));
+    }
+
     public static function getGitserverAuthorizationHeader(string $problem, string $username) {
         if (OMEGAUP_GITSERVER_SECRET_TOKEN != '') {
             return 'Authorization: Bearer ' . OMEGAUP_GITSERVER_SECRET_TOKEN . ' ' . $username;

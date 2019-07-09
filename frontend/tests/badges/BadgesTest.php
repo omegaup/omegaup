@@ -119,9 +119,15 @@ class BadgesTest extends BadgesTestCase {
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         foreach ($aliases as $alias) {
             $badgePath = static::OMEGAUP_BADGES_ROOT . "/${alias}";
+
             if (!is_dir($badgePath)) {
                 continue;
             }
+
+            if (!Validators::isValidAlias($alias)) {
+                throw new Exception('The alias for this badge is invalid.');
+            }
+
             $iconPath = "${badgePath}/" . static::ICON_FILE;
             if (file_exists($iconPath)) {
                 $this->assertLessThanOrEqual(

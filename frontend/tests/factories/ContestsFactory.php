@@ -139,6 +139,24 @@ class ContestsFactory {
         ];
     }
 
+    /**
+     * Insert problems in a contest
+     *
+     * @param type $contestData
+     * @param type $numOfProblems
+     * @return array array of problemData
+     */
+    public static function insertProblemsInContest($contestData, $numOfProblems = 3) {
+        // Create problems
+        $problems = [];
+        for ($i = 0; $i < $numOfProblems; $i++) {
+            $problems[$i] = ProblemsFactory::createProblem();
+            ContestsFactory::addProblemToContest($problems[$i], $contestData);
+        }
+
+        return $problems;
+    }
+
     public static function createContest($params = null) {
         if (!($params instanceof ContestParams)) {
             $params = new ContestParams($params);

@@ -13,7 +13,7 @@ class ProblemsetController extends Controller {
             throw new ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem)
-            && !Authorization::isProblemAdmin($identity->identity_id, $problem)
+            && !Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
