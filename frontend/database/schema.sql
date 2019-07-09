@@ -869,6 +869,7 @@ CREATE TABLE `Users` (
   `username` varchar(50) NOT NULL,
   `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
   `password` varchar(100) DEFAULT NULL,
+  `git_token` char(40) DEFAULT NULL COMMENT 'Token de acceso para git',
   `main_email_id` int(11) DEFAULT NULL,
   `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',
   `name` varchar(256) DEFAULT NULL,

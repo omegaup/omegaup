@@ -1582,15 +1582,17 @@ class UserController extends Controller {
         }
 
         try {
-            $users = UsersDAO::FindByUsernameOrName($r[$param]);
+            $identities = IdentitiesDAO::findByUsernameOrName($r[$param]);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         $response = [];
-        foreach ($users as $user) {
-            $entry = ['label' => $user->username, 'value' => $user->username];
-            array_push($response, $entry);
+        foreach ($identities as $identity) {
+            array_push($response, [
+                'label' => $identity->username,
+                'value' => $identity->username
+            ]);
         }
 
         return $response;
@@ -2122,7 +2124,10 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new NotFoundException('problemNotFound');
                     }
-                    if (!is_null($identity) && Authorization::isProblemAdmin($identity->identity_id, $problem)) {
+                    if (!is_null($identity) && Authorization::isProblemAdmin(
+                        $identity,
+                        $problem
+                    )) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif (!ProblemsDAO::isVisible($problem)) {
                         throw new ForbiddenAccessException('problemIsPrivate');
@@ -2516,6 +2521,26 @@ class UserController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    /**
+     * Generate a new gitserver token. This token can be used to authenticate
+     * against the gitserver.
+     */
+    public static function apiGenerateGitToken(Request $r) {
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+
+        $r->user->git_token = SecurityTools::randomHexString(40);
+        try {
+            UsersDAO::update($r->user);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        return [
+            'status' => 'ok',
+            'token' => $r->user->git_token,
+        ];
     }
 }
 
