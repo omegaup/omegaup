@@ -78,7 +78,7 @@ class LinkedIn {
         if (!isset($_SESSION['li-state']) ||
             !isset($state_array['ct']) ||
             $_SESSION['li-state'] != $state_array['ct']) {
-            throw new ApiException('invalidCsrfToken');
+            throw new CSRFException('invalidCsrfToken');
         }
 
         // If we make it here, the CSRF token has been consumed

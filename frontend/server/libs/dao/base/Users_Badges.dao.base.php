@@ -155,7 +155,7 @@ abstract class UsersBadgesDAOBase {
      */
     final public static function create(UsersBadges $Users_Badges) {
         if (is_null($Users_Badges->assignation_time)) {
-            $Users_Badges->assignation_time = gmdate('Y-m-d H:i:s');
+            $Users_Badges->assignation_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
         $params = [

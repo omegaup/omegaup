@@ -64,7 +64,7 @@ class ContestController extends Controller {
             $query = $r['query'];
             Validators::validateStringOfLengthInRange($query, 'query', null, 255, false /* not required */);
             $cache_key = "$active_contests-$recommended-$page-$page_size";
-            if ($r['current_user_id'] === null) {
+            if (is_null($r->identity)) {
                 // Get all public contests
                 Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_PUBLIC,
@@ -76,10 +76,10 @@ class ContestController extends Controller {
                     $contests
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
-                $contests = ContestsDAO::getContestsParticipating($r['current_identity_id'], $page, $page_size, $query);
+                $contests = ContestsDAO::getContestsParticipating($r->identity->identity_id, $page, $page_size, $query);
             } elseif ($public) {
-                $contests = ContestsDAO::getRecentPublicContests($r['current_identity_id'], $page, $page_size, $query);
-            } elseif (Authorization::isSystemAdmin($r['current_identity_id'])) {
+                $contests = ContestsDAO::getRecentPublicContests($r->identity->identity_id, $page, $page_size, $query);
+            } elseif (Authorization::isSystemAdmin($r->identity->identity_id)) {
                 // Get all contests
                 Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_SYSTEM_ADMIN,
@@ -92,7 +92,7 @@ class ContestController extends Controller {
                 );
             } else {
                 // Get all public+private contests
-                $contests = ContestsDAO::getAllContestsForIdentity($r['current_identity_id'], $page, $page_size, $active_contests, $recommended, $query);
+                $contests = ContestsDAO::getAllContestsForIdentity($r->identity->identity_id, $page, $page_size, $active_contests, $recommended, $query);
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -149,7 +149,7 @@ class ContestController extends Controller {
         // Create array of relevant columns
         $contests = null;
         try {
-            if (Authorization::isSystemAdmin($r['current_identity_id'])) {
+            if (Authorization::isSystemAdmin($r->identity->identity_id)) {
                 $contests = ContestsDAO::getAllContestsWithScoreboard(
                     $page,
                     $pageSize,
@@ -158,7 +158,7 @@ class ContestController extends Controller {
                 );
             } else {
                 $contests = ContestsDAO::getAllContestsAdminedByIdentity(
-                    $r['current_identity_id'],
+                    $r->identity->identity_id,
                     $page,
                     $pageSize
                 );
@@ -180,9 +180,7 @@ class ContestController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getContestListInternal(Request $r, $callback_user_function) : Array {
-        self::authenticateRequest($r);
-
+    private static function getContestListInternal(Request $r, $callback_user_function) : Array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
@@ -191,7 +189,7 @@ class ContestController extends Controller {
         $query = $r['query'];
         $contests = null;
         $identity_id = $callback_user_function == 'ContestsDAO::getContestsParticipating'
-          ? $r['current_identity_id'] : $r['current_user_id'];
+          ? $r->identity->identity_id : $r->user->user_id;
         try {
             $contests = call_user_func(
                 $callback_user_function,
@@ -230,6 +228,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         return self::getContestListInternal($r, 'ContestsDAO::getAllContestsOwnedByUser');
     }
 
@@ -241,6 +240,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListParticipating(Request $r) {
+        self::authenticateRequest($r);
         return self::getContestListInternal($r, 'ContestsDAO::getContestsParticipating');
     }
 
@@ -254,16 +254,22 @@ class ContestController extends Controller {
      * In case of access check failed, an exception is thrown.
      *
      * @param Contests $contest
-     * @param int $currentIdentityId
+     * @param Identities $identity
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    public static function canAccessContest(Contests $contest, int $currentIdentityId) : void {
+    private static function canAccessContest(
+        Contests $contest,
+        Identities $identity
+    ) : void {
         if ($contest->admission_mode == 'private') {
             try {
-                if (is_null(ProblemsetIdentitiesDAO::getByPK($currentIdentityId, $contest->problemset_id))
-                        && !Authorization::isContestAdmin($currentIdentityId, $contest)) {
+                if (is_null(ProblemsetIdentitiesDAO::getByPK(
+                    $identity->identity_id,
+                    $contest->problemset_id
+                )) && !Authorization::isContestAdmin($identity, $contest)
+                ) {
                     throw new ForbiddenAccessException('userNotAllowed');
                 }
             } catch (ApiException $e) {
@@ -274,10 +280,10 @@ class ContestController extends Controller {
                 throw new InvalidDatabaseOperationException($e);
             }
         } elseif ($contest->admission_mode == 'registration' &&
-            !Authorization::isContestAdmin($currentIdentityId, $contest)
+            !Authorization::isContestAdmin($identity, $contest)
         ) {
             $req = ProblemsetIdentityRequestDAO::getByPK(
-                $currentIdentityId,
+                $identity->identity_id,
                 $contest->problemset_id
             );
             if (is_null($req) || ($req->accepted === '0')) {
@@ -294,7 +300,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    private static function validateBasicDetails(string $contestAlias) : Array {
+    private static function validateBasicDetails(?string $contestAlias) : array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         // If the contest is private, verify that our user is invited
         try {
@@ -312,17 +318,19 @@ class ContestController extends Controller {
      * Validate if a contestant has explicit access to a contest.
      *
      * @param Contests $contest
-     * @param int $currentUserId
-     * @param int $currentIdentityId
+     * @param Identities $identity
      * @return bool
      */
-    private static function isInvitedToContest(Contests $contest, ?int $currentUserId, int $currentIdentityId) : bool {
-        if (is_null($currentUserId)) {
+    private static function isInvitedToContest(
+        Contests $contest,
+        Identities $identity
+    ) : bool {
+        if (is_null($identity->user_id)) {
             return false;
         }
         return self::isPublic($contest->admission_mode) ||
             !is_null(ProblemsetIdentitiesDAO::getByPK(
-                $currentIdentityId,
+                $identity->identity_id,
                 $contest->problemset_id
             ));
     }
@@ -348,17 +356,16 @@ class ContestController extends Controller {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
             if ($session['valid'] && !is_null($session['identity'])) {
-                $r['current_identity'] = $session['identity'];
-                $r['current_identity_id'] = $session['identity']->identity_id;
+                $r->identity = $session['identity'];
 
+                $r->user = null;
                 if (!is_null($session['user'])) {
-                    $r['current_user'] = $session['user'];
-                    $r['current_user_id'] = $session['user']->user_id;
+                    $r->user = $session['user'];
                 }
 
                 // Privacy Statement Information
                 $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-                    $session['user']->language_id,
+                    $r->identity->language_id,
                     'contest',
                     $result['requests_user_information']
                 );
@@ -373,11 +380,11 @@ class ContestController extends Controller {
                     self::isPublic($contest->admission_mode) ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
                 return $result;
             }
-            self::canAccessContest($contest, $r['current_identity_id']);
+            self::canAccessContest($contest, $r->identity);
         } catch (Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
-            if (!self::isInvitedToContest($contest, $r['current_user_id'], $r['current_identity_id'])) {
+            if (!self::isInvitedToContest($contest, $r->identity)) {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
@@ -387,7 +394,7 @@ class ContestController extends Controller {
 
         // You already started the contest.
         $contestOpened = ProblemsetIdentitiesDAO::getByPK(
-            $r['current_identity_id'],
+            $r->identity->identity_id,
             $contest->problemset_id
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
@@ -414,13 +421,14 @@ class ContestController extends Controller {
         $contestAdmin = false;
         $contestAlias = '';
 
-        // If the contest has not started, user should not see it, unless it is admin or has a token.
+        // If the contest has not started, user should not see it, unless it i
+        // admin or has a token.
         if (is_null($r['token'])) {
             // Crack the request to get the current user
             self::authenticateRequest($r);
-            self::canAccessContest($contest, $r['current_identity_id']);
+            self::canAccessContest($contest, $r->identity);
 
-            $contestAdmin = Authorization::isContestAdmin($r['current_identity_id'], $contest);
+            $contestAdmin = Authorization::isContestAdmin($r->identity, $contest);
             if (!ContestsDAO::hasStarted($contest) && !$contestAdmin) {
                 $exception = new PreconditionFailedException('contestNotStarted');
                 $exception->addCustomMessageToArray('start_time', strtotime($contest->start_time));
@@ -519,9 +527,9 @@ class ContestController extends Controller {
 
         try {
             ProblemsetIdentityRequestDAO::save(new ProblemsetIdentityRequest([
-                'identity_id' => $r['current_identity_id'],
+                'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $contest->problemset_id,
-                'request_time' => gmdate('Y-m-d H:i:s'),
+                'request_time' => gmdate('Y-m-d H:i:s', Time::get()),
             ]));
         } catch (Exception $e) {
             self::$log->error('Failed to create new ProblemsetIdentityRequest: ' . $e->getMessage());
@@ -551,7 +559,7 @@ class ContestController extends Controller {
         DAO::transBegin();
         try {
             ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
-                $r['current_identity_id'],
+                $r->identity->identity_id,
                 $response['contest']->problemset_id,
                 true,
                 $r['share_user_information']
@@ -562,12 +570,12 @@ class ContestController extends Controller {
             if ($needsInformation['requests_user_information'] != 'no') {
                 $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
-                    $r['current_identity_id'],
+                    $r->identity->identity_id,
                     $privacystatement_id
                 );
 
                 ProblemsetIdentitiesDAO::updatePrivacyStatementConsent(new ProblemsetIdentities([
-                    'identity_id' => $r['current_identity_id'],
+                    'identity_id' => $r->identity->identity_id,
                     'problemset_id' => $response['contest']->problemset_id,
                     'privacystatement_consent_id' => $privacystatement_consent_id
                 ]));
@@ -579,7 +587,7 @@ class ContestController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::$log->info("User '{$r['current_identity']->username}' joined contest '{$response['contest']->alias}'");
+        self::$log->info("User '{$r->identity->username}' joined contest '{$response['contest']->alias}'");
         return ['status' => 'ok'];
     }
 
@@ -697,7 +705,7 @@ class ContestController extends Controller {
             // Save the time of the first access
             try {
                 $problemset_user = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
-                    $r['current_identity_id'],
+                    $r->identity->identity_id,
                     $response['contest']->problemset_id
                 );
             } catch (ApiException $e) {
@@ -716,11 +724,14 @@ class ContestController extends Controller {
                     strtotime($problemset_user->access_time) + $response['contest']->window_length * 60
                 );
             }
-            $result['admin'] = Authorization::isContestAdmin($r['current_identity_id'], $response['contest']);
+            $result['admin'] = Authorization::isContestAdmin(
+                $r->identity,
+                $response['contest']
+            );
 
             // Log the operation.
             ProblemsetAccessLogDAO::create(new ProblemsetAccessLog([
-                'identity_id' => $r['current_identity_id'],
+                'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $response['contest']->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR']),
             ]));
@@ -745,7 +756,7 @@ class ContestController extends Controller {
     public static function apiAdminDetails(Request $r) {
         $response = self::validateDetails($r);
 
-        if (!Authorization::isContestAdmin($r['current_identity_id'], $response['contest'])) {
+        if (!Authorization::isContestAdmin($r->identity, $response['contest'])) {
             throw new ForbiddenAccessException();
         }
 
@@ -753,7 +764,7 @@ class ContestController extends Controller {
         self::getCachedDetails($r['contest_alias'], $response['contest'], $result);
 
         $result['opened'] = ProblemsetIdentitiesDAO::checkProblemsetOpened(
-            (int)$r['current_identity_id'],
+            (int)$r->identity->identity_id,
             (int)$response['contest']->problemset_id
         );
         $result['available_languages'] = RunController::$kSupportedLanguages;
@@ -809,9 +820,12 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
-        $originalContest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $originalContest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         $length = strtotime($originalContest->finish_time) -
                   strtotime($originalContest->start_time);
@@ -843,7 +857,7 @@ class ContestController extends Controller {
         DAO::transBegin();
         try {
             // Create the contest
-            self::createContest($problemset, $contest, $r['current_user_id']);
+            self::createContest($problemset, $contest, $r->user->user_id);
 
             $problemsetProblems = ProblemsetProblemsDAO::getProblemsetProblems(
                 $originalContest->problemset_id
@@ -859,7 +873,7 @@ class ContestController extends Controller {
                     $problem,
                     $problemsetProblem['commit'],
                     $problemsetProblem['version'],
-                    $r['current_identity_id'],
+                    $r->identity,
                     $problemsetProblem['points'],
                     $problemsetProblem['order'] ?: 1
                 );
@@ -886,7 +900,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         try {
             $originalContest = ContestsDAO::getByAlias($r['alias']);
@@ -941,7 +955,7 @@ class ContestController extends Controller {
         self::createContest(
             $problemset,
             $contest,
-            $r['current_user_id'],
+            $r->user->user_id,
             $originalContest->problemset_id
         );
 
@@ -1032,7 +1046,7 @@ class ContestController extends Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         // Validate request
         self::validateCreate($r);
@@ -1068,7 +1082,7 @@ class ContestController extends Controller {
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
         ]);
 
-        self::createContest($problemset, $contest, $r['current_user_id']);
+        self::createContest($problemset, $contest, $r->user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1142,23 +1156,26 @@ class ContestController extends Controller {
 
         // Problems is optional
         if (!is_null($r['problems'])) {
-            $request_problems = json_decode($r['problems']);
-            if (is_null($request_problems)) {
+            $requestProblems = json_decode($r['problems']);
+            if (is_null($requestProblems)) {
                 throw new InvalidParameterException('invalidParameters', 'problems');
             }
 
             $problems = [];
 
-            foreach ($request_problems as $problem) {
-                $p = ProblemsDAO::getByAlias($problem->problem);
-                if (is_null($p)) {
+            foreach ($requestProblems as $requestProblem) {
+                $problem = ProblemsDAO::getByAlias($requestProblem->problem);
+                if (is_null($problem)) {
                     throw new InvalidParameterException('parameterNotFound', 'problems');
                 }
-                ProblemsetController::validateAddProblemToProblemset(null, $p, $r['current_identity_id']);
+                ProblemsetController::validateAddProblemToProblemset(
+                    $problem,
+                    $r->identity
+                );
                 array_push($problems, [
-                    'id' => $p->problem_id,
-                    'alias' => $problem->problem,
-                    'points' => $problem->points
+                    'id' => $problem->problem_id,
+                    'alias' => $requestProblem->problem,
+                    'points' => $requestProblem->points
                 ]);
             }
 
@@ -1197,7 +1214,10 @@ class ContestController extends Controller {
      * @throws InvalidParameterException
      */
     private static function validateUpdate(Request $r) : Contests {
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         self::validateCommonCreateOrUpdate($r, $contest, false /* is required*/);
 
@@ -1225,7 +1245,7 @@ class ContestController extends Controller {
      * admins or contest organizers.
      *
      * @param string $contestAlias
-     * @param int $currentIdentityId
+     * @param Identities $identity
      * @return Contests
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
@@ -1233,7 +1253,7 @@ class ContestController extends Controller {
      */
     private static function validateContestAdmin(
         string $contestAlias,
-        int $currentIdentityId,
+        Identities $identity,
         string $message = 'userNotAllowed'
     ) : Contests {
         try {
@@ -1246,7 +1266,7 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
-        if (!Authorization::isContestAdmin($currentIdentityId, $contest)) {
+        if (!Authorization::isContestAdmin($identity, $contest)) {
             throw new ForbiddenAccessException($message);
         }
         return $contest;
@@ -1279,7 +1299,11 @@ class ContestController extends Controller {
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         // Only director is allowed to create problems in contest
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id'], 'cannotAddProb');
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity,
+            'cannotAddProb'
+        );
 
         $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
 
@@ -1308,7 +1332,11 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Validate the request and get the problem and the contest in an array
-        $params = self::validateAddToContestRequest($r, $r['contest_alias'], $r['problem_alias'], $r['current_identity_id']);
+        $params = self::validateAddToContestRequest(
+            $r,
+            $r['contest_alias'],
+            $r['problem_alias']
+        );
 
         self::forbiddenInVirtual($params['contest']);
 
@@ -1329,9 +1357,9 @@ class ContestController extends Controller {
             $params['problem'],
             $masterCommit,
             $currentVersion,
-            $r['current_identity_id'],
+            $r->identity,
             $r['points'],
-            is_null($r['order_in_contest']) ? 1 : $r['order_in_contest']
+            $r['order_in_contest'] ?: 1
         );
 
         // Invalidar cache
@@ -1348,7 +1376,6 @@ class ContestController extends Controller {
      * @param Request $r
      * @param string $contestAlias
      * @param string $problemAlias
-     * @param int $currentIdentityId
      * @return Array
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
@@ -1357,8 +1384,7 @@ class ContestController extends Controller {
     private static function validateAddToContestRequest(
         Request $r,
         string $contestAlias,
-        ?string $problemAlias,
-        int $currentIdentityId
+        ?string $problemAlias
     ) : Array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
@@ -1373,7 +1399,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'contest_alias');
         }
         // Only contest admin is allowed to create problems in contest
-        if (!Authorization::isContestAdmin($r['current_identity_id'], $contest)) {
+        if (!Authorization::isContestAdmin($r->identity, $contest)) {
             throw new ForbiddenAccessException('cannotAddProb');
         }
 
@@ -1394,7 +1420,10 @@ class ContestController extends Controller {
             || $problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
-        if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin($currentIdentityId, $problem)) {
+        if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin(
+            $r->identity,
+            $problem
+        )) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
 
@@ -1419,7 +1448,11 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Validate the request and get the problem and the contest in an array
-        $params = self::validateRemoveFromContestRequest($r['contest_alias'], $r['problem_alias'], $r['current_identity_id']);
+        $params = self::validateRemoveFromContestRequest(
+            $r['contest_alias'],
+            $r['problem_alias'],
+            $r->identity
+        );
 
         self::forbiddenInVirtual($params['contest']);
 
@@ -1447,7 +1480,7 @@ class ContestController extends Controller {
      *
      * @param string $contestAlias
      * @param string $problemAlias
-     * @param int $currentIdentityId
+     * @param Identities $identity
      * @return Array
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
@@ -1456,7 +1489,7 @@ class ContestController extends Controller {
     private static function validateRemoveFromContestRequest(
         string $contestAlias,
         ?string $problemAlias,
-        int $currentIdentityId
+        Identities $identity
     ) : Array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
@@ -1470,7 +1503,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
         // Only contest admin is allowed to remove problems in contest
-        if (!Authorization::isContestAdmin($currentIdentityId, $contest)) {
+        if (!Authorization::isContestAdmin($identity, $contest)) {
             throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
@@ -1492,7 +1525,7 @@ class ContestController extends Controller {
             (int)$problem->problem_id,
             (int)$contest->problemset_id
         ) > 0 &&
-            !Authorization::isSystemAdmin($currentIdentityId)) {
+            !Authorization::isSystemAdmin($identity->identity_id)) {
             throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
 
@@ -1521,7 +1554,7 @@ class ContestController extends Controller {
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
         Validators::validateStringNonEmpty($r['version'], 'version');
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1556,7 +1589,7 @@ class ContestController extends Controller {
      *
      * @param string $contestAlias
      * @param string $usernameOrEmail
-     * @param int $currentIdentityId
+     * @param Identities $identity
      * @return Array
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
@@ -1565,19 +1598,19 @@ class ContestController extends Controller {
     private static function validateAddRemoveUser(
         string $contestAlias,
         string $usernameOrEmail,
-        int $currentIdentityId
+        Identities $identity
     ) : Array {
         // Check contest_alias
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
-        $user = UserController::resolveUser($usernameOrEmail);
+        $identityToRemove = IdentityController::resolveIdentity($usernameOrEmail);
 
-        if (is_null($user)) {
+        if (is_null($identityToRemove)) {
             throw new NotFoundException('userOrMailNotFound');
         }
 
-        $contest = self::validateContestAdmin($contestAlias, $currentIdentityId);
-        return [$user, $contest];
+        $contest = self::validateContestAdmin($contestAlias, $identity);
+        return [$identityToRemove, $contest];
     }
 
     /**
@@ -1597,13 +1630,17 @@ class ContestController extends Controller {
 
         // Authenticate logged user
         self::authenticateRequest($r);
-        [$user, $contest] = self::validateAddRemoveUser($r['contest_alias'], $r['usernameOrEmail'], $r['current_identity_id']);
+        [$identity, $contest] = self::validateAddRemoveUser(
+            $r['contest_alias'],
+            $r['usernameOrEmail'],
+            $r->identity
+        );
 
         // Save the contest to the DB
         try {
             ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
                 'problemset_id' => $contest->problemset_id,
-                'identity_id' => $user->main_identity_id,
+                'identity_id' => $identity->identity_id,
                 'access_time' => null,
                 'score' => '0',
                 'time' => '0',
@@ -1626,12 +1663,16 @@ class ContestController extends Controller {
     public static function apiRemoveUser(Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
-        [$user, $contest] = self::validateAddRemoveUser($r['contest_alias'], $r['usernameOrEmail'], $r['current_identity_id']);
+        [$identity, $contest] = self::validateAddRemoveUser(
+            $r['contest_alias'],
+            $r['usernameOrEmail'],
+            $r->identity
+        );
 
         try {
             ProblemsetIdentitiesDAO::delete(new ProblemsetIdentities([
                 'problemset_id' => $contest->problemset_id,
-                'identity_id' => $user->main_identity_id,
+                'identity_id' => $identity->identity_id,
             ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -1661,7 +1702,7 @@ class ContestController extends Controller {
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         ACLController::addUser($contest->acl_id, $user->user_id);
 
@@ -1683,16 +1724,16 @@ class ContestController extends Controller {
         // Check contest_alias
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $user = UserController::resolveUser($r['usernameOrEmail']);
+        $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isContestAdmin($user->main_identity_id, $contest)) {
+        if (!Authorization::isContestAdmin($identity, $contest)) {
             throw new NotFoundException();
         }
 
-        ACLController::removeUser($contest->acl_id, $user->user_id);
+        ACLController::removeUser($contest->acl_id, $identity->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1722,7 +1763,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         ACLController::addGroup($contest->acl_id, $group->group_id);
 
@@ -1750,7 +1791,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         ACLController::removeGroup($contest->acl_id, $group->group_id);
 
@@ -1797,16 +1838,16 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
         $contest = self::validateClarifications($r);
 
-        $is_contest_director = Authorization::isContestAdmin(
-            $r['current_identity_id'],
+        $isContestDirector = Authorization::isContestAdmin(
+            $r->identity,
             $contest
         );
 
         try {
             $clarifications = ClarificationsDAO::GetProblemsetClarifications(
                 $contest->problemset_id,
-                $is_contest_director,
-                $r['current_identity_id'],
+                $isContestDirector,
+                $r->identity->identity_id,
                 $r['offset'],
                 $r['rowcount']
             );
@@ -1841,7 +1882,7 @@ class ContestController extends Controller {
 
         $params = ScoreboardParams::fromContest($response['contest']);
         $params['admin'] = (
-            Authorization::isContestAdmin($r['current_identity_id'], $response['contest']) &&
+            Authorization::isContestAdmin($r->identity, $response['contest']) &&
             !ContestsDAO::isVirtual($response['contest'])
         );
         $params['show_all_runs'] = !ContestsDAO::isVirtual($response['contest']);
@@ -1872,9 +1913,9 @@ class ContestController extends Controller {
             // Get the current user
             self::authenticateRequest($r);
 
-            self::canAccessContest($contest, $r['current_identity_id']);
+            self::canAccessContest($contest, $r->identity);
 
-            if (Authorization::isContestAdmin($r['current_identity_id'], $contest)) {
+            if (Authorization::isContestAdmin($r->identity, $contest)) {
                 $showAllRuns = true;
             }
         } else {
@@ -2033,7 +2074,7 @@ class ContestController extends Controller {
 
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         try {
             $db_results = ProblemsetIdentityRequestDAO::getRequestsForProblemset($contest->problemset_id);
@@ -2106,7 +2147,7 @@ class ContestController extends Controller {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         $targetIdentity = IdentitiesDAO::FindByUsername($r['username']);
 
@@ -2124,7 +2165,7 @@ class ContestController extends Controller {
 
         $request->accepted = $resolution;
         $request->extra_note = $r['note'];
-        $request->last_update = gmdate('Y-m-d H:i:s');
+        $request->last_update = gmdate('Y-m-d H:i:s', Time::get());
 
         ProblemsetIdentityRequestDAO::save($request);
 
@@ -2133,7 +2174,7 @@ class ContestController extends Controller {
             'identity_id' => $request->identity_id,
             'problemset_id' => $contest->problemset_id,
             'time' => $request->last_update,
-            'admin_id' => $r['current_user_id'],
+            'admin_id' => $r->user->user_id,
             'accepted' => $request->accepted,
         ]));
 
@@ -2156,7 +2197,7 @@ class ContestController extends Controller {
 
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         // Get identities from DB
         try {
@@ -2186,7 +2227,7 @@ class ContestController extends Controller {
 
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         return [
             'status' => 'ok',
@@ -2285,7 +2326,7 @@ class ContestController extends Controller {
             DAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            self::updateContest($contest, $originalContest, $r['current_user_id']);
+            self::updateContest($contest, $originalContest, $r->user->user_id);
 
             if ($updateProblemset) {
                 // Save the problemset object with data sent by user to the database
@@ -2365,7 +2406,7 @@ class ContestController extends Controller {
 
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
@@ -2450,15 +2491,18 @@ class ContestController extends Controller {
      * Validates that request contains contest_alias and the api is contest-admin only
      *
      * @param string $contestAlias
-     * @param int $currentIdentityId
+     * @param Identities $identity
      * @return Contests
      * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
-    private static function validateStats(string $contestAlias, int $currentIdentityId) : Contests {
+    private static function validateStats(
+        string $contestAlias,
+        Identities $identity
+    ) : Contests {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
-        return self::validateContestAdmin($contestAlias, $currentIdentityId);
+        return self::validateContestAdmin($contestAlias, $identity);
     }
 
     /**
@@ -2473,7 +2517,7 @@ class ContestController extends Controller {
         // Get user
         self::authenticateRequest($r);
 
-        $contest = self::validateStats($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         try {
             $pendingRunGuids = RunsDAO::getPendingRunGuidsOfProblemset((int)$contest->problemset_id);
@@ -2539,7 +2583,7 @@ class ContestController extends Controller {
     public static function apiReport(Request $r) {
         self::authenticateRequest($r);
 
-        $contest = self::validateStats($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         $params = ScoreboardParams::fromContest($contest);
         $params['admin'] = true;
@@ -2568,7 +2612,7 @@ class ContestController extends Controller {
     public static function apiCsvReport(Request $r) {
         self::authenticateRequest($r);
 
-        $contest = self::validateStats($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         // Get full Report API of the contest
         $contestReport = self::apiReport(new Request([
@@ -2682,7 +2726,7 @@ class ContestController extends Controller {
     public static function apiDownload(Request $r) {
         self::authenticateRequest($r);
 
-        $contest = self::validateStats($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         include_once 'libs/third_party/ZipStream.php';
         $zip = new ZipStream("{$r['contest_alias']}.zip");
@@ -2703,7 +2747,7 @@ class ContestController extends Controller {
         try {
             if ($r['contest_alias'] == 'all-events') {
                 self::authenticateRequest($r);
-                if (Authorization::isSystemAdmin($r['current_identity_id'])) {
+                if (Authorization::isSystemAdmin($r->identity->identity_id)) {
                     return [
                         'status' => 'ok',
                         'admin' => true
@@ -2737,7 +2781,7 @@ class ContestController extends Controller {
     public static function apiSetRecommended(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
+        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -2779,7 +2823,7 @@ class ContestController extends Controller {
     public static function apiContestants(Request $r) {
         self::authenticateRequest($r);
 
-        $contest = self::validateStats($r['contest_alias'], $r['current_identity_id']);
+        $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         if (!ContestsDAO::requestsUserInformation($contest->contest_id)) {
             throw new ForbiddenAccessException('contestInformationNotRequired');

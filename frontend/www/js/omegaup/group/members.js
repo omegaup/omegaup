@@ -6,14 +6,17 @@ OmegaUp.on('ready', function() {
   const formData = document.querySelector('#form-data');
   const groupAlias = formData.getAttribute('data-alias');
   const payload = JSON.parse(document.getElementById('payload').innerText);
+
   let groupMembers = new Vue({
-    el: '#group_members',
+    el: '#group-members div.list',
     render: function(createElement) {
       return createElement('omegaup-group-members', {
         props: {
           identities: this.identities,
           identitiesCsv: this.identitiesCsv,
+          groupAlias: this.groupAlias,
           countries: this.countries,
+          show: this.show,
         },
         on: {
           'add-member': function(groupMembersInstance, username) {
@@ -27,6 +30,30 @@ OmegaUp.on('ready', function() {
                   groupMembersInstance.reset();
                 })
                 .fail(UI.apiError);
+          },
+          'edit-identity': function(groupMembersInstance, identity) {
+            groupMembersInstance.show = true;
+            groupMembersInstance.identity = identity;
+            groupMembersInstance.username = identity.username;
+          },
+          'edit-identity-member': function(identityEditInstance,
+                                           groupMembersInstance, identity,
+                                           countryId, stateId) {
+            API.Identity.update({
+                          username: identity.username,
+                          name: identity.name,
+                          country_id: countryId,
+                          state_id: stateId,
+                          school_name: identity.school,
+                          group_alias: groupAlias,
+                          original_username: identityEditInstance.username,
+                        })
+                .then(function(data) {
+                  UI.success(T.groupEditMemberUpdated);
+                  groupMembersInstance.show = false;
+                  refreshMemberList();
+                })
+                .fail(function(response) { UI.apiError(response); });
           },
           'change-password-identity-member': function(
               groupMembersInstance, username, newPassword, newPasswordRepeat) {
@@ -60,13 +87,20 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
+          cancel: function(groupMembersInstance) {
+            refreshMemberList();
+            groupMembersInstance.show = false;
+            groupMembersInstance.$el.scrollIntoView();
+          },
         },
       });
     },
     data: {
       identities: [],
       identitiesCsv: [],
+      groupAlias: groupAlias,
       countries: payload.countries,
+      show: false,
     },
     components: {
       'omegaup-group-members': group_Members,

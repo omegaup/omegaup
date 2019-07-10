@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Testing synchronization betwen User and Identity
+ * Testing synchronization between User and Identity
  *
  * @author juan.pablo
  */

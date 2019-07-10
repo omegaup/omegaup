@@ -40,7 +40,7 @@ class RunController extends Controller {
      */
     private static function validateCreateRequest(Request $r) {
         // https://github.com/omegaup/omegaup/issues/739
-        if ($r['current_identity']->username == 'omi') {
+        if ($r->identity->username == 'omi') {
             throw new ForbiddenAccessException();
         }
 
@@ -107,15 +107,15 @@ class RunController extends Controller {
                 // Check for practice or public problem, there is no contest info
                 // in this scenario.
                 if (ProblemsDAO::isVisible($r['problem']) ||
-                      Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']) ||
+                      Authorization::isProblemAdmin($r->identity, $r['problem']) ||
                       Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                     if (!RunsDAO::isRunInsideSubmissionGap(
                         null,
                         null,
                         (int)$r['problem']->problem_id,
-                        (int)$r['current_identity_id']
+                        (int)$r->identity->identity_id
                     )
-                            && !Authorization::isSystemAdmin($r['current_identity_id'])) {
+                            && !Authorization::isSystemAdmin($r->identity->identity_id)) {
                             throw new NotAllowedToSubmitException('runWaitGap');
                     }
 
@@ -158,11 +158,11 @@ class RunController extends Controller {
             }
 
             // Contest admins can skip following checks
-            if (!Authorization::isAdmin($r['current_identity_id'], $r['problemset'])) {
+            if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
                 // Before submit something, user had to open the problem/problemset.
-                if (!ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id) &&
+                if (!ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset_id) &&
                     !Authorization::canSubmitToProblemset(
-                        $r['current_identity_id'],
+                        $r->identity,
                         $r['problemset']
                     )
                 ) {
@@ -170,16 +170,16 @@ class RunController extends Controller {
                 }
 
                 // Validate that the run is timely inside contest
-                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r['current_identity_id'])) {
+                if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r->identity->identity_id)) {
                     throw new NotAllowedToSubmitException('runNotInsideContest');
                 }
 
                 // Validate if the user is allowed to submit given the submissions_gap
-                if (!RunsDAO::IsRunInsideSubmissionGap(
+                if (!RunsDAO::isRunInsideSubmissionGap(
                     (int)$problemset_id,
                     $r['contest'],
                     (int)$r['problem']->problem_id,
-                    (int)$r['current_identity_id']
+                    (int)$r->identity->identity_id
                 )) {
                     throw new NotAllowedToSubmitException('runWaitGap');
                 }
@@ -241,7 +241,7 @@ class RunController extends Controller {
                         $opened = ProblemsetProblemOpenedDAO::getByPK(
                             $problemset_id,
                             $r['problem']->problem_id,
-                            $r['current_identity_id']
+                            $r->identity->identity_id
                         );
 
                         if (is_null($opened)) {
@@ -279,14 +279,14 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $type = (Authorization::isAdmin($r['current_identity_id'], $r['problemset']) &&
+            $type = (Authorization::isAdmin($r->identity, $r['problemset']) &&
                 !is_null($r['contest']) &&
                 !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
         }
 
         // Populate new run+submission object
         $submission = new Submissions([
-            'identity_id' => $r['current_identity_id'],
+            'identity_id' => $r->identity->identity_id,
             'problem_id' => $r['problem']->problem_id,
             'problemset_id' => $problemset_id,
             'guid' => md5(uniqid(rand(), true)),
@@ -335,8 +335,8 @@ class RunController extends Controller {
             }
 
             SubmissionLogDAO::create(new SubmissionLog([
-                'user_id' => $r['current_user_id'],
-                'identity_id' => $r['current_identity_id'],
+                'user_id' => $r->identity->user_id,
+                'identity_id' => $r->identity->identity_id,
                 'submission_id' => $submission->submission_id,
                 'problemset_id' => $submission->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR'])
@@ -354,7 +354,7 @@ class RunController extends Controller {
         } else {
             // Add remaining time to the response
             try {
-                $contest_user = ProblemsetIdentitiesDAO::getByPK($r['current_identity_id'], $problemset_id);
+                $contest_user = ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset_id);
 
                 if (isset($r['container']->finish_time)) {
                     $response['submission_deadline'] = strtotime($r['container']->finish_time);
@@ -430,7 +430,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewSubmission($r['current_identity_id'], $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -452,8 +452,8 @@ class RunController extends Controller {
         if ($filtered['contest_score'] != null) {
             $filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
         }
-        if ($r['submission']->identity_id == $r['current_identity_id']) {
-            $filtered['username'] = $r['current_identity']->username;
+        if ($r['submission']->identity_id == $r->identity->identity_id) {
+            $filtered['username'] = $r->identity->username;
         }
         return $filtered;
     }
@@ -472,7 +472,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canEditSubmission($r['current_identity_id'], $r['submission']))) {
+        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -511,7 +511,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canEditSubmission($r['current_identity_id'], $r['submission'])) {
+        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -575,19 +575,19 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::canViewSubmission($r['current_identity_id'], $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
         // Get the source
         $response = [
             'status' => 'ok',
-            'admin' => Authorization::isProblemAdmin($r['current_identity_id'], $r['problem']),
+            'admin' => Authorization::isProblemAdmin($r->identity, $r['problem']),
             'guid' => $r['submission']->guid,
             'language' => $r['submission']->language,
         ];
         $showDetails = $response['admin'] ||
-            ProblemsDAO::isProblemSolved($r['problem'], (int)$r['current_identity_id']);
+            ProblemsDAO::isProblemSolved($r['problem'], (int)$r->identity->identity_id);
 
         // Get the details, compile error, logs, etc.
         RunController::populateRunDetails($r['submission'], $r['run'], $showDetails, $response);
@@ -616,7 +616,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!(Authorization::canViewSubmission($r['current_identity_id'], $r['submission']))) {
+        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -668,13 +668,21 @@ class RunController extends Controller {
         self::authenticateRequest($r);
 
         Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
-        if (!RunController::downloadSubmission($r['run_alias'], $r['current_identity_id'], /*passthru=*/true)) {
+        if (!RunController::downloadSubmission(
+            $r['run_alias'],
+            $r->identity,
+            /*passthru=*/true
+        )) {
             http_response_code(404);
         }
         exit;
     }
 
-    public static function downloadSubmission(string $guid, int $identityId, bool $passthru) {
+    public static function downloadSubmission(
+        string $guid,
+        Identities $identity,
+        bool $passthru
+    ) {
         try {
             $submission = SubmissionsDAO::getByGuid($guid);
         } catch (Exception $e) {
@@ -703,7 +711,7 @@ class RunController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        if (!(Authorization::isProblemAdmin($identityId, $problem))) {
+        if (!Authorization::isProblemAdmin($identity, $problem)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -828,7 +836,7 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        if (!Authorization::isSystemAdmin($r['current_identity_id'])) {
+        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 

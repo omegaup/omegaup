@@ -71,13 +71,13 @@ class ClarificationController extends Controller {
         $time = Time::get();
         $receiver_id = $r['identity'] ? $r['identity']->identity_id : null;
         $r['clarification'] = new Clarifications([
-            'author_id' => $r['current_identity_id'],
+            'author_id' => $r->identity->identity_id,
             'receiver_id' => $receiver_id,
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
             'time' => gmdate('Y-m-d H:i:s', $time),
-            'public' => $receiver_id == $r['current_identity_id'] ? '1' : '0',
+            'public' => $receiver_id == $r->identity->identity_id ? '1' : '0',
         ]);
 
         // Insert new Clarification
@@ -89,7 +89,6 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['user'] = $r['current_user'];
         self::clarificationUpdated($r, $time);
 
         return [
@@ -122,7 +121,10 @@ class ClarificationController extends Controller {
 
         // If the clarification is private, verify that our user is invited or is contest director
         if ($r['clarification']->public != 1) {
-            if (!(Authorization::canViewClarification($r['current_identity_id'], $r['clarification']))) {
+            if (!Authorization::canViewClarification(
+                $r->identity,
+                $r['clarification']
+            )) {
                 throw new ForbiddenAccessException();
             }
         }
@@ -171,7 +173,10 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::canEditClarification($r['current_identity_id'], $r['clarification'])) {
+        if (!Authorization::canEditClarification(
+            $r->identity,
+            $r['clarification']
+        )) {
             throw new ForbiddenAccessException();
         }
     }

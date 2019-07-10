@@ -23,6 +23,11 @@ class Request extends ArrayObject {
     public $user = null;
 
     /**
+     * The object of the identity currently logged in.
+     */
+    public $identity = null;
+
+    /**
      * The method that will be called.
      */
     public $method = null;
@@ -37,7 +42,7 @@ class Request extends ArrayObject {
      *
      * @param string $key The key.
      */
-    public function offsetExists($key) {
+    public function offsetExists($key) : bool {
         return parent::offsetExists($key) || ($this->parent != null && isset($this->parent[$key]));
     }
 
@@ -61,7 +66,7 @@ class Request extends ArrayObject {
      *
      * @param array $contents The (optional) array with the values.
      */
-    public function push($contents = null) {
+    public function push(?array $contents = null) : Request {
         $req = new Request($contents);
         $req->parent = $this;
         $req->user = $this->user;
@@ -86,7 +91,7 @@ class Request extends ArrayObject {
      *
      * @return the global per-request unique(-ish) ID
      */
-    public static function requestId() {
+    public static function requestId() : string {
         return Request::$_requestId;
     }
 
@@ -96,7 +101,7 @@ class Request extends ArrayObject {
     public function ensureBool(
         string $key,
         bool $required = true
-    ) {
+    ) : void {
         $val = self::offsetGet($key);
         if (is_int($val)) {
             $this[$key] = $val == 1;
@@ -121,7 +126,7 @@ class Request extends ArrayObject {
         ?int $lowerBound = null,
         ?int $upperBound = null,
         bool $required = true
-    ) {
+    ) : void {
         if (!self::offsetExists($key)) {
             if (!$required) {
                 return;
@@ -141,7 +146,7 @@ class Request extends ArrayObject {
         ?float $lowerBound = null,
         ?float $upperBound = null,
         bool $required = true
-    ) {
+    ) : void {
         if (!self::offsetExists($key)) {
             if (!$required) {
                 return;

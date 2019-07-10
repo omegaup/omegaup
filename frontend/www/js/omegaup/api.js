@@ -66,6 +66,47 @@ function _normalizeContestFields(contest) {
 }
 
 export default {
+  Badge: {
+    badgeDetails: _call('/api/badge/badgeDetails/',
+                        function(result) {
+                          result.first_assignation =
+                              result.first_assignation ?
+                                  new Date(result.first_assignation * 1000) :
+                                  null;
+                          return result;
+                        }),
+
+    list: _call('/api/badge/list/'),
+
+    myBadgeAssignationTime: _call('/api/badge/myBadgeAssignationTime/',
+                                  function(result) {
+                                    result.assignation_time =
+                                        result.assignation_time ?
+                                            new Date(result.assignation_time *
+                                                     1000) :
+                                            null;
+                                    return result;
+                                  }),
+
+    myList: _call('/api/badge/myList/',
+                  function(result) {
+                    result.badges.forEach((badge) => {
+                      badge.assignation_time =
+                          new Date(badge.assignation_time * 1000);
+                    });
+                    return result;
+                  }),
+
+    userList: _call('/api/badge/userList/',
+                    function(result) {
+                      result.badges.forEach((badge) => {
+                        badge.assignation_time =
+                            new Date(badge.assignation_time * 1000);
+                      });
+                      return result;
+                    }),
+  },
+
   Clarification: {
     create: _call('/api/clarification/create/'),
 
@@ -374,6 +415,8 @@ export default {
     create: _call('/api/identity/create/'),
 
     bulkCreate: _call('/api/identity/bulkCreate/'),
+
+    update: _call('/api/identity/update/'),
   },
 
   Interview: {

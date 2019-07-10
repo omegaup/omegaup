@@ -5,38 +5,46 @@
         v-bind:disabled="!enabled">
 </template>
 
-<script>
-import {T} from '../omegaup.js';
-export default {
-  props: {
-    value: Date,
-    enabled: {
-      type: Boolean,
-      'default': true,
-    },
-    format: {
-      type: String,
-      'default': T.dateTimePickerFormat,
-    },
-  },
-  data: function() { return {};},
-  watch: {
-    value: function(val) { $(this.$el)
-                               .data('datetimepicker')
-                               .setDate(val);},
-  },
-  mounted: function() {
-    var self = this;
+<script lang="ts">
+import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import { T } from '../omegaup.js';
+
+@Component
+export default class DateTimePicker extends Vue {
+  T = T;
+
+  @Prop() value!: Date;
+  @Prop({ default: true }) enabled!: boolean;
+  @Prop({ default: T.dateTimePickerFormat }) format!: string;
+
+  mounted() {
+    let self = this;
     $(self.$el)
-        .datetimepicker({
-          format: self.format,
-          defaultDate: self.value,
-          language: T.locale,
-        })
-        .on('change', function(e) {
-          self.$emit('input', $(self.$el).data('datetimepicker').getDate());
-        });
-    $(this.$el).data('datetimepicker').setDate(this.value);
-  },
-};
+      .datetimepicker({
+        format: self.format,
+        defaultDate: self.value,
+        locale: T.locale,
+      })
+      .on('change', ev => {
+        self.$emit(
+          'input',
+          $(self.$el)
+            .data('datetimepicker')
+            .getDate(),
+        );
+      });
+
+    $(this.$el)
+      .data('datetimepicker')
+      .setDate(self.value);
+  }
+
+  @Watch('value')
+  onPropertyChanged(newValue: string) {
+    $(this.$el)
+      .data('datetimepicker')
+      .setDate(newValue);
+  }
+}
+
 </script>

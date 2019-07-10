@@ -17,27 +17,35 @@ class Controller {
 
     /**
      * Given the request, returns what user is performing the request by
-     * looking at the auth_token
+     * looking at the auth_token, when requireMainUserIdentity flag is true, we
+     * need to ensure that the request is made by the main identity of the
+     * logged user
      *
      * @param Request $r
+     * @param bool $requireMainUserIdentity
      * @throws InvalidDatabaseOperationException
      * @throws UnauthorizedException
      */
-    protected static function authenticateRequest(Request $r) {
+    protected static function authenticateRequest(
+        Request $r,
+        bool $requireMainUserIdentity = false
+    ) {
+        $r->user = null;
         $session = SessionController::apiCurrentSession($r)['session'];
         if (is_null($session['identity'])) {
-            $r['current_user'] = null;
-            $r['current_user_id'] = null;
-            $r['current_identity'] = null;
-            $r['current_identity_id'] = null;
+            $r->user = null;
+            $r->identity = null;
             throw new UnauthorizedException();
         }
         if (!is_null($session['user'])) {
-            $r['current_user'] = $session['user'];
-            $r['current_user_id'] = $session['user']->user_id;
+            $r->user = $session['user'];
         }
-        $r['current_identity'] = $session['identity'];
-        $r['current_identity_id'] = $session['identity']->identity_id;
+        $r->identity = $session['identity'];
+        if ($requireMainUserIdentity && (is_null($r->user) ||
+            $r->user->main_identity_id != $r->identity->identity_id)
+        ) {
+            throw new ForbiddenException();
+        }
     }
 
     /**
@@ -73,7 +81,7 @@ class Controller {
      */
     protected static function resolveTargetUser(Request $r) {
         // By default use current user
-        $user = $r['current_user'];
+        $user = $r->user;
 
         if (!is_null($r['username'])) {
             Validators::validateStringNonEmpty($r['username'], 'username');
@@ -108,7 +116,7 @@ class Controller {
      */
     protected static function resolveTargetIdentity(Request $r) {
         // By default use current identity
-        $identity = $r['current_identity'];
+        $identity = $r->identity;
 
         if (is_null($r['username'])) {
             return $identity;

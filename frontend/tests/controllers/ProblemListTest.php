@@ -188,7 +188,7 @@ class ProblemList extends OmegaupTestCase {
             []
         );
 
-        Utils::RunCronjobScript();
+        Utils::RunAggregateFeedback();
 
         // Filter 1:
         // - Containing tag-0

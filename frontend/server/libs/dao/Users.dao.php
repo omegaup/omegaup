@@ -47,34 +47,6 @@ class UsersDAO extends UsersDAOBase {
         return $conn->GetOne($sql, $params) > 0;
     }
 
-    public static function FindByUsernameOrName($usernameOrName) {
-        global  $conn;
-        $sql = "
-            SELECT
-                u.*
-            FROM
-                Users u
-            WHERE
-                u.username = ? OR u.name = ?
-            UNION DISTINCT
-            SELECT DISTINCT
-                u.*
-            FROM
-                Users u
-            WHERE
-                u.username LIKE CONCAT('%', ?, '%') OR
-                u.username LIKE CONCAT('%', ?, '%')
-            LIMIT 10";
-        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
-
-        $rs = $conn->GetAll($sql, $args);
-        $result = [];
-        foreach ($rs as $user_data) {
-            array_push($result, new Users($user_data));
-        }
-        return $result;
-    }
-
     public static function FindResetInfoByEmail($email) {
         $user = self::FindByEmail($email);
         if (is_null($user)) {
@@ -222,5 +194,14 @@ class UsersDAO extends UsersDAOBase {
             array_push($users, new Users($row));
         }
         return $users;
+    }
+
+    public static function getUsersCount() {
+        $sql = 'SELECT
+                    COUNT(*) AS total
+                FROM
+                    Users;';
+        global $conn;
+        return $conn->GetRow($sql)['total'];
     }
 }

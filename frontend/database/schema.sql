@@ -867,6 +867,7 @@ CREATE TABLE `Users` (
   `username` varchar(50) NOT NULL,
   `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
   `password` varchar(100) DEFAULT NULL,
+  `git_token` char(40) DEFAULT NULL COMMENT 'Token de acceso para git',
   `main_email_id` int(11) DEFAULT NULL,
   `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',
   `name` varchar(256) DEFAULT NULL,
@@ -908,7 +909,6 @@ CREATE TABLE `Users_Badges` (
   `badge_alias` varchar(32) NOT NULL COMMENT 'Identificador de badge',
   `assignation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_badge_id`),
-  UNIQUE KEY `badge_alias` (`badge_alias`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Badges de Usuario';
