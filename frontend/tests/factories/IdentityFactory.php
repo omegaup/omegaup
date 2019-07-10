@@ -46,7 +46,8 @@ class IdentityFactory {
             'auth_token' => $adminLogin->auth_token,
             'identities' => IdentityFactory::getCsvData(
                 'identities.csv',
-                $group->alias
+                $group->alias,
+                $password
             ),
             'group_alias' => $group->alias,
         ]));
@@ -60,13 +61,6 @@ class IdentityFactory {
         [$identity] = $response['identities'];
         $identity = IdentitiesDAO::FindByUsername($identity['username']);
 
-        // Change identity password
-        IdentityController::apiChangePassword(new Request([
-            'auth_token' => $adminLogin->auth_token,
-            'username' => $identity->username,
-            'password' => $password,
-            'group_alias' => $group->alias,
-        ]));
         $identity->password = $password;
         return $identity;
     }
