@@ -37,7 +37,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
-        $this->assertEquals($locale->language_id, $userDb->language_id);
+        $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Edit all fields again with diff values
         $locale = LanguagesDAO::getByName('pseudo');
@@ -64,13 +64,15 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
         $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
-        $this->assertEquals($locale->language_id, $userDb->language_id);
+        $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
         $r = new Request([
             'username' => $user->username
         ]);
-        $this->assertEquals($locale->name, UserController::getPreferredLanguage($r));
+        $this->assertEquals($locale->name, IdentityController::getPreferredLanguage(
+            $r
+        ));
     }
 
     /**

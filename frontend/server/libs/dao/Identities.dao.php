@@ -187,7 +187,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LEFT JOIN
                     Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
-                    Languages l ON u.language_id = l.language_id
+                    Languages l ON i.language_id = l.language_id
                 WHERE
                     i.`identity_id` = ?
                 LIMIT
