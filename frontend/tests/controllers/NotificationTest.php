@@ -102,24 +102,26 @@ class NotificationTest extends OmegaupTestCase {
 
     public function testReadNotificationsForbbidenAccessException() {
         $user = UserFactory::createUser();
+        $login = self::login($user);
         NotificationsDAO::create(new Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
         ]));
+        $results = NotificationController::apiMyList(new Request([
+            'auth_token' => $login->auth_token,
+            'user' => $user,
+        ]));
+
+        $notification = $results['notifications'][0];
 
         $maliciousUser = UserFactory::createUser();
         $login = self::login($maliciousUser);
-
-        $maliciousIds = [];
-        for ($i = 1; $i <= 100; $i++) {
-            $maliciousIds[] = $i;
-        }
 
         try {
             NotificationController::apiReadNotifications(new Request([
                 'auth_token' => $login->auth_token,
                 'user' => $maliciousUser,
-                'notifications' => $maliciousIds,
+                'notifications' => [$notification['notification_id']],
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (ForbiddenAccessException $e) {
