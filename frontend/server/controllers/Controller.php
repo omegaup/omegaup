@@ -124,7 +124,7 @@ class Controller {
         Validators::validateStringNonEmpty($r['username'], 'username');
 
         try {
-            $identity = IdentitiesDAO::FindByUsername($r['username']);
+            $identity = IdentitiesDAO::findByUsername($r['username']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -153,9 +153,13 @@ class Controller {
      * @param Request $request
      * @param object $object
      * @param array $properties
-     * @return boolean True if there were changes to any property marked as 'important'.
+     * @return bool True if there were changes to any property marked as 'important'.
      */
-    protected static function updateValueProperties($request, $object, $properties) {
+    protected static function updateValueProperties(
+        Request $request,
+        object $object,
+        array $properties
+    ) : bool {
         $importantChange = false;
         foreach ($properties as $source => $info) {
             if (is_int($source)) {

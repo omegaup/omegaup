@@ -56,9 +56,6 @@ class Users extends VO {
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = $data['scholar_degree'];
         }
-        if (isset($data['language_id'])) {
-            $this->language_id = (int)$data['language_id'];
-        }
         if (isset($data['graduation_date'])) {
             $this->graduation_date = $data['graduation_date'];
         }
@@ -173,13 +170,6 @@ class Users extends VO {
       * @var enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate')
       */
     public $scholar_degree;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $language_id;
 
     /**
       *  [Campo no documentado]

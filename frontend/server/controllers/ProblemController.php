@@ -930,7 +930,7 @@ class ProblemController extends Controller {
             'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
         Validators::validateInEnum($r['lang'], 'lang', $iso639_1, false /* is_required */);
         if (is_null($r['lang'])) {
-            $r['lang'] = UserController::getPreferredLanguage($r);
+            $r['lang'] = IdentityController::getPreferredLanguage($r);
         }
         $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
@@ -1020,7 +1020,7 @@ class ProblemController extends Controller {
         if (!is_null($r['lang'])) {
             Validators::validateStringOfLengthInRange($r['lang'], 'lang', 2, 2);
         } else {
-            $r['lang'] = UserController::getPreferredLanguage($r);
+            $r['lang'] = IdentityController::getPreferredLanguage($r);
         }
 
         try {
@@ -1920,7 +1920,7 @@ class ProblemController extends Controller {
             }
             if (!is_null($r['username'])) {
                 try {
-                    $r['identity'] = IdentitiesDAO::FindByUsername($r['username']);
+                    $r['identity'] = IdentitiesDAO::findByUsername($r['username']);
                 } catch (Exception $e) {
                     throw new NotFoundException('userNotFound');
                 }
