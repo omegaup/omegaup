@@ -40,13 +40,14 @@ class IdentityFactory {
         Groups $group,
         ScopedLoginToken $adminLogin,
         string $password
-    ) : Identities {
+    ) : array {
         // Call api using identity creator group member
         IdentityController::apiBulkCreate(new Request([
             'auth_token' => $adminLogin->auth_token,
             'identities' => IdentityFactory::getCsvData(
                 'identities.csv',
-                $group->alias
+                $group->alias,
+                $password
             ),
             'group_alias' => $group->alias,
         ]));
@@ -57,17 +58,16 @@ class IdentityFactory {
             'group_alias' => $group->alias,
         ]));
 
-        [$identity] = $response['identities'];
-        $identity = IdentitiesDAO::FindByUsername($identity['username']);
+        [$unassociatedIdentity, $associatedIdentity] = $response['identities'];
+        $unassociatedIdentity = IdentitiesDAO::FindByUsername(
+            $unassociatedIdentity['username']
+        );
+        $associatedIdentity = IdentitiesDAO::FindByUsername(
+            $associatedIdentity['username']
+        );
 
-        // Change identity password
-        IdentityController::apiChangePassword(new Request([
-            'auth_token' => $adminLogin->auth_token,
-            'username' => $identity->username,
-            'password' => $password,
-            'group_alias' => $group->alias,
-        ]));
-        $identity->password = $password;
-        return $identity;
+        $unassociatedIdentity->password = $password;
+        $associatedIdentity->password = $password;
+        return [$unassociatedIdentity, $associatedIdentity];
     }
 }

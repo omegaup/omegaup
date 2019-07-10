@@ -13,16 +13,146 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
         // Create a group, a set of identities, get one of them
         $password = Utils::CreateRandomString();
-        $identity = self::createGroupIdentityCreatorAndGroup($password);
+        [
+            $unassociatedIdentity,
+            $associatedIdentity
+        ] = self::createGroupIdentityCreatorAndGroup($password);
 
+        // Create a new user to associate with identity
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        // Associate identity with user
+        UserController::apiAssociateIdentity(new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $associatedIdentity->username,
+            'password' => $associatedIdentity->password,
+        ]));
+
+        $this->getRestrictContestForIdentity($unassociatedIdentity, $contestData);
+        $this->getRestrictContestForIdentity($associatedIdentity, $contestData, true);
+    }
+
+    /**
+     * Restricted Course APIs for unassociated identities.
+     */
+    public function testRestrictionsForCourses() {
+        // Create a course with admin privileges (main identity can do that)
+        $courseData = CoursesFactory::createCourse();
+
+        // Create a group, a set of identities, get one of them
+        $password = Utils::CreateRandomString();
+        [
+            $unassociatedIdentity,
+            $associatedIdentity
+        ] = self::createGroupIdentityCreatorAndGroup($password);
+
+        // Create a new user to associate with identity
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        // Associate identity with user
+        UserController::apiAssociateIdentity(new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $associatedIdentity->username,
+            'password' => $associatedIdentity->password,
+        ]));
+
+        $this->getRestrictCourseForIdentity($unassociatedIdentity, $courseData);
+        $this->getRestrictCourseForIdentity($associatedIdentity, $courseData, true);
+    }
+
+    /**
+     * Restricted Problem APIs for unassociated identities.
+     */
+    public function testRestrictionsForProblems() {
+        // Create a group, a set of identities, get one of them
+        $password = Utils::CreateRandomString();
+        [
+            $unassociatedIdentity,
+            $associatedIdentity
+        ] = self::createGroupIdentityCreatorAndGroup($password);
+
+        // Create a new user to associate with identity
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        // Associate identity with user
+        UserController::apiAssociateIdentity(new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $associatedIdentity->username,
+            'password' => $associatedIdentity->password,
+        ]));
+
+        $this->getRestrictProblemForIdentity($unassociatedIdentity);
+        $this->getRestrictProblemForIdentity($associatedIdentity, true);
+    }
+
+    /**
+     * Restricted Group APIs for unassociated identities.
+     */
+    public function testRestrictionsForGroups() {
+        // Create a group, a set of identities, get one of them
+        $password = Utils::CreateRandomString();
+        [
+            $unassociatedIdentity,
+            $associatedIdentity
+        ] = self::createGroupIdentityCreatorAndGroup($password);
+
+        // Create a new user to associate with identity
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        // Associate identity with user
+        UserController::apiAssociateIdentity(new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $associatedIdentity->username,
+            'password' => $associatedIdentity->password,
+        ]));
+
+        $this->getRestrictGroupForIdentity($unassociatedIdentity);
+        $this->getRestrictGroupForIdentity($associatedIdentity, true);
+    }
+
+    private static function createGroupIdentityCreatorAndGroup(
+        string $password
+    ) : array {
+        // Add a new user with identity groups creator privileges, and login
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+
+        // Create a group, where identities will be added
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        )['group'];
+
+        // Create identities and get one unassociated and other one to be
+        // associated with a user
+        return IdentityFactory::createIdentitiesFromAGroup(
+            $group,
+            $creatorLogin,
+            $password
+        );
+    }
+
+    private function getRestrictContestForIdentity(
+        Identities $identity,
+        array $contestData,
+        bool $isAssociated = false
+    ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
+        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             ContestController::apiMyList(new Request([
                 'auth_token' => $login->auth_token
             ]));
-            $this->fail('unassociated identity does not have access to see apiMyList');
+            $this->fail("{$identityStatus} identity does not have access to see apiMyList");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -32,7 +162,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'alias' => $contestData['contest']->alias,
             ]));
-            $this->fail('unassociated identity can not create virtual contests');
+            $this->fail("{$identityStatus} identity can not create virtual contests");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -46,7 +176,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'alias' => Utils::CreateRandomString(),
                 'start_time' => Time::get(),
             ]));
-            $this->fail('unassociated identity can not clone contests');
+            $this->fail("{$identityStatus} identity can not clone contests");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -61,20 +191,15 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
     }
 
-    /**
-     * Restricted Course APIs for unassociated identities.
-     */
-    public function testRestrictionsForCourses() {
-        // Create a course with admin privileges (main identity can do that)
-        $courseData = CoursesFactory::createCourse();
-
-        // Create a group, a set of identities, get one of them
-        $password = Utils::CreateRandomString();
-        $identity = self::createGroupIdentityCreatorAndGroup($password);
-
+    private function getRestrictCourseForIdentity(
+        Identities $identity,
+        array $courseData,
+        bool $isAssociated = false
+    ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
+        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             CourseController::apiClone(new Request([
                 'auth_token' => $login->auth_token,
@@ -83,7 +208,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'alias' => Utils::CreateRandomString(),
                 'start_time' => Time::get()
             ]));
-            $this->fail('unassociated identity can not clone courses');
+            $this->fail("{$identityStatus} identity can not clone courses");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -97,28 +222,25 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
                 'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
             ]));
-            $this->fail('unassociated identity can not create courses');
+            $this->fail("{$identityStatus} identity can not create courses");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
 
-    /**
-     * Restricted Problem APIs for unassociated identities.
-     */
-    public function testRestrictionsForProblems() {
-        // Create a group, a set of identities, get one of them
-        $password = Utils::CreateRandomString();
-        $identity = self::createGroupIdentityCreatorAndGroup($password);
-
+    private function getRestrictProblemForIdentity(
+        Identities $identity,
+        bool $isAssociated = false
+    ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
+        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             ProblemController::apiMyList(new Request([
                 'auth_token' => $login->auth_token
             ]));
-            $this->fail('unassociated identity does not have access to see apiMyList');
+            $this->fail("{$identityStatus} identity does not have access to see apiMyList");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -126,52 +248,27 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         try {
             // try to create a problem
             $problemData = ProblemsFactory::createProblem(null, $login);
-            $this->fail('unassociated identity can not create problems');
+            $this->fail("{$identityStatus} identity can not create problems");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
 
-    /**
-     * Restricted Group APIs for unassociated identities.
-     */
-    public function testRestrictionsForGroups() {
-        // Create a group, a set of identities, get one of them
-        $password = Utils::CreateRandomString();
-        $identity = self::createGroupIdentityCreatorAndGroup($password);
-
+    private function getRestrictGroupForIdentity(
+        Identities $identity,
+        bool $isAssociated = false
+    ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
+        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             GroupController::apiMyList(new Request([
                 'auth_token' => $login->auth_token
             ]));
-            $this->fail('unassociated identity does not have access to see apiMyList');
+            $this->fail("{$identityStatus} identity does not have access to see apiMyList");
         } catch (ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
-    }
-
-    private static function createGroupIdentityCreatorAndGroup(string $password) {
-        // Add a new user with identity groups creator privileges, and login
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
-
-        // Create a group, where identities will be added
-        $group = GroupsFactory::createGroup(
-            $creator,
-            null,
-            null,
-            null,
-            $creatorLogin
-        )['group'];
-
-        // Create identities and get one for testing
-        return IdentityFactory::createIdentitiesFromAGroup(
-            $group,
-            $creatorLogin,
-            $password
-        );
     }
 }
