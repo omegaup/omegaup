@@ -26,9 +26,9 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         'name' => $intro_details['name'],
         'description' => $intro_details['description'],
         'alias' => $intro_details['alias'],
-        'currentUsername' => $session['user']->username,
-        'needsBasicInformation' => $intro_details['basic_information_required'] && !is_null($session['user']) && (
-            !$session['user']->country_id || !$session['user']->state_id || !$session['user']->school_id
+        'currentUsername' => $session['identity']->username,
+        'needsBasicInformation' => $intro_details['basic_information_required'] && !is_null($session['identity']) && (
+            !$session['identity']->country_id || !$session['identity']->state_id || !$session['identity']->school_id
         ),
         'requestsUserInformation' => $intro_details['requests_user_information'],
         'showAcceptTeacher' => $intro_details['showAcceptTeacher'],
