@@ -72,7 +72,7 @@ export default class Notification extends Vue {
           badgeName: this.T[`badge_${this.notification.contents.badge}_name`],
         });
       default:
-        return ``;
+        return '';
     }
   }
 
