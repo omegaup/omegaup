@@ -1968,7 +1968,7 @@ class ProblemController extends Controller {
                     foreach ($runsArray as $run) {
                         $run['time'] = (int)$run['time'];
                         $run['contest_score'] = (float)$run['contest_score'];
-                        $run['username'] = $r->user->username;
+                        $run['username'] = $r->identity->username;
                         $run['alias'] = $r['problem']->alias;
                         array_push($response['runs'], $run);
                     }
@@ -2531,5 +2531,24 @@ class ProblemController extends Controller {
                 (int)$r['validator_time_limit'] . 'ms'
             );
         }
+    }
+
+    public static function getProblemsMineInfo(Request $r) : array {
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $privateProblemsAlert = 0;
+
+        if (!SessionController::currentSessionAvailable()) {
+            return [$privateProblemsAlert, false /* isAdmin */];
+        }
+
+        if (!isset($_SESSION['private_problems_alert']) &&
+            ProblemsDAO::getPrivateCount($r->user) > 0) {
+            $_SESSION['private_problems_alert'] = 1;
+            $privateProblemsAlert = 1;
+        }
+        return [
+            $privateProblemsAlert,
+            Authorization::isSystemAdmin($r->identity->identity_id)
+        ];
     }
 }

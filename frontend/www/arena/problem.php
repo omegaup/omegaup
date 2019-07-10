@@ -43,6 +43,7 @@ $smarty->assign('quality_payload', [
     'dismissed' => (bool) $nominationStatus['dismissed'],
     'problem_alias' => $result['alias'],
     'language' => $result['statement']['language'],
+    'can_nominate_problem' => !is_null($session['user']),
 ]);
 $smarty->assign('qualitynomination_reportproblem_payload', [
     'problem_alias' => $result['alias'],

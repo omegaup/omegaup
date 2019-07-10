@@ -87,7 +87,12 @@ import {API, T} from '../../omegaup.js';
 import UI from '../../ui.js';
 
 export default {
-  props: {solved: Boolean, nominated: Boolean, dismissed: Boolean},
+  props: {
+    solved: Boolean,
+    nominated: Boolean,
+    dismissed: Boolean,
+    canNominateProblem: Boolean
+  },
   data: function() {
     return {
       API: API,
@@ -146,7 +151,7 @@ export default {
   computed: {
     showForm: function() {
       return this.showFormOverride && this.solved && !this.nominated &&
-             !this.dismissed;
+             !this.dismissed && this.canNominateProblem;
     },
     showSugestLink: function() { return this.solved && !this.nominated;},
     sortedProblemTopics: function() {

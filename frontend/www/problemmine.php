@@ -2,19 +2,17 @@
 
 require_once('../server/bootstrap_smarty.php');
 
-$private_problems_alert = 0;
-$is_admin = false;
-
-if ($session['valid']) {
-    if (!isset($_SESSION['private_problems_alert']) &&
-        ProblemsDAO::getPrivateCount($session['user']) > 0) {
-        $_SESSION['private_problems_alert'] = 1;
-        $private_problems_alert = 1;
-    }
-    $is_admin = Authorization::isSystemAdmin($session['identity']->identity_id);
+try {
+    [$privateProblemsAlert, $isAdmin] = ProblemController::getProblemsMineInfo(
+        new Request($_REQUEST)
+    );
+} catch (ForbiddenAccessException $e) {
+    Logger::getLogger('course')->error('APIException ' . $e);
+    header('HTTP/1.1 404 Not Found');
+    die(file_get_contents('404.html'));
 }
 
-$smarty->assign('PRIVATE_PROBLEMS_ALERT', $private_problems_alert);
-$smarty->assign('IS_SYSADMIN', $is_admin);
+$smarty->assign('PRIVATE_PROBLEMS_ALERT', $privateProblemsAlert);
+$smarty->assign('IS_SYSADMIN', $isAdmin);
 
 $smarty->display('../templates/problem.mine.tpl');

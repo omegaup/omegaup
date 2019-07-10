@@ -1863,8 +1863,8 @@ export class Arena {
             ' / ' +
             parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
             ')');
-    $('.omegaup-scoreboard tr.' + OmegaUp.username + ' td.' + alias +
-      ' .points')
+    let fixedUsername = OmegaUp.username.replace(':', '\\:');
+    $(`.omegaup-scoreboard tr.${fixedUsername} td.${alias} .points`)
         .text(self.myRuns.getMaxScore(alias, previousScore)
                   .toFixed(self.digitsAfterDecimalPoint))
   }

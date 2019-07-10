@@ -2398,16 +2398,16 @@ class UserController extends Controller {
         if (!$session['valid']) {
             return ['filteredBy' => null, 'value' => null];
         }
-        $user = $session['user'];
+        $identity = $session['identity'];
         $filteredBy = $r['filter'];
         if ($filteredBy == 'country') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->country_id];
+            return ['filteredBy' => $filteredBy, 'value' => $identity->country_id];
         }
         if ($filteredBy == 'state') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->country_id . '-' . $user->state_id];
+            return ['filteredBy' => $filteredBy, 'value' => $identity->country_id . '-' . $identity->state_id];
         }
         if ($filteredBy == 'school') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
+            return ['filteredBy' => $filteredBy, 'value' => $identity->school_id];
         }
         return ['filteredBy' => null, 'value' => null];
     }
