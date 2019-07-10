@@ -311,7 +311,9 @@ CREATE TABLE `Identities` (
   KEY `school_id` (`school_id`),
   KEY `user_id` (`user_id`),
   KEY `fk_is_state_id` (`country_id`,`state_id`),
+  KEY `language_id` (`language_id`),
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_is_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_is_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_iu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -875,7 +877,6 @@ CREATE TABLE `Users` (
   `state_id` char(3) DEFAULT NULL,
   `school_id` int(11) DEFAULT NULL,
   `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
-  `language_id` int(11) DEFAULT NULL,
   `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `gender` enum('female','male','other','decline') DEFAULT NULL,
