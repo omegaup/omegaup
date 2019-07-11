@@ -175,7 +175,7 @@ class RunController extends Controller {
                 }
 
                 // Validate if the user is allowed to submit given the submissions_gap
-                if (!RunsDAO::IsRunInsideSubmissionGap(
+                if (!RunsDAO::isRunInsideSubmissionGap(
                     (int)$problemset_id,
                     $r['contest'],
                     (int)$r['problem']->problem_id,
@@ -335,7 +335,7 @@ class RunController extends Controller {
             }
 
             SubmissionLogDAO::create(new SubmissionLog([
-                'user_id' => $r->user->user_id,
+                'user_id' => $r->identity->user_id,
                 'identity_id' => $r->identity->identity_id,
                 'submission_id' => $submission->submission_id,
                 'problemset_id' => $submission->problemset_id,

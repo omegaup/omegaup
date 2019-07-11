@@ -61,7 +61,7 @@ if (isset($result['settings']['cases'])
 $result['user'] = [
     'logged_in' => $session['valid'],
     'admin' => $session['valid'] ?
-        Authorization::isProblemAdmin($session['identity']->identity_id, $problem) :
+        Authorization::isProblemAdmin($session['identity'], $problem) :
         false
 ];
 $smarty->assign('problem_admin', $result['user']['admin']);
