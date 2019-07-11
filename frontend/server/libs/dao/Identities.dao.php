@@ -32,7 +32,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return new Identities($rs);
     }
 
-    public static function findByUsername(?string $username) : ?Identities {
+    public static function findByUsername(string $username) : ?Identities {
         global  $conn;
         $sql = 'SELECT
                    i.*
@@ -78,7 +78,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return $result;
     }
 
-    public static function findByUserId(int $userId) : Identities {
+    public static function findByUserId(int $userId) : ?Identities {
         global  $conn;
         $sql = 'SELECT
                   i.*

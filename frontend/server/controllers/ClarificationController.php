@@ -35,7 +35,8 @@ class ClarificationController extends Controller {
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            $r['identity'] = IdentitiesDAO::findByUsername($r['username']);
+            $r['identity'] = !is_null($r['username']) ?
+                IdentitiesDAO::findByUsername($r['username']) : null;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
