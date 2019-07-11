@@ -29,8 +29,16 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             'password' => $associatedIdentity->password,
         ]));
 
-        $this->getRestrictContestForIdentity($unassociatedIdentity, $contestData);
-        $this->getRestrictContestForIdentity($associatedIdentity, $contestData, true);
+        $this->assertContestRestrictionsForIdentity(
+            $unassociatedIdentity,
+            $contestData,
+            'Unassociated'
+        );
+        $this->assertContestRestrictionsForIdentity(
+            $associatedIdentity,
+            $contestData,
+            'Associated'
+        );
     }
 
     /**
@@ -58,8 +66,16 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             'password' => $associatedIdentity->password,
         ]));
 
-        $this->getRestrictCourseForIdentity($unassociatedIdentity, $courseData);
-        $this->getRestrictCourseForIdentity($associatedIdentity, $courseData, true);
+        $this->assertCourseRestrictionsForIdentity(
+            $unassociatedIdentity,
+            $courseData,
+            'Unassociated'
+        );
+        $this->assertCourseRestrictionsForIdentity(
+            $associatedIdentity,
+            $courseData,
+            'Associated'
+        );
     }
 
     /**
@@ -84,8 +100,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             'password' => $associatedIdentity->password,
         ]));
 
-        $this->getRestrictProblemForIdentity($unassociatedIdentity);
-        $this->getRestrictProblemForIdentity($associatedIdentity, true);
+        $this->assertProblemRestrictionsForIdentity(
+            $unassociatedIdentity,
+            'Unassociated'
+        );
+        $this->assertProblemRestrictionsForIdentity(
+            $associatedIdentity,
+            'Associated'
+        );
     }
 
     /**
@@ -110,8 +132,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             'password' => $associatedIdentity->password,
         ]));
 
-        $this->getRestrictGroupForIdentity($unassociatedIdentity);
-        $this->getRestrictGroupForIdentity($associatedIdentity, true);
+        $this->assertGroupRestrictionsForIdentity(
+            $unassociatedIdentity,
+            'Unassociated'
+        );
+        $this->assertGroupRestrictionsForIdentity(
+            $associatedIdentity,
+            'Associated'
+        );
     }
 
     private static function createGroupIdentityCreatorAndGroup(
@@ -139,15 +167,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         );
     }
 
-    private function getRestrictContestForIdentity(
+    private function assertContestRestrictionsForIdentity(
         Identities $identity,
         array $contestData,
-        bool $isAssociated = false
+        string $identityStatus
     ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
-        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             ContestController::apiMyList(new Request([
                 'auth_token' => $login->auth_token
@@ -191,15 +218,14 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
     }
 
-    private function getRestrictCourseForIdentity(
+    private function assertCourseRestrictionsForIdentity(
         Identities $identity,
         array $courseData,
-        bool $isAssociated = false
+        string $identityStatus
     ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
-        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             CourseController::apiClone(new Request([
                 'auth_token' => $login->auth_token,
@@ -228,14 +254,13 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
     }
 
-    private function getRestrictProblemForIdentity(
+    private function assertProblemRestrictionsForIdentity(
         Identities $identity,
-        bool $isAssociated = false
+        string $identityStatus
     ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
-        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             ProblemController::apiMyList(new Request([
                 'auth_token' => $login->auth_token
@@ -254,14 +279,13 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
     }
 
-    private function getRestrictGroupForIdentity(
+    private function assertGroupRestrictionsForIdentity(
         Identities $identity,
-        bool $isAssociated = false
+        string $identityStatus
     ) : void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
-        $identityStatus = $isAssociated ? 'Associated' : 'Unassociated';
         try {
             GroupController::apiMyList(new Request([
                 'auth_token' => $login->auth_token
