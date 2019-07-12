@@ -9,7 +9,7 @@
 				<th class="time col-md-2" data-bind="visible: showTimes">{#wordsStartTime#}</th>
 				<th class="time col-md-2" data-bind="visible: showTimes">{#wordsEndTime#}</th>
 				<th class="col-md-2" data-bind="visible: showTimes">{#wordsDuration#}</th>
-				<th class="col-md-2" data-bind="visible: showPractice" ></th>
+				<th class="col-md-2" colspan="2" data-bind="visible: showPractice" ></th>
 				<th class="col-md-2" data-bind="visible: showVirtual" ></th>
 				<th class="col-md-2" data-bind="visible: showPublicUpdated" >{#wordsPublicUpdated#}</th>
 			</tr></thead>
@@ -30,6 +30,11 @@
 					<td class="col-md-2" data-bind="visible: $parent.showPractice">
 						<a data-bind="attr: { href: '/arena/' + alias + '/practice/' }">
 							<span>{#wordsPractice#}</span>
+						</a>
+					</td>
+					<td class="col-md-2" data-bind="visible: $parent.showPractice">
+						<a data-bind="attr:  { href: scoreboardLink }">
+							<span>{#wordsContestsResults#}</span>
 						</a>
 					</td>
 					<td class="col-md-2" data-bind="visible: (!isVirtual && $parent.showVirtual)">

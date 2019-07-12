@@ -26,6 +26,9 @@ class UserRankTest extends OmegaupTestCase {
     public function testFullRankByProblemSolved() {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
+        $contestantIdentity = IdentitiesDAO::getByPK(
+            $contestant->main_identity_id
+        );
         $problemData = ProblemsFactory::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
@@ -40,7 +43,7 @@ class UserRankTest extends OmegaupTestCase {
         foreach ($response['rank'] as $entry) {
             if ($entry['username'] == $contestant->username) {
                 $found = true;
-                $this->assertEquals($entry['name'], $contestant->name);
+                $this->assertEquals($entry['name'], $contestantIdentity->name);
                 $this->assertEquals($entry['problems_solved'], 1);
                 $this->assertEquals($entry['score'], 100);
             }
@@ -83,6 +86,9 @@ class UserRankTest extends OmegaupTestCase {
     public function testFullRankByProblemSolvedNoPrivateProblems() {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
+        $contestantIdentity = IdentitiesDAO::getByPK(
+            $contestant->main_identity_id
+        );
         $problemData = ProblemsFactory::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
@@ -105,7 +111,7 @@ class UserRankTest extends OmegaupTestCase {
         foreach ($response['rank'] as $entry) {
             if ($entry['username'] == $contestant->username) {
                 $found = true;
-                $this->assertEquals($entry['name'], $contestant->name);
+                $this->assertEquals($entry['name'], $contestantIdentity->name);
                 $this->assertEquals($entry['problems_solved'], 1);
                 $this->assertEquals($entry['score'], 100);
             }
@@ -124,6 +130,9 @@ class UserRankTest extends OmegaupTestCase {
     public function testUserRankByProblemsSolved() {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
+        $contestantIdentity = IdentitiesDAO::getByPK(
+            $contestant->main_identity_id
+        );
         $problemData = ProblemsFactory::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
@@ -136,7 +145,7 @@ class UserRankTest extends OmegaupTestCase {
             'username' => $contestant->username
         ]));
 
-        $this->assertEquals($response['name'], $contestant->name);
+        $this->assertEquals($response['name'], $contestantIdentity->name);
         $this->assertEquals($response['problems_solved'], 1);
     }
 
@@ -146,6 +155,9 @@ class UserRankTest extends OmegaupTestCase {
     public function testUserRankByProblemsSolvedWith0Runs() {
         // Create a user with no runs
         $contestant = UserFactory::createUser();
+        $contestantIdentity = IdentitiesDAO::getByPK(
+            $contestant->main_identity_id
+        );
 
         // Refresh Rank
         $this->refreshUserRank();
@@ -155,7 +167,7 @@ class UserRankTest extends OmegaupTestCase {
             'username' => $contestant->username
         ]));
 
-        $this->assertEquals($response['name'], $contestant->name);
+        $this->assertEquals($response['name'], $contestantIdentity->name);
         $this->assertEquals($response['problems_solved'], 0);
         $this->assertEquals($response['rank'], 0);
     }
