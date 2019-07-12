@@ -14,7 +14,7 @@ class CoursesFactory {
         }
         $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
         if ($public != false) {
-            $curatorGroup = GroupsDAO::FindByAlias(
+            $curatorGroup = GroupsDAO::findByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
