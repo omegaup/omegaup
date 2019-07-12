@@ -1104,74 +1104,6 @@ class UserController extends Controller {
     }
 
     /**
-     * Returns the prefered language as a string (en,es,fra) of the user given
-     * If no user is give, language is retrived from the browser.
-     *
-     * @param Users $user
-     * @return String
-     */
-    public static function getPreferredLanguage(Request $r = null) {
-        // for quick debugging
-        if (isset($_GET['lang'])) {
-            return IdentityController::convertToSupportedLanguage($_GET['lang']);
-        }
-
-        try {
-            $user = self::resolveTargetUser($r);
-            if (!is_null($user) && !is_null($user->language_id)) {
-                $result = LanguagesDAO::getByPK($user->language_id);
-                if (is_null($result)) {
-                    self::$log->warn('Invalid language id for user');
-                } else {
-                    return IdentityController::convertToSupportedLanguage($result->name);
-                }
-            }
-        } catch (NotFoundException $ex) {
-            self::$log->debug($ex);
-        } catch (InvalidParameterException $ex) {
-            self::$log->debug($ex);
-        }
-
-        $langs = [];
-
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            // break up string into pieces (languages and q factors)
-            preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
-
-            if (count($lang_parse[1])) {
-                // create a list like "en" => 0.8
-                $langs = array_combine($lang_parse[1], $lang_parse[4]);
-
-                // set default to 1 for any without q factor
-                foreach ($langs as $lang => $val) {
-                    if ($val === '') {
-                        $langs[$lang] = 1;
-                    }
-                }
-
-                // sort list based on value
-                arsort($langs, SORT_NUMERIC);
-            }
-        }
-
-        foreach ($langs as $langCode => $langWeight) {
-            switch (substr($langCode, 0, 2)) {
-                case 'en':
-                    return 'en';
-
-                case 'es':
-                    return 'es';
-
-                case 'pt':
-                    return 'pt';
-            }
-        }
-
-        // Fallback to spanish.
-        return 'es';
-    }
-
-    /**
      * Returns the profile of the user given
      *
      * @param Users $user
@@ -1195,28 +1127,18 @@ class UserController extends Controller {
             'hide_problem_tags' => is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags,
         ];
 
-        if (!is_null($user->language_id)) {
-            $query = LanguagesDAO::getByPK($user->language_id);
-            if (!is_null($query)) {
-                $response['userinfo']['locale'] =
-                    IdentityController::convertToSupportedLanguage($query->name);
-            }
-        }
-
         try {
-            $user_db = UsersDAO::getExtendedProfileDataByPk($user->user_id);
+            $userDb = UsersDAO::getExtendedProfileDataByPk($user->user_id);
 
-            $response['userinfo']['email'] = $user_db['email'];
-            $response['userinfo']['country'] = $user_db['country'];
+            $response['userinfo']['email'] = $userDb['email'];
+            $response['userinfo']['country'] = $userDb['country'];
             $response['userinfo']['country_id'] = $user->country_id ?? 'xx';
-            $response['userinfo']['state'] = $user_db['state'];
+            $response['userinfo']['state'] = $userDb['state'];
             $response['userinfo']['state_id'] = $user->state_id;
-            $response['userinfo']['school'] = $user_db['school'];
+            $response['userinfo']['school'] = $userDb['school'];
             $response['userinfo']['school_id'] = $user->school_id;
-
-            if (!is_null($user->language_id)) {
-                $response['userinfo']['locale'] = IdentityController::convertToSupportedLanguage($user_db['locale']);
-            }
+            $response['userinfo']['locale'] =
+              IdentityController::convertToSupportedLanguage($userDb['locale']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -1728,17 +1650,22 @@ class UserController extends Controller {
 
             Validators::validateValidUsername($r['username'], 'username');
             $r->user->username = $r['username'];
+            $r->identity->username = $r['username'];
         }
 
         SecurityTools::testStrongPassword($r['password']);
         $hashedPassword = SecurityTools::hashString($r['password']);
         $r->user->password = $hashedPassword;
+        $r->identity->password = $hashedPassword;
 
         try {
             DAO::transBegin();
 
-            UsersDAO::save($r->user);
-            IdentityController::convertFromUser($r->user);
+            // Update username and password for user object
+            UsersDAO::update($r->user);
+
+            // Update username and password for identity object
+            IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -1857,18 +1784,22 @@ class UserController extends Controller {
             if (is_null($language)) {
                 throw new InvalidParameterException('invalidLanguage', 'locale');
             }
-
-            $r->user->language_id = $language->language_id;
+            $r->identity->language_id = $language->language_id;
         }
 
         $r->ensureBool('is_private', false);
         $r->ensureBool('hide_problem_tags', false);
 
         if (!is_null($r['gender'])) {
-            Validators::validateInEnum($r['gender'], 'gender', UserController::ALLOWED_GENDER_OPTIONS, true);
+            Validators::validateInEnum(
+                $r['gender'],
+                'gender',
+                UserController::ALLOWED_GENDER_OPTIONS,
+                true
+            );
         }
 
-        $valueProperties = [
+        $userValueProperties = [
             'username',
             'name',
             'country_id',
@@ -1887,14 +1818,26 @@ class UserController extends Controller {
             'hide_problem_tags',
         ];
 
-        self::updateValueProperties($r, $r->user, $valueProperties);
+        $identityValueProperties = [
+            'username',
+            'name',
+            'country_id',
+            'state_id',
+            'school_id',
+            'gender',
+        ];
+
+        self::updateValueProperties($r, $r->user, $userValueProperties);
+        self::updateValueProperties($r, $r->identity, $identityValueProperties);
 
         try {
             DAO::transBegin();
 
-            UsersDAO::save($r->user);
+            // Update user object
+            UsersDAO::update($r->user);
 
-            IdentityController::convertFromUser($r->user);
+            // Update identity object
+            IdentitiesDAO::update($r->identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -2429,10 +2372,10 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
 
         $lang = 'es';
-        if ($user->language_id == UserController::LANGUAGE_EN ||
-            $user->language_id == UserController::LANGUAGE_PSEUDO) {
+        if ($identity->language_id == UserController::LANGUAGE_EN ||
+            $identity->language_id == UserController::LANGUAGE_PSEUDO) {
             $lang = 'en';
-        } elseif ($user->language_id == UserController::LANGUAGE_PT) {
+        } elseif ($identity->language_id == UserController::LANGUAGE_PT) {
             $lang = 'pt';
         }
         $latest_statement = PrivacyStatementsDAO::getLatestPublishedStatement();
