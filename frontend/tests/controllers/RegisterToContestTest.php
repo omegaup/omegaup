@@ -66,8 +66,8 @@ class RegisterToContestTest extends OmegaupTestCase {
         $response = ContestController::apiOpen($request2);
 
         // Now that i have joined the contest, i should not see the intro
-        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
-        $this->assertEquals($show_intro, !ContestController::SHOW_INTRO);
+        $showIntro = ContestController::showContestIntro($request2)['shouldShowIntro'];
+        $this->assertEquals($showIntro, !ContestController::SHOW_INTRO);
     }
 
     /**

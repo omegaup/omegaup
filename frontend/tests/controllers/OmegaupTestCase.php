@@ -60,7 +60,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
 
     public static function logout() {
         $session = new SessionController();
-        if ($session->CurrentSessionAvailable()) {
+        if ($session->currentSessionAvailable()) {
             $session->InvalidateCache();
         }
         if (isset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {

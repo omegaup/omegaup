@@ -92,8 +92,10 @@ class ContestUsersTest extends OmegaupTestCase {
         ContestController::apiOpen(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
-            'privacy_git_object_id' => $showContestIntro['git_object_id'],
-            'statement_type' => $showContestIntro['statement_type'],
+            'privacy_git_object_id' =>
+                $showContestIntro['privacyStatement']['gitObjectId'],
+            'statement_type' =>
+                $showContestIntro['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
@@ -119,8 +121,10 @@ class ContestUsersTest extends OmegaupTestCase {
         ContestController::apiOpen(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
-            'privacy_git_object_id' => $showContestIntro['git_object_id'],
-            'statement_type' => $showContestIntro['statement_type'],
+            'privacy_git_object_id' =>
+                $showContestIntro['privacyStatement']['gitObjectId'],
+            'statement_type' =>
+                $showContestIntro['privacyStatement']['statementType'],
             'share_user_information' => 0,
         ]));
 
@@ -135,8 +139,10 @@ class ContestUsersTest extends OmegaupTestCase {
         ContestController::apiOpen(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
-            'privacy_git_object_id' => $showContestIntro['git_object_id'],
-            'statement_type' => $showContestIntro['statement_type'],
+            'privacy_git_object_id' =>
+                $showContestIntro['privacyStatement']['gitObjectId'],
+            'statement_type' =>
+                $showContestIntro['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
@@ -154,5 +160,16 @@ class ContestUsersTest extends OmegaupTestCase {
             }
         }
         return $numberOfContestants;
+    }
+
+    public function testContestCanBeSeenByUnloggedUsers() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        $showContestIntro = ContestController::showContestIntro(new Request([
+            'contest_alias' => $contestData['request']['alias'],
+        ]));
+
+        $this->assertEquals(1, $showContestIntro['shouldShowIntroForNotLoggedIdentity']);
     }
 }

@@ -286,7 +286,7 @@ class ContestController extends Controller {
                 $identity->identity_id,
                 $contest->problemset_id
             );
-            if (is_null($req) || ($req->accepted === '0')) {
+            if (is_null($req) || $req->accepted === '0') {
                 throw new ForbiddenAccessException('contestNotRegistered');
             }
         }
@@ -350,41 +350,52 @@ class ContestController extends Controller {
         if (is_null($contest)) {
             throw new NotFoundException('contestNotFound');
         }
-        $result = ContestsDAO::getNeedsInformation($contest->problemset_id);
+        $isPublicContest = self::isPublic($contest->admission_mode)
+            ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
 
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
-            if ($session['valid'] && !is_null($session['identity'])) {
-                $r->identity = $session['identity'];
-
-                $r->user = null;
-                if (!is_null($session['user'])) {
-                    $r->user = $session['user'];
-                }
-
-                // Privacy Statement Information
-                $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-                    $r->identity->language_id,
-                    'contest',
-                    $result['requests_user_information']
-                );
-                if (!is_null($result['privacy_statement_markdown'])) {
-                    $statement_type = "contest_{$result['requests_user_information']}_consent";
-                    $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
-                    $result['statement_type'] = $statement_type;
-                }
-            } else {
-                // No session, show the intro (if public), so that they can login.
-                $result['shouldShowIntro'] =
-                    self::isPublic($contest->admission_mode) ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
+            $result['shouldShowIntro'] = false;
+            $result['shouldShowIntroForNotLoggedIdentity'] = false;
+            $result['privacyStatement'] = [];
+            if (!$session['valid'] || is_null($session['identity'])) {
+                // No session, show the intro if public, so that they can login.
+                $result['shouldShowIntroForNotLoggedIdentity'] = $isPublicContest;
                 return $result;
+            } else {
+                [
+                    $needsInformation,
+                    $requestUserInformation
+                ] = ContestsDAO::getNeedsInformation($contest->problemset_id);
+                $identity = $session['identity'];
+                $result['needsBasicInformation'] = $needsInformation && (
+                    !$identity->country_id || !$identity->state_id || !$identity->school_id
+                );
+                // Privacy Statement Information
+                $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
+                    $identity->language_id,
+                    'contest',
+                    $requestUserInformation
+                );
+                if (!is_null($privacyStatementMarkdown)) {
+                    $statementType = "contest_{$requestUserInformation}_consent";
+                    $result['privacyStatement'] = [
+                        'markdown' => $privacyStatementMarkdown,
+                        'gitObjectId' =>
+                            PrivacyStatementsDAO::getLatestPublishedStatement(
+                                $statementType
+                            )['git_object_id'],
+                        'statementType' => $statementType
+                    ];
+                }
+                $result['requestUserInformation'] = $requestUserInformation;
             }
-            self::canAccessContest($contest, $r->identity);
+            self::canAccessContest($contest, $identity);
         } catch (Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
-            if (!self::isInvitedToContest($contest, $r->identity)) {
+            if (!self::isInvitedToContest($contest, $identity)) {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
@@ -394,7 +405,7 @@ class ContestController extends Controller {
 
         // You already started the contest.
         $contestOpened = ProblemsetIdentitiesDAO::getByPK(
-            $r->identity->identity_id,
+            $identity->identity_id,
             $contest->problemset_id
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
@@ -448,13 +459,6 @@ class ContestController extends Controller {
             'contest_admin' => $contestAdmin,
             'contest_alias' => $contestAlias,
         ];
-    }
-
-     /**
-     * Temporal hotfix wrapper
-     */
-    public static function apiIntroDetails(Request $r) {
-        return self::apiPublicDetails($r);
     }
 
     public static function apiPublicDetails(Request $r) {
@@ -547,11 +551,15 @@ class ContestController extends Controller {
      */
     public static function apiOpen(Request $r) {
         $response = self::validateDetails($r);
-        $needsInformation = ContestsDAO::getNeedsInformation($response['contest']->problemset_id);
+        [
+            $needsInformation,
+            $requestUserInformation
+        ] = ContestsDAO::getNeedsInformation($response['contest']->problemset_id);
         $session = SessionController::apiCurrentSession($r)['session'];
 
-        if ($needsInformation['needs_basic_information'] && !is_null($session['identity']) &&
-              (!$session['identity']->country_id || !$session['identity']->state_id || !$session['identity']->school_id)
+        if ($needsInformation && !is_null($session['identity']) &&
+              (!$session['identity']->country_id || !$session['identity']->state_id
+                || !$session['identity']->school_id)
         ) {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
@@ -567,7 +575,7 @@ class ContestController extends Controller {
 
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
-            if ($needsInformation['requests_user_information'] != 'no') {
+            if ($requestUserInformation != 'no') {
                 $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r->identity->identity_id,
@@ -674,10 +682,12 @@ class ContestController extends Controller {
             // Add problems to response
             $result['problems'] = $problemsResponseArray;
             $result['languages'] = explode(',', $result['languages']);
-            $result = array_merge(
-                $result,
-                ContestsDAO::getNeedsInformation($contest->problemset_id)
-            );
+            [
+                $needsInformation,
+                $requestUserInformation
+            ] = ContestsDAO::getNeedsInformation($contest->problemset_id);
+            $result['needs_basic_information'] = $needsInformation;
+            $result['requests_user_information'] = $requestUserInformation;
             return $result;
         }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
     }
