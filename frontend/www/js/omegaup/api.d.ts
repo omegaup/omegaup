@@ -28,6 +28,7 @@ declare namespace omegaup {
   }
 
   export interface Notification {
+    notification_id: number;
     contents: NotificationContents;
     timestamp: Date;
   }
