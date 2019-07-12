@@ -81,7 +81,7 @@ class GroupController extends Controller {
     ) {
         Validators::validateStringNonEmpty($groupAlias, 'group_alias');
         try {
-            $group = GroupsDAO::FindByAlias($groupAlias);
+            $group = GroupsDAO::findByAlias($groupAlias);
 
             if (is_null($group)) {
                 return null;
