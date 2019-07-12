@@ -7,11 +7,12 @@
         href="#"
         role="button"><span class="glyphicon glyphicon-bell"></span> <span class=
         "label label-danger count-label"
-          v-if="!!notifications.length">{{ notifications.length }}</span></a>
+          v-show="!!notifications.length">{{ notifications.length }}</span></a>
     <ul class="dropdown-menu notification-dropdown">
-      <li v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications
-      }}</li><omegaup-notification v-bind:notification="notification"
-          v-for="notification in notifications"></omegaup-notification>
+      <li v-show="notifications.length === 0">{{ this.T.notificationsNoNewNotifications
+      }}</li><omegaup-notification v-bind:key="index"
+          v-bind:notification="notification"
+          v-for="(notification, index) in notifications"></omegaup-notification>
     </ul>
   </li>
 </template>
