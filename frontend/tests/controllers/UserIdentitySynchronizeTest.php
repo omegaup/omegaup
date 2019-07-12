@@ -95,7 +95,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
         $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
 
-        $this->assertEquals($r['name'], $userDb->name);
+        $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $userDb->country_id);
         $this->assertEquals($r['state_id'], $userDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
@@ -122,7 +122,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Check user from db
         $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
         $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
-        $this->assertEquals($r['name'], $userDb->name);
+        $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $userDb->country_id);
         $this->assertEquals($r['state_id'], $userDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);

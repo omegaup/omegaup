@@ -344,8 +344,14 @@ class QualityNominationTest extends OmegaupTestCase {
         ]);
         $response = QualityNominationController::apiResolve($request);
 
-        $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
-        $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
+        $this->assertContains(
+            $problemData['problem']->title,
+            $emailSender::$listEmails[0]['subject']
+        );
+        $this->assertContains(
+            $problemData['authorIdentity']->name,
+            $emailSender::$listEmails[0]['body']
+        );
         $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
         $this->assertContains('something else', $emailSender::$listEmails[0]['body']);
         $this->assertEquals(1, count($emailSender::$listEmails));

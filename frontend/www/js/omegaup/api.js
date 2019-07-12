@@ -429,6 +429,18 @@ export default {
     list: _call('/api/interview/list/'),
   },
 
+  Notification: {
+    myList: _call('/api/notification/myList/',
+                  function(result) {
+                    result.notifications.forEach(notification => {
+                      notification.timestamp =
+                          new Date(notification.timestamp * 1000);
+                      notification.contents = JSON.parse(notification.contents);
+                    });
+                    return result;
+                  }),
+  },
+
   Problem: {
     addAdmin: _call('/api/problem/addAdmin/'),
 

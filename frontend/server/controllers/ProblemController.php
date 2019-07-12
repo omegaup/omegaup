@@ -1446,7 +1446,7 @@ class ProblemController extends Controller {
         if (ProblemsDAO::isVisible($problem['problem']) ||
             Authorization::isProblemAdmin($r->identity, $problem['problem'])) {
             $acl = ACLsDAO::getByPK($problem['problem']->acl_id);
-            $problemsetter = UsersDAO::getByPK($acl->owner_id);
+            $problemsetter = IdentitiesDAO::findByUserId($acl->owner_id);
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
                 'name' => is_null($problemsetter->name) ?
@@ -1920,7 +1920,7 @@ class ProblemController extends Controller {
             }
             if (!is_null($r['username'])) {
                 try {
-                    $r['identity'] = IdentitiesDAO::FindByUsername($r['username']);
+                    $r['identity'] = IdentitiesDAO::findByUsername($r['username']);
                 } catch (Exception $e) {
                     throw new NotFoundException('userNotFound');
                 }

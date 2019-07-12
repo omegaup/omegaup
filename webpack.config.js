@@ -50,6 +50,7 @@ let config = [
       course_submissions_list:
           './frontend/www/js/omegaup/course/submissions_list.js',
       group_list: './frontend/www/js/omegaup/group/list.js',
+      notification_list: './frontend/www/js/omegaup/notification/list.js',
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',

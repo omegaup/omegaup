@@ -21,7 +21,7 @@ class IdentityController extends Controller {
                 return $identity;
             }
 
-            $identity = IdentitiesDAO::FindByUsername($userOrEmail);
+            $identity = IdentitiesDAO::findByUsername($userOrEmail);
             if (!is_null($identity)) {
                 return $identity;
             }
@@ -364,7 +364,8 @@ class IdentityController extends Controller {
         if ($omitRank) {
             $response['userinfo']['rankinfo'] = [];
         } else {
-            $response['userinfo']['rankinfo'] = UserController::getRankByProblemsSolved($r);
+            $response['userinfo']['rankinfo'] =
+                UserController::getRankByProblemsSolved($r, $identity);
         }
 
         // Do not leak plain emails in case the request is for a profile other than
@@ -394,7 +395,7 @@ class IdentityController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getProfileImpl(Identities $identity) {
+    private static function getProfileImpl(Identities $identity) {
         try {
             $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
 
