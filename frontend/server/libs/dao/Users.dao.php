@@ -91,6 +91,8 @@ class UsersDAO extends UsersDAOBase {
                 FROM
                     Users u
                 INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                INNER JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
                     Countries c ON u.country_id = c.country_id
@@ -99,7 +101,7 @@ class UsersDAO extends UsersDAOBase {
                 LEFT JOIN
                     Schools sc ON u.school_id = sc.school_id
                 LEFT JOIN
-                    Languages l ON u.language_id = l.language_id
+                    Languages l ON i.language_id = l.language_id
                 WHERE
                     u.`user_id` = ?
                 LIMIT
