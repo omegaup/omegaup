@@ -35,7 +35,8 @@ class ClarificationController extends Controller {
         try {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            $r['identity'] = IdentitiesDAO::FindByUsername($r['username']);
+            $r['identity'] = !is_null($r['username']) ?
+                IdentitiesDAO::findByUsername($r['username']) : null;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -89,7 +90,6 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $r['user'] = $r->user;
         self::clarificationUpdated($r, $time);
 
         return [
@@ -122,7 +122,10 @@ class ClarificationController extends Controller {
 
         // If the clarification is private, verify that our user is invited or is contest director
         if ($r['clarification']->public != 1) {
-            if (!(Authorization::canViewClarification($r->identity->identity_id, $r['clarification']))) {
+            if (!Authorization::canViewClarification(
+                $r->identity,
+                $r['clarification']
+            )) {
                 throw new ForbiddenAccessException();
             }
         }
@@ -171,7 +174,10 @@ class ClarificationController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        if (!Authorization::canEditClarification($r->identity->identity_id, $r['clarification'])) {
+        if (!Authorization::canEditClarification(
+            $r->identity,
+            $r['clarification']
+        )) {
             throw new ForbiddenAccessException();
         }
     }

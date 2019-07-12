@@ -368,6 +368,7 @@ class ProblemDeployer {
                     'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
                     'review-bad-layout' => 'problemDeployerReviewBadLayout',
                     'slow-rejected' => 'problemDeployerSlowRejected',
+                    'tests-bad-layout' => 'problemDeployerTestsBadLayout',
                     'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
                 ];
                 $tokens = explode(': ', $output->error, 2);

@@ -69,13 +69,16 @@ class GroupController extends Controller {
     /**
      * Validate group param
      *
-     * @param $groupAlias
-     * @param $identityId
+     * @param string $groupAlias
+     * @param Identities $identity
      * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
      */
-    public static function validateGroup($groupAlias, $identityId) {
+    public static function validateGroup(
+        string $groupAlias,
+        Identities $identity
+    ) {
         Validators::validateStringNonEmpty($groupAlias, 'group_alias');
         try {
             $group = GroupsDAO::FindByAlias($groupAlias);
@@ -89,7 +92,7 @@ class GroupController extends Controller {
             throw new InvalidDatabaseOperationException($ex);
         }
 
-        if (!Authorization::isGroupAdmin($identityId, $group)) {
+        if (!Authorization::isGroupAdmin($identity, $group)) {
             throw new ForbiddenAccessException();
         }
         return $group;
@@ -98,11 +101,14 @@ class GroupController extends Controller {
     /**
      * Validate common params for these APIs
      *
-     * @param $groupAlias
-     * @param $identityId
+     * @param string $groupAlias
+     * @param Identities $identity
      */
-    private static function validateGroupAndOwner($groupAlias, $identityId) {
-        return self::validateGroup($groupAlias, $identityId);
+    private static function validateGroupAndOwner(
+        string $groupAlias,
+        Identities $identity
+    ) {
+        return self::validateGroup($groupAlias, $identity);
     }
 
     /**
@@ -112,7 +118,7 @@ class GroupController extends Controller {
      */
     public static function apiAddUser(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
@@ -135,7 +141,7 @@ class GroupController extends Controller {
      */
     public static function apiRemoveUser(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
@@ -165,7 +171,7 @@ class GroupController extends Controller {
      * @param Request $r
      */
     public static function apiMyList(Request $r) {
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         $response = [];
         $response['groups'] = [];
@@ -223,7 +229,7 @@ class GroupController extends Controller {
      */
     public static function apiDetails(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
 
         if (is_null($group)) {
             return [
@@ -259,7 +265,7 @@ class GroupController extends Controller {
      */
     public static function apiMembers(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
 
         $response = [];
 
@@ -280,7 +286,7 @@ class GroupController extends Controller {
      */
     public static function apiCreateScoreboard(Request $r) {
         self::authenticateRequest($r);
-        $group = self::validateGroup($r['group_alias'], $r->identity->identity_id);
+        $group = self::validateGroup($r['group_alias'], $r->identity);
 
         Validators::validateValidAlias($r['alias'], 'alias', true);
         Validators::validateStringNonEmpty($r['name'], 'name', true);

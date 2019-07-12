@@ -187,11 +187,11 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
             nominator.username as nominator_username,
-            nominator.name as nominator_name,
+            nominatorIdentity.name as nominator_name,
             p.alias,
             p.title,
             author.username as author_username,
-            author.name as author_name
+            authorIdentity.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -203,13 +203,21 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             nominator.user_id = qn.user_id
         INNER JOIN
+            Identities nominatorIdentity
+        ON
+            nominatorIdentity.identity_id = nominator.main_identity_id
+        INNER JOIN
             ACLs acl
         ON
             acl.acl_id = p.acl_id
         INNER JOIN
             Users author
         ON
-            author.user_id = acl.owner_id';
+            author.user_id = acl.owner_id
+        INNER JOIN
+            Identities authorIdentity
+        ON
+            authorIdentity.identity_id = author.main_identity_id';
         $params = [];
         $conditions = [];
 
@@ -264,11 +272,11 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
             nominator.username as nominator_username,
-            nominator.name as nominator_name,
+            nominatorIdentity.name as nominator_name,
             p.alias,
             p.title,
             author.username as author_username,
-            author.name as author_name
+            authorIdentity.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -280,6 +288,10 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             nominator.user_id = qn.user_id
         INNER JOIN
+            Identities nominatorIdentity
+        ON
+            nominatorIdentity.identity_id = nominator.main_identity_id
+        INNER JOIN
             ACLs acl
         ON
             acl.acl_id = p.acl_id
@@ -287,6 +299,10 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             Users author
         ON
             author.user_id = acl.owner_id
+        INNER JOIN
+            Identities authorIdentity
+        ON
+            authorIdentity.identity_id = author.main_identity_id
         WHERE
             qn.qualitynomination_id = ?;';
 

@@ -8,14 +8,7 @@
 class BadgeController extends Controller {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
-    /**
-     * Returns a list of existing badges
-     *
-     * @param Request $r
-     * @return array
-     * @throws InvalidDatabaseOperationException
-     */
-    public static function apiList(Request $r) {
+    public static function getAllBadges(): array {
         $aliases = array_diff(scandir(static::OMEGAUP_BADGES_ROOT), ['..', '.', 'default_icon.svg']);
         $results = [];
         foreach ($aliases as $alias) {
@@ -25,6 +18,17 @@ class BadgeController extends Controller {
             $results[] = $alias;
         }
         return $results;
+    }
+
+    /**
+     * Returns a list of existing badges
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiList(Request $r) {
+        return self::getAllBadges();
     }
 
     /**
@@ -38,7 +42,9 @@ class BadgeController extends Controller {
         self::authenticateRequest($r);
         return [
             'status' => 'ok',
-            'badges' => UsersBadgesDAO::getUserOwnedBadges($r->user),
+            'badges' => is_null($r->user) ?
+                [] :
+                UsersBadgesDAO::getUserOwnedBadges($r->user),
         ];
     }
 
@@ -65,5 +71,57 @@ class BadgeController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
     }
-    // TODO: apiListProfileBadges, apiUserHasBadge
+
+    /**
+     * Returns a the assignation timestamp of a badge
+     * for current user.
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiMyBadgeAssignationTime(Request $r) {
+        self::authenticateRequest($r);
+        Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
+        Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
+        try {
+            return [
+                'status' => 'ok',
+                'assignation_time' => is_null($r->user) ?
+                    null :
+                    UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $r['badge_alias']),
+            ];
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
+
+    /**
+     * Returns the number of owners and the first
+     * assignation timestamp for a certain badge
+     *
+     * @param Request $r
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiBadgeDetails(Request $r) {
+        Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
+        Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
+        try {
+            $totalUsers = max(UsersDAO::getUsersCount(), 1);
+            $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($r['badge_alias']);
+            $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($r['badge_alias']);
+            return [
+                'status' => 'ok',
+                'first_assignation' => $firstAssignation,
+                'owners_percentage' => (($ownersCount / $totalUsers) * 100)
+            ];
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+    }
 }

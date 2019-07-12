@@ -238,6 +238,7 @@ class Utils {
             'Identities',
             'Identity_Login_Log',
             'Interviews',
+            'Notifications',
             'PrivacyStatement_Consent_Log',
             'Problems',
             'Problems_Languages',
@@ -260,6 +261,7 @@ class Utils {
             'Tags',
             'User_Roles',
             'Users',
+            'Users_Badges',
             'Users_Experiments',
         ];
 
@@ -309,6 +311,17 @@ class Utils {
         self::commit();
 
         shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/aggregate_feedback.py' .
+                 ' --quiet ' .
+                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
+    }
+
+    public static function RunAssignBadges() {
+        // Ensure everything is commited before invoking external script
+        self::commit();
+        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/assign_badges.py' .
                  ' --quiet ' .
                  ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
                  ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
