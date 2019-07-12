@@ -1142,9 +1142,9 @@ class UserController extends Controller {
 
             $response['userinfo']['email'] = $userDb['email'];
             $response['userinfo']['country'] = $userDb['country'];
-            $response['userinfo']['country_id'] = $user->country_id ?? 'xx';
+            $response['userinfo']['country_id'] = $userDb['country_id'];
             $response['userinfo']['state'] = $userDb['state'];
-            $response['userinfo']['state_id'] = $user->state_id;
+            $response['userinfo']['state_id'] = $userDb['state_id'];
             $response['userinfo']['school'] = $userDb['school'];
             $response['userinfo']['school_id'] = $userDb['school_id'];
             $response['userinfo']['locale'] =
@@ -1820,8 +1820,6 @@ class UserController extends Controller {
 
         $userValueProperties = [
             'username',
-            'country_id',
-            'state_id',
             'scholar_degree',
             'school_id',
             'preferred_language',

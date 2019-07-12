@@ -47,12 +47,6 @@ class Users extends VO {
         if (isset($data['main_identity_id'])) {
             $this->main_identity_id = (int)$data['main_identity_id'];
         }
-        if (isset($data['country_id'])) {
-            $this->country_id = $data['country_id'];
-        }
-        if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
-        }
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = $data['scholar_degree'];
         }
@@ -149,20 +143,6 @@ class Users extends VO {
       * @var int(11)
       */
     public $main_identity_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $country_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $state_id;
 
     /**
       *  [Campo no documentado]
