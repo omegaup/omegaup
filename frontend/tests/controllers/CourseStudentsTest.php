@@ -87,7 +87,7 @@ class CourseStudentsTest extends OmegaupTestCase {
 
         // Create identities for a group
         $password = Utils::CreateRandomString();
-        $associatedIdentity = IdentityFactory::createIdentitiesFromAGroup(
+        [$_, $associatedIdentity] = IdentityFactory::createIdentitiesFromAGroup(
             $associatedGroup,
             $creatorLogin,
             $password
@@ -102,7 +102,7 @@ class CourseStudentsTest extends OmegaupTestCase {
             $creatorLogin
         )['group'];
 
-        $unassociatedIdentity = IdentityFactory::createIdentitiesFromAGroup(
+        [$unassociatedIdentity, $_] = IdentityFactory::createIdentitiesFromAGroup(
             $unassociatedGroup,
             $creatorLogin,
             $password

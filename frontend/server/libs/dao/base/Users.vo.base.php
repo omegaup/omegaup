@@ -47,32 +47,20 @@ class Users extends VO {
         if (isset($data['main_identity_id'])) {
             $this->main_identity_id = (int)$data['main_identity_id'];
         }
-        if (isset($data['name'])) {
-            $this->name = $data['name'];
-        }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
         }
         if (isset($data['state_id'])) {
             $this->state_id = $data['state_id'];
         }
-        if (isset($data['school_id'])) {
-            $this->school_id = (int)$data['school_id'];
-        }
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = $data['scholar_degree'];
-        }
-        if (isset($data['language_id'])) {
-            $this->language_id = (int)$data['language_id'];
         }
         if (isset($data['graduation_date'])) {
             $this->graduation_date = $data['graduation_date'];
         }
         if (isset($data['birth_date'])) {
             $this->birth_date = $data['birth_date'];
-        }
-        if (isset($data['gender'])) {
-            $this->gender = $data['gender'];
         }
         if (isset($data['verified'])) {
             $this->verified = $data['verified'] == '1';
@@ -165,13 +153,6 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
-    public $name;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var char(3)
       */
     public $country_id;
@@ -186,23 +167,9 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $school_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate')
       */
     public $scholar_degree;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $language_id;
 
     /**
       *  [Campo no documentado]
@@ -217,13 +184,6 @@ class Users extends VO {
       * @var date
       */
     public $birth_date;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('female','male','other','decline')
-      */
-    public $gender;
 
     /**
       *  [Campo no documentado]

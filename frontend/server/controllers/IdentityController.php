@@ -6,21 +6,6 @@
  * @author juan.pablo
  */
 class IdentityController extends Controller {
-    public static function convertFromUser(Users $user) {
-        return IdentitiesDAO::save(new Identities([
-            'identity_id' => $user->main_identity_id,
-            'username' => $user->username,
-            'password' => $user->password,
-            'name' => $user->name,
-            'user_id' => $user->user_id,
-            'language_id' => $user->language_id,
-            'country_id' => $user->country_id,
-            'state_id' => $user->state_id,
-            'school_id' => $user->school_id,
-            'gender' => $user->gender,
-        ]));
-    }
-
     /**
      * Given a username or a email, returns the identity object
      *
@@ -36,7 +21,7 @@ class IdentityController extends Controller {
                 return $identity;
             }
 
-            $identity = IdentitiesDAO::FindByUsername($userOrEmail);
+            $identity = IdentitiesDAO::findByUsername($userOrEmail);
             if (!is_null($identity)) {
                 return $identity;
             }
@@ -379,7 +364,8 @@ class IdentityController extends Controller {
         if ($omitRank) {
             $response['userinfo']['rankinfo'] = [];
         } else {
-            $response['userinfo']['rankinfo'] = UserController::getRankByProblemsSolved($r);
+            $response['userinfo']['rankinfo'] =
+                UserController::getRankByProblemsSolved($r, $identity);
         }
 
         // Do not leak plain emails in case the request is for a profile other than
@@ -409,7 +395,7 @@ class IdentityController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getProfileImpl(Identities $identity) {
+    private static function getProfileImpl(Identities $identity) {
         try {
             $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
 
@@ -431,6 +417,73 @@ class IdentityController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    /**
+     * Returns the prefered language as a string (en,es,fra) of the identity given
+     * If no identity is given, language is retrived from the browser.
+     *
+     * @return String
+     */
+    public static function getPreferredLanguage(Request $r) {
+        // for quick debugging
+        if (isset($_GET['lang'])) {
+            return self::convertToSupportedLanguage($_GET['lang']);
+        }
+
+        try {
+            $identity = self::resolveTargetIdentity($r);
+            if (!is_null($identity) && !is_null($identity->language_id)) {
+                $result = LanguagesDAO::getByPK($identity->language_id);
+                if (is_null($result)) {
+                    self::$log->warn('Invalid language id for identity');
+                } else {
+                    return IdentityController::convertToSupportedLanguage($result->name);
+                }
+            }
+        } catch (NotFoundException $ex) {
+            self::$log->debug($ex);
+        } catch (InvalidParameterException $ex) {
+            self::$log->debug($ex);
+        }
+
+        $langs = [];
+
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            // break up string into pieces (languages and q factors)
+            preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+
+            if (count($lang_parse[1])) {
+                // create a list like "en" => 0.8
+                $langs = array_combine($lang_parse[1], $lang_parse[4]);
+
+                // set default to 1 for any without q factor
+                foreach ($langs as $lang => $val) {
+                    if ($val === '') {
+                        $langs[$lang] = 1;
+                    }
+                }
+
+                // sort list based on value
+                arsort($langs, SORT_NUMERIC);
+            }
+        }
+
+        foreach ($langs as $langCode => $langWeight) {
+            switch (substr($langCode, 0, 2)) {
+                case 'en':
+                    return 'en';
+
+                case 'es':
+                    return 'es';
+
+                case 'pt':
+                    return 'pt';
+            }
+        }
+
+        // Fallback to spanish.
+        return 'es';
     }
 
     public static function convertToSupportedLanguage($lang) {

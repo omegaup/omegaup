@@ -2149,7 +2149,7 @@ class ContestController extends Controller {
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
-        $targetIdentity = IdentitiesDAO::FindByUsername($r['username']);
+        $targetIdentity = IdentitiesDAO::findByUsername($r['username']);
 
         $request = ProblemsetIdentityRequestDAO::getByPK($targetIdentity->identity_id, $contest->problemset_id);
 

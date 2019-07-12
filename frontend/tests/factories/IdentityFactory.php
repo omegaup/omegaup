@@ -40,7 +40,7 @@ class IdentityFactory {
         Groups $group,
         ScopedLoginToken $adminLogin,
         string $password
-    ) : Identities {
+    ) : array {
         // Call api using identity creator group member
         IdentityController::apiBulkCreate(new Request([
             'auth_token' => $adminLogin->auth_token,
@@ -58,10 +58,16 @@ class IdentityFactory {
             'group_alias' => $group->alias,
         ]));
 
-        [$identity] = $response['identities'];
-        $identity = IdentitiesDAO::FindByUsername($identity['username']);
+        [$unassociatedIdentity, $associatedIdentity] = $response['identities'];
+        $unassociatedIdentity = IdentitiesDAO::FindByUsername(
+            $unassociatedIdentity['username']
+        );
+        $associatedIdentity = IdentitiesDAO::FindByUsername(
+            $associatedIdentity['username']
+        );
 
-        $identity->password = $password;
-        return $identity;
+        $unassociatedIdentity->password = $password;
+        $associatedIdentity->password = $password;
+        return [$unassociatedIdentity, $associatedIdentity];
     }
 }
