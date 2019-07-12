@@ -103,24 +103,31 @@ class UserController extends Controller {
         }
 
         // Prepare DAOs
-        $user_data = [
+        $identityData = [
+            'username' => $r['username'],
+            'password' => $hashedPassword
+        ];
+        $userData = [
             'username' => $r['username'],
             'password' => $hashedPassword,
             'verified' => 0,
             'verification_id' => SecurityTools::randomString(50),
         ];
         if (isset($r['is_private'])) {
-            $user_data['is_private'] = $r['is_private'];
+            $userData['is_private'] = $r['is_private'];
         }
         if (isset($r['name'])) {
-            $user_data['name'] = $r['name'];
+            $identityData['name'] = $r['name'];
+        }
+        if (isset($r['gender'])) {
+            $identityData['gender'] = $r['gender'];
         }
         if (isset($r['facebook_user_id'])) {
-            $user_data['facebook_user_id'] = $r['facebook_user_id'];
+            $userData['facebook_user_id'] = $r['facebook_user_id'];
         }
         if (!is_null(self::$permissionKey) &&
             self::$permissionKey == $r['permission_key']) {
-            $user_data['verified'] = 1;
+            $userData['verified'] = 1;
         } elseif (OMEGAUP_VALIDATE_CAPTCHA) {
             // Validate captcha
             if (!isset($r['recaptcha'])) {
@@ -162,8 +169,8 @@ class UserController extends Controller {
             }
         }
 
-        $user = new Users($user_data);
-        $identity = new Identities($user_data);
+        $user = new Users($userData);
+        $identity = new Identities($identityData);
 
         $email = new Emails([
             'email' => $r['email'],
@@ -1110,15 +1117,18 @@ class UserController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getProfileImpl(Users $user) {
+    public static function getProfileImpl(
+        Users $user,
+        Identities $identity
+    ) {
         $response = [];
         $response['userinfo'] = [];
 
         $response['userinfo'] = [
             'username' => $user->username,
-            'name' => $user->name,
+            'name' => $identity->name,
             'birth_date' => is_null($user->birth_date) ? null : strtotime($user->birth_date),
-            'gender' => $user->gender,
+            'gender' => $identity->gender,
             'graduation_date' => is_null($user->graduation_date) ? null : strtotime($user->graduation_date),
             'scholar_degree' => $user->scholar_degree,
             'preferred_language' => $user->preferred_language,
@@ -1136,7 +1146,7 @@ class UserController extends Controller {
             $response['userinfo']['state'] = $userDb['state'];
             $response['userinfo']['state_id'] = $user->state_id;
             $response['userinfo']['school'] = $userDb['school'];
-            $response['userinfo']['school_id'] = $user->school_id;
+            $response['userinfo']['school_id'] = $userDb['school_id'];
             $response['userinfo']['locale'] =
               IdentityController::convertToSupportedLanguage($userDb['locale']);
         } catch (Exception $e) {
@@ -1282,13 +1292,14 @@ class UserController extends Controller {
                 $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
             }
             $user = UsersDAO::getByPK($coderOfTheMonthUserId);
+            $identity = IdentitiesDAO::findByUserId($coderOfTheMonthUserId);
         } catch (Exception $e) {
             self::$log->error('Unable to get coder of the month: ' . $e);
             throw new InvalidDatabaseOperationException($e);
         }
 
         // Get the profile of the coder of the month
-        $response = UserController::getProfileImpl($user);
+        $response = UserController::getProfileImpl($user, $identity);
 
         // But avoid divulging the email in the response.
         unset($response['userinfo']['email']);
@@ -1429,12 +1440,14 @@ class UserController extends Controller {
 
         $response = [];
         $user = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
 
         $openedProblemset = self::userOpenedProblemset($contest->problemset_id, $user->user_id);
 
         $response['user_verified'] = $user->verified === '1';
         $response['interview_url'] = 'https://omegaup.com/interview/' . $contest->alias . '/arena';
-        $response['name_or_username'] = is_null($user->name) ? $user->username : $user->name;
+        $response['name_or_username'] = is_null($identity->name) ?
+                                          $identity->username : $identity->name;
         $response['opened_interview'] = $openedProblemset;
         $response['finished'] = !ProblemsetsDAO::insideSubmissionWindow($contest, $user->user_id);
         $response['status'] = 'ok';
@@ -1708,6 +1721,7 @@ class UserController extends Controller {
 
         if (!is_null($r['name'])) {
             Validators::validateStringOfLengthInRange($r['name'], 'name', 1, 50);
+            $r->identity->name = $r['name'];
         }
 
         $state = null;
@@ -1725,6 +1739,8 @@ class UserController extends Controller {
             if (is_null($state)) {
                 throw new InvalidParameterException('parameterInvalid', 'state_id');
             }
+            $r->identity->state_id = $state->state_id;
+            $r->identity->country_id = $state->country_id;
         }
 
         if (!is_null($r['school_id'])) {
@@ -1738,6 +1754,7 @@ class UserController extends Controller {
                 if (is_null($r['school'])) {
                     throw new InvalidParameterException('parameterInvalid', 'school');
                 }
+                $r->identity->school_id = $r['school']->school_id;
             } elseif (empty($r['school_name'])) {
                 $r['school_id'] = null;
             } else {
@@ -1749,6 +1766,7 @@ class UserController extends Controller {
                         'auth_token' => $r['auth_token'],
                     ]));
                     $r['school_id'] = $response['school_id'];
+                    $r->identity->school_id = $response['school_id'];
                 } catch (Exception $e) {
                     throw new InvalidDatabaseOperationException($e);
                 }
@@ -1797,11 +1815,11 @@ class UserController extends Controller {
                 UserController::ALLOWED_GENDER_OPTIONS,
                 true
             );
+            $r->identity->gender = $r['gender'];
         }
 
         $userValueProperties = [
             'username',
-            'name',
             'country_id',
             'state_id',
             'scholar_degree',
@@ -1813,7 +1831,6 @@ class UserController extends Controller {
             'birth_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
-            'gender',
             'is_private',
             'hide_problem_tags',
         ];
@@ -1867,12 +1884,12 @@ class UserController extends Controller {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
 
-        $r['user'] = null;
+        $identity = null;
         if (!is_null($r['username'])) {
             Validators::validateStringNonEmpty($r['username'], 'username');
             try {
-                $r['user'] = UsersDAO::FindByUsername($r['username']);
-                if (is_null($r['user'])) {
+                $identity = IdentitiesDAO::findByUsername($r['username']);
+                if (is_null($identity)) {
                     throw new NotFoundException('userNotExist');
                 }
             } catch (ApiException $e) {
@@ -1891,7 +1908,7 @@ class UserController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        return self::getRankByProblemsSolved($r);
+        return self::getRankByProblemsSolved($r, $identity);
     }
 
     /**
@@ -1901,10 +1918,13 @@ class UserController extends Controller {
      * @param Request $r
      * @throws InvalidDatabaseOperationException
      */
-    public static function getRankByProblemsSolved(Request $r) {
-        if (is_null($r['user'])) {
+    public static function getRankByProblemsSolved(
+        Request $r,
+        ?Identities $identity
+    ) : array {
+        if (is_null($identity)) {
             $selectedFilter = self::getSelectedFilter($r);
-            $rankCacheName =  "{$r['offset']}-{$r['rowcount']}-{$r['filter']}-{$selectedFilter['value']}";
+            $rankCacheName = "{$r['offset']}-{$r['rowcount']}-{$r['filter']}-{$selectedFilter['value']}";
             $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
                 $response = [];
                 $response['rank'] = [];
@@ -1941,18 +1961,18 @@ class UserController extends Controller {
             $response = [];
 
             try {
-                $userRank = UserRankDAO::getByPK($r['user']->user_id);
+                $userRank = UserRankDAO::getByPK($identity->user_id);
             } catch (Exception $e) {
                 throw new InvalidDatabaseOperationException($e);
             }
 
             if (!is_null($userRank)) {
                 $response['rank'] = $userRank->rank;
-                $response['name'] = $r['user']->name;
+                $response['name'] = $identity->name;
                 $response['problems_solved'] = $userRank->problems_solved_count;
             } else {
                 $response['rank'] = 0;
-                $response['name'] = $r['user']->name;
+                $response['name'] = $identity->name;
                 $response['problems_solved'] = 0;
             }
         }
@@ -2398,16 +2418,25 @@ class UserController extends Controller {
         if (!$session['valid']) {
             return ['filteredBy' => null, 'value' => null];
         }
-        $user = $session['user'];
+        $identity = $session['identity'];
         $filteredBy = $r['filter'];
         if ($filteredBy == 'country') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->country_id];
+            return [
+                'filteredBy' => $filteredBy,
+                'value' => $identity->country_id
+            ];
         }
         if ($filteredBy == 'state') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->country_id . '-' . $user->state_id];
+            return [
+                'filteredBy' => $filteredBy,
+                'value' => "{$identity->country_id}-{$identity->state_id}"
+            ];
         }
         if ($filteredBy == 'school') {
-            return ['filteredBy' => $filteredBy, 'value' => $user->school_id];
+            return [
+                'filteredBy' => $filteredBy,
+                'value' => $identity->school_id
+            ];
         }
         return ['filteredBy' => null, 'value' => null];
     }

@@ -86,6 +86,7 @@ class UsersDAO extends UsersDAOBase {
                     COALESCE(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
+                    sc.`school_id` AS school_id,
                     e.`email`,
                     l.`name` AS locale
                 FROM
@@ -99,7 +100,7 @@ class UsersDAO extends UsersDAOBase {
                 LEFT JOIN
                     States s ON u.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
-                    Schools sc ON u.school_id = sc.school_id
+                    Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
                     Languages l ON i.language_id = l.language_id
                 WHERE

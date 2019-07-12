@@ -124,7 +124,7 @@ class Controller {
         Validators::validateStringNonEmpty($r['username'], 'username');
 
         try {
-            $identity = IdentitiesDAO::FindByUsername($r['username']);
+            $identity = IdentitiesDAO::findByUsername($r['username']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

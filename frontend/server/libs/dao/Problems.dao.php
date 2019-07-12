@@ -682,13 +682,17 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql = '
             SELECT DISTINCT
                 e.email,
-                u.name
+                i.name
             FROM
                 ACLs a
             INNER JOIN
                 Users u
             ON
                 a.owner_id = u.user_id
+            INNER JOIN
+                Identities i
+            ON
+                i.user_id = u.user_id AND i.identity_id = u.main_identity_id
             INNER JOIN
                 Emails e
             ON
