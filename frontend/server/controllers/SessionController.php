@@ -491,7 +491,7 @@ class SessionController extends Controller {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }
-            $identity = IdentitiesDAO::FindByUsername($res['username']);
+            $identity = IdentitiesDAO::findByUsername($res['username']);
         }
 
         $this->RegisterSession($identity);

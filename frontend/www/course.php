@@ -28,8 +28,8 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         'alias' => $intro_details['alias'],
         'currentUsername' => $session['user']->username,
         'needsBasicInformation' => $intro_details['basic_information_required']
-         && !is_null($session['identity']) && (!$session['identity']->country_id
-            || !$session['identity']->state_id || !$session['identity']->school_id
+            && !is_null($session['identity']) && (!$session['identity']->country_id
+                || !$session['identity']->state_id || !$session['identity']->school_id
         ),
         'requestsUserInformation' => $intro_details['requests_user_information'],
         'showAcceptTeacher' => $intro_details['showAcceptTeacher'],

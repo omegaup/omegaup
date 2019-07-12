@@ -47,12 +47,6 @@ class Users extends VO {
         if (isset($data['main_identity_id'])) {
             $this->main_identity_id = (int)$data['main_identity_id'];
         }
-        if (isset($data['name'])) {
-            $this->name = $data['name'];
-        }
-        if (isset($data['school_id'])) {
-            $this->school_id = (int)$data['school_id'];
-        }
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = $data['scholar_degree'];
         }
@@ -61,9 +55,6 @@ class Users extends VO {
         }
         if (isset($data['birth_date'])) {
             $this->birth_date = $data['birth_date'];
-        }
-        if (isset($data['gender'])) {
-            $this->gender = $data['gender'];
         }
         if (isset($data['verified'])) {
             $this->verified = $data['verified'] == '1';
@@ -156,20 +147,6 @@ class Users extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
-    public $name;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $school_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
       * @var enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate')
       */
     public $scholar_degree;
@@ -187,13 +164,6 @@ class Users extends VO {
       * @var date
       */
     public $birth_date;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('female','male','other','decline')
-      */
-    public $gender;
 
     /**
       *  [Campo no documentado]

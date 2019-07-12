@@ -872,12 +872,9 @@ CREATE TABLE `Users` (
   `git_token` char(40) DEFAULT NULL COMMENT 'Token de acceso para git',
   `main_email_id` int(11) DEFAULT NULL,
   `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',
-  `name` varchar(256) DEFAULT NULL,
-  `school_id` int(11) DEFAULT NULL,
   `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
   `graduation_date` date DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
-  `gender` enum('female','male','other','decline') DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',
   `verification_id` varchar(50) DEFAULT NULL,
   `reset_digest` varchar(45) DEFAULT NULL,
@@ -888,12 +885,10 @@ CREATE TABLE `Users` (
   `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
-  KEY `school_id` (`school_id`),
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Usuarios registrados.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

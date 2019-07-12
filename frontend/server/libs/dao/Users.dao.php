@@ -88,6 +88,7 @@ class UsersDAO extends UsersDAOBase {
                     s.`name` AS state,
                     s.`state_id` AS state_id,
                     sc.`name` AS school,
+                    sc.`school_id` AS school_id,
                     e.`email`,
                     l.`name` AS locale
                 FROM
