@@ -27,6 +27,17 @@ declare namespace omegaup {
     state_id: string;
   }
 
+  export interface Notification {
+    notification_id: number;
+    contents: NotificationContents;
+    timestamp: Date;
+  }
+
+  export interface NotificationContents {
+    type: string;
+    badge?: string;
+  }
+
   export interface Problem {
     alias: string;
     title: string;
