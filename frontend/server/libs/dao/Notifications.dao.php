@@ -15,7 +15,7 @@ class NotificationsDAO extends NotificationsDAOBase {
     public static function getUnreadNotifications(Users $user) {
         global $conn;
         $sql = 'SELECT
-                    n.contents, UNIX_TIMESTAMP(n.timestamp) as timestamp
+                    n.contents, n.timestamp
                 FROM
                     Notifications n
                 WHERE
