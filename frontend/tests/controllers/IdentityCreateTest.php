@@ -260,7 +260,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         $user = UsersDAO::FindByUsername($identityName);
         $this->assertNull($user);
 
-        $identity = IdentitiesDAO::FindByUsername("{$group['group']->alias}:{$identityName}");
+        $identity = IdentitiesDAO::findByUsername("{$group['group']->alias}:{$identityName}");
 
         $this->assertEquals($identityName, $identity->name);
 
