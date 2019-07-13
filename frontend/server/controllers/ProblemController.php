@@ -3,6 +3,7 @@
 require_once 'libs/FileHandler.php';
 require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ProblemDeployer.php';
+require_once 'libs/dao/QualityNominations.dao.php';
 
 /**
  * ProblemsController
@@ -2531,5 +2532,80 @@ class ProblemController extends Controller {
                 (int)$r['validator_time_limit'] . 'ms'
             );
         }
+    }
+
+    public static function getExtraInformation(
+        Request $r,
+        array $result
+    ) : array {
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        $session = SessionController::apiCurrentSession($r)['session'];
+        $problem = ProblemsDAO::GetByAlias($r['problem_alias']);
+        $nominationStatus = [
+            'solved' => false,
+            'nominated' => false,
+            'dismissed' => false
+        ];
+        $isKarelProblem = count(array_intersect(
+            $result['languages'],
+            ['kp', 'kj']
+        )) == 2;
+        $sampleInput = null;
+        if (isset($result['settings']['cases']) && isset(
+            $result['settings']['cases']['sample']
+        ) && isset(
+            $result['settings']['cases']['sample']['in']
+        )
+        ) {
+            $sampleInput = $result['settings']['cases']['sample']['in'];
+        }
+        $histogram = [
+            'difficulty_histogram' => $problem->difficulty_histogram,
+            'quality_histogram' => $problem->quality_histogram,
+            'quality' => floatval($problem->quality),
+            'difficulty' => floatval($problem->difficulty)
+        ];
+        $user = [
+            'logged_in' => false,
+            'admin' => false
+        ];
+
+        $extraInformation = [
+            'nomination_status' => $nominationStatus,
+            'karel_problem' => $isKarelProblem,
+            'sample_input' => $sampleInput,
+            'problem_admin' => false,
+        ];
+        $extraResults = [
+            'user' => $user,
+            'histogram' => $histogram
+        ];
+        $result = array_merge($result, $extraResults);
+
+        if (!$session['valid']) {
+            return [$result, $extraInformation];
+        }
+        $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
+            $problem,
+            $session['identity']
+        );
+        $isProblemAdmin = Authorization::isProblemAdmin(
+            $session['identity'],
+            $problem
+        );
+        $nominationStatus['solved'] = (bool) $nominationStatus['solved'];
+        $nominationStatus['nominated'] = (bool) $nominationStatus['nominated'];
+        $nominationStatus['dismissed'] = (bool) $nominationStatus['dismissed'];
+        $nominationStatus['problem_alias'] = $result['alias'];
+        $nominationStatus['language'] = $result['statement']['language'];
+        $user = [
+            'logged_in' => true,
+            'admin' => $isProblemAdmin
+        ];
+        $extraInformation['nomination_status'] = $nominationStatus;
+        $extraInformation['problem_admin'] = $isProblemAdmin;
+        $extraResults['user'] = $user;
+        $result = array_merge($result, $extraResults);
+        return [$result, $extraInformation];
     }
 }
