@@ -1,24 +1,28 @@
 <?php
 
 /**
- * Description of SecurityTools
- *
- * @author Alan Gonzalez alanboy@alanboy.net
- * @author Joe Ponce joe@omegaup.com
+ * Password and token functions.
  */
-
-require_once 'third_party/PasswordHash.php';
-
 class SecurityTools {
-    // Base-2 logarithm of the iteration count used for password stretching
-    const HASH_COST = 8;
+    /**
+     * The expected prefix of an Argon2id crypt hash.
+     */
+    private const ARGON2ID_CRYPT_HASH_PREFIX = '$argon2id$';
 
-    // Do we require the hashes to be portable to older systems (less secure)?
-    const HASH_PORTABILITY = false;
+    /**
+     * The memory cost for the Argon2id crypt hash, in kibibytes.
+     */
+    private const ARGON2ID_MEMORY_COST = 1024;
 
-    // Minimum size that we like the hash strings to be. Shorter than this is
-    // considered insecure
-    const MIN_HASHED_STRING_LENGTH = 20;
+    /**
+     * Options that allow for compatibility between PHP's password_hash() and
+     * libsodium's sodium_crypto_pwhash_str().
+     */
+    private const PASSWORD_HASH_OPTIONS = [
+        'threads' => 1,
+        'memory_cost' => self::ARGON2ID_MEMORY_COST,
+        'time_cost' => SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE,
+    ];
 
     /**
      * The secret key that is used to communicate with omegaup-gitserver.
@@ -33,38 +37,58 @@ class SecurityTools {
      * @param string $hashedPassword
      * @return boolean
      */
-    public static function compareHashedStrings($passwordToCheck, $hashedPassword) {
-        // Get an instance of the pass hasher
-        $hasher = new PasswordHash(self::HASH_COST, self::HASH_PORTABILITY);
-
-        // Compare passwords
-        return $hasher->CheckPassword($passwordToCheck, $hashedPassword);
+    public static function compareHashedStrings(string $passwordToCheck, string $hashedPassword) : bool {
+        if (!defined('PASSWORD_ARGON2ID') &&
+            strpos($hashedPassword, self::ARGON2ID_CRYPT_HASH_PREFIX) === 0
+        ) {
+            return sodium_crypto_pwhash_str_verify($hashedPassword, $passwordToCheck);
+        }
+        return password_verify($passwordToCheck, $hashedPassword);
     }
 
-    public static function testStrongPassword($s_Password) {
+    public static function testStrongPassword(?string $password) : bool {
         // Setting max passwd length to 72 to avoid DoS attacks
-        Validators::validateStringOfLengthInRange($s_Password, 'password', 8, 72);
+        Validators::validateStringOfLengthInRange($password, 'password', 8, 72);
 
         return true;
     }
 
     /**
-     * Given a plain string, returns its hash using phpass library
+     * Given a plain string, returns its hash using the Argon2id algorithm.
      *
      * @param string $string
      * @return string
-     * @throws InternalServerErrorException
      */
-    public static function hashString($string) {
-        $hasher = new PasswordHash(self::HASH_COST, self::HASH_PORTABILITY);
-        $hash = $hasher->HashPassword($string);
-
-        // Check that hashed password is not too short
-        if (strlen($hash) < self::MIN_HASHED_STRING_LENGTH) {
-            throw new InternalServerErrorException(new Exception('phpass::PasswordHash::HashPassword returned hash too short.'));
+    public static function hashString(string $string) : string {
+        if (!defined('PASSWORD_ARGON2ID')) {
+            return sodium_crypto_pwhash_str(
+                $string,
+                SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE,
+                self::ARGON2ID_MEMORY_COST * 1024
+            );
         }
+        return password_hash($string, PASSWORD_ARGON2ID, self::PASSWORD_HASH_OPTIONS);
+    }
 
-        return $hash;
+    /**
+     * Given a hashed password, returns whether it was hashed using the old
+     * Blowfish algorithm.
+     *
+     * @param string $hashedPassword The hashed password
+     * @return bool Whether it is produced using the old Blowfish algorithm.
+     */
+    public static function isOldHash(string $hashedPassword) : bool {
+        if (!defined('PASSWORD_ARGON2ID')) {
+            if (strpos($hashedPassword, self::ARGON2ID_CRYPT_HASH_PREFIX) !== 0) {
+                return true;
+            }
+            return sodium_crypto_pwhash_str_needs_rehash(
+                $hashedPassword,
+                SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE,
+                self::ARGON2ID_MEMORY_COST * 1024
+            );
+        }
+        return password_needs_rehash($hashedPassword, PASSWORD_ARGON2ID, self::PASSWORD_HASH_OPTIONS);
     }
 
     /**
@@ -73,7 +97,7 @@ class SecurityTools {
      * @param string $length
      * @return string
      */
-    public static function randomString($length) {
+    public static function randomString(int $length) : string {
         $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         $str = '';
         $max = strlen($chars) - 1;
@@ -95,11 +119,30 @@ class SecurityTools {
         return bin2hex(random_bytes($length / 2));
     }
 
-    public static function getGitserverAuthorizationHeader(string $problem, string $username) {
+    /**
+     * Returns the Bearer HTTP authorization header to use against the gitserver.
+     *
+     * @param string $problem  The problem alias.
+     * @param string $username The username that is going to be authenticated.
+     * @return string The Bearer HTTP authorization header.
+     */
+    public static function getGitserverAuthorizationHeader(string $problem, string $username) : string {
         if (OMEGAUP_GITSERVER_SECRET_TOKEN != '') {
             return 'Authorization: Bearer ' . OMEGAUP_GITSERVER_SECRET_TOKEN . ' ' . $username;
         }
 
+        return 'Authorization: Bearer ' . self::getGitserverAuthorizationToken($problem, $username);
+    }
+
+    /**
+     * Gets a Bearer authorization token for a particular user to be used the
+     * gitserver that is valid for a single problem for 5 minutes.
+     *
+     * @param string $problem  The problem alias.
+     * @param string $username The username that can use the token.
+     * @return string The Bearer authorization token.
+     */
+    public static function getGitserverAuthorizationToken(string $problem, string $username) : string {
         require_once 'libs/third_party/sodium_compat/autoload-fast.php';
 
         require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
@@ -142,6 +185,6 @@ class SecurityTools {
             ->setClaims([
                 'problem' => $problem,
             ]);
-        return "Authorization: Bearer {$token->toString()}";
+        return $token->toString();
     }
 }

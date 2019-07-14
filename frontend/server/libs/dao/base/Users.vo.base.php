@@ -117,16 +117,16 @@ class Users extends VO {
     public $facebook_user_id;
 
     /**
-      *  [Campo no documentado]
+      * Contraseña del usuario, usando Argon2i o Blowfish
       * @access public
-      * @var varchar(100)
+      * @var varchar(128)
       */
     public $password;
 
     /**
-      * Token de acceso para git
+      * Token de acceso para git, usando Argon2i
       * @access public
-      * @var char(40)
+      * @var varchar(128)
       */
     public $git_token;
 
