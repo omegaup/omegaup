@@ -12,35 +12,34 @@
       <li class="text-center"
           v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications }}</li>
       <li v-else="">
-        <p class="read-all-notifications"
-           v-on:click="$emit('read', notifications)">{{ this.T.notificationsMarkAllAsRead }} ✔️</p>
+        <div class="dropdown-item read-all-notifications"
+             v-on:click="$emit('read', notifications)">
+          {{ this.T.notificationsMarkAllAsRead }} ✔️
+        </div>
       </li><transition-group name="list"><omegaup-notification v-bind:key=
       "notification.notification_id"
                             v-bind:notification="notification"
                             v-for="notification in notifications"
                             v-on:remove=
-                            "readNotification"></omegaup-notification></transition-group>
+                            "$emit('read', [notification])"></omegaup-notification></transition-group>
     </ul>
   </li>
 </template>
 
 <style>
 .nav>li>a.notification-btn {
-  padding: 12px 4px 0 0;
+  padding: 12px 4px 0 0;	  padding: 12px 4px 0 0;
 }
 
 .glyphicon-bell {
   font-size: 20px;
   display: block;
-  text-align: center;
 }
 
 .read-all-notifications {
   display: inline-block;
-  margin: 0;
   color: #337ab7;
   cursor: pointer;
-  font-size: 14px;
   user-select: none;
 }
 
@@ -55,9 +54,12 @@
 
 .notification-dropdown {
   width: 500px;
-  padding: 5px;
   max-height: 600px;
   overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 3px 20px;
 }
 
 /* Transitions */
@@ -84,10 +86,6 @@ import Notification from './Notification.vue';
 export default class NotificationList extends Vue {
   @Prop() notifications!: omegaup.Notification[];
   T = T;
-
-  readNotification(notification: omegaup.Notification): void {
-    this.$emit('read', [notification]);
-  }
 }
 
 </script>

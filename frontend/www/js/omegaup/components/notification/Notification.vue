@@ -1,12 +1,16 @@
 <template>
-  <li class="notification">
+  <li class="dropdown-item notification">
     <hr class="notification-separator">
     <div class="notification-header">
-      <p class="notification-date">{{ date }}</p><button class="close"
+      <div class="notification-date">
+        {{ date }}
+      </div><button class="close"
            v-on:click="$emit('remove', notification)">❌</button>
     </div><img class="notification-img"
         v-bind:src="iconUrl">
-    <p class="notification-text">{{ text }}</p>
+    <div class="notification-text">
+      {{ text }}
+    </div>
   </li>
 </template>
 
@@ -16,11 +20,6 @@
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-}
-
-.notification-date,
-.notification-text {
-  margin: 0;
 }
 
 .notification-header {
