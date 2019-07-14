@@ -332,9 +332,7 @@ class ProblemDeployer {
             );
             $output = curl_exec($curl);
             $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($output !== false && $retval == 200) {
-                $retval = 0;
-            }
+            $retval = ($output !== false && $retval == 200) ? 0 : 1;
             $result = [
                 'retval' => $retval,
                 'output' => (string)$output,
