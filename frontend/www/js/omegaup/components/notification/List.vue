@@ -9,15 +9,17 @@
         "label label-danger count-label"
           v-show="!!notifications.length">{{ notifications.length }}</span></a>
     <ul class="dropdown-menu notification-dropdown">
-      <li v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications
-      }}</li>
-      <li v-else>
-        <p class="read-all-notifications" v-on:click="$emit('read', notifications)">Marcar todas las notificaciones como leídas ✔️</p>
-      </li>
-      <omegaup-notification v-bind:key="notification.notification_id"
-          v-bind:notification="notification"
-          v-for="notification in notifications"
-          v-on:remove="readNotification"></omegaup-notification>
+      <li v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications }}</li>
+      <li v-else="">
+        <p class="read-all-notifications"
+           v-on:click="$emit('read', notifications)">Marcar todas las notificaciones como leídas
+           ✔️</p>
+      </li><transition-group name="list"><omegaup-notification v-bind:key=
+      "notification.notification_id"
+                            v-bind:notification="notification"
+                            v-for="notification in notifications"
+                            v-on:remove=
+                            "readNotification"></omegaup-notification></transition-group>
     </ul>
   </li>
 </template>
@@ -56,6 +58,12 @@
   padding: 5px 5px 0;
   max-height: 600px;
   overflow-y: auto;
+}
+.list-enter-active, .list-leave-active {
+  transition: all .75s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
 

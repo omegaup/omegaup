@@ -14,15 +14,14 @@ OmegaUp.on('ready', function() {
         on: {
           read: function(notifications) {
             API.Notification.readNotifications({
-              'notifications': notifications.map(notification => notification.notification_id),
-            })
-            .then(function() {
-              return API.Notification.myList({})
-            })
-            .then(function(data) {
-              notificationsList.notifications = data.notifications;
-            })
-            .fail(UI.apiError);
+                              'notifications': notifications.map(
+                                  notification => notification.notification_id),
+                            })
+                .then(function() { return API.Notification.myList({}); })
+                .then(function(data) {
+                  notificationsList.notifications = data.notifications;
+                })
+                .fail(UI.apiError);
           },
         }
       });
