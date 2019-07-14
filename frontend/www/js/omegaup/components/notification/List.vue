@@ -9,11 +9,11 @@
         "label label-danger count-label"
           v-show="!!notifications.length">{{ notifications.length }}</span></a>
     <ul class="dropdown-menu notification-dropdown">
-      <li v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications }}</li>
+      <li class="text-center"
+          v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications }}</li>
       <li v-else="">
         <p class="read-all-notifications"
-           v-on:click="$emit('read', notifications)">Marcar todas las notificaciones como leídas
-           ✔️</p>
+           v-on:click="$emit('read', notifications)">{{ this.T.notificationsMarkAllAsRead }} ✔️</p>
       </li><transition-group name="list"><omegaup-notification v-bind:key=
       "notification.notification_id"
                             v-bind:notification="notification"
@@ -55,7 +55,7 @@
 
 .notification-dropdown {
   width: 500px;
-  padding: 5px 5px 0;
+  padding: 5px;
   max-height: 600px;
   overflow-y: auto;
 }
