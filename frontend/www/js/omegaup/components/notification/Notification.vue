@@ -1,9 +1,12 @@
 <template>
   <li class="notification">
-    <p class="notification-date">{{ date }}</p><img class="notification-img"
-        v-bind:src="iconUrl">
-    <p class="notification-text">{{ text }}</p>
     <hr class="notification-separator">
+    <div class="notification-header">
+      <p class="notification-date">{{ date }}</p>
+      <button class="close" v-on:click="$emit('remove', notification)">❌</button>
+    </div>
+    <img class="notification-img" v-bind:src="iconUrl">
+    <p class="notification-text">{{ text }}</p>
   </li>
 </template>
 
@@ -20,10 +23,19 @@
   margin: 0;
 }
 
-.notification-date {
+.notification-header {
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.notification-header .close {
+  font-size: inherit;
+}
+
+.notification-date {
   font-size: 12px;
-  color: grey;
+  color: #666;
 }
 
 .notification-img {

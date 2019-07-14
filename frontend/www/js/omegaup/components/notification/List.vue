@@ -9,10 +9,15 @@
         "label label-danger count-label"
           v-show="!!notifications.length">{{ notifications.length }}</span></a>
     <ul class="dropdown-menu notification-dropdown">
-      <li v-show="notifications.length === 0">{{ this.T.notificationsNoNewNotifications
-      }}</li><omegaup-notification v-bind:key="notification.notification_id"
+      <li v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications
+      }}</li>
+      <li v-else>
+        <p class="read-all-notifications" v-on:click="$emit('read', notifications)">Marcar todas las notificaciones como leídas ✔️</p>
+      </li>
+      <omegaup-notification v-bind:key="notification.notification_id"
           v-bind:notification="notification"
-          v-for="notification in notifications"></omegaup-notification>
+          v-for="notification in notifications"
+          v-on:remove="readNotification"></omegaup-notification>
     </ul>
   </li>
 </template>
@@ -26,6 +31,20 @@
   font-size: 20px;
   display: block;
   text-align: center;
+}
+
+.read-all-notifications {
+  display: inline-block;
+  margin: 0;
+  color: #337ab7;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
+
+.read-all-notifications:hover {
+  color: #666;
+  text-decoration: underline;
 }
 
 .count-label {
@@ -54,6 +73,10 @@ import Notification from './Notification.vue';
 export default class NotificationList extends Vue {
   @Prop() notifications!: omegaup.Notification[];
   T = T;
+
+  readNotification(notification: omegaup.Notification): void {
+    this.$emit('read', [notification]);
+  }
 }
 
 </script>
