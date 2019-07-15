@@ -704,7 +704,7 @@ td.forcebreaks-arena {
 
 #status {
 	position: -webkit-sticky; /* Safari */
-	position: relative;
+	position: sticky;
 	z-index: 99999999;
 	max-width: 900px;
 	margin-right: auto;

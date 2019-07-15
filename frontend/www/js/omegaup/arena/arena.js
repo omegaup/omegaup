@@ -24,8 +24,13 @@ let ScoreboardColors = [
 ];
 
 export function GetOptionsFromLocation(arenaLocation) {
-  let payload =
-      JSON.parse(document.getElementById('payload').firstChild.nodeValue);
+  const elementPayload = document.getElementById('payload');
+  let shouldShowFirstAssociatedIdentityRunWarning = false;
+  if (elementPayload != null) {
+    const payload = JSON.parse(elementPayload.firstChild.nodeValue);
+    shouldShowFirstAssociatedIdentityRunWarning =
+        payload.shouldShowFirstAssociatedIdentityRunWarning;
+  }
   let options = {
     isLockdownMode: false,
     isInterview: false,
@@ -36,7 +41,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     contestAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning:
-        payload.shouldShowFirstAssociatedIdentityRunWarning,
+        shouldShowFirstAssociatedIdentityRunWarning,
   };
 
   if ($('body').hasClass('lockdown')) {

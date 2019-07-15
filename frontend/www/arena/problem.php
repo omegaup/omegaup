@@ -71,8 +71,9 @@ $result['histogram'] = [
     'quality_histogram' => $problem->quality_histogram,
     'quality' => floatval($problem->quality),
     'difficulty' => floatval($problem->difficulty)];
+error_log(print_r($session, true));
 $result['shouldShowFirstAssociatedIdentityRunWarning'] =
-    !$session['is_logged_with_main_identity'] &&
+    !$session['is_main_identity'] && !is_null($r->user) &&
     ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
         $session['user']
     );

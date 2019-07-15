@@ -132,7 +132,7 @@ class SessionController extends Controller {
                 'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-                'is_logged_with_main_identity' => false,
+                'is_main_identity' => false,
             ];
         }
 
@@ -160,7 +160,7 @@ class SessionController extends Controller {
                 'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-                'is_logged_with_main_identity' => false,
+                'is_main_identity' => false,
             ];
         }
 
@@ -174,7 +174,7 @@ class SessionController extends Controller {
             'is_admin' => Authorization::isSystemAdmin(
                 $currentIdentity->identity_id
             ),
-            'is_logged_with_main_identity' => $isLoggedWithMainIdentity,
+            'is_main_identity' => $isLoggedWithMainIdentity,
         ];
     }
 

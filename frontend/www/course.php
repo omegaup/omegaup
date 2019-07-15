@@ -66,7 +66,7 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
     );
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->assign('payload', ['shouldShowFirstAssociatedIdentityRunWarning' =>
-        !$session['is_logged_with_main_identity'] &&
+        !$session['is_main_identity'] && !is_null($r->user) &&
         ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
             $session['user']
         ),
