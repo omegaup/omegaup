@@ -296,6 +296,33 @@ class UserUpdateTest extends OmegaupTestCase {
 
         $dbUser = UsersDAO::FindByUsername($user->username);
         $this->assertNotNull($dbUser->git_token);
-        $this->assertEquals($response['token'], $dbUser->git_token);
+        $this->assertTrue(SecurityTools::compareHashedStrings($response['token'], $dbUser->git_token));
+    }
+
+    /**
+     * Tests that users that have old hashes can migrate transparently to
+     * Argon2id.
+     */
+    public function testOldHashTransparentMigration() {
+        // Create the user and manually set its password to the well-known
+        // 'omegaup' hash.
+        $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity->password = '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a';
+        IdentitiesDAO::update($identity);
+        $user->password = $identity->password;
+        UsersDAO::update($user);
+        $this->assertTrue(SecurityTools::isOldHash($identity->password));
+
+        // After logging in, the password should have been updated.
+        $identity->password = 'omegaup';
+        self::login($identity);
+        $identity = IdentitiesDAO::getByPK($identity->identity_id);
+        $this->assertFalse(SecurityTools::isOldHash($identity->password));
+
+        // After logging in once, the user should be able to log in again with
+        // the exact same password.
+        $identity->password = 'omegaup';
+        self::login($identity);
     }
 }

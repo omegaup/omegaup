@@ -86,9 +86,9 @@ class Identities extends VO {
     public $username;
 
     /**
-      *  [Campo no documentado]
+      * Contraseña del usuario, usando Argon2i o Blowfish
       * @access public
-      * @var varchar(100)
+      * @var varchar(128)
       */
     public $password;
 
