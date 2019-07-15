@@ -80,6 +80,9 @@ class Users extends VO {
         if (isset($data['preferred_language'])) {
             $this->preferred_language = $data['preferred_language'];
         }
+        if (isset($data['was_notified_for_first_submission_with_no_main_identity'])) {
+            $this->was_notified_for_first_submission_with_no_main_identity = $data['was_notified_for_first_submission_with_no_main_identity'] == '1';
+        }
     }
 
     /**
@@ -220,4 +223,11 @@ class Users extends VO {
       * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
       */
     public $preferred_language;
+
+    /**
+      * Bandera para indicar si un usuario ya fue notificado que está intentando realizar un envío desde una identidad que no es la principal
+      * @access public
+      * @var tinyint(1)
+      */
+    public $was_notified_for_first_submission_with_no_main_identity;
 }

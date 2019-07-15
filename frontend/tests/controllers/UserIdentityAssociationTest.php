@@ -300,9 +300,13 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $identity->password = $password;
         ContestsFactory::openContest($contestData, $identity);
 
-        $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
-            $user
-        );
+        // TODO: This test will change when we migrate the logic of contest.php
+        $result = false;
+        if (!is_null($user)) {
+            $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                $user
+            );
+        }
 
         $this->assertFalse($result, 'Message should not be shown because' .
                                     ' identity has no associated user');

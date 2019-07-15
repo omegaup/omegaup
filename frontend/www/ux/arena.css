@@ -376,7 +376,7 @@ body#only-problem #problems .main {
 	background: #eee;
 	width: 850px;
 	height: 38em;
-	margin: 2em auto 0 auto;
+	margin: 4em auto 0 auto;
 	border: 2px solid #ccc;
 	padding: 1em;
 	position: relative;
@@ -704,11 +704,11 @@ td.forcebreaks-arena {
 
 #status {
 	position: -webkit-sticky; /* Safari */
-	position: sticky;
-	z-index: 1;
+	position: relative;
+	z-index: 99999999;
 	max-width: 900px;
 	margin-right: auto;
 	margin-left: auto;
-	top: 50px;
+	top: -50px;
 	width: 100%;
 }

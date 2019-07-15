@@ -35,7 +35,8 @@ if ($showIntro['shouldShowIntro']) {
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->assign('payload', [
-        'shouldShowFirstAssociatedIdentityRunWarning' => $session['valid'] &&
+        'shouldShowFirstAssociatedIdentityRunWarning' =>
+            !$session['is_logged_with_main_identity'] &&
             ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
                 $session['user']
             )

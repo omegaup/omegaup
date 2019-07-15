@@ -155,7 +155,7 @@
 				</form>
 			</div>
 		</div>
-{if !empty($ENABLED_EXPERIMENTS) && in_array('identities', $ENABLED_EXPERIMENTS)}
+{if true}
 		<div id="manage-identities"></div>
 		<script type="text/javascript" src="{version_hash src="/js/dist/user_manage_identities.js"}"></script>
 {/if}

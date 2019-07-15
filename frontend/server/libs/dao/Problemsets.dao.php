@@ -106,39 +106,37 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     }
 
     /**
-     * Validates that users don't have made submissions with any of their
-     * associated identities and are currently logged in with one of them.
+     * Checks whether users have made submissions with any of their associated
+     * identities and are currently logged in with one of them.
      * In this case a flag is turned on and a message will be displayed in arena
      *
      * @param Users $user
      */
     public static function shouldShowFirstAssociatedIdentityRunWarning(
-        ?Users $user
+        Users $user
     ) : bool {
-        if (is_null($user)) {
-            return false;
-        }
-        $sql = 'SELECT
-                    COUNT(*)
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Identities i
-                ON
-                    i.identity_id = s.identity_id
-                INNER JOIN
-                    Users u
-                ON
-                    u.user_id = i.user_id
-                    AND u.main_identity_id != s.identity_id
-                WHERE
-                    u.user_id = ?
-                LIMIT
-                    1;';
+        $sql = '
+            SELECT
+                COUNT(*) AS `total_submissions`,
+                was_notified_for_first_submission_with_no_main_identity AS `notified`
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            INNER JOIN
+                Users u
+            ON
+                u.user_id = i.user_id
+            WHERE
+                u.user_id = ?
+            LIMIT
+                1;';
 
         global $conn;
-        $result = $conn->GetOne($sql, [$user->user_id]);
+        $result = $conn->GetRow($sql, [$user->user_id]);
 
-        return $result == '0';
+        return $result['total_submissions'] == '0' && $result['notified'] != '1';
     }
 }

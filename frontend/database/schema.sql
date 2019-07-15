@@ -883,6 +883,7 @@ CREATE TABLE `Users` (
   `in_mailing_list` tinyint(1) NOT NULL DEFAULT '0',
   `is_private` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Determina si el usuario eligió no compartir su información de manera pública',
   `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
+  `was_notified_for_first_submission_with_no_main_identity` tinyint(1) DEFAULT NULL COMMENT 'Bandera para indicar si un usuario ya fue notificado que está intentando realizar un envío desde una identidad que no es la principal',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `fk_main_email_id` (`main_email_id`),

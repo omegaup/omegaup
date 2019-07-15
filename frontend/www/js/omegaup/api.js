@@ -627,6 +627,8 @@ export default {
 
     listUnsolvedProblems: _call('/api/user/listUnsolvedProblems/'),
 
+    markAsNotified: _call('/api/user/markAsNotified/'),
+
     problemsSolved: _call('/api/user/problemssolved/'),
 
     profile: _call('/api/user/profile/',

@@ -24,6 +24,8 @@ let ScoreboardColors = [
 ];
 
 export function GetOptionsFromLocation(arenaLocation) {
+  let payload =
+      JSON.parse(document.getElementById('payload').firstChild.nodeValue);
   let options = {
     isLockdownMode: false,
     isInterview: false,
@@ -33,7 +35,8 @@ export function GetOptionsFromLocation(arenaLocation) {
     disableSockets: false,
     contestAlias: null,
     scoreboardToken: null,
-    shouldShowFirstAssociatedIdentityRunWarning: false,
+    shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -43,10 +46,6 @@ export function GetOptionsFromLocation(arenaLocation) {
       e.returnValue = dialogText;
       return e.returnValue;
     };
-  }
-
-  if (options.shouldShowFirstAssociatedIdentityRunWarning) {
-    UI.warning(T.firstSumbissionWithIdentity);
   }
 
   if (arenaLocation.pathname.indexOf('/practice') !== -1) {
@@ -1458,6 +1457,13 @@ export class Arena {
           // for the display to update correctly!
           self.codeEditor.refresh();
         }
+        if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
+          self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
+          UI.warning(omegaup.T.firstSumbissionWithIdentity);
+          API.User.markAsNotified({run_alias: self.guid})
+              .then()
+              .fail(UI.ignoreError);
+        }
       }
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
@@ -1751,10 +1757,7 @@ export class Arena {
         .fail(function(run) {
           alert(run.error);
           $('input', self.elements.submitForm).prop('disabled', false);
-        }
-
-              );
-    UI.dismissNotifications();
+        });
   }
 
   updateSummary(contest) {

@@ -66,10 +66,10 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
     );
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->assign('payload', ['shouldShowFirstAssociatedIdentityRunWarning' =>
-         $session['valid'] &&
-            ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
-                $session['user']
-            ),
+        !$session['is_logged_with_main_identity'] &&
+        ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            $session['user']
+        ),
      ]);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {
