@@ -128,7 +128,7 @@ class SecurityTools {
      */
     public static function getGitserverAuthorizationHeader(string $problem, string $username) : string {
         if (OMEGAUP_GITSERVER_SECRET_TOKEN != '') {
-            return 'Authorization: Bearer ' . OMEGAUP_GITSERVER_SECRET_TOKEN . ' ' . $username;
+            return 'Authorization: OmegaUpSharedSecret ' . OMEGAUP_GITSERVER_SECRET_TOKEN . ' ' . $username;
         }
 
         return 'Authorization: Bearer ' . self::getGitserverAuthorizationToken($problem, $username);
