@@ -1757,7 +1757,7 @@ class ContestController extends Controller {
         // Check contest_alias
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $group = GroupsDAO::FindByAlias($r['group']);
+        $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
             throw new InvalidParameterException('invalidParameters');
@@ -1785,7 +1785,7 @@ class ContestController extends Controller {
         // Check contest_alias
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $group = GroupsDAO::FindByAlias($r['group']);
+        $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
             throw new InvalidParameterException('invalidParameters');
@@ -2149,7 +2149,7 @@ class ContestController extends Controller {
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
-        $targetIdentity = IdentitiesDAO::FindByUsername($r['username']);
+        $targetIdentity = IdentitiesDAO::findByUsername($r['username']);
 
         $request = ProblemsetIdentityRequestDAO::getByPK($targetIdentity->identity_id, $contest->problemset_id);
 

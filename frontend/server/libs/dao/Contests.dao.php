@@ -846,7 +846,7 @@ class ContestsDAO extends ContestsDAOBase {
     public static function getContestantsInfo($contestId) {
         $sql = '
             SELECT
-                u.name,
+                i.name,
                 u.username,
                 IF(pi.share_user_information, e.email, NULL) AS email,
                 IF(pi.share_user_information, st.name, NULL) AS state,
@@ -855,15 +855,17 @@ class ContestsDAO extends ContestsDAOBase {
             FROM
                 Users u
             INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
+            INNER JOIN
                 Emails e ON e.email_id = u.main_email_id
             LEFT JOIN
-                States st ON st.state_id = u.state_id AND st.country_id = u.country_id
+                States st ON st.state_id = i.state_id AND st.country_id = i.country_id
             LEFT JOIN
-                Countries cn ON cn.country_id = u.country_id
+                Countries cn ON cn.country_id = i.country_id
             LEFT JOIN
-                Schools sc ON sc.school_id = u.school_id
+                Schools sc ON sc.school_id = i.school_id
             INNER JOIN
-                Problemset_Identities pi ON pi.identity_id = u.main_identity_id
+                Problemset_Identities pi ON pi.identity_id = i.identity_id
             INNER JOIN
                 Contests c ON c.problemset_id = pi.problemset_id
             WHERE

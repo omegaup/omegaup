@@ -84,22 +84,27 @@ class UsersDAO extends UsersDAOBase {
         }
         $sql = 'SELECT
                     COALESCE(c.`name`, "xx") AS country,
+                    c.`country_id` AS country_id,
                     s.`name` AS state,
+                    s.`state_id` AS state_id,
                     sc.`name` AS school,
+                    sc.`school_id` AS school_id,
                     e.`email`,
                     l.`name` AS locale
                 FROM
                     Users u
                 INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                INNER JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
-                    Countries c ON u.country_id = c.country_id
+                    Countries c ON i.country_id = c.country_id
                 LEFT JOIN
-                    States s ON u.state_id = s.state_id AND s.country_id = c.country_id
+                    States s ON i.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
-                    Schools sc ON u.school_id = sc.school_id
+                    Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
-                    Languages l ON u.language_id = l.language_id
+                    Languages l ON i.language_id = l.language_id
                 WHERE
                     u.`user_id` = ?
                 LIMIT

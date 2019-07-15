@@ -15,12 +15,13 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user to be the author
-        $author = UserFactory::createUser();
+        $authorUser = UserFactory::createUser();
+        $authorIdentity = IdentitiesDAO::getByPK($authorUser->main_identity_id);
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $author
+            'author' => $authorUser
         ]));
 
         // Add the problem to the contest
@@ -50,8 +51,14 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals($response['title'], $problemDAO->title);
         $this->assertEquals($response['alias'], $problemDAO->alias);
         $this->assertEquals($response['points'], 100);
-        $this->assertEquals($response['problemsetter']['username'], $author->username);
-        $this->assertEquals($response['problemsetter']['name'], $author->name);
+        $this->assertEquals(
+            $response['problemsetter']['username'],
+            $authorUser->username
+        );
+        $this->assertEquals(
+            $response['problemsetter']['name'],
+            $authorIdentity->name
+        );
         $this->assertEquals($response['source'], $problemDAO->source);
         $this->assertContains('# Entrada', $response['statement']['markdown']);
         $this->assertEquals($response['order'], $problemDAO->order);
