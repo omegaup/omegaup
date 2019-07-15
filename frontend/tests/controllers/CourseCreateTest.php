@@ -6,7 +6,7 @@ class CourseCreateTest extends OmegaupTestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $curatorGroup = GroupsDAO::FindByAlias(
+        $curatorGroup = GroupsDAO::findByAlias(
             Authorization::COURSE_CURATOR_GROUP_ALIAS
         );
 

@@ -18,9 +18,9 @@ if ($show_intro['shouldShowIntro']) {
     $session = SessionController::apiCurrentSession($r)['session'];
     $smarty->assign(
         'needsBasicInformation',
-        $show_intro['needs_basic_information'] && !is_null($session['identity']) && (
-            !$session['identity']->country_id || !$session['identity']->state_id ||
-            !$session['identity']->school_id
+        $show_intro['needs_basic_information'] && !is_null($session['identity'])
+         && (!$session['identity']->country_id || !$session['identity']->state_id
+            || !$session['identity']->school_id
         )
     );
     $smarty->assign(
