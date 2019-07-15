@@ -2467,8 +2467,8 @@ class UserController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiAssociateIdentity(Request $r) {
-        // global $experiments;
-        // $experiments->ensureEnabled(Experiments::IDENTITIES);
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
         Validators::validateStringNonEmpty($r['username'], 'username');

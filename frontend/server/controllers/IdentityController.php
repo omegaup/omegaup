@@ -65,8 +65,8 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
-        // global $experiments;
-        // $experiments->ensureEnabled(Experiments::IDENTITIES);
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -110,8 +110,8 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiBulkCreate(Request $r) {
-        // global $experiments;
-        // $experiments->ensureEnabled(Experiments::IDENTITIES);
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -220,8 +220,8 @@ class IdentityController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdate(Request $r) {
-        // global $experiments;
-        // $experiments->ensureEnabled(Experiments::IDENTITIES);
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
 
@@ -258,8 +258,8 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiChangePassword(Request $r) {
-        // global $experiments;
-        // $experiments->ensureEnabled(Experiments::IDENTITIES);
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
 
