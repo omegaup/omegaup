@@ -2533,7 +2533,7 @@ class ProblemController extends Controller {
         }
     }
 
-    public static function getProblemsMineInfo(Request $r) : array {
+    public static function getProblemsMineInfoForSmarty(Request $r) : array {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
         $privateProblemsAlert = 0;
 
@@ -2547,8 +2547,10 @@ class ProblemController extends Controller {
             $privateProblemsAlert = 1;
         }
         return [
-            $privateProblemsAlert,
-            Authorization::isSystemAdmin($r->identity->identity_id)
+            'privateProblemsAlert' => $privateProblemsAlert,
+            'isSysadmin' => Authorization::isSystemAdmin(
+                $r->identity->identity_id
+            ),
         ];
     }
 }

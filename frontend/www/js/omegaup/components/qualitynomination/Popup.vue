@@ -91,7 +91,7 @@ export default {
     solved: Boolean,
     nominated: Boolean,
     dismissed: Boolean,
-    canNominateProblem: Boolean
+    canNominateProblem: Boolean,
   },
   data: function() {
     return {
