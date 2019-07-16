@@ -1465,9 +1465,6 @@ export class Arena {
         if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
           self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
           UI.warning(omegaup.T.firstSumbissionWithIdentity);
-          API.User.markAsNotified({run_alias: self.guid})
-              .then()
-              .fail(UI.ignoreError);
         }
       }
     } else if (self.activeTab == 'problems') {

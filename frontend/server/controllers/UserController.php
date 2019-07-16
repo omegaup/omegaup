@@ -2509,8 +2509,8 @@ class UserController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiListAssociatedIdentities(Request $r) {
-        // global $experiments;
-        // $experiments->ensureEnabled(Experiments::IDENTITIES);
+        global $experiments;
+        $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
         try {
@@ -2542,23 +2542,6 @@ class UserController extends Controller {
             'status' => 'ok',
             'token' => $token,
         ];
-    }
-
-    /**
-     * API to mark as notified when a user opens for the very first time run
-     * window in arena with an identity wich is not the main one
-     */
-    public static function apiMarkAsNotified(Request $r) {
-        self::authenticateRequest($r);
-
-        $r->user->was_notified_for_first_submission_with_no_main_identity = '1';
-        try {
-            UsersDAO::update($r->user);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return [ 'status' => 'ok'];
     }
 }
 

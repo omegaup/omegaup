@@ -117,8 +117,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     ) : bool {
         $sql = '
             SELECT
-                COUNT(*) AS `total_submissions`,
-                was_notified_for_first_submission_with_no_main_identity AS `notified`
+                COUNT(*)
             FROM
                 Submissions s
             INNER JOIN
@@ -135,8 +134,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                 1;';
 
         global $conn;
-        $result = $conn->GetRow($sql, [$user->user_id]);
 
-        return $result['total_submissions'] == '0' && $result['notified'] != '1';
+        return $conn->GetOne($sql, [$user->user_id]) == '0';
     }
 }
