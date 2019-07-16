@@ -12,10 +12,9 @@
       <li class="text-center"
           v-if="notifications.length === 0">{{ this.T.notificationsNoNewNotifications }}</li>
       <li v-else="">
-        <div class="dropdown-item read-all-notifications"
-             v-on:click="$emit('read', notifications)">
-          {{ this.T.notificationsMarkAllAsRead }} ✔️
-        </div>
+        <a role="button"
+            v-on:click="$emit('read', notifications)">{{ this.T.notificationsMarkAllAsRead }}
+            ✔️</a>
       </li><transition-group name="list"><omegaup-notification v-bind:key=
       "notification.notification_id"
                             v-bind:notification="notification"
@@ -28,24 +27,12 @@
 
 <style>
 .nav>li>a.notification-btn {
-  padding: 12px 4px 0 0;	  padding: 12px 4px 0 0;
+  padding: 12px 4px 0 0;
 }
 
 .glyphicon-bell {
   font-size: 20px;
   display: block;
-}
-
-.read-all-notifications {
-  display: inline-block;
-  color: #337ab7;
-  cursor: pointer;
-  user-select: none;
-}
-
-.read-all-notifications:hover {
-  color: #666;
-  text-decoration: underline;
 }
 
 .count-label {
