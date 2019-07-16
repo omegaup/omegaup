@@ -396,7 +396,7 @@ class ContestController extends Controller {
                         'statementType' => $statementType
                     ];
                 }
-                $result['smartyProperties']['requestUserInformation'] = $requestUserInformation;
+                $result['smartyProperties']['requestsUserInformation'] = $requestUserInformation;
             }
             self::canAccessContest($contest, $identity);
         } catch (Exception $e) {
