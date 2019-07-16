@@ -4,7 +4,7 @@
   function updateGraderStatus() {
     graderCount.removeClass(
         'grader-error grader-ok grader-warning grader-unknown');
-    graderCount.html("<img src='/media/waitcircle.gif' />");
+    graderCount.text('…');
     omegaup.API.Grader.status()
         .then(function(stats) {
           var graderInfo = stats.grader;
