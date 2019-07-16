@@ -265,33 +265,6 @@ class UserController extends Controller {
     }
 
     /**
-     *
-     * Description:
-     *     Tests a if a password is valid for a given user.
-     *
-     * @param user_id
-     * @param email
-     * @param username
-     * @param password
-     *
-     * */
-    public static function testPassword(Identities $identity, string $password) {
-        if (is_null($identity->password)) {
-            // The user had logged in through a third-party account.
-            throw new LoginDisabledException('loginThroughThirdParty');
-        }
-
-        if (strlen($identity->password) === 0) {
-            throw new LoginDisabledException('loginDisabled');
-        }
-
-        return SecurityTools::compareHashedStrings(
-            $password,
-            $identity->password
-        );
-    }
-
-    /**
      * Send the mail with verification link to the user in the Request
      *
      * @param Request $r
@@ -1142,9 +1115,9 @@ class UserController extends Controller {
 
             $response['userinfo']['email'] = $userDb['email'];
             $response['userinfo']['country'] = $userDb['country'];
-            $response['userinfo']['country_id'] = $user->country_id ?? 'xx';
+            $response['userinfo']['country_id'] = $userDb['country_id'];
             $response['userinfo']['state'] = $userDb['state'];
-            $response['userinfo']['state_id'] = $user->state_id;
+            $response['userinfo']['state_id'] = $userDb['state_id'];
             $response['userinfo']['school'] = $userDb['school'];
             $response['userinfo']['school_id'] = $userDb['school_id'];
             $response['userinfo']['locale'] =
@@ -1820,8 +1793,6 @@ class UserController extends Controller {
 
         $userValueProperties = [
             'username',
-            'country_id',
-            'state_id',
             'scholar_degree',
             'school_id',
             'preferred_language',
@@ -2559,7 +2530,8 @@ class UserController extends Controller {
     public static function apiGenerateGitToken(Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
-        $r->user->git_token = SecurityTools::randomHexString(40);
+        $token = SecurityTools::randomHexString(40);
+        $r->user->git_token = SecurityTools::hashString($token);
         try {
             UsersDAO::update($r->user);
         } catch (Exception $e) {
@@ -2568,7 +2540,7 @@ class UserController extends Controller {
 
         return [
             'status' => 'ok',
-            'token' => $r->user->git_token,
+            'token' => $token,
         ];
     }
 }

@@ -32,6 +32,31 @@ class IdentityController extends Controller {
     }
 
     /**
+     * Tests a if a password is valid for a given identity.
+     *
+     * @param Identities $identity    The identity.
+     * @param string     $password    The password.
+     * @return bool                   Whether the password is valid.
+     * @throws LoginDisabledException When the identity is not allowed to login
+     *                                using a password.
+     */
+    public static function testPassword(Identities $identity, string $password) : bool {
+        if (is_null($identity->password)) {
+            // The user had logged in through a third-party account.
+            throw new LoginDisabledException('loginThroughThirdParty');
+        }
+
+        if (strlen($identity->password) === 0) {
+            throw new LoginDisabledException('loginDisabled');
+        }
+
+        return SecurityTools::compareHashedStrings(
+            $password,
+            $identity->password
+        );
+    }
+
+    /**
      * Entry point for Create an Identity API
      *
      * @param Request $r

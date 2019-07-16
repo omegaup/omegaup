@@ -197,7 +197,7 @@ class QualityNominationController extends Controller {
         QualityNominationsDAO::save($nomination);
 
         if ($nomination->nomination == 'promotion') {
-            $qualityReviewerGroup = GroupsDAO::FindByAlias(
+            $qualityReviewerGroup = GroupsDAO::findByAlias(
                 Authorization::QUALITY_REVIEWER_GROUP_ALIAS
             );
             foreach (GroupsDAO::sampleMembers(

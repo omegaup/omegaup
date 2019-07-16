@@ -36,7 +36,7 @@ class GroupsFactory {
         ]);
 
         $response = GroupController::apiCreate($r);
-        $group = GroupsDAO::FindByAlias($alias);
+        $group = GroupsDAO::findByAlias($alias);
 
         return [
             'request' => $r,

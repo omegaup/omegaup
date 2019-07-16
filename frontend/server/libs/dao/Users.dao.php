@@ -84,7 +84,9 @@ class UsersDAO extends UsersDAOBase {
         }
         $sql = 'SELECT
                     COALESCE(c.`name`, "xx") AS country,
+                    c.`country_id` AS country_id,
                     s.`name` AS state,
+                    s.`state_id` AS state_id,
                     sc.`name` AS school,
                     sc.`school_id` AS school_id,
                     e.`email`,
@@ -96,9 +98,9 @@ class UsersDAO extends UsersDAOBase {
                 INNER JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
-                    Countries c ON u.country_id = c.country_id
+                    Countries c ON i.country_id = c.country_id
                 LEFT JOIN
-                    States s ON u.state_id = s.state_id AND s.country_id = c.country_id
+                    States s ON i.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
                     Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
