@@ -1767,7 +1767,7 @@ class ContestController extends Controller {
         // Check contest_alias
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $group = GroupsDAO::FindByAlias($r['group']);
+        $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
             throw new InvalidParameterException('invalidParameters');
@@ -1795,7 +1795,7 @@ class ContestController extends Controller {
         // Check contest_alias
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $group = GroupsDAO::FindByAlias($r['group']);
+        $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
             throw new InvalidParameterException('invalidParameters');
