@@ -19,9 +19,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $r = new Request([
             'problem_alias' => $problemData['request']['problem_alias'],
         ]);
-        $details = ProblemController::apiDetails($r);
-
-        $result = ProblemController::getExtraInformation($r, $details);
+        $result = ProblemController::getProblemDetailsForSmarty($r);
 
         $this->assertFalse($result['user']['logged_in']);
         $this->assertFalse($result['karel_problem']);
@@ -31,9 +29,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
         $r['auth_token'] = $login->auth_token;
-        $details = ProblemController::apiDetails($r);
-
-        $result = ProblemController::getExtraInformation($r, $details);
+        $result = ProblemController::getProblemDetailsForSmarty($r);
 
         $this->assertTrue($result['user']['logged_in']);
         $this->assertFalse($result['karel_problem']);

@@ -1365,7 +1365,11 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(Request $r) : array {
+        return self::getProblemDetails($r);
+    }
+
+    private static function getProblemDetails(Request $r) : array {
         // Get user.
         // Allow unauthenticated requests if we are not opening a problem
         // inside a contest.
@@ -1526,7 +1530,7 @@ class ProblemController extends Controller {
                     throw new InvalidDatabaseOperationException($e);
                 }
             }
-        } elseif (isset($r['show_solvers']) && $r['show_solvers']) {
+        } elseif (!empty($r['show_solvers'])) {
             $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem((int)$problem['problem']->problem_id);
         }
 
@@ -2534,78 +2538,81 @@ class ProblemController extends Controller {
         }
     }
 
-    public static function getExtraInformation(
-        Request $r,
-        array $result
+    public static function getProblemDetailsForSmarty(
+        Request $r
     ) : array {
+        // Get problem details from API
+        $r['show_solvers'] = true;
+        $details = self::getProblemDetails($r);
+
         Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-        $session = SessionController::apiCurrentSession($r)['session'];
         $problem = ProblemsDAO::GetByAlias($r['problem_alias']);
-        $nominationStatus = [
+
+        $result = [];
+        $result['problem_alias'] = $details['alias'];
+        $result['visibility'] = $details['visibility'];
+        $result['source'] = $details['source'];
+        $result['problemsetter'] = $details['problemsetter'];
+        $result['title'] = $details['title'];
+        $result['points'] = $details['points'];
+        $result['time_limit'] = $details['settings']['limits']['TimeLimit'];
+        $result['overall_wall_time_limit'] =
+            $details['settings']['limits']['OverallWallTimeLimit'];
+        $memoryLimit = (int)$details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
+        $result['memory_limit'] = "{$memoryLimit} MiB";
+        $result['input_limit'] = ($details['input_limit'] / 1024) . ' KiB';
+        $result['solvers'] = $details['solvers'];
+        $result['quality_payload'] = [
             'solved' => false,
             'nominated' => false,
             'dismissed' => false
         ];
-        $isKarelProblem = count(array_intersect(
-            $result['languages'],
+        $result['qualitynomination_reportproblem_payload'] = [
+            'problem_alias' => $details['alias'],
+        ];
+        $result['karel_problem'] = count(array_intersect(
+            $details['languages'],
             ['kp', 'kj']
         )) == 2;
-        $sampleInput = null;
-        if (isset($result['settings']['cases']) && isset(
-            $result['settings']['cases']['sample']
-        ) && isset(
-            $result['settings']['cases']['sample']['in']
-        )
+        if (isset($details['settings']['cases']) &&
+            isset($details['settings']['cases']['sample']) &&
+            isset($result['settings']['cases']['sample']['in'])
         ) {
-            $sampleInput = $result['settings']['cases']['sample']['in'];
+            $result['sample_input'] = $result['settings']['cases']['sample']['in'];
         }
-        $histogram = [
+        $result['histogram'] = [
             'difficulty_histogram' => $problem->difficulty_histogram,
             'quality_histogram' => $problem->quality_histogram,
             'quality' => floatval($problem->quality),
-            'difficulty' => floatval($problem->difficulty)
+            'difficulty' => floatval($problem->difficulty),
         ];
-        $user = [
-            'logged_in' => false,
-            'admin' => false
-        ];
+        $result['user'] = ['logged_in' => false, 'admin' => false];
+        $result['problem_admin'] = false;
+        $result['payload'] = $details;
 
-        $extraInformation = [
-            'nomination_status' => $nominationStatus,
-            'karel_problem' => $isKarelProblem,
-            'sample_input' => $sampleInput,
-            'problem_admin' => false,
-        ];
-        $extraResults = [
-            'user' => $user,
-            'histogram' => $histogram
-        ];
-        $result = array_merge($result, $extraResults);
-
-        if (!$session['valid']) {
-            return [$result, $extraInformation];
+        if (is_null($r->identity)) {
+            return $result;
         }
         $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
             $problem,
-            $session['identity']
+            $r->identity
         );
         $isProblemAdmin = Authorization::isProblemAdmin(
-            $session['identity'],
+            $r->identity,
             $problem
         );
         $nominationStatus['solved'] = (bool) $nominationStatus['solved'];
         $nominationStatus['nominated'] = (bool) $nominationStatus['nominated'];
         $nominationStatus['dismissed'] = (bool) $nominationStatus['dismissed'];
-        $nominationStatus['problem_alias'] = $result['alias'];
-        $nominationStatus['language'] = $result['statement']['language'];
+        $nominationStatus['problem_alias'] = $details['alias'];
+        $nominationStatus['language'] = $details['statement']['language'];
         $user = [
             'logged_in' => true,
             'admin' => $isProblemAdmin
         ];
-        $extraInformation['nomination_status'] = $nominationStatus;
-        $extraInformation['problem_admin'] = $isProblemAdmin;
-        $extraResults['user'] = $user;
-        $result = array_merge($result, $extraResults);
-        return [$result, $extraInformation];
+        $result['quality_payload'] = $nominationStatus;
+        $result['problem_admin'] = $isProblemAdmin;
+        $result['user'] = $user;
+        return $result;
     }
 }
