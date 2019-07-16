@@ -83,19 +83,22 @@ class ContestUsersTest extends OmegaupTestCase {
 
         $userLogin = self::login($user[0]);
 
-        $showContestIntro = ContestController::showContestIntro(new Request([
-            'auth_token' => $userLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-        ]));
+        $contestDetails =
+            ContestController::getContestDetailsForSmartyAndShouldShowintro(
+                new Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
 
         // Explicitly join contest
         ContestController::apiOpen(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
-                $showContestIntro['privacyStatement']['gitObjectId'],
+                $contestDetails['smartyProperties']['privacyStatement']['gitObjectId'],
             'statement_type' =>
-                $showContestIntro['privacyStatement']['statementType'],
+                $contestDetails['smartyProperties']['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
@@ -122,9 +125,9 @@ class ContestUsersTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
-                $showContestIntro['privacyStatement']['gitObjectId'],
+                $contestDetails['smartyProperties']['privacyStatement']['gitObjectId'],
             'statement_type' =>
-                $showContestIntro['privacyStatement']['statementType'],
+                $contestDetails['smartyProperties']['privacyStatement']['statementType'],
             'share_user_information' => 0,
         ]));
 
@@ -140,9 +143,9 @@ class ContestUsersTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
-                $showContestIntro['privacyStatement']['gitObjectId'],
+                $contestDetails['smartyProperties']['privacyStatement']['gitObjectId'],
             'statement_type' =>
-                $showContestIntro['privacyStatement']['statementType'],
+                $contestDetails['smartyProperties']['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
@@ -166,10 +169,13 @@ class ContestUsersTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        $showContestIntro = ContestController::showContestIntro(new Request([
-            'contest_alias' => $contestData['request']['alias'],
-        ]));
+        $contestDetails =
+            ContestController::getContestDetailsForSmartyAndShouldShowintro(
+                new Request([
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
 
-        $this->assertEquals(1, $showContestIntro['shouldShowIntroForNotLoggedIdentity']);
+        $this->assertEquals(1, $contestDetails['shouldShowIntro']);
     }
 }

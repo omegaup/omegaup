@@ -336,12 +336,14 @@ class ContestController extends Controller {
     }
 
     /**
-     * Show the contest intro unless you are admin, or you
-     * already started this contest.
+     * Show the contest intro unless you are admin, or you already started this
+     * contest. Also, get all the properties for smarty.
      * @param Request $r
      * @return Array
      */
-    public static function showContestIntro(Request $r) : Array {
+    public static function getContestDetailsForSmartyAndShouldShowintro(
+        Request $r
+    ) : array {
         try {
             $contest = ContestsDAO::getByAlias($r['contest_alias']);
         } catch (Exception $e) {
@@ -356,12 +358,16 @@ class ContestController extends Controller {
         try {
             // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
-            $result['shouldShowIntro'] = false;
-            $result['shouldShowIntroForNotLoggedIdentity'] = false;
-            $result['privacyStatement'] = [];
+            $result = [
+                'shouldShowIntro' => $isPublicContest,
+                'smartyProperties' => [
+                    'needsBasicInformation' => false,
+                    'requestsUserInformation' => false,
+                ],
+            ];
+            // $result['privacyStatement'] = [];
             if (!$session['valid'] || is_null($session['identity'])) {
                 // No session, show the intro if public, so that they can login.
-                $result['shouldShowIntroForNotLoggedIdentity'] = $isPublicContest;
                 return $result;
             } else {
                 [
@@ -369,8 +375,9 @@ class ContestController extends Controller {
                     $requestUserInformation
                 ] = ContestsDAO::getNeedsInformation($contest->problemset_id);
                 $identity = $session['identity'];
-                $result['needsBasicInformation'] = $needsInformation && (
-                    !$identity->country_id || !$identity->state_id || !$identity->school_id
+                $result['smartyProperties']['needsBasicInformation'] = $needsInformation && (
+                    !$identity->country_id || !$identity->state_id ||
+                    !$identity->school_id
                 );
                 // Privacy Statement Information
                 $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
@@ -380,7 +387,7 @@ class ContestController extends Controller {
                 );
                 if (!is_null($privacyStatementMarkdown)) {
                     $statementType = "contest_{$requestUserInformation}_consent";
-                    $result['privacyStatement'] = [
+                    $result['smartyProperties']['privacyStatement'] = [
                         'markdown' => $privacyStatementMarkdown,
                         'gitObjectId' =>
                             PrivacyStatementsDAO::getLatestPublishedStatement(
@@ -389,7 +396,7 @@ class ContestController extends Controller {
                         'statementType' => $statementType
                     ];
                 }
-                $result['requestUserInformation'] = $requestUserInformation;
+                $result['smartyProperties']['requestUserInformation'] = $requestUserInformation;
             }
             self::canAccessContest($contest, $identity);
         } catch (Exception $e) {

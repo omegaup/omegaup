@@ -40,7 +40,10 @@ class RegisterToContestTest extends OmegaupTestCase {
             // Expected contestNotStarted exception. Continue.
         }
 
-        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
+        $show_intro =
+            ContestController::getContestDetailsForSmartyAndShouldShowintro(
+                $request2
+            )['shouldShowIntro'];
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
         // Contest is going on right now
@@ -53,7 +56,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
 
-        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
+        $show_intro =
+            ContestController::getContestDetailsForSmartyAndShouldShowintro(
+                $request2
+            )['shouldShowIntro'];
         $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
 
         $contestantLogin = self::login($contestant);
@@ -66,7 +72,10 @@ class RegisterToContestTest extends OmegaupTestCase {
         $response = ContestController::apiOpen($request2);
 
         // Now that i have joined the contest, i should not see the intro
-        $showIntro = ContestController::showContestIntro($request2)['shouldShowIntro'];
+        $showIntro =
+            ContestController::getContestDetailsForSmartyAndShouldShowintro(
+                $request2
+            )['shouldShowIntro'];
         $this->assertEquals($showIntro, !ContestController::SHOW_INTRO);
     }
 
@@ -86,7 +95,10 @@ class RegisterToContestTest extends OmegaupTestCase {
             'auth_token' => $contestantLogin->auth_token,
         ]);
 
-        $show_intro = ContestController::showContestIntro($request)['shouldShowIntro'];
+        $show_intro =
+            ContestController::getContestDetailsForSmartyAndShouldShowintro(
+                $request
+            )['shouldShowIntro'];
 
         $this->assertEquals(1, $show_intro);
     }
