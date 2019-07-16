@@ -21,7 +21,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         ]);
         $result = ProblemController::getProblemDetailsForSmarty($r);
 
-        $this->assertFalse($result['user']['logged_in']);
+        $this->assertFalse($result['payload']['user']['logged_in']);
         $this->assertFalse($result['karel_problem']);
         $this->assertFalse($result['problem_admin']);
 
@@ -31,7 +31,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
         $result = ProblemController::getProblemDetailsForSmarty($r);
 
-        $this->assertTrue($result['user']['logged_in']);
+        $this->assertTrue($result['payload']['user']['logged_in']);
         $this->assertFalse($result['karel_problem']);
         $this->assertFalse($result['problem_admin']);
     }

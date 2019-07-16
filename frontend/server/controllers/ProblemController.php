@@ -2548,46 +2548,47 @@ class ProblemController extends Controller {
         Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
         $problem = ProblemsDAO::GetByAlias($r['problem_alias']);
 
-        $result = [];
-        $result['problem_alias'] = $details['alias'];
-        $result['visibility'] = $details['visibility'];
-        $result['source'] = $details['source'];
-        $result['problemsetter'] = $details['problemsetter'];
-        $result['title'] = $details['title'];
-        $result['points'] = $details['points'];
-        $result['time_limit'] = $details['settings']['limits']['TimeLimit'];
-        $result['overall_wall_time_limit'] =
-            $details['settings']['limits']['OverallWallTimeLimit'];
-        $memoryLimit = (int)$details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
-        $result['memory_limit'] = "{$memoryLimit} MiB";
-        $result['input_limit'] = ($details['input_limit'] / 1024) . ' KiB';
-        $result['solvers'] = $details['solvers'];
-        $result['quality_payload'] = [
-            'solved' => false,
-            'nominated' => false,
-            'dismissed' => false
-        ];
-        $result['qualitynomination_reportproblem_payload'] = [
+        $memoryLimit = (int) $details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
+        $result = [
             'problem_alias' => $details['alias'],
+            'visibility' => $details['visibility'],
+            'source' => $details['source'],
+            'problemsetter' => $details['problemsetter'],
+            'title' => $details['title'],
+            'points' => $details['points'],
+            'time_limit' => $details['settings']['limits']['TimeLimit'],
+            'overall_wall_time_limit' =>
+                $details['settings']['limits']['OverallWallTimeLimit'],
+            'memory_limit' => "{$memoryLimit} MiB",
+            'input_limit' => ($details['input_limit'] / 1024) . ' KiB',
+            'solvers' => $details['solvers'],
+            'quality_payload' => [
+                'solved' => false,
+                'nominated' => false,
+                'dismissed' => false,
+            ],
+            'qualitynomination_reportproblem_payload' => [
+                'problem_alias' => $details['alias'],
+            ],
+            'karel_problem' => count(array_intersect(
+                $details['languages'],
+                ['kp', 'kj']
+            )) == 2,
+            'problem_admin' => false,
         ];
-        $result['karel_problem'] = count(array_intersect(
-            $details['languages'],
-            ['kp', 'kj']
-        )) == 2;
         if (isset($details['settings']['cases']) &&
             isset($details['settings']['cases']['sample']) &&
             isset($result['settings']['cases']['sample']['in'])
         ) {
             $result['sample_input'] = $result['settings']['cases']['sample']['in'];
         }
-        $result['histogram'] = [
+        $details['histogram'] = [
             'difficulty_histogram' => $problem->difficulty_histogram,
             'quality_histogram' => $problem->quality_histogram,
             'quality' => floatval($problem->quality),
             'difficulty' => floatval($problem->difficulty),
         ];
-        $result['user'] = ['logged_in' => false, 'admin' => false];
-        $result['problem_admin'] = false;
+        $details['user'] = ['logged_in' => false, 'admin' => false];
         $result['payload'] = $details;
 
         if (is_null($r->identity)) {
@@ -2601,9 +2602,6 @@ class ProblemController extends Controller {
             $r->identity,
             $problem
         );
-        $nominationStatus['solved'] = (bool) $nominationStatus['solved'];
-        $nominationStatus['nominated'] = (bool) $nominationStatus['nominated'];
-        $nominationStatus['dismissed'] = (bool) $nominationStatus['dismissed'];
         $nominationStatus['problem_alias'] = $details['alias'];
         $nominationStatus['language'] = $details['statement']['language'];
         $user = [
@@ -2612,7 +2610,7 @@ class ProblemController extends Controller {
         ];
         $result['quality_payload'] = $nominationStatus;
         $result['problem_admin'] = $isProblemAdmin;
-        $result['user'] = $user;
+        $result['payload']['user'] = $user;
         return $result;
     }
 }
