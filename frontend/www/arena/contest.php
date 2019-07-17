@@ -36,7 +36,7 @@ if ($showIntro['shouldShowIntro']) {
 } else {
     $smarty->assign('payload', [
         'shouldShowFirstAssociatedIdentityRunWarning' =>
-            !$session['is_main_identity'] && !is_null($r->user) &&
+            !UserController::isMainIdentity($session['user'], $session['identity']) &&
             ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
                 $session['user']
             )

@@ -59,9 +59,7 @@
                 {$CURRENT_USER_GRAVATAR_URL_51}
                 <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
                 {if $CURRENT_USER_IS_ADMIN eq '1'}
-                  <span class="grader-count badge">
-                    <img src="/media/waitcircle.gif" />
-                  </span>
+                  <span class="grader-count badge">…</span>
                 {/if}
                 <span class="caret"></span>
               </a>

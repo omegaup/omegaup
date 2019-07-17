@@ -132,22 +132,17 @@ class SessionController extends Controller {
                 'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-                'is_main_identity' => false,
             ];
         }
 
         $currentUser = AuthTokensDAO::getUserByToken($authToken);
         $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
-        $isLoggedWithMainIdentity = false;
 
         // Get email via their id
         if (!is_null($currentUser)) {
             $email = EmailsDAO::getByPK($currentUser->main_email_id);
             if (is_null($currentIdentity)) {
                 $currentIdentity = IdentitiesDAO::getByPK($currentUser->main_identity_id);
-            } else {
-                $isLoggedWithMainIdentity = $currentIdentity->identity_id ==
-                    $currentUser->main_identity_id;
             }
         }
 
@@ -160,7 +155,6 @@ class SessionController extends Controller {
                 'identity' => null,
                 'auth_token' => null,
                 'is_admin' => false,
-                'is_main_identity' => false,
             ];
         }
 
@@ -171,10 +165,7 @@ class SessionController extends Controller {
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::isSystemAdmin(
-                $currentIdentity->identity_id
-            ),
-            'is_main_identity' => $isLoggedWithMainIdentity,
+            'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
         ];
     }
 

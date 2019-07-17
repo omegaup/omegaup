@@ -40,8 +40,6 @@ export function GetOptionsFromLocation(arenaLocation) {
     disableSockets: false,
     contestAlias: null,
     scoreboardToken: null,
-    shouldShowFirstAssociatedIdentityRunWarning:
-        shouldShowFirstAssociatedIdentityRunWarning,
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -71,7 +69,8 @@ export function GetOptionsFromLocation(arenaLocation) {
   if (arenaLocation.search.indexOf('ws=off') !== -1) {
     options.disableSockets = true;
   }
-
+  options.shouldShowFirstAssociatedIdentityRunWarning =
+      shouldShowFirstAssociatedIdentityRunWarning;
   return options;
 }
 

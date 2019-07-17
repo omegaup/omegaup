@@ -465,7 +465,7 @@ const translations = {
 	noCoders: "No hay coders",
 	notRegisteredInContest: "No estas registrado en este concurso.",
 	notificationNewBadge: "Has recibido una nueva insignia: %(badgeName)",
-	notificationsMarkAllAsRead: "Macar todo como le\u00eddo",
+	notificationsMarkAllAsRead: "Marcar todo como le\u00eddo",
 	notificationsNoNewNotifications: "No hay nuevas notificaciones.",
 	oldPassword: "Contrase\u00f1a anterior",
 	omegaupTitleAdminUsers: "Administraci\u00f3n de usuarios",

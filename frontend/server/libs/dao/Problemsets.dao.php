@@ -130,6 +130,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                 u.user_id = i.user_id
             WHERE
                 u.user_id = ?
+                AND u.main_identity_id != i.identity_id
             LIMIT
                 1;';
 
