@@ -344,10 +344,6 @@ class CourseController extends Controller {
         Courses $course,
         Users $creator
     ) : Courses {
-        if ($course->alias == 'new') {
-            throw new DuplicatedEntryInDatabaseException('aliasInUse');
-        }
-
         if (!is_null(CoursesDAO::getByAlias($course->alias))) {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
