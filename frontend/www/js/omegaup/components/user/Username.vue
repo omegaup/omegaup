@@ -4,16 +4,6 @@
         v-else="">{{ username }}</span>
 </template>
 
-<script>
-export default {
-  props: {
-    username: String,
-    classname: String,
-    linkify: Boolean,
-  },
-}
-</script>
-
 <style>
 .user-rank-beginner,
 .user-rank-specialist,
@@ -43,3 +33,15 @@ export default {
   color: #CB000A;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+@Component
+export default class UserName extends Vue {
+  @Prop() username!: string;
+  @Prop() classname!: string;
+  @Prop() linkify!: boolean;
+}
+
+</script>
