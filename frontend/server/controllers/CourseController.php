@@ -1460,64 +1460,144 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiIntroDetails(Request $r) {
+        $result = self::getIntroDetails($r);
+        return [
+            'status' => 'ok',
+            'details' => $result['smartyProperties'],
+        ];
+    }
+
+    public static function getCourseDetailsForSmarty(Request $r) : array {
+        return self::getIntroDetails($r);
+    }
+
+    /**
+     * Refactor of apiIntroDetails in order to be called from php files and APIs
+     */
+    private static function getIntroDetails(Request $r) : array {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
         $group = self::resolveGroup($course, $r['group']);
-
+        $showAssignment = false;
+        if (!empty($r['assignment_alias'])) {
+            $showAssignment = true;
+        }
         $shouldShowIntro = !Authorization::canViewCourse(
             $r->identity,
             $course,
             $group
         );
         $isFirstTimeAccess = false;
-        $showAcceptTeacher = false;
+        $shouldShowAcceptTeacher = false;
         if (!Authorization::isGroupAdmin($r->identity, $group)) {
-            $sharingInformation = CoursesDAO::getSharingInformation($r->identity->identity_id, $course, $group);
-            $isFirstTimeAccess = $sharingInformation['share_user_information'] == null;
-            $showAcceptTeacher = $sharingInformation['accept_teacher'] == null;
+            $sharingInformation = CoursesDAO::getSharingInformation(
+                $r->identity->identity_id,
+                $course,
+                $group
+            );
+            $isFirstTimeAccess =
+                $sharingInformation['share_user_information'] == null;
+            $shouldShowAcceptTeacher =
+                $sharingInformation['accept_teacher'] == null;
         }
         if ($shouldShowIntro && !$course->public) {
             throw new ForbiddenAccessException();
         }
 
-        $result = self::getCommonCourseDetails(
+        $courseDetails = self::getCommonCourseDetails(
             $course,
             $r->identity,
             true  /*onlyIntroDetails*/
         );
-        $result['showAcceptTeacher'] = $showAcceptTeacher;
+        $requestUserInformation = $courseDetails['requests_user_information'];
+        if ($shouldShowIntro || $shouldShowAcceptTeacher || ($isFirstTimeAccess
+            && $requestUserInformation != 'no'
+        )) {
+            $needsBasicInformation = $courseDetails['basic_information_required']
+                && !is_null($r->identity) && ($r->identity->country_id ||
+                $r->identity->state_id || $r->identity->school_id);
 
-        // Privacy Statement Information
-        $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-            $r->identity->language_id,
-            'course',
-            $result['requests_user_information']
-        );
-        $result['git_object_id'] = null;
-        $result['statement_type'] = null;
-        if (!is_null($result['privacy_statement_markdown'])) {
-            $statement_type = "course_{$result['requests_user_information']}_consent";
-            $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
-            $result['statement_type'] = $statement_type;
+            // Privacy Statement Information
+            $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
+                $r->identity->language_id,
+                'course',
+                $requestUserInformation
+            );
+
+            $privacyStatement = [
+                'markdown' => $privacyStatementMarkdown,
+                'gitObjectId' => null,
+                'statementType' => null,
+            ];
+            if (!is_null($privacyStatementMarkdown)) {
+                $statementType = "course_{$requestUserInformation}_consent";
+                $privacyStatement['gitObjectId'] =
+                    PrivacyStatementsDAO::getLatestPublishedStatement(
+                        $statementType
+                    )['git_object_id'];
+                $privacyStatement['statementType'] = $statementType;
+            }
+
+            $markdown = PrivacyStatement::getForConsent(
+                $r->identity->language_id,
+                'accept_teacher'
+            );
+            if (is_null($markdown)) {
+                throw new InvalidFilesystemOperationException();
+            }
+            $acceptTeacherStatement = [
+                'gitObjectId' =>
+                    PrivacyStatementsDAO::getLatestPublishedStatement(
+                        'accept_teacher'
+                    )['git_object_id'],
+                'markdown' => $markdown,
+                'statementType' => 'accept_teacher',
+            ];
+
+            $smartyProperties = [
+                'coursePayload' => [
+                    'name' => $courseDetails['name'],
+                    'description' => $courseDetails['description'],
+                    'alias' => $courseDetails['alias'],
+                    'currentUsername' => $r->identity->username,
+                    'needsBasicInformation' => $needsBasicInformation,
+                    'requestsUserInformation' =>
+                        $courseDetails['requests_user_information'],
+                    'shouldShowAcceptTeacher' => $shouldShowAcceptTeacher,
+                    'statements' => [
+                        'privacy' => $privacyStatement,
+                        'acceptTeacher' => $acceptTeacherStatement,
+                    ],
+                    'isFirstTimeAccess' => $isFirstTimeAccess,
+                    'shouldShowResults' => $shouldShowIntro,
+                ]
+            ];
+            $template = 'arena.course.intro.tpl';
+        } elseif ($showAssignment) {
+            $smartyProperties = [
+                'showRanking' => !is_null($r->identity) &&
+                    CourseController::shouldShowScoreboard(
+                        $r->identity,
+                        $course,
+                        $group
+                    )
+            ];
+            $template = 'arena.contest.course.tpl';
+        } else {
+            $smartyProperties = [
+                'showRanking' => !is_null($r->identity) &&
+                    Authorization::isCourseAdmin($r->identity, $course)
+            ];
+            $template = 'course.details.tpl';
         }
 
-        $markdown = PrivacyStatement::getForConsent($r->identity->language_id, 'accept_teacher');
-        if (is_null($markdown)) {
-            throw new InvalidFilesystemOperationException();
-        }
-        $result['accept_teacher_statement'] = [
-            'git_object_id' => PrivacyStatementsDAO::getLatestPublishedStatement('accept_teacher')['git_object_id'],
-            'markdown' => $markdown,
-            'statement_type' => 'accept_teacher',
+        return [
+            'smartyProperties' => $smartyProperties,
+            'template' => $template,
         ];
-        $result['shouldShowResults'] = $shouldShowIntro;
-        $result['isFirstTimeAccess'] = $isFirstTimeAccess;
-        $result['requests_user_information'] = $result['requests_user_information'];
-
-        return $result;
     }
 
     /**

@@ -132,7 +132,10 @@ class CourseDetailsTest extends OmegaupTestCase {
         ]));
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals($courseData['request']['name'], $response['name']);
+        $this->assertEquals(
+            $courseData['request']['name'],
+            $response['details']['coursePayload']['name']
+        );
         $this->assertArrayNotHasKey('assignments', $response);
     }
 
