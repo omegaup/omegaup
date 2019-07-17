@@ -28,7 +28,7 @@ class GroupController extends Controller {
 
             GroupsDAO::save($group);
 
-            self::$log->info('Group ' . $alias . ' created.');
+            self::$log->info("Group {$alias} created.");
 
             DAO::transEnd();
         } catch (Exception $e) {

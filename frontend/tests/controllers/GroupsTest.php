@@ -34,6 +34,26 @@ class GroupsTest extends OmegaupTestCase {
     }
 
     /**
+     * Attempts to create groups with a restricted alias should fail.
+     */
+    public function testCreateGroupRestrictedAlias() {
+        $owner = UserFactory::createUser();
+
+        try {
+            $login = self::login($owner);
+            GroupController::apiCreate(new Request([
+                'auth_token' => $login->auth_token,
+                'name' => Utils::CreateRandomString(),
+                'alias' => 'omegaup',
+                'description' => Utils::CreateRandomString(),
+            ]));
+            $this->fail('Group creation should have failed');
+        } catch (DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals($e->getMessage(), 'aliasInUse');
+        }
+    }
+
+    /**
      * Add user to group
      */
     public function testAddUserToGroup() {
