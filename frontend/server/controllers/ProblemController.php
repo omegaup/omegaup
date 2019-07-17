@@ -3,6 +3,7 @@
 require_once 'libs/FileHandler.php';
 require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ProblemDeployer.php';
+require_once 'libs/dao/QualityNominations.dao.php';
 
 /**
  * ProblemsController
@@ -1364,7 +1365,11 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(Request $r) : array {
+        return self::getProblemDetails($r);
+    }
+
+    private static function getProblemDetails(Request $r) : array {
         // Get user.
         // Allow unauthenticated requests if we are not opening a problem
         // inside a contest.
@@ -1525,7 +1530,7 @@ class ProblemController extends Controller {
                     throw new InvalidDatabaseOperationException($e);
                 }
             }
-        } elseif (isset($r['show_solvers']) && $r['show_solvers']) {
+        } elseif (!empty($r['show_solvers'])) {
             $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem((int)$problem['problem']->problem_id);
         }
 
@@ -2535,22 +2540,87 @@ class ProblemController extends Controller {
 
     public static function getProblemsMineInfoForSmarty(Request $r) : array {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
-        $privateProblemsAlert = 0;
 
-        if (!SessionController::currentSessionAvailable()) {
-            return [$privateProblemsAlert, false /* isAdmin */];
-        }
-
-        if (!isset($_SESSION['private_problems_alert']) &&
-            ProblemsDAO::getPrivateCount($r->user) > 0) {
-            $_SESSION['private_problems_alert'] = 1;
-            $privateProblemsAlert = 1;
-        }
         return [
-            'privateProblemsAlert' => $privateProblemsAlert,
             'isSysadmin' => Authorization::isSystemAdmin(
                 $r->identity->identity_id
             ),
         ];
+    }
+
+    public static function getProblemDetailsForSmarty(
+        Request $r
+    ) : array {
+        // Get problem details from API
+        $r['show_solvers'] = true;
+        $details = self::getProblemDetails($r);
+
+        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        $problem = ProblemsDAO::GetByAlias($r['problem_alias']);
+
+        $memoryLimit = (int) $details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
+        $result = [
+            'problem_alias' => $details['alias'],
+            'visibility' => $details['visibility'],
+            'source' => $details['source'],
+            'problemsetter' => $details['problemsetter'],
+            'title' => $details['title'],
+            'points' => $details['points'],
+            'time_limit' => $details['settings']['limits']['TimeLimit'],
+            'overall_wall_time_limit' =>
+                $details['settings']['limits']['OverallWallTimeLimit'],
+            'memory_limit' => "{$memoryLimit} MiB",
+            'input_limit' => ($details['input_limit'] / 1024) . ' KiB',
+            'solvers' => $details['solvers'],
+            'quality_payload' => [
+                'solved' => false,
+                'nominated' => false,
+                'dismissed' => false,
+            ],
+            'qualitynomination_reportproblem_payload' => [
+                'problem_alias' => $details['alias'],
+            ],
+            'karel_problem' => count(array_intersect(
+                $details['languages'],
+                ['kp', 'kj']
+            )) == 2,
+            'problem_admin' => false,
+        ];
+        if (isset($details['settings']['cases']) &&
+            isset($details['settings']['cases']['sample']) &&
+            isset($result['settings']['cases']['sample']['in'])
+        ) {
+            $result['sample_input'] = $result['settings']['cases']['sample']['in'];
+        }
+        $details['histogram'] = [
+            'difficulty_histogram' => $problem->difficulty_histogram,
+            'quality_histogram' => $problem->quality_histogram,
+            'quality' => floatval($problem->quality),
+            'difficulty' => floatval($problem->difficulty),
+        ];
+        $details['user'] = ['logged_in' => false, 'admin' => false];
+        $result['payload'] = $details;
+
+        if (is_null($r->identity)) {
+            return $result;
+        }
+        $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
+            $problem,
+            $r->identity
+        );
+        $isProblemAdmin = Authorization::isProblemAdmin(
+            $r->identity,
+            $problem
+        );
+        $nominationStatus['problem_alias'] = $details['alias'];
+        $nominationStatus['language'] = $details['statement']['language'];
+        $user = [
+            'logged_in' => true,
+            'admin' => $isProblemAdmin
+        ];
+        $result['quality_payload'] = $nominationStatus;
+        $result['problem_admin'] = $isProblemAdmin;
+        $result['payload']['user'] = $user;
+        return $result;
     }
 }

@@ -67,7 +67,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             WHERE
                 i.username LIKE CONCAT('%', ?, '%') OR
                 i.username LIKE CONCAT('%', ?, '%')
-            LIMIT 50";
+            LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
         $rs = $conn->GetAll($sql, $args);

@@ -101,19 +101,37 @@ class Validators {
 
         if (!is_string($parameter) ||
             empty($parameter) ||
-            strlen($parameter) > 32 ||
-            !self::isValidAlias($parameter)
+            strlen($parameter) > 32
         ) {
+            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+        }
+        if (self::isRestrictedAlias($parameter)) {
+            throw new DuplicatedEntryInDatabaseException('aliasInUse');
+        }
+        if (!self::isValidAlias($parameter)) {
             throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
     }
 
     /**
-     * @param string $parameter
+     * Returns whether the alias is valid and is not a restricted alias.
+     *
+     * @param string $alias
      * @return boolean
      */
-    public static function isValidAlias(string $parameter) : bool {
-        return preg_match('/^[a-zA-Z0-9_-]+$/', $parameter) === 1;
+    public static function isValidAlias(string $alias) : bool {
+        return preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1 && !self::isRestrictedAlias($alias);
+    }
+
+    /**
+     * Returns whether the alias is restricted.
+     *
+     * @param string $alias the alias.
+     * @return boolean whether the alias is restricted.
+     */
+    public static function isRestrictedAlias(string $alias) : bool {
+        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup'];
+        return in_array(strtolower($alias), $restrictedAliases);
     }
 
     /**
