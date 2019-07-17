@@ -10,6 +10,19 @@ OmegaUp.on('ready', function() {
       return createElement('omegaup-notification-list', {
         props: {
           notifications: this.notifications,
+        },
+        on: {
+          read: function(notifications) {
+            API.Notification.readNotifications({
+                              'notifications': notifications.map(
+                                  notification => notification.notification_id),
+                            })
+                .then(function() { return API.Notification.myList({}); })
+                .then(function(data) {
+                  notificationsList.notifications = data.notifications;
+                })
+                .fail(UI.apiError);
+          },
         }
       });
     },
