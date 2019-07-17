@@ -1,5 +1,5 @@
 <template>
-  <li class="dropdown">
+  <li class="dropdown hide">
     <a aria-expanded="true"
         aria-haspopup="true"
         class="notification-btn dropdown-toggle"
