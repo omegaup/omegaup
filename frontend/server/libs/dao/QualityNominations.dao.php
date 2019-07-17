@@ -19,7 +19,10 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
      */
     const CONFIDENCE = 5;
 
-    public static function getNominationStatusForProblem(Problems $problem, Identities $identity) {
+    public static function getNominationStatusForProblem(
+        Problems $problem,
+        Identities $identity
+    ) : array {
         $sql = '
             SELECT
                 COUNT(r.run_id) > 0 as solved,
@@ -60,7 +63,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ';
 
         global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
+        $result = $conn->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
+        return [
+            'solved' => (bool) $result['solved'],
+            'nominated' => (bool) $result['nominated'],
+            'dismissed' => (bool) $result['dismissed'],
+        ];
     }
 
     /**
