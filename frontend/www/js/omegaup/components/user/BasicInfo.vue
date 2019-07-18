@@ -94,19 +94,22 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 import user_Username from './Username.vue';
-export default {
-  props: {
-    profile: Object,
-    rank: String,
-  },
-  data: function() {
-    return { T: T, }
-  },
+
+@Component({
   components: {
     'omegaup-user-username': user_Username,
-  }
+  },
+})
+export default class UserBasicInfo extends Vue {
+  @Prop() profile!: omegaup.Profile;
+  @Prop() rank!: string;
+
+  T = T;
 }
+
 </script>
