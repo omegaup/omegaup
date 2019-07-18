@@ -2551,7 +2551,7 @@ class UserController extends Controller {
      * @return bool
      */
     public static function isMainIdentity(Users $user, Identities $identity) : bool {
-        return !is_null($user) && $identity->identity_id == $user->main_identity_id;
+        return $identity->identity_id == $user->main_identity_id;
     }
 }
 

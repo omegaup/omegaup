@@ -65,12 +65,17 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         $group
     );
     $smarty->assign('showRanking', $showScoreboard);
+    $shouldShowFirstAssociatedIdentityRunWarning = false;
+    if (!is_null($session['user'])) {
+        $shouldShowFirstAssociatedIdentityRunWarning =
+            !UserController::isMainIdentity($session['user'], $session['identity'])
+            && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                $session['user']
+            );
+    }
     $smarty->assign('payload', ['shouldShowFirstAssociatedIdentityRunWarning' =>
-        !UserController::isMainIdentity($session['user'], $session['identity'])
-        && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
-            $session['user']
-        ),
-     ]);
+        $shouldShowFirstAssociatedIdentityRunWarning,
+    ]);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);

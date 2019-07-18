@@ -34,12 +34,16 @@ if ($showIntro['shouldShowIntro']) {
     }
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
-    $smarty->assign('payload', [
-        'shouldShowFirstAssociatedIdentityRunWarning' =>
-            !UserController::isMainIdentity($session['user'], $session['identity']) &&
-            ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+    $shouldShowFirstAssociatedIdentityRunWarning = false;
+    if (!is_null($session['user'])) {
+        $shouldShowFirstAssociatedIdentityRunWarning =
+            !UserController::isMainIdentity($session['user'], $session['identity'])
+            && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
                 $session['user']
-            )
+            );
+    }
+    $smarty->assign('payload', ['shouldShowFirstAssociatedIdentityRunWarning' =>
+        $shouldShowFirstAssociatedIdentityRunWarning
     ]);
     $smarty->display('../../templates/arena.contest.contestant.tpl');
 }
