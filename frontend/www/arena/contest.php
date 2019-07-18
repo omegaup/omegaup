@@ -6,17 +6,19 @@ try {
         'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
         'contest_alias' => $_REQUEST['contest_alias'],
     ]);
-    $result = ContestController::getContestDetailsForSmartyAndShouldShowintro($r);
+    $showIntro = ContestController::showIntro($r);
+    if ($showIntro) {
+        $result = ContestController::getContestDetailsForSmarty($r);
+    }
 } catch (ApiException $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
 }
 
-foreach ($result['smartyProperties'] as $key => $value) {
-    $smarty->assign($key, $value);
-}
-
-if ($result['shouldShowIntro']) {
+if ($showIntro) {
+    foreach ($result as $key => $value) {
+        $smarty->assign($key, $value);
+    }
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.contestant.tpl');

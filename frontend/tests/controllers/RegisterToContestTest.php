@@ -40,11 +40,8 @@ class RegisterToContestTest extends OmegaupTestCase {
             // Expected contestNotStarted exception. Continue.
         }
 
-        $show_intro =
-            ContestController::getContestDetailsForSmartyAndShouldShowintro(
-                $request2
-            )['shouldShowIntro'];
-        $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
+        $showIntro = ContestController::showIntro($request2);
+        $this->assertEquals($showIntro, ContestController::SHOW_INTRO);
 
         // Contest is going on right now
         $adminLogin = self::login($contestAdmin);
@@ -56,11 +53,8 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
 
-        $show_intro =
-            ContestController::getContestDetailsForSmartyAndShouldShowintro(
-                $request2
-            )['shouldShowIntro'];
-        $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
+        $showIntro = ContestController::showIntro($request2);
+        $this->assertEquals($showIntro, ContestController::SHOW_INTRO);
 
         $contestantLogin = self::login($contestant);
         $request2 = new Request([
@@ -72,10 +66,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $response = ContestController::apiOpen($request2);
 
         // Now that i have joined the contest, i should not see the intro
-        $showIntro =
-            ContestController::getContestDetailsForSmartyAndShouldShowintro(
-                $request2
-            )['shouldShowIntro'];
+        $showIntro = ContestController::showIntro($request2);
         $this->assertEquals($showIntro, !ContestController::SHOW_INTRO);
     }
 
@@ -95,12 +86,9 @@ class RegisterToContestTest extends OmegaupTestCase {
             'auth_token' => $contestantLogin->auth_token,
         ]);
 
-        $show_intro =
-            ContestController::getContestDetailsForSmartyAndShouldShowintro(
-                $request
-            )['shouldShowIntro'];
+        $showIntro = ContestController::showIntro($request);
 
-        $this->assertEquals(1, $show_intro);
+        $this->assertEquals(1, $showIntro);
     }
 
     //pruebas (público, privado) x (usuario mortal, admin, invitado)

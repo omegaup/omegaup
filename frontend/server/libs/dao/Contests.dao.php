@@ -796,8 +796,8 @@ class ContestsDAO extends ContestsDAOBase {
             throw new NotFoundException('problemsetNotFound');
         }
         return [
-            $rs['needs_basic_information'] == '1',
-            $rs['requests_user_information']
+            'needsBasicInformation' => $rs['needs_basic_information'] == '1',
+            'requestsUserInformation' => $rs['requests_user_information']
         ];
     }
 

@@ -84,7 +84,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $userLogin = self::login($user[0]);
 
         $contestDetails =
-            ContestController::getContestDetailsForSmartyAndShouldShowintro(
+            ContestController::getContestDetailsForSmarty(
                 new Request([
                     'auth_token' => $userLogin->auth_token,
                     'contest_alias' => $contestData['request']['alias'],
@@ -96,9 +96,9 @@ class ContestUsersTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
-                $contestDetails['smartyProperties']['privacyStatement']['gitObjectId'],
+                $contestDetails['privacyStatement']['gitObjectId'],
             'statement_type' =>
-                $contestDetails['smartyProperties']['privacyStatement']['statementType'],
+                $contestDetails['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
@@ -125,9 +125,9 @@ class ContestUsersTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
-                $contestDetails['smartyProperties']['privacyStatement']['gitObjectId'],
+                $contestDetails['privacyStatement']['gitObjectId'],
             'statement_type' =>
-                $contestDetails['smartyProperties']['privacyStatement']['statementType'],
+                $contestDetails['privacyStatement']['statementType'],
             'share_user_information' => 0,
         ]));
 
@@ -143,9 +143,9 @@ class ContestUsersTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
-                $contestDetails['smartyProperties']['privacyStatement']['gitObjectId'],
+                $contestDetails['privacyStatement']['gitObjectId'],
             'statement_type' =>
-                $contestDetails['smartyProperties']['privacyStatement']['statementType'],
+                $contestDetails['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
@@ -153,6 +153,45 @@ class ContestUsersTest extends OmegaupTestCase {
 
         // Now there are two participants sharing their information
         $this->assertEquals(2, self::usersSharingUserInformation($response['contestants']));
+    }
+
+    public function testContestCanBeSeenByUnloggedUsers() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        $showIntro =
+            ContestController::showIntro(
+                new Request([
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
+
+        $this->assertTrue($showIntro);
+    }
+
+    public function testNeedsBasicInformation() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'basic_information' => 'true'
+        ]));
+
+        // Create and login a user to view the contest
+        $user = UserFactory::createUser();
+        $userLogin = self::login($user);
+
+        $r = new Request([
+            'auth_token' => $userLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]);
+
+        // Contest intro can be shown by the user
+        $showIntro = ContestController::showIntro($r);
+        $this->assertTrue($showIntro);
+
+        // Contest needs basic information for the user
+        $contestDetails = ContestController::getContestDetailsForSmarty($r);
+
+        $this->assertTrue($contestDetails['needsBasicInformation']);
     }
 
     private static function usersSharingUserInformation($contestants) {
@@ -163,19 +202,5 @@ class ContestUsersTest extends OmegaupTestCase {
             }
         }
         return $numberOfContestants;
-    }
-
-    public function testContestCanBeSeenByUnloggedUsers() {
-        // Get a contest
-        $contestData = ContestsFactory::createContest();
-
-        $contestDetails =
-            ContestController::getContestDetailsForSmartyAndShouldShowintro(
-                new Request([
-                    'contest_alias' => $contestData['request']['alias'],
-                ])
-            );
-
-        $this->assertEquals(1, $contestDetails['shouldShowIntro']);
     }
 }

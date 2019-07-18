@@ -263,8 +263,6 @@ class InterviewController extends Controller {
     }
 
     public static function showIntro(Request $r) {
-        return ContestController::getContestDetailsForSmartyAndShouldShowintro(
-            $r
-        )['shouldShowIntro'];
+        return ContestController::showIntro($r);
     }
 }
