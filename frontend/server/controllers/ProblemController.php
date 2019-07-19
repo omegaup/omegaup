@@ -2569,9 +2569,10 @@ class ProblemController extends Controller {
     public static function getProblemDetailsForSmarty(
         Request $r
     ) : array {
-        $problem = self::getValidProblemAndProblemset($r);
+        $problemsetWithProblem = self::getValidProblemAndProblemset($r);
+        $problem = $problemsetWithProblem['problem'];
         // Get problem details from API
-        $details = self::getProblemDetails($r, $problem, /*showSolvers=*/true);
+        $details = self::getProblemDetails($r, $problemsetWithProblem, /*showSolvers=*/true);
 
         $memoryLimit = (int) $details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
         $result = [
