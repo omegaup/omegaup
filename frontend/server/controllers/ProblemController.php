@@ -1366,10 +1366,18 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiDetails(Request $r) : array {
-        return self::getProblemDetails($r);
+        if (!isset($r['show_solvers'])) {
+            return self::getProblemDetails($r);
+        }
+        $r->ensureBool('show_solvers');
+        return self::getProblemDetails($r, $r['show_solvers']);
     }
 
-    private static function getProblemDetails(Request $r) : array {
+    private static function getProblemDetails(
+        Request $r,
+        bool $showSolvers = false,
+        bool $showProblemObject = false
+    ) : array {
         // Get user.
         // Allow unauthenticated requests if we are not opening a problem
         // inside a contest.
@@ -1530,8 +1538,10 @@ class ProblemController extends Controller {
                     throw new InvalidDatabaseOperationException($e);
                 }
             }
-        } elseif (!empty($r['show_solvers'])) {
-            $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem((int)$problem['problem']->problem_id);
+        } elseif ($showSolvers) {
+            $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem(
+                (int)$problem['problem']->problem_id
+            );
         }
 
         if (!is_null($r->identity)) {
@@ -1558,6 +1568,9 @@ class ProblemController extends Controller {
         }
         $response['status'] = 'ok';
         $response['exists'] = true;
+        if ($showProblemObject) {
+            $response['problem'] = $problem['problem'];
+        }
         return $response;
     }
 
@@ -2552,11 +2565,12 @@ class ProblemController extends Controller {
         Request $r
     ) : array {
         // Get problem details from API
-        $r['show_solvers'] = true;
-        $details = self::getProblemDetails($r);
-
-        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-        $problem = ProblemsDAO::GetByAlias($r['problem_alias']);
+        $details = self::getProblemDetails(
+            $r,
+            true, /* show solvers */
+            true  /* show problem object */
+        );
+        $problem = $details['problem'];
 
         $memoryLimit = (int) $details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
         $result = [
