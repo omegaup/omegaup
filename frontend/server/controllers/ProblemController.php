@@ -1366,21 +1366,20 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiDetails(Request $r) : array {
-        if (!isset($r['show_solvers'])) {
-            return self::getProblemDetails($r);
-        }
-        $r->ensureBool('show_solvers');
-        return self::getProblemDetails($r, $r['show_solvers']);
+        $r->ensureBool('show_solvers', /*required=*/false);
+        $problem = self::getValidProblemAndProblemset($r);
+        return self::getProblemDetails($r, $problem);
     }
 
-    private static function getProblemDetails(
-        Request $r,
-        bool $showSolvers = false,
-        bool $showProblemObject = false
-    ) : array {
-        // Get user.
-        // Allow unauthenticated requests if we are not opening a problem
-        // inside a contest.
+    /**
+     * Get user. Allow unauthenticated requests if we are not opening a problem
+     * inside a contest
+     *
+     * @param Request $r
+     * @return Problems
+     * @throws UnauthorizedException
+     */
+    private static function getValidProblemAndProblemset(Request $r) : array {
         try {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
@@ -1389,14 +1388,23 @@ class ProblemController extends Controller {
             }
         }
 
-        // Validate request
-        $problem = self::validateDetails($r);
-        if (is_null($problem)) {
-            return [
-                'status' => 'ok',
-                'exists' => false,
-            ];
-        }
+        // Validate request and return the object
+        return self::validateDetails($r);
+    }
+
+    /**
+     * Get the extra problem details with all the validations
+     * @param Request $r
+     * @param Problems $problem
+     * @param bool $showSolvers
+     * @return array
+     * @throws InvalidDatabaseOperationException
+     */
+    private static function getProblemDetails(
+        Request $r,
+        array $problem,
+        bool $showSolvers = false
+    ) : array {
         $response = [];
 
         // Get the expected commit version.
@@ -1538,7 +1546,7 @@ class ProblemController extends Controller {
                     throw new InvalidDatabaseOperationException($e);
                 }
             }
-        } elseif ($showSolvers) {
+        } elseif ($showSolvers || (!empty($r['show_solvers']) && $r['show_solvers'])) {
             $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem(
                 (int)$problem['problem']->problem_id
             );
@@ -1568,9 +1576,6 @@ class ProblemController extends Controller {
         }
         $response['status'] = 'ok';
         $response['exists'] = true;
-        if ($showProblemObject) {
-            $response['problem'] = $problem['problem'];
-        }
         return $response;
     }
 
@@ -2564,13 +2569,9 @@ class ProblemController extends Controller {
     public static function getProblemDetailsForSmarty(
         Request $r
     ) : array {
+        $problem = self::getValidProblemAndProblemset($r);
         // Get problem details from API
-        $details = self::getProblemDetails(
-            $r,
-            true, /* show solvers */
-            true  /* show problem object */
-        );
-        $problem = $details['problem'];
+        $details = self::getProblemDetails($r, $problem, /*showSolvers=*/true);
 
         $memoryLimit = (int) $details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
         $result = [
