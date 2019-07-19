@@ -24,13 +24,6 @@ let ScoreboardColors = [
 ];
 
 export function GetOptionsFromLocation(arenaLocation) {
-  const elementPayload = document.getElementById('payload');
-  let shouldShowFirstAssociatedIdentityRunWarning = false;
-  if (elementPayload != null) {
-    const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    shouldShowFirstAssociatedIdentityRunWarning =
-        payload.shouldShowFirstAssociatedIdentityRunWarning;
-  }
   let options = {
     isLockdownMode: false,
     isInterview: false,
@@ -40,6 +33,7 @@ export function GetOptionsFromLocation(arenaLocation) {
     disableSockets: false,
     contestAlias: null,
     scoreboardToken: null,
+    shouldShowFirstAssociatedIdentityRunWarning: false,
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -69,8 +63,12 @@ export function GetOptionsFromLocation(arenaLocation) {
   if (arenaLocation.search.indexOf('ws=off') !== -1) {
     options.disableSockets = true;
   }
-  options.shouldShowFirstAssociatedIdentityRunWarning =
-      shouldShowFirstAssociatedIdentityRunWarning;
+  const elementPayload = document.getElementById('payload');
+  if (elementPayload != null) {
+    const payload = JSON.parse(elementPayload.firstChild.nodeValue);
+    options.shouldShowFirstAssociatedIdentityRunWarning =
+        payload.shouldShowFirstAssociatedIdentityRunWarning;
+  }
   return options;
 }
 

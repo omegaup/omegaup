@@ -73,8 +73,13 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
                 $session['user']
             );
     }
-    $smarty->assign('payload', ['shouldShowFirstAssociatedIdentityRunWarning' =>
-        $shouldShowFirstAssociatedIdentityRunWarning,
+    $smarty->assign('payload', [
+        'shouldShowFirstAssociatedIdentityRunWarning' =>
+            !is_null($session['user']) &&
+            !UserController::isMainIdentity($session['user'], $session['identity'])
+            && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                $session['user']
+            ),
     ]);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {
