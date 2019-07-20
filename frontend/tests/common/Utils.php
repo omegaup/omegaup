@@ -241,6 +241,7 @@ class Utils {
             'Notifications',
             'PrivacyStatement_Consent_Log',
             'Problems',
+            'Problems_Forfeited',
             'Problems_Languages',
             'Problems_Tags',
             'Problemset_Access_Log',
