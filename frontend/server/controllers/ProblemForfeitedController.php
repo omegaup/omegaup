@@ -14,15 +14,15 @@ class ProblemForfeitedController extends Controller {
    * @return array
    * @throws InvalidDatabaseOperationException
    */
-  public static function apiGetCounts(Request $r) {
-    self::authenticateRequest($r);
-    if (is_null($r->user) || is_null($r->identity)) {
-      throw new NotFoundException('userNotExist');
+    public static function apiGetCounts(Request $r) {
+        self::authenticateRequest($r);
+        if (is_null($r->user) || is_null($r->identity)) {
+            throw new NotFoundException('userNotExist');
+        }
+        return [
+            'status' => 'ok',
+            'solved' => ProblemsDAO::getProblemsSolvedCount($r->identity->identity_id),
+            'forfeited' => ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user->user_id),
+        ];
     }
-    return [
-      'status' => 'ok',
-      'solved' => ProblemsDAO::getProblemsSolvedCount($r->identity->identity_id),
-      'forfeited' => ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user->user_id),
-    ];
-  }
 }
