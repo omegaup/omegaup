@@ -21,8 +21,8 @@ class ProblemForfeitedController extends Controller {
         }
         return [
             'status' => 'ok',
-            'solved' => ProblemsDAO::getProblemsSolvedCount($r->identity->identity_id),
-            'forfeited' => ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user->user_id),
+            'allowed' => intval(ProblemsDAO::getProblemsSolvedCount($r->identity->identity_id) / 10),
+            'seen' => ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user->user_id),
         ];
     }
 }
