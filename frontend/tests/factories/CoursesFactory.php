@@ -14,7 +14,7 @@ class CoursesFactory {
         }
         $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
         if ($public != false) {
-            $curatorGroup = GroupsDAO::FindByAlias(
+            $curatorGroup = GroupsDAO::findByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
@@ -67,6 +67,7 @@ class CoursesFactory {
 
         // Create the assignment
         $assignmentAlias = Utils::CreateRandomString();
+        $course = CoursesDAO::getByAlias($courseAlias);
 
         $r = new Request([
             'auth_token' => $adminLogin->auth_token,
@@ -77,9 +78,9 @@ class CoursesFactory {
             'finish_time' => Utils::GetPhpUnixTimestamp() + 120,
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework',
+            'course' => $course,
         ]);
         $assignmentResult = CourseController::apiCreateAssignment($r);
-        $course = CoursesDAO::getByAlias($courseAlias);
         $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         return [
             'course' => $course,

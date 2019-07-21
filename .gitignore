@@ -5,6 +5,7 @@ bin/mysql-connector-java-5.1.29.jar
 # Ignore temporary files
 *~
 *.swp
+*.swo
 *.pyc
 .pytest_cache/
 .cache
@@ -47,6 +48,7 @@ yarn-error.log
 #ignore crated-by-test stuff
 frontend/server/api/tests/problems/
 frontend/server/api/tests/submissions/
+frontend/tests/controllers/gitserver.config.json
 frontend/tests/controllers/gitserver.log
 frontend/tests/controllers/gitserver.pid
 frontend/tests/controllers/grade/
@@ -91,6 +93,9 @@ frontend/www/js/dist/
 
 # Ignore SASS-CSS build files.
 frontend/www/css/dist/
+
+# Ignore media/dist folder
+frontend/www/media/dist/
 
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp

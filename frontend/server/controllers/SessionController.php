@@ -392,20 +392,35 @@ class SessionController extends Controller {
 
         try {
             $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
-            $r['user_id'] = $identity->user_id;
-            $r['identity_id'] = $identity->identity_id;
-            $r['user'] = $identity;
         } catch (ApiException $e) {
             self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
             return false;
         }
 
-        if (!UserController::testPassword($identity, $r['password'])) {
-            self::$log->warn("Identity {$r['usernameOrEmail']} has introduced invalid credentials.");
+        if (!IdentityController::testPassword($identity, $r['password'])) {
+            self::$log->warn("Identity {$identity->username} has introduced invalid credentials.");
             return false;
         }
+        if (SecurityTools::isOldHash($identity->password)) {
+            // Update the password using the new Argon2i algorithm.
+            self::$log->warn("Identity {$identity->username}'s password hash is being upgraded.");
+            try {
+                DAO::transBegin();
+                $identity->password = SecurityTools::hashString($r['password']);
+                IdentitiesDAO::update($identity);
+                if (!is_null($identity->user_id)) {
+                    $user = UsersDAO::getByPK($identity->user_id);
+                    $user->password = $identity->password;
+                    UsersDAO::update($user);
+                }
+                DAO::transEnd();
+            } catch (Exception $e) {
+                DAO::transRollback();
+                throw $e;
+            }
+        }
 
-        self::$log->info("Identity {$r['usernameOrEmail']} has logged in natively.");
+        self::$log->info("Identity {$identity->username} has logged in natively.");
 
         if (!is_null($identity->user_id)) {
             $user = UsersDAO::getByPK($identity->user_id);
@@ -491,7 +506,7 @@ class SessionController extends Controller {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }
-            $identity = IdentitiesDAO::FindByUsername($res['username']);
+            $identity = IdentitiesDAO::findByUsername($res['username']);
         }
 
         $this->RegisterSession($identity);

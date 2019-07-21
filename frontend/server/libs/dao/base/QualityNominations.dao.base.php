@@ -161,7 +161,7 @@ abstract class QualityNominationsDAOBase {
             $QualityNominations->nomination = 'suggestion';
         }
         if (is_null($QualityNominations->time)) {
-            $QualityNominations->time = gmdate('Y-m-d H:i:s');
+            $QualityNominations->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($QualityNominations->status)) {
             $QualityNominations->status = 'open';

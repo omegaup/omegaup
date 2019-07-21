@@ -540,10 +540,10 @@ padding-right: 5px;
 .no-bottom-margin { margin-bottom: 0; }
 .no-right-padding { padding-right: 0; }
 
-#problem .statement p { text-align: justify; }
-#problem .statement li { text-align: justify; }
-#problem .statement h1 { font-weight: bold; }
-#problem .statement ul {
+.statement p { text-align: justify; }
+.statement li { text-align: justify; }
+.statement h1 { font-weight: bold; }
+.statement ul {
 	list-style: initial;
 	padding-left: 2em;
 }

@@ -157,7 +157,7 @@ abstract class QualityNominationCommentsDAOBase {
      */
     final public static function create(QualityNominationComments $QualityNomination_Comments) {
         if (is_null($QualityNomination_Comments->time)) {
-            $QualityNomination_Comments->time = gmdate('Y-m-d H:i:s');
+            $QualityNomination_Comments->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?);';
         $params = [

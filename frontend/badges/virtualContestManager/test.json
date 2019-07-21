@@ -1,0 +1,69 @@
+{
+  "testType": "apicall",
+  "actions": [
+    {
+      "type": "apicalls",
+      "apicalls": [
+        {
+          "username": "admintest",
+          "password": "testtesttest",
+          "requests": [
+            {
+              "api": "UserController::apiCreate",
+              "params": {
+                "username": "test_user_0",
+                "email": "user_0@domain.com",
+                "password": "test_user_0"
+              }
+            },
+            {
+              "api": "UserController::apiCreate",
+              "params": {
+                "username": "test_user_1",
+                "email": "user_1@domain.com",
+                "password": "test_user_1"
+              }
+            }
+          ]
+        },
+        {
+          "username": "test_user_0",
+          "password": "test_user_0",
+          "requests": [
+            {
+              "api": "ContestController::apiCreate",
+              "params": {
+                "visibility": 1,
+                "title": "Prueba",
+                "alias": "prueba",
+                "description": "Concurso de prueba",
+                "start_time": "1560786190",
+                "finish_time": "1560872590",
+                "window_length": "0",
+                "scoreboard": 100,
+                "points_decay_factor": 0,
+                "partial_score": 1,
+                "submissions_gap": 1200,
+                "feedback": "yes",
+                "penalty_type": "contest_start",
+                "penalty_calc_policy": "sum",
+                "admission_mode": "private",
+                "show_scoreboard_after": "true"
+              }
+            },
+            {
+              "api": "ContestController::apiCreateVirtual",
+              "params": {
+                "alias": "prueba",
+                "start_time": "1560958990"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "expectedResults": [
+    "test_user_0"
+  ]
+}

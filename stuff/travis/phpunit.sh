@@ -33,6 +33,9 @@ stage_script() {
 		--configuration=frontend/tests/phpunit.xml \
 		--coverage-clover=coverage.xml \
 		frontend/tests/controllers
+	phpunit --bootstrap frontend/tests/bootstrap.php \
+		--configuration=frontend/tests/phpunit.xml \
+		frontend/tests/badges
 	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
 	python3 stuff/policy-tool.py --database=omegaup-test validate
 }

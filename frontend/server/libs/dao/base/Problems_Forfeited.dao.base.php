@@ -8,20 +8,20 @@
   *                                                                                 *
   * ******************************************************************************* */
 
-/** Badges Data Access Object (DAO) Base.
+/** ProblemsForfeited Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Badges}.
+ * {@link ProblemsForfeited}.
  * @access public
  * @abstract
  *
  */
-abstract class BadgesDAOBase {
+abstract class ProblemsForfeitedDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link Badges}
+     * Este metodo guarda el estado actual del objeto {@link ProblemsForfeited}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,14 +30,14 @@ abstract class BadgesDAOBase {
      *
      * @static
      * @throws Exception si la operacion fallo.
-     * @param Badges [$Badges] El objeto de tipo Badges
+     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Badges $Badges) {
-        if (is_null(self::getByPK($Badges->badge_id))) {
-            return BadgesDAOBase::create($Badges);
+    final public static function save(ProblemsForfeited $Problems_Forfeited) {
+        if (is_null(self::getByPK($Problems_Forfeited->problem_forfeited_id))) {
+            return ProblemsForfeitedDAOBase::create($Problems_Forfeited);
         }
-        return BadgesDAOBase::update($Badges);
+        return ProblemsForfeitedDAOBase::update($Problems_Forfeited);
     }
 
     /**
@@ -45,16 +45,15 @@ abstract class BadgesDAOBase {
      *
      * @static
      * @return Filas afectadas
-     * @param Badges [$Badges] El objeto de tipo Badges a actualizar.
+     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a actualizar.
      */
-    final public static function update(Badges $Badges) {
-        $sql = 'UPDATE `Badges` SET `name` = ?, `image_url` = ?, `description` = ?, `hint` = ? WHERE `badge_id` = ?;';
+    final public static function update(ProblemsForfeited $Problems_Forfeited) {
+        $sql = 'UPDATE `Problems_Forfeited` SET `user_id` = ?, `problem_id` = ?, `forfeited_date` = ? WHERE `problem_forfeited_id` = ?;';
         $params = [
-            $Badges->name,
-            $Badges->image_url,
-            $Badges->description,
-            $Badges->hint,
-            is_null($Badges->badge_id) ? null : (int)$Badges->badge_id,
+            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
+            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
+            $Problems_Forfeited->forfeited_date,
+            is_null($Problems_Forfeited->problem_forfeited_id) ? null : (int)$Problems_Forfeited->problem_forfeited_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -62,33 +61,33 @@ abstract class BadgesDAOBase {
     }
 
     /**
-     * Obtener {@link Badges} por llave primaria.
+     * Obtener {@link ProblemsForfeited} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Badges} de la base
+     * Este metodo cargará un objeto {@link ProblemsForfeited} de la base
      * de datos usando sus llaves primarias.
      *
      * @static
-     * @return @link Badges Un objeto del tipo {@link Badges}. NULL si no hay tal registro.
+     * @return @link ProblemsForfeited Un objeto del tipo {@link ProblemsForfeited}. NULL si no hay tal registro.
      */
-    final public static function getByPK($badge_id) {
-        if (is_null($badge_id)) {
+    final public static function getByPK($problem_forfeited_id) {
+        if (is_null($problem_forfeited_id)) {
             return null;
         }
-        $sql = 'SELECT `Badges`.`badge_id`, `Badges`.`name`, `Badges`.`image_url`, `Badges`.`description`, `Badges`.`hint` FROM Badges WHERE (badge_id = ?) LIMIT 1;';
-        $params = [$badge_id];
+        $sql = 'SELECT `Problems_Forfeited`.`problem_forfeited_id`, `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (problem_forfeited_id = ?) LIMIT 1;';
+        $params = [$problem_forfeited_id];
         global $conn;
         $row = $conn->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new Badges($row);
+        return new ProblemsForfeited($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Badges suministrado. Una vez que se ha
+     * el objeto ProblemsForfeited suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
      * {@link save()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
@@ -98,11 +97,11 @@ abstract class BadgesDAOBase {
      *
      * @static
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Badges [$Badges] El objeto de tipo Badges a eliminar
+     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a eliminar
      */
-    final public static function delete(Badges $Badges) {
-        $sql = 'DELETE FROM `Badges` WHERE badge_id = ?;';
-        $params = [$Badges->badge_id];
+    final public static function delete(ProblemsForfeited $Problems_Forfeited) {
+        $sql = 'DELETE FROM `Problems_Forfeited` WHERE problem_forfeited_id = ?;';
+        $params = [$Problems_Forfeited->problem_forfeited_id];
         global $conn;
 
         $conn->Execute($sql, $params);
@@ -115,7 +114,7 @@ abstract class BadgesDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Badges}.
+     * y construirá un arreglo que contiene objetos de tipo {@link ProblemsForfeited}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -126,10 +125,10 @@ abstract class BadgesDAOBase {
      * @param $filasPorPagina Filas por página.
      * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Badges}.
+     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsForfeited}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Badges`.`badge_id`, `Badges`.`name`, `Badges`.`image_url`, `Badges`.`description`, `Badges`.`hint` from Badges';
+        $sql = 'SELECT `Problems_Forfeited`.`problem_forfeited_id`, `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` from Problems_Forfeited';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -139,7 +138,7 @@ abstract class BadgesDAOBase {
         }
         $allData = [];
         foreach ($conn->GetAll($sql) as $row) {
-            $allData[] = new Badges($row);
+            $allData[] = new ProblemsForfeited($row);
         }
         return $allData;
     }
@@ -148,22 +147,21 @@ abstract class BadgesDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Badges suministrado.
+     * contenidos del objeto ProblemsForfeited suministrado.
      *
      * @static
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Badges [$Badges] El objeto de tipo Badges a crear.
+     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a crear.
      */
-    final public static function create(Badges $Badges) {
-        if (is_null($Badges->name)) {
-            $Badges->name = 'MyBadge';
+    final public static function create(ProblemsForfeited $Problems_Forfeited) {
+        if (is_null($Problems_Forfeited->forfeited_date)) {
+            $Problems_Forfeited->forfeited_date = gmdate('Y-m-d H:i:s', Time::get());
         }
-        $sql = 'INSERT INTO Badges (`name`, `image_url`, `description`, `hint`) VALUES (?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
         $params = [
-            $Badges->name,
-            $Badges->image_url,
-            $Badges->description,
-            $Badges->hint,
+            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
+            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
+            $Problems_Forfeited->forfeited_date,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -171,7 +169,7 @@ abstract class BadgesDAOBase {
         if ($ar == 0) {
             return 0;
         }
-        $Badges->badge_id = $conn->Insert_ID();
+        $Problems_Forfeited->problem_forfeited_id = $conn->Insert_ID();
 
         return $ar;
     }

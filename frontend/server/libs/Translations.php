@@ -25,7 +25,7 @@ class Translations {
      * @return self
      */
     private function __construct() {
-        $lang = UserController::getPreferredLanguage(new Request());
+        $lang = IdentityController::getPreferredLanguage(new Request());
         $filename = OMEGAUP_ROOT . "/templates/{$lang}.lang";
         foreach (new RegexIterator(
             new SplFileObject($filename),

@@ -842,4 +842,56 @@ class ContestsDAO extends ContestsDAOBase {
         }
         return ['type' => FilteredStatus::FULLTEXT, 'query' => join(' ', $result)];
     }
+
+    public static function getContestantsInfo($contestId) {
+        $sql = '
+            SELECT
+                i.name,
+                u.username,
+                IF(pi.share_user_information, e.email, NULL) AS email,
+                IF(pi.share_user_information, st.name, NULL) AS state,
+                IF(pi.share_user_information, cn.name, NULL) AS country,
+                IF(pi.share_user_information, sc.name, NULL) AS school
+            FROM
+                Users u
+            INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
+            INNER JOIN
+                Emails e ON e.email_id = u.main_email_id
+            LEFT JOIN
+                States st ON st.state_id = i.state_id AND st.country_id = i.country_id
+            LEFT JOIN
+                Countries cn ON cn.country_id = i.country_id
+            LEFT JOIN
+                Schools sc ON sc.school_id = i.school_id
+            INNER JOIN
+                Problemset_Identities pi ON pi.identity_id = i.identity_id
+            INNER JOIN
+                Contests c ON c.problemset_id = pi.problemset_id
+            WHERE
+                c.contest_id = ?;
+        ';
+
+        global $conn;
+
+        return $conn->GetAll($sql, [$contestId]);
+    }
+
+    public static function requestsUserInformation($contestId) {
+        $sql = '
+            SELECT
+                requests_user_information
+            FROM
+                Problemsets p
+            WHERE
+                contest_id = ?
+            LIMIT 1;
+        ';
+
+        global $conn;
+
+        $requestsUsersInfo = $conn->GetOne($sql, [$contestId]);
+
+        return $requestsUsersInfo == 'yes' || $requestsUsersInfo == 'optional';
+    }
 }

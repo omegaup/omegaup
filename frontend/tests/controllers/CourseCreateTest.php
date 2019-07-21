@@ -6,7 +6,7 @@ class CourseCreateTest extends OmegaupTestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $curatorGroup = GroupsDAO::FindByAlias(
+        $curatorGroup = GroupsDAO::findByAlias(
             Authorization::COURSE_CURATOR_GROUP_ALIAS
         );
 
@@ -299,9 +299,17 @@ class CourseCreateTest extends OmegaupTestCase {
         $course = CoursesDAO::getByPK($courseData['request']['course']->course_id);
         $studentLogin = OmegaupTestCase::login($student);
         // Scoreboard have to be visible to associated user
-        $this->assertTrue(CourseController::shouldShowScoreboard($identityStudent->identity_id, $course, $group));
+        $this->assertTrue(CourseController::shouldShowScoreboard(
+            $identityStudent,
+            $course,
+            $group
+        ));
         // But, Scoreboard shouldn't  be visible to unassociated user
-        $this->assertFalse(CourseController::shouldShowScoreboard($identityUser->identity_id, $course, $group));
+        $this->assertFalse(CourseController::shouldShowScoreboard(
+            $identityUser,
+            $course,
+            $group
+        ));
 
         // Turning off show_scoreboard flag
         CourseController::apiUpdate(new Request([
@@ -316,7 +324,15 @@ class CourseCreateTest extends OmegaupTestCase {
         $course = CoursesDAO::getByPK($courseData['request']['course']->course_id);
 
         // Scoreboard shouldn't be visible to associated or unassociated user
-        $this->assertFalse(CourseController::shouldShowScoreboard($identityStudent->identity_id, $course, $group));
-        $this->assertFalse(CourseController::shouldShowScoreboard($identityUser->identity_id, $course, $group));
+        $this->assertFalse(CourseController::shouldShowScoreboard(
+            $identityStudent,
+            $course,
+            $group
+        ));
+        $this->assertFalse(CourseController::shouldShowScoreboard(
+            $identityUser,
+            $course,
+            $group
+        ));
     }
 }

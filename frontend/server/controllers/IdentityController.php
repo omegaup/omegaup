@@ -6,21 +6,6 @@
  * @author juan.pablo
  */
 class IdentityController extends Controller {
-    public static function convertFromUser(Users $user) {
-        return IdentitiesDAO::save(new Identities([
-            'identity_id' => $user->main_identity_id,
-            'username' => $user->username,
-            'password' => $user->password,
-            'name' => $user->name,
-            'user_id' => $user->user_id,
-            'language_id' => $user->language_id,
-            'country_id' => $user->country_id,
-            'state_id' => $user->state_id,
-            'school_id' => $user->school_id,
-            'gender' => $user->gender,
-        ]));
-    }
-
     /**
      * Given a username or a email, returns the identity object
      *
@@ -36,7 +21,7 @@ class IdentityController extends Controller {
                 return $identity;
             }
 
-            $identity = IdentitiesDAO::FindByUsername($userOrEmail);
+            $identity = IdentitiesDAO::findByUsername($userOrEmail);
             if (!is_null($identity)) {
                 return $identity;
             }
@@ -44,6 +29,31 @@ class IdentityController extends Controller {
         } catch (ApiException $apiException) {
             throw $apiException;
         }
+    }
+
+    /**
+     * Tests a if a password is valid for a given identity.
+     *
+     * @param Identities $identity    The identity.
+     * @param string     $password    The password.
+     * @return bool                   Whether the password is valid.
+     * @throws LoginDisabledException When the identity is not allowed to login
+     *                                using a password.
+     */
+    public static function testPassword(Identities $identity, string $password) : bool {
+        if (is_null($identity->password)) {
+            // The user had logged in through a third-party account.
+            throw new LoginDisabledException('loginThroughThirdParty');
+        }
+
+        if (strlen($identity->password) === 0) {
+            throw new LoginDisabledException('loginDisabled');
+        }
+
+        return SecurityTools::compareHashedStrings(
+            $password,
+            $identity->password
+        );
     }
 
     /**
@@ -141,10 +151,10 @@ class IdentityController extends Controller {
      */
     private static function validateGroupOwnership(Request $r) {
         self::authenticateRequest($r);
-        if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
+        if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
-        $group = GroupController::validateGroup($r['group_alias'], $r['current_identity_id']);
+        $group = GroupController::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -213,7 +223,7 @@ class IdentityController extends Controller {
         global $experiments;
         $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
-        $original_identity = self::resolveIdentity($r['username']);
+        $originalIdentity = self::resolveIdentity($r['original_username']);
 
         // Prepare DAOs
         $identity = self::updateIdentity(
@@ -224,13 +234,15 @@ class IdentityController extends Controller {
             $r['gender'],
             $r['school_name'],
             $r['group_alias'],
-            $original_identity
+            $originalIdentity
         );
 
-        $identity->identity_id = $original_identity->identity_id;
+        $identity->identity_id = $originalIdentity->identity_id;
 
         // Save in DB
         IdentitiesDAO::save($identity);
+
+        Cache::deleteFromCache(Cache::USER_PROFILE, $identity->username);
 
         return [
             'status' => 'ok',
@@ -273,10 +285,10 @@ class IdentityController extends Controller {
      */
     private static function validateUpdateRequest(Request $r) {
         self::authenticateRequest($r);
-        if (!Authorization::isGroupIdentityCreator($r['current_identity_id'])) {
+        if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
-        GroupController::validateGroup($r['group_alias'], $r['current_identity_id']);
+        GroupController::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -348,8 +360,13 @@ class IdentityController extends Controller {
      * @param Request $r
      * @return type
      */
-    public static function getProfile(Request $r) {
-        if (is_null($r['identity'])) {
+    public static function getProfile(
+        Request $r,
+        ?Identities $identity,
+        ?Users $user,
+        bool $omitRank
+    ) : array {
+        if (is_null($identity)) {
             throw new InvalidParameterException('parameterNotFound', 'Identity');
         }
 
@@ -357,33 +374,39 @@ class IdentityController extends Controller {
 
         Cache::getFromCacheOrSet(
             Cache::USER_PROFILE,
-            $r['identity']->username,
-            $r,
-            function (Request $r) {
-                if (!is_null($r['user'])) {
-                    return UserController::getProfileImpl($r['user'], $r['identity']);
+            $identity->username,
+            [$identity, $user],
+            function (array $params) {
+                [$identity, $user] = $params;
+                if (!is_null($user)) {
+                    return UserController::getProfileImpl($user, $identity);
                 }
-                return IdentityController::getProfileImpl($r['identity']);
+                return IdentityController::getProfileImpl($identity);
             },
             $response
         );
 
-        if (!empty($r['omit_rank'])) {
-            $response['userinfo']['rankinfo'] = UserController::getRankByProblemsSolved($r);
-        } else {
+        if ($omitRank) {
             $response['userinfo']['rankinfo'] = [];
+        } else {
+            $response['userinfo']['rankinfo'] =
+                UserController::getRankByProblemsSolved($r, $identity);
         }
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged identity's one. Admins can see emails
-        if (Authorization::isSystemAdmin($r['current_identity_id'])
-              || $r['identity']->identity_id == $r['current_identity_id']) {
+        if (!is_null($r->identity)
+            && (Authorization::isSystemAdmin($r->identity->identity_id)
+                || $identity->identity_id == $r->identity->identity_id)
+        ) {
             return $response;
         }
 
         // Mentors can see current coder of the month email.
-        if (Authorization::canViewEmail($r['current_identity_id']) &&
-              CoderOfTheMonthDAO::isLastCoderOfTheMonth($r['identity']->username)) {
+        if (!is_null($r->identity)
+            && Authorization::canViewEmail($r->identity->identity_id)
+            && CoderOfTheMonthDAO::isLastCoderOfTheMonth($identity->username)
+        ) {
             return $response;
         }
         unset($response['userinfo']['email']);
@@ -397,7 +420,7 @@ class IdentityController extends Controller {
      * @return array
      * @throws InvalidDatabaseOperationException
      */
-    public static function getProfileImpl(Identities $identity) {
+    private static function getProfileImpl(Identities $identity) {
         try {
             $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
 
@@ -419,6 +442,73 @@ class IdentityController extends Controller {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
+    }
+
+    /**
+     * Returns the prefered language as a string (en,es,fra) of the identity given
+     * If no identity is given, language is retrived from the browser.
+     *
+     * @return String
+     */
+    public static function getPreferredLanguage(Request $r) {
+        // for quick debugging
+        if (isset($_GET['lang'])) {
+            return self::convertToSupportedLanguage($_GET['lang']);
+        }
+
+        try {
+            $identity = self::resolveTargetIdentity($r);
+            if (!is_null($identity) && !is_null($identity->language_id)) {
+                $result = LanguagesDAO::getByPK($identity->language_id);
+                if (is_null($result)) {
+                    self::$log->warn('Invalid language id for identity');
+                } else {
+                    return IdentityController::convertToSupportedLanguage($result->name);
+                }
+            }
+        } catch (NotFoundException $ex) {
+            self::$log->debug($ex);
+        } catch (InvalidParameterException $ex) {
+            self::$log->debug($ex);
+        }
+
+        $langs = [];
+
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            // break up string into pieces (languages and q factors)
+            preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+
+            if (count($lang_parse[1])) {
+                // create a list like "en" => 0.8
+                $langs = array_combine($lang_parse[1], $lang_parse[4]);
+
+                // set default to 1 for any without q factor
+                foreach ($langs as $lang => $val) {
+                    if ($val === '') {
+                        $langs[$lang] = 1;
+                    }
+                }
+
+                // sort list based on value
+                arsort($langs, SORT_NUMERIC);
+            }
+        }
+
+        foreach ($langs as $langCode => $langWeight) {
+            switch (substr($langCode, 0, 2)) {
+                case 'en':
+                    return 'en';
+
+                case 'es':
+                    return 'es';
+
+                case 'pt':
+                    return 'pt';
+            }
+        }
+
+        // Fallback to spanish.
+        return 'es';
     }
 
     public static function convertToSupportedLanguage($lang) {

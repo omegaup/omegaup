@@ -5,16 +5,17 @@
         width="16">
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
-export default {
-  props: ['country'],
-  computed: {
-    flagUrl: function() {
-      if (this.country == null) return '';
-      return '/media/flags/' + this.country.toLowerCase() + '.png';
-    }
-  },
-  data: function() { return {};},
-};
+@Component
+export default class CountryFlag extends Vue {
+  @Prop() country!: string;
+
+  get flagUrl(): string {
+    if (this.country == null) return '';
+    return `/media/flags/${this.country.toLowerCase()}.png`;
+  }
+}
+
 </script>

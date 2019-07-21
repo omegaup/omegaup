@@ -40,24 +40,6 @@
         </tbody>
       </table>
     </div>
-    <div class="panel panel-primary">
-      <div class="panel-body">
-        {{T.pendingRegistrations}}
-      </div>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>{{T.wordsUser}}</th>
-            <th>{{T.userEditCountry}}</th>
-            <th>{{T.requestDate}}</th>
-            <th>{{T.currentStatus}}</th>
-            <th>{{T.lastUpdate}}</th>
-            <th>{{T.contestAdduserAddContestant}}</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
   </div>
 </template>
 

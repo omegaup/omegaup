@@ -9,16 +9,16 @@
   * ******************************************************************************* */
 
 /**
- * Value Object file for table Badges.
+ * Value Object file for table Notifications.
  *
  * VO does not have any behaviour.
  * @access public
  */
-class Badges extends VO {
+class Notifications extends VO {
     /**
-     * Constructor de Badges
+     * Constructor de Notifications
      *
-     * Para construir un objeto de tipo Badges debera llamarse a el constructor
+     * Para construir un objeto de tipo Notifications debera llamarse a el constructor
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
@@ -26,20 +26,20 @@ class Badges extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['badge_id'])) {
-            $this->badge_id = (int)$data['badge_id'];
+        if (isset($data['notification_id'])) {
+            $this->notification_id = (int)$data['notification_id'];
         }
-        if (isset($data['name'])) {
-            $this->name = $data['name'];
+        if (isset($data['user_id'])) {
+            $this->user_id = (int)$data['user_id'];
         }
-        if (isset($data['image_url'])) {
-            $this->image_url = $data['image_url'];
+        if (isset($data['timestamp'])) {
+            $this->timestamp = $data['timestamp'];
         }
-        if (isset($data['description'])) {
-            $this->description = $data['description'];
+        if (isset($data['read'])) {
+            $this->read = $data['read'] == '1';
         }
-        if (isset($data['hint'])) {
-            $this->hint = $data['hint'];
+        if (isset($data['contents'])) {
+            $this->contents = $data['contents'];
         }
     }
 
@@ -48,7 +48,7 @@ class Badges extends VO {
      */
     public function toUnixTime(array $fields = []) {
         if (empty($fields)) {
-            parent::toUnixTime([]);
+            parent::toUnixTime(['timestamp']);
             return;
         }
         parent::toUnixTime($fields);
@@ -61,33 +61,33 @@ class Badges extends VO {
       * @access public
       * @var int(11)
       */
-    public $badge_id;
+    public $notification_id;
+
+    /**
+      * Identificador de usuario
+      * @access public
+      * @var int(11)
+      */
+    public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(45)
+      * @var timestamp
       */
-    public $name;
+    public $timestamp;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(45)
+      * @var tinyint(1)
       */
-    public $image_url;
+    public $read;
 
     /**
-      * La descripcion habla de como se obtuvo el badge, de forma corta.
+      * JSON con el contenido de la notificación
       * @access public
-      * @var varchar(500)
+      * @var text
       */
-    public $description;
-
-    /**
-      * Tip de como desbloquear el badge.
-      * @access public
-      * @var varchar(100)
-      */
-    public $hint;
+    public $contents;
 }

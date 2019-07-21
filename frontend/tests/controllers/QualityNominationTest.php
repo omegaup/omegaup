@@ -344,8 +344,14 @@ class QualityNominationTest extends OmegaupTestCase {
         ]);
         $response = QualityNominationController::apiResolve($request);
 
-        $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
-        $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
+        $this->assertContains(
+            $problemData['problem']->title,
+            $emailSender::$listEmails[0]['subject']
+        );
+        $this->assertContains(
+            $problemData['authorIdentity']->name,
+            $emailSender::$listEmails[0]['body']
+        );
         $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
         $this->assertContains('something else', $emailSender::$listEmails[0]['body']);
         $this->assertEquals(1, count($emailSender::$listEmails));
@@ -808,7 +814,7 @@ class QualityNominationTest extends OmegaupTestCase {
             throw new NotFoundException('problemNotFound');
         }
         $problemDismissed = QualityNominationsDAO::getByUserAndProblem(
-            $r['current_user_id'],
+            $r->user->user_id,
             $problem->problem_id,
             $r['nomination'],
             json_encode([]), // re-encoding it for normalization.
@@ -823,7 +829,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             QualityNominationController::apiCreate($r);
             $pd = QualityNominationsDAO::getByUserAndProblem(
-                $r['current_user_id'],
+                $r->user->user_id,
                 $problem->problem_id,
                 $r['nomination'],
                 json_encode([]), // re-encoding it for normalization.
@@ -893,8 +899,8 @@ class QualityNominationTest extends OmegaupTestCase {
     */
     public function testAggregateFeedback() {
         /* Previous tests create some users with their assigned ranges and forget to delete them, which affects this test */
-        self::deleteAllRanks();
-        self::deleteAllPreviousRuns();
+        Utils::deleteAllRanks();
+        Utils::deleteAllPreviousRuns();
 
         for ($i = 0; $i < 5; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem();
@@ -904,7 +910,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         self::setUpRankForUsers($problemData, $userData, true);
 
-        Utils::runCronjobScript();
+        Utils::RunAggregateFeedback();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.971428571, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
@@ -938,8 +944,8 @@ class QualityNominationTest extends OmegaupTestCase {
         $tags3 = array_map($extractName, $tagArrayForProblem3);
         $this->assertEquals($tags3, ['dp', 'greedy', 'geometry', 'search', 'lenguaje']);
 
-        self::runUpdateUserRank();
-        Utils::runCronJobScript();
+        Utils::RunUpdateUserRank();
+        Utils::RunAggregateFeedback();
 
         $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.895384615, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
@@ -982,7 +988,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
 
         if ($withSuggestions) {
-            self::deleteAllSuggestions();
+            Utils::deleteAllSuggestions();
 
             QualityNominationFactory::createSuggestion(
                 $login[0],
@@ -1115,7 +1121,7 @@ class QualityNominationTest extends OmegaupTestCase {
     // with difficulty < 2.
     public function testUpdateProblemOfTheWeek() {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
-        Utils::runCronjobScript();
+        Utils::RunAggregateFeedback();
 
         $problemOfTheWeek = ProblemOfTheWeekDAO::getByDificulty('easy');
         $this->assertEquals(count($problemOfTheWeek), 1);
@@ -1126,19 +1132,10 @@ class QualityNominationTest extends OmegaupTestCase {
         // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
     }
 
-    private function runUpdateUserRank() {
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
-    }
-
     public function setUpSyntheticSuggestionsForProblemOfTheWeek() {
         // Delete existing suggestions and problems of the week.
-        self::deleteAllSuggestions();
-        self::deleteAllProblemsOfTheWeek();
+        Utils::deleteAllSuggestions();
+        Utils::deleteAllProblemsOfTheWeek();
 
         // Setup synthetic data.
         $numberOfProblems = 4;
@@ -1205,7 +1202,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ));
         $this->assertEquals($tags, ['dp', 'lenguaje']);
 
-        Utils::runCronjobScript();
+        Utils::RunAggregateFeedback();
 
         $tags = array_map(function ($tag) {
             return $tag['name'];
@@ -1218,7 +1215,7 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     public function setUpSyntheticSuggestions($problemData) {
-        self::deleteAllSuggestions();
+        Utils::deleteAllSuggestions();
 
         // Setup synthetic data.
         $login = [];
@@ -1372,29 +1369,6 @@ class QualityNominationTest extends OmegaupTestCase {
             3,
             ['Geometry', 'Math']
         );
-    }
-
-    private static function deleteAllSuggestions() {
-        global $conn;
-        $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
-    }
-
-    private static function deleteAllRanks() {
-        global $conn;
-        $conn->Execute('DELETE FROM `User_Rank`;');
-    }
-
-    private static function deleteAllPreviousRuns() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Submission_Log`;');
-        $conn->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
-        $conn->Execute('DELETE FROM `Runs`;');
-        $conn->Execute('DELETE FROM `Submissions`;');
-    }
-
-    private static function deleteAllProblemsOfTheWeek() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
     }
 
     public function testMostVotedTags() {
