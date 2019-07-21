@@ -13,7 +13,7 @@ require_once('base/Problems_Forfeited.vo.base.php');
  *
  */
 class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
-    public static function getProblemsForfeitedCount($userId) {
+    public static function getProblemsForfeitedCount(Users $user): int {
         global $conn;
         $sql = 'SELECT
                     COUNT(*)
@@ -21,7 +21,7 @@ class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
                     Problems_Forfeited
                 WHERE
                     user_id = ?;';
-        $args = [$userId];
+        $args = [$user->user_id];
         return $conn->getOne($sql, $args);
     }
 }

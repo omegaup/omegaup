@@ -425,22 +425,22 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $conn->GetOne($sql, [$id]);
     }
 
-    public static function getProblemsSolvedCount($identityId) {
+    public static function getProblemsSolvedCount(Identities $identity): int {
         global $conn;
-
         $sql = 'SELECT
-                    COUNT(*)
-                FROM
-                    Problems p
-                INNER JOIN
-                    Submissions s ON s.problem_id = p.problem_id
-                INNER JOIN
-                    Runs r ON r.run_id = s.current_run_id
-                WHERE
-                    r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
-                ORDER BY
-                    p.problem_id DESC;';
-        $args = [$identityId];
+            COUNT(*)
+        FROM
+            Problems p
+        INNER JOIN
+            Submissions s ON s.problem_id = p.problem_id
+        INNER JOIN
+            Runs r ON r.run_id = s.current_run_id
+        WHERE
+            r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+        ORDER BY
+            p.problem_id DESC;';
+
+        $args = [$identity->identity_id];
 
         return $conn->getOne($sql, $args);
     }

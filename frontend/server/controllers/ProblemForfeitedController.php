@@ -14,15 +14,17 @@ class ProblemForfeitedController extends Controller {
    * @return array
    * @throws InvalidDatabaseOperationException
    */
+
+    // For each 10 solved problems, 1 solution is granted
+    const SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION = 10;
+
     public static function apiGetCounts(Request $r) {
-        self::authenticateRequest($r);
-        if (is_null($r->user) || is_null($r->identity)) {
-            throw new NotFoundException('userNotExist');
-        }
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
         return [
             'status' => 'ok',
-            'allowed' => intval(ProblemsDAO::getProblemsSolvedCount($r->identity->identity_id) / 10),
-            'seen' => ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user->user_id),
+            'allowed' => intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
+                                static::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION),
+            'seen' => ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user),
         ];
     }
 }
