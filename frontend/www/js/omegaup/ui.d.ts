@@ -5,12 +5,12 @@ declare namespace omegaup {
     escape: (s: string) => string;
     formatDate: (date: Date) => string;
     formatString: (template: string, values: { [key: string]: string; }) => string;
-    markdownConverter: (options?: markdownConverterOptions) => converter;
+    markdownConverter: (options?: MarkdownConverterOptions) => converter;
     navigateTo: (url: string) => void;
     userTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
   };
 
-  interface markdownConverterOptions {
+  interface MarkdownConverterOptions {
     preview: boolean;
   }
 

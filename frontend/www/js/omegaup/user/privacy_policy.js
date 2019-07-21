@@ -5,6 +5,7 @@ import UI from '../ui.js';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
+
   let privacyPolicy = new Vue({
     el: '#privacy-policy',
     render: function(createElement) {
