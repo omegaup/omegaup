@@ -104,4 +104,38 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
 
         return $problemset;
     }
+
+    /**
+     * Checks whether users have made submissions with any of their associated
+     * identities and are currently logged in with one of them.
+     * In this case a flag is turned on and a message will be displayed in arena
+     *
+     * @param Users $user
+     */
+    public static function shouldShowFirstAssociatedIdentityRunWarning(
+        Users $user
+    ) : bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            INNER JOIN
+                Users u
+            ON
+                u.user_id = i.user_id
+            WHERE
+                u.user_id = ?
+                AND u.main_identity_id != i.identity_id
+            LIMIT
+                1;';
+
+        global $conn;
+
+        return $conn->GetOne($sql, [$user->user_id]) == '0';
+    }
 }
