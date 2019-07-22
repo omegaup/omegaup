@@ -1,7 +1,7 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle="{#omegaupTitleMyProblemsList#}"}
 
-{if $privateProblemsAlert eq 1}
+{if $privateProblemsAlert eq true}
 	<div class="alert alert-info">
 		<span class="message">
 			{#messageMakeYourProblemsPublic#}

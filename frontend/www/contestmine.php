@@ -9,16 +9,15 @@ try {
     // suggesting to contribute to the community by releasing the material to
     // the public. This flag ensures that this alert is shown only once per
     // session, the first time the user visits the "My contests" page.
-    $privateContestsAlert = 0;
+    $privateContestsAlert = ($session['valid'] &&
+        !isset($_SESSION['private_contests_alert']) &&
+        ContestsDAO::getPrivateContestsCount($session['user']) > 0);
 
-    if ($session['valid'] && !isset($_SESSION['private_contests_alert'])) {
-        if (ContestsDAO::getPrivateContestsCount($session['user']) > 0) {
-            $_SESSION['private_contests_alert'] = 1;
-            $privateContestsAlert = 1;
-        }
+    if ($privateContestsAlert) {
+        $_SESSION['private_contests_alert'] = true;
     }
 
-    $smarty->assign('PRIVATE_CONTESTS_ALERT', $privateContestsAlert);
+    $smarty->assign('privateContestsAlert', $privateContestsAlert);
     $smarty->assign('payload', $payload);
     $smarty->display('../templates/contest.mine.tpl');
 } catch (APIException $e) {

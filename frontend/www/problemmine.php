@@ -16,11 +16,10 @@ foreach ($smartyProperties as $key => $value) {
     $smarty->assign($key, $value);
 }
 
-$privateProblemsAlert = 0;
-if (!isset($_SESSION['private_problems_alert']) &&
-    ProblemsDAO::getPrivateCount($session['user']) > 0) {
-    $_SESSION['private_problems_alert'] = 1;
-    $privateProblemsAlert = 1;
+$privateProblemsAlert = (!isset($_SESSION['private_problems_alert']) &&
+    ProblemsDAO::getPrivateCount($session['user']) > 0);
+if ($privateProblemsAlert) {
+    $_SESSION['private_problems_alert'] = true;
 }
 $smarty->assign('privateProblemsAlert', $privateProblemsAlert);
 
