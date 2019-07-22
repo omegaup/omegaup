@@ -110,7 +110,6 @@ class Request extends ArrayObject {
         } else {
             if (empty($val)) {
                 if (!$required) {
-                    $this[$key] = false;
                     return;
                 }
                 throw new InvalidParameterException('parameterEmpty', $key);

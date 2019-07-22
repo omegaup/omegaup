@@ -1030,7 +1030,12 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
         if (is_null($problem)) {
-            return null;
+            return [
+                'status' => 'ok',
+                'exists' => false,
+                'problem' => null,
+                'problemset' => null,
+            ];
         }
 
         if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
@@ -1075,6 +1080,7 @@ class ProblemController extends Controller {
             }
         }
         return [
+            'exists' => true,
             'problem' => $problem,
             'problemset' => $problemset['problemset'],
         ];
@@ -1367,11 +1373,21 @@ class ProblemController extends Controller {
      */
     public static function apiDetails(Request $r) : array {
         $r->ensureBool('show_solvers', /*required=*/false);
+        $result = self::getValidProblemAndProblemset($r);
         [
+            'exists' => $problemExisits,
             'problem' => $problem,
-            'problemset' => $problemset
-        ] = self::getValidProblemAndProblemset($r);
-        return self::getProblemDetails($r, $problem, $problemset, $r['show_solvers']);
+            'problemset' => $problemset,
+        ] = $result;
+        if (!$problemExisits) {
+            return $result;
+        }
+        return self::getProblemDetails(
+            $r,
+            $problem,
+            $problemset,
+            $r['show_solvers'] === true
+        );
     }
 
     /**
@@ -1578,7 +1594,6 @@ class ProblemController extends Controller {
             );
         }
         $response['status'] = 'ok';
-        $response['exists'] = true;
         return $response;
     }
 
