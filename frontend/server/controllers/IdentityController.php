@@ -110,10 +110,11 @@ class IdentityController extends Controller {
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiBulkCreate(Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
-
+        if ($r->identity->identity_id != 1) {
+            global $experiments;
+            $experiments->ensureEnabled(Experiments::IDENTITIES);
+        }
         // Save objects into DB
         try {
             DAO::transBegin();
