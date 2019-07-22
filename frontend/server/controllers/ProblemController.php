@@ -1367,8 +1367,11 @@ class ProblemController extends Controller {
      */
     public static function apiDetails(Request $r) : array {
         $r->ensureBool('show_solvers', /*required=*/false);
-        $problem = self::getValidProblemAndProblemset($r);
-        return self::getProblemDetails($r, $problem);
+        [
+            'problem' => $problem,
+            'problemset' => $problemset
+        ] = self::getValidProblemAndProblemset($r);
+        return self::getProblemDetails($r, $problem, $problemset, $r['show_solvers']);
     }
 
     /**
@@ -1402,18 +1405,19 @@ class ProblemController extends Controller {
      */
     private static function getProblemDetails(
         Request $r,
-        array $problem,
-        bool $showSolvers = false
+        Problems $problem,
+        ?Problemsets $problemset,
+        bool $showSolvers
     ) : array {
         $response = [];
 
         // Get the expected commit version.
-        $commit = $problem['problem']->commit;
-        $version = $problem['problem']->current_version;
-        if (!empty($problem['problemset'])) {
+        $commit = $problem->commit;
+        $version = $problem->current_version;
+        if (!empty($problemset)) {
             $problemsetProblem = ProblemsetProblemsDAO::getByPK(
-                $problem['problemset']->problemset_id,
-                $problem['problem']->problem_id
+                $problemset->problemset_id,
+                $problem->problem_id
             );
             if (is_null($problemsetProblem)) {
                 return [
@@ -1426,12 +1430,12 @@ class ProblemController extends Controller {
         }
 
         $response['statement'] = ProblemController::getProblemStatement(
-            $problem['problem'],
+            $problem,
             $commit,
             $r['lang']
         );
         $response['settings'] = ProblemController::getProblemSettingsDistrib(
-            $problem['problem'],
+            $problem,
             $commit
         );
 
@@ -1454,7 +1458,7 @@ class ProblemController extends Controller {
         }
 
         // Add the problem the response
-        $response = array_merge($response, $problem['problem']->asFilteredArray([
+        $response = array_merge($response, $problem->asFilteredArray([
             'title', 'alias', 'input_limit', 'visits', 'submissions',
             'accepted', 'difficulty', 'creation_date', 'source', 'order',
             'points', 'visibility', 'languages', 'email_clarifications',
@@ -1464,9 +1468,9 @@ class ProblemController extends Controller {
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
-        if (ProblemsDAO::isVisible($problem['problem']) ||
-            Authorization::isProblemAdmin($r->identity, $problem['problem'])) {
-            $acl = ACLsDAO::getByPK($problem['problem']->acl_id);
+        if (ProblemsDAO::isVisible($problem) ||
+            Authorization::isProblemAdmin($r->identity, $problem)) {
+            $acl = ACLsDAO::getByPK($problem->acl_id);
             $problemsetter = IdentitiesDAO::findByUserId($acl->owner_id);
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
@@ -1479,14 +1483,13 @@ class ProblemController extends Controller {
             unset($response['source']);
         }
 
-        $problemset = $problem['problemset'];
         $problemsetId = !is_null($problemset) ? (int)$problemset->problemset_id : null;
 
         if (!is_null($r->identity)) {
             // Get all the available runs done by the current_user
             try {
                 $runsArray = RunsDAO::getForProblemDetails(
-                    (int)$problem['problem']->problem_id,
+                    (int)$problem->problem_id,
                     $problemsetId,
                     (int)$r->identity->identity_id
                 );
@@ -1498,7 +1501,7 @@ class ProblemController extends Controller {
             // Add each filtered run to an array
             $response['runs'] = [];
             foreach ($runsArray as $run) {
-                $run['alias'] = $problem['problem']->alias;
+                $run['alias'] = $problem->alias;
                 $run['username'] = $r->identity->username;
                 $run['time'] = (int)$run['time'];
                 $run['contest_score'] = (float)$run['contest_score'];
@@ -1516,7 +1519,7 @@ class ProblemController extends Controller {
                         $problemset->problemset_id,
                         Authorization::canSubmitToProblemset(
                             $r->identity,
-                            $problem['problemset']
+                            $problemset
                         )
                     );
                 } catch (ApiException $e) {
@@ -1530,14 +1533,14 @@ class ProblemController extends Controller {
             // As last step, register the problem as opened
             if (!ProblemsetProblemOpenedDAO::getByPK(
                 $problemsetId,
-                $problem['problem']->problem_id,
+                $problem->problem_id,
                 $r->identity->identity_id
             )) {
                 try {
                     // Save object in the DB
                     ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
                         'problemset_id' => $problemset->problemset_id,
-                        'problem_id' => $problem['problem']->problem_id,
+                        'problem_id' => $problem->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
                         'identity_id' => $r->identity->identity_id
                     ]));
@@ -1546,16 +1549,16 @@ class ProblemController extends Controller {
                     throw new InvalidDatabaseOperationException($e);
                 }
             }
-        } elseif ($showSolvers || (!empty($r['show_solvers']) && $r['show_solvers'])) {
+        } elseif ($showSolvers) {
             $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem(
-                (int)$problem['problem']->problem_id
+                (int)$problem->problem_id
             );
         }
 
         if (!is_null($r->identity)) {
             ProblemViewedDAO::MarkProblemViewed(
                 $r->identity->identity_id,
-                $problem['problem']->problem_id
+                $problem->problem_id
             );
         }
 
@@ -1568,7 +1571,7 @@ class ProblemController extends Controller {
             $response['score'] = 0.0;
         } else {
             $response['score'] = self::bestScore(
-                $problem['problem'],
+                $problem,
                 $problemsetId,
                 $r['contest_alias'],
                 $r->identity->identity_id
@@ -2569,10 +2572,12 @@ class ProblemController extends Controller {
     public static function getProblemDetailsForSmarty(
         Request $r
     ) : array {
-        $problemsetWithProblem = self::getValidProblemAndProblemset($r);
-        $problem = $problemsetWithProblem['problem'];
+        [
+            'problem' => $problem,
+            'problemset' => $problemset
+        ] = self::getValidProblemAndProblemset($r);
         // Get problem details from API
-        $details = self::getProblemDetails($r, $problemsetWithProblem, /*showSolvers=*/true);
+        $details = self::getProblemDetails($r, $problem, $problemset, /*showSolvers=*/true);
 
         $memoryLimit = (int) $details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
         $result = [
