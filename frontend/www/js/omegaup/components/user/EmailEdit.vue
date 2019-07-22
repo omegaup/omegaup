@@ -21,7 +21,8 @@
             <div class="col-md-offset-3 col-md-7">
               <button class="btn btn-primary"
                    type="button"
-                   v-on:click.prevent="change">{{ T.wordsSaveChanges }}</button>
+                   v-on:click.prevent="$emit('submit', this.email)">{{ T.wordsSaveChanges
+                   }}</button>
             </div>
           </div>
         </form>
@@ -30,17 +31,15 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
 
-export default {
-  props: {
-    initialEmail: String,
-  },
-  data: function() {
-    return { T: T, email: this.initialEmail, }
-  },
-  methods: {change: function() { this.$emit('submit', this.email);}}
+@Component
+export default class UserEmailEdit extends Vue {
+  @Prop() initialEmail!: string;
+  T = T;
+  email: string = this.initialEmail;
 }
 
 </script>
