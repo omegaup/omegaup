@@ -300,7 +300,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    private static function validateBasicDetails(?string $contestAlias) : array {
+    public static function validateBasicDetails(?string $contestAlias) : array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         // If the contest is private, verify that our user is invited
         try {
@@ -338,58 +338,55 @@ class ContestController extends Controller {
     /**
      * Get all the properties for smarty.
      * @param Request $r
+     * @param Contests $contest
      * @return Array
      */
     public static function getContestDetailsForSmarty(
-        Request $r
+        Request $r,
+        Contests $contest
     ) : array {
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $isPublicContest = self::isPublic($contest->admission_mode)
             ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
-        try {
-            // Half-authenticate, in case there is no session in place.
-            $session = SessionController::apiCurrentSession($r)['session'];
-            $result = [
-                'needsBasicInformation' => false,
-                'requestsUserInformation' => false,
+        // Half-authenticate, in case there is no session in place.
+        $session = SessionController::apiCurrentSession($r)['session'];
+        $result = [
+            'needsBasicInformation' => false,
+            'requestsUserInformation' => false,
+        ];
+        if (!$session['valid'] || is_null($session['identity'])) {
+            // No session, show the intro if public, so that they can login.
+            return $result;
+        }
+
+        [
+            'needsBasicInformation' => $result['needsBasicInformation'],
+            'requestsUserInformation' => $result['requestsUserInformation'],
+        ] = ContestsDAO::getNeedsInformation($contest->problemset_id);
+        $identity = $session['identity'];
+
+        $result['needsBasicInformation'] =
+            $result['needsBasicInformation'] && (
+                !$identity->country_id || !$identity->state_id ||
+                !$identity->school_id
+        );
+
+        // Privacy Statement Information
+        $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
+            $identity->language_id,
+            'contest',
+            $result['requestsUserInformation']
+        );
+        if (!is_null($privacyStatementMarkdown)) {
+            $statementType =
+                "contest_{$result['requestsUserInformation']}_consent";
+            $result['privacyStatement'] = [
+                'markdown' => $privacyStatementMarkdown,
+                'gitObjectId' =>
+                    PrivacyStatementsDAO::getLatestPublishedStatement(
+                        $statementType
+                    )['git_object_id'],
+                'statementType' => $statementType
             ];
-            if (!$session['valid'] || is_null($session['identity'])) {
-                // No session, show the intro if public, so that they can login.
-                return $result;
-            }
-
-            [
-                'needsBasicInformation' => $result['needsBasicInformation'],
-                'requestsUserInformation' => $result['requestsUserInformation'],
-            ] = ContestsDAO::getNeedsInformation($contest->problemset_id);
-            $identity = $session['identity'];
-
-            $result['needsBasicInformation'] =
-                $result['needsBasicInformation'] && (
-                    !$identity->country_id || !$identity->state_id ||
-                    !$identity->school_id
-            );
-
-            // Privacy Statement Information
-            $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
-                $identity->language_id,
-                'contest',
-                $result['requestsUserInformation']
-            );
-            if (!is_null($privacyStatementMarkdown)) {
-                $statementType =
-                    "contest_{$result['requestsUserInformation']}_consent";
-                $result['privacyStatement'] = [
-                    'markdown' => $privacyStatementMarkdown,
-                    'gitObjectId' =>
-                        PrivacyStatementsDAO::getLatestPublishedStatement(
-                            $statementType
-                        )['git_object_id'],
-                    'statementType' => $statementType
-                ];
-            }
-        } catch (ApiException $e) {
-            throw $e;
         }
 
         return $result;
@@ -399,20 +396,13 @@ class ContestController extends Controller {
      * Show the contest intro unless you are admin, or you already started this
      * contest.
      * @param Request $r
+     * @param Contests $contest
      * @return bool
      */
-    public static function showIntro(
-        Request $r
+    public static function shouldShowIntro(
+        Request $r,
+        Contests $contest
     ) : bool {
-        try {
-            $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        } catch (Exception $e) {
-            throw new NotFoundException('contestNotFound');
-        }
-        if (is_null($contest)) {
-            throw new NotFoundException('contestNotFound');
-        }
-
         try {
             $session = SessionController::apiCurrentSession($r)['session'];
             if (is_null($session['identity'])) {

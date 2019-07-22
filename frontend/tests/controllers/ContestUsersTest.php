@@ -71,7 +71,9 @@ class ContestUsersTest extends OmegaupTestCase {
 
     public function testContestParticipantsReport() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['requests_user_information' => 'optional']));
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'requests_user_information' => 'optional'
+        ]));
 
         for ($i = 0; $i < 3; $i++) {
             // Create users
@@ -83,12 +85,16 @@ class ContestUsersTest extends OmegaupTestCase {
 
         $userLogin = self::login($user[0]);
 
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
         $contestDetails =
             ContestController::getContestDetailsForSmarty(
                 new Request([
                     'auth_token' => $userLogin->auth_token,
                     'contest_alias' => $contestData['request']['alias'],
-                ])
+                ]),
+                $contest
             );
 
         // Explicitly join contest
@@ -116,7 +122,9 @@ class ContestUsersTest extends OmegaupTestCase {
         $this->assertEquals(3, count($response['contestants']));
 
         // But only one participant has accepted share user information
-        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
+        $this->assertEquals(1, self::numberOfUsersSharingBasicInformation(
+            $response['contestants']
+        ));
 
         $userLogin = self::login($user[1]);
 
@@ -134,7 +142,9 @@ class ContestUsersTest extends OmegaupTestCase {
         $response = ContestController::apiContestants($r);
 
         // The number of participants sharing their information still remains the same
-        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
+        $this->assertEquals(1, self::numberOfUsersSharingBasicInformation(
+            $response['contestants']
+        ));
 
         $userLogin = self::login($user[2]);
 
@@ -152,18 +162,24 @@ class ContestUsersTest extends OmegaupTestCase {
         $response = ContestController::apiContestants($r);
 
         // Now there are two participants sharing their information
-        $this->assertEquals(2, self::usersSharingUserInformation($response['contestants']));
+        $this->assertEquals(2, self::numberOfUsersSharingBasicInformation(
+            $response['contestants']
+        ));
     }
 
     public function testContestCanBeSeenByUnloggedUsers() {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
         $showIntro =
-            ContestController::showIntro(
+            ContestController::shouldShowIntro(
                 new Request([
                     'contest_alias' => $contestData['request']['alias'],
-                ])
+                ]),
+                $contest
             );
 
         $this->assertTrue($showIntro);
@@ -184,17 +200,24 @@ class ContestUsersTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
+        // Get valid contest
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
+
         // Contest intro can be shown by the user
-        $showIntro = ContestController::showIntro($r);
+        $showIntro = ContestController::shouldShowIntro($r, $contest);
         $this->assertTrue($showIntro);
 
         // Contest needs basic information for the user
-        $contestDetails = ContestController::getContestDetailsForSmarty($r);
+        $contestDetails = ContestController::getContestDetailsForSmarty($r, $contest);
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
     }
 
-    private static function usersSharingUserInformation($contestants) {
+    private static function numberOfUsersSharingBasicInformation(
+        array $contestants
+    ) : int {
         $numberOfContestants = 0;
         foreach ($contestants as $contestant) {
             if ($contestant['email']) {

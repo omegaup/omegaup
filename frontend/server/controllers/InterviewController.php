@@ -263,6 +263,11 @@ class InterviewController extends Controller {
     }
 
     public static function showIntro(Request $r) {
-        return ContestController::showIntro($r);
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
+        // TODO: Arreglar esto para que Problemsets se encargue de obtener
+        //       la info correcta
+        return ContestController::shouldShowIntro($r, $contest);
     }
 }

@@ -40,7 +40,11 @@ class RegisterToContestTest extends OmegaupTestCase {
             // Expected contestNotStarted exception. Continue.
         }
 
-        $showIntro = ContestController::showIntro($request2);
+        // Get a valid contest
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
+        $showIntro = ContestController::shouldShowIntro($request2, $contest);
         $this->assertEquals($showIntro, ContestController::SHOW_INTRO);
 
         // Contest is going on right now
@@ -53,7 +57,11 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
 
-        $showIntro = ContestController::showIntro($request2);
+        // Get a valid contest
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
+        $showIntro = ContestController::shouldShowIntro($request2, $contest);
         $this->assertEquals($showIntro, ContestController::SHOW_INTRO);
 
         $contestantLogin = self::login($contestant);
@@ -65,8 +73,12 @@ class RegisterToContestTest extends OmegaupTestCase {
         // Join this contest
         $response = ContestController::apiOpen($request2);
 
+        // Get a valid contest
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
         // Now that i have joined the contest, i should not see the intro
-        $showIntro = ContestController::showIntro($request2);
+        $showIntro = ContestController::shouldShowIntro($request2, $contest);
         $this->assertEquals($showIntro, !ContestController::SHOW_INTRO);
     }
 
@@ -86,7 +98,11 @@ class RegisterToContestTest extends OmegaupTestCase {
             'auth_token' => $contestantLogin->auth_token,
         ]);
 
-        $showIntro = ContestController::showIntro($request);
+        // Get a valid contest
+        [$contest, $_] = ContestController::validateBasicDetails(
+            $contestData['request']['alias']
+        );
+        $showIntro = ContestController::shouldShowIntro($request, $contest);
 
         $this->assertEquals(1, $showIntro);
     }
