@@ -562,7 +562,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        $contest = self::validateContest($r['contest_alias']);
+        $contest = self::validateContest($r['contest_alias'] ?? '');
 
         try {
             ProblemsetIdentityRequestDAO::save(new ProblemsetIdentityRequest([

@@ -7,7 +7,7 @@ try {
         'contest_alias' => $_REQUEST['contest_alias'],
     ]);
     $session = SessionController::apiCurrentSession($r)['session'];
-    $contest = ContestController::validateContest($_REQUEST['contest_alias']);
+    $contest = ContestController::validateContest($r['contest_alias'] ?? '');
     $showIntro = ContestController::shouldShowIntro($r, $contest);
     if ($showIntro) {
         $result = ContestController::getContestDetailsForSmarty($r, $contest);

@@ -4,7 +4,6 @@ require_once('libs/dao/Problemsets.dao.php');
 require_once('libs/dao/Problemset_Problems.dao.php');
 
 class ProblemsetController extends Controller {
-    const SHOW_INTRO = true;
     public static function validateAddProblemToProblemset(
         Problems $problem,
         Identities $identity
