@@ -265,33 +265,6 @@ class UserController extends Controller {
     }
 
     /**
-     *
-     * Description:
-     *     Tests a if a password is valid for a given user.
-     *
-     * @param user_id
-     * @param email
-     * @param username
-     * @param password
-     *
-     * */
-    public static function testPassword(Identities $identity, string $password) {
-        if (is_null($identity->password)) {
-            // The user had logged in through a third-party account.
-            throw new LoginDisabledException('loginThroughThirdParty');
-        }
-
-        if (strlen($identity->password) === 0) {
-            throw new LoginDisabledException('loginDisabled');
-        }
-
-        return SecurityTools::compareHashedStrings(
-            $password,
-            $identity->password
-        );
-    }
-
-    /**
      * Send the mail with verification link to the user in the Request
      *
      * @param Request $r
@@ -1622,11 +1595,13 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
         $user = null;
         if (!is_null($identity->user_id)) {
-            $user = self::resolveTargetUser($r);
+            $user = UsersDAO::getByPK($identity->user_id);
         }
 
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
-            && (!is_null($user) && $user->is_private == 1) && !Authorization::isSystemAdmin($r->identity->identity_id)) {
+            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity->identity_id))
+            && (!is_null($user) && $user->is_private == 1)
+        ) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
@@ -2557,7 +2532,8 @@ class UserController extends Controller {
     public static function apiGenerateGitToken(Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
-        $r->user->git_token = SecurityTools::randomHexString(40);
+        $token = SecurityTools::randomHexString(40);
+        $r->user->git_token = SecurityTools::hashString($token);
         try {
             UsersDAO::update($r->user);
         } catch (Exception $e) {
@@ -2566,7 +2542,7 @@ class UserController extends Controller {
 
         return [
             'status' => 'ok',
-            'token' => $r->user->git_token,
+            'token' => $token,
         ];
     }
 }

@@ -296,7 +296,7 @@ CREATE TABLE `Groups_Scoreboards_Problemsets` (
 CREATE TABLE `Identities` (
   `identity_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
-  `password` varchar(100) DEFAULT NULL,
+  `password` varchar(128) DEFAULT NULL COMMENT 'Contraseña del usuario, usando Argon2i o Blowfish',
   `name` varchar(256) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `language_id` int(11) DEFAULT NULL,
@@ -476,6 +476,20 @@ CREATE TABLE `Problems` (
   KEY `idx_problems_visibility` (`visibility`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Problems_Forfeited` (
+  `problem_forfeited_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL COMMENT 'Identificador de usuario',
+  `problem_id` int(11) NOT NULL,
+  `forfeited_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`problem_forfeited_id`),
+  KEY `user_id` (`user_id`),
+  KEY `problem_id` (`problem_id`),
+  CONSTRAINT `fk_pfp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_pfu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Problemas que no cuentan para el ranking';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -868,8 +882,8 @@ CREATE TABLE `Users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
-  `password` varchar(100) DEFAULT NULL,
-  `git_token` char(40) DEFAULT NULL COMMENT 'Token de acceso para git',
+  `password` varchar(128) DEFAULT NULL COMMENT 'Contraseña del usuario, usando Argon2i o Blowfish',
+  `git_token` varchar(128) DEFAULT NULL COMMENT 'Token de acceso para git, usando Argon2i',
   `main_email_id` int(11) DEFAULT NULL,
   `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',
   `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
