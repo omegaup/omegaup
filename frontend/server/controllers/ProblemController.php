@@ -1562,7 +1562,7 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Entry point for Problem Solution API.
+     * Returns the solution for a problem if conditions are satisfied.
      *
      * @param Request $r
      * @throws InvalidFilesystemOperationException
@@ -1582,13 +1582,6 @@ class ProblemController extends Controller {
         $problemset = $problem['problemset'];
         $problem = $problem['problem'];
 
-        if (!Authorization::canViewProblemSolution(
-            $r->identity,
-            $problem
-        )) {
-            throw new ForbiddenAccessException('problemSolutionNotVisible');
-        }
-
         // Get the expected commit version.
         $commit = $problem->commit;
         $version = $problem->current_version;
@@ -1605,6 +1598,26 @@ class ProblemController extends Controller {
             }
             $commit = $problemsetProblem->commit;
             $version = $problemsetProblem->version;
+        }
+
+        if (!Authorization::canViewProblemSolution(
+            $r->identity,
+            $problem
+        )) {
+            $seenSolutions = ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user);
+            $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
+                                ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
+
+            // Validate not overpassing the number of allowed solutions
+            if ($seenSolutions >= $allowedSolutions) {
+                throw new ForbiddenAccessException('allowedSolutionsLimitReached');
+            }
+
+            // Save problem as forfeited
+            ProblemsForfeitedDAO::create(new ProblemsForfeited([
+                'user_id' => $r->user->user_id,
+                'problem_id' => $problem->problem_id
+            ]));
         }
 
         return [

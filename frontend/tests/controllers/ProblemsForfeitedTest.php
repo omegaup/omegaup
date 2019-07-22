@@ -32,4 +32,45 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $this->assertEquals(1, $results['allowed']);
         $this->assertEquals(1, $results['seen']);
     }
+
+    public function testGetSolution() {
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+        $problems = [];
+        for ($i = 0;
+             $i < ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
+             $i++) {
+            $problems[] = ProblemsFactory::createProblem();
+            $run = RunsFactory::createRunToProblem($problems[$i], $user, $login);
+            RunsFactory::gradeRun($run);
+        }
+
+        $extraProblem = ProblemsFactory::createProblem();
+        $response = ProblemController::apiSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $extraProblem['problem']->alias,
+        ]));
+        $this->assertContains('`long long`', $response['solution']['markdown']);
+        $this->assertTrue(
+            ProblemsForfeitedDAO::isProblemForfeited(
+                $extraProblem['problem'],
+                IdentitiesDAO::findByUsername($user->username)
+            )
+        );
+    }
+
+    public function testGetSolutionForbiddenAccessException() {
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+        $problem = ProblemsFactory::createProblem()['problem'];
+        try {
+            ProblemController::apiSolution(new Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problem->alias,
+            ]));
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'allowedSolutionsLimitReached');
+        }
+    }
 }

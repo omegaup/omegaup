@@ -24,4 +24,20 @@ class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
         $args = [$user->user_id];
         return $conn->getOne($sql, $args);
     }
+
+    public static function isProblemForfeited(
+        Problems $problem,
+        Identities $identity
+    ) : bool {
+        global $conn;
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    Problems_Forfeited
+                WHERE
+                    problem_id = ? AND user_id = ?;';
+        $args = [$problem->problem_id, $identity->user_id];
+        $resueltos = $conn->GetOne($sql, $args) == 0 ? 'Cero' : 'No es cero';
+        return $conn->GetOne($sql, $args) > 0;
+    }
 }

@@ -365,28 +365,15 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         $contestant = UserFactory::createUser();
 
-        try {
-            $login = self::login($contestant);
-            ProblemController::apiSolution(new Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['problem_alias'],
-            ]));
-            $this->fail('User should not have been able to view solution');
-        } catch (ForbiddenAccessException $e) {
-            $this->assertEquals('problemSolutionNotVisible', $e->getMessage());
-        }
-
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
 
-        {
-            $login = self::login($contestant);
-            $response = ProblemController::apiSolution(new Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['problem_alias'],
-            ]));
-            $this->assertContains('`long long`', $response['solution']['markdown']);
-        }
+        $login = self::login($contestant);
+        $response = ProblemController::apiSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertContains('`long long`', $response['solution']['markdown']);
     }
 
     public function testAuthorizationController() {
