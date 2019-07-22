@@ -85,16 +85,13 @@ class ContestUsersTest extends OmegaupTestCase {
 
         $userLogin = self::login($user[0]);
 
-        [$contest, $_] = ContestController::validateBasicDetails(
-            $contestData['request']['alias']
-        );
         $contestDetails =
             ContestController::getContestDetailsForSmarty(
                 new Request([
                     'auth_token' => $userLogin->auth_token,
                     'contest_alias' => $contestData['request']['alias'],
                 ]),
-                $contest
+                $contestData['contest']
             );
 
         // Explicitly join contest
@@ -171,15 +168,12 @@ class ContestUsersTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        [$contest, $_] = ContestController::validateBasicDetails(
-            $contestData['request']['alias']
-        );
         $showIntro =
             ContestController::shouldShowIntro(
                 new Request([
                     'contest_alias' => $contestData['request']['alias'],
                 ]),
-                $contest
+                $contestData['contest']
             );
 
         $this->assertTrue($showIntro);
@@ -200,17 +194,12 @@ class ContestUsersTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
-        // Get valid contest
-        [$contest, $_] = ContestController::validateBasicDetails(
-            $contestData['request']['alias']
-        );
-
         // Contest intro can be shown by the user
-        $showIntro = ContestController::shouldShowIntro($r, $contest);
+        $showIntro = ContestController::shouldShowIntro($r, $contestData['contest']);
         $this->assertTrue($showIntro);
 
         // Contest needs basic information for the user
-        $contestDetails = ContestController::getContestDetailsForSmarty($r, $contest);
+        $contestDetails = ContestController::getContestDetailsForSmarty($r, $contestData['contest']);
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
     }

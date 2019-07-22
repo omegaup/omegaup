@@ -300,7 +300,7 @@ class ContestController extends Controller {
      * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
-    public static function validateBasicDetails(?string $contestAlias) : array {
+    private static function validateBasicDetails(?string $contestAlias) : array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         // If the contest is private, verify that our user is invited
         try {
@@ -312,6 +312,27 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
         return [new Contests($contestProblemset), new Problemsets($contestProblemset)];
+    }
+
+    /**
+     * Validate a contest with contest alias
+     *
+     * @param string $contestAlias
+     * @return Contests $contest
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function validateContest(string $contestAlias) : Contests {
+        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        try {
+            $contest = ContestsDAO::getByAlias($contestAlias);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+        return $contest;
     }
 
     /**
@@ -541,7 +562,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        [$contest, $_] = self::validateBasicDetails($r['contest_alias']);
+        $contest = self::validateContest($r['contest_alias']);
 
         try {
             ProblemsetIdentityRequestDAO::save(new ProblemsetIdentityRequest([

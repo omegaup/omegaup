@@ -143,19 +143,16 @@ class ContestsDAO extends ContestsDAOBase {
                                 rerun_id
                                 ';
 
-    final public static function getByAlias($alias) {
+    final public static function getByAlias(string $alias) : ?Contests {
         $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
-        $params = [$alias];
 
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = $conn->GetRow($sql, [$alias]);
         if (empty($rs)) {
             return null;
         }
 
-        $contest = new Contests($rs);
-
-        return $contest;
+        return new Contests($rs);
     }
 
     final public static function getByTitle($title) {

@@ -439,6 +439,8 @@ export default {
                     });
                     return result;
                   }),
+
+    readNotifications: _call('/api/notification/readNotifications/'),
   },
 
   Problem: {

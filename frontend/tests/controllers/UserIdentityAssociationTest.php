@@ -253,4 +253,94 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $this->assertEquals($e->getMessage(), 'identityAlreadyAssociated');
         }
     }
+
+    public function testUnassociatedIdentitySubmitsARunInContest() {
+        // Identity creator group member will create the identity
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        $identityName = 'identity';
+        $username = "{$group['group']->alias}:{$identityName}";
+        $password = Utils::CreateRandomString();
+        // Call api using identity creator group member
+        IdentityController::apiCreate(new Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => $identityName,
+            'password' => $password,
+            'country_id' => 'HN',
+            'state_id' => 'AT',
+            'gender' => 'male',
+            'school_name' => Utils::CreateRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+        $identity = IdentitiesDAO::FindByUsername($username);
+        $user = UsersDAO::FindByUsername($username);
+
+        // Get a problem
+        $problemData = ProblemsFactory::createProblem();
+
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        // Add the problem to the contest
+        ContestsFactory::addProblemToContest($problemData, $contestData);
+
+        // Add it to the contest
+        ContestsFactory::addUser($contestData, $identity);
+
+        // Identity joins the contest
+        $identity->password = $password;
+        ContestsFactory::openContest($contestData, $identity);
+
+        // TODO: This test will change when we migrate the logic of contest.php
+        $result = false;
+        if (!is_null($user)) {
+            $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                $user
+            );
+        }
+
+        $this->assertFalse($result, 'Message should not be shown because' .
+                                    ' identity has no associated user');
+
+        // Create the user to associate
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+
+        // Associate identity to logged user
+        UserController::apiAssociateIdentity(new Request([
+            'auth_token' => $login->auth_token,
+            'username' => $username,
+            'password' => $password,
+        ]));
+
+        $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            $user
+        );
+
+        $this->assertTrue($result, 'Message should be shown because identity' .
+                                ' has associated with user and it does not' .
+                                ' have submissions in the problemset');
+
+        // Create a run
+        $runData = RunsFactory::createRun($problemData, $contestData, $identity);
+
+        // Grade the run
+        RunsFactory::gradeRun($runData);
+
+        $result = ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            $user
+        );
+
+        $this->assertFalse($result, 'Message should not be shown because' .
+                             ' identity has already made a submission');
+    }
 }

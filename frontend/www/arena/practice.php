@@ -6,9 +6,8 @@ try {
         'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
         'contest_alias' => $_REQUEST['contest_alias'],
     ]);
-    [$contest, $_] = ContestController::validateBasicDetails(
-        $_REQUEST['contest_alias']
-    );
+    $session = SessionController::apiCurrentSession($r)['session'];
+    $contest = ContestController::validateContest($_REQUEST['contest_alias']);
     $result = ContestController::getContestDetailsForSmarty($r, $contest);
 } catch (ApiException $e) {
     header('HTTP/1.1 404 Not Found');
