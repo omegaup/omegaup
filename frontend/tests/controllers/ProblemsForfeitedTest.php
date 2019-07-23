@@ -49,6 +49,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $response = ProblemController::apiSolution(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $extraProblem['problem']->alias,
+            'forfeit_problem' => true,
         ]));
         $this->assertContains('`long long`', $response['solution']['markdown']);
         $this->assertTrue(
@@ -67,6 +68,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
             ProblemController::apiSolution(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
+                'forfeit_problem' => true,
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (ForbiddenAccessException $e) {

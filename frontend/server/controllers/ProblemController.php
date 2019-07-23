@@ -1582,6 +1582,29 @@ class ProblemController extends Controller {
         $problemset = $problem['problemset'];
         $problem = $problem['problem'];
 
+        $forfeit = false;
+        if (isset($r['forfeit_problem'])) {
+            $forfeit = !!$r['forfeit_problem'];
+        }
+
+        if (!Authorization::canViewProblemSolution($r->identity, $problem) && !$forfeit) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
+
+        if ($forfeit) {
+            $seenSolutions = ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user);
+            $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
+                                ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
+
+            // Validate that the user will not exceed the number of allowed solutions.
+            if ($seenSolutions >= $allowedSolutions) {
+                throw new ForbiddenAccessException('allowedSolutionsLimitReached');
+            }
+        }
+
         // Get the expected commit version.
         $commit = $problem->commit;
         $version = $problem->current_version;
@@ -1600,19 +1623,7 @@ class ProblemController extends Controller {
             $version = $problemsetProblem->version;
         }
 
-        if (!Authorization::canViewProblemSolution(
-            $r->identity,
-            $problem
-        )) {
-            $seenSolutions = ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user);
-            $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
-                                ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
-
-            // Validate that the user will not exceed the number of allowed solutions.
-            if ($seenSolutions >= $allowedSolutions) {
-                throw new ForbiddenAccessException('allowedSolutionsLimitReached');
-            }
-
+        if ($forfeit) {
             // Save problem as forfeited
             ProblemsForfeitedDAO::create(new ProblemsForfeited([
                 'user_id' => $r->user->user_id,

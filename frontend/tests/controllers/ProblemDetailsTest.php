@@ -370,6 +370,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
             ProblemController::apiSolution(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
+                'forfeit_problem' => true,
             ]));
             $this->fail('User should not have been able to view solution');
         } catch (ForbiddenAccessException $e) {
