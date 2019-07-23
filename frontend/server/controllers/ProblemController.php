@@ -1594,6 +1594,7 @@ class ProblemController extends Controller {
             );
         }
         $response['status'] = 'ok';
+        $response['exists'] = true;
         return $response;
     }
 
