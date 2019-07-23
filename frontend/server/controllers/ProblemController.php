@@ -1973,7 +1973,7 @@ class ProblemController extends Controller {
                     foreach ($runsArray as $run) {
                         $run['time'] = (int)$run['time'];
                         $run['contest_score'] = (float)$run['contest_score'];
-                        $run['username'] = $r->identity->username;
+                        $run['username'] = $r->user->username;
                         $run['alias'] = $r['problem']->alias;
                         array_push($response['runs'], $run);
                     }
@@ -2611,17 +2611,6 @@ class ProblemController extends Controller {
         $result['quality_payload'] = $nominationStatus;
         $result['problem_admin'] = $isProblemAdmin;
         $result['payload']['user'] = $user;
-        if (is_null($r->user)) {
-            // Warning never should be shown whether identity doesn't have an
-            // associated user
-            $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] = false;
-            return $result;
-        }
-        $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
-            !UserController::isMainIdentity($r->user, $r->identity) &&
-            ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
-                $r->user
-            );
         return $result;
     }
 }
