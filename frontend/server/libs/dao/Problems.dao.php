@@ -341,7 +341,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             'quality_histogram', 'difficulty_histogram',
         ];
         $problems = [];
-        $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? UsersDAO::getHideTags($identityId) : false;
+        $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? UsersDao::getHideTags($identityId) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);

@@ -26,7 +26,7 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         'name' => $intro_details['name'],
         'description' => $intro_details['description'],
         'alias' => $intro_details['alias'],
-        'currentUsername' => $session['identity']->username,
+        'currentUsername' => $session['user']->username,
         'needsBasicInformation' => $intro_details['basic_information_required']
             && !is_null($session['identity']) && (!$session['identity']->country_id
                 || !$session['identity']->state_id || !$session['identity']->school_id
@@ -65,19 +65,10 @@ if ($intro_details['shouldShowResults'] || $intro_details['showAcceptTeacher'] |
         $group
     );
     $smarty->assign('showRanking', $showScoreboard);
-    $smarty->assign('payload', [
-        'shouldShowFirstAssociatedIdentityRunWarning' =>
-            !is_null($session['user']) &&
-            !UserController::isMainIdentity($session['user'], $session['identity'])
-            && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
-                $session['user']
-            ),
-    ]);
     $smarty->display('../templates/arena.contest.course.tpl');
 } else {
     $course = CoursesDAO::getByAlias($_REQUEST['course_alias']);
-    $showScoreboard = $session['valid'] && !is_null($session['user']) &&
-               Authorization::isCourseAdmin($session['identity'], $course);
+    $showScoreboard = $session['valid'] && Authorization::isCourseAdmin($session['identity'], $course);
     $smarty->assign('showRanking', $showScoreboard);
     $smarty->display('../templates/course.details.tpl');
 }
