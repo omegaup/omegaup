@@ -57,7 +57,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['request']['alias']
-        ]))['details']['coursePayload'];
+        ]));
         // Asserting isFirstTimeAccess
         $this->assertEquals(
             'optional',
@@ -104,7 +104,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['request']['alias']
-        ]))['details']['coursePayload'];
+        ]));
         // Asserting shouldShowResults is off
         $this->assertEquals(0, $details['shouldShowResults']);
     }
@@ -235,7 +235,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPrivate['course_alias']
-            ]))['details']['coursePayload'];
+            ]));
         $this->assertEquals(false, $details['shouldShowResults']);
 
         // Before adding student to public course, intro should show
@@ -255,7 +255,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseDataPublic['course_alias']
-            ]))['details']['coursePayload'];
+            ]));
         // After adding student to public course, intro should not show
         $this->assertEquals(false, $details['shouldShowResults']);
     }
@@ -280,7 +280,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-        ]))['details']['coursePayload'];
+        ]));
         $this->assertEquals(true, $details['shouldShowAcceptTeacher']);
 
         $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
@@ -293,10 +293,10 @@ class CourseStudentAddTest extends OmegaupTestCase {
             'accept_teacher_git_object_id' => $gitObjectId,
             'accept_teacher' => 'yes',
         ]));
-        $details = CourseController::apiIntroDetails(new Request([
+        $details = CourseController::getIntroDetails(new Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias']
-        ]))['details'];
+        ]));
 
         // After adding student to course, intro should not show
         $this->assertArrayNotHasKey('shouldShowAcceptTeacher', $details);

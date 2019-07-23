@@ -344,10 +344,6 @@ class CourseController extends Controller {
         Courses $course,
         Users $creator
     ) : Courses {
-        if ($course->alias == 'new') {
-            throw new DuplicatedEntryInDatabaseException('aliasInUse');
-        }
-
         if (!is_null(CoursesDAO::getByAlias($course->alias))) {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
@@ -1460,11 +1456,9 @@ class CourseController extends Controller {
      * @return array
      */
     public static function apiIntroDetails(Request $r) {
-        $result = self::getIntroDetails($r);
-        return [
-            'status' => 'ok',
-            'details' => $result['smartyProperties'],
-        ];
+        $result = self::getIntroDetails($r)['smartyProperties']['coursePayload'];
+        $result['status'] = 'ok';
+        return $result;
     }
 
     public static function getCourseDetailsForSmarty(Request $r) : array {
@@ -1474,17 +1468,14 @@ class CourseController extends Controller {
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      */
-    private static function getIntroDetails(Request $r) : array {
+    public static function getIntroDetails(Request $r) : array {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
         $group = self::resolveGroup($course, $r['group']);
-        $showAssignment = false;
-        if (!empty($r['assignment_alias'])) {
-            $showAssignment = true;
-        }
+        $showAssignment = !empty($r['assignment_alias']);
         $shouldShowIntro = !Authorization::canViewCourse(
             $r->identity,
             $course,
@@ -1517,8 +1508,8 @@ class CourseController extends Controller {
             && $requestUserInformation != 'no'
         )) {
             $needsBasicInformation = $courseDetails['basic_information_required']
-                && !is_null($r->identity) && ($r->identity->country_id ||
-                $r->identity->state_id || $r->identity->school_id);
+                && !is_null($r->identity) && (!is_null($r->identity->country_id)
+                || !is_null($r->identity->state_id) || !is_null($r->identity->school_id));
 
             // Privacy Statement Information
             $privacyStatementMarkdown = PrivacyStatement::getForProblemset(

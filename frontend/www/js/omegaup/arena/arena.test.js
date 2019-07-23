@@ -26,6 +26,8 @@ describe('omegaup.arena', function() {
       expect(options.disableClarifications).toEqual(false);
       expect(options.disableSockets).toEqual(false);
       expect(options.scoreboardToken).toEqual(null);
+      expect(options.shouldShowFirstAssociatedIdentityRunWarning)
+          .toEqual(false);
     });
 
     it('Should detect practice mode', function() {

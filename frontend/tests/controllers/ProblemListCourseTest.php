@@ -44,7 +44,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
             $details = CourseController::apiIntroDetails(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
-            ]))['details']['coursePayload'];
+            ]));
 
             $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
             CourseController::apiAddStudent(new Request([
@@ -137,7 +137,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
             $details = CourseController::apiIntroDetails(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
-            ]))['details']['coursePayload'];
+            ]));
 
             $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
             CourseController::apiAddStudent(new Request([
@@ -164,7 +164,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin[$i]->auth_token,
             'course_alias' => $courseData['course_alias']
-        ]))['details']['coursePayload'];
+        ]));
 
         $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
         CourseController::apiAddStudent(new Request([

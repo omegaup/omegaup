@@ -9,7 +9,7 @@
           <p v-html="policyHtml"></p>
         </div>
       </div>
-      <form v-on:submit.prevent="onSubmit">
+      <form v-on:submit.prevent="$emit('submit', this)">
         <div class="top-margin text-center">
           <label><input name="agreed"
                  type="checkbox"
@@ -22,26 +22,24 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
-export default {
-  props: {
-    policyMarkdown: String,
-    initialAgreed: Boolean,
-    saved: Boolean,
-  },
-  computed: {
-    policyHtml: function() {
-      return this.markdownConverter.makeHtml(this.policyMarkdown);
-    }
-  },
-  methods: {onSubmit: function() { this.$emit('submit', this);}},
-  data: function() {
-    return {
-      T: T, agreed: this.initialAgreed,
-          markdownConverter: UI.markdownConverter(),
-    }
-  },
+
+@Component
+export default class UserPrivacyPolicy extends Vue {
+  @Prop() policyMarkdown!: string;
+  @Prop({ default: false }) initialAgreed!: boolean;
+  @Prop() saved!: boolean;
+
+  T = T;
+  agreed = this.initialAgreed;
+  markdownConverter = UI.markdownConverter();
+
+  get policyHtml(): string {
+    return this.markdownConverter.makeHtml(this.policyMarkdown);
+  }
 }
+
 </script>

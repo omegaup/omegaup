@@ -24,4 +24,5 @@
 				<textarea id="editor" name="code"></textarea><br/>
 				<label>{#arenaRunSubmitUpload#} <input type="file" /></label><br/>
 				<input type="submit" />
+				<script type="text/json" id="payload">{$payload|json_encode}</script>
 			</form>
