@@ -1608,7 +1608,7 @@ class ProblemController extends Controller {
             $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
                                 ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
 
-            // Validate not overpassing the number of allowed solutions
+            // Validate that the user will not exceed the number of allowed solutions.
             if ($seenSolutions >= $allowedSolutions) {
                 throw new ForbiddenAccessException('allowedSolutionsLimitReached');
             }
