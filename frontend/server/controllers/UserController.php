@@ -2545,16 +2545,6 @@ class UserController extends Controller {
             'token' => $token,
         ];
     }
-
-    /**
-     * Returns true whether user is logged with the main identity
-     * @param Users $user
-     * @param Identities $identity
-     * @return bool
-     */
-    public static function isMainIdentity(Users $user, Identities $identity) : bool {
-        return $identity->identity_id == $user->main_identity_id;
-    }
 }
 
 UserController::$urlHelper = new UrlHelper();

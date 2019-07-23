@@ -1,11 +1,14 @@
 <?php
 require_once('../../server/bootstrap_smarty.php');
 
+$show_intro = true;
+
 try {
     $r = new Request([
         'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
         'contest_alias' => $_REQUEST['contest_alias'],
     ]);
+
     $session = SessionController::apiCurrentSession($r)['session'];
     $contest = ContestController::validateContest($r['contest_alias'] ?? '');
     $showIntro = ContestController::shouldShowIntro($r, $contest);
@@ -23,12 +26,5 @@ if ($showIntro) {
     }
     $smarty->display('../../templates/arena.contest.intro.tpl');
 } else {
-    $smarty->assign('payload', [
-        'shouldShowFirstAssociatedIdentityRunWarning' => !is_null($session['user']) &&
-            !UserController::isMainIdentity($session['user'], $session['identity'])
-            && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
-                $session['user']
-            ),
-    ]);
     $smarty->display('../../templates/arena.contest.contestant.tpl');
 }
