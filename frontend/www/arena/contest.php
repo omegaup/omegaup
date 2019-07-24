@@ -6,8 +6,8 @@ try {
     $r->ensureBool('is_practice', false);
 
     $contest = ContestController::validateContest($_REQUEST['contest_alias'] ?? '');
-    $showIntro = ($_GET['practice'] !== 'true' &&
-        ContestController::shouldShowIntro($r, $contest));
+    $showIntro = (!isset($_GET['is_practice']) || $_GET['is_practice'] !== 'true')
+        && ContestController::shouldShowIntro($r, $contest);
     if ($showIntro) {
         $result = ContestController::getContestDetailsForSmarty($r, $contest);
     }
@@ -21,7 +21,7 @@ if ($showIntro) {
         $smarty->assign($key, $value);
     }
     $smarty->display('../../templates/arena.contest.intro.tpl');
-} elseif ($r['is_practice'] !== true) {
+} elseif (!isset($_GET['is_practice']) || $_GET['is_practice'] !== 'true') {
     $smarty->display('../../templates/arena.contest.contestant.tpl');
 } else {
     $smarty->display('../../templates/arena.contest.practice.tpl');
