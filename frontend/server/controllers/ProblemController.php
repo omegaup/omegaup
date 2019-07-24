@@ -1587,13 +1587,28 @@ class ProblemController extends Controller {
             $forfeit = !!$r['forfeit_problem'];
         }
 
-        if (!Authorization::canViewProblemSolution($r->identity, $problem)) {
-            $r->ensureBool('forefeit_problem', false /*isRequired*/);
-            if ($r['forfeit_problem'] !== true) {
+        // Get the expected commit version.
+        $commit = $problem->commit;
+        $version = $problem->current_version;
+        if (!empty($problemset)) {
+            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+                $problemset->problemset_id,
+                $problem->problem_id
+            );
+            if (is_null($problemsetProblem)) {
                 return [
                     'status' => 'ok',
                     'exists' => false,
                 ];
+            }
+            $commit = $problemsetProblem->commit;
+            $version = $problemsetProblem->version;
+        }
+
+        if (!Authorization::canViewProblemSolution($r->identity, $problem)) {
+            $r->ensureBool('forefeit_problem', false /*isRequired*/);
+            if ($r['forfeit_problem'] !== true) {
+                throw new ForbiddenAccessException('problemSolutionNotVisible');
             }
             $seenSolutions = ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user);
             $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
@@ -1606,26 +1621,6 @@ class ProblemController extends Controller {
                 'user_id' => $r->user->user_id,
                 'problem_id' => $problem->problem_id
             ]));
-        }
-
-        // Get the expected commit version.
-        $commit = $problem->commit;
-        $version = $problem->current_version;
-        if (!empty($problemset)) {
-            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
-                $problemset->problemset_id,
-                $problem->problem_id
-            );
-            if (is_null($problemsetProblem)) {
-                // Rollback the new entry in Problems_Forfeited
-                DAO::transRollback();
-                return [
-                    'status' => 'ok',
-                    'exists' => false,
-                ];
-            }
-            $commit = $problemsetProblem->commit;
-            $version = $problemsetProblem->version;
         }
 
         return [
