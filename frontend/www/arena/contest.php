@@ -6,7 +6,8 @@ try {
     $r->ensureBool('is_practice', false);
 
     $contest = ContestController::validateContest($_REQUEST['contest_alias'] ?? '');
-    $showIntro = ContestController::shouldShowIntro($r, $contest);
+    $showIntro = ($_GET['practice'] !== 'true' &&
+        ContestController::shouldShowIntro($r, $contest));
     if ($showIntro) {
         $result = ContestController::getContestDetailsForSmarty($r, $contest);
     }

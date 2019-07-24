@@ -422,9 +422,6 @@ class ContestController extends Controller {
         Request $r,
         Contests $contest
     ) : bool {
-        if ($r['is_practice'] === true) {
-            return false;
-        }
         try {
             $session = SessionController::apiCurrentSession($r)['session'];
             if (is_null($session['identity'])) {
@@ -2139,6 +2136,7 @@ class ContestController extends Controller {
                 if (!is_null($data)) {
                     $admin_infos[$admin_id]['user_id'] = $data->user_id;
                     $admin_infos[$admin_id]['username'] = $data->username;
+                    $admin_infos[$admin_id]['name'] = $data->name;
                 }
             }
         }
