@@ -366,8 +366,6 @@ class ContestController extends Controller {
         Request $r,
         Contests $contest
     ) : array {
-        $isPublicContest = self::isPublic($contest->admission_mode)
-            ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
         // Half-authenticate, in case there is no session in place.
         $session = SessionController::apiCurrentSession($r)['session'];
         $result = [
@@ -424,10 +422,14 @@ class ContestController extends Controller {
         Request $r,
         Contests $contest
     ) : bool {
+        if ($r['is_practice'] === true) {
+            return false;
+        }
         try {
             $session = SessionController::apiCurrentSession($r)['session'];
             if (is_null($session['identity'])) {
-                return ContestController::SHOW_INTRO;
+                // No session, show the intro (if public), so that they can login.
+                return self::isPublic($contest->admission_mode);
             }
             self::canAccessContest($contest, $session['identity']);
         } catch (Exception $e) {
@@ -2137,7 +2139,6 @@ class ContestController extends Controller {
                 if (!is_null($data)) {
                     $admin_infos[$admin_id]['user_id'] = $data->user_id;
                     $admin_infos[$admin_id]['username'] = $data->username;
-                    $admin_infos[$admin_id]['name'] = $data->name;
                 }
             }
         }

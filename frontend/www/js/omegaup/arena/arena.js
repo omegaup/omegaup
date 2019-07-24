@@ -850,8 +850,8 @@ export class Arena {
                 .html('(' +
                       problem.points.toFixed(self.digitsAfterDecimalPoint) +
                       ' / ' +
-                      self.problems[alias].points.toFixed(
-                          self.digitsAfterDecimalPoint) +
+                      parseInt(self.problems[alias].points)
+                          .toFixed(self.digitsAfterDecimalPoint) +
                       ')');
             self.updateProblemScore(alias, self.problems[alias].points,
                                     problem.points);
