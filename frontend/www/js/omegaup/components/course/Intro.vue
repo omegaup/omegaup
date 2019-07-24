@@ -15,7 +15,7 @@
                v-bind:value="0"
                v-model="shareUserInformation"> {{ T.wordsNo }}</label>
       </template>
-      <template v-if="showAcceptTeacher">
+      <template v-if="shouldShowAcceptTeacher">
         <p v-html="acceptTeacherConsentHtml"></p><label><input name="accept-teacher"
                type="radio"
                v-model="acceptTeacher"
@@ -46,7 +46,7 @@ export default {
     description: String,
     needsBasicInformation: Boolean,
     requestsUserInformation: String,
-    showAcceptTeacher: Boolean,
+    shouldShowAcceptTeacher: Boolean,
     statements: Object,
   },
   computed: {

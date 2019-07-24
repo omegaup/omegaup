@@ -320,7 +320,6 @@ const translations = {
 	errorEc2RunInstances: "",
 	errorEc2TerminateInstance: "",
 	errorWhileSendingMail: "Hubo un problema al enviar el correo de verificaci\u00f3n. Por favor intenta m\u00e1s tarde o escribe a omegaup-soporte@googlegroups.com para obtener ayuda. Tu direcci\u00f3n de correo a\u00fan no ha sido verificada.",
-	firstSumbissionWithIdentity: "Ten en cuenta que est\u00e1s intentando enviar una soluci\u00f3n con una cuenta de identidad",
 	forSelectedItems: "Para los items seleccionados",
 	forbiddenInVirtualContest: "Prohibido en concurso virtual",
 	frontPageCreateContestButton: "&iexcl;Crea tu propio concurso en omegaUp!",

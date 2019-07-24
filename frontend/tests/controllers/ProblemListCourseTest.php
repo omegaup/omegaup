@@ -41,16 +41,18 @@ class ProblemListCourseTest extends OmegaupTestCase {
         // Users must join course
         for ($i=0; $i<$num_users; $i++) {
             $userLogin[$i] = self::login($user[$i]);
-            $intro_details = CourseController::apiIntroDetails(new Request([
+            $details = CourseController::apiIntroDetails(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
             ]));
+
+            $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
             CourseController::apiAddStudent(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
                 'accept_teacher' => 'yes',
-                'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+                'accept_teacher_git_object_id' => $gitObjectId,
             ]));
         }
         $adminLogin = self::login($courseData['admin']);
@@ -132,16 +134,18 @@ class ProblemListCourseTest extends OmegaupTestCase {
         // Users must join course
         for ($i=0; $i<($num_users - 1); $i++) {
             $userLogin[$i] = self::login($user[$i]);
-            $intro_details = CourseController::apiIntroDetails(new Request([
+            $details = CourseController::apiIntroDetails(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
             ]));
+
+            $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
             CourseController::apiAddStudent(new Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
                 'accept_teacher' => 'no',
-                'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+                'accept_teacher_git_object_id' => $gitObjectId,
             ]));
         }
         $solvedProblems = CourseController::apiListSolvedProblems(new Request([
@@ -157,16 +161,18 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $this->assertEquals(0, count($unsolvedProblems['user_problems']));
         // User[2] accept teacher's request
         $userLogin[2] = self::login($user[2]);
-        $intro_details = CourseController::apiIntroDetails(new Request([
+        $details = CourseController::apiIntroDetails(new Request([
             'auth_token' => $userLogin[$i]->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
+
+        $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
         CourseController::apiAddStudent(new Request([
             'auth_token' => $userLogin[2]->auth_token,
             'course_alias' => $courseData['course_alias'],
             'usernameOrEmail' => $user[2]->username,
             'accept_teacher' => 'yes',
-            'accept_teacher_git_object_id' => $intro_details['accept_teacher_statement']['git_object_id'],
+            'accept_teacher_git_object_id' => $gitObjectId,
         ]));
         $solvedProblems = CourseController::apiListSolvedProblems(new Request([
             'auth_token' => $adminLogin->auth_token,
