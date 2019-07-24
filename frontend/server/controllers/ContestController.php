@@ -2077,65 +2077,29 @@ class ContestController extends Controller {
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         try {
-            $db_results = ProblemsetIdentityRequestDAO::getRequestsForProblemset($contest->problemset_id);
+            $dbResults = ProblemsetIdentityRequestDAO::getRequestsForProblemset($contest->problemset_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        // @TODO prefetch an alias-user_id map so that we dont need
-        // a getbypk (sql select query) on every iteration of the following loop
+        $usersRequests = array_map(function ($request) {
+            $admin = [
+                'user_id' => $request['admin_user_id'],
+                'username' => $request['admin_username'],
+                'name' => $request['admin_name'],
+            ];
+            $request['admin'] = $admin;
+            unset($request['admin_user_id']);
+            unset($request['admin_username']);
+            unset($request['admin_name']);
+            return $request;
+        }, $dbResults);
 
-        // Precalculate all admin profiles.
-        $admin_infos = [];
-        foreach ($db_results as $result) {
-            $admin_id = $result['admin_id'];
-            if (!array_key_exists($admin_id, $admin_infos)) {
-                $data = UsersDAO::getByPK($admin_id);
-                if (!is_null($data)) {
-                    $admin_infos[$admin_id]['user_id'] = $data->user_id;
-                    $admin_infos[$admin_id]['username'] = $data->username;
-                    $admin_infos[$admin_id]['name'] = $data->name;
-                }
-            }
-        }
-
-        $users = [];
-        foreach ($db_results as $result) {
-            $admin_id = $result['admin_id'];
-
-            $result = new ProblemsetIdentityRequest($result);
-            $identity_id = $result->identity_id;
-            $user = IdentitiesDAO::getByPK($identity_id);
-
-            // Get user profile. Email, school, etc.
-            $profile_request = new Request();
-            $profile_request['username'] = $user->username;
-            $profile_request['omit_rank'] = true;
-
-            $userprofile = UserController::apiProfile($profile_request);
-            $adminprofile = [];
-
-            if (array_key_exists($admin_id, $admin_infos)) {
-                $adminprofile = $admin_infos[$admin_id];
-            }
-
-            $users[] = array_merge(
-                $userprofile['userinfo'],
-                [
-                    'last_update' => $result->last_update,
-                    'accepted' => $result->accepted,
-                    'extra_note' => $result->extra_note,
-                    'admin' => $adminprofile,
-                    'request_time' => $result->request_time]
-            );
-        }
-
-        $response = [];
-        $response['users'] = $users;
-        $response['contest_alias'] = $r['contest_alias'];
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'users' => $usersRequests,
+            'contest_alias' => $r['contest_alias'],
+            'status' => 'ok',
+        ];
     }
 
     public static function apiArbitrateRequest(Request $r) {
