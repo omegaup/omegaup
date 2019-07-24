@@ -32,7 +32,8 @@ export function GetOptionsFromLocation(arenaLocation) {
     disableClarifications: false,
     disableSockets: false,
     contestAlias: null,
-    scoreboardToken: null
+    scoreboardToken: null,
+    shouldShowFirstAssociatedIdentityRunWarning: false,
   };
 
   if ($('body').hasClass('lockdown')) {
@@ -62,7 +63,16 @@ export function GetOptionsFromLocation(arenaLocation) {
   if (arenaLocation.search.indexOf('ws=off') !== -1) {
     options.disableSockets = true;
   }
-
+  const elementPayload = document.getElementById('payload');
+  if (elementPayload != null) {
+    const payload = JSON.parse(elementPayload.firstChild.nodeValue);
+    if (payload != null &&
+        typeof payload.shouldShowFirstAssociatedIdentityRunWarning !==
+            'undefined') {
+      options.shouldShowFirstAssociatedIdentityRunWarning =
+          payload.shouldShowFirstAssociatedIdentityRunWarning;
+    }
+  }
   return options;
 }
 
@@ -1453,6 +1463,10 @@ export class Arena {
           // for the display to update correctly!
           self.codeEditor.refresh();
         }
+        if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
+          self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
+          UI.warning(omegaup.T.firstSumbissionWithIdentity);
+        }
       }
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
@@ -1746,9 +1760,7 @@ export class Arena {
         .fail(function(run) {
           alert(run.error);
           $('input', self.elements.submitForm).prop('disabled', false);
-        }
-
-              );
+        });
   }
 
   updateSummary(contest) {
