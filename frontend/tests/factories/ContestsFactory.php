@@ -264,11 +264,33 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
-    public static function addUser(array $contestData, Object $userOrIdentity) {
+    public static function addUser(
+        array $contestData,
+        Users $user
+    ) : void {
         // Prepare our request
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $userOrIdentity->username;
+        $r['usernameOrEmail'] = $user->username;
+
+        // Log in the contest director
+        $login = OmegaupTestCase::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ContestController::apiAddUser($r);
+
+        unset($_REQUEST);
+    }
+
+    public static function addIdentity(
+        array $contestData,
+        Identities $identitiy
+    ) : void {
+        // Prepare our request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['usernameOrEmail'] = $identitiy->username;
 
         // Log in the contest director
         $login = OmegaupTestCase::login($contestData['director']);
