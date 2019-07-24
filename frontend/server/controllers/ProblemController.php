@@ -1587,22 +1587,25 @@ class ProblemController extends Controller {
             $forfeit = !!$r['forfeit_problem'];
         }
 
-        if (!Authorization::canViewProblemSolution($r->identity, $problem) && !$forfeit) {
-            return [
-                'status' => 'ok',
-                'exists' => false,
-            ];
-        }
-
-        if ($forfeit) {
+        if (!Authorization::canViewProblemSolution($r->identity, $problem)) {
+            $r->ensureBool('forefeit_problem', false /*isRequired*/);
+            if ($r['forfeit_problem'] !== true) {
+                return [
+                    'status' => 'ok',
+                    'exists' => false,
+                ];
+            }
             $seenSolutions = ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user);
             $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
                                 ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
-
             // Validate that the user will not exceed the number of allowed solutions.
             if ($seenSolutions >= $allowedSolutions) {
                 throw new ForbiddenAccessException('allowedSolutionsLimitReached');
             }
+            ProblemsForfeitedDAO::create(new ProblemsForfeited([
+                'user_id' => $r->user->user_id,
+                'problem_id' => $problem->problem_id
+            ]));
         }
 
         // Get the expected commit version.
@@ -1614,6 +1617,8 @@ class ProblemController extends Controller {
                 $problem->problem_id
             );
             if (is_null($problemsetProblem)) {
+                // Rollback the new entry in Problems_Forfeited
+                DAO::transRollback();
                 return [
                     'status' => 'ok',
                     'exists' => false,
@@ -1621,14 +1626,6 @@ class ProblemController extends Controller {
             }
             $commit = $problemsetProblem->commit;
             $version = $problemsetProblem->version;
-        }
-
-        if ($forfeit) {
-            // Save problem as forfeited
-            ProblemsForfeitedDAO::create(new ProblemsForfeited([
-                'user_id' => $r->user->user_id,
-                'problem_id' => $problem->problem_id
-            ]));
         }
 
         return [

@@ -46,12 +46,25 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         }
 
         $extraProblem = ProblemsFactory::createProblem();
+
+        $response = ProblemController::apiSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $extraProblem['problem']->alias,
+        ]));
+        $this->assertFalse($response['exists']);
+        $this->assertFalse(
+            ProblemsForfeitedDAO::isProblemForfeited(
+                $extraProblem['problem'],
+                IdentitiesDAO::findByUsername($user->username)
+            )
+        );
+
         $response = ProblemController::apiSolution(new Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $extraProblem['problem']->alias,
             'forfeit_problem' => true,
         ]));
-        $this->assertContains('`long long`', $response['solution']['markdown']);
+        $this->assertTrue($response['exists']);
         $this->assertTrue(
             ProblemsForfeitedDAO::isProblemForfeited(
                 $extraProblem['problem'],
