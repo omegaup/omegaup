@@ -1582,11 +1582,6 @@ class ProblemController extends Controller {
         $problemset = $problem['problemset'];
         $problem = $problem['problem'];
 
-        $forfeit = false;
-        if (isset($r['forfeit_problem'])) {
-            $forfeit = !!$r['forfeit_problem'];
-        }
-
         // Get the expected commit version.
         $commit = $problem->commit;
         $version = $problem->current_version;
