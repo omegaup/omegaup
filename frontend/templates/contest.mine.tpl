@@ -1,7 +1,7 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' navbarSection='contests' htmlTitle="{#omegaupTitleContest#}"}
 
-{if $PRIVATE_CONTESTS_ALERT eq 1}
+{if $privateContestsAlert eq true}
 	<div class="alert alert-info">
 		<span class="message">
 			{#messageMakeYourContestsPublic#}

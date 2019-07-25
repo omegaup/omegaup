@@ -76,3 +76,4 @@ rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
 rewrite ^/rank/?$ /rank.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolsrank/?$ /schoolsrank.php last;
+rewrite ^/scoreboardmerge/?$ /scoreboardmerge.php last;

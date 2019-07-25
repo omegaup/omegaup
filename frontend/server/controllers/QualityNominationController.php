@@ -471,7 +471,7 @@ class QualityNominationController extends Controller {
         }
 
         // Validate request
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         return self::getListImpl($r, $r->user->user_id, null /* assignee */);
     }
