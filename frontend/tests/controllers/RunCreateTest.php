@@ -114,7 +114,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertNotNull($submission);
 
         // Get contest from DB to check times with respect to contest start
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = ContestsDAO::getByAlias($r['contest_alias'] ?? '');
 
         // Validate data
         $this->assertEquals($r['language'], $submission->language);
