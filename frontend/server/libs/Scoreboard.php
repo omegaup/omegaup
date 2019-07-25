@@ -524,6 +524,7 @@ class Scoreboard {
             $noRuns[$contestant['identity_id']] = true;
             foreach ($problemMapping as $id => $problem) {
                 array_push($identityProblems, [
+                    'alias' => $problem['alias'],
                     'points' => 0,
                     'percent' => 0,
                     'penalty' => 0,

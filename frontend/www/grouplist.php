@@ -9,5 +9,5 @@ try {
 } catch (APIException $e) {
     Logger::getLogger('grouplist')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');
-    die();
+    die(file_get_contents('404.html'));
 }

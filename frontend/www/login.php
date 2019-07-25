@@ -60,7 +60,7 @@ function shouldRedirect($url) {
     return $redirect_url == OMEGAUP_URL;
 }
 
-if ($c_Session->CurrentSessionAvailable()) {
+if ($c_Session->currentSessionAvailable()) {
     if (!empty($_GET['redirect']) && shouldRedirect($_GET['redirect'])) {
         die(header('Location: ' . $_GET['redirect']));
     }
