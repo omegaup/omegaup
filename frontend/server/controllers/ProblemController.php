@@ -2622,12 +2622,6 @@ class ProblemController extends Controller {
         $result['quality_payload'] = $nominationStatus;
         $result['problem_admin'] = $isProblemAdmin;
         $result['payload']['user'] = $user;
-        if (is_null($r->user)) {
-            // Warning should never be shown when identity doesn't have an
-            // associated user
-            $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] = false;
-            return $result;
-        }
         $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
             !is_null($r->user) && !UserController::isMainIdentity(
                 $r->user,

@@ -66,11 +66,9 @@ export function GetOptionsFromLocation(arenaLocation) {
   const elementPayload = document.getElementById('payload');
   if (elementPayload != null) {
     const payload = JSON.parse(elementPayload.firstChild.nodeValue);
-    if (payload != null &&
-        typeof payload.shouldShowFirstAssociatedIdentityRunWarning !==
-            'undefined') {
+    if (payload != null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
-          payload.shouldShowFirstAssociatedIdentityRunWarning;
+          payload.shouldShowFirstAssociatedIdentityRunWarning || false;
     }
   }
   return options;
