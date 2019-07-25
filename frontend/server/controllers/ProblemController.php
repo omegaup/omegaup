@@ -2669,6 +2669,13 @@ class ProblemController extends Controller {
         $result['quality_payload'] = $nominationStatus;
         $result['problem_admin'] = $isProblemAdmin;
         $result['payload']['user'] = $user;
+        $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
+            !is_null($r->user) && !UserController::isMainIdentity(
+                $r->user,
+                $r->identity
+            ) && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                $r->user
+            );
         return $result;
     }
 }

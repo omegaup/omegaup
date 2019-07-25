@@ -364,10 +364,24 @@ class ContestController extends Controller {
      */
     public static function getContestDetailsForSmarty(
         Request $r,
-        Contests $contest
+        Contests $contest,
+        bool $shouldShowIntro
     ) : array {
         // Half-authenticate, in case there is no session in place.
         $session = SessionController::apiCurrentSession($r)['session'];
+        if (!$shouldShowIntro) {
+            return ['payload' => [
+                'shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($session['user']) &&
+                    !UserController::isMainIdentity(
+                        $session['user'],
+                        $session['identity']
+                    )
+                    && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                        $session['user']
+                    ),
+            ]];
+        }
         $result = [
             'needsBasicInformation' => false,
             'requestsUserInformation' => false,
