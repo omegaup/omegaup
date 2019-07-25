@@ -2077,23 +2077,32 @@ class ContestController extends Controller {
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         try {
-            $dbResults = ProblemsetIdentityRequestDAO::getRequestsForProblemset($contest->problemset_id);
+            $admins =
+                ProblemsetIdentityRequestDAO::getFirstAdminForProblemsetRequest(
+                    $contest->problemset_id
+                );
+            $requests = ProblemsetIdentityRequestDAO::getRequestsForProblemset(
+                $contest->problemset_id
+            );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        $usersRequests = array_map(function ($request) {
-            $admin = [
-                'user_id' => $request['admin_user_id'],
-                'username' => $request['admin_username'],
-                'name' => $request['admin_name'],
-            ];
-            $request['admin'] = $admin;
-            unset($request['admin_user_id']);
-            unset($request['admin_username']);
-            unset($request['admin_name']);
+        $requestsAdmins = [];
+        foreach ($admins as $requestAdmin) {
+            if (!isset($requestsAdmins[$requestAdmin['contestant_id']])) {
+                $requestsAdmins[$requestAdmin['contestant_id']] = $requestAdmin;
+            }
+            unset($requestsAdmins[$requestAdmin['contestant_id']]['contestant_id']);
+        }
+
+        $usersRequests = array_map(function ($request) use ($requestsAdmins) {
+            $request['admin'] = ['user_id' => null, 'username' => null, 'name' => null];
+            if (isset($requestsAdmins[$request['identity_id']])) {
+                $request['admin'] = $requestsAdmins[$request['identity_id']];
+            }
             return $request;
-        }, $dbResults);
+        }, $requests);
 
         return [
             'users' => $usersRequests,
