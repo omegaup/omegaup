@@ -937,7 +937,6 @@ class ProblemController extends Controller {
         if (!is_null($r['update_published'])) {
             $updatePublished = $r['update_published'];
         }
-        $updatedStatementLanguages = [];
 
         $updatedStatementLanguages = [];
         try {
@@ -947,6 +946,72 @@ class ProblemController extends Controller {
                 $r->user,
                 [
                     "statements/{$r['lang']}.markdown" => $r['statement'],
+                ]
+            );
+            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
+                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+                    $problem,
+                    $problemDeployer->publishedCommit
+                );
+                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                        $problem,
+                        $r->user,
+                        $updatePublished
+                    );
+                }
+                ProblemsDAO::update($problem);
+            }
+            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+
+        self::invalidateCache($problem, $updatedStatementLanguages);
+
+        // All clear
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    /**
+     * Updates problem solution only
+     *
+     * @param Request $r
+     * @return array
+     * @throws ApiException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateSolution(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCreateOrUpdate($r, true);
+
+        $problem = $r['problem'];
+
+        // Validate solution
+        Validators::validateStringNonEmpty($r['solution'], 'solution');
+        Validators::validateStringNonEmpty($r['message'], 'message');
+
+        // Check that lang is available, default is "es".
+        $langs = ['en', 'es', 'pt'];
+        Validators::validateInEnum($r['lang'], 'lang', $langs, false /* is_required */);
+        if (is_null($r['lang'])) {
+            $r['lang'] = IdentityController::getPreferredLanguage($r);
+        }
+        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        if (!is_null($r['update_published'])) {
+            $updatePublished = $r['update_published'];
+        }
+
+        try {
+            $problemDeployer = new ProblemDeployer($r['problem_alias']);
+            $problemDeployer->commitStatements(
+                "{$r['lang']}.markdown: {$r['message']}",
+                $r->user,
+                [
+                    "solutions/{$r['lang']}.markdown" => $r['solution'],
                 ]
             );
             if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
