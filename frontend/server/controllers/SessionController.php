@@ -53,7 +53,7 @@ class SessionController extends Controller {
         return true;
     }
 
-    public static function CurrentSessionAvailable() {
+    public static function currentSessionAvailable() {
         return self::apiCurrentSession()['session']['valid'];
     }
 
