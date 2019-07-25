@@ -1,7 +1,7 @@
 {include file='redirect.tpl'}
 {include file='head.tpl' htmlTitle="{#omegaupTitleMyProblemsList#}"}
 
-{if $PRIVATE_PROBLEMS_ALERT eq 1}
+{if $privateProblemsAlert eq true}
 	<div class="alert alert-info">
 		<span class="message">
 			{#messageMakeYourProblemsPublic#}
@@ -17,7 +17,7 @@
     <div class="checkbox btn-group">
       <label>
         <input type="checkbox" id="show-admin-problems" />
-        {if $IS_SYSADMIN}
+        {if $isSysadmin}
             {#problemListShowAdminProblemsAndDeleted#}
         {else}
             {#problemListShowAdminProblems#}

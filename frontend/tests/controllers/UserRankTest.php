@@ -312,6 +312,7 @@ class UserRankTest extends OmegaupTestCase {
         ]));
         $this->assertCount(1, $response['rank']);
     }
+
     public function testUserRankingClassName() {
         // Create a user and sumbit a run with them
         $contestant = UserFactory::createUser();
@@ -328,5 +329,56 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         $this->assertNotEquals($response['userinfo']['classname'], 'user-rank-unranked');
+    }
+
+    public function testUserRankWithForfeitedProblem() {
+        $firstPlaceUser = UserFactory::createUser();
+        $login = self::login($firstPlaceUser);
+        $problems = [];
+        $extraProblem = ProblemsFactory::createProblem();
+        for ($i = 0;
+             $i < ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
+             $i++) {
+            $problems[] = ProblemsFactory::createProblem();
+            $run = RunsFactory::createRunToProblem($problems[$i], $firstPlaceUser, $login);
+            RunsFactory::gradeRun($run);
+        }
+        $run = RunsFactory::createRunToProblem($extraProblem, $firstPlaceUser, $login);
+        RunsFactory::gradeRun($run);
+
+        $user = UserFactory::createUser();
+        $login = self::login($user);
+        for ($i = 0;
+            $i < ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
+            $i++) {
+            $run = RunsFactory::createRunToProblem($problems[$i], $user, $login);
+            RunsFactory::gradeRun($run);
+        }
+
+        ProblemController::apiSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $extraProblem['problem']->alias,
+            'forfeit_problem' => true,
+        ]));
+
+        $run = RunsFactory::createRunToProblem($extraProblem, $user, $login);
+        RunsFactory::gradeRun($run);
+
+        // Refresh Rank
+        $this->refreshUserRank();
+
+        $firstPlaceUserRank = UserController::apiRankByProblemsSolved(new Request([
+            'username' => $firstPlaceUser->username
+        ]));
+        $userRank = UserController::apiRankByProblemsSolved(new Request([
+            'username' => $user->username
+        ]));
+
+        $this->assertTrue($firstPlaceUserRank['rank'] < $userRank['rank']);
+        $this->assertEquals(sizeof($problems), $userRank['problems_solved']);
+        $this->assertEquals(
+            sizeof($problems) + 1 /* extraProblem */,
+            $firstPlaceUserRank['problems_solved']
+        );
     }
 }

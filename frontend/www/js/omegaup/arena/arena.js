@@ -1865,6 +1865,27 @@ export class Arena {
 
   updateProblemScore(alias, maxScore, previousScore) {
     let self = this;
+    // It only works for contests
+    if (self.options.contestAlias != null) {
+      self.elements.rankingTable.ranking =
+          self.elements.rankingTable.ranking.map(rank => {
+            let ranking = rank;
+            if (ranking.username == OmegaUp.username) {
+              ranking.problems = rank.problems.map(problem => {
+                let problemRanking = problem;
+                if (problemRanking.alias == alias) {
+                  let maxScore = self.myRuns.getMaxScore(problemRanking.alias,
+                                                         previousScore);
+                  problemRanking.points = maxScore;
+                }
+                return problemRanking;
+              });
+              ranking.total.points = rank.problems.reduce(
+                  (accumulator, problem) => accumulator + problem.points, 0);
+            }
+            return ranking;
+          });
+    }
     $('.problem_' + alias + ' .solved')
         .text(
             '(' +
@@ -1873,10 +1894,6 @@ export class Arena {
             ' / ' +
             parseFloat(maxScore || '0').toFixed(self.digitsAfterDecimalPoint) +
             ')');
-    $('.omegaup-scoreboard tr.' + OmegaUp.username + ' td.' + alias +
-      ' .points')
-        .text(self.myRuns.getMaxScore(alias, previousScore)
-                  .toFixed(self.digitsAfterDecimalPoint))
   }
 }
 ;
