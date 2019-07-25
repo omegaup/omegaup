@@ -34,7 +34,7 @@ abstract class ProblemsForfeitedDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function save(ProblemsForfeited $Problems_Forfeited) {
-        if (is_null(self::getByPK($Problems_Forfeited->problem_forfeited_id))) {
+        if (is_null(self::getByPK($Problems_Forfeited->user_id, $Problems_Forfeited->problem_id))) {
             return ProblemsForfeitedDAOBase::create($Problems_Forfeited);
         }
         return ProblemsForfeitedDAOBase::update($Problems_Forfeited);
@@ -48,12 +48,11 @@ abstract class ProblemsForfeitedDAOBase {
      * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a actualizar.
      */
     final public static function update(ProblemsForfeited $Problems_Forfeited) {
-        $sql = 'UPDATE `Problems_Forfeited` SET `user_id` = ?, `problem_id` = ?, `forfeited_date` = ? WHERE `problem_forfeited_id` = ?;';
+        $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
+            $Problems_Forfeited->forfeited_date,
             is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
             is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
-            $Problems_Forfeited->forfeited_date,
-            is_null($Problems_Forfeited->problem_forfeited_id) ? null : (int)$Problems_Forfeited->problem_forfeited_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -69,12 +68,12 @@ abstract class ProblemsForfeitedDAOBase {
      * @static
      * @return @link ProblemsForfeited Un objeto del tipo {@link ProblemsForfeited}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problem_forfeited_id) {
-        if (is_null($problem_forfeited_id)) {
+    final public static function getByPK($user_id, $problem_id) {
+        if (is_null($user_id) || is_null($problem_id)) {
             return null;
         }
-        $sql = 'SELECT `Problems_Forfeited`.`problem_forfeited_id`, `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (problem_forfeited_id = ?) LIMIT 1;';
-        $params = [$problem_forfeited_id];
+        $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
+        $params = [$user_id, $problem_id];
         global $conn;
         $row = $conn->GetRow($sql, $params);
         if (empty($row)) {
@@ -100,8 +99,8 @@ abstract class ProblemsForfeitedDAOBase {
      * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a eliminar
      */
     final public static function delete(ProblemsForfeited $Problems_Forfeited) {
-        $sql = 'DELETE FROM `Problems_Forfeited` WHERE problem_forfeited_id = ?;';
-        $params = [$Problems_Forfeited->problem_forfeited_id];
+        $sql = 'DELETE FROM `Problems_Forfeited` WHERE user_id = ? AND problem_id = ?;';
+        $params = [$Problems_Forfeited->user_id, $Problems_Forfeited->problem_id];
         global $conn;
 
         $conn->Execute($sql, $params);
@@ -128,7 +127,7 @@ abstract class ProblemsForfeitedDAOBase {
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsForfeited}.
      */
     final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT `Problems_Forfeited`.`problem_forfeited_id`, `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` from Problems_Forfeited';
+        $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` from Problems_Forfeited';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -169,7 +168,6 @@ abstract class ProblemsForfeitedDAOBase {
         if ($ar == 0) {
             return 0;
         }
-        $Problems_Forfeited->problem_forfeited_id = $conn->Insert_ID();
 
         return $ar;
     }

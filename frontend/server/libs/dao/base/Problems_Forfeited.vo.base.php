@@ -26,9 +26,6 @@ class ProblemsForfeited extends VO {
         if (is_null($data)) {
             return;
         }
-        if (isset($data['problem_forfeited_id'])) {
-            $this->problem_forfeited_id = (int)$data['problem_forfeited_id'];
-        }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
         }
@@ -52,16 +49,8 @@ class ProblemsForfeited extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $problem_forfeited_id;
-
-    /**
       * Identificador de usuario
+      * Llave Primaria
       * @access public
       * @var int(11)
       */
@@ -69,6 +58,7 @@ class ProblemsForfeited extends VO {
 
     /**
       *  [Campo no documentado]
+      * Llave Primaria
       * @access public
       * @var int(11)
       */
