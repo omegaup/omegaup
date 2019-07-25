@@ -2,44 +2,30 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $r = new Request([
-        'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
-        'contest_alias' => $_REQUEST['contest_alias'],
-    ]);
-    $showIntro = ContestController::showContestIntro($r);
-} catch (Exception $e) {
+    $r = new Request($_REQUEST);
+    $r->ensureBool('is_practice', false);
+
+    $contest = ContestController::validateContest($_REQUEST['contest_alias'] ?? '');
+    $shouldShowIntro = (!isset($_GET['is_practice']) || $_GET['is_practice'] !== 'true')
+        && ContestController::shouldShowIntro($r, $contest);
+    $result = ContestController::getContestDetailsForSmarty(
+        $r,
+        $contest,
+        $shouldShowIntro
+    );
+} catch (ApiException $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
 }
 
-$session = SessionController::apiCurrentSession($r)['session'];
-if ($showIntro['shouldShowIntro']) {
-    $smarty->assign(
-        'needsBasicInformation',
-        $showIntro['needs_basic_information'] &&
-            !is_null($session['identity']) && (!$session['identity']->country_id
-            || !$session['identity']->state_id || !$session['identity']->school_id
-        )
-    );
-    $smarty->assign(
-        'requestsUserInformation',
-        $showIntro['requests_user_information']
-    );
-    if (isset($showIntro['privacy_statement_markdown'])) {
-        $smarty->assign('privacyStatement', [
-            'markdown' => $showIntro['privacy_statement_markdown'],
-            'gitObjectId' => $showIntro['git_object_id'],
-            'statementType' => $showIntro['statement_type'],
-        ]);
-    }
+foreach ($result as $key => $value) {
+    $smarty->assign($key, $value);
+}
+
+if ($shouldShowIntro) {
     $smarty->display('../../templates/arena.contest.intro.tpl');
-} else {
-    $smarty->assign('payload', [
-        'shouldShowFirstAssociatedIdentityRunWarning' => !is_null($session['user']) &&
-            !UserController::isMainIdentity($session['user'], $session['identity'])
-            && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
-                $session['user']
-            ),
-    ]);
+} elseif (!isset($_GET['is_practice']) || $_GET['is_practice'] !== 'true') {
     $smarty->display('../../templates/arena.contest.contestant.tpl');
+} else {
+    $smarty->display('../../templates/arena.contest.practice.tpl');
 }

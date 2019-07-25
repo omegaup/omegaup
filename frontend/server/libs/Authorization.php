@@ -165,7 +165,8 @@ class Authorization {
             return false;
         }
         return Authorization::canEditProblem($identity, $problem) ||
-            ProblemsDAO::isProblemSolved($problem, $identity->identity_id);
+            ProblemsDAO::isProblemSolved($problem, $identity->identity_id) ||
+            ProblemsForfeitedDAO::isProblemForfeited($problem, $identity);
     }
 
     public static function canViewEmail($identity_id) {
