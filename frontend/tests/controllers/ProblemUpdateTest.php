@@ -304,7 +304,7 @@ class UpdateProblemTest extends OmegaupTestCase {
     public function testProblemSolutionUpdate() {
         $problemData = ProblemsFactory::createProblem();
 
-        // Update ssolution
+        // Update solution
         $solution = 'La nueva solución \$x\$';
         $login = self::login($problemData['author']);
         $response = ProblemController::apiUpdateSolution(new Request([
