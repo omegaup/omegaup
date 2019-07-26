@@ -2077,7 +2077,7 @@ class ContestController extends Controller {
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         try {
-            $admins =
+            $requestsAdmins =
                 ProblemsetIdentityRequestDAO::getFirstAdminForProblemsetRequest(
                     $contest->problemset_id
                 );
@@ -2086,14 +2086,6 @@ class ContestController extends Controller {
             );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
-        }
-
-        $requestsAdmins = [];
-        foreach ($admins as $requestAdmin) {
-            if (!isset($requestsAdmins[$requestAdmin['contestant_id']])) {
-                $requestsAdmins[$requestAdmin['contestant_id']] = $requestAdmin;
-            }
-            unset($requestsAdmins[$requestAdmin['contestant_id']]['contestant_id']);
         }
 
         $usersRequests = array_map(function ($request) use ($requestsAdmins) {

@@ -15,39 +15,45 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
     ) : ?array {
         global $conn;
         $sql = '
-        SELECT
-            hi.identity_id AS contestant_id,
-            i.username,
-            i.user_id,
-            i.name,
-            hi.history_id
-        FROM
-            `Identities` i
-        INNER JOIN
-            `Problemset_Identity_Request_History` hi
-        ON
-            hi.admin_id = i.user_id
-        WHERE
-            i.user_id IN (
-                SELECT
-                    (SELECT
-                        h.admin_id
-                    FROM
-                        `Problemset_Identity_Request_History` h
-                    WHERE
-                        r.identity_id = h.identity_id
-                        AND r.problemset_id = h.problemset_id
-                    LIMIT
-                        1) AS admin_id
+            SELECT
+                r.*,
+                (SELECT
+                    h.admin_id
                 FROM
-                    `Problemset_Identity_Request` r
+                    `Problemset_Identity_Request_History` h
                 WHERE
-                    r.problemset_id = ?)
-            AND hi.problemset_id = ?
-        ORDER BY
-            hi.history_id;';
+                    r.identity_id = h.identity_id
+                    AND r.problemset_id = h.problemset_id
+                ORDER BY
+                    h.history_id
+                LIMIT
+                    1) AS admin_id
+            FROM
+                `Problemset_Identity_Request` r
+            WHERE
+                r.problemset_id = ?;';
 
-        return $conn->GetAll($sql, [$problemsetId, $problemsetId]);
+        $rs = $conn->GetAll($sql, [$problemsetId]);
+
+        $admins = [];
+        $requestsAdmins = [];
+        foreach ($rs as $result) {
+            $adminId = $result['admin_id'];
+            if (!array_key_exists($adminId, $admins)) {
+                $admin = [];
+                $data = IdentitiesDAO::getByPK($adminId);
+                if (!is_null($data)) {
+                    $admin = [
+                        'user_id' => $data->user_id,
+                        'username' => $data->username,
+                        'name' => $data->name,
+                    ];
+                }
+                $requestsAdmins[$result['identity_id']] = $admin;
+            }
+        }
+
+        return $requestsAdmins;
     }
 
     public static function getRequestsForProblemset(int $problemsetId) : array {
