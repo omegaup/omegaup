@@ -31,6 +31,24 @@ class ProblemController extends Controller {
     // edit privileges.
     const UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS = 'editable-problemsets';
 
+    // ISO 639-1 langs
+    const ISO639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
+        'as', 'av', 'ae', 'ay', 'az', 'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi',
+        'bs', 'br', 'bg', 'my', 'ca', 'ch', 'ce', 'ny', 'zh', 'cv', 'kw', 'co',
+        'cr', 'hr', 'cs', 'da', 'dv', 'nl', 'dz', 'en', 'eo', 'et', 'ee', 'fo',
+        'fj', 'fi', 'fr', 'ff', 'gl', 'ka', 'de', 'el', 'gn', 'gu', 'ht', 'ha',
+        'he', 'hz', 'hi', 'ho', 'hu', 'ia', 'id', 'ie', 'ga', 'ig', 'ik', 'io',
+        'is', 'it', 'iu', 'ja', 'jv', 'kl', 'kn', 'kr', 'ks', 'kk', 'km', 'ki',
+        'rw', 'ky', 'kv', 'kg', 'ko', 'ku', 'kj', 'la', 'lb', 'lg', 'li', 'ln',
+        'lo', 'lt', 'lu', 'lv', 'gv', 'mk', 'mg', 'ms', 'ml', 'mt', 'mi', 'mr',
+        'mh', 'mn', 'na', 'nv', 'nd', 'ne', 'ng', 'nb', 'nn', 'no', 'ii', 'nr',
+        'oc', 'oj', 'cu', 'om', 'or', 'os', 'pa', 'pi', 'fa', 'pl', 'ps', 'pt',
+        'qu', 'rm', 'rn', 'ro', 'ru', 'sa', 'sc', 'sd', 'se', 'sm', 'sg', 'sr',
+        'gd', 'sn', 'si', 'sk', 'sl', 'so', 'st', 'es', 'su', 'sw', 'ss', 'sv',
+        'ta', 'te', 'tg', 'th', 'ti', 'bo', 'tk', 'tl', 'tn', 'to', 'tr', 'ts',
+        'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
+        'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
+
     /**
      * Validates a Create or Update Problem API request
      *
@@ -823,7 +841,7 @@ class ProblemController extends Controller {
                         $updatePublished
                     );
                 }
-                $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
+                $updatedStatementLanguages = $problemDeployer->getUpdatedFileLanguages();
             }
 
             // Save the contest object with data sent by user to the database
@@ -895,41 +913,25 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Updates problem statement only
+     * Updates loose file
      *
      * @param Request $r
-     * @return array
+     * @return void
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiUpdateStatement(Request $r) {
+    private static function updateLooseFile(Request $r, string $type): void {
         self::authenticateRequest($r);
-
         self::validateCreateOrUpdate($r, true);
+
         $problem = $r['problem'];
 
-        // Validate statement
-        Validators::validateStringNonEmpty($r['statement'], 'statement');
+        // Validate solution
+        Validators::validateStringNonEmpty($r[$type], $type);
         Validators::validateStringNonEmpty($r['message'], 'message');
 
         // Check that lang is in the ISO 639-1 code list, default is "es".
-        $iso639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
-            'as', 'av', 'ae', 'ay', 'az', 'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi',
-            'bs', 'br', 'bg', 'my', 'ca', 'ch', 'ce', 'ny', 'zh', 'cv', 'kw', 'co',
-            'cr', 'hr', 'cs', 'da', 'dv', 'nl', 'dz', 'en', 'eo', 'et', 'ee', 'fo',
-            'fj', 'fi', 'fr', 'ff', 'gl', 'ka', 'de', 'el', 'gn', 'gu', 'ht', 'ha',
-            'he', 'hz', 'hi', 'ho', 'hu', 'ia', 'id', 'ie', 'ga', 'ig', 'ik', 'io',
-            'is', 'it', 'iu', 'ja', 'jv', 'kl', 'kn', 'kr', 'ks', 'kk', 'km', 'ki',
-            'rw', 'ky', 'kv', 'kg', 'ko', 'ku', 'kj', 'la', 'lb', 'lg', 'li', 'ln',
-            'lo', 'lt', 'lu', 'lv', 'gv', 'mk', 'mg', 'ms', 'ml', 'mt', 'mi', 'mr',
-            'mh', 'mn', 'na', 'nv', 'nd', 'ne', 'ng', 'nb', 'nn', 'no', 'ii', 'nr',
-            'oc', 'oj', 'cu', 'om', 'or', 'os', 'pa', 'pi', 'fa', 'pl', 'ps', 'pt',
-            'qu', 'rm', 'rn', 'ro', 'ru', 'sa', 'sc', 'sd', 'se', 'sm', 'sg', 'sr',
-            'gd', 'sn', 'si', 'sk', 'sl', 'so', 'st', 'es', 'su', 'sw', 'ss', 'sv',
-            'ta', 'te', 'tg', 'th', 'ti', 'bo', 'tk', 'tl', 'tn', 'to', 'tr', 'ts',
-            'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
-            'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
-        Validators::validateInEnum($r['lang'], 'lang', $iso639_1, false /* is_required */);
+        Validators::validateInEnum($r['lang'], 'lang', ProblemController::ISO639_1, false /* is_required */);
         if (is_null($r['lang'])) {
             $r['lang'] = IdentityController::getPreferredLanguage($r);
         }
@@ -938,14 +940,14 @@ class ProblemController extends Controller {
             $updatePublished = $r['update_published'];
         }
 
-        $updatedStatementLanguages = [];
+        $updatedFileLanguages = [];
         try {
             $problemDeployer = new ProblemDeployer($r['problem_alias']);
-            $problemDeployer->commitStatements(
+            $problemDeployer->commitLooseFiles(
                 "{$r['lang']}.markdown: {$r['message']}",
                 $r->user,
                 [
-                    "statements/{$r['lang']}.markdown" => $r['statement'],
+                    "{$r['folder']}/{$r['lang']}.markdown" => $r[$type],
                 ]
             );
             if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
@@ -962,18 +964,30 @@ class ProblemController extends Controller {
                 }
                 ProblemsDAO::update($problem);
             }
-            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
+            $updatedFileLanguages = $problemDeployer->getUpdatedFileLanguages();
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::invalidateCache($problem, $updatedStatementLanguages);
+        self::invalidateCache($problem, $updatedFileLanguages);
+    }
 
-        // All clear
-        $response['status'] = 'ok';
-        return $response;
+    /**
+     * Updates problem statement only
+     *
+     * @param Request $r
+     * @return array
+     * @throws ApiException
+     * @throws InvalidDatabaseOperationException
+     */
+    public static function apiUpdateStatement(Request $r) {
+        $r['folder'] = 'statements';
+        self::updateLooseFile($r, 'statement');
+        return [
+            'status' => 'ok'
+        ];
     }
 
     /**
@@ -985,61 +999,11 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateSolution(Request $r) {
-        self::authenticateRequest($r);
-        self::validateCreateOrUpdate($r, true);
-
-        $problem = $r['problem'];
-
-        // Validate solution
-        Validators::validateStringNonEmpty($r['solution'], 'solution');
-        Validators::validateStringNonEmpty($r['message'], 'message');
-
-        // Check that lang is available, default is "es".
-        $langs = ['en', 'es', 'pt'];
-        Validators::validateInEnum($r['lang'], 'lang', $langs, false /* is_required */);
-        if (is_null($r['lang'])) {
-            $r['lang'] = IdentityController::getPreferredLanguage($r);
-        }
-        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
-        if (!is_null($r['update_published'])) {
-            $updatePublished = $r['update_published'];
-        }
-
-        try {
-            $problemDeployer = new ProblemDeployer($r['problem_alias']);
-            $problemDeployer->commitStatements(
-                "{$r['lang']}.markdown: {$r['message']}",
-                $r->user,
-                [
-                    "solutions/{$r['lang']}.markdown" => $r['solution'],
-                ]
-            );
-            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
-                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
-                    $problem,
-                    $problemDeployer->publishedCommit
-                );
-                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
-                    ProblemsetProblemsDAO::updateVersionToCurrent(
-                        $problem,
-                        $r->user,
-                        $updatePublished
-                    );
-                }
-                ProblemsDAO::update($problem);
-            }
-            $updatedStatementLanguages = $problemDeployer->getUpdatedStatementLanguages();
-        } catch (ApiException $e) {
-            throw $e;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        self::invalidateCache($problem, $updatedStatementLanguages);
-
-        // All clear
-        $response['status'] = 'ok';
-        return $response;
+        $r['folder'] = 'solutions';
+        self::updateLooseFile($r, 'solution');
+        return [
+            'status' => 'ok'
+        ];
     }
 
     /**
