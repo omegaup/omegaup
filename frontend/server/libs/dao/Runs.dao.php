@@ -335,7 +335,7 @@ class RunsDAO extends RunsDAOBase {
                         Problemset_Identities pi ON i.identity_id = pi.identity_id
                     WHERE
                         pi.problemset_id = ? AND
-                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)';
+                        (i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)';
                 $val = [
                     $problemsetId,
                     $aclId,
@@ -346,7 +346,7 @@ class RunsDAO extends RunsDAOBase {
                     $sql = $sql . ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
                     $val[] =  $aclId;
                 }
-                $sql = $sql . ';';
+                $sql = $sql . 'OR i.user_id IS NULL);';
             } else {
                 $sql = '
                     SELECT
@@ -357,8 +357,9 @@ class RunsDAO extends RunsDAOBase {
                         Groups_Identities gi ON i.identity_id = gi.identity_id
                     WHERE
                         gi.group_id = ? AND
-                        i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
-                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?);';
+                        (i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?) AND
+                        i.user_id NOT IN (SELECT ur.user_id FROM User_Roles ur WHERE ur.acl_id IN (?, ?) AND ur.role_id = ?)
+                        OR i.user_id IS NULL);';
                 $val = [
                     $groupId,
                     $aclId,
