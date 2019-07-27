@@ -9,7 +9,7 @@ if (is_null($session['identity'])) {
     die();
 }
 
-$is_organizer =
+$is_organizer = $experiments->isEnabled(Experiments::IDENTITIES) &&
     Authorization::canCreateGroupIdentities($session['identity']->identity_id);
 $smarty->assign('IS_ORGANIZER', $is_organizer);
 $smarty->assign('payload', [
