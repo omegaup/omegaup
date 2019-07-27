@@ -1574,7 +1574,17 @@ class CourseController extends Controller {
                         $r->identity,
                         $course,
                         $group
-                    )
+                    ),
+                'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($r->user) &&
+                    !UserController::isMainIdentity(
+                        $r->user,
+                        $r->identity
+                    ) &&
+                    ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                        $r->user
+                    ),
+                ],
             ];
             $template = 'arena.contest.course.tpl';
         } else {

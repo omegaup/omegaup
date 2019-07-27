@@ -364,10 +364,24 @@ class ContestController extends Controller {
      */
     public static function getContestDetailsForSmarty(
         Request $r,
-        Contests $contest
+        Contests $contest,
+        bool $shouldShowIntro
     ) : array {
         // Half-authenticate, in case there is no session in place.
         $session = SessionController::apiCurrentSession($r)['session'];
+        if (!$shouldShowIntro) {
+            return ['payload' => [
+                'shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($session['user']) &&
+                    !UserController::isMainIdentity(
+                        $session['user'],
+                        $session['identity']
+                    )
+                    && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                        $session['user']
+                    ),
+            ]];
+        }
         $result = [
             'needsBasicInformation' => false,
             'requestsUserInformation' => false,
@@ -2131,8 +2145,8 @@ class ContestController extends Controller {
         $admin_infos = [];
         foreach ($db_results as $result) {
             $admin_id = $result['admin_id'];
-            if (!array_key_exists($admin_id, $admin_infos)) {
-                $data = UsersDAO::getByPK($admin_id);
+            if (!empty($admin_id) && !array_key_exists($admin_id, $admin_infos)) {
+                $data = IdentitiesDAO::findByUserId($admin_id);
                 if (!is_null($data)) {
                     $admin_infos[$admin_id]['user_id'] = $data->user_id;
                     $admin_infos[$admin_id]['username'] = $data->username;
