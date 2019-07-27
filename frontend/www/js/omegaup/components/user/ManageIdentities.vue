@@ -5,7 +5,7 @@
     </div>
     <div class="panel-body">
       <form class="form"
-            v-on:submit.prevent="onAddIdentity">
+            v-on:submit.prevent="onAddIdentity(username, password)">
         <div class="form-group">
           <label>{{ T.wordsIdentity }}</label> <span aria-hidden="true"
                class="glyphicon glyphicon-info-sign"
@@ -51,31 +51,29 @@
   </div>
 </template>
 
-<script>
-import UI from '../../ui.js';
-import {T} from '../../omegaup.js';
-
-export default {
-  props: {
-    identities: Array,
-  },
-  data: function() {
-    return {
-      T: T,
-      username: '',
-      password: '',
-    };
-  },
-  methods: {
-    onAddIdentity: function() {
-      this.$emit('add-identity', this.username, this.password);
-    },
-  },
-};
-</script>
-
 <style>
 th.align-right {
   text-align: right;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
+
+@Component
+export default class UserManageIdentities extends Vue {
+  @Prop() identities!: omegaup.Identity[];
+  T = T;
+  username: string = '';
+  password: string = '';
+
+  @Emit('add-identity')
+  onAddIdentity(username: string, password: string) {
+    this.username = username;
+    this.password = password;
+  }
+}
+
+</script>

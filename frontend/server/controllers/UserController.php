@@ -1595,11 +1595,13 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
         $user = null;
         if (!is_null($identity->user_id)) {
-            $user = self::resolveTargetUser($r);
+            $user = UsersDAO::getByPK($identity->user_id);
         }
 
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
-            && (!is_null($user) && $user->is_private == 1) && !Authorization::isSystemAdmin($r->identity->identity_id)) {
+            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity->identity_id))
+            && (!is_null($user) && $user->is_private == 1)
+        ) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
         }
 
@@ -2542,6 +2544,16 @@ class UserController extends Controller {
             'status' => 'ok',
             'token' => $token,
         ];
+    }
+
+    /**
+     * Returns true whether user is logged with the main identity
+     * @param Users $user
+     * @param Identities $identity
+     * @return bool
+     */
+    public static function isMainIdentity(Users $user, Identities $identity) : bool {
+        return $identity->identity_id == $user->main_identity_id;
     }
 }
 

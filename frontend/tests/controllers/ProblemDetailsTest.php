@@ -370,10 +370,11 @@ class ProblemDetailsTest extends OmegaupTestCase {
             ProblemController::apiSolution(new Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
+                'forfeit_problem' => true,
             ]));
             $this->fail('User should not have been able to view solution');
         } catch (ForbiddenAccessException $e) {
-            $this->assertEquals('problemSolutionNotVisible', $e->getMessage());
+            $this->assertEquals('allowedSolutionsLimitReached', $e->getMessage());
         }
 
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -387,5 +388,33 @@ class ProblemDetailsTest extends OmegaupTestCase {
             ]));
             $this->assertContains('`long long`', $response['solution']['markdown']);
         }
+    }
+
+    public function testAuthorizationController() {
+        $problemData = ProblemsFactory::createProblem();
+        $contestant = UserFactory::createUser();
+
+        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        RunsFactory::gradeRun($runData);
+
+        $result = AuthorizationController::apiProblem(new Request([
+            'token' => OMEGAUP_GRADER_SECRET,
+            'username' => $contestant->username,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertTrue($result['has_solved']);
+        $this->assertFalse($result['is_admin']);
+        $this->assertTrue($result['can_view']);
+        $this->assertFalse($result['can_edit']);
+
+        $result = AuthorizationController::apiProblem(new Request([
+            'token' => OMEGAUP_GRADER_SECRET,
+            'username' => $problemData['author']->username,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertFalse($result['has_solved']);
+        $this->assertTrue($result['is_admin']);
+        $this->assertTrue($result['can_view']);
+        $this->assertTrue($result['can_edit']);
     }
 }

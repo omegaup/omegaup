@@ -51,33 +51,26 @@
   </div>
 </template>
 
-<script>
-import {OmegaUp, T, API} from '../../omegaup.js';
-export default {
-  data: function() {
-    return { T: T, newPassword1: '', newPassword2: '', username: '', }
-  },
-  mounted: function() {
-    var self = this;
-    omegaup.API.User.profile()
-        .then(function(data) { self.username = data.userinfo.username; })
-        .fail(omegaup.UI.apiError);
-  },
-  methods: {
-    formSubmit: function() {
-      var self = this;
-      if (self.newPassword1 != self.newPassword2) {
-        omegaup.UI.error(T.userPasswordMustBeSame);
-        return false;
-      }
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
 
-      omegaup.API.User.updateBasicInfo({
-                        username: self.username,
-                        password: self.newPassword1,
-                      })
-          .then(function(response) { window.location = '/profile/'; })
-          .fail(omegaup.UI.apiError);
-    },
+@Component
+export default class UserBasicEdit extends Vue {
+  @Prop() username!: string;
+
+  T = T;
+  UI = UI;
+  newPassword1 = '';
+  newPassword2 = '';
+
+  formSubmit(): void {
+    if (this.newPassword1 != this.newPassword2) {
+      this.UI.error(this.T.userPasswordMustBeSame);
+      return;
+    }
+    this.$emit('update', this.username, this.newPassword1);
   }
 }
 

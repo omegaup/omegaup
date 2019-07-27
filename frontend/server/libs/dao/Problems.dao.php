@@ -341,7 +341,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             'quality_histogram', 'difficulty_histogram',
         ];
         $problems = [];
-        $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? UsersDao::getHideTags($identityId) : false;
+        $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? UsersDAO::getHideTags($identityId) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
                 $temp = new Problems($row);
@@ -423,6 +423,26 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $sql = 'SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Problemset_Problems pp USING(problemset_id) WHERE pp.problem_id = ?';
         return $conn->GetOne($sql, [$id]);
+    }
+
+    public static function getProblemsSolvedCount(Identities $identity): int {
+        global $conn;
+        $sql = 'SELECT
+            COUNT(*)
+        FROM
+            Problems p
+        INNER JOIN
+            Submissions s ON s.problem_id = p.problem_id
+        INNER JOIN
+            Runs r ON r.run_id = s.current_run_id
+        WHERE
+            r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+        ORDER BY
+            p.problem_id DESC;';
+
+        $args = [$identity->identity_id];
+
+        return $conn->getOne($sql, $args);
     }
 
     final public static function getProblemsSolved($identityId) {
