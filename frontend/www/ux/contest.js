@@ -62,7 +62,7 @@ omegaup.OmegaUp.on('ready', function() {
     var self = this;
     var tabChanged = false;
     var foundHash = false;
-    var tabs = ['problems', 'clarifications', 'runs'];
+    var tabs = ['problems', 'clarifications', 'runs', 'solution'];
 
     for (var i = 0; i < tabs.length; i++) {
       if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
