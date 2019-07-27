@@ -7,9 +7,7 @@
  * @author juan.pablo@omegaup.com
  */
 class ContestRequestsTest extends OmegaupTestCase {
-    private function preparePublicContestWithRegistration(
-        bool $addSecondaryAdmin = true
-    ) : array {
+    private function preparePublicContestWithRegistration() : array {
         // create a contest and its admin
         $contestAdmin = UserFactory::createUser();
         $contestData = ContestsFactory::createContest(new ContestParams([
@@ -29,12 +27,6 @@ class ContestRequestsTest extends OmegaupTestCase {
             'mainAdmin' => $contestAdmin,
             'contestData' => $contestData,
         ];
-
-        if ($addSecondaryAdmin) {
-            $user = UserFactory::createUser();
-            ContestsFactory::addAdminUser($contestData, $user);
-            $result['secondaryAdminLogin'] = $user;
-        }
 
         return $result;
     }
@@ -102,9 +94,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         [
             'mainAdmin' => $admin,
             'contestData' => $contestData,
-        ] = $this->preparePublicContestWithRegistration(
-            /*$addSecondaryAdmin*/ false
-        );
+        ] = $this->preparePublicContestWithRegistration();
 
         // some user asks for contest
         $contestant = UserFactory::createUser();
@@ -126,9 +116,12 @@ class ContestRequestsTest extends OmegaupTestCase {
     public function testRejectedAndAcceptedRequestsByTwoDifferentAdmins() {
         [
             'mainAdmin' => $mainAdmin,
-            'secondaryAdminLogin' => $secondaryAdminLogin,
             'contestData' => $contestData,
         ] = $this->preparePublicContestWithRegistration();
+
+        // Adding secondary admin
+        $secondaryAdminLogin = UserFactory::createUser();
+        ContestsFactory::addAdminUser($contestData, $secondaryAdminLogin);
 
         // some users ask for contest
         $contestants = [];
@@ -203,8 +196,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         ContestController::apiArbitrateRequest(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
-            'username' => $ua
-                ,
+            'username' => $ua,
             'resolution' => true,
         ]));
         $acceptedUsers[] = $ua;
