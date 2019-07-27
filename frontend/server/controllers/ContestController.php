@@ -2145,8 +2145,8 @@ class ContestController extends Controller {
         $admin_infos = [];
         foreach ($db_results as $result) {
             $admin_id = $result['admin_id'];
-            if (!array_key_exists($admin_id, $admin_infos)) {
-                $data = IdentitiesDAO::findByUserId($admin_id ?? 0);
+            if (!empty($admin_id) && !array_key_exists($admin_id, $admin_infos)) {
+                $data = IdentitiesDAO::findByUserId($admin_id);
                 if (!is_null($data)) {
                     $admin_infos[$admin_id]['user_id'] = $data->user_id;
                     $admin_infos[$admin_id]['username'] = $data->username;
