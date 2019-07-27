@@ -18,8 +18,7 @@ class ProblemDeployer {
     private $zipPath = null;
     public $privateTreeHash = null;
     public $publishedCommit = null;
-    private $updatedStatementLanguages = [];
-    private $updatedSolutionLanguages = [];
+    private $updatedLanguages = [];
     private $acceptsSubmissions = true;
     private $updatePublished = true;
 
@@ -116,14 +115,14 @@ class ProblemDeployer {
                     $updated_file['path'],
                     $matches
                 ) === 1) {
-                    $this->updatedStatementLanguages[] = $matches[1];
+                    $this->updatedLanguages[] = $matches[1];
                 }
                 if (preg_match(
                     '%solutions/([a-z]{2})\\.markdown%',
                     $updated_file['path'],
                     $matches
                 ) === 1) {
-                    $this->updatedSolutionLanguages[] = $matches[1];
+                    $this->updatedLanguages[] = $matches[1];
                 }
                 if (preg_match(
                     '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
@@ -245,8 +244,8 @@ class ProblemDeployer {
      * @param string The filetype
      * @return array The list of updated languages
      */
-    public function getUpdatedFileLanguages($type = 'statement') {
-        return $type == 'solution' ? $this->$updatedSolutionLanguages : $this->updatedStatementLanguages;
+    public function getUpdatedLanguages() {
+        return $this->updatedLanguages;
     }
 
     private function executeRaw(array $args, string $cwd) : array {

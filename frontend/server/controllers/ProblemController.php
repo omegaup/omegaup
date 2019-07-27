@@ -841,7 +841,7 @@ class ProblemController extends Controller {
                         $updatePublished
                     );
                 }
-                $updatedStatementLanguages = $problemDeployer->getUpdatedFileLanguages();
+                $updatedStatementLanguages = $problemDeployer->getUpdatedLanguages();
             }
 
             // Save the contest object with data sent by user to the database
@@ -920,14 +920,16 @@ class ProblemController extends Controller {
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      */
-    private static function updateLooseFile(Request $r, string $type): void {
+    private static function updateLooseFile(
+        Request $r,
+        string $directory,
+        string $contents
+    ): void {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
 
         $problem = $r['problem'];
 
-        // Validate solution
-        Validators::validateStringNonEmpty($r[$type], $type);
         Validators::validateStringNonEmpty($r['message'], 'message');
 
         // Check that lang is in the ISO 639-1 code list, default is "es".
@@ -947,7 +949,7 @@ class ProblemController extends Controller {
                 "{$r['lang']}.markdown: {$r['message']}",
                 $r->user,
                 [
-                    "{$r['folder']}/{$r['lang']}.markdown" => $r[$type],
+                    "{$directory}/{$r['lang']}.markdown" => $contents,
                 ]
             );
             if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
@@ -964,7 +966,7 @@ class ProblemController extends Controller {
                 }
                 ProblemsDAO::update($problem);
             }
-            $updatedFileLanguages = $problemDeployer->getUpdatedFileLanguages();
+            $updatedFileLanguages = $problemDeployer->getUpdatedLanguages();
         } catch (ApiException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -983,8 +985,8 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateStatement(Request $r) {
-        $r['folder'] = 'statements';
-        self::updateLooseFile($r, 'statement');
+        Validators::validateStringNonEmpty($r['statement'], 'statement');
+        self::updateLooseFile($r, 'statements', $r['statement']);
         return [
             'status' => 'ok'
         ];
@@ -999,8 +1001,8 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateSolution(Request $r) {
-        $r['folder'] = 'solutions';
-        self::updateLooseFile($r, 'solution');
+        Validators::validateStringNonEmpty($r['solution'], 'solution');
+        self::updateLooseFile($r, 'solutions', $r['solution']);
         return [
             'status' => 'ok'
         ];
