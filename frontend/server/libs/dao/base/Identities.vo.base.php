@@ -22,7 +22,7 @@ class Identities extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -61,7 +61,7 @@ class Identities extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -74,70 +74,70 @@ class Identities extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $username;
 
     /**
       * Contraseña del usuario, usando Argon2i o Blowfish
       * @access public
-      * @var varchar(128)
-      */
+      * @var ?string
+     */
     public $password;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
+      * @var ?string
+     */
     public $name;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $language_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $state_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $school_id;
 
     /**
       * Género de la identidad
       * @access public
-      * @var enum('female','male','other','decline')
-      */
+      * @var ?string
+     */
     public $gender;
 }

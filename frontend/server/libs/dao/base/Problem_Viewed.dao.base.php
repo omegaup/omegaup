@@ -33,8 +33,11 @@ abstract class ProblemViewedDAOBase {
      * @param ProblemViewed [$Problem_Viewed] El objeto de tipo ProblemViewed
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemViewed $Problem_Viewed) {
-        if (is_null(self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->identity_id))) {
+    final public static function save(ProblemViewed $Problem_Viewed) : int {
+        if (is_null($Problem_Viewed->problem_id) ||
+            is_null($Problem_Viewed->identity_id) ||
+            is_null(self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->identity_id))
+        ) {
             return ProblemViewedDAOBase::create($Problem_Viewed);
         }
         return ProblemViewedDAOBase::update($Problem_Viewed);
@@ -47,12 +50,12 @@ abstract class ProblemViewedDAOBase {
      * @return Filas afectadas
      * @param ProblemViewed [$Problem_Viewed] El objeto de tipo ProblemViewed a actualizar.
      */
-    final public static function update(ProblemViewed $Problem_Viewed) {
+    final public static function update(ProblemViewed $Problem_Viewed) : int {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             $Problem_Viewed->view_time,
-            is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
-            is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
+            (int)$Problem_Viewed->problem_id,
+            (int)$Problem_Viewed->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -68,10 +71,7 @@ abstract class ProblemViewedDAOBase {
      * @static
      * @return @link ProblemViewed Un objeto del tipo {@link ProblemViewed}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problem_id, $identity_id) {
-        if (is_null($problem_id) || is_null($identity_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problem_id, int $identity_id) : ?ProblemViewed {
         $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time` FROM Problem_Viewed WHERE (problem_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$problem_id, $identity_id];
         global $conn;
@@ -98,7 +98,7 @@ abstract class ProblemViewedDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemViewed [$Problem_Viewed] El objeto de tipo ProblemViewed a eliminar
      */
-    final public static function delete(ProblemViewed $Problem_Viewed) {
+    final public static function delete(ProblemViewed $Problem_Viewed) : void {
         $sql = 'DELETE FROM `Problem_Viewed` WHERE problem_id = ? AND identity_id = ?;';
         $params = [$Problem_Viewed->problem_id, $Problem_Viewed->identity_id];
         global $conn;
@@ -126,7 +126,12 @@ abstract class ProblemViewedDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemViewed}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time` from Problem_Viewed';
         global $conn;
         if (!is_null($orden)) {
@@ -152,23 +157,23 @@ abstract class ProblemViewedDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemViewed [$Problem_Viewed] El objeto de tipo ProblemViewed a crear.
      */
-    final public static function create(ProblemViewed $Problem_Viewed) {
+    final public static function create(ProblemViewed $Problem_Viewed) : int {
         if (is_null($Problem_Viewed->view_time)) {
             $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
-            is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
+            (int)$Problem_Viewed->problem_id,
+            (int)$Problem_Viewed->identity_id,
             $Problem_Viewed->view_time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

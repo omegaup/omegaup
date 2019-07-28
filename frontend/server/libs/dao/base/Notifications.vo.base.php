@@ -22,7 +22,7 @@ class Notifications extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -36,7 +36,7 @@ class Notifications extends VO {
             $this->timestamp = $data['timestamp'];
         }
         if (isset($data['read'])) {
-            $this->read = $data['read'] == '1';
+            $this->read = boolval($data['read']);
         }
         if (isset($data['contents'])) {
             $this->contents = $data['contents'];
@@ -46,7 +46,7 @@ class Notifications extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['timestamp']);
             return;
@@ -59,35 +59,35 @@ class Notifications extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $notification_id;
 
     /**
       * Identificador de usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $timestamp;
+      * @var string
+     */
+    public $timestamp = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
-      */
-    public $read;
+      * @var bool
+     */
+    public $read = false;
 
     /**
       * JSON con el contenido de la notificación
       * @access public
-      * @var text
-      */
+      * @var string
+     */
     public $contents;
 }

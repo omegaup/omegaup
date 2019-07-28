@@ -33,8 +33,10 @@ abstract class IdentitiesDAOBase {
      * @param Identities [$Identities] El objeto de tipo Identities
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Identities $Identities) {
-        if (is_null(self::getByPK($Identities->identity_id))) {
+    final public static function save(Identities $Identities) : int {
+        if (is_null($Identities->identity_id) ||
+            is_null(self::getByPK($Identities->identity_id))
+        ) {
             return IdentitiesDAOBase::create($Identities);
         }
         return IdentitiesDAOBase::update($Identities);
@@ -47,7 +49,7 @@ abstract class IdentitiesDAOBase {
      * @return Filas afectadas
      * @param Identities [$Identities] El objeto de tipo Identities a actualizar.
      */
-    final public static function update(Identities $Identities) {
+    final public static function update(Identities $Identities) : int {
         $sql = 'UPDATE `Identities` SET `username` = ?, `password` = ?, `name` = ?, `user_id` = ?, `language_id` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `gender` = ? WHERE `identity_id` = ?;';
         $params = [
             $Identities->username,
@@ -59,7 +61,7 @@ abstract class IdentitiesDAOBase {
             $Identities->state_id,
             is_null($Identities->school_id) ? null : (int)$Identities->school_id,
             $Identities->gender,
-            is_null($Identities->identity_id) ? null : (int)$Identities->identity_id,
+            (int)$Identities->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,10 +77,7 @@ abstract class IdentitiesDAOBase {
      * @static
      * @return @link Identities Un objeto del tipo {@link Identities}. NULL si no hay tal registro.
      */
-    final public static function getByPK($identity_id) {
-        if (is_null($identity_id)) {
-            return null;
-        }
+    final public static function getByPK(int $identity_id) : ?Identities {
         $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` FROM Identities WHERE (identity_id = ?) LIMIT 1;';
         $params = [$identity_id];
         global $conn;
@@ -105,7 +104,7 @@ abstract class IdentitiesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Identities [$Identities] El objeto de tipo Identities a eliminar
      */
-    final public static function delete(Identities $Identities) {
+    final public static function delete(Identities $Identities) : void {
         $sql = 'DELETE FROM `Identities` WHERE identity_id = ?;';
         $params = [$Identities->identity_id];
         global $conn;
@@ -133,7 +132,12 @@ abstract class IdentitiesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Identities}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` from Identities';
         global $conn;
         if (!is_null($orden)) {
@@ -159,7 +163,7 @@ abstract class IdentitiesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Identities [$Identities] El objeto de tipo Identities a crear.
      */
-    final public static function create(Identities $Identities) {
+    final public static function create(Identities $Identities) : int {
         $sql = 'INSERT INTO Identities (`username`, `password`, `name`, `user_id`, `language_id`, `country_id`, `state_id`, `school_id`, `gender`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Identities->username,
@@ -174,12 +178,12 @@ abstract class IdentitiesDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Identities->identity_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

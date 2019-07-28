@@ -33,8 +33,10 @@ abstract class RolesDAOBase {
      * @param Roles [$Roles] El objeto de tipo Roles
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Roles $Roles) {
-        if (is_null(self::getByPK($Roles->role_id))) {
+    final public static function save(Roles $Roles) : int {
+        if (is_null($Roles->role_id) ||
+            is_null(self::getByPK($Roles->role_id))
+        ) {
             return RolesDAOBase::create($Roles);
         }
         return RolesDAOBase::update($Roles);
@@ -47,12 +49,12 @@ abstract class RolesDAOBase {
      * @return Filas afectadas
      * @param Roles [$Roles] El objeto de tipo Roles a actualizar.
      */
-    final public static function update(Roles $Roles) {
+    final public static function update(Roles $Roles) : int {
         $sql = 'UPDATE `Roles` SET `name` = ?, `description` = ? WHERE `role_id` = ?;';
         $params = [
             $Roles->name,
             $Roles->description,
-            is_null($Roles->role_id) ? null : (int)$Roles->role_id,
+            (int)$Roles->role_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -68,10 +70,7 @@ abstract class RolesDAOBase {
      * @static
      * @return @link Roles Un objeto del tipo {@link Roles}. NULL si no hay tal registro.
      */
-    final public static function getByPK($role_id) {
-        if (is_null($role_id)) {
-            return null;
-        }
+    final public static function getByPK(int $role_id) : ?Roles {
         $sql = 'SELECT `Roles`.`role_id`, `Roles`.`name`, `Roles`.`description` FROM Roles WHERE (role_id = ?) LIMIT 1;';
         $params = [$role_id];
         global $conn;
@@ -98,7 +97,7 @@ abstract class RolesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Roles [$Roles] El objeto de tipo Roles a eliminar
      */
-    final public static function delete(Roles $Roles) {
+    final public static function delete(Roles $Roles) : void {
         $sql = 'DELETE FROM `Roles` WHERE role_id = ?;';
         $params = [$Roles->role_id];
         global $conn;
@@ -126,7 +125,12 @@ abstract class RolesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Roles}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Roles`.`role_id`, `Roles`.`name`, `Roles`.`description` from Roles';
         global $conn;
         if (!is_null($orden)) {
@@ -152,7 +156,7 @@ abstract class RolesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Roles [$Roles] El objeto de tipo Roles a crear.
      */
-    final public static function create(Roles $Roles) {
+    final public static function create(Roles $Roles) : int {
         $sql = 'INSERT INTO Roles (`name`, `description`) VALUES (?, ?);';
         $params = [
             $Roles->name,
@@ -160,12 +164,12 @@ abstract class RolesDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Roles->role_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

@@ -22,7 +22,7 @@ class Problems extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -75,10 +75,10 @@ class Problems extends VO {
             $this->order = $data['order'];
         }
         if (isset($data['deprecated'])) {
-            $this->deprecated = $data['deprecated'] == '1';
+            $this->deprecated = boolval($data['deprecated']);
         }
         if (isset($data['email_clarifications'])) {
-            $this->email_clarifications = $data['email_clarifications'] == '1';
+            $this->email_clarifications = boolval($data['email_clarifications']);
         }
         if (isset($data['quality'])) {
             $this->quality = (float)$data['quality'];
@@ -94,7 +94,7 @@ class Problems extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['creation_date']);
             return;
@@ -107,147 +107,147 @@ class Problems extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problem_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $acl_id;
 
     /**
       * -1 banned, 0 private, 1 public, 2 recommended
       * @access public
-      * @var int(1)
-      */
-    public $visibility;
+      * @var int
+     */
+    public $visibility = 1;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
+      * @var string
+     */
     public $title;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(32)
-      */
+      * @var string
+     */
     public $alias;
 
     /**
       * El hash SHA1 del commit en la rama master del problema.
       * @access public
-      * @var char(40)
-      */
-    public $commit;
+      * @var string
+     */
+    public $commit = 'published';
 
     /**
       * El hash SHA1 del árbol de la rama private.
       * @access public
-      * @var char(40)
-      */
+      * @var string
+     */
     public $current_version;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
-      */
-    public $languages;
+      * @var string
+     */
+    public $languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $input_limit;
+      * @var int
+     */
+    public $input_limit = 10240;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $visits;
+      * @var int
+     */
+    public $visits = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $submissions;
+      * @var int
+     */
+    public $submissions = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $accepted;
+      * @var int
+     */
+    public $accepted = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
+      * @var ?float
+     */
     public $difficulty;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $creation_date;
+      * @var string
+     */
+    public $creation_date = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
+      * @var ?string
+     */
     public $source;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('normal','inverse')
-      */
-    public $order;
+      * @var string
+     */
+    public $order = 'normal';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
-      */
-    public $deprecated;
+      * @var bool
+     */
+    public $deprecated = false;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
-      */
-    public $email_clarifications;
+      * @var bool
+     */
+    public $email_clarifications = false;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
+      * @var ?float
+     */
     public $quality;
 
     /**
       * Valores del histograma de calidad del problema.
       * @access public
-      * @var text
-      */
+      * @var ?string
+     */
     public $quality_histogram;
 
     /**
       * Valores del histograma de dificultad del problema.
       * @access public
-      * @var text
-      */
+      * @var ?string
+     */
     public $difficulty_histogram;
 }

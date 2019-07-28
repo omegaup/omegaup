@@ -38,7 +38,7 @@ final class DAO {
  *
  */
 abstract class VO {
-    function asArray() {
+    function asArray() : array {
         return get_object_vars($this);
     }
 
@@ -49,11 +49,11 @@ abstract class VO {
      * La representacion de este objeto en cadena es la forma JSON (JavaScript Object Notation) para este objeto.
      * @return String
      */
-    public function __toString() {
+    public function __toString() : string {
         return json_encode($this->asArray());
     }
 
-    public function asFilteredArray($filters) {
+    public function asFilteredArray(iterable $filters) : array {
         // Get the complete representation of the array
         $completeArray = get_object_vars($this);
         // Declare an empty array to return
@@ -69,9 +69,9 @@ abstract class VO {
         return $returnArray;
     }
 
-    protected function toUnixTime(array $fields) {
-        foreach ($fields as $f) {
-            $this->$f = strtotime($this->$f);
+    protected function toUnixTime(iterable $fieldNames) : void {
+        foreach ($fieldNames as $fieldName) {
+            $this->$fieldName = strtotime($this->$fieldName);
         }
     }
 }

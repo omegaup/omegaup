@@ -33,8 +33,10 @@ abstract class AuthTokensDAOBase {
      * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(AuthTokens $Auth_Tokens) {
-        if (is_null(self::getByPK($Auth_Tokens->token))) {
+    final public static function save(AuthTokens $Auth_Tokens) : int {
+        if (is_null($Auth_Tokens->token) ||
+            is_null(self::getByPK($Auth_Tokens->token))
+        ) {
             return AuthTokensDAOBase::create($Auth_Tokens);
         }
         return AuthTokensDAOBase::update($Auth_Tokens);
@@ -47,11 +49,11 @@ abstract class AuthTokensDAOBase {
      * @return Filas afectadas
      * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a actualizar.
      */
-    final public static function update(AuthTokens $Auth_Tokens) {
+    final public static function update(AuthTokens $Auth_Tokens) : int {
         $sql = 'UPDATE `Auth_Tokens` SET `user_id` = ?, `identity_id` = ?, `create_time` = ? WHERE `token` = ?;';
         $params = [
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
-            is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
+            (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->create_time,
             $Auth_Tokens->token,
         ];
@@ -69,10 +71,7 @@ abstract class AuthTokensDAOBase {
      * @static
      * @return @link AuthTokens Un objeto del tipo {@link AuthTokens}. NULL si no hay tal registro.
      */
-    final public static function getByPK($token) {
-        if (is_null($token)) {
-            return null;
-        }
+    final public static function getByPK(string $token) : ?AuthTokens {
         $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` FROM Auth_Tokens WHERE (token = ?) LIMIT 1;';
         $params = [$token];
         global $conn;
@@ -99,7 +98,7 @@ abstract class AuthTokensDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a eliminar
      */
-    final public static function delete(AuthTokens $Auth_Tokens) {
+    final public static function delete(AuthTokens $Auth_Tokens) : void {
         $sql = 'DELETE FROM `Auth_Tokens` WHERE token = ?;';
         $params = [$Auth_Tokens->token];
         global $conn;
@@ -127,7 +126,12 @@ abstract class AuthTokensDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link AuthTokens}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Auth_Tokens`.`user_id`, `Auth_Tokens`.`identity_id`, `Auth_Tokens`.`token`, `Auth_Tokens`.`create_time` from Auth_Tokens';
         global $conn;
         if (!is_null($orden)) {
@@ -153,24 +157,24 @@ abstract class AuthTokensDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param AuthTokens [$Auth_Tokens] El objeto de tipo AuthTokens a crear.
      */
-    final public static function create(AuthTokens $Auth_Tokens) {
+    final public static function create(AuthTokens $Auth_Tokens) : int {
         if (is_null($Auth_Tokens->create_time)) {
             $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
         $params = [
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
-            is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
+            (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->token,
             $Auth_Tokens->create_time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

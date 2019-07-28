@@ -33,8 +33,12 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetProblemOpened $Problemset_Problem_Opened) {
-        if (is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id))) {
+    final public static function save(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
+        if (is_null($Problemset_Problem_Opened->problemset_id) ||
+            is_null($Problemset_Problem_Opened->problem_id) ||
+            is_null($Problemset_Problem_Opened->identity_id) ||
+            is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id))
+        ) {
             return ProblemsetProblemOpenedDAOBase::create($Problemset_Problem_Opened);
         }
         return ProblemsetProblemOpenedDAOBase::update($Problemset_Problem_Opened);
@@ -47,13 +51,13 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * @return Filas afectadas
      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a actualizar.
      */
-    final public static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) {
+    final public static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             $Problemset_Problem_Opened->open_time,
-            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
-            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
-            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
+            (int)$Problemset_Problem_Opened->problemset_id,
+            (int)$Problemset_Problem_Opened->problem_id,
+            (int)$Problemset_Problem_Opened->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -69,10 +73,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * @static
      * @return @link ProblemsetProblemOpened Un objeto del tipo {@link ProblemsetProblemOpened}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problemset_id, $problem_id, $identity_id) {
-        if (is_null($problemset_id) || is_null($problem_id) || is_null($identity_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problemset_id, int $problem_id, int $identity_id) : ?ProblemsetProblemOpened {
         $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM Problemset_Problem_Opened WHERE (problemset_id = ? AND problem_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$problemset_id, $problem_id, $identity_id];
         global $conn;
@@ -99,7 +100,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a eliminar
      */
-    final public static function delete(ProblemsetProblemOpened $Problemset_Problem_Opened) {
+    final public static function delete(ProblemsetProblemOpened $Problemset_Problem_Opened) : void {
         $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND identity_id = ?;';
         $params = [$Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id];
         global $conn;
@@ -127,7 +128,12 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblemOpened}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` from Problemset_Problem_Opened';
         global $conn;
         if (!is_null($orden)) {
@@ -153,24 +159,24 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a crear.
      */
-    final public static function create(ProblemsetProblemOpened $Problemset_Problem_Opened) {
+    final public static function create(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         if (is_null($Problemset_Problem_Opened->open_time)) {
             $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
-            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
-            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
+            (int)$Problemset_Problem_Opened->problemset_id,
+            (int)$Problemset_Problem_Opened->problem_id,
+            (int)$Problemset_Problem_Opened->identity_id,
             $Problemset_Problem_Opened->open_time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

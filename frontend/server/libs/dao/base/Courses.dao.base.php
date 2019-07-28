@@ -33,8 +33,10 @@ abstract class CoursesDAOBase {
      * @param Courses [$Courses] El objeto de tipo Courses
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Courses $Courses) {
-        if (is_null(self::getByPK($Courses->course_id))) {
+    final public static function save(Courses $Courses) : int {
+        if (is_null($Courses->course_id) ||
+            is_null(self::getByPK($Courses->course_id))
+        ) {
             return CoursesDAOBase::create($Courses);
         }
         return CoursesDAOBase::update($Courses);
@@ -47,22 +49,22 @@ abstract class CoursesDAOBase {
      * @return Filas afectadas
      * @param Courses [$Courses] El objeto de tipo Courses a actualizar.
      */
-    final public static function update(Courses $Courses) {
+    final public static function update(Courses $Courses) : int {
         $sql = 'UPDATE `Courses` SET `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ?, `public` = ?, `school_id` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `show_scoreboard` = ? WHERE `course_id` = ?;';
         $params = [
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
-            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
+            (int)$Courses->group_id,
+            (int)$Courses->acl_id,
             $Courses->start_time,
             $Courses->finish_time,
-            is_null($Courses->public) ? null : (int)$Courses->public,
+            (int)$Courses->public,
             is_null($Courses->school_id) ? null : (int)$Courses->school_id,
-            is_null($Courses->needs_basic_information) ? null : (int)$Courses->needs_basic_information,
+            (int)$Courses->needs_basic_information,
             $Courses->requests_user_information,
-            is_null($Courses->show_scoreboard) ? null : (int)$Courses->show_scoreboard,
-            is_null($Courses->course_id) ? null : (int)$Courses->course_id,
+            (int)$Courses->show_scoreboard,
+            (int)$Courses->course_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,10 +80,7 @@ abstract class CoursesDAOBase {
      * @static
      * @return @link Courses Un objeto del tipo {@link Courses}. NULL si no hay tal registro.
      */
-    final public static function getByPK($course_id) {
-        if (is_null($course_id)) {
-            return null;
-        }
+    final public static function getByPK(int $course_id) : ?Courses {
         $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` FROM Courses WHERE (course_id = ?) LIMIT 1;';
         $params = [$course_id];
         global $conn;
@@ -108,7 +107,7 @@ abstract class CoursesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Courses [$Courses] El objeto de tipo Courses a eliminar
      */
-    final public static function delete(Courses $Courses) {
+    final public static function delete(Courses $Courses) : void {
         $sql = 'DELETE FROM `Courses` WHERE course_id = ?;';
         $params = [$Courses->course_id];
         global $conn;
@@ -136,7 +135,12 @@ abstract class CoursesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Courses}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` from Courses';
         global $conn;
         if (!is_null($orden)) {
@@ -162,7 +166,7 @@ abstract class CoursesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Courses [$Courses] El objeto de tipo Courses a crear.
      */
-    final public static function create(Courses $Courses) {
+    final public static function create(Courses $Courses) : int {
         if (is_null($Courses->start_time)) {
             $Courses->start_time = '2000-01-01 06:00:00';
         }
@@ -186,24 +190,24 @@ abstract class CoursesDAOBase {
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
-            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
+            (int)$Courses->group_id,
+            (int)$Courses->acl_id,
             $Courses->start_time,
             $Courses->finish_time,
-            is_null($Courses->public) ? null : (int)$Courses->public,
+            (int)$Courses->public,
             is_null($Courses->school_id) ? null : (int)$Courses->school_id,
-            is_null($Courses->needs_basic_information) ? null : (int)$Courses->needs_basic_information,
+            (int)$Courses->needs_basic_information,
             $Courses->requests_user_information,
-            is_null($Courses->show_scoreboard) ? null : (int)$Courses->show_scoreboard,
+            (int)$Courses->show_scoreboard,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Courses->course_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

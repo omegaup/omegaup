@@ -33,8 +33,10 @@ abstract class ProblemOfTheWeekDAOBase {
      * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemOfTheWeek $Problem_Of_The_Week) {
-        if (is_null(self::getByPK($Problem_Of_The_Week->problem_of_the_week_id))) {
+    final public static function save(ProblemOfTheWeek $Problem_Of_The_Week) : int {
+        if (is_null($Problem_Of_The_Week->problem_of_the_week_id) ||
+            is_null(self::getByPK($Problem_Of_The_Week->problem_of_the_week_id))
+        ) {
             return ProblemOfTheWeekDAOBase::create($Problem_Of_The_Week);
         }
         return ProblemOfTheWeekDAOBase::update($Problem_Of_The_Week);
@@ -47,13 +49,13 @@ abstract class ProblemOfTheWeekDAOBase {
      * @return Filas afectadas
      * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek a actualizar.
      */
-    final public static function update(ProblemOfTheWeek $Problem_Of_The_Week) {
+    final public static function update(ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'UPDATE `Problem_Of_The_Week` SET `problem_id` = ?, `time` = ?, `difficulty` = ? WHERE `problem_of_the_week_id` = ?;';
         $params = [
-            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
+            (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
-            is_null($Problem_Of_The_Week->problem_of_the_week_id) ? null : (int)$Problem_Of_The_Week->problem_of_the_week_id,
+            (int)$Problem_Of_The_Week->problem_of_the_week_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -69,10 +71,7 @@ abstract class ProblemOfTheWeekDAOBase {
      * @static
      * @return @link ProblemOfTheWeek Un objeto del tipo {@link ProblemOfTheWeek}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problem_of_the_week_id) {
-        if (is_null($problem_of_the_week_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problem_of_the_week_id) : ?ProblemOfTheWeek {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` FROM Problem_Of_The_Week WHERE (problem_of_the_week_id = ?) LIMIT 1;';
         $params = [$problem_of_the_week_id];
         global $conn;
@@ -99,7 +98,7 @@ abstract class ProblemOfTheWeekDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek a eliminar
      */
-    final public static function delete(ProblemOfTheWeek $Problem_Of_The_Week) {
+    final public static function delete(ProblemOfTheWeek $Problem_Of_The_Week) : void {
         $sql = 'DELETE FROM `Problem_Of_The_Week` WHERE problem_of_the_week_id = ?;';
         $params = [$Problem_Of_The_Week->problem_of_the_week_id];
         global $conn;
@@ -127,7 +126,12 @@ abstract class ProblemOfTheWeekDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemOfTheWeek}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` from Problem_Of_The_Week';
         global $conn;
         if (!is_null($orden)) {
@@ -153,24 +157,24 @@ abstract class ProblemOfTheWeekDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek a crear.
      */
-    final public static function create(ProblemOfTheWeek $Problem_Of_The_Week) {
+    final public static function create(ProblemOfTheWeek $Problem_Of_The_Week) : int {
         if (is_null($Problem_Of_The_Week->time)) {
             $Problem_Of_The_Week->time = '2000-01-01';
         }
         $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
+            (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Problem_Of_The_Week->problem_of_the_week_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

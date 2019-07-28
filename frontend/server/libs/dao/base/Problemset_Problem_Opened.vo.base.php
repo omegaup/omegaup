@@ -22,7 +22,7 @@ class ProblemsetProblemOpened extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -43,7 +43,7 @@ class ProblemsetProblemOpened extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['open_time']);
             return;
@@ -55,30 +55,30 @@ class ProblemsetProblemOpened extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problem_id;
 
     /**
       * Identidad del usuario
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $open_time;
+      * @var string
+     */
+    public $open_time = null;
 }

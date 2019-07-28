@@ -22,7 +22,7 @@ class GroupsScoreboardsProblemsets extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -33,7 +33,7 @@ class GroupsScoreboardsProblemsets extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['only_ac'])) {
-            $this->only_ac = $data['only_ac'] == '1';
+            $this->only_ac = boolval($data['only_ac']);
         }
         if (isset($data['weight'])) {
             $this->weight = (int)$data['weight'];
@@ -43,7 +43,7 @@ class GroupsScoreboardsProblemsets extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -55,29 +55,29 @@ class GroupsScoreboardsProblemsets extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_scoreboard_id;
 
     /**
       * Conjunto de problemas del scoreboard
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
-      */
-    public $only_ac;
+      * @var bool
+     */
+    public $only_ac = false;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $weight;
+      * @var int
+     */
+    public $weight = 1;
 }

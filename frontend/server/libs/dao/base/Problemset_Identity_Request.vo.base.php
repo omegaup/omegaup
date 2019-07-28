@@ -22,7 +22,7 @@ class ProblemsetIdentityRequest extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -39,7 +39,7 @@ class ProblemsetIdentityRequest extends VO {
             $this->last_update = $data['last_update'];
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'] == '1';
+            $this->accepted = boolval($data['accepted']);
         }
         if (isset($data['extra_note'])) {
             $this->extra_note = $data['extra_note'];
@@ -49,7 +49,7 @@ class ProblemsetIdentityRequest extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['request_time', 'last_update']);
             return;
@@ -61,43 +61,43 @@ class ProblemsetIdentityRequest extends VO {
       * Identidad del usuario
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $request_time;
+      * @var string
+     */
+    public $request_time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
+      * @var ?string
+     */
     public $last_update;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
-      */
+      * @var ?bool
+     */
     public $accepted;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var mediumtext
-      */
+      * @var ?string
+     */
     public $extra_note;
 }

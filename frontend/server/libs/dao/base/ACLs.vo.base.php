@@ -22,7 +22,7 @@ class ACLs extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -37,7 +37,7 @@ class ACLs extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -50,14 +50,14 @@ class ACLs extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $acl_id;
 
     /**
       * El usuario que creó el objeto y que tiene un rol de administrador implícito
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $owner_id;
 }

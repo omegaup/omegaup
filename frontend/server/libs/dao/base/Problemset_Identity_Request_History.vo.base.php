@@ -22,7 +22,7 @@ class ProblemsetIdentityRequestHistory extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -39,7 +39,7 @@ class ProblemsetIdentityRequestHistory extends VO {
             $this->time = $data['time'];
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'] == '1';
+            $this->accepted = boolval($data['accepted']);
         }
         if (isset($data['admin_id'])) {
             $this->admin_id = (int)$data['admin_id'];
@@ -49,7 +49,7 @@ class ProblemsetIdentityRequestHistory extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -62,42 +62,42 @@ class ProblemsetIdentityRequestHistory extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $history_id;
 
     /**
       * Identidad del usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(4)
-      */
+      * @var bool
+     */
     public $accepted;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $admin_id;
 }

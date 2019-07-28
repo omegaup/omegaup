@@ -33,8 +33,10 @@ abstract class ProblemsetsDAOBase {
      * @param Problemsets [$Problemsets] El objeto de tipo Problemsets
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Problemsets $Problemsets) {
-        if (is_null(self::getByPK($Problemsets->problemset_id))) {
+    final public static function save(Problemsets $Problemsets) : int {
+        if (is_null($Problemsets->problemset_id) ||
+            is_null(self::getByPK($Problemsets->problemset_id))
+        ) {
             return ProblemsetsDAOBase::create($Problemsets);
         }
         return ProblemsetsDAOBase::update($Problemsets);
@@ -47,13 +49,13 @@ abstract class ProblemsetsDAOBase {
      * @return Filas afectadas
      * @param Problemsets [$Problemsets] El objeto de tipo Problemsets a actualizar.
      */
-    final public static function update(Problemsets $Problemsets) {
+    final public static function update(Problemsets $Problemsets) : int {
         $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `type` = ?, `contest_id` = ?, `assignment_id` = ?, `interview_id` = ? WHERE `problemset_id` = ?;';
         $params = [
-            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
+            (int)$Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
-            is_null($Problemsets->needs_basic_information) ? null : (int)$Problemsets->needs_basic_information,
+            (int)$Problemsets->needs_basic_information,
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
@@ -61,7 +63,7 @@ abstract class ProblemsetsDAOBase {
             is_null($Problemsets->contest_id) ? null : (int)$Problemsets->contest_id,
             is_null($Problemsets->assignment_id) ? null : (int)$Problemsets->assignment_id,
             is_null($Problemsets->interview_id) ? null : (int)$Problemsets->interview_id,
-            is_null($Problemsets->problemset_id) ? null : (int)$Problemsets->problemset_id,
+            (int)$Problemsets->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -77,10 +79,7 @@ abstract class ProblemsetsDAOBase {
      * @static
      * @return @link Problemsets Un objeto del tipo {@link Problemsets}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problemset_id) {
-        if (is_null($problemset_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problemset_id) : ?Problemsets {
         $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`scoreboard_url`, `Problemsets`.`scoreboard_url_admin`, `Problemsets`.`type`, `Problemsets`.`contest_id`, `Problemsets`.`assignment_id`, `Problemsets`.`interview_id` FROM Problemsets WHERE (problemset_id = ?) LIMIT 1;';
         $params = [$problemset_id];
         global $conn;
@@ -107,7 +106,7 @@ abstract class ProblemsetsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Problemsets [$Problemsets] El objeto de tipo Problemsets a eliminar
      */
-    final public static function delete(Problemsets $Problemsets) {
+    final public static function delete(Problemsets $Problemsets) : void {
         $sql = 'DELETE FROM `Problemsets` WHERE problemset_id = ?;';
         $params = [$Problemsets->problemset_id];
         global $conn;
@@ -135,7 +134,12 @@ abstract class ProblemsetsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Problemsets}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problemsets`.`problemset_id`, `Problemsets`.`acl_id`, `Problemsets`.`access_mode`, `Problemsets`.`languages`, `Problemsets`.`needs_basic_information`, `Problemsets`.`requests_user_information`, `Problemsets`.`scoreboard_url`, `Problemsets`.`scoreboard_url_admin`, `Problemsets`.`type`, `Problemsets`.`contest_id`, `Problemsets`.`assignment_id`, `Problemsets`.`interview_id` from Problemsets';
         global $conn;
         if (!is_null($orden)) {
@@ -161,7 +165,7 @@ abstract class ProblemsetsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Problemsets [$Problemsets] El objeto de tipo Problemsets a crear.
      */
-    final public static function create(Problemsets $Problemsets) {
+    final public static function create(Problemsets $Problemsets) : int {
         if (is_null($Problemsets->access_mode)) {
             $Problemsets->access_mode = 'public';
         }
@@ -176,10 +180,10 @@ abstract class ProblemsetsDAOBase {
         }
         $sql = 'INSERT INTO Problemsets (`acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `scoreboard_url`, `scoreboard_url_admin`, `type`, `contest_id`, `assignment_id`, `interview_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
+            (int)$Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
-            is_null($Problemsets->needs_basic_information) ? null : (int)$Problemsets->needs_basic_information,
+            (int)$Problemsets->needs_basic_information,
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
@@ -190,12 +194,12 @@ abstract class ProblemsetsDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Problemsets->problemset_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

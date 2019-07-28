@@ -22,7 +22,7 @@ class RunCounts extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -40,7 +40,7 @@ class RunCounts extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -52,21 +52,21 @@ class RunCounts extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var date
-      */
+      * @var string
+     */
     public $date;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $total;
+      * @var int
+     */
+    public $total = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $ac_count;
+      * @var int
+     */
+    public $ac_count = 0;
 }

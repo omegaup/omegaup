@@ -22,7 +22,7 @@ class UserRank extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -58,7 +58,7 @@ class UserRank extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -70,63 +70,63 @@ class UserRank extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $rank;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $problems_solved_count;
+      * @var int
+     */
+    public $problems_solved_count = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
-    public $score;
+      * @var float
+     */
+    public $score = 0.00;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $username;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
+      * @var ?string
+     */
     public $name;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $state_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $school_id;
 }

@@ -22,7 +22,7 @@ class QualityNominationComments extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -49,7 +49,7 @@ class QualityNominationComments extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -62,42 +62,42 @@ class QualityNominationComments extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $qualitynomination_comment_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $qualitynomination_id;
 
     /**
       * El usuario que emitió el comentario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       * Fecha de creacion de este comentario
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       * El voto emitido en este comentario. En el rango de [-2, +2]
       * @access public
-      * @var int(1)
-      */
+      * @var int
+     */
     public $vote;
 
     /**
       * El contenido de el comentario
       * @access public
-      * @var text
-      */
+      * @var string
+     */
     public $contents;
 }
