@@ -10,10 +10,12 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-problem-solution', {
         props: {
+          status: this.status,
         },
       });
     },
     data: {
+      status: payload['solution_status'],
     },
     components: {
       'omegaup-problem-solution': problem_Solution,

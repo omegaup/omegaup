@@ -99,7 +99,6 @@
     </div>
   {/if}
   {include file='arena.clarification_list.tpl' contest=false}
-  {* Solution *}
   <div id="solution" class="tab">
     <div id="problem-solution"></div>
     <script type="text/javascript" src="{version_hash src="/js/dist/problem_solution.js"}"></script>

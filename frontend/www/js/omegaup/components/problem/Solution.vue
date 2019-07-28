@@ -1,9 +1,11 @@
 <template>
   <div class="panel">
+    {{ status }}
   </div>
 </template>
 
 <style>
+
 </style>
 
 <script lang="ts">
@@ -13,6 +15,8 @@ import UI from '../../ui.js';
 
 @Component
 export default class UserBasicEdit extends Vue {
+  @Prop() status!: string;
   T = T;
 }
+
 </script>

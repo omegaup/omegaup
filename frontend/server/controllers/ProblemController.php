@@ -17,6 +17,11 @@ class ProblemController extends Controller {
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;
 
+    // SOLUTION STATUS
+    const SOLUTION_NOT_FOUND = 'not_found';
+    const SOLUTION_UNLOCKED = 'unlocked';
+    const SOLUTION_LOCKED = 'locked';
+
     const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
 
@@ -1217,8 +1222,8 @@ class ProblemController extends Controller {
      * Gets the problem solution from the gitserver.
      *
      * @param Problems $problem  The problem.
-     * @param string   $commit   The git commit at which to get the statement.
-     * @param string   $language The language of the problem. Will default to
+     * @param string   $commit   The git commit at which to get the solution.
+     * @param string   $language The language of the solution. Will default to
      *                           Spanish if not found.
      *
      * @return array The contents of the file.
@@ -1674,7 +1679,7 @@ class ProblemController extends Controller {
         }
 
         if (!Authorization::canViewProblemSolution($r->identity, $problem)) {
-            $r->ensureBool('forefeit_problem', false /*isRequired*/);
+            $r->ensureBool('forfeit_problem', false /*isRequired*/);
             if ($r['forfeit_problem'] !== true) {
                 throw new ForbiddenAccessException('problemSolutionNotVisible');
             }
@@ -2712,6 +2717,32 @@ class ProblemController extends Controller {
             ) && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
                 $r->user
             );
+        $result['payload']['solution_status'] = self::getProblemSolutionStatus($problem, $r->identity);
         return $result;
+    }
+
+    /**
+     * Returns the status for a problem solution.
+     *
+     * @param Problems $problem
+     * @param Identity $user
+     * @return string The status for the problem solution.
+     */
+    public static function getProblemSolutionStatus(
+        Problems $problem,
+        Identities $userIdentity
+    ) : string {
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
+        $existingSolutionLanguages = [];
+        foreach (self::ISO639_1 as $lang) {
+            $sourcePath = "solutions/{$lang}.markdown";
+            if ($problemArtifacts->exists($sourcePath)) {
+                if (Authorization::canViewProblemSolution($userIdentity, $problem)) {
+                    return self::SOLUTION_UNLOCKED;
+                }
+                return self::SOLUTION_LOCKED;
+            }
+        }
+        return self::SOLUTION_NOT_FOUND;
     }
 }
