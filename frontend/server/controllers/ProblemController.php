@@ -923,7 +923,8 @@ class ProblemController extends Controller {
     private static function updateLooseFile(
         Request $r,
         string $directory,
-        string $contents
+        string $contents,
+        string $cachePrefix
     ): void {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
@@ -973,7 +974,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::invalidateCache($problem, $updatedFileLanguages);
+        self::invalidateCache($problem, $updatedFileLanguages, $cachePrefix);
     }
 
     /**
@@ -986,7 +987,7 @@ class ProblemController extends Controller {
      */
     public static function apiUpdateStatement(Request $r) {
         Validators::validateStringNonEmpty($r['statement'], 'statement');
-        self::updateLooseFile($r, 'statements', $r['statement']);
+        self::updateLooseFile($r, 'statements', $r['statement'], Cache::PROBLEM_STATEMENT);
         return [
             'status' => 'ok'
         ];
@@ -1002,7 +1003,7 @@ class ProblemController extends Controller {
      */
     public static function apiUpdateSolution(Request $r) {
         Validators::validateStringNonEmpty($r['solution'], 'solution');
-        self::updateLooseFile($r, 'solutions', $r['solution']);
+        self::updateLooseFile($r, 'solutions', $r['solution'], Cache::PROBLEM_SOLUTION);
         return [
             'status' => 'ok'
         ];
@@ -1012,19 +1013,23 @@ class ProblemController extends Controller {
      * Invalidates the various caches of the problem, as well as updating the
      * languages.
      *
-     * @param Problems $problem                   the problem
-     * @param array    $updatedStatementLanguages the array of updated
-     *                                            statement languages.
+     * @param Problems $problem the problem
+     * @param array $updatedLanguages the array of updated loose file languages.
+     * @param string $prefix the prefix that indicates if updated files are statements or solutions.
      *
      * @return void
      */
-    private static function invalidateCache(Problems $problem, array $updatedStatementLanguages) {
+    private static function invalidateCache(
+        Problems $problem,
+        array $updatedLanguages,
+        string $prefix = Cache::PROBLEM_STATEMENT
+    ) {
         self::updateLanguages($problem);
 
-        // Invalidate problem statement cache
-        foreach ($updatedStatementLanguages as $lang) {
+        // Invalidate problem statement or solution cache
+        foreach ($updatedLanguages as $lang) {
             Cache::deleteFromCache(
-                Cache::PROBLEM_STATEMENT,
+                $prefix,
                 "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
             );
         }
