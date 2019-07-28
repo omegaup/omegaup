@@ -1711,7 +1711,7 @@ class ContestController extends Controller {
 
         // Save the contest to the DB
         try {
-            ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
+            ProblemsetIdentitiesDAO::replace(new ProblemsetIdentities([
                 'problemset_id' => $contest->problemset_id,
                 'identity_id' => $identity->identity_id,
                 'access_time' => null,
