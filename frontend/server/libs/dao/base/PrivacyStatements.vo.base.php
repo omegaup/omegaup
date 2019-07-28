@@ -15,6 +15,12 @@
  * @access public
  */
 class PrivacyStatements extends VO {
+    const FIELD_NAMES = [
+        'privacystatement_id' => true,
+        'git_object_id' => true,
+        'type' => true,
+    ];
+
     /**
      * Constructor de PrivacyStatements
      *
@@ -23,8 +29,12 @@ class PrivacyStatements extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['privacystatement_id'])) {
             $this->privacystatement_id = (int)$data['privacystatement_id'];

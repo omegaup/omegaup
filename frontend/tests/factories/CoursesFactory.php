@@ -21,7 +21,6 @@ class CoursesFactory {
             GroupsIdentitiesDAO::save(new GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
                 'identity_id' => $identity->identity_id,
-                'role_id' => Authorization::ADMIN_ROLE,
             ]));
         }
 

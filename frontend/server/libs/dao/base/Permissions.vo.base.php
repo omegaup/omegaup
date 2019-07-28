@@ -15,6 +15,12 @@
  * @access public
  */
 class Permissions extends VO {
+    const FIELD_NAMES = [
+        'permission_id' => true,
+        'name' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de Permissions
      *
@@ -23,8 +29,12 @@ class Permissions extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['permission_id'])) {
             $this->permission_id = (int)$data['permission_id'];

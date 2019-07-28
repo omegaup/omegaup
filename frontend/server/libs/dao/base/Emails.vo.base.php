@@ -15,6 +15,12 @@
  * @access public
  */
 class Emails extends VO {
+    const FIELD_NAMES = [
+        'email_id' => true,
+        'email' => true,
+        'user_id' => true,
+    ];
+
     /**
      * Constructor de Emails
      *
@@ -23,8 +29,12 @@ class Emails extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['email_id'])) {
             $this->email_id = (int)$data['email_id'];

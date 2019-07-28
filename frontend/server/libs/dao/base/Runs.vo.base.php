@@ -15,6 +15,21 @@
  * @access public
  */
 class Runs extends VO {
+    const FIELD_NAMES = [
+        'run_id' => true,
+        'submission_id' => true,
+        'version' => true,
+        'status' => true,
+        'verdict' => true,
+        'runtime' => true,
+        'penalty' => true,
+        'memory' => true,
+        'score' => true,
+        'contest_score' => true,
+        'time' => true,
+        'judged_by' => true,
+    ];
+
     /**
      * Constructor de Runs
      *
@@ -23,8 +38,12 @@ class Runs extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['run_id'])) {
             $this->run_id = (int)$data['run_id'];

@@ -311,7 +311,14 @@ class ContestController extends Controller {
         if (is_null($contestProblemset)) {
             throw new NotFoundException('contestNotFound');
         }
-        return [new Contests($contestProblemset), new Problemsets($contestProblemset)];
+        return [
+            new Contests(
+                array_intersect_key($contestProblemset, Contests::FIELD_NAMES)
+            ),
+            new Problemsets(
+                array_intersect_key($contestProblemset, Problemsets::FIELD_NAMES)
+            ),
+        ];
     }
 
     /**
@@ -2159,7 +2166,9 @@ class ContestController extends Controller {
         foreach ($db_results as $result) {
             $admin_id = $result['admin_id'];
 
-            $result = new ProblemsetIdentityRequest($result);
+            $result = new ProblemsetIdentityRequest(
+                array_intersect_key($result, ProblemsetIdentityRequest::FIELD_NAMES)
+            );
             $identity_id = $result->identity_id;
             $user = IdentitiesDAO::getByPK($identity_id);
 

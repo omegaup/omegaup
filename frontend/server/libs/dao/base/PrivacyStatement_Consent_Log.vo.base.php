@@ -15,6 +15,13 @@
  * @access public
  */
 class PrivacyStatementConsentLog extends VO {
+    const FIELD_NAMES = [
+        'privacystatement_consent_id' => true,
+        'identity_id' => true,
+        'privacystatement_id' => true,
+        'timestamp' => true,
+    ];
+
     /**
      * Constructor de PrivacyStatementConsentLog
      *
@@ -23,8 +30,12 @@ class PrivacyStatementConsentLog extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['privacystatement_consent_id'])) {
             $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];

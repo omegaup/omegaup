@@ -15,6 +15,27 @@
  * @access public
  */
 class Users extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'username' => true,
+        'facebook_user_id' => true,
+        'password' => true,
+        'git_token' => true,
+        'main_email_id' => true,
+        'main_identity_id' => true,
+        'scholar_degree' => true,
+        'graduation_date' => true,
+        'birth_date' => true,
+        'verified' => true,
+        'verification_id' => true,
+        'reset_digest' => true,
+        'reset_sent_at' => true,
+        'hide_problem_tags' => true,
+        'in_mailing_list' => true,
+        'is_private' => true,
+        'preferred_language' => true,
+    ];
+
     /**
      * Constructor de Users
      *
@@ -23,8 +44,12 @@ class Users extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];

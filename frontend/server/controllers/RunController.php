@@ -291,10 +291,9 @@ class RunController extends Controller {
             'problemset_id' => $problemset_id,
             'guid' => md5(uniqid(rand(), true)),
             'language' => $r['language'],
-            'penalty' => $submit_delay,
             'time' => gmdate('Y-m-d H:i:s', Time::get()),
             'submit_delay' => $submit_delay, /* based on penalty_type */
-            'type' => $type
+            'type' => $type,
         ]);
         $run = new Runs([
             'version' => $r['problem']->current_version,
@@ -305,7 +304,6 @@ class RunController extends Controller {
             'score' => 0,
             'contest_score' => $problemset_id != null ? 0 : null,
             'verdict' => 'JE',
-            'type' => $type
         ]);
 
         try {

@@ -15,6 +15,12 @@
  * @access public
  */
 class IdentityLoginLog extends VO {
+    const FIELD_NAMES = [
+        'identity_id' => true,
+        'ip' => true,
+        'time' => true,
+    ];
+
     /**
      * Constructor de IdentityLoginLog
      *
@@ -23,8 +29,12 @@ class IdentityLoginLog extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
             $this->identity_id = (int)$data['identity_id'];

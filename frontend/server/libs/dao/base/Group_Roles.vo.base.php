@@ -15,6 +15,12 @@
  * @access public
  */
 class GroupRoles extends VO {
+    const FIELD_NAMES = [
+        'group_id' => true,
+        'role_id' => true,
+        'acl_id' => true,
+    ];
+
     /**
      * Constructor de GroupRoles
      *
@@ -23,8 +29,12 @@ class GroupRoles extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_id'])) {
             $this->group_id = (int)$data['group_id'];

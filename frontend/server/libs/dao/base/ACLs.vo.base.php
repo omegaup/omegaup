@@ -15,6 +15,11 @@
  * @access public
  */
 class ACLs extends VO {
+    const FIELD_NAMES = [
+        'acl_id' => true,
+        'owner_id' => true,
+    ];
+
     /**
      * Constructor de ACLs
      *
@@ -23,8 +28,12 @@ class ACLs extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['acl_id'])) {
             $this->acl_id = (int)$data['acl_id'];

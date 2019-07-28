@@ -15,6 +15,19 @@
  * @access public
  */
 class Identities extends VO {
+    const FIELD_NAMES = [
+        'identity_id' => true,
+        'username' => true,
+        'password' => true,
+        'name' => true,
+        'user_id' => true,
+        'language_id' => true,
+        'country_id' => true,
+        'state_id' => true,
+        'school_id' => true,
+        'gender' => true,
+    ];
+
     /**
      * Constructor de Identities
      *
@@ -23,8 +36,12 @@ class Identities extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
             $this->identity_id = (int)$data['identity_id'];

@@ -15,6 +15,18 @@
  * @access public
  */
 class Clarifications extends VO {
+    const FIELD_NAMES = [
+        'clarification_id' => true,
+        'author_id' => true,
+        'receiver_id' => true,
+        'message' => true,
+        'answer' => true,
+        'time' => true,
+        'problem_id' => true,
+        'problemset_id' => true,
+        'public' => true,
+    ];
+
     /**
      * Constructor de Clarifications
      *
@@ -23,8 +35,12 @@ class Clarifications extends VO {
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
     function __construct(?array $data = null) {
-        if (is_null($data)) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['clarification_id'])) {
             $this->clarification_id = (int)$data['clarification_id'];
