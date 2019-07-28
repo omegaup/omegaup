@@ -299,6 +299,33 @@ class UpdateProblemTest extends OmegaupTestCase {
     }
 
     /**
+     * Test apiUpdateSolution
+     */
+    public function testProblemSolutionUpdate() {
+        $problemData = ProblemsFactory::createProblem();
+
+        // Update solution
+        $solution = 'La nueva solución \$x\$';
+        $login = self::login($problemData['author']);
+        $response = ProblemController::apiUpdateSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'message' => 'Solution modified for test.',
+            'solution' => $solution
+        ]));
+
+        $this->assertEquals($response['status'], 'ok');
+
+        // Check solution contents
+        $response = ProblemController::apiSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        $this->assertContains($solution, $response['solution']['markdown']);
+    }
+
+    /**
      * Test apiUpdateStatement with embedded imgs via data URI
      */
     public function testProblemStatementUpdateWithImagesAsDataURI() {
