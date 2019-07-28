@@ -46,7 +46,7 @@ class IdentityController extends Controller {
             throw new LoginDisabledException('loginThroughThirdParty');
         }
 
-        if (strlen($identity->password) === 0) {
+        if (empty($identity->password)) {
             throw new LoginDisabledException('loginDisabled');
         }
 

@@ -216,8 +216,6 @@ class LoginTest extends OmegaupTestCase {
 
     /**
      * Logins with empty passwords in DB are disabled
-     *
-     * @expectedException LoginDisabledException
      */
     public function testLoginDisabled() {
         // User to be verified
@@ -230,6 +228,12 @@ class LoginTest extends OmegaupTestCase {
         $identity->password = $user->password;
         IdentitiesDAO::save($identity);
 
-        self::login($user);
+        try {
+            $user->password = 'foo';
+            self::login($user);
+            $this->fail('User should have not been able to log in');
+        } catch (LoginDisabledException $e) {
+            $this->assertEquals('loginDisabled', $e->getMessage());
+        }
     }
 }
