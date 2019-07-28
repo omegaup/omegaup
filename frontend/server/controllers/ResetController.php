@@ -21,7 +21,7 @@ class ResetController extends Controller {
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::save($user);
+        UsersDAO::update($user);
 
         if (IS_TEST) {
             return ['status' => 'ok', 'token' => $token];
@@ -40,7 +40,7 @@ class ResetController extends Controller {
             self::$log->error('Failed to send reset password email ' . $e->getMessage());
             $user->reset_digest = null;
             $user->reset_sent_at = null;
-            UsersDAO::save($user);
+            UsersDAO::update($user);
         }
 
         return [
@@ -84,7 +84,7 @@ class ResetController extends Controller {
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::save($user);
+        UsersDAO::update($user);
 
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
@@ -116,8 +116,8 @@ class ResetController extends Controller {
         $identity->password = $user->password;
         try {
             DAO::transBegin();
-            UsersDAO::save($user);
-            IdentitiesDAO::save($identity);
+            UsersDAO::update($user);
+            IdentitiesDAO::update($identity);
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();

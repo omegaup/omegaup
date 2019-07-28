@@ -336,19 +336,19 @@ class ContestsFactory {
     public static function makeContestWindowLength($contestData, $windowLength = 20) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->window_length = $windowLength;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
     }
 
     public static function forcePublic($contestData, $last_updated = null) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->admission_mode = 'public';
         $contest->last_updated = gmdate('Y-m-d H:i:s', $last_updated);
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->scoreboard = $percentage;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
     }
 }

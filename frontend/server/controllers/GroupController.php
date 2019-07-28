@@ -16,17 +16,17 @@ class GroupController extends Controller {
             'name' => $name,
             'description' => $description,
         ]);
-        $group_acl = new ACLs([
+        $groupAcl = new ACLs([
             'owner_id' => $owner_id,
         ]);
 
         DAO::transBegin();
 
         try {
-            ACLsDAO::save($group_acl);
-            $group->acl_id = $group_acl->acl_id;
+            ACLsDAO::create($groupAcl);
+            $group->acl_id = $groupAcl->acl_id;
 
-            GroupsDAO::save($group);
+            GroupsDAO::create($group);
 
             self::$log->info("Group {$alias} created.");
 
@@ -122,11 +122,10 @@ class GroupController extends Controller {
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         try {
-            $groups_identity = new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $group->group_id,
                 'identity_id' => $resolvedIdentity->identity_id
-            ]);
-            GroupsIdentitiesDAO::save($groups_identity);
+            ]));
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }
@@ -293,17 +292,15 @@ class GroupController extends Controller {
         Validators::validateStringNonEmpty($r['description'], 'description', false);
 
         try {
-            $groupScoreboard = new GroupsScoreboards([
+            GroupsScoreboardsDAO::create(new GroupsScoreboards([
                 'group_id' => $group->group_id,
                 'name' => $r['name'],
                 'description' =>$r['description'],
                 'alias' => $r['alias'],
                 'create_time' => gmdate('Y-m-d H:i:s', Time::get())
-            ]);
+            ]));
 
-            GroupsScoreboardsDAO::save($groupScoreboard);
-
-            self::$log->info('New scoreboard created ' . $r['alias']);
+            self::$log->info("New scoreboard created {$r['alias']}");
         } catch (Exception $ex) {
             throw new InvalidDatabaseOperationException($ex);
         }

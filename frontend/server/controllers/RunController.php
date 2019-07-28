@@ -478,7 +478,7 @@ class RunController extends Controller {
 
         // Reset fields.
         $r['run']->status = 'new';
-        RunsDAO::save($r['run']);
+        RunsDAO::update($r['run']);
 
         try {
             Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);

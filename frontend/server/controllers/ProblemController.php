@@ -440,7 +440,7 @@ class ProblemController extends Controller {
                 $tag = new Tags([
                     'name' => $tagName,
                 ]);
-                TagsDAO::save($tag);
+                TagsDAO::create($tag);
             } catch (Exception $e) {
                 $this->log->info($e);
                 // Operation failed in the data layer
@@ -453,7 +453,7 @@ class ProblemController extends Controller {
         }
 
         try {
-            ProblemsTagsDAO::save(new ProblemsTags([
+            ProblemsTagsDAO::create(new ProblemsTags([
                 'problem_id' => $problem->problem_id,
                 'tag_id' => $tag->tag_id,
                 'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
@@ -732,7 +732,7 @@ class ProblemController extends Controller {
                 $run->verdict = 'JE';
                 $run->score = 0;
                 $run->contest_score = 0;
-                RunsDAO::save($run);
+                RunsDAO::update($run);
 
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
@@ -795,7 +795,6 @@ class ProblemController extends Controller {
         }
         $updatedStatementLanguages = [];
 
-        // Insert new problem
         try {
             //Begin transaction
             DAO::transBegin();
@@ -1585,7 +1584,7 @@ class ProblemController extends Controller {
             )) {
                 try {
                     // Save object in the DB
-                    ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
+                    ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
                         'problemset_id' => $problemset->problemset_id,
                         'problem_id' => $problem->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),

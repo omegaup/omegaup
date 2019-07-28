@@ -315,7 +315,7 @@ class UserController extends Controller {
 
             try {
                 $user->verification_id = SecurityTools::randomString(50);
-                UsersDAO::save($user);
+                UsersDAO::update($user);
             } catch (Exception $e) {
                 self::$log->info("Unable to save verification ID: $e");
             }
@@ -414,9 +414,9 @@ class UserController extends Controller {
         try {
             DAO::transBegin();
 
-            UsersDAO::save($user);
+            UsersDAO::update($user);
 
-            IdentitiesDAO::save($identity);
+            IdentitiesDAO::update($identity);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -473,7 +473,7 @@ class UserController extends Controller {
 
         try {
             $user->verified = 1;
-            UsersDAO::save($user);
+            UsersDAO::update($user);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
@@ -521,7 +521,7 @@ class UserController extends Controller {
 
                 if ($registered) {
                     $user->in_mailing_list = 1;
-                    UsersDAO::save($user);
+                    UsersDAO::update($user);
                 }
 
                 $usersAdded[$user->username] = $registered;
@@ -1247,7 +1247,7 @@ class UserController extends Controller {
                 }
 
                 // Only first place coder is saved
-                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                CoderOfTheMonthDAO::create(new CoderOfTheMonth([
                     'user_id' => $users[0]['user_id'],
                     'time' => $firstDay,
                     'rank' => 1,
@@ -1353,7 +1353,7 @@ class UserController extends Controller {
                 }
 
                 // Save it
-                CoderOfTheMonthDAO::save(new CoderOfTheMonth([
+                CoderOfTheMonthDAO::create(new CoderOfTheMonth([
                     'user_id' => $user['user_id'],
                     'time' => $dateToSelect,
                     'rank' => $index + 1,
@@ -1975,7 +1975,7 @@ class UserController extends Controller {
             // Update email
             $email = EmailsDAO::getByPK($r->user->main_email_id);
             $email->email = $r['email'];
-            EmailsDAO::save($email);
+            EmailsDAO::update($email);
 
             // Add verification_id if not there
             if ($r->user->verified == '0') {
@@ -1986,7 +1986,7 @@ class UserController extends Controller {
 
                     try {
                         $r->user->verification_id = SecurityTools::randomString(50);
-                        UsersDAO::save($r->user);
+                        UsersDAO::update($r->user);
                     } catch (Exception $e) {
                         // best effort, eat exception
                     }
@@ -2244,9 +2244,9 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveGroup($r);
         try {
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'identity_id' => $r->identity->identity_id,
-                'group_id' => $r['group']->group_id
+                'group_id' => $r['group']->group_id,
             ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

@@ -359,8 +359,7 @@ class CourseController extends Controller {
 
         try {
             $acl = new ACLs(['owner_id' => $creator->user_id]);
-
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
 
             GroupRolesDAO::create(new GroupRoles([
                 'group_id' => $group->group_id,
