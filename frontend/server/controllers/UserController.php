@@ -1933,10 +1933,14 @@ class UserController extends Controller {
         } else {
             $response = [];
 
-            try {
-                $userRank = UserRankDAO::getByPK($identity->user_id);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
+            if (is_null($identity->user_id)) {
+                $userRank = null;
+            } else {
+                try {
+                    $userRank = UserRankDAO::getByPK($identity->user_id);
+                } catch (Exception $e) {
+                    throw new InvalidDatabaseOperationException($e);
+                }
             }
 
             if (!is_null($userRank)) {

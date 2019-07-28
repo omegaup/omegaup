@@ -22,7 +22,7 @@ class GroupsScoreboards extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -49,7 +49,7 @@ class GroupsScoreboards extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['create_time']);
             return;
@@ -62,42 +62,42 @@ class GroupsScoreboards extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_scoreboard_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $create_time;
+      * @var string
+     */
+    public $create_time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $alias;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $name;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
+      * @var ?string
+     */
     public $description;
 }

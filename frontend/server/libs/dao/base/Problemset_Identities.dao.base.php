@@ -33,8 +33,11 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @param ProblemsetIdentities [$Problemset_Identities] El objeto de tipo ProblemsetIdentities
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetIdentities $Problemset_Identities) {
-        if (is_null(self::getByPK($Problemset_Identities->identity_id, $Problemset_Identities->problemset_id))) {
+    final public static function save(ProblemsetIdentities $Problemset_Identities) : int {
+        if (is_null($Problemset_Identities->identity_id) ||
+            is_null($Problemset_Identities->problemset_id) ||
+            is_null(self::getByPK($Problemset_Identities->identity_id, $Problemset_Identities->problemset_id))
+        ) {
             return ProblemsetIdentitiesDAOBase::create($Problemset_Identities);
         }
         return ProblemsetIdentitiesDAOBase::update($Problemset_Identities);
@@ -47,17 +50,17 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @return Filas afectadas
      * @param ProblemsetIdentities [$Problemset_Identities] El objeto de tipo ProblemsetIdentities a actualizar.
      */
-    final public static function update(ProblemsetIdentities $Problemset_Identities) {
+    final public static function update(ProblemsetIdentities $Problemset_Identities) : int {
         $sql = 'UPDATE `Problemset_Identities` SET `access_time` = ?, `score` = ?, `time` = ?, `share_user_information` = ?, `privacystatement_consent_id` = ?, `is_invited` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
             $Problemset_Identities->access_time,
-            is_null($Problemset_Identities->score) ? null : (int)$Problemset_Identities->score,
-            is_null($Problemset_Identities->time) ? null : (int)$Problemset_Identities->time,
+            (int)$Problemset_Identities->score,
+            (int)$Problemset_Identities->time,
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
             is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
-            is_null($Problemset_Identities->is_invited) ? null : (int)$Problemset_Identities->is_invited,
-            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
-            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
+            (int)$Problemset_Identities->is_invited,
+            (int)$Problemset_Identities->identity_id,
+            (int)$Problemset_Identities->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -73,10 +76,7 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @static
      * @return @link ProblemsetIdentities Un objeto del tipo {@link ProblemsetIdentities}. NULL si no hay tal registro.
      */
-    final public static function getByPK($identity_id, $problemset_id) {
-        if (is_null($identity_id) || is_null($problemset_id)) {
-            return null;
-        }
+    final public static function getByPK(int $identity_id, int $problemset_id) : ?ProblemsetIdentities {
         $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
@@ -103,7 +103,7 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemsetIdentities [$Problemset_Identities] El objeto de tipo ProblemsetIdentities a eliminar
      */
-    final public static function delete(ProblemsetIdentities $Problemset_Identities) {
+    final public static function delete(ProblemsetIdentities $Problemset_Identities) : void {
         $sql = 'DELETE FROM `Problemset_Identities` WHERE identity_id = ? AND problemset_id = ?;';
         $params = [$Problemset_Identities->identity_id, $Problemset_Identities->problemset_id];
         global $conn;
@@ -131,7 +131,12 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetIdentities}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` from Problemset_Identities';
         global $conn;
         if (!is_null($orden)) {
@@ -157,7 +162,7 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsetIdentities [$Problemset_Identities] El objeto de tipo ProblemsetIdentities a crear.
      */
-    final public static function create(ProblemsetIdentities $Problemset_Identities) {
+    final public static function create(ProblemsetIdentities $Problemset_Identities) : int {
         if (is_null($Problemset_Identities->score)) {
             $Problemset_Identities->score = 1;
         }
@@ -169,22 +174,22 @@ abstract class ProblemsetIdentitiesDAOBase {
         }
         $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
-            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
+            (int)$Problemset_Identities->identity_id,
+            (int)$Problemset_Identities->problemset_id,
             $Problemset_Identities->access_time,
-            is_null($Problemset_Identities->score) ? null : (int)$Problemset_Identities->score,
-            is_null($Problemset_Identities->time) ? null : (int)$Problemset_Identities->time,
+            (int)$Problemset_Identities->score,
+            (int)$Problemset_Identities->time,
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
             is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
-            is_null($Problemset_Identities->is_invited) ? null : (int)$Problemset_Identities->is_invited,
+            (int)$Problemset_Identities->is_invited,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

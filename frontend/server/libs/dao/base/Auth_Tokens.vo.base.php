@@ -22,7 +22,7 @@ class AuthTokens extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -43,7 +43,7 @@ class AuthTokens extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['create_time']);
             return;
@@ -54,29 +54,29 @@ class AuthTokens extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $user_id;
 
     /**
       * Identidad del usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var varchar(128)
-      */
+      * @var string
+     */
     public $token;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $create_time;
+      * @var string
+     */
+    public $create_time = null;
 }

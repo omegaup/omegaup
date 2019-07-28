@@ -22,7 +22,7 @@ class Messages extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -30,7 +30,7 @@ class Messages extends VO {
             $this->message_id = (int)$data['message_id'];
         }
         if (isset($data['read'])) {
-            $this->read = $data['read'] == '1';
+            $this->read = boolval($data['read']);
         }
         if (isset($data['sender_id'])) {
             $this->sender_id = (int)$data['sender_id'];
@@ -49,7 +49,7 @@ class Messages extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['date']);
             return;
@@ -62,42 +62,42 @@ class Messages extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $message_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
-      */
-    public $read;
+      * @var bool
+     */
+    public $read = false;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $sender_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $recipient_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinytext
-      */
+      * @var string
+     */
     public $message;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $date;
+      * @var string
+     */
+    public $date = null;
 }

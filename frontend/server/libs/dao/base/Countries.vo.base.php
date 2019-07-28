@@ -22,7 +22,7 @@ class Countries extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -37,7 +37,7 @@ class Countries extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -49,14 +49,14 @@ class Countries extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var char(3)
-      */
+      * @var string
+     */
     public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $name;
 }

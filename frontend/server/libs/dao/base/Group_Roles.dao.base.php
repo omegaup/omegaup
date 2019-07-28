@@ -27,10 +27,7 @@ abstract class GroupRolesDAOBase {
      * @static
      * @return @link GroupRoles Un objeto del tipo {@link GroupRoles}. NULL si no hay tal registro.
      */
-    final public static function getByPK($group_id, $role_id, $acl_id) {
-        if (is_null($group_id) || is_null($role_id) || is_null($acl_id)) {
-            return null;
-        }
+    final public static function getByPK(int $group_id, int $role_id, int $acl_id) : ?GroupRoles {
         $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` FROM Group_Roles WHERE (group_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
         $params = [$group_id, $role_id, $acl_id];
         global $conn;
@@ -57,7 +54,7 @@ abstract class GroupRolesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param GroupRoles [$Group_Roles] El objeto de tipo GroupRoles a eliminar
      */
-    final public static function delete(GroupRoles $Group_Roles) {
+    final public static function delete(GroupRoles $Group_Roles) : void {
         $sql = 'DELETE FROM `Group_Roles` WHERE group_id = ? AND role_id = ? AND acl_id = ?;';
         $params = [$Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->acl_id];
         global $conn;
@@ -85,7 +82,12 @@ abstract class GroupRolesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link GroupRoles}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` from Group_Roles';
         global $conn;
         if (!is_null($orden)) {
@@ -111,20 +113,20 @@ abstract class GroupRolesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param GroupRoles [$Group_Roles] El objeto de tipo GroupRoles a crear.
      */
-    final public static function create(GroupRoles $Group_Roles) {
+    final public static function create(GroupRoles $Group_Roles) : int {
         $sql = 'INSERT INTO Group_Roles (`group_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Group_Roles->group_id) ? null : (int)$Group_Roles->group_id,
-            is_null($Group_Roles->role_id) ? null : (int)$Group_Roles->role_id,
-            is_null($Group_Roles->acl_id) ? null : (int)$Group_Roles->acl_id,
+            (int)$Group_Roles->group_id,
+            (int)$Group_Roles->role_id,
+            (int)$Group_Roles->acl_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

@@ -33,8 +33,10 @@ abstract class PermissionsDAOBase {
      * @param Permissions [$Permissions] El objeto de tipo Permissions
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Permissions $Permissions) {
-        if (is_null(self::getByPK($Permissions->permission_id))) {
+    final public static function save(Permissions $Permissions) : int {
+        if (is_null($Permissions->permission_id) ||
+            is_null(self::getByPK($Permissions->permission_id))
+        ) {
             return PermissionsDAOBase::create($Permissions);
         }
         return PermissionsDAOBase::update($Permissions);
@@ -47,12 +49,12 @@ abstract class PermissionsDAOBase {
      * @return Filas afectadas
      * @param Permissions [$Permissions] El objeto de tipo Permissions a actualizar.
      */
-    final public static function update(Permissions $Permissions) {
+    final public static function update(Permissions $Permissions) : int {
         $sql = 'UPDATE `Permissions` SET `name` = ?, `description` = ? WHERE `permission_id` = ?;';
         $params = [
             $Permissions->name,
             $Permissions->description,
-            is_null($Permissions->permission_id) ? null : (int)$Permissions->permission_id,
+            (int)$Permissions->permission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -68,10 +70,7 @@ abstract class PermissionsDAOBase {
      * @static
      * @return @link Permissions Un objeto del tipo {@link Permissions}. NULL si no hay tal registro.
      */
-    final public static function getByPK($permission_id) {
-        if (is_null($permission_id)) {
-            return null;
-        }
+    final public static function getByPK(int $permission_id) : ?Permissions {
         $sql = 'SELECT `Permissions`.`permission_id`, `Permissions`.`name`, `Permissions`.`description` FROM Permissions WHERE (permission_id = ?) LIMIT 1;';
         $params = [$permission_id];
         global $conn;
@@ -98,7 +97,7 @@ abstract class PermissionsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Permissions [$Permissions] El objeto de tipo Permissions a eliminar
      */
-    final public static function delete(Permissions $Permissions) {
+    final public static function delete(Permissions $Permissions) : void {
         $sql = 'DELETE FROM `Permissions` WHERE permission_id = ?;';
         $params = [$Permissions->permission_id];
         global $conn;
@@ -126,7 +125,12 @@ abstract class PermissionsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Permissions}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Permissions`.`permission_id`, `Permissions`.`name`, `Permissions`.`description` from Permissions';
         global $conn;
         if (!is_null($orden)) {
@@ -152,7 +156,7 @@ abstract class PermissionsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Permissions [$Permissions] El objeto de tipo Permissions a crear.
      */
-    final public static function create(Permissions $Permissions) {
+    final public static function create(Permissions $Permissions) : int {
         $sql = 'INSERT INTO Permissions (`name`, `description`) VALUES (?, ?);';
         $params = [
             $Permissions->name,
@@ -160,12 +164,12 @@ abstract class PermissionsDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Permissions->permission_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

@@ -22,7 +22,7 @@ class CoderOfTheMonth extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -52,7 +52,7 @@ class CoderOfTheMonth extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -65,49 +65,49 @@ class CoderOfTheMonth extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $coder_of_the_month_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinytext
-      */
+      * @var ?string
+     */
     public $description;
 
     /**
       * Fecha no es UNIQUE por si hay más de 1 coder de mes.
       * @access public
-      * @var date
-      */
-    public $time;
+      * @var string
+     */
+    public $time = '2000-01-01';
 
     /**
       * Para linekar a un post del blog con entrevistas.
       * @access public
-      * @var varchar(256)
-      */
+      * @var ?string
+     */
     public $interview_url;
 
     /**
       * El lugar en el que el usuario estuvo durante ese mes
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $rank;
 
     /**
       * Id de la identidad que seleccionó al coder.
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $selected_by;
 }

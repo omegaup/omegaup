@@ -22,7 +22,7 @@ class Schools extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -43,7 +43,7 @@ class Schools extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -56,28 +56,28 @@ class Schools extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $school_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $state_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(128)
-      */
+      * @var string
+     */
     public $name;
 }

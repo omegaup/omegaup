@@ -22,7 +22,7 @@ class UserRankCutoffs extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -40,7 +40,7 @@ class UserRankCutoffs extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -51,21 +51,21 @@ class UserRankCutoffs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
+      * @var float
+     */
     public $score;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
+      * @var float
+     */
     public $percentile;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $classname;
 }

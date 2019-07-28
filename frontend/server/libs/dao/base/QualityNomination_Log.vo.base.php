@@ -22,7 +22,7 @@ class QualityNominationLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -52,7 +52,7 @@ class QualityNominationLog extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -65,49 +65,49 @@ class QualityNominationLog extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $qualitynomination_log_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $qualitynomination_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $from_status;
+      * @var string
+     */
+    public $from_status = 'open';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $to_status;
+      * @var string
+     */
+    public $to_status = 'open';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var text
-      */
+      * @var ?string
+     */
     public $rationale;
 }

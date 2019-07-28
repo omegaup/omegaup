@@ -33,8 +33,10 @@ abstract class RunCountsDAOBase {
      * @param RunCounts [$Run_Counts] El objeto de tipo RunCounts
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(RunCounts $Run_Counts) {
-        if (is_null(self::getByPK($Run_Counts->date))) {
+    final public static function save(RunCounts $Run_Counts) : int {
+        if (is_null($Run_Counts->date) ||
+            is_null(self::getByPK($Run_Counts->date))
+        ) {
             return RunCountsDAOBase::create($Run_Counts);
         }
         return RunCountsDAOBase::update($Run_Counts);
@@ -47,11 +49,11 @@ abstract class RunCountsDAOBase {
      * @return Filas afectadas
      * @param RunCounts [$Run_Counts] El objeto de tipo RunCounts a actualizar.
      */
-    final public static function update(RunCounts $Run_Counts) {
+    final public static function update(RunCounts $Run_Counts) : int {
         $sql = 'UPDATE `Run_Counts` SET `total` = ?, `ac_count` = ? WHERE `date` = ?;';
         $params = [
-            is_null($Run_Counts->total) ? null : (int)$Run_Counts->total,
-            is_null($Run_Counts->ac_count) ? null : (int)$Run_Counts->ac_count,
+            (int)$Run_Counts->total,
+            (int)$Run_Counts->ac_count,
             $Run_Counts->date,
         ];
         global $conn;
@@ -68,10 +70,7 @@ abstract class RunCountsDAOBase {
      * @static
      * @return @link RunCounts Un objeto del tipo {@link RunCounts}. NULL si no hay tal registro.
      */
-    final public static function getByPK($date) {
-        if (is_null($date)) {
-            return null;
-        }
+    final public static function getByPK(string $date) : ?RunCounts {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` FROM Run_Counts WHERE (date = ?) LIMIT 1;';
         $params = [$date];
         global $conn;
@@ -98,7 +97,7 @@ abstract class RunCountsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param RunCounts [$Run_Counts] El objeto de tipo RunCounts a eliminar
      */
-    final public static function delete(RunCounts $Run_Counts) {
+    final public static function delete(RunCounts $Run_Counts) : void {
         $sql = 'DELETE FROM `Run_Counts` WHERE date = ?;';
         $params = [$Run_Counts->date];
         global $conn;
@@ -126,7 +125,12 @@ abstract class RunCountsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link RunCounts}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` from Run_Counts';
         global $conn;
         if (!is_null($orden)) {
@@ -152,7 +156,7 @@ abstract class RunCountsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param RunCounts [$Run_Counts] El objeto de tipo RunCounts a crear.
      */
-    final public static function create(RunCounts $Run_Counts) {
+    final public static function create(RunCounts $Run_Counts) : int {
         if (is_null($Run_Counts->total)) {
             $Run_Counts->total = 0;
         }
@@ -162,16 +166,16 @@ abstract class RunCountsDAOBase {
         $sql = 'INSERT INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
         $params = [
             $Run_Counts->date,
-            is_null($Run_Counts->total) ? null : (int)$Run_Counts->total,
-            is_null($Run_Counts->ac_count) ? null : (int)$Run_Counts->ac_count,
+            (int)$Run_Counts->total,
+            (int)$Run_Counts->ac_count,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

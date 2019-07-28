@@ -150,9 +150,10 @@ class SessionController extends Controller {
 
         if (is_null($currentIdentity->user_id)) {
             $currentUser = null;
+            $email = null;
         } else {
             $currentUser = UsersDAO::getByPK($currentIdentity->user_id);
-            $email = EmailsDAO::getByPK($currentUser->main_email_id);
+            $email = !is_null($currentUser->main_email_id) ? EmailsDAO::getByPK($currentUser->main_email_id) : null;
         }
 
         return [

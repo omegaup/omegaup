@@ -22,7 +22,7 @@ class Courses extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -51,26 +51,26 @@ class Courses extends VO {
             $this->finish_time = $data['finish_time'];
         }
         if (isset($data['public'])) {
-            $this->public = $data['public'] == '1';
+            $this->public = boolval($data['public']);
         }
         if (isset($data['school_id'])) {
             $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['needs_basic_information'])) {
-            $this->needs_basic_information = $data['needs_basic_information'] == '1';
+            $this->needs_basic_information = boolval($data['needs_basic_information']);
         }
         if (isset($data['requests_user_information'])) {
             $this->requests_user_information = $data['requests_user_information'];
         }
         if (isset($data['show_scoreboard'])) {
-            $this->show_scoreboard = $data['show_scoreboard'] == '1';
+            $this->show_scoreboard = boolval($data['show_scoreboard']);
         }
     }
 
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['start_time', 'finish_time']);
             return;
@@ -83,91 +83,91 @@ class Courses extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $course_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(100)
-      */
+      * @var string
+     */
     public $name;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinytext
-      */
+      * @var string
+     */
     public $description;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(32)
-      */
+      * @var string
+     */
     public $alias;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $acl_id;
 
     /**
       * Hora de inicio de este curso
       * @access public
-      * @var timestamp
-      */
-    public $start_time;
+      * @var string
+     */
+    public $start_time = '2000-01-01 06:00:00';
 
     /**
       * Hora de finalizacion de este curso
       * @access public
-      * @var timestamp
-      */
-    public $finish_time;
+      * @var string
+     */
+    public $finish_time = '2000-01-01 06:00:00';
 
     /**
       * True implica que cualquier usuario puede entrar al curso
       * @access public
-      * @var tinyint(1)
-      */
-    public $public;
+      * @var bool
+     */
+    public $public = false;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $school_id;
 
     /**
       * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil
       * @access public
-      * @var tinyint(1)
-      */
-    public $needs_basic_information;
+      * @var bool
+     */
+    public $needs_basic_information = false;
 
     /**
       * Se solicita información de los participantes para contactarlos posteriormente.
       * @access public
-      * @var enum('no','optional','required')
-      */
-    public $requests_user_information;
+      * @var string
+     */
+    public $requests_user_information = 'no';
 
     /**
       * Los estudiantes pueden visualizar el scoreboard de un curso.
       * @access public
-      * @var tinyint(1)
-      */
-    public $show_scoreboard;
+      * @var bool
+     */
+    public $show_scoreboard = false;
 }

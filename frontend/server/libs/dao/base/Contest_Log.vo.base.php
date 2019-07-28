@@ -22,7 +22,7 @@ class ContestLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -49,7 +49,7 @@ class ContestLog extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -62,42 +62,42 @@ class ContestLog extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $public_contest_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $contest_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('private','registration','public')
-      */
+      * @var string
+     */
     public $from_admission_mode;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('private','registration','public')
-      */
+      * @var string
+     */
     public $to_admission_mode;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 }

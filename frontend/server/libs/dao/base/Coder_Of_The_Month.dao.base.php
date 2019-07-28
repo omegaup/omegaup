@@ -33,8 +33,10 @@ abstract class CoderOfTheMonthDAOBase {
      * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(CoderOfTheMonth $Coder_Of_The_Month) {
-        if (is_null(self::getByPK($Coder_Of_The_Month->coder_of_the_month_id))) {
+    final public static function save(CoderOfTheMonth $Coder_Of_The_Month) : int {
+        if (is_null($Coder_Of_The_Month->coder_of_the_month_id) ||
+            is_null(self::getByPK($Coder_Of_The_Month->coder_of_the_month_id))
+        ) {
             return CoderOfTheMonthDAOBase::create($Coder_Of_The_Month);
         }
         return CoderOfTheMonthDAOBase::update($Coder_Of_The_Month);
@@ -47,16 +49,16 @@ abstract class CoderOfTheMonthDAOBase {
      * @return Filas afectadas
      * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a actualizar.
      */
-    final public static function update(CoderOfTheMonth $Coder_Of_The_Month) {
+    final public static function update(CoderOfTheMonth $Coder_Of_The_Month) : int {
         $sql = 'UPDATE `Coder_Of_The_Month` SET `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ?, `rank` = ?, `selected_by` = ? WHERE `coder_of_the_month_id` = ?;';
         $params = [
-            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
+            (int)$Coder_Of_The_Month->user_id,
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
+            (int)$Coder_Of_The_Month->rank,
             is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
-            is_null($Coder_Of_The_Month->coder_of_the_month_id) ? null : (int)$Coder_Of_The_Month->coder_of_the_month_id,
+            (int)$Coder_Of_The_Month->coder_of_the_month_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -72,10 +74,7 @@ abstract class CoderOfTheMonthDAOBase {
      * @static
      * @return @link CoderOfTheMonth Un objeto del tipo {@link CoderOfTheMonth}. NULL si no hay tal registro.
      */
-    final public static function getByPK($coder_of_the_month_id) {
-        if (is_null($coder_of_the_month_id)) {
-            return null;
-        }
+    final public static function getByPK(int $coder_of_the_month_id) : ?CoderOfTheMonth {
         $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` FROM Coder_Of_The_Month WHERE (coder_of_the_month_id = ?) LIMIT 1;';
         $params = [$coder_of_the_month_id];
         global $conn;
@@ -102,7 +101,7 @@ abstract class CoderOfTheMonthDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a eliminar
      */
-    final public static function delete(CoderOfTheMonth $Coder_Of_The_Month) {
+    final public static function delete(CoderOfTheMonth $Coder_Of_The_Month) : void {
         $sql = 'DELETE FROM `Coder_Of_The_Month` WHERE coder_of_the_month_id = ?;';
         $params = [$Coder_Of_The_Month->coder_of_the_month_id];
         global $conn;
@@ -130,7 +129,12 @@ abstract class CoderOfTheMonthDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link CoderOfTheMonth}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` from Coder_Of_The_Month';
         global $conn;
         if (!is_null($orden)) {
@@ -156,27 +160,27 @@ abstract class CoderOfTheMonthDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param CoderOfTheMonth [$Coder_Of_The_Month] El objeto de tipo CoderOfTheMonth a crear.
      */
-    final public static function create(CoderOfTheMonth $Coder_Of_The_Month) {
+    final public static function create(CoderOfTheMonth $Coder_Of_The_Month) : int {
         if (is_null($Coder_Of_The_Month->time)) {
             $Coder_Of_The_Month->time = '2000-01-01';
         }
         $sql = 'INSERT INTO Coder_Of_The_Month (`user_id`, `description`, `time`, `interview_url`, `rank`, `selected_by`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
+            (int)$Coder_Of_The_Month->user_id,
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
+            (int)$Coder_Of_The_Month->rank,
             is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Coder_Of_The_Month->coder_of_the_month_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

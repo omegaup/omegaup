@@ -33,8 +33,10 @@ abstract class MessagesDAOBase {
      * @param Messages [$Messages] El objeto de tipo Messages
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Messages $Messages) {
-        if (is_null(self::getByPK($Messages->message_id))) {
+    final public static function save(Messages $Messages) : int {
+        if (is_null($Messages->message_id) ||
+            is_null(self::getByPK($Messages->message_id))
+        ) {
             return MessagesDAOBase::create($Messages);
         }
         return MessagesDAOBase::update($Messages);
@@ -47,15 +49,15 @@ abstract class MessagesDAOBase {
      * @return Filas afectadas
      * @param Messages [$Messages] El objeto de tipo Messages a actualizar.
      */
-    final public static function update(Messages $Messages) {
+    final public static function update(Messages $Messages) : int {
         $sql = 'UPDATE `Messages` SET `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE `message_id` = ?;';
         $params = [
-            is_null($Messages->read) ? null : (int)$Messages->read,
-            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
-            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
+            (int)$Messages->read,
+            (int)$Messages->sender_id,
+            (int)$Messages->recipient_id,
             $Messages->message,
             $Messages->date,
-            is_null($Messages->message_id) ? null : (int)$Messages->message_id,
+            (int)$Messages->message_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,10 +73,7 @@ abstract class MessagesDAOBase {
      * @static
      * @return @link Messages Un objeto del tipo {@link Messages}. NULL si no hay tal registro.
      */
-    final public static function getByPK($message_id) {
-        if (is_null($message_id)) {
-            return null;
-        }
+    final public static function getByPK(int $message_id) : ?Messages {
         $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` FROM Messages WHERE (message_id = ?) LIMIT 1;';
         $params = [$message_id];
         global $conn;
@@ -101,7 +100,7 @@ abstract class MessagesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Messages [$Messages] El objeto de tipo Messages a eliminar
      */
-    final public static function delete(Messages $Messages) {
+    final public static function delete(Messages $Messages) : void {
         $sql = 'DELETE FROM `Messages` WHERE message_id = ?;';
         $params = [$Messages->message_id];
         global $conn;
@@ -129,7 +128,12 @@ abstract class MessagesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Messages}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` from Messages';
         global $conn;
         if (!is_null($orden)) {
@@ -155,7 +159,7 @@ abstract class MessagesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Messages [$Messages] El objeto de tipo Messages a crear.
      */
-    final public static function create(Messages $Messages) {
+    final public static function create(Messages $Messages) : int {
         if (is_null($Messages->read)) {
             $Messages->read = false;
         }
@@ -164,20 +168,20 @@ abstract class MessagesDAOBase {
         }
         $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Messages->read) ? null : (int)$Messages->read,
-            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
-            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
+            (int)$Messages->read,
+            (int)$Messages->sender_id,
+            (int)$Messages->recipient_id,
             $Messages->message,
             $Messages->date,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Messages->message_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

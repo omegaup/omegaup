@@ -27,10 +27,7 @@ abstract class RolesPermissionsDAOBase {
      * @static
      * @return @link RolesPermissions Un objeto del tipo {@link RolesPermissions}. NULL si no hay tal registro.
      */
-    final public static function getByPK($role_id, $permission_id) {
-        if (is_null($role_id) || is_null($permission_id)) {
-            return null;
-        }
+    final public static function getByPK(int $role_id, int $permission_id) : ?RolesPermissions {
         $sql = 'SELECT `Roles_Permissions`.`role_id`, `Roles_Permissions`.`permission_id` FROM Roles_Permissions WHERE (role_id = ? AND permission_id = ?) LIMIT 1;';
         $params = [$role_id, $permission_id];
         global $conn;
@@ -57,7 +54,7 @@ abstract class RolesPermissionsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param RolesPermissions [$Roles_Permissions] El objeto de tipo RolesPermissions a eliminar
      */
-    final public static function delete(RolesPermissions $Roles_Permissions) {
+    final public static function delete(RolesPermissions $Roles_Permissions) : void {
         $sql = 'DELETE FROM `Roles_Permissions` WHERE role_id = ? AND permission_id = ?;';
         $params = [$Roles_Permissions->role_id, $Roles_Permissions->permission_id];
         global $conn;
@@ -85,7 +82,12 @@ abstract class RolesPermissionsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link RolesPermissions}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Roles_Permissions`.`role_id`, `Roles_Permissions`.`permission_id` from Roles_Permissions';
         global $conn;
         if (!is_null($orden)) {
@@ -111,19 +113,19 @@ abstract class RolesPermissionsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param RolesPermissions [$Roles_Permissions] El objeto de tipo RolesPermissions a crear.
      */
-    final public static function create(RolesPermissions $Roles_Permissions) {
+    final public static function create(RolesPermissions $Roles_Permissions) : int {
         $sql = 'INSERT INTO Roles_Permissions (`role_id`, `permission_id`) VALUES (?, ?);';
         $params = [
-            is_null($Roles_Permissions->role_id) ? null : (int)$Roles_Permissions->role_id,
-            is_null($Roles_Permissions->permission_id) ? null : (int)$Roles_Permissions->permission_id,
+            (int)$Roles_Permissions->role_id,
+            (int)$Roles_Permissions->permission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

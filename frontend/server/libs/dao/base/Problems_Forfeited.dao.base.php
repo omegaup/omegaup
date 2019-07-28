@@ -33,8 +33,11 @@ abstract class ProblemsForfeitedDAOBase {
      * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsForfeited $Problems_Forfeited) {
-        if (is_null(self::getByPK($Problems_Forfeited->user_id, $Problems_Forfeited->problem_id))) {
+    final public static function save(ProblemsForfeited $Problems_Forfeited) : int {
+        if (is_null($Problems_Forfeited->user_id) ||
+            is_null($Problems_Forfeited->problem_id) ||
+            is_null(self::getByPK($Problems_Forfeited->user_id, $Problems_Forfeited->problem_id))
+        ) {
             return ProblemsForfeitedDAOBase::create($Problems_Forfeited);
         }
         return ProblemsForfeitedDAOBase::update($Problems_Forfeited);
@@ -47,12 +50,12 @@ abstract class ProblemsForfeitedDAOBase {
      * @return Filas afectadas
      * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a actualizar.
      */
-    final public static function update(ProblemsForfeited $Problems_Forfeited) {
+    final public static function update(ProblemsForfeited $Problems_Forfeited) : int {
         $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
             $Problems_Forfeited->forfeited_date,
-            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
-            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
+            (int)$Problems_Forfeited->user_id,
+            (int)$Problems_Forfeited->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -68,10 +71,7 @@ abstract class ProblemsForfeitedDAOBase {
      * @static
      * @return @link ProblemsForfeited Un objeto del tipo {@link ProblemsForfeited}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_id, $problem_id) {
-        if (is_null($user_id) || is_null($problem_id)) {
-            return null;
-        }
+    final public static function getByPK(int $user_id, int $problem_id) : ?ProblemsForfeited {
         $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
         global $conn;
@@ -98,7 +98,7 @@ abstract class ProblemsForfeitedDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a eliminar
      */
-    final public static function delete(ProblemsForfeited $Problems_Forfeited) {
+    final public static function delete(ProblemsForfeited $Problems_Forfeited) : void {
         $sql = 'DELETE FROM `Problems_Forfeited` WHERE user_id = ? AND problem_id = ?;';
         $params = [$Problems_Forfeited->user_id, $Problems_Forfeited->problem_id];
         global $conn;
@@ -126,7 +126,12 @@ abstract class ProblemsForfeitedDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsForfeited}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` from Problems_Forfeited';
         global $conn;
         if (!is_null($orden)) {
@@ -152,23 +157,23 @@ abstract class ProblemsForfeitedDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a crear.
      */
-    final public static function create(ProblemsForfeited $Problems_Forfeited) {
+    final public static function create(ProblemsForfeited $Problems_Forfeited) : int {
         if (is_null($Problems_Forfeited->forfeited_date)) {
             $Problems_Forfeited->forfeited_date = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
-            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
+            (int)$Problems_Forfeited->user_id,
+            (int)$Problems_Forfeited->problem_id,
             $Problems_Forfeited->forfeited_date,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

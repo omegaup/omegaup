@@ -33,8 +33,10 @@ abstract class RunsDAOBase {
      * @param Runs [$Runs] El objeto de tipo Runs
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Runs $Runs) {
-        if (is_null(self::getByPK($Runs->run_id))) {
+    final public static function save(Runs $Runs) : int {
+        if (is_null($Runs->run_id) ||
+            is_null(self::getByPK($Runs->run_id))
+        ) {
             return RunsDAOBase::create($Runs);
         }
         return RunsDAOBase::update($Runs);
@@ -47,21 +49,21 @@ abstract class RunsDAOBase {
      * @return Filas afectadas
      * @param Runs [$Runs] El objeto de tipo Runs a actualizar.
      */
-    final public static function update(Runs $Runs) {
+    final public static function update(Runs $Runs) : int {
         $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `judged_by` = ? WHERE `run_id` = ?;';
         $params = [
-            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
+            (int)$Runs->submission_id,
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
-            is_null($Runs->runtime) ? null : (int)$Runs->runtime,
-            is_null($Runs->penalty) ? null : (int)$Runs->penalty,
-            is_null($Runs->memory) ? null : (int)$Runs->memory,
-            is_null($Runs->score) ? null : (float)$Runs->score,
+            (int)$Runs->runtime,
+            (int)$Runs->penalty,
+            (int)$Runs->memory,
+            (float)$Runs->score,
             is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
             $Runs->time,
             $Runs->judged_by,
-            is_null($Runs->run_id) ? null : (int)$Runs->run_id,
+            (int)$Runs->run_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -77,10 +79,7 @@ abstract class RunsDAOBase {
      * @static
      * @return @link Runs Un objeto del tipo {@link Runs}. NULL si no hay tal registro.
      */
-    final public static function getByPK($run_id) {
-        if (is_null($run_id)) {
-            return null;
-        }
+    final public static function getByPK(int $run_id) : ?Runs {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
         $params = [$run_id];
         global $conn;
@@ -107,7 +106,7 @@ abstract class RunsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Runs [$Runs] El objeto de tipo Runs a eliminar
      */
-    final public static function delete(Runs $Runs) {
+    final public static function delete(Runs $Runs) : void {
         $sql = 'DELETE FROM `Runs` WHERE run_id = ?;';
         $params = [$Runs->run_id];
         global $conn;
@@ -135,7 +134,12 @@ abstract class RunsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Runs}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` from Runs';
         global $conn;
         if (!is_null($orden)) {
@@ -161,7 +165,7 @@ abstract class RunsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Runs [$Runs] El objeto de tipo Runs a crear.
      */
-    final public static function create(Runs $Runs) {
+    final public static function create(Runs $Runs) : int {
         if (is_null($Runs->status)) {
             $Runs->status = 'new';
         }
@@ -175,33 +179,33 @@ abstract class RunsDAOBase {
             $Runs->memory = 0;
         }
         if (is_null($Runs->score)) {
-            $Runs->score = (float)0;
+            $Runs->score = 0.00;
         }
         if (is_null($Runs->time)) {
             $Runs->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
+            (int)$Runs->submission_id,
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
-            is_null($Runs->runtime) ? null : (int)$Runs->runtime,
-            is_null($Runs->penalty) ? null : (int)$Runs->penalty,
-            is_null($Runs->memory) ? null : (int)$Runs->memory,
-            is_null($Runs->score) ? null : (float)$Runs->score,
+            (int)$Runs->runtime,
+            (int)$Runs->penalty,
+            (int)$Runs->memory,
+            (float)$Runs->score,
             is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
             $Runs->time,
             $Runs->judged_by,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Runs->run_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

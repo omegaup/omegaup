@@ -22,18 +22,16 @@ class {{ table.class_name }} extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {
-{%- if 'tinyint' in column.type %}
-            $this->{{ column.name }} = $data['{{ column.name }}'] == '1';
-{%- elif 'int' in column.type %}
-            $this->{{ column.name }} = (int)$data['{{ column.name }}'];
-{%- elif 'double' in column.type %}
-            $this->{{ column.name }} = (float)$data['{{ column.name }}'];
+{%- if column.php_primitive_type == 'bool' %}
+            $this->{{ column.name }} = boolval($data['{{ column.name }}']);
+{%- elif column.php_primitive_type in ('int', 'float') %}
+            $this->{{ column.name }} = ({{ column.php_primitive_type }})$data['{{ column.name }}'];
 {%- else %}
             $this->{{ column.name }} = $data['{{ column.name }}'];
 {%- endif %}
@@ -44,7 +42,7 @@ class {{ table.class_name }} extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([{{ table.columns|selectattr('type', 'equalto', ('timestamp',))|map(attribute='name')|listformat("'{}'")|join(', ') }}]);
             return;
@@ -62,9 +60,23 @@ class {{ table.class_name }} extends VO {
       * Auto Incremento
 {%- endif %}
       * @access public
-      * @var {{ column.type|join('')|lower }}
-      */
+      * @var {{ column.php_type }}
+     */
+{%- if column.default %}
+{%- if column.default == 'CURRENT_TIMESTAMP' %}
+    public ${{ column.name }} = null;
+{%- elif column.php_primitive_type == 'bool' %}
+    public ${{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
+{%- elif column.php_primitive_type == 'int' %}
+    public ${{ column.name }} = {{ '%d'|format(column.default|int) }};
+{%- elif column.php_primitive_type == 'float' %}
+    public ${{ column.name }} = {{ '%.2f'|format(column.default|float) }};
+{%- else %}
+    public ${{ column.name }} = '{{ column.default }}';
+{%- endif %}
+{%- else %}
     public ${{ column.name }};
+{%- endif %}
 {%- endfor %}
 }
 

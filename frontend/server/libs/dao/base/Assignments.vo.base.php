@@ -22,7 +22,7 @@ class Assignments extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -70,7 +70,7 @@ class Assignments extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['start_time', 'finish_time']);
             return;
@@ -83,91 +83,91 @@ class Assignments extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $assignment_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $course_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       * La lista de control de acceso compartida con el curso
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $acl_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(100)
-      */
+      * @var string
+     */
     public $name;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinytext
-      */
+      * @var string
+     */
     public $description;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(32)
-      */
+      * @var string
+     */
     public $alias;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $publish_time_delay;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('homework','test')
-      */
+      * @var string
+     */
     public $assignment_type;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $start_time;
+      * @var string
+     */
+    public $start_time = '2000-01-01 06:00:00';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $finish_time;
+      * @var string
+     */
+    public $finish_time = '2000-01-01 06:00:00';
 
     /**
       * La cantidad total de puntos que se pueden obtener.
       * @access public
-      * @var double
-      */
-    public $max_points;
+      * @var float
+     */
+    public $max_points = 0.00;
 
     /**
       * Define el orden de aparición de los problemas/tareas
       * @access public
-      * @var int(11)
-      */
-    public $order;
+      * @var int
+     */
+    public $order = 1;
 }

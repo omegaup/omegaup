@@ -33,8 +33,10 @@ abstract class CountriesDAOBase {
      * @param Countries [$Countries] El objeto de tipo Countries
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Countries $Countries) {
-        if (is_null(self::getByPK($Countries->country_id))) {
+    final public static function save(Countries $Countries) : int {
+        if (is_null($Countries->country_id) ||
+            is_null(self::getByPK($Countries->country_id))
+        ) {
             return CountriesDAOBase::create($Countries);
         }
         return CountriesDAOBase::update($Countries);
@@ -47,7 +49,7 @@ abstract class CountriesDAOBase {
      * @return Filas afectadas
      * @param Countries [$Countries] El objeto de tipo Countries a actualizar.
      */
-    final public static function update(Countries $Countries) {
+    final public static function update(Countries $Countries) : int {
         $sql = 'UPDATE `Countries` SET `name` = ? WHERE `country_id` = ?;';
         $params = [
             $Countries->name,
@@ -67,10 +69,7 @@ abstract class CountriesDAOBase {
      * @static
      * @return @link Countries Un objeto del tipo {@link Countries}. NULL si no hay tal registro.
      */
-    final public static function getByPK($country_id) {
-        if (is_null($country_id)) {
-            return null;
-        }
+    final public static function getByPK(string $country_id) : ?Countries {
         $sql = 'SELECT `Countries`.`country_id`, `Countries`.`name` FROM Countries WHERE (country_id = ?) LIMIT 1;';
         $params = [$country_id];
         global $conn;
@@ -97,7 +96,7 @@ abstract class CountriesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Countries [$Countries] El objeto de tipo Countries a eliminar
      */
-    final public static function delete(Countries $Countries) {
+    final public static function delete(Countries $Countries) : void {
         $sql = 'DELETE FROM `Countries` WHERE country_id = ?;';
         $params = [$Countries->country_id];
         global $conn;
@@ -125,7 +124,12 @@ abstract class CountriesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Countries}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Countries`.`country_id`, `Countries`.`name` from Countries';
         global $conn;
         if (!is_null($orden)) {
@@ -151,7 +155,7 @@ abstract class CountriesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Countries [$Countries] El objeto de tipo Countries a crear.
      */
-    final public static function create(Countries $Countries) {
+    final public static function create(Countries $Countries) : int {
         $sql = 'INSERT INTO Countries (`country_id`, `name`) VALUES (?, ?);';
         $params = [
             $Countries->country_id,
@@ -159,11 +163,11 @@ abstract class CountriesDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

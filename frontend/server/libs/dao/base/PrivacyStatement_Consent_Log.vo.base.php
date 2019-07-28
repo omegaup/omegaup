@@ -22,7 +22,7 @@ class PrivacyStatementConsentLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
+    function __construct(?array $data = null) {
         if (is_null($data)) {
             return;
         }
@@ -43,7 +43,7 @@ class PrivacyStatementConsentLog extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['timestamp']);
             return;
@@ -56,28 +56,28 @@ class PrivacyStatementConsentLog extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $privacystatement_consent_id;
 
     /**
       * Identidad del usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       * Id del documento de privacidad
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $privacystatement_id;
 
     /**
       * Fecha y hora en la que el usuario acepta las nuevas políticas
       * @access public
-      * @var timestamp
-      */
-    public $timestamp;
+      * @var string
+     */
+    public $timestamp = null;
 }
