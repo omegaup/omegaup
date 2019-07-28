@@ -1599,7 +1599,7 @@ class UserController extends Controller {
         }
 
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
-            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity->identity_id))
+            && (is_null($r->identity) || (!is_null($r->identity) && !Authorization::isSystemAdmin($r->identity->identity_id)))
             && (!is_null($user) && $user->is_private == 1)
         ) {
             throw new ForbiddenAccessException('userProfileIsPrivate');

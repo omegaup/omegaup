@@ -2632,8 +2632,12 @@ class ProblemController extends Controller {
     ) : array {
         [
             'problem' => $problem,
-            'problemset' => $problemset
+            'problemset' => $problemset,
         ] = self::getValidProblemAndProblemset($r);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
         // Get problem details from API
         $details = self::getProblemDetails($r, $problem, $problemset, /*showSolvers=*/true);
 

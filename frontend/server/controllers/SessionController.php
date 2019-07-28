@@ -135,17 +135,7 @@ class SessionController extends Controller {
             ];
         }
 
-        $currentUser = AuthTokensDAO::getUserByToken($authToken);
         $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
-
-        // Get email via their id
-        if (!is_null($currentUser)) {
-            $email = EmailsDAO::getByPK($currentUser->main_email_id);
-            if (is_null($currentIdentity)) {
-                $currentIdentity = IdentitiesDAO::getByPK($currentUser->main_identity_id);
-            }
-        }
-
         if (is_null($currentIdentity)) {
             // Means user has auth token, but does not exist in DB
             return [
@@ -156,6 +146,13 @@ class SessionController extends Controller {
                 'auth_token' => null,
                 'is_admin' => false,
             ];
+        }
+
+        if (is_null($currentIdentity->user_id)) {
+            $currentUser = null;
+        } else {
+            $currentUser = UsersDAO::getByPK($currentIdentity->user_id);
+            $email = EmailsDAO::getByPK($currentUser->main_email_id);
         }
 
         return [
@@ -383,6 +380,8 @@ class SessionController extends Controller {
      */
     public function NativeLogin(Request $r) {
         $identity = null;
+
+        Validators::validateStringNonEmpty($r['password'], 'password');
 
         if (null != $r['returnAuthToken']) {
             $returnAuthToken = $r['returnAuthToken'];
