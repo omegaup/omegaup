@@ -793,28 +793,29 @@ class RunController extends Controller {
      * @return type
      * @throws InvalidDatabaseOperationException
      */
-    public static function apiCounts(Request $r) {
-        $totals = [];
+    public static function apiCounts(Request $r) : array {
+        return Cache::getFromCacheOrSet(
+            Cache::RUN_COUNTS,
+            '',
+            function () use ($r) {
+                $totals = [];
+                $totals['total'] = [];
+                $totals['ac'] = [];
+                try {
+                    $runCounts = RunCountsDAO::getAll(1, 90, 'date', 'DESC');
 
-        Cache::getFromCacheOrSet(Cache::RUN_COUNTS, '', $r, function (Request $r) {
-            $totals = [];
-            $totals['total'] = [];
-            $totals['ac'] = [];
-            try {
-                $runCounts = RunCountsDAO::getAll(1, 90, 'date', 'DESC');
-
-                foreach ($runCounts as $runCount) {
-                    $totals['total'][$runCount->date] = $runCount->total;
-                    $totals['ac'][$runCount->date] = $runCount->ac_count;
+                    foreach ($runCounts as $runCount) {
+                        $totals['total'][$runCount->date] = $runCount->total;
+                        $totals['ac'][$runCount->date] = $runCount->ac_count;
+                    }
+                } catch (Exception $e) {
+                    throw new InvalidDatabaseOperationException($e);
                 }
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
 
-            return $totals;
-        }, $totals, 24*60*60 /*expire in 1 day*/);
-
-        return $totals;
+                return $totals;
+            },
+            24*60*60 /*expire in 1 day*/
+        );
     }
 
     /**
