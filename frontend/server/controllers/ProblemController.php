@@ -445,7 +445,7 @@ class ProblemController extends Controller {
                 $tag = new Tags([
                     'name' => $tagName,
                 ]);
-                TagsDAO::save($tag);
+                TagsDAO::create($tag);
             } catch (Exception $e) {
                 $this->log->info($e);
                 // Operation failed in the data layer
@@ -458,7 +458,7 @@ class ProblemController extends Controller {
         }
 
         try {
-            ProblemsTagsDAO::save(new ProblemsTags([
+            ProblemsTagsDAO::create(new ProblemsTags([
                 'problem_id' => $problem->problem_id,
                 'tag_id' => $tag->tag_id,
                 'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
@@ -737,7 +737,7 @@ class ProblemController extends Controller {
                 $run->verdict = 'JE';
                 $run->score = 0;
                 $run->contest_score = 0;
-                RunsDAO::save($run);
+                RunsDAO::update($run);
 
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
@@ -800,7 +800,6 @@ class ProblemController extends Controller {
         }
         $updatedStatementLanguages = [];
 
-        // Insert new problem
         try {
             //Begin transaction
             DAO::transBegin();
@@ -1200,22 +1199,19 @@ class ProblemController extends Controller {
         string $commit,
         string $language
     ) : array {
-        $problemStatement = null;
-        Cache::getFromCacheOrSet(
+        return Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            [
-                'directory' => 'statements',
-                'alias' => $problem->alias,
-                'commit' => $commit,
-                'language' => $language,
-            ],
-            'ProblemController::getProblemResourceImpl',
-            $problemStatement,
+            function () use ($problem, $commit, $language) {
+                return ProblemController::getProblemResourceImpl([
+                    'directory' => 'statements',
+                    'alias' => $problem->alias,
+                    'commit' => $commit,
+                    'language' => $language,
+                ]);
+            },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-
-        return $problemStatement;
     }
 
     /**
@@ -1234,22 +1230,19 @@ class ProblemController extends Controller {
         string $commit,
         string $language
     ) : array {
-        $problemSolution = null;
-        Cache::getFromCacheOrSet(
+        return Cache::getFromCacheOrSet(
             Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            [
-                'directory' => 'solutions',
-                'alias' => $problem->alias,
-                'commit' => $commit,
-                'language' => $language,
-            ],
-            'ProblemController::getProblemResourceImpl',
-            $problemSolution,
+            function () use ($problem, $commit, $language) {
+                return ProblemController::getProblemResourceImpl([
+                    'directory' => 'solutions',
+                    'alias' => $problem->alias,
+                    'commit' => $commit,
+                    'language' => $language,
+                ]);
+            },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-
-        return $problemSolution;
     }
 
     /**
@@ -1263,19 +1256,17 @@ class ProblemController extends Controller {
         Problems $problem,
         string $commit
     ) : array {
-        $problemSettingsDistrib = null;
-        Cache::getFromCacheOrSet(
+        return Cache::getFromCacheOrSet(
             Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            [
-                'alias' => $problem->alias,
-                'commit' => $problem->commit,
-            ],
-            'ProblemController::getProblemSettingsDistribImpl',
-            $problemSettingsDistrib,
+            function () use ($problem) {
+                return ProblemController::getProblemSettingsDistribImpl([
+                    'alias' => $problem->alias,
+                    'commit' => $problem->commit,
+                ]);
+            },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-        return $problemSettingsDistrib;
     }
 
     /**
@@ -1497,21 +1488,18 @@ class ProblemController extends Controller {
         );
 
         // Add preferred language of the user.
-        $user_data = [];
         $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
         if (!is_null($r->identity)) {
-            Cache::getFromCacheOrSet(
+            $userData = Cache::getFromCacheOrSet(
                 Cache::USER_PROFILE,
                 $r->identity->username,
-                $request,
-                function (Request $request) {
-                        return UserController::apiProfile($request);
-                },
-                $user_data
+                function () use ($r) {
+                    return UserController::apiProfile($r);
+                }
             );
-        }
-        if (!empty($user_data)) {
-            $response['preferred_language'] = $user_data['userinfo']['preferred_language'];
+            if (!empty($userData)) {
+                $response['preferred_language'] = $userData['userinfo']['preferred_language'];
+            }
         }
 
         // Add the problem the response
@@ -1595,7 +1583,7 @@ class ProblemController extends Controller {
             )) {
                 try {
                     // Save object in the DB
-                    ProblemsetProblemOpenedDAO::save(new ProblemsetProblemOpened([
+                    ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
                         'problemset_id' => $problemset->problemset_id,
                         'problem_id' => $problem->problem_id,
                         'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
@@ -2642,8 +2630,12 @@ class ProblemController extends Controller {
     ) : array {
         [
             'problem' => $problem,
-            'problemset' => $problemset
+            'problemset' => $problemset,
         ] = self::getValidProblemAndProblemset($r);
+        if (is_null($problem)) {
+            throw new NotFoundException('problemNotFound');
+        }
+
         // Get problem details from API
         $details = self::getProblemDetails($r, $problem, $problemset, /*showSolvers=*/true);
 

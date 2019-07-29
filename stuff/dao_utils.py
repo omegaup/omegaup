@@ -11,6 +11,7 @@ from pyparsing import (CaselessKeyword, Optional, ParseException, Regex,
                        Suppress, Word, ZeroOrMore, alphanums, delimitedList)
 
 
+# pylint: disable=too-many-instance-attributes
 class Column:
     '''Represents a MySQL column definition.'''
 
@@ -26,6 +27,16 @@ class Column:
         if self.default == 'NULL':
             self.default = None
         self.comment = tokens.get('comment', None)
+        if 'tinyint' in self.type:
+            self.php_primitive_type = 'bool'
+        elif 'int' in self.type:
+            self.php_primitive_type = 'int'
+        elif 'double' in self.type:
+            self.php_primitive_type = 'float'
+        else:
+            self.php_primitive_type = 'string'
+        self.php_type = (
+            ('' if self.not_null else '?') + self.php_primitive_type)
 
     def __repr__(self):
         return 'Column<name={}, type={}>'.format(self.name, self.type)

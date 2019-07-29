@@ -35,7 +35,12 @@ abstract class ProblemsetAccessLogDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetAccessLog}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` from Problemset_Access_Log';
         global $conn;
         if (!is_null($orden)) {
@@ -61,24 +66,24 @@ abstract class ProblemsetAccessLogDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsetAccessLog [$Problemset_Access_Log] El objeto de tipo ProblemsetAccessLog a crear.
      */
-    final public static function create(ProblemsetAccessLog $Problemset_Access_Log) {
+    final public static function create(ProblemsetAccessLog $Problemset_Access_Log) : int {
         if (is_null($Problemset_Access_Log->time)) {
             $Problemset_Access_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Access_Log->problemset_id) ? null : (int)$Problemset_Access_Log->problemset_id,
-            is_null($Problemset_Access_Log->identity_id) ? null : (int)$Problemset_Access_Log->identity_id,
-            is_null($Problemset_Access_Log->ip) ? null : (int)$Problemset_Access_Log->ip,
+            (int)$Problemset_Access_Log->problemset_id,
+            (int)$Problemset_Access_Log->identity_id,
+            (int)$Problemset_Access_Log->ip,
             $Problemset_Access_Log->time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

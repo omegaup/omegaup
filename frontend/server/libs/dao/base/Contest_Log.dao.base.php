@@ -33,8 +33,10 @@ abstract class ContestLogDAOBase {
      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ContestLog $Contest_Log) {
-        if (is_null(self::getByPK($Contest_Log->public_contest_id))) {
+    final public static function save(ContestLog $Contest_Log) : int {
+        if (is_null($Contest_Log->public_contest_id) ||
+            is_null(self::getByPK($Contest_Log->public_contest_id))
+        ) {
             return ContestLogDAOBase::create($Contest_Log);
         }
         return ContestLogDAOBase::update($Contest_Log);
@@ -47,15 +49,15 @@ abstract class ContestLogDAOBase {
      * @return Filas afectadas
      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a actualizar.
      */
-    final public static function update(ContestLog $Contest_Log) {
+    final public static function update(ContestLog $Contest_Log) : int {
         $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_admission_mode` = ?, `to_admission_mode` = ?, `time` = ? WHERE `public_contest_id` = ?;';
         $params = [
-            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
-            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
+            (int)$Contest_Log->contest_id,
+            (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             $Contest_Log->time,
-            is_null($Contest_Log->public_contest_id) ? null : (int)$Contest_Log->public_contest_id,
+            (int)$Contest_Log->public_contest_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,10 +73,7 @@ abstract class ContestLogDAOBase {
      * @static
      * @return @link ContestLog Un objeto del tipo {@link ContestLog}. NULL si no hay tal registro.
      */
-    final public static function getByPK($public_contest_id) {
-        if (is_null($public_contest_id)) {
-            return null;
-        }
+    final public static function getByPK(int $public_contest_id) : ?ContestLog {
         $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` FROM Contest_Log WHERE (public_contest_id = ?) LIMIT 1;';
         $params = [$public_contest_id];
         global $conn;
@@ -101,7 +100,7 @@ abstract class ContestLogDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a eliminar
      */
-    final public static function delete(ContestLog $Contest_Log) {
+    final public static function delete(ContestLog $Contest_Log) : void {
         $sql = 'DELETE FROM `Contest_Log` WHERE public_contest_id = ?;';
         $params = [$Contest_Log->public_contest_id];
         global $conn;
@@ -129,7 +128,12 @@ abstract class ContestLogDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ContestLog}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Contest_Log`.`public_contest_id`, `Contest_Log`.`contest_id`, `Contest_Log`.`user_id`, `Contest_Log`.`from_admission_mode`, `Contest_Log`.`to_admission_mode`, `Contest_Log`.`time` from Contest_Log';
         global $conn;
         if (!is_null($orden)) {
@@ -155,26 +159,26 @@ abstract class ContestLogDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ContestLog [$Contest_Log] El objeto de tipo ContestLog a crear.
      */
-    final public static function create(ContestLog $Contest_Log) {
+    final public static function create(ContestLog $Contest_Log) : int {
         if (is_null($Contest_Log->time)) {
             $Contest_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
-            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
+            (int)$Contest_Log->contest_id,
+            (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             $Contest_Log->time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Contest_Log->public_contest_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

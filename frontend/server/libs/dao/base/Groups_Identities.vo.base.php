@@ -15,6 +15,14 @@
  * @access public
  */
 class GroupsIdentities extends VO {
+    const FIELD_NAMES = [
+        'group_id' => true,
+        'identity_id' => true,
+        'share_user_information' => true,
+        'privacystatement_consent_id' => true,
+        'accept_teacher' => true,
+    ];
+
     /**
      * Constructor de GroupsIdentities
      *
@@ -22,9 +30,13 @@ class GroupsIdentities extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_id'])) {
             $this->group_id = (int)$data['group_id'];
@@ -33,7 +45,7 @@ class GroupsIdentities extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['share_user_information'])) {
-            $this->share_user_information = $data['share_user_information'] == '1';
+            $this->share_user_information = boolval($data['share_user_information']);
         }
         if (isset($data['privacystatement_consent_id'])) {
             $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
@@ -46,7 +58,7 @@ class GroupsIdentities extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -58,36 +70,36 @@ class GroupsIdentities extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_id;
 
     /**
       * Identidad del usuario
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
       * @access public
-      * @var tinyint(1)
-      */
+      * @var ?bool
+     */
     public $share_user_information;
 
     /**
       * Id del documento con el consentimiento de privacidad
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $privacystatement_consent_id;
 
     /**
       * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
       * @access public
-      * @var enum('yes','no')
-      */
+      * @var ?string
+     */
     public $accept_teacher;
 }

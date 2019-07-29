@@ -27,10 +27,7 @@ abstract class ProblemsLanguagesDAOBase {
      * @static
      * @return @link ProblemsLanguages Un objeto del tipo {@link ProblemsLanguages}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problem_id, $language_id) {
-        if (is_null($problem_id) || is_null($language_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problem_id, int $language_id) : ?ProblemsLanguages {
         $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` FROM Problems_Languages WHERE (problem_id = ? AND language_id = ?) LIMIT 1;';
         $params = [$problem_id, $language_id];
         global $conn;
@@ -57,7 +54,7 @@ abstract class ProblemsLanguagesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemsLanguages [$Problems_Languages] El objeto de tipo ProblemsLanguages a eliminar
      */
-    final public static function delete(ProblemsLanguages $Problems_Languages) {
+    final public static function delete(ProblemsLanguages $Problems_Languages) : void {
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ? AND language_id = ?;';
         $params = [$Problems_Languages->problem_id, $Problems_Languages->language_id];
         global $conn;
@@ -85,7 +82,12 @@ abstract class ProblemsLanguagesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsLanguages}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` from Problems_Languages';
         global $conn;
         if (!is_null($orden)) {
@@ -111,19 +113,19 @@ abstract class ProblemsLanguagesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsLanguages [$Problems_Languages] El objeto de tipo ProblemsLanguages a crear.
      */
-    final public static function create(ProblemsLanguages $Problems_Languages) {
+    final public static function create(ProblemsLanguages $Problems_Languages) : int {
         $sql = 'INSERT INTO Problems_Languages (`problem_id`, `language_id`) VALUES (?, ?);';
         $params = [
-            is_null($Problems_Languages->problem_id) ? null : (int)$Problems_Languages->problem_id,
-            is_null($Problems_Languages->language_id) ? null : (int)$Problems_Languages->language_id,
+            (int)$Problems_Languages->problem_id,
+            (int)$Problems_Languages->language_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

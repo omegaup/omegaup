@@ -33,8 +33,10 @@ abstract class InterviewsDAOBase {
      * @param Interviews [$Interviews] El objeto de tipo Interviews
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Interviews $Interviews) {
-        if (is_null(self::getByPK($Interviews->interview_id))) {
+    final public static function save(Interviews $Interviews) : int {
+        if (is_null($Interviews->interview_id) ||
+            is_null(self::getByPK($Interviews->interview_id))
+        ) {
             return InterviewsDAOBase::create($Interviews);
         }
         return InterviewsDAOBase::update($Interviews);
@@ -47,16 +49,16 @@ abstract class InterviewsDAOBase {
      * @return Filas afectadas
      * @param Interviews [$Interviews] El objeto de tipo Interviews a actualizar.
      */
-    final public static function update(Interviews $Interviews) {
+    final public static function update(Interviews $Interviews) : int {
         $sql = 'UPDATE `Interviews` SET `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE `interview_id` = ?;';
         $params = [
-            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
-            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
+            (int)$Interviews->problemset_id,
+            (int)$Interviews->acl_id,
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
-            is_null($Interviews->interview_id) ? null : (int)$Interviews->interview_id,
+            (int)$Interviews->window_length,
+            (int)$Interviews->interview_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -72,10 +74,7 @@ abstract class InterviewsDAOBase {
      * @static
      * @return @link Interviews Un objeto del tipo {@link Interviews}. NULL si no hay tal registro.
      */
-    final public static function getByPK($interview_id) {
-        if (is_null($interview_id)) {
-            return null;
-        }
+    final public static function getByPK(int $interview_id) : ?Interviews {
         $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` FROM Interviews WHERE (interview_id = ?) LIMIT 1;';
         $params = [$interview_id];
         global $conn;
@@ -102,7 +101,7 @@ abstract class InterviewsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Interviews [$Interviews] El objeto de tipo Interviews a eliminar
      */
-    final public static function delete(Interviews $Interviews) {
+    final public static function delete(Interviews $Interviews) : void {
         $sql = 'DELETE FROM `Interviews` WHERE interview_id = ?;';
         $params = [$Interviews->interview_id];
         global $conn;
@@ -130,7 +129,12 @@ abstract class InterviewsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Interviews}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` from Interviews';
         global $conn;
         if (!is_null($orden)) {
@@ -156,24 +160,24 @@ abstract class InterviewsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Interviews [$Interviews] El objeto de tipo Interviews a crear.
      */
-    final public static function create(Interviews $Interviews) {
+    final public static function create(Interviews $Interviews) : int {
         $sql = 'INSERT INTO Interviews (`problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
-            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
+            (int)$Interviews->problemset_id,
+            (int)$Interviews->acl_id,
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
+            (int)$Interviews->window_length,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Interviews->interview_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

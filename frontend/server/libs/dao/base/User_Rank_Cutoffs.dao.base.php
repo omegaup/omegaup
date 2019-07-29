@@ -35,7 +35,12 @@ abstract class UserRankCutoffsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link UserRankCutoffs}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `User_Rank_Cutoffs`.`score`, `User_Rank_Cutoffs`.`percentile`, `User_Rank_Cutoffs`.`classname` from User_Rank_Cutoffs';
         global $conn;
         if (!is_null($orden)) {
@@ -61,20 +66,20 @@ abstract class UserRankCutoffsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param UserRankCutoffs [$User_Rank_Cutoffs] El objeto de tipo UserRankCutoffs a crear.
      */
-    final public static function create(UserRankCutoffs $User_Rank_Cutoffs) {
+    final public static function create(UserRankCutoffs $User_Rank_Cutoffs) : int {
         $sql = 'INSERT INTO User_Rank_Cutoffs (`score`, `percentile`, `classname`) VALUES (?, ?, ?);';
         $params = [
-            is_null($User_Rank_Cutoffs->score) ? null : (float)$User_Rank_Cutoffs->score,
-            is_null($User_Rank_Cutoffs->percentile) ? null : (float)$User_Rank_Cutoffs->percentile,
+            (float)$User_Rank_Cutoffs->score,
+            (float)$User_Rank_Cutoffs->percentile,
             $User_Rank_Cutoffs->classname,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

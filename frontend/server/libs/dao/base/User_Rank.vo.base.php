@@ -15,6 +15,18 @@
  * @access public
  */
 class UserRank extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'rank' => true,
+        'problems_solved_count' => true,
+        'score' => true,
+        'username' => true,
+        'name' => true,
+        'country_id' => true,
+        'state_id' => true,
+        'school_id' => true,
+    ];
+
     /**
      * Constructor de UserRank
      *
@@ -22,9 +34,13 @@ class UserRank extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -58,7 +74,7 @@ class UserRank extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -70,63 +86,63 @@ class UserRank extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $rank;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $problems_solved_count;
+      * @var int
+     */
+    public $problems_solved_count = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
-    public $score;
+      * @var float
+     */
+    public $score = 0.00;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $username;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
+      * @var ?string
+     */
     public $name;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $state_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $school_id;
 }

@@ -33,8 +33,11 @@ abstract class ProblemsetProblemsDAOBase {
      * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetProblems $Problemset_Problems) {
-        if (is_null(self::getByPK($Problemset_Problems->problemset_id, $Problemset_Problems->problem_id))) {
+    final public static function save(ProblemsetProblems $Problemset_Problems) : int {
+        if (is_null($Problemset_Problems->problemset_id) ||
+            is_null($Problemset_Problems->problem_id) ||
+            is_null(self::getByPK($Problemset_Problems->problemset_id, $Problemset_Problems->problem_id))
+        ) {
             return ProblemsetProblemsDAOBase::create($Problemset_Problems);
         }
         return ProblemsetProblemsDAOBase::update($Problemset_Problems);
@@ -47,15 +50,15 @@ abstract class ProblemsetProblemsDAOBase {
      * @return Filas afectadas
      * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a actualizar.
      */
-    final public static function update(ProblemsetProblems $Problemset_Problems) {
+    final public static function update(ProblemsetProblems $Problemset_Problems) : int {
         $sql = 'UPDATE `Problemset_Problems` SET `commit` = ?, `version` = ?, `points` = ?, `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
         $params = [
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            is_null($Problemset_Problems->points) ? null : (float)$Problemset_Problems->points,
-            is_null($Problemset_Problems->order) ? null : (int)$Problemset_Problems->order,
-            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
-            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
+            (float)$Problemset_Problems->points,
+            (int)$Problemset_Problems->order,
+            (int)$Problemset_Problems->problemset_id,
+            (int)$Problemset_Problems->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,10 +74,7 @@ abstract class ProblemsetProblemsDAOBase {
      * @static
      * @return @link ProblemsetProblems Un objeto del tipo {@link ProblemsetProblems}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problemset_id, $problem_id) {
-        if (is_null($problemset_id) || is_null($problem_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problemset_id, int $problem_id) : ?ProblemsetProblems {
         $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM Problemset_Problems WHERE (problemset_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$problemset_id, $problem_id];
         global $conn;
@@ -101,7 +101,7 @@ abstract class ProblemsetProblemsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a eliminar
      */
-    final public static function delete(ProblemsetProblems $Problemset_Problems) {
+    final public static function delete(ProblemsetProblems $Problemset_Problems) : void {
         $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ? AND problem_id = ?;';
         $params = [$Problemset_Problems->problemset_id, $Problemset_Problems->problem_id];
         global $conn;
@@ -129,7 +129,12 @@ abstract class ProblemsetProblemsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblems}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` from Problemset_Problems';
         global $conn;
         if (!is_null($orden)) {
@@ -155,32 +160,32 @@ abstract class ProblemsetProblemsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a crear.
      */
-    final public static function create(ProblemsetProblems $Problemset_Problems) {
+    final public static function create(ProblemsetProblems $Problemset_Problems) : int {
         if (is_null($Problemset_Problems->commit)) {
             $Problemset_Problems->commit = 'published';
         }
         if (is_null($Problemset_Problems->points)) {
-            $Problemset_Problems->points = (float)1;
+            $Problemset_Problems->points = 1.00;
         }
         if (is_null($Problemset_Problems->order)) {
             $Problemset_Problems->order = 1;
         }
         $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
-            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
+            (int)$Problemset_Problems->problemset_id,
+            (int)$Problemset_Problems->problem_id,
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            is_null($Problemset_Problems->points) ? null : (float)$Problemset_Problems->points,
-            is_null($Problemset_Problems->order) ? null : (int)$Problemset_Problems->order,
+            (float)$Problemset_Problems->points,
+            (int)$Problemset_Problems->order,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

@@ -15,6 +15,16 @@
  * @access public
  */
 class QualityNominations extends VO {
+    const FIELD_NAMES = [
+        'qualitynomination_id' => true,
+        'user_id' => true,
+        'problem_id' => true,
+        'nomination' => true,
+        'contents' => true,
+        'time' => true,
+        'status' => true,
+    ];
+
     /**
      * Constructor de QualityNominations
      *
@@ -22,9 +32,13 @@ class QualityNominations extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['qualitynomination_id'])) {
             $this->qualitynomination_id = (int)$data['qualitynomination_id'];
@@ -52,7 +66,7 @@ class QualityNominations extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -65,49 +79,49 @@ class QualityNominations extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $qualitynomination_id;
 
     /**
       * El usuario que nominó el problema
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       * El problema que fue nominado
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problem_id;
 
     /**
       * El tipo de nominación
       * @access public
-      * @var enum('suggestion','promotion','demotion','dismissal')
-      */
-    public $nomination;
+      * @var string
+     */
+    public $nomination = 'suggestion';
 
     /**
       * Un blob json con el contenido de la nominación
       * @access public
-      * @var text
-      */
+      * @var string
+     */
     public $contents;
 
     /**
       * Fecha de creacion de esta nominación
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       * El estado de la nominación
       * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $status;
+      * @var string
+     */
+    public $status = 'open';
 }

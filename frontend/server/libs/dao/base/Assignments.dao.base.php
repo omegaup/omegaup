@@ -33,8 +33,10 @@ abstract class AssignmentsDAOBase {
      * @param Assignments [$Assignments] El objeto de tipo Assignments
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Assignments $Assignments) {
-        if (is_null(self::getByPK($Assignments->assignment_id))) {
+    final public static function save(Assignments $Assignments) : int {
+        if (is_null($Assignments->assignment_id) ||
+            is_null(self::getByPK($Assignments->assignment_id))
+        ) {
             return AssignmentsDAOBase::create($Assignments);
         }
         return AssignmentsDAOBase::update($Assignments);
@@ -47,12 +49,12 @@ abstract class AssignmentsDAOBase {
      * @return Filas afectadas
      * @param Assignments [$Assignments] El objeto de tipo Assignments a actualizar.
      */
-    final public static function update(Assignments $Assignments) {
+    final public static function update(Assignments $Assignments) : int {
         $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ?, `max_points` = ?, `order` = ? WHERE `assignment_id` = ?;';
         $params = [
-            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
-            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
-            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
+            (int)$Assignments->course_id,
+            (int)$Assignments->problemset_id,
+            (int)$Assignments->acl_id,
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,
@@ -60,9 +62,9 @@ abstract class AssignmentsDAOBase {
             $Assignments->assignment_type,
             $Assignments->start_time,
             $Assignments->finish_time,
-            is_null($Assignments->max_points) ? null : (float)$Assignments->max_points,
-            is_null($Assignments->order) ? null : (int)$Assignments->order,
-            is_null($Assignments->assignment_id) ? null : (int)$Assignments->assignment_id,
+            (float)$Assignments->max_points,
+            (int)$Assignments->order,
+            (int)$Assignments->assignment_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,10 +80,7 @@ abstract class AssignmentsDAOBase {
      * @static
      * @return @link Assignments Un objeto del tipo {@link Assignments}. NULL si no hay tal registro.
      */
-    final public static function getByPK($assignment_id) {
-        if (is_null($assignment_id)) {
-            return null;
-        }
+    final public static function getByPK(int $assignment_id) : ?Assignments {
         $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` FROM Assignments WHERE (assignment_id = ?) LIMIT 1;';
         $params = [$assignment_id];
         global $conn;
@@ -108,7 +107,7 @@ abstract class AssignmentsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Assignments [$Assignments] El objeto de tipo Assignments a eliminar
      */
-    final public static function delete(Assignments $Assignments) {
+    final public static function delete(Assignments $Assignments) : void {
         $sql = 'DELETE FROM `Assignments` WHERE assignment_id = ?;';
         $params = [$Assignments->assignment_id];
         global $conn;
@@ -136,7 +135,12 @@ abstract class AssignmentsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Assignments}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Assignments`.`assignment_id`, `Assignments`.`course_id`, `Assignments`.`problemset_id`, `Assignments`.`acl_id`, `Assignments`.`name`, `Assignments`.`description`, `Assignments`.`alias`, `Assignments`.`publish_time_delay`, `Assignments`.`assignment_type`, `Assignments`.`start_time`, `Assignments`.`finish_time`, `Assignments`.`max_points`, `Assignments`.`order` from Assignments';
         global $conn;
         if (!is_null($orden)) {
@@ -162,7 +166,7 @@ abstract class AssignmentsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Assignments [$Assignments] El objeto de tipo Assignments a crear.
      */
-    final public static function create(Assignments $Assignments) {
+    final public static function create(Assignments $Assignments) : int {
         if (is_null($Assignments->start_time)) {
             $Assignments->start_time = '2000-01-01 06:00:00';
         }
@@ -170,16 +174,16 @@ abstract class AssignmentsDAOBase {
             $Assignments->finish_time = '2000-01-01 06:00:00';
         }
         if (is_null($Assignments->max_points)) {
-            $Assignments->max_points = (float)0;
+            $Assignments->max_points = 0.00;
         }
         if (is_null($Assignments->order)) {
             $Assignments->order = 1;
         }
         $sql = 'INSERT INTO Assignments (`course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
-            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
-            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
+            (int)$Assignments->course_id,
+            (int)$Assignments->problemset_id,
+            (int)$Assignments->acl_id,
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,
@@ -187,17 +191,17 @@ abstract class AssignmentsDAOBase {
             $Assignments->assignment_type,
             $Assignments->start_time,
             $Assignments->finish_time,
-            is_null($Assignments->max_points) ? null : (float)$Assignments->max_points,
-            is_null($Assignments->order) ? null : (int)$Assignments->order,
+            (float)$Assignments->max_points,
+            (int)$Assignments->order,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Assignments->assignment_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

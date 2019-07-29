@@ -190,7 +190,7 @@ class ProblemsFactory {
             || $visibility == ProblemController::VISIBILITY_PROMOTED
         ) {
             $problem->visibility = $visibility;
-            ProblemsDAO::save($problem);
+            ProblemsDAO::update($problem);
         }
 
         // Clean up our mess

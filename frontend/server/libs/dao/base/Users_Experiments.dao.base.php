@@ -35,7 +35,12 @@ abstract class UsersExperimentsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link UsersExperiments}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Users_Experiments`.`user_id`, `Users_Experiments`.`experiment` from Users_Experiments';
         global $conn;
         if (!is_null($orden)) {
@@ -61,19 +66,19 @@ abstract class UsersExperimentsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param UsersExperiments [$Users_Experiments] El objeto de tipo UsersExperiments a crear.
      */
-    final public static function create(UsersExperiments $Users_Experiments) {
+    final public static function create(UsersExperiments $Users_Experiments) : int {
         $sql = 'INSERT INTO Users_Experiments (`user_id`, `experiment`) VALUES (?, ?);';
         $params = [
-            is_null($Users_Experiments->user_id) ? null : (int)$Users_Experiments->user_id,
+            (int)$Users_Experiments->user_id,
             $Users_Experiments->experiment,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

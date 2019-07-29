@@ -15,6 +15,13 @@
  * @access public
  */
 class AuthTokens extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'identity_id' => true,
+        'token' => true,
+        'create_time' => true,
+    ];
+
     /**
      * Constructor de AuthTokens
      *
@@ -22,9 +29,13 @@ class AuthTokens extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -43,7 +54,7 @@ class AuthTokens extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['create_time']);
             return;
@@ -54,29 +65,29 @@ class AuthTokens extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $user_id;
 
     /**
       * Identidad del usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var varchar(128)
-      */
+      * @var string
+     */
     public $token;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $create_time;
+      * @var string
+     */
+    public $create_time = null;
 }
