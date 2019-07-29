@@ -192,7 +192,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Ban the problem.
         $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
-        ProblemsDAO::save($problem);
+        ProblemsDAO::update($problem);
 
         $directorLogin = self::login($contestData['director']);
         try {
@@ -210,7 +210,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Make it private. Now it should be possible to add it.
         $problem->visibility = ProblemController::VISIBILITY_PRIVATE;
-        ProblemsDAO::save($problem);
+        ProblemsDAO::update($problem);
 
         $r = new Request([
             'auth_token' => $directorLogin->auth_token,

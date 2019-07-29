@@ -15,6 +15,15 @@
  * @access public
  */
 class ContestLog extends VO {
+    const FIELD_NAMES = [
+        'public_contest_id' => true,
+        'contest_id' => true,
+        'user_id' => true,
+        'from_admission_mode' => true,
+        'to_admission_mode' => true,
+        'time' => true,
+    ];
+
     /**
      * Constructor de ContestLog
      *
@@ -22,9 +31,13 @@ class ContestLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['public_contest_id'])) {
             $this->public_contest_id = (int)$data['public_contest_id'];
@@ -49,7 +62,7 @@ class ContestLog extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -62,42 +75,42 @@ class ContestLog extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $public_contest_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $contest_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('private','registration','public')
-      */
+      * @var string
+     */
     public $from_admission_mode;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('private','registration','public')
-      */
+      * @var string
+     */
     public $to_admission_mode;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 }

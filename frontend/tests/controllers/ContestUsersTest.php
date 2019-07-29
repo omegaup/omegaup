@@ -71,7 +71,9 @@ class ContestUsersTest extends OmegaupTestCase {
 
     public function testContestParticipantsReport() {
         // Get a contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['requests_user_information' => 'optional']));
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'requests_user_information' => 'optional'
+        ]));
 
         for ($i = 0; $i < 3; $i++) {
             // Create users
@@ -82,18 +84,28 @@ class ContestUsersTest extends OmegaupTestCase {
         }
 
         $userLogin = self::login($user[0]);
-
-        $showContestIntro = ContestController::showContestIntro(new Request([
+        $r = new Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-        ]));
+        ]);
+        $shoulShowIntro = ContestController::shouldShowIntro(
+            $r,
+            $contestData['contest']
+        );
+        $contestDetails = ContestController::getContestDetailsForSmarty(
+            $r,
+            $contestData['contest'],
+            $shoulShowIntro
+        );
 
         // Explicitly join contest
         ContestController::apiOpen(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
-            'privacy_git_object_id' => $showContestIntro['git_object_id'],
-            'statement_type' => $showContestIntro['statement_type'],
+            'privacy_git_object_id' =>
+                $contestDetails['privacyStatement']['gitObjectId'],
+            'statement_type' =>
+                $contestDetails['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
@@ -111,7 +123,9 @@ class ContestUsersTest extends OmegaupTestCase {
         $this->assertEquals(3, count($response['contestants']));
 
         // But only one participant has accepted share user information
-        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
+        $this->assertEquals(1, self::numberOfUsersSharingBasicInformation(
+            $response['contestants']
+        ));
 
         $userLogin = self::login($user[1]);
 
@@ -119,15 +133,19 @@ class ContestUsersTest extends OmegaupTestCase {
         ContestController::apiOpen(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
-            'privacy_git_object_id' => $showContestIntro['git_object_id'],
-            'statement_type' => $showContestIntro['statement_type'],
+            'privacy_git_object_id' =>
+                $contestDetails['privacyStatement']['gitObjectId'],
+            'statement_type' =>
+                $contestDetails['privacyStatement']['statementType'],
             'share_user_information' => 0,
         ]));
 
         $response = ContestController::apiContestants($r);
 
         // The number of participants sharing their information still remains the same
-        $this->assertEquals(1, self::usersSharingUserInformation($response['contestants']));
+        $this->assertEquals(1, self::numberOfUsersSharingBasicInformation(
+            $response['contestants']
+        ));
 
         $userLogin = self::login($user[2]);
 
@@ -135,18 +153,71 @@ class ContestUsersTest extends OmegaupTestCase {
         ContestController::apiOpen(new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
-            'privacy_git_object_id' => $showContestIntro['git_object_id'],
-            'statement_type' => $showContestIntro['statement_type'],
+            'privacy_git_object_id' =>
+                $contestDetails['privacyStatement']['gitObjectId'],
+            'statement_type' =>
+                $contestDetails['privacyStatement']['statementType'],
             'share_user_information' => 1,
         ]));
 
         $response = ContestController::apiContestants($r);
 
         // Now there are two participants sharing their information
-        $this->assertEquals(2, self::usersSharingUserInformation($response['contestants']));
+        $this->assertEquals(2, self::numberOfUsersSharingBasicInformation(
+            $response['contestants']
+        ));
     }
 
-    private static function usersSharingUserInformation($contestants) {
+    public function testContestCanBeSeenByUnloggedUsers() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest();
+
+        $shouldShowIntro =
+            ContestController::shouldShowIntro(
+                new Request([
+                    'contest_alias' => $contestData['request']['alias'],
+                ]),
+                $contestData['contest']
+            );
+
+        $this->assertTrue($shouldShowIntro);
+    }
+
+    public function testNeedsBasicInformation() {
+        // Get a contest
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'basic_information' => 'true'
+        ]));
+
+        // Create and login a user to view the contest
+        $user = UserFactory::createUser();
+        $userLogin = self::login($user);
+
+        $r = new Request([
+            'auth_token' => $userLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+        ]);
+
+        // Contest intro can be shown by the user
+        $shouldShowIntro = ContestController::shouldShowIntro(
+            $r,
+            $contestData['contest']
+        );
+        $this->assertTrue($shouldShowIntro);
+
+        // Contest needs basic information for the user
+        $contestDetails = ContestController::getContestDetailsForSmarty(
+            $r,
+            $contestData['contest'],
+            $shouldShowIntro
+        );
+
+        $this->assertTrue($contestDetails['needsBasicInformation']);
+    }
+
+    private static function numberOfUsersSharingBasicInformation(
+        array $contestants
+    ) : int {
         $numberOfContestants = 0;
         foreach ($contestants as $contestant) {
             if ($contestant['email']) {

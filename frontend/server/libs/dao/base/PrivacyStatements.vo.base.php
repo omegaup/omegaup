@@ -15,6 +15,12 @@
  * @access public
  */
 class PrivacyStatements extends VO {
+    const FIELD_NAMES = [
+        'privacystatement_id' => true,
+        'git_object_id' => true,
+        'type' => true,
+    ];
+
     /**
      * Constructor de PrivacyStatements
      *
@@ -22,9 +28,13 @@ class PrivacyStatements extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['privacystatement_id'])) {
             $this->privacystatement_id = (int)$data['privacystatement_id'];
@@ -40,7 +50,7 @@ class PrivacyStatements extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -53,21 +63,21 @@ class PrivacyStatements extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $privacystatement_id;
 
     /**
       * Id de la versión del documento en el que se almacena la nueva política
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $git_object_id;
 
     /**
       * Tipo de documento de privacidad
       * @access public
-      * @var enum('privacy_policy','contest_optional_consent','contest_required_consent','course_optional_consent','course_required_consent','accept_teacher')
-      */
-    public $type;
+      * @var string
+     */
+    public $type = 'privacy_policy';
 }

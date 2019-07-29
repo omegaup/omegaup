@@ -15,6 +15,15 @@
  * @access public
  */
 class SubmissionLog extends VO {
+    const FIELD_NAMES = [
+        'problemset_id' => true,
+        'submission_id' => true,
+        'user_id' => true,
+        'identity_id' => true,
+        'ip' => true,
+        'time' => true,
+    ];
+
     /**
      * Constructor de SubmissionLog
      *
@@ -22,9 +31,13 @@ class SubmissionLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = (int)$data['problemset_id'];
@@ -49,7 +62,7 @@ class SubmissionLog extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -60,43 +73,43 @@ class SubmissionLog extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $submission_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var ?int
+     */
     public $user_id;
 
     /**
       * Identidad del usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(10)
-      */
+      * @var int
+     */
     public $ip;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 }

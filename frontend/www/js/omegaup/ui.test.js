@@ -66,7 +66,7 @@ Case #2: 15
 ||end`)).toEqual(`<h1>Ejemplo</h1>
 
 <table class="sample_io">
-<thead><tr><th>Entrada</th><th>Salida</th><th>Descripci&oacute;n</th></tr></thead><tbody><tr><td><pre>1
+<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead><tbody><tr><td><pre>1
 2</pre></td><td><pre>Case #1: 3</pre></td><td><p>Explicación</p></td></tr><tr><td><pre>5
 10</pre></td><td><pre>Case #2: 15</pre></td><td></td></tr></tbody>
 </table>`);

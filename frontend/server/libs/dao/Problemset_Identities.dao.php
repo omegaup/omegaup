@@ -37,12 +37,12 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemset_identity->time = 0;
             $problemset_identity->is_invited = 0;
             $problemset_identity->share_user_information = $share_user_information;
-            ProblemsetIdentitiesDAO::save($problemset_identity);
+            ProblemsetIdentitiesDAO::create($problemset_identity);
         } elseif (is_null($problemset_identity->access_time)) {
             // If its set to default time, update it
             $problemset_identity->access_time = date('Y-m-d H:i:s');
             $problemset_identity->share_user_information = $share_user_information;
-            ProblemsetIdentitiesDAO::save($problemset_identity);
+            ProblemsetIdentitiesDAO::update($problemset_identity);
         }
         return $problemset_identity;
     }

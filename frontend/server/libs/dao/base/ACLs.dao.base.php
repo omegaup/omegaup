@@ -33,8 +33,10 @@ abstract class ACLsDAOBase {
      * @param ACLs [$ACLs] El objeto de tipo ACLs
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ACLs $ACLs) {
-        if (is_null(self::getByPK($ACLs->acl_id))) {
+    final public static function save(ACLs $ACLs) : int {
+        if (is_null($ACLs->acl_id) ||
+            is_null(self::getByPK($ACLs->acl_id))
+        ) {
             return ACLsDAOBase::create($ACLs);
         }
         return ACLsDAOBase::update($ACLs);
@@ -47,11 +49,11 @@ abstract class ACLsDAOBase {
      * @return Filas afectadas
      * @param ACLs [$ACLs] El objeto de tipo ACLs a actualizar.
      */
-    final public static function update(ACLs $ACLs) {
+    final public static function update(ACLs $ACLs) : int {
         $sql = 'UPDATE `ACLs` SET `owner_id` = ? WHERE `acl_id` = ?;';
         $params = [
-            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
-            is_null($ACLs->acl_id) ? null : (int)$ACLs->acl_id,
+            (int)$ACLs->owner_id,
+            (int)$ACLs->acl_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -67,10 +69,7 @@ abstract class ACLsDAOBase {
      * @static
      * @return @link ACLs Un objeto del tipo {@link ACLs}. NULL si no hay tal registro.
      */
-    final public static function getByPK($acl_id) {
-        if (is_null($acl_id)) {
-            return null;
-        }
+    final public static function getByPK(int $acl_id) : ?ACLs {
         $sql = 'SELECT `ACLs`.`acl_id`, `ACLs`.`owner_id` FROM ACLs WHERE (acl_id = ?) LIMIT 1;';
         $params = [$acl_id];
         global $conn;
@@ -97,7 +96,7 @@ abstract class ACLsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ACLs [$ACLs] El objeto de tipo ACLs a eliminar
      */
-    final public static function delete(ACLs $ACLs) {
+    final public static function delete(ACLs $ACLs) : void {
         $sql = 'DELETE FROM `ACLs` WHERE acl_id = ?;';
         $params = [$ACLs->acl_id];
         global $conn;
@@ -125,7 +124,12 @@ abstract class ACLsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ACLs}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `ACLs`.`acl_id`, `ACLs`.`owner_id` from ACLs';
         global $conn;
         if (!is_null($orden)) {
@@ -151,19 +155,19 @@ abstract class ACLsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ACLs [$ACLs] El objeto de tipo ACLs a crear.
      */
-    final public static function create(ACLs $ACLs) {
+    final public static function create(ACLs $ACLs) : int {
         $sql = 'INSERT INTO ACLs (`owner_id`) VALUES (?);';
         $params = [
-            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
+            (int)$ACLs->owner_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $ACLs->acl_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

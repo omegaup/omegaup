@@ -27,10 +27,7 @@ abstract class QualityNominationReviewersDAOBase {
      * @static
      * @return @link QualityNominationReviewers Un objeto del tipo {@link QualityNominationReviewers}. NULL si no hay tal registro.
      */
-    final public static function getByPK($qualitynomination_id, $user_id) {
-        if (is_null($qualitynomination_id) || is_null($user_id)) {
-            return null;
-        }
+    final public static function getByPK(int $qualitynomination_id, int $user_id) : ?QualityNominationReviewers {
         $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` FROM QualityNomination_Reviewers WHERE (qualitynomination_id = ? AND user_id = ?) LIMIT 1;';
         $params = [$qualitynomination_id, $user_id];
         global $conn;
@@ -57,7 +54,7 @@ abstract class QualityNominationReviewersDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param QualityNominationReviewers [$QualityNomination_Reviewers] El objeto de tipo QualityNominationReviewers a eliminar
      */
-    final public static function delete(QualityNominationReviewers $QualityNomination_Reviewers) {
+    final public static function delete(QualityNominationReviewers $QualityNomination_Reviewers) : void {
         $sql = 'DELETE FROM `QualityNomination_Reviewers` WHERE qualitynomination_id = ? AND user_id = ?;';
         $params = [$QualityNomination_Reviewers->qualitynomination_id, $QualityNomination_Reviewers->user_id];
         global $conn;
@@ -85,7 +82,12 @@ abstract class QualityNominationReviewersDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link QualityNominationReviewers}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` from QualityNomination_Reviewers';
         global $conn;
         if (!is_null($orden)) {
@@ -111,19 +113,19 @@ abstract class QualityNominationReviewersDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param QualityNominationReviewers [$QualityNomination_Reviewers] El objeto de tipo QualityNominationReviewers a crear.
      */
-    final public static function create(QualityNominationReviewers $QualityNomination_Reviewers) {
+    final public static function create(QualityNominationReviewers $QualityNomination_Reviewers) : int {
         $sql = 'INSERT INTO QualityNomination_Reviewers (`qualitynomination_id`, `user_id`) VALUES (?, ?);';
         $params = [
-            is_null($QualityNomination_Reviewers->qualitynomination_id) ? null : (int)$QualityNomination_Reviewers->qualitynomination_id,
-            is_null($QualityNomination_Reviewers->user_id) ? null : (int)$QualityNomination_Reviewers->user_id,
+            (int)$QualityNomination_Reviewers->qualitynomination_id,
+            (int)$QualityNomination_Reviewers->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

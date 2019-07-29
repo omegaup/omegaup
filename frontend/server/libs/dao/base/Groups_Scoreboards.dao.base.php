@@ -33,8 +33,10 @@ abstract class GroupsScoreboardsDAOBase {
      * @param GroupsScoreboards [$Groups_Scoreboards] El objeto de tipo GroupsScoreboards
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(GroupsScoreboards $Groups_Scoreboards) {
-        if (is_null(self::getByPK($Groups_Scoreboards->group_scoreboard_id))) {
+    final public static function save(GroupsScoreboards $Groups_Scoreboards) : int {
+        if (is_null($Groups_Scoreboards->group_scoreboard_id) ||
+            is_null(self::getByPK($Groups_Scoreboards->group_scoreboard_id))
+        ) {
             return GroupsScoreboardsDAOBase::create($Groups_Scoreboards);
         }
         return GroupsScoreboardsDAOBase::update($Groups_Scoreboards);
@@ -47,15 +49,15 @@ abstract class GroupsScoreboardsDAOBase {
      * @return Filas afectadas
      * @param GroupsScoreboards [$Groups_Scoreboards] El objeto de tipo GroupsScoreboards a actualizar.
      */
-    final public static function update(GroupsScoreboards $Groups_Scoreboards) {
+    final public static function update(GroupsScoreboards $Groups_Scoreboards) : int {
         $sql = 'UPDATE `Groups_Scoreboards` SET `group_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_scoreboard_id` = ?;';
         $params = [
-            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
+            (int)$Groups_Scoreboards->group_id,
             $Groups_Scoreboards->create_time,
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,
             $Groups_Scoreboards->description,
-            is_null($Groups_Scoreboards->group_scoreboard_id) ? null : (int)$Groups_Scoreboards->group_scoreboard_id,
+            (int)$Groups_Scoreboards->group_scoreboard_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,10 +73,7 @@ abstract class GroupsScoreboardsDAOBase {
      * @static
      * @return @link GroupsScoreboards Un objeto del tipo {@link GroupsScoreboards}. NULL si no hay tal registro.
      */
-    final public static function getByPK($group_scoreboard_id) {
-        if (is_null($group_scoreboard_id)) {
-            return null;
-        }
+    final public static function getByPK(int $group_scoreboard_id) : ?GroupsScoreboards {
         $sql = 'SELECT `Groups_Scoreboards`.`group_scoreboard_id`, `Groups_Scoreboards`.`group_id`, `Groups_Scoreboards`.`create_time`, `Groups_Scoreboards`.`alias`, `Groups_Scoreboards`.`name`, `Groups_Scoreboards`.`description` FROM Groups_Scoreboards WHERE (group_scoreboard_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id];
         global $conn;
@@ -101,7 +100,7 @@ abstract class GroupsScoreboardsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param GroupsScoreboards [$Groups_Scoreboards] El objeto de tipo GroupsScoreboards a eliminar
      */
-    final public static function delete(GroupsScoreboards $Groups_Scoreboards) {
+    final public static function delete(GroupsScoreboards $Groups_Scoreboards) : void {
         $sql = 'DELETE FROM `Groups_Scoreboards` WHERE group_scoreboard_id = ?;';
         $params = [$Groups_Scoreboards->group_scoreboard_id];
         global $conn;
@@ -129,7 +128,12 @@ abstract class GroupsScoreboardsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link GroupsScoreboards}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Groups_Scoreboards`.`group_scoreboard_id`, `Groups_Scoreboards`.`group_id`, `Groups_Scoreboards`.`create_time`, `Groups_Scoreboards`.`alias`, `Groups_Scoreboards`.`name`, `Groups_Scoreboards`.`description` from Groups_Scoreboards';
         global $conn;
         if (!is_null($orden)) {
@@ -155,13 +159,13 @@ abstract class GroupsScoreboardsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param GroupsScoreboards [$Groups_Scoreboards] El objeto de tipo GroupsScoreboards a crear.
      */
-    final public static function create(GroupsScoreboards $Groups_Scoreboards) {
+    final public static function create(GroupsScoreboards $Groups_Scoreboards) : int {
         if (is_null($Groups_Scoreboards->create_time)) {
             $Groups_Scoreboards->create_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Groups_Scoreboards (`group_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
+            (int)$Groups_Scoreboards->group_id,
             $Groups_Scoreboards->create_time,
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,
@@ -169,12 +173,12 @@ abstract class GroupsScoreboardsDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Groups_Scoreboards->group_scoreboard_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }
