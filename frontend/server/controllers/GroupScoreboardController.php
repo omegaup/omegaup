@@ -95,14 +95,12 @@ class GroupScoreboardController extends Controller {
         $r->ensureFloat('weight');
 
         try {
-            $groupScoreboardProblemset = new GroupsScoreboardsProblemsets([
+            GroupsScoreboardsProblemsetsDAO::create(new GroupsScoreboardsProblemsets([
                 'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
                 'problemset_id' => $contestScoreboard['contest']->problemset_id,
                 'only_ac' => $r['only_ac'],
                 'weight' => $r['weight'],
-            ]);
-
-            GroupsScoreboardsProblemsetsDAO::save($groupScoreboardProblemset);
+            ]));
 
             self::$log->info(
                 "Contest {$r['contest_alias']} added to scoreboard {$r['scoreboard_alias']}"

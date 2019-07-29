@@ -27,10 +27,7 @@ abstract class FavoritesDAOBase {
      * @static
      * @return @link Favorites Un objeto del tipo {@link Favorites}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_id, $problem_id) {
-        if (is_null($user_id) || is_null($problem_id)) {
-            return null;
-        }
+    final public static function getByPK(int $user_id, int $problem_id) : ?Favorites {
         $sql = 'SELECT `Favorites`.`user_id`, `Favorites`.`problem_id` FROM Favorites WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
         global $conn;
@@ -57,7 +54,7 @@ abstract class FavoritesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Favorites [$Favorites] El objeto de tipo Favorites a eliminar
      */
-    final public static function delete(Favorites $Favorites) {
+    final public static function delete(Favorites $Favorites) : void {
         $sql = 'DELETE FROM `Favorites` WHERE user_id = ? AND problem_id = ?;';
         $params = [$Favorites->user_id, $Favorites->problem_id];
         global $conn;
@@ -85,7 +82,12 @@ abstract class FavoritesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Favorites}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Favorites`.`user_id`, `Favorites`.`problem_id` from Favorites';
         global $conn;
         if (!is_null($orden)) {
@@ -111,19 +113,19 @@ abstract class FavoritesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Favorites [$Favorites] El objeto de tipo Favorites a crear.
      */
-    final public static function create(Favorites $Favorites) {
+    final public static function create(Favorites $Favorites) : int {
         $sql = 'INSERT INTO Favorites (`user_id`, `problem_id`) VALUES (?, ?);';
         $params = [
-            is_null($Favorites->user_id) ? null : (int)$Favorites->user_id,
-            is_null($Favorites->problem_id) ? null : (int)$Favorites->problem_id,
+            (int)$Favorites->user_id,
+            (int)$Favorites->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

@@ -15,6 +15,15 @@
  * @access public
  */
 class GroupsScoreboards extends VO {
+    const FIELD_NAMES = [
+        'group_scoreboard_id' => true,
+        'group_id' => true,
+        'create_time' => true,
+        'alias' => true,
+        'name' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de GroupsScoreboards
      *
@@ -22,9 +31,13 @@ class GroupsScoreboards extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_scoreboard_id'])) {
             $this->group_scoreboard_id = (int)$data['group_scoreboard_id'];
@@ -49,7 +62,7 @@ class GroupsScoreboards extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['create_time']);
             return;
@@ -62,42 +75,42 @@ class GroupsScoreboards extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_scoreboard_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $create_time;
+      * @var string
+     */
+    public $create_time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $alias;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $name;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(256)
-      */
+      * @var ?string
+     */
     public $description;
 }

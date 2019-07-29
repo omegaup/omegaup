@@ -33,8 +33,10 @@ abstract class EmailsDAOBase {
      * @param Emails [$Emails] El objeto de tipo Emails
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Emails $Emails) {
-        if (is_null(self::getByPK($Emails->email_id))) {
+    final public static function save(Emails $Emails) : int {
+        if (is_null($Emails->email_id) ||
+            is_null(self::getByPK($Emails->email_id))
+        ) {
             return EmailsDAOBase::create($Emails);
         }
         return EmailsDAOBase::update($Emails);
@@ -47,12 +49,12 @@ abstract class EmailsDAOBase {
      * @return Filas afectadas
      * @param Emails [$Emails] El objeto de tipo Emails a actualizar.
      */
-    final public static function update(Emails $Emails) {
+    final public static function update(Emails $Emails) : int {
         $sql = 'UPDATE `Emails` SET `email` = ?, `user_id` = ? WHERE `email_id` = ?;';
         $params = [
             $Emails->email,
             is_null($Emails->user_id) ? null : (int)$Emails->user_id,
-            is_null($Emails->email_id) ? null : (int)$Emails->email_id,
+            (int)$Emails->email_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -68,10 +70,7 @@ abstract class EmailsDAOBase {
      * @static
      * @return @link Emails Un objeto del tipo {@link Emails}. NULL si no hay tal registro.
      */
-    final public static function getByPK($email_id) {
-        if (is_null($email_id)) {
-            return null;
-        }
+    final public static function getByPK(int $email_id) : ?Emails {
         $sql = 'SELECT `Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id` FROM Emails WHERE (email_id = ?) LIMIT 1;';
         $params = [$email_id];
         global $conn;
@@ -98,7 +97,7 @@ abstract class EmailsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Emails [$Emails] El objeto de tipo Emails a eliminar
      */
-    final public static function delete(Emails $Emails) {
+    final public static function delete(Emails $Emails) : void {
         $sql = 'DELETE FROM `Emails` WHERE email_id = ?;';
         $params = [$Emails->email_id];
         global $conn;
@@ -126,7 +125,12 @@ abstract class EmailsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Emails}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id` from Emails';
         global $conn;
         if (!is_null($orden)) {
@@ -152,7 +156,7 @@ abstract class EmailsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Emails [$Emails] El objeto de tipo Emails a crear.
      */
-    final public static function create(Emails $Emails) {
+    final public static function create(Emails $Emails) : int {
         $sql = 'INSERT INTO Emails (`email`, `user_id`) VALUES (?, ?);';
         $params = [
             $Emails->email,
@@ -160,12 +164,12 @@ abstract class EmailsDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Emails->email_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

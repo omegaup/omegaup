@@ -33,8 +33,10 @@ abstract class ProblemsDAOBase {
      * @param Problems [$Problems] El objeto de tipo Problems
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Problems $Problems) {
-        if (is_null(self::getByPK($Problems->problem_id))) {
+    final public static function save(Problems $Problems) : int {
+        if (is_null($Problems->problem_id) ||
+            is_null(self::getByPK($Problems->problem_id))
+        ) {
             return ProblemsDAOBase::create($Problems);
         }
         return ProblemsDAOBase::update($Problems);
@@ -47,30 +49,30 @@ abstract class ProblemsDAOBase {
      * @return Filas afectadas
      * @param Problems [$Problems] El objeto de tipo Problems a actualizar.
      */
-    final public static function update(Problems $Problems) {
+    final public static function update(Problems $Problems) : int {
         $sql = 'UPDATE `Problems` SET `acl_id` = ?, `visibility` = ?, `title` = ?, `alias` = ?, `commit` = ?, `current_version` = ?, `languages` = ?, `input_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `deprecated` = ?, `email_clarifications` = ?, `quality` = ?, `quality_histogram` = ?, `difficulty_histogram` = ? WHERE `problem_id` = ?;';
         $params = [
-            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
-            is_null($Problems->visibility) ? null : (int)$Problems->visibility,
+            (int)$Problems->acl_id,
+            (int)$Problems->visibility,
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
             $Problems->current_version,
             $Problems->languages,
-            is_null($Problems->input_limit) ? null : (int)$Problems->input_limit,
-            is_null($Problems->visits) ? null : (int)$Problems->visits,
-            is_null($Problems->submissions) ? null : (int)$Problems->submissions,
-            is_null($Problems->accepted) ? null : (int)$Problems->accepted,
+            (int)$Problems->input_limit,
+            (int)$Problems->visits,
+            (int)$Problems->submissions,
+            (int)$Problems->accepted,
             is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
             $Problems->creation_date,
             $Problems->source,
             $Problems->order,
-            is_null($Problems->deprecated) ? null : (int)$Problems->deprecated,
-            is_null($Problems->email_clarifications) ? null : (int)$Problems->email_clarifications,
+            (int)$Problems->deprecated,
+            (int)$Problems->email_clarifications,
             is_null($Problems->quality) ? null : (float)$Problems->quality,
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
-            is_null($Problems->problem_id) ? null : (int)$Problems->problem_id,
+            (int)$Problems->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -86,10 +88,7 @@ abstract class ProblemsDAOBase {
      * @static
      * @return @link Problems Un objeto del tipo {@link Problems}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problem_id) {
-        if (is_null($problem_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problem_id) : ?Problems {
         $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`commit`, `Problems`.`current_version`, `Problems`.`languages`, `Problems`.`input_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality`, `Problems`.`quality_histogram`, `Problems`.`difficulty_histogram` FROM Problems WHERE (problem_id = ?) LIMIT 1;';
         $params = [$problem_id];
         global $conn;
@@ -116,7 +115,7 @@ abstract class ProblemsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Problems [$Problems] El objeto de tipo Problems a eliminar
      */
-    final public static function delete(Problems $Problems) {
+    final public static function delete(Problems $Problems) : void {
         $sql = 'DELETE FROM `Problems` WHERE problem_id = ?;';
         $params = [$Problems->problem_id];
         global $conn;
@@ -144,7 +143,12 @@ abstract class ProblemsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Problems}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problems`.`problem_id`, `Problems`.`acl_id`, `Problems`.`visibility`, `Problems`.`title`, `Problems`.`alias`, `Problems`.`commit`, `Problems`.`current_version`, `Problems`.`languages`, `Problems`.`input_limit`, `Problems`.`visits`, `Problems`.`submissions`, `Problems`.`accepted`, `Problems`.`difficulty`, `Problems`.`creation_date`, `Problems`.`source`, `Problems`.`order`, `Problems`.`deprecated`, `Problems`.`email_clarifications`, `Problems`.`quality`, `Problems`.`quality_histogram`, `Problems`.`difficulty_histogram` from Problems';
         global $conn;
         if (!is_null($orden)) {
@@ -170,7 +174,7 @@ abstract class ProblemsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Problems [$Problems] El objeto de tipo Problems a crear.
      */
-    final public static function create(Problems $Problems) {
+    final public static function create(Problems $Problems) : int {
         if (is_null($Problems->visibility)) {
             $Problems->visibility = 1;
         }
@@ -206,35 +210,35 @@ abstract class ProblemsDAOBase {
         }
         $sql = 'INSERT INTO Problems (`acl_id`, `visibility`, `title`, `alias`, `commit`, `current_version`, `languages`, `input_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `deprecated`, `email_clarifications`, `quality`, `quality_histogram`, `difficulty_histogram`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
-            is_null($Problems->visibility) ? null : (int)$Problems->visibility,
+            (int)$Problems->acl_id,
+            (int)$Problems->visibility,
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
             $Problems->current_version,
             $Problems->languages,
-            is_null($Problems->input_limit) ? null : (int)$Problems->input_limit,
-            is_null($Problems->visits) ? null : (int)$Problems->visits,
-            is_null($Problems->submissions) ? null : (int)$Problems->submissions,
-            is_null($Problems->accepted) ? null : (int)$Problems->accepted,
+            (int)$Problems->input_limit,
+            (int)$Problems->visits,
+            (int)$Problems->submissions,
+            (int)$Problems->accepted,
             is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
             $Problems->creation_date,
             $Problems->source,
             $Problems->order,
-            is_null($Problems->deprecated) ? null : (int)$Problems->deprecated,
-            is_null($Problems->email_clarifications) ? null : (int)$Problems->email_clarifications,
+            (int)$Problems->deprecated,
+            (int)$Problems->email_clarifications,
             is_null($Problems->quality) ? null : (float)$Problems->quality,
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Problems->problem_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

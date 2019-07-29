@@ -33,8 +33,10 @@ abstract class UsersDAOBase {
      * @param Users [$Users] El objeto de tipo Users
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Users $Users) {
-        if (is_null(self::getByPK($Users->user_id))) {
+    final public static function save(Users $Users) : int {
+        if (is_null($Users->user_id) ||
+            is_null(self::getByPK($Users->user_id))
+        ) {
             return UsersDAOBase::create($Users);
         }
         return UsersDAOBase::update($Users);
@@ -47,7 +49,7 @@ abstract class UsersDAOBase {
      * @return Filas afectadas
      * @param Users [$Users] El objeto de tipo Users a actualizar.
      */
-    final public static function update(Users $Users) {
+    final public static function update(Users $Users) : int {
         $sql = 'UPDATE `Users` SET `username` = ?, `facebook_user_id` = ?, `password` = ?, `git_token` = ?, `main_email_id` = ?, `main_identity_id` = ?, `scholar_degree` = ?, `graduation_date` = ?, `birth_date` = ?, `verified` = ?, `verification_id` = ?, `reset_digest` = ?, `reset_sent_at` = ?, `hide_problem_tags` = ?, `in_mailing_list` = ?, `is_private` = ?, `preferred_language` = ? WHERE `user_id` = ?;';
         $params = [
             $Users->username,
@@ -59,15 +61,15 @@ abstract class UsersDAOBase {
             $Users->scholar_degree,
             $Users->graduation_date,
             $Users->birth_date,
-            is_null($Users->verified) ? null : (int)$Users->verified,
+            (int)$Users->verified,
             $Users->verification_id,
             $Users->reset_digest,
             $Users->reset_sent_at,
             is_null($Users->hide_problem_tags) ? null : (int)$Users->hide_problem_tags,
-            is_null($Users->in_mailing_list) ? null : (int)$Users->in_mailing_list,
-            is_null($Users->is_private) ? null : (int)$Users->is_private,
+            (int)$Users->in_mailing_list,
+            (int)$Users->is_private,
             $Users->preferred_language,
-            is_null($Users->user_id) ? null : (int)$Users->user_id,
+            (int)$Users->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -83,10 +85,7 @@ abstract class UsersDAOBase {
      * @static
      * @return @link Users Un objeto del tipo {@link Users}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_id) {
-        if (is_null($user_id)) {
-            return null;
-        }
+    final public static function getByPK(int $user_id) : ?Users {
         $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`git_token`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`scholar_degree`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` FROM Users WHERE (user_id = ?) LIMIT 1;';
         $params = [$user_id];
         global $conn;
@@ -113,7 +112,7 @@ abstract class UsersDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Users [$Users] El objeto de tipo Users a eliminar
      */
-    final public static function delete(Users $Users) {
+    final public static function delete(Users $Users) : void {
         $sql = 'DELETE FROM `Users` WHERE user_id = ?;';
         $params = [$Users->user_id];
         global $conn;
@@ -141,7 +140,12 @@ abstract class UsersDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Users}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Users`.`user_id`, `Users`.`username`, `Users`.`facebook_user_id`, `Users`.`password`, `Users`.`git_token`, `Users`.`main_email_id`, `Users`.`main_identity_id`, `Users`.`scholar_degree`, `Users`.`graduation_date`, `Users`.`birth_date`, `Users`.`verified`, `Users`.`verification_id`, `Users`.`reset_digest`, `Users`.`reset_sent_at`, `Users`.`hide_problem_tags`, `Users`.`in_mailing_list`, `Users`.`is_private`, `Users`.`preferred_language` from Users';
         global $conn;
         if (!is_null($orden)) {
@@ -167,7 +171,7 @@ abstract class UsersDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Users [$Users] El objeto de tipo Users a crear.
      */
-    final public static function create(Users $Users) {
+    final public static function create(Users $Users) : int {
         if (is_null($Users->verified)) {
             $Users->verified = false;
         }
@@ -188,23 +192,23 @@ abstract class UsersDAOBase {
             $Users->scholar_degree,
             $Users->graduation_date,
             $Users->birth_date,
-            is_null($Users->verified) ? null : (int)$Users->verified,
+            (int)$Users->verified,
             $Users->verification_id,
             $Users->reset_digest,
             $Users->reset_sent_at,
             is_null($Users->hide_problem_tags) ? null : (int)$Users->hide_problem_tags,
-            is_null($Users->in_mailing_list) ? null : (int)$Users->in_mailing_list,
-            is_null($Users->is_private) ? null : (int)$Users->is_private,
+            (int)$Users->in_mailing_list,
+            (int)$Users->is_private,
             $Users->preferred_language,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Users->user_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

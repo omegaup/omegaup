@@ -15,6 +15,12 @@
  * @access public
  */
 class Permissions extends VO {
+    const FIELD_NAMES = [
+        'permission_id' => true,
+        'name' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de Permissions
      *
@@ -22,9 +28,13 @@ class Permissions extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['permission_id'])) {
             $this->permission_id = (int)$data['permission_id'];
@@ -40,7 +50,7 @@ class Permissions extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -53,21 +63,21 @@ class Permissions extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $permission_id;
 
     /**
       * El nombre corto del permiso.
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $name;
 
     /**
       * La descripción humana del permiso.
       * @access public
-      * @var varchar(100)
-      */
+      * @var string
+     */
     public $description;
 }

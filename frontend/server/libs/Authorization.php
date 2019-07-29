@@ -78,7 +78,6 @@ class Authorization {
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
         if (is_null($problem)) {
             return false;
         }
@@ -87,12 +86,18 @@ class Authorization {
             throw new PreconditionFailedException('problemDeprecated');
         }
 
-        $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
-        if (!is_null($problemset) && Authorization::isAdmin(
-            $identity,
-            $problemset
-        )) {
-            return true;
+        if (!is_null($submission->problemset_id)) {
+            try {
+                $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
+            } catch (Exception $e) {
+                throw new InvalidDatabaseOperationException($e);
+            }
+            if (!is_null($problemset) && Authorization::isAdmin(
+                $identity,
+                $problemset
+            )) {
+                return true;
+            }
         }
 
         return Authorization::isProblemAdmin($identity, $problem);
@@ -108,8 +113,11 @@ class Authorization {
             return true;
         }
 
-        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
-
+        try {
+            $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
         if (is_null($problemset)) {
             return false;
         }
@@ -121,14 +129,21 @@ class Authorization {
         Identities $identity,
         Clarifications $clarification
     ) : bool {
-        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
+        try {
+            $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($problemset)) {
+            return false;
+        }
+
         try {
             $problem = ProblemsDAO::getByPK($clarification->problem_id);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        if (is_null($problemset) || is_null($problem)) {
+        if (is_null($problem)) {
             return false;
         }
 
@@ -165,7 +180,8 @@ class Authorization {
             return false;
         }
         return Authorization::canEditProblem($identity, $problem) ||
-            ProblemsDAO::isProblemSolved($problem, $identity->identity_id);
+            ProblemsDAO::isProblemSolved($problem, $identity->identity_id) ||
+            ProblemsForfeitedDAO::isProblemForfeited($problem, $identity);
     }
 
     public static function canViewEmail($identity_id) {
@@ -321,7 +337,11 @@ class Authorization {
     }
 
     private static function isOwner(Identities $identity, int $aclId) {
-        $acl = ACLsDAO::getByPK($aclId);
+        try {
+            $acl = ACLsDAO::getByPK($aclId);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
         return $acl->owner_id == $identity->user_id;
     }
 
@@ -339,15 +359,14 @@ class Authorization {
     }
 
     private static function isGroupMember(int $identityId, Groups $group) {
-        if (is_null($identityId) || is_null($group)) {
-            return false;
-        }
-
         if (Authorization::isSystemAdmin($identityId)) {
             return true;
         }
-        $groupUsers = GroupsIdentitiesDAO::getByPK($group->group_id, $identityId);
-
+        try {
+            $groupUsers = GroupsIdentitiesDAO::getByPK($group->group_id, $identityId);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
         return !empty($groupUsers);
     }
 

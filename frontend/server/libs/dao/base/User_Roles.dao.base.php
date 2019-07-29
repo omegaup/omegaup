@@ -27,10 +27,7 @@ abstract class UserRolesDAOBase {
      * @static
      * @return @link UserRoles Un objeto del tipo {@link UserRoles}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_id, $role_id, $acl_id) {
-        if (is_null($user_id) || is_null($role_id) || is_null($acl_id)) {
-            return null;
-        }
+    final public static function getByPK(int $user_id, int $role_id, int $acl_id) : ?UserRoles {
         $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` FROM User_Roles WHERE (user_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
         $params = [$user_id, $role_id, $acl_id];
         global $conn;
@@ -57,7 +54,7 @@ abstract class UserRolesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param UserRoles [$User_Roles] El objeto de tipo UserRoles a eliminar
      */
-    final public static function delete(UserRoles $User_Roles) {
+    final public static function delete(UserRoles $User_Roles) : void {
         $sql = 'DELETE FROM `User_Roles` WHERE user_id = ? AND role_id = ? AND acl_id = ?;';
         $params = [$User_Roles->user_id, $User_Roles->role_id, $User_Roles->acl_id];
         global $conn;
@@ -85,7 +82,12 @@ abstract class UserRolesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link UserRoles}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` from User_Roles';
         global $conn;
         if (!is_null($orden)) {
@@ -111,20 +113,20 @@ abstract class UserRolesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param UserRoles [$User_Roles] El objeto de tipo UserRoles a crear.
      */
-    final public static function create(UserRoles $User_Roles) {
+    final public static function create(UserRoles $User_Roles) : int {
         $sql = 'INSERT INTO User_Roles (`user_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
         $params = [
-            is_null($User_Roles->user_id) ? null : (int)$User_Roles->user_id,
-            is_null($User_Roles->role_id) ? null : (int)$User_Roles->role_id,
-            is_null($User_Roles->acl_id) ? null : (int)$User_Roles->acl_id,
+            (int)$User_Roles->user_id,
+            (int)$User_Roles->role_id,
+            (int)$User_Roles->acl_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

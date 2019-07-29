@@ -33,8 +33,10 @@ abstract class UsersBadgesDAOBase {
      * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(UsersBadges $Users_Badges) {
-        if (is_null(self::getByPK($Users_Badges->user_badge_id))) {
+    final public static function save(UsersBadges $Users_Badges) : int {
+        if (is_null($Users_Badges->user_badge_id) ||
+            is_null(self::getByPK($Users_Badges->user_badge_id))
+        ) {
             return UsersBadgesDAOBase::create($Users_Badges);
         }
         return UsersBadgesDAOBase::update($Users_Badges);
@@ -47,13 +49,13 @@ abstract class UsersBadgesDAOBase {
      * @return Filas afectadas
      * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a actualizar.
      */
-    final public static function update(UsersBadges $Users_Badges) {
+    final public static function update(UsersBadges $Users_Badges) : int {
         $sql = 'UPDATE `Users_Badges` SET `user_id` = ?, `badge_alias` = ?, `assignation_time` = ? WHERE `user_badge_id` = ?;';
         $params = [
-            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
+            (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
             $Users_Badges->assignation_time,
-            is_null($Users_Badges->user_badge_id) ? null : (int)$Users_Badges->user_badge_id,
+            (int)$Users_Badges->user_badge_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -69,10 +71,7 @@ abstract class UsersBadgesDAOBase {
      * @static
      * @return @link UsersBadges Un objeto del tipo {@link UsersBadges}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_badge_id) {
-        if (is_null($user_badge_id)) {
-            return null;
-        }
+    final public static function getByPK(int $user_badge_id) : ?UsersBadges {
         $sql = 'SELECT `Users_Badges`.`user_badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`badge_alias`, `Users_Badges`.`assignation_time` FROM Users_Badges WHERE (user_badge_id = ?) LIMIT 1;';
         $params = [$user_badge_id];
         global $conn;
@@ -99,7 +98,7 @@ abstract class UsersBadgesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a eliminar
      */
-    final public static function delete(UsersBadges $Users_Badges) {
+    final public static function delete(UsersBadges $Users_Badges) : void {
         $sql = 'DELETE FROM `Users_Badges` WHERE user_badge_id = ?;';
         $params = [$Users_Badges->user_badge_id];
         global $conn;
@@ -127,7 +126,12 @@ abstract class UsersBadgesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link UsersBadges}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Users_Badges`.`user_badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`badge_alias`, `Users_Badges`.`assignation_time` from Users_Badges';
         global $conn;
         if (!is_null($orden)) {
@@ -153,24 +157,24 @@ abstract class UsersBadgesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a crear.
      */
-    final public static function create(UsersBadges $Users_Badges) {
+    final public static function create(UsersBadges $Users_Badges) : int {
         if (is_null($Users_Badges->assignation_time)) {
             $Users_Badges->assignation_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
+            (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
             $Users_Badges->assignation_time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Users_Badges->user_badge_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

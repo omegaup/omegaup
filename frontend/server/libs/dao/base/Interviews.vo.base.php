@@ -15,6 +15,16 @@
  * @access public
  */
 class Interviews extends VO {
+    const FIELD_NAMES = [
+        'interview_id' => true,
+        'problemset_id' => true,
+        'acl_id' => true,
+        'alias' => true,
+        'title' => true,
+        'description' => true,
+        'window_length' => true,
+    ];
+
     /**
      * Constructor de Interviews
      *
@@ -22,9 +32,13 @@ class Interviews extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['interview_id'])) {
             $this->interview_id = (int)$data['interview_id'];
@@ -52,7 +66,7 @@ class Interviews extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -65,49 +79,49 @@ class Interviews extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $interview_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       * La lista de control de acceso del problema
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $acl_id;
 
     /**
       * El alias de la entrevista
       * @access public
-      * @var varchar(32)
-      */
+      * @var string
+     */
     public $alias;
 
     /**
       * El titulo de la entrevista.
       * @access public
-      * @var varchar(256)
-      */
+      * @var string
+     */
     public $title;
 
     /**
       * Una breve descripcion de la entrevista.
       * @access public
-      * @var tinytext
-      */
+      * @var string
+     */
     public $description;
 
     /**
       * Indica el tiempo que tiene el usuario para envíar soluciones.
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $window_length;
 }

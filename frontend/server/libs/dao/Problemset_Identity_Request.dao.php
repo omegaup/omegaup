@@ -33,27 +33,7 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
             WHERE
                 r.problemset_id = ?;';
 
-        $rs = $conn->GetAll($sql, [$problemsetId]);
-
-        $admins = [];
-        $requestsAdmins = [];
-        foreach ($rs as $result) {
-            $adminId = $result['admin_id'];
-            if (!array_key_exists($adminId, $admins)) {
-                $admin = [];
-                $data = IdentitiesDAO::getByPK($adminId);
-                if (!is_null($data)) {
-                    $admin = [
-                        'user_id' => $data->user_id,
-                        'username' => $data->username,
-                        'name' => $data->name,
-                    ];
-                }
-                $requestsAdmins[$result['identity_id']] = $admin;
-            }
-        }
-
-        return $requestsAdmins;
+        return $conn->GetAll($sql, [$problemsetId]);
     }
 
     public static function getRequestsForProblemset(int $problemsetId) : array {

@@ -63,17 +63,21 @@ class ContestController extends Controller {
             }
             $query = $r['query'];
             Validators::validateStringOfLengthInRange($query, 'query', null, 255, false /* not required */);
-            $cache_key = "$active_contests-$recommended-$page-$page_size";
+            $cacheKey = "{$active_contests}-{$recommended}-{$page}-{$page_size}";
             if (is_null($r->identity)) {
                 // Get all public contests
-                Cache::getFromCacheOrSet(
+                $contests = Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_PUBLIC,
-                    $cache_key,
-                    $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
-                            return ContestsDAO::getAllPublicContests($page, $page_size, $active_contests, $recommended, $query);
-                    },
-                    $contests
+                    $cacheKey,
+                    function () use ($page, $page_size, $active_contests, $recommended, $query) {
+                        return ContestsDAO::getAllPublicContests(
+                            $page,
+                            $page_size,
+                            $active_contests,
+                            $recommended,
+                            $query
+                        );
+                    }
                 );
             } elseif ($participating == ParticipatingStatus::YES) {
                 $contests = ContestsDAO::getContestsParticipating($r->identity->identity_id, $page, $page_size, $query);
@@ -81,14 +85,12 @@ class ContestController extends Controller {
                 $contests = ContestsDAO::getRecentPublicContests($r->identity->identity_id, $page, $page_size, $query);
             } elseif (Authorization::isSystemAdmin($r->identity->identity_id)) {
                 // Get all contests
-                Cache::getFromCacheOrSet(
+                $contests = Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_SYSTEM_ADMIN,
-                    $cache_key,
-                    $r,
-                    function (Request $r) use ($page, $page_size, $active_contests, $recommended, $query) {
+                    $cacheKey,
+                    function () use ($page, $page_size, $active_contests, $recommended, $query) {
                             return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended, $query);
-                    },
-                    $contests
+                    }
                 );
             } else {
                 // Get all public+private contests
@@ -286,7 +288,7 @@ class ContestController extends Controller {
                 $identity->identity_id,
                 $contest->problemset_id
             );
-            if (is_null($req) || ($req->accepted === '0')) {
+            if (is_null($req) || $req->accepted === '0') {
                 throw new ForbiddenAccessException('contestNotRegistered');
             }
         }
@@ -311,7 +313,35 @@ class ContestController extends Controller {
         if (is_null($contestProblemset)) {
             throw new NotFoundException('contestNotFound');
         }
-        return [new Contests($contestProblemset), new Problemsets($contestProblemset)];
+        return [
+            new Contests(
+                array_intersect_key($contestProblemset, Contests::FIELD_NAMES)
+            ),
+            new Problemsets(
+                array_intersect_key($contestProblemset, Problemsets::FIELD_NAMES)
+            ),
+        ];
+    }
+
+    /**
+     * Validate a contest with contest alias
+     *
+     * @param string $contestAlias
+     * @return Contests $contest
+     * @throws InvalidDatabaseOperationException
+     * @throws NotFoundException
+     */
+    public static function validateContest(string $contestAlias) : Contests {
+        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        try {
+            $contest = ContestsDAO::getByAlias($contestAlias);
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
+        if (is_null($contest)) {
+            throw new NotFoundException('contestNotFound');
+        }
+        return $contest;
     }
 
     /**
@@ -336,74 +366,112 @@ class ContestController extends Controller {
     }
 
     /**
-     * Show the contest intro unless you are admin, or you
-     * already started this contest.
+     * Get all the properties for smarty.
      * @param Request $r
+     * @param Contests $contest
      * @return Array
      */
-    public static function showContestIntro(Request $r) : Array {
-        try {
-            $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        } catch (Exception $e) {
-            throw new NotFoundException('contestNotFound');
+    public static function getContestDetailsForSmarty(
+        Request $r,
+        Contests $contest,
+        bool $shouldShowIntro
+    ) : array {
+        // Half-authenticate, in case there is no session in place.
+        $session = SessionController::apiCurrentSession($r)['session'];
+        if (!$shouldShowIntro) {
+            return ['payload' => [
+                'shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($session['user']) &&
+                    !UserController::isMainIdentity(
+                        $session['user'],
+                        $session['identity']
+                    )
+                    && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                        $session['user']
+                    ),
+            ]];
         }
-        if (is_null($contest)) {
-            throw new NotFoundException('contestNotFound');
+        $result = [
+            'needsBasicInformation' => false,
+            'requestsUserInformation' => false,
+        ];
+        if (!$session['valid'] || is_null($session['identity'])) {
+            // No session, show the intro if public, so that they can login.
+            return $result;
         }
-        $result = ContestsDAO::getNeedsInformation($contest->problemset_id);
 
+        [
+            'needsBasicInformation' => $result['needsBasicInformation'],
+            'requestsUserInformation' => $result['requestsUserInformation'],
+        ] = ContestsDAO::getNeedsInformation($contest->problemset_id);
+        $identity = $session['identity'];
+
+        $result['needsBasicInformation'] =
+            $result['needsBasicInformation'] && (
+                !$identity->country_id || !$identity->state_id ||
+                !$identity->school_id
+        );
+
+        // Privacy Statement Information
+        $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
+            $identity->language_id,
+            'contest',
+            $result['requestsUserInformation']
+        );
+        if (!is_null($privacyStatementMarkdown)) {
+            $statementType =
+                "contest_{$result['requestsUserInformation']}_consent";
+            $result['privacyStatement'] = [
+                'markdown' => $privacyStatementMarkdown,
+                'gitObjectId' =>
+                    PrivacyStatementsDAO::getLatestPublishedStatement(
+                        $statementType
+                    )['git_object_id'],
+                'statementType' => $statementType
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Show the contest intro unless you are admin, or you already started this
+     * contest.
+     * @param Request $r
+     * @param Contests $contest
+     * @return bool
+     */
+    public static function shouldShowIntro(
+        Request $r,
+        Contests $contest
+    ) : bool {
         try {
-            // Half-authenticate, in case there is no session in place.
             $session = SessionController::apiCurrentSession($r)['session'];
-            if ($session['valid'] && !is_null($session['identity'])) {
-                $r->identity = $session['identity'];
-
-                $r->user = null;
-                if (!is_null($session['user'])) {
-                    $r->user = $session['user'];
-                }
-
-                // Privacy Statement Information
-                $result['privacy_statement_markdown'] = PrivacyStatement::getForProblemset(
-                    $r->identity->language_id,
-                    'contest',
-                    $result['requests_user_information']
-                );
-                if (!is_null($result['privacy_statement_markdown'])) {
-                    $statement_type = "contest_{$result['requests_user_information']}_consent";
-                    $result['git_object_id'] = PrivacyStatementsDAO::getLatestPublishedStatement($statement_type)['git_object_id'];
-                    $result['statement_type'] = $statement_type;
-                }
-            } else {
+            if (is_null($session['identity'])) {
                 // No session, show the intro (if public), so that they can login.
-                $result['shouldShowIntro'] =
-                    self::isPublic($contest->admission_mode) ? ContestController::SHOW_INTRO : !ContestController::SHOW_INTRO;
-                return $result;
+                return self::isPublic($contest->admission_mode);
             }
-            self::canAccessContest($contest, $r->identity);
+            self::canAccessContest($contest, $session['identity']);
         } catch (Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
-            if (!self::isInvitedToContest($contest, $r->identity)) {
+            if (!self::isInvitedToContest($contest, $session['identity'])) {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
-            $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
-            return $result;
+            return ContestController::SHOW_INTRO;
         }
 
         // You already started the contest.
         $contestOpened = ProblemsetIdentitiesDAO::getByPK(
-            $r->identity->identity_id,
+            $session['identity']->identity_id,
             $contest->problemset_id
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
             self::$log->debug('No intro because you already started the contest');
-            $result['shouldShowIntro'] = !ContestController::SHOW_INTRO;
-            return $result;
+            return !ContestController::SHOW_INTRO;
         }
-        $result['shouldShowIntro'] = ContestController::SHOW_INTRO;
-        return $result;
+        return ContestController::SHOW_INTRO;
     }
 
     /**
@@ -448,13 +516,6 @@ class ContestController extends Controller {
             'contest_admin' => $contestAdmin,
             'contest_alias' => $contestAlias,
         ];
-    }
-
-     /**
-     * Temporal hotfix wrapper
-     */
-    public static function apiIntroDetails(Request $r) {
-        return self::apiPublicDetails($r);
     }
 
     public static function apiPublicDetails(Request $r) {
@@ -523,10 +584,10 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        [$contest, $_] = self::validateBasicDetails($r['contest_alias']);
+        $contest = self::validateContest($r['contest_alias'] ?? '');
 
         try {
-            ProblemsetIdentityRequestDAO::save(new ProblemsetIdentityRequest([
+            ProblemsetIdentityRequestDAO::create(new ProblemsetIdentityRequest([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $contest->problemset_id,
                 'request_time' => gmdate('Y-m-d H:i:s', Time::get()),
@@ -547,11 +608,15 @@ class ContestController extends Controller {
      */
     public static function apiOpen(Request $r) {
         $response = self::validateDetails($r);
-        $needsInformation = ContestsDAO::getNeedsInformation($response['contest']->problemset_id);
+        [
+            'needsBasicInformation' => $needsInformation,
+            'requestsUserInformation' => $requestsUserInformation
+        ] = ContestsDAO::getNeedsInformation($response['contest']->problemset_id);
         $session = SessionController::apiCurrentSession($r)['session'];
 
-        if ($needsInformation['needs_basic_information'] && !is_null($session['identity']) &&
-              (!$session['identity']->country_id || !$session['identity']->state_id || !$session['identity']->school_id)
+        if ($needsInformation && !is_null($session['identity']) &&
+              (!$session['identity']->country_id || !$session['identity']->state_id
+                || !$session['identity']->school_id)
         ) {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
@@ -567,7 +632,7 @@ class ContestController extends Controller {
 
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
-            if ($needsInformation['requests_user_information'] != 'no') {
+            if ($requestsUserInformation != 'no') {
                 $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
                 $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
                     $r->identity->identity_id,
@@ -599,87 +664,92 @@ class ContestController extends Controller {
      * @param Contests $contest
      * @param $result
      */
-    private static function getCachedDetails(string $contestAlias, Contests $contest, &$result) {
-        Cache::getFromCacheOrSet(Cache::CONTEST_INFO, $contestAlias, $contest, function (Contests $contest) {
-            // Initialize response to be the contest information
-            $result = $contest->asFilteredArray([
-                'title',
-                'description',
-                'start_time',
-                'finish_time',
-                'window_length',
-                'alias',
-                'scoreboard',
-                'scoreboard_url',
-                'scoreboard_url_admin',
-                'points_decay_factor',
-                'partial_score',
-                'submissions_gap',
-                'feedback',
-                'penalty',
-                'penalty_type',
-                'penalty_calc_policy',
-                'show_scoreboard_after',
-                'admission_mode',
-                'languages',
-                'problemset_id',
-                'rerun_id',
-            ]);
+    private static function getCachedDetails(string $contestAlias, Contests $contest) : array {
+        return Cache::getFromCacheOrSet(
+            Cache::CONTEST_INFO,
+            $contestAlias,
+            function () use ($contest, &$result) {
+                // Initialize response to be the contest information
+                $result = $contest->asFilteredArray([
+                    'title',
+                    'description',
+                    'start_time',
+                    'finish_time',
+                    'window_length',
+                    'alias',
+                    'scoreboard',
+                    'scoreboard_url',
+                    'scoreboard_url_admin',
+                    'points_decay_factor',
+                    'partial_score',
+                    'submissions_gap',
+                    'feedback',
+                    'penalty',
+                    'penalty_type',
+                    'penalty_calc_policy',
+                    'show_scoreboard_after',
+                    'admission_mode',
+                    'languages',
+                    'problemset_id',
+                    'rerun_id',
+                ]);
 
-            $result['start_time'] = strtotime($result['start_time']);
-            $result['finish_time'] = strtotime($result['finish_time']);
-            $result['show_scoreboard_after'] = (bool)$result['show_scoreboard_after'];
-            $result['original_contest_alias'] = null;
-            $result['original_problemset_id'] = null;
-            if ($result['rerun_id'] != 0) {
-                $original_contest = ContestsDAO::getByPK($result['rerun_id']);
-                $result['original_contest_alias'] = $original_contest->alias;
-                $result['original_problemset_id'] = $original_contest->problemset_id;
-            }
-
-            try {
-                $acl = ACLsDAO::getByPK($contest->acl_id);
-                $result['director'] = UsersDAO::getByPK($acl->owner_id)->username;
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            try {
-                $problemsInContest = ProblemsetProblemsDAO::getProblemsByProblemset($contest->problemset_id);
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
-            }
-
-            // Add info of each problem to the contest
-            $problemsResponseArray = [];
-
-            $letter = 0;
-
-            foreach ($problemsInContest as $problem) {
-                // Add the 'points' value that is stored in the ContestProblem relationship
-                $problem['letter'] = ContestController::columnName($letter++);
-                if (!empty($result['languages'])) {
-                    $problem['languages'] = join(',', array_intersect(
-                        explode(',', $result['languages']),
-                        explode(',', $problem['languages'])
-                    ));
+                $result['start_time'] = strtotime($result['start_time']);
+                $result['finish_time'] = strtotime($result['finish_time']);
+                $result['show_scoreboard_after'] = (bool)$result['show_scoreboard_after'];
+                $result['original_contest_alias'] = null;
+                $result['original_problemset_id'] = null;
+                if ($result['rerun_id'] != 0) {
+                    $original_contest = ContestsDAO::getByPK($result['rerun_id']);
+                    $result['original_contest_alias'] = $original_contest->alias;
+                    $result['original_problemset_id'] = $original_contest->problemset_id;
                 }
 
-                // Save our array into the response
-                array_push($problemsResponseArray, $problem);
-            }
+                try {
+                    $acl = ACLsDAO::getByPK($contest->acl_id);
+                    $result['director'] = UsersDAO::getByPK($acl->owner_id)->username;
+                } catch (Exception $e) {
+                    // Operation failed in the data layer
+                    throw new InvalidDatabaseOperationException($e);
+                }
 
-            // Add problems to response
-            $result['problems'] = $problemsResponseArray;
-            $result['languages'] = explode(',', $result['languages']);
-            $result = array_merge(
-                $result,
-                ContestsDAO::getNeedsInformation($contest->problemset_id)
-            );
-            return $result;
-        }, $result, APC_USER_CACHE_CONTEST_INFO_TIMEOUT);
+                try {
+                    $problemsInContest = ProblemsetProblemsDAO::getProblemsByProblemset($contest->problemset_id);
+                } catch (Exception $e) {
+                    // Operation failed in the data layer
+                    throw new InvalidDatabaseOperationException($e);
+                }
+
+                // Add info of each problem to the contest
+                $problemsResponseArray = [];
+
+                $letter = 0;
+
+                foreach ($problemsInContest as $problem) {
+                    // Add the 'points' value that is stored in the ContestProblem relationship
+                    $problem['letter'] = ContestController::columnName($letter++);
+                    if (!empty($result['languages'])) {
+                        $problem['languages'] = join(',', array_intersect(
+                            explode(',', $result['languages']),
+                            explode(',', $problem['languages'])
+                        ));
+                    }
+
+                    // Save our array into the response
+                    array_push($problemsResponseArray, $problem);
+                }
+
+                // Add problems to response
+                $result['problems'] = $problemsResponseArray;
+                $result['languages'] = explode(',', $result['languages']);
+                [
+                    'needsBasicInformation' => $result['needs_basic_information'],
+                    'requestsUserInformation' => $result['requests_user_information'],
+                ] = ContestsDAO::getNeedsInformation($contest->problemset_id);
+                return $result;
+            },
+            APC_USER_CACHE_CONTEST_INFO_TIMEOUT
+        );
     }
 
     /**
@@ -694,8 +764,7 @@ class ContestController extends Controller {
     public static function apiDetails(Request $r) {
         $response = self::validateDetails($r);
 
-        $result = [];
-        self::getCachedDetails($r['contest_alias'], $response['contest'], $result);
+        $result = self::getCachedDetails($r['contest_alias'], $response['contest']);
         unset($result['scoreboard_url']);
         unset($result['scoreboard_url_admin']);
         unset($result['rerun_id']);
@@ -760,8 +829,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $result = [];
-        self::getCachedDetails($r['contest_alias'], $response['contest'], $result);
+        $result = self::getCachedDetails($r['contest_alias'], $response['contest']);
 
         $result['opened'] = ProblemsetIdentitiesDAO::checkProblemsetOpened(
             (int)$r->identity->identity_id,
@@ -985,7 +1053,7 @@ class ContestController extends Controller {
             // Begin a new transaction
             DAO::transBegin();
 
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
             $problemset->acl_id = $acl->acl_id;
             $problemset->type = 'Contest';
             $problemset->scoreboard_url = SecurityTools::randomString(30);
@@ -993,7 +1061,7 @@ class ContestController extends Controller {
             $contest->acl_id = $acl->acl_id;
 
             // Save the problemset object with data sent by user to the database
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::create($problemset);
 
             $contest->problemset_id = $problemset->problemset_id;
             $contest->penalty_calc_policy = $contest->penalty_calc_policy ?: 'sum';
@@ -1006,11 +1074,11 @@ class ContestController extends Controller {
             }
 
             // Save the contest object with data sent by user to the database
-            ContestsDAO::save($contest);
+            ContestsDAO::create($contest);
 
             // Update contest_id in problemset object
             $problemset->contest_id = $contest->contest_id;
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::update($problemset);
 
             // End transaction transaction
             DAO::transEnd();
@@ -1604,11 +1672,6 @@ class ContestController extends Controller {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         $identityToRemove = IdentityController::resolveIdentity($usernameOrEmail);
-
-        if (is_null($identityToRemove)) {
-            throw new NotFoundException('userOrMailNotFound');
-        }
-
         $contest = self::validateContestAdmin($contestAlias, $identity);
         return [$identityToRemove, $contest];
     }
@@ -2077,24 +2140,42 @@ class ContestController extends Controller {
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         try {
-            $requestsAdmins =
+            $resultAdmins =
                 ProblemsetIdentityRequestDAO::getFirstAdminForProblemsetRequest(
                     $contest->problemset_id
                 );
-            $requests = ProblemsetIdentityRequestDAO::getRequestsForProblemset(
-                $contest->problemset_id
-            );
+            $resultRequests =
+                ProblemsetIdentityRequestDAO::getRequestsForProblemset(
+                    $contest->problemset_id
+                );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
+        $admins = [];
+        $requestsAdmins = [];
+        foreach ($resultAdmins as $result) {
+            $adminId = $result['admin_id'];
+            if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
+                $admin = [];
+                $data = IdentitiesDAO::findByUserId($adminId);
+                if (!is_null($data)) {
+                    $admin = [
+                        'user_id' => $data->user_id,
+                        'username' => $data->username,
+                        'name' => $data->name,
+                    ];
+                }
+                $requestsAdmins[$result['identity_id']] = $admin;
+            }
+        }
+
         $usersRequests = array_map(function ($request) use ($requestsAdmins) {
-            $request['admin'] = ['user_id' => null, 'username' => null, 'name' => null];
             if (isset($requestsAdmins[$request['identity_id']])) {
                 $request['admin'] = $requestsAdmins[$request['identity_id']];
             }
             return $request;
-        }, $requests);
+        }, $resultRequests);
 
         return [
             'users' => $usersRequests,
@@ -2132,10 +2213,10 @@ class ContestController extends Controller {
         $request->extra_note = $r['note'];
         $request->last_update = gmdate('Y-m-d H:i:s', Time::get());
 
-        ProblemsetIdentityRequestDAO::save($request);
+        ProblemsetIdentityRequestDAO::update($request);
 
         // Save this action in the history
-        ProblemsetIdentityRequestHistoryDAO::save(new ProblemsetIdentityRequestHistory([
+        ProblemsetIdentityRequestHistoryDAO::create(new ProblemsetIdentityRequestHistory([
             'identity_id' => $request->identity_id,
             'problemset_id' => $contest->problemset_id,
             'time' => $request->last_update,
@@ -2298,7 +2379,7 @@ class ContestController extends Controller {
                 $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
                 $problemset->needs_basic_information = $r['basic_information'] ?? 0;
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
-                ProblemsetsDAO::save($problemset);
+                ProblemsetsDAO::update($problemset);
             }
 
             // End transaction
@@ -2335,7 +2416,7 @@ class ContestController extends Controller {
     private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
         if ($original_contest->admission_mode !== $contest->admission_mode) {
             $timestamp = gmdate('Y-m-d H:i:s', Time::get());
-            ContestLogDAO::save(new ContestLog([
+            ContestLogDAO::create(new ContestLog([
                 'contest_id' => $contest->contest_id,
                 'user_id' => $user_id,
                 'from_admission_mode' => $original_contest->admission_mode,
@@ -2344,7 +2425,7 @@ class ContestController extends Controller {
             ]));
             $contest->last_updated = $timestamp;
         }
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
         if ($original_contest->penalty_type == $contest->penalty_type) {
             return;
         }
@@ -2767,7 +2848,7 @@ class ContestController extends Controller {
         $r['contest']->recommended = $r['value'];
 
         try {
-            ContestsDAO::save($r['contest']);
+            ContestsDAO::update($r['contest']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

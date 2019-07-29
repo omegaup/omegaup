@@ -229,7 +229,7 @@ let UI = {
             {
               source: UI.typeaheadWrapper(searchFn),
               async: true,
-              limit: 20,
+              limit: 100,
               display: 'label',
               templates: {
                 suggestion: function(val) {
