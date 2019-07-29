@@ -365,20 +365,15 @@ class IdentityController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'Identity');
         }
 
-        $response = [];
-
-        Cache::getFromCacheOrSet(
+        $response = Cache::getFromCacheOrSet(
             Cache::USER_PROFILE,
             $identity->username,
-            [$identity, $user],
-            function (array $params) {
-                [$identity, $user] = $params;
+            function () use ($identity, $user) {
                 if (!is_null($user)) {
                     return UserController::getProfileImpl($user, $identity);
                 }
                 return IdentityController::getProfileImpl($identity);
-            },
-            $response
+            }
         );
 
         if ($omitRank) {

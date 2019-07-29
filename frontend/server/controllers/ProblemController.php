@@ -1189,22 +1189,19 @@ class ProblemController extends Controller {
         string $commit,
         string $language
     ) : array {
-        $problemStatement = null;
-        Cache::getFromCacheOrSet(
+        return Cache::getFromCacheOrSet(
             Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            [
-                'directory' => 'statements',
-                'alias' => $problem->alias,
-                'commit' => $commit,
-                'language' => $language,
-            ],
-            'ProblemController::getProblemResourceImpl',
-            $problemStatement,
+            function () use ($problem, $commit, $language) {
+                return ProblemController::getProblemResourceImpl([
+                    'directory' => 'statements',
+                    'alias' => $problem->alias,
+                    'commit' => $commit,
+                    'language' => $language,
+                ]);
+            },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-
-        return $problemStatement;
     }
 
     /**
@@ -1223,22 +1220,19 @@ class ProblemController extends Controller {
         string $commit,
         string $language
     ) : array {
-        $problemSolution = null;
-        Cache::getFromCacheOrSet(
+        return Cache::getFromCacheOrSet(
             Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            [
-                'directory' => 'solutions',
-                'alias' => $problem->alias,
-                'commit' => $commit,
-                'language' => $language,
-            ],
-            'ProblemController::getProblemResourceImpl',
-            $problemSolution,
+            function () use ($problem, $commit, $language) {
+                return ProblemController::getProblemResourceImpl([
+                    'directory' => 'solutions',
+                    'alias' => $problem->alias,
+                    'commit' => $commit,
+                    'language' => $language,
+                ]);
+            },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-
-        return $problemSolution;
     }
 
     /**
@@ -1252,19 +1246,17 @@ class ProblemController extends Controller {
         Problems $problem,
         string $commit
     ) : array {
-        $problemSettingsDistrib = null;
-        Cache::getFromCacheOrSet(
+        return Cache::getFromCacheOrSet(
             Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            [
-                'alias' => $problem->alias,
-                'commit' => $problem->commit,
-            ],
-            'ProblemController::getProblemSettingsDistribImpl',
-            $problemSettingsDistrib,
+            function () use ($problem) {
+                return ProblemController::getProblemSettingsDistribImpl([
+                    'alias' => $problem->alias,
+                    'commit' => $problem->commit,
+                ]);
+            },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-        return $problemSettingsDistrib;
     }
 
     /**
@@ -1486,21 +1478,18 @@ class ProblemController extends Controller {
         );
 
         // Add preferred language of the user.
-        $user_data = [];
         $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
         if (!is_null($r->identity)) {
-            Cache::getFromCacheOrSet(
+            $userData = Cache::getFromCacheOrSet(
                 Cache::USER_PROFILE,
                 $r->identity->username,
-                $request,
-                function (Request $request) {
-                        return UserController::apiProfile($request);
-                },
-                $user_data
+                function () use ($r) {
+                    return UserController::apiProfile($r);
+                }
             );
-        }
-        if (!empty($user_data)) {
-            $response['preferred_language'] = $user_data['userinfo']['preferred_language'];
+            if (!empty($userData)) {
+                $response['preferred_language'] = $userData['userinfo']['preferred_language'];
+            }
         }
 
         // Add the problem the response

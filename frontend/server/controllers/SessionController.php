@@ -63,10 +63,11 @@ class SessionController extends Controller {
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
      * */
-    public static function apiCurrentSession(Request $r = null) {
+    public static function apiCurrentSession(?Request $r = null) : array {
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
-            !is_null(self::$current_session)) {
+            !is_null(self::$current_session)
+        ) {
             return [
                 'status' => 'ok',
                 'session' => self::$current_session,
@@ -80,18 +81,18 @@ class SessionController extends Controller {
             $r['auth_token'] = SessionController::getAuthToken($r);
         }
         $authToken = $r['auth_token'];
-        if ($authToken != null &&
-            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
-            OMEGAUP_SESSION_CACHE_ENABLED === true) {
-            Cache::getFromCacheOrSet(
+        if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+            OMEGAUP_SESSION_CACHE_ENABLED === true &&
+            !is_null($authToken)
+         ) {
+            self::$current_session = Cache::getFromCacheOrSet(
                 Cache::SESSION_PREFIX,
                 $authToken,
-                $r,
-                ['SessionController', 'getCurrentSession'],
-                $session,
+                function () use ($r) {
+                    return SessionController::getCurrentSession($r);
+                },
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
-            self::$current_session = $session;
         } else {
             self::$current_session = SessionController::getCurrentSession($r);
         }
@@ -172,6 +173,9 @@ class SessionController extends Controller {
      */
     public function InvalidateCache() {
         $currentSession = self::apiCurrentSession()['session'];
+        if (is_null($currentSession['auth_token'])) {
+            return;
+        }
         Cache::deleteFromCache(Cache::SESSION_PREFIX, $currentSession['auth_token']);
     }
 

@@ -131,7 +131,7 @@ class SchoolController extends Controller {
             $r['finish_time'] = gmdate('Y-m-d', $r['finish_time']);
         }
 
-        $fetch = function (Request $r) {
+        $fetch = function () use ($r) {
             try {
                 return SchoolsDAO::getRankByUsersAndProblemsWithAC(
                     $r['start_time'],
@@ -144,19 +144,15 @@ class SchoolController extends Controller {
             }
         };
 
-        $result = [];
         if ($canUseCache) {
-            $cache_key = $r['offset'] .'-'. $r['rowcount'];
-            Cache::getFromCacheOrSet(
+            $result = Cache::getFromCacheOrSet(
                 Cache::SCHOOL_RANK,
-                $cache_key,
-                $r,
+                "{$r['offset']}-{$r['rowcount']}",
                 $fetch,
-                $result,
                 60 * 60 * 24 // 1 day
             );
         } else {
-            $result = $fetch($r);
+            $result = $fetch();
         }
 
         return ['status' => 'ok', 'rank' => $result];

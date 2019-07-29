@@ -1890,38 +1890,43 @@ class UserController extends Controller {
         if (is_null($identity)) {
             $selectedFilter = self::getSelectedFilter($r);
             $rankCacheName = "{$r['offset']}-{$r['rowcount']}-{$r['filter']}-{$selectedFilter['value']}";
-            $cacheUsed = Cache::getFromCacheOrSet(Cache::PROBLEMS_SOLVED_RANK, $rankCacheName, $r, function (Request $r) {
-                $response = [];
-                $response['rank'] = [];
-                $response['total'] = 0;
-                $selectedFilter = self::getSelectedFilter($r);
-                try {
-                    $userRankEntries = UserRankDAO::getFilteredRank(
-                        $r['offset'],
-                        $r['rowcount'],
-                        'rank',
-                        'ASC',
-                        $selectedFilter['filteredBy'],
-                        $selectedFilter['value']
-                    );
-                } catch (Exception $e) {
-                    throw new InvalidDatabaseOperationException($e);
-                }
-
-                if (!is_null($userRankEntries)) {
-                    foreach ($userRankEntries['rows'] as $userRank) {
-                        array_push($response['rank'], [
-                            'username' => $userRank->username,
-                            'name' => $userRank->name,
-                            'problems_solved' => $userRank->problems_solved_count,
-                            'rank' => $userRank->rank,
-                            'score' => $userRank->score,
-                            'country_id' => $userRank->country_id]);
+            $response = Cache::getFromCacheOrSet(
+                Cache::PROBLEMS_SOLVED_RANK,
+                $rankCacheName,
+                function () use ($r) {
+                    $response = [];
+                    $response['rank'] = [];
+                    $response['total'] = 0;
+                    $selectedFilter = self::getSelectedFilter($r);
+                    try {
+                        $userRankEntries = UserRankDAO::getFilteredRank(
+                            $r['offset'],
+                            $r['rowcount'],
+                            'rank',
+                            'ASC',
+                            $selectedFilter['filteredBy'],
+                            $selectedFilter['value']
+                        );
+                    } catch (Exception $e) {
+                        throw new InvalidDatabaseOperationException($e);
                     }
-                    $response['total'] = $userRankEntries['total'];
-                }
-                return $response;
-            }, $response, APC_USER_CACHE_USER_RANK_TIMEOUT);
+
+                    if (!is_null($userRankEntries)) {
+                        foreach ($userRankEntries['rows'] as $userRank) {
+                            array_push($response['rank'], [
+                                'username' => $userRank->username,
+                                'name' => $userRank->name,
+                                'problems_solved' => $userRank->problems_solved_count,
+                                'rank' => $userRank->rank,
+                                'score' => $userRank->score,
+                                'country_id' => $userRank->country_id]);
+                        }
+                        $response['total'] = $userRankEntries['total'];
+                    }
+                    return $response;
+                },
+                APC_USER_CACHE_USER_RANK_TIMEOUT
+            );
         } else {
             $response = [];
 
