@@ -1667,11 +1667,6 @@ class ContestController extends Controller {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         $identityToRemove = IdentityController::resolveIdentity($usernameOrEmail);
-
-        if (is_null($identityToRemove)) {
-            throw new NotFoundException('userOrMailNotFound');
-        }
-
         $contest = self::validateContestAdmin($contestAlias, $identity);
         return [$identityToRemove, $contest];
     }
