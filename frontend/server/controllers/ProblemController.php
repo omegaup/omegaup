@@ -1041,6 +1041,13 @@ class ProblemController extends Controller {
             Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}"
         );
+
+        if ($prefix === Cache::PROBLEM_SOLUTION_EXISTS) {
+            Cache::deleteFromCache(
+                Cache::PROBLEM_SOLUTION_EXISTS,
+                "{$problem->alias}-{$problem->commit}"
+            );
+        }
     }
 
     /**
