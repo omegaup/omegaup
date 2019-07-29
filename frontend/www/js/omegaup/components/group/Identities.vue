@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-body">
-      <form>
+      <form class="upload-csv-form">
         <div class="panel-heading">
           {{ T.groupsUploadCsvFile }} <input name="identities"
                type="file">
@@ -11,9 +11,8 @@
                v-on:click.prevent="readCsv">{{ T.groupsUploadCsvFile }}</a>
         </div>
       </form><br>
-      <div class="panel panel-default no-bottom-margin"
-           v-show="identities.length &gt; 0">
-        <form>
+      <div class="panel panel-default no-bottom-margin">
+        <form class="identities-form">
           <div class="panel-heading">
             <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
           </div>
