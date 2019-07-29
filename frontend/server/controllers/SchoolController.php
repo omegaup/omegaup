@@ -80,7 +80,7 @@ class SchoolController extends Controller {
                 return $existing[0]->school_id;
             }
             // Save in db
-            SchoolsDAO::save($school);
+            SchoolsDAO::create($school);
             return $school->school_id;
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);

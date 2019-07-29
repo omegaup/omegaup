@@ -18,7 +18,7 @@ class CoursesFactory {
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
                 'identity_id' => $identity->identity_id,
             ]));

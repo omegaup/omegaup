@@ -15,7 +15,7 @@ class QualityNominationFactory {
         for ($i = 0; $i < 5; $i++) {
             $reviewer = UserFactory::createUser();
             $identity = IdentitiesDAO::getByPK($reviewer->main_identity_id);
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $qualityReviewerGroup->group_id,
                 'identity_id' => $identity->identity_id,
             ]));
@@ -24,12 +24,12 @@ class QualityNominationFactory {
     }
 
     public static function initTags() {
-        TagsDAO::save(new Tags(['name' => 'dp']));
-        TagsDAO::save(new Tags(['name' => 'math']));
-        TagsDAO::save(new Tags(['name' => 'matrices']));
-        TagsDAO::save(new Tags(['name' => 'greedy']));
-        TagsDAO::save(new Tags(['name' => 'geometry']));
-        TagsDAO::save(new Tags(['name' => 'search']));
+        TagsDAO::create(new Tags(['name' => 'dp']));
+        TagsDAO::create(new Tags(['name' => 'math']));
+        TagsDAO::create(new Tags(['name' => 'matrices']));
+        TagsDAO::create(new Tags(['name' => 'greedy']));
+        TagsDAO::create(new Tags(['name' => 'geometry']));
+        TagsDAO::create(new Tags(['name' => 'search']));
     }
 
     public static function createSuggestion($login, $problemAlias, $difficulty, $quality, $tags) {

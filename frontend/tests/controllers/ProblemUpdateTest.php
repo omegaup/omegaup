@@ -647,7 +647,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Ban the problem.
         $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
-        ProblemsDAO::save($problem);
+        ProblemsDAO::update($problem);
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
@@ -687,7 +687,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Promote the problem.
         $problem->visibility = ProblemController::VISIBILITY_PROMOTED;
-        ProblemsDAO::save($problem);
+        ProblemsDAO::update($problem);
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,

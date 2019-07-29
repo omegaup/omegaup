@@ -585,7 +585,7 @@ class ContestController extends Controller {
         $contest = self::validateContest($r['contest_alias'] ?? '');
 
         try {
-            ProblemsetIdentityRequestDAO::save(new ProblemsetIdentityRequest([
+            ProblemsetIdentityRequestDAO::create(new ProblemsetIdentityRequest([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $contest->problemset_id,
                 'request_time' => gmdate('Y-m-d H:i:s', Time::get()),
@@ -1048,7 +1048,7 @@ class ContestController extends Controller {
             // Begin a new transaction
             DAO::transBegin();
 
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
             $problemset->acl_id = $acl->acl_id;
             $problemset->type = 'Contest';
             $problemset->scoreboard_url = SecurityTools::randomString(30);
@@ -1056,7 +1056,7 @@ class ContestController extends Controller {
             $contest->acl_id = $acl->acl_id;
 
             // Save the problemset object with data sent by user to the database
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::create($problemset);
 
             $contest->problemset_id = $problemset->problemset_id;
             $contest->penalty_calc_policy = $contest->penalty_calc_policy ?: 'sum';
@@ -1069,11 +1069,11 @@ class ContestController extends Controller {
             }
 
             // Save the contest object with data sent by user to the database
-            ContestsDAO::save($contest);
+            ContestsDAO::create($contest);
 
             // Update contest_id in problemset object
             $problemset->contest_id = $contest->contest_id;
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::update($problemset);
 
             // End transaction transaction
             DAO::transEnd();
@@ -2227,10 +2227,10 @@ class ContestController extends Controller {
         $request->extra_note = $r['note'];
         $request->last_update = gmdate('Y-m-d H:i:s', Time::get());
 
-        ProblemsetIdentityRequestDAO::save($request);
+        ProblemsetIdentityRequestDAO::update($request);
 
         // Save this action in the history
-        ProblemsetIdentityRequestHistoryDAO::save(new ProblemsetIdentityRequestHistory([
+        ProblemsetIdentityRequestHistoryDAO::create(new ProblemsetIdentityRequestHistory([
             'identity_id' => $request->identity_id,
             'problemset_id' => $contest->problemset_id,
             'time' => $request->last_update,
@@ -2393,7 +2393,7 @@ class ContestController extends Controller {
                 $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
                 $problemset->needs_basic_information = $r['basic_information'] ?? 0;
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
-                ProblemsetsDAO::save($problemset);
+                ProblemsetsDAO::update($problemset);
             }
 
             // End transaction
@@ -2430,7 +2430,7 @@ class ContestController extends Controller {
     private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
         if ($original_contest->admission_mode !== $contest->admission_mode) {
             $timestamp = gmdate('Y-m-d H:i:s', Time::get());
-            ContestLogDAO::save(new ContestLog([
+            ContestLogDAO::create(new ContestLog([
                 'contest_id' => $contest->contest_id,
                 'user_id' => $user_id,
                 'from_admission_mode' => $original_contest->admission_mode,
@@ -2439,7 +2439,7 @@ class ContestController extends Controller {
             ]));
             $contest->last_updated = $timestamp;
         }
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
         if ($original_contest->penalty_type == $contest->penalty_type) {
             return;
         }
@@ -2862,7 +2862,7 @@ class ContestController extends Controller {
         $r['contest']->recommended = $r['value'];
 
         try {
-            ContestsDAO::save($r['contest']);
+            ContestsDAO::update($r['contest']);
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }

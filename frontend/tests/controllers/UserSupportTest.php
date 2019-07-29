@@ -133,7 +133,7 @@ class UserSupportTest extends OmegaupTestCase {
             ApiUtils::GetStringTime(Utils::GetPhpUnixTimestamp() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24));
         $user = UsersDAO::FindByEmail($email);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::save($user);
+        UsersDAO::update($user);
 
         // Support can not genearate token because it has expired
         $response = UserController::apiExtraInformation(new Request([

@@ -77,7 +77,7 @@ class ResetUpdateTest extends OmegaupTestCase {
         $reset_sent_at = ApiUtils::GetStringTime(Utils::GetPhpUnixTimestamp() - PASSWORD_RESET_TIMEOUT - 1);
         $user = UsersDAO::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::save($user);
+        UsersDAO::update($user);
 
         try {
             $r = new Request($user_data);

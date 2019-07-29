@@ -193,12 +193,14 @@ class SessionController extends Controller {
         try {
             AuthTokensDAO::delete($authToken);
         } catch (Exception $e) {
+            // Best effort
+            self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
         }
 
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private function RegisterSession(Identities $identity, $b_ReturnAuthTokenAsString = false) {
+    private function registerSession(Identities $identity) : string {
         // Log the login.
         IdentityLoginLogDAO::create(new IdentityLoginLog([
             'identity_id' => $identity->identity_id,
@@ -218,29 +220,24 @@ class SessionController extends Controller {
         // Create the new token
         $entropy = bin2hex(random_bytes(SessionController::AUTH_TOKEN_ENTROPY_SIZE));
         $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
-        $s_AuthT = "{$entropy}-{$identity->identity_id}-{$hash}";
-
-        $authToken = new AuthTokens();
-        $authToken->user_id = $identity->user_id;
-        $authToken->identity_id = $identity->identity_id;
-        $authToken->token = $s_AuthT;
+        $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
         try {
-            AuthTokensDAO::save($authToken);
+            AuthTokensDAO::save(new AuthTokens([
+                'user_id' => $identity->user_id,
+                'identity_id' => $identity->identity_id,
+                'token' => $token,
+            ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
         if (self::$setCookieOnRegisterSession) {
-            $sm = $this->getSessionManagerInstance();
-            $sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, 0, '/');
+            $this->getSessionManagerInstance()->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $token, 0, '/');
         }
 
-        Cache::deleteFromCache(Cache::SESSION_PREFIX, $s_AuthT);
-
-        if ($b_ReturnAuthTokenAsString) {
-            return $s_AuthT;
-        }
+        Cache::deleteFromCache(Cache::SESSION_PREFIX, $token);
+        return $token;
     }
 
     private static function getUniqueUsernameFromEmail($s_Email) {
@@ -428,7 +425,7 @@ class SessionController extends Controller {
         }
 
         try {
-            return $this->RegisterSession($identity, $returnAuthToken);
+            return $this->registerSession($identity, $returnAuthToken);
         } catch (Exception $e) {
             self::$log->error($e);
             return false;
@@ -509,7 +506,7 @@ class SessionController extends Controller {
             $identity = IdentitiesDAO::findByUsername($res['username']);
         }
 
-        $this->RegisterSession($identity);
+        $this->registerSession($identity);
         return ['status' => 'ok'];
     }
 }

@@ -194,7 +194,7 @@ class QualityNominationController extends Controller {
             'contents' => json_encode($contents), // re-encoding it for normalization.
             'status' => 'open',
         ]);
-        QualityNominationsDAO::save($nomination);
+        QualityNominationsDAO::create($nomination);
 
         if ($nomination->nomination == 'promotion') {
             $qualityReviewerGroup = GroupsDAO::findByAlias(
@@ -292,8 +292,8 @@ class QualityNominationController extends Controller {
         try {
             $response = [];
             ProblemController::apiUpdate($r);
-            QualityNominationsDAO::save($qualitynomination);
-            QualityNominationLogDAO::save($qualitynominationlog);
+            QualityNominationsDAO::update($qualitynomination);
+            QualityNominationLogDAO::create($qualitynominationlog);
             DAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
               $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {

@@ -192,9 +192,9 @@ class IdentityController extends Controller {
      */
     private static function saveIdentityGroup(Identities $identity, $groupId) {
         try {
-            IdentitiesDAO::save($identity);
+            IdentitiesDAO::create($identity);
 
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $groupId,
                 'identity_id' => $identity->identity_id,
             ]));
@@ -235,7 +235,7 @@ class IdentityController extends Controller {
         $identity->identity_id = $originalIdentity->identity_id;
 
         // Save in DB
-        IdentitiesDAO::save($identity);
+        IdentitiesDAO::update($identity);
 
         Cache::deleteFromCache(Cache::USER_PROFILE, $identity->username);
 
@@ -264,7 +264,7 @@ class IdentityController extends Controller {
         // Save object into DB
         try {
             // Update password
-            IdentitiesDAO::save($identity);
+            IdentitiesDAO::update($identity);
         } catch (ApiException $e) {
             throw $e;
         }
