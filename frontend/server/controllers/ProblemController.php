@@ -888,7 +888,7 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
-        self::invalidateCache($problem, $updatedStatementLanguages);
+        self::invalidateCache($problem, $updatedStatementLanguages, Cache::PROBLEM_STATEMENT);
 
         // All clear
         $response['status'] = 'ok';
@@ -1026,7 +1026,7 @@ class ProblemController extends Controller {
     private static function invalidateCache(
         Problems $problem,
         array $updatedLanguages,
-        string $prefix = Cache::PROBLEM_STATEMENT
+        string $prefix
     ) {
         self::updateLanguages($problem);
 
@@ -1873,7 +1873,8 @@ class ProblemController extends Controller {
         }
         self::invalidateCache(
             $problem,
-            array_merge($updatedStatementLanguages, ProblemController::VALID_LANGUAGES)
+            array_merge($updatedStatementLanguages, ProblemController::VALID_LANGUAGES),
+            Cache::PROBLEM_STATEMENT
         );
 
         return [
@@ -2714,6 +2715,32 @@ class ProblemController extends Controller {
     }
 
     /**
+     * Gets the problem solution existence status (0 = not_found, 1 = found)
+     *
+     * @param Problems $problem The problem object.
+     * @return bool The problem solution status.
+     * @throws InvalidFilesystemOperationException
+     */
+    public static function getProblemSolutionExistenceImpl(
+        Problems $problem
+    ): bool {
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
+        $existingFiles = $problemArtifacts->lsTree('solutions');
+        foreach ($existingFiles as $file) {
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if ($extension !== 'markdown') {
+                continue;
+            }
+
+            $lang = pathinfo($file['name'], PATHINFO_FILENAME);
+            if (in_array($lang, self::ISO639_1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns the status for a problem solution.
      *
      * @param Problems $problem
@@ -2722,19 +2749,25 @@ class ProblemController extends Controller {
      */
     public static function getProblemSolutionStatus(
         Problems $problem,
-        Identities $userIdentity
+        Identities $identity
     ) : string {
-        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
-        $existingSolutionLanguages = [];
-        foreach (self::ISO639_1 as $lang) {
-            $sourcePath = "solutions/{$lang}.markdown";
-            if ($problemArtifacts->exists($sourcePath)) {
-                if (Authorization::canViewProblemSolution($userIdentity, $problem)) {
-                    return self::SOLUTION_UNLOCKED;
-                }
-                return self::SOLUTION_LOCKED;
-            }
+        $exists = Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SOLUTION_EXISTS,
+            "{$problem->alias}-{$problem->commit}",
+            function () use ($problem, $identity) {
+                return ProblemController::getProblemSolutionExistenceImpl(
+                    $problem,
+                    $identity
+                );
+            },
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+        if (!$exists) {
+            return self::SOLUTION_NOT_FOUND;
         }
-        return self::SOLUTION_NOT_FOUND;
+        if (Authorization::canViewProblemSolution($identity, $problem)) {
+            return self::SOLUTION_UNLOCKED;
+        }
+        return self::SOLUTION_LOCKED;
     }
 }
