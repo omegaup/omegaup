@@ -21,7 +21,7 @@ CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
+MESSAGE_WHITELIST = ('/api/grader/status/',)
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -198,3 +198,56 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
         '//*[name()="svg"]/*[contains(@class, "%s")]/*[contains(@class'
         ', "highcharts-tracker")]' % series)
     assert len(scoreboard_events) == num_elements, len(scoreboard_events)
+
+
+def create_identities_course(driver, course_alias):
+    '''Upload and create identities into the group belongs to given course'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.ID, 'nav-contests'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//li[@id = "nav-contests"]'
+                  '//a[@href = "/group/"]')))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[contains(@href, "/group/%s/edit")]' %
+                  course_alias)))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[contains(@href, "#identities")]'))).click()
+    identities_element = driver.browser.find_element_by_name('identities')
+    identities_element.send_keys(os.path.join(
+        OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//div[@class = "upload-csv"]/div/a'))).click()
+    xpath_table = '//table[starts-with(@class, "identities-table")]/tbody/tr'
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, xpath_table)))
+    identity1 = driver.browser.find_element_by_xpath('%s[1]/td/strong' %
+                                                     xpath_table).text
+    password1 = driver.browser.find_element_by_xpath('%s[1]/th' %
+                                                     xpath_table).text
+    identity2 = driver.browser.find_element_by_xpath('%s[2]/td/strong' %
+                                                     xpath_table).text
+    password2 = driver.browser.find_element_by_xpath('%s[2]/th' %
+                                                     xpath_table).text
+    create_identities_button = driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//button[starts-with(@name, "create_identities")]')))
+    create_identities_button.click()
+    message = driver.wait.until(
+        EC.visibility_of_element_located((By.ID, 'status')))
+    message_class = message.get_attribute('class')
+    assert 'success' in message_class, message_class
+    return [(identity1, password1), (identity2, password2)]
