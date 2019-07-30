@@ -888,7 +888,7 @@ class ProblemController extends Controller {
             header('Location: ' . $_SERVER['HTTP_REFERER']);
         }
 
-        self::invalidateCache($problem, $updatedStatementLanguages, Cache::PROBLEM_STATEMENT);
+        self::invalidateCache($problem, $updatedStatementLanguages);
 
         // All clear
         $response['status'] = 'ok';
@@ -920,16 +920,15 @@ class ProblemController extends Controller {
      * Updates loose file
      *
      * @param Request $r
-     * @return void
+     * @return array The problem and updated file languages
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      */
     private static function updateLooseFile(
         Request $r,
         string $directory,
-        string $contents,
-        string $cachePrefix
-    ): void {
+        string $contents
+    ): array {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
 
@@ -978,7 +977,10 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::invalidateCache($problem, $updatedFileLanguages, $cachePrefix);
+        return [
+            'problem' => $problem,
+            'updatedFileLanguages' => $updatedFileLanguages
+        ];
     }
 
     /**
@@ -991,7 +993,8 @@ class ProblemController extends Controller {
      */
     public static function apiUpdateStatement(Request $r) {
         Validators::validateStringNonEmpty($r['statement'], 'statement');
-        self::updateLooseFile($r, 'statements', $r['statement'], Cache::PROBLEM_STATEMENT);
+        $payload = self::updateLooseFile($r, 'statements', $r['statement'], Cache::PROBLEM_STATEMENT);
+        self::invalidateCache($payload['problem'], $payload['updatedFileLanguages']);
         return [
             'status' => 'ok'
         ];
@@ -1007,7 +1010,8 @@ class ProblemController extends Controller {
      */
     public static function apiUpdateSolution(Request $r) {
         Validators::validateStringNonEmpty($r['solution'], 'solution');
-        self::updateLooseFile($r, 'solutions', $r['solution'], Cache::PROBLEM_SOLUTION);
+        $payload = self::updateLooseFile($r, 'solutions', $r['solution'], Cache::PROBLEM_SOLUTION);
+        self::invalidateSolutionCache($payload['problem'], $payload['updatedFileLanguages']);
         return [
             'status' => 'ok'
         ];
@@ -1018,22 +1022,20 @@ class ProblemController extends Controller {
      * languages.
      *
      * @param Problems $problem the problem
-     * @param array $updatedLanguages the array of updated loose file languages.
-     * @param string $prefix the prefix that indicates if updated files are statements or solutions.
+     * @param array $updatedLanguages the array of updated statement file languages.
      *
      * @return void
      */
     private static function invalidateCache(
         Problems $problem,
-        array $updatedLanguages,
-        string $prefix
-    ) {
+        array $updatedLanguages
+    ): void {
         self::updateLanguages($problem);
 
         // Invalidate problem statement or solution cache
         foreach ($updatedLanguages as $lang) {
             Cache::deleteFromCache(
-                $prefix,
+                Cache::PROBLEM_STATEMENT,
                 "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
             );
         }
@@ -1041,13 +1043,31 @@ class ProblemController extends Controller {
             Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}"
         );
+    }
 
-        if ($prefix === Cache::PROBLEM_SOLUTION_EXISTS) {
+    /**
+     * Invalidates the problem solution cache
+     *
+     * @param Problems $problem the problem
+     * @param array $updatedLanguages the array of updated loose file languages.
+     *
+     * @return void
+     */
+    private static function invalidateSolutionCache(
+        Problems $problem,
+        array $updatedLanguages
+    ): void {
+        // Invalidate problem solution cache
+        foreach ($updatedLanguages as $lang) {
             Cache::deleteFromCache(
-                Cache::PROBLEM_SOLUTION_EXISTS,
-                "{$problem->alias}-{$problem->commit}"
+                Cache::PROBLEM_SOLUTION,
+                "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
             );
         }
+        Cache::deleteFromCache(
+            Cache::PROBLEM_SOLUTION_EXISTS,
+            "{$problem->alias}-{$problem->commit}"
+        );
     }
 
     /**
@@ -1880,8 +1900,7 @@ class ProblemController extends Controller {
         }
         self::invalidateCache(
             $problem,
-            array_merge($updatedStatementLanguages, ProblemController::VALID_LANGUAGES),
-            Cache::PROBLEM_STATEMENT
+            array_merge($updatedStatementLanguages, ProblemController::VALID_LANGUAGES)
         );
 
         return [
@@ -2728,7 +2747,7 @@ class ProblemController extends Controller {
      * @return bool The problem solution status.
      * @throws InvalidFilesystemOperationException
      */
-    public static function getProblemSolutionExistenceImpl(
+    private static function getProblemSolutionExistenceImpl(
         Problems $problem
     ): bool {
         $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
@@ -2747,6 +2766,21 @@ class ProblemController extends Controller {
         return false;
     }
 
+    private static function getProblemSolutionExistence(
+        Problems $problem
+    ): bool {
+        return Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SOLUTION_EXISTS,
+            "{$problem->alias}-{$problem->commit}",
+            function () use ($problem) {
+                return ProblemController::getProblemSolutionExistenceImpl(
+                    $problem
+                );
+            },
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+    }
+
     /**
      * Returns the status for a problem solution.
      *
@@ -2758,17 +2792,7 @@ class ProblemController extends Controller {
         Problems $problem,
         Identities $identity
     ) : string {
-        $exists = Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SOLUTION_EXISTS,
-            "{$problem->alias}-{$problem->commit}",
-            function () use ($problem, $identity) {
-                return ProblemController::getProblemSolutionExistenceImpl(
-                    $problem,
-                    $identity
-                );
-            },
-            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
-        );
+        $exists = self::getProblemSolutionExistence($problem);
         if (!$exists) {
             return self::SOLUTION_NOT_FOUND;
         }
