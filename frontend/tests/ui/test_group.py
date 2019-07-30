@@ -66,11 +66,11 @@ def create_group(driver, group_title, description):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//form[@class = "upload-csv-form"]/div/a'))).click()
+                 '//div[@class = "upload-csv"]/div/a'))).click()
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//form[@class = "identities-form"]/table/tbody/tr')))
+                 '//table[starts-with(@class, "identities-table")]/tbody/tr')))
         create_identities_button = driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,

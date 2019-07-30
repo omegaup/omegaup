@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-body">
-      <form class="upload-csv-form">
+      <div class="upload-csv">
         <div class="panel-heading">
           {{ T.groupsUploadCsvFile }} <input name="identities"
                type="file">
@@ -10,45 +10,44 @@
           <a class="btn btn-primary"
                v-on:click.prevent="readCsv">{{ T.groupsUploadCsvFile }}</a>
         </div>
-      </form><br>
-      <div class="panel panel-default no-bottom-margin">
-        <form class="identities-form">
-          <div class="panel-heading">
-            <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
-          </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{{ T.profileUsername }}</th>
-                <th>{{ T.profile }}</th>
-                <th>{{ T.loginPassword }}</th>
-                <th>{{ T.profileCountry }}</th>
-                <th>{{ T.profileState }}</th>
-                <th>{{ T.wordsGender }}</th>
-                <th>{{ T.profileSchool }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="identity in identities">
-                <td><strong>{{ identity.username }}</strong></td>
-                <td>{{ identity.name }}</td>
-                <th>{{ identity.password }}</th>
-                <td>{{ identity.country_id }}</td>
-                <td>{{ identity.state_id }}</td>
-                <td>{{ identity.gender }}</td>
-                <td>{{ identity.school_name }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="panel-heading">
-            <button class="btn btn-primary"
-                 name="create_identities"
-                 v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
-          </div>
-          <div>
-            {{ T.groupsIdentityWarning }}
-          </div>
-        </form>
+      </div><br>
+      <div class="panel panel-default no-bottom-margin"
+           v-show="identities.length &gt; 0">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
+        </div>
+        <table class="identities-table table">
+          <thead>
+            <tr>
+              <th>{{ T.profileUsername }}</th>
+              <th>{{ T.profile }}</th>
+              <th>{{ T.loginPassword }}</th>
+              <th>{{ T.profileCountry }}</th>
+              <th>{{ T.profileState }}</th>
+              <th>{{ T.wordsGender }}</th>
+              <th>{{ T.profileSchool }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="identity in identities">
+              <td><strong>{{ identity.username }}</strong></td>
+              <td>{{ identity.name }}</td>
+              <th>{{ identity.password }}</th>
+              <td>{{ identity.country_id }}</td>
+              <td>{{ identity.state_id }}</td>
+              <td>{{ identity.gender }}</td>
+              <td>{{ identity.school_name }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="panel-heading">
+          <button class="btn btn-primary"
+               name="create_identities"
+               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
+        </div>
+        <div>
+          {{ T.groupsIdentityWarning }}
+        </div>
       </div>
     </div>
   </div>
