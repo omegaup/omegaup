@@ -90,7 +90,14 @@ class UserController extends Controller {
                 'username' => $r['username'],
                 'password' => $hashedPassword
             ]);
-            UsersDAO::savePassword($user);
+            try {
+                UsersDAO::savePassword($user);
+            } catch (Exception $e) {
+                if (DAO::isDuplicateEntryException($e)) {
+                    throw new DuplicatedEntryInDatabaseException('usernameInUse');
+                }
+                throw new InvalidDatabaseOperationException($e);
+            }
 
             return [
                 'status' => 'ok',
@@ -2000,9 +2007,8 @@ class UserController extends Controller {
         } catch (Exception $e) {
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('mailInUse');
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw new InvalidDatabaseOperationException($e);
         }
 
         // Delete profile cache
