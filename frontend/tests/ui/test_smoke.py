@@ -45,7 +45,7 @@ def test_login(driver):
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 
-    problem_alias = 'unittest_problem_%s' % driver.generate_id()
+    problem_alias = 'ut_problem_%s' % driver.generate_id()
     create_problem(driver, problem_alias)
 
     with driver.login_user():

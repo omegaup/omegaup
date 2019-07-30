@@ -87,6 +87,9 @@ def test_create_identities_for_course(driver):
     school_name = 'ut_rank_school_%s' % run_id
     assignment_alias = 'ut_rank_hw_%s' % run_id
     problem = 'sumas'
+    username = 'ut_user_%s' % driver.generate_id()
+    password = 'p@ssw0rd'
+    driver.register_user(username, password)
 
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
@@ -94,6 +97,7 @@ def test_create_identities_for_course(driver):
         add_problem_to_assignment(driver, assignment_alias, problem)
         identities = util.create_identities_course(driver, course_alias)
         (unassociated_identity, unassociated_password) = identities[0]
+        (associated_identity, associated_password) = identities[1]
 
     with driver.login(unassociated_identity, unassociated_password):
         enter_course(driver, course_alias, assignment_alias)
@@ -114,6 +118,46 @@ def test_create_identities_for_course(driver):
 
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
+
+    with driver.login(username, password):
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'nav-user'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-user"]'
+                      '//a[@href = "/profile/"]')))).click()
+
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, ('//a[@href = "/profile/edit/"]')))).click()
+
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[contains(@class, "username-input")]'
+                 ))).send_keys(associated_identity)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[contains(@class, "password-input")]'
+                 ))).send_keys(associated_password)
+
+        associate_identity_button = driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//form[contains(@class, "add-identity-form")]/div/button')))
+        associate_identity_button.click()
+
+        associated_identities = driver.browser.find_element_by_xpath(
+            '//tr/td[text()="%s"]' % (associated_identity))
+        assert associated_identities is not None, 'No identity matches'
+
+    with driver.login(associated_identity, associated_password):
+        enter_course(driver, course_alias, assignment_alias)
 
 
 def enter_course_assignments_page(driver, course_alias):
