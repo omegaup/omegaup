@@ -920,7 +920,7 @@ class ProblemController extends Controller {
      * Updates loose file
      *
      * @param Request $r
-     * @return array The problem and updated file languages
+     * @return array The updated file languages
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      */
@@ -929,13 +929,7 @@ class ProblemController extends Controller {
         string $directory,
         string $contents
     ): array {
-        self::authenticateRequest($r);
-        self::validateCreateOrUpdate($r, true);
-
-        $problem = $r['problem'];
-
         Validators::validateStringNonEmpty($r['message'], 'message');
-
         // Check that lang is in the ISO 639-1 code list, default is "es".
         Validators::validateInEnum($r['lang'], 'lang', ProblemController::ISO639_1, false /* is_required */);
         if (is_null($r['lang'])) {
@@ -946,6 +940,7 @@ class ProblemController extends Controller {
             $updatePublished = $r['update_published'];
         }
 
+        $problem = $r['problem'];
         $updatedFileLanguages = [];
         try {
             $problemDeployer = new ProblemDeployer($r['problem_alias']);
@@ -977,10 +972,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        return [
-            'problem' => $problem,
-            'updatedFileLanguages' => $updatedFileLanguages
-        ];
+        return $updatedFileLanguages;
     }
 
     /**
@@ -992,9 +984,11 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateStatement(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['statement'], 'statement');
-        $payload = self::updateLooseFile($r, 'statements', $r['statement'], Cache::PROBLEM_STATEMENT);
-        self::invalidateCache($payload['problem'], $payload['updatedFileLanguages']);
+        $updatedFileLanguages = self::updateLooseFile($r, 'statements', $r['statement']);
+        self::invalidateCache($r['problem'], $updatedFileLanguages);
         return [
             'status' => 'ok'
         ];
@@ -1009,9 +1003,11 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateSolution(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['solution'], 'solution');
-        $payload = self::updateLooseFile($r, 'solutions', $r['solution'], Cache::PROBLEM_SOLUTION);
-        self::invalidateSolutionCache($payload['problem'], $payload['updatedFileLanguages']);
+        $updatedFileLanguages = self::updateLooseFile($r, 'solutions', $r['solution']);
+        self::invalidateSolutionCache($r['problem'], $updatedFileLanguages);
         return [
             'status' => 'ok'
         ];
@@ -2741,7 +2737,7 @@ class ProblemController extends Controller {
     }
 
     /**
-     * Gets the problem solution existence status (0 = not_found, 1 = found)
+     * Returns true if the problem's solution exists, otherwise returns false.
      *
      * @param Problems $problem The problem object.
      * @return bool The problem solution status.
