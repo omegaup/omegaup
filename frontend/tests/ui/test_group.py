@@ -70,11 +70,11 @@ def create_group(driver, group_title, description):
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//table[starts-with(@class, "identities-table")]/tbody/tr')))
+                 '//table[contains(@class, "identities-table")]/tbody/tr')))
         create_identities_button = driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//button[starts-with(@name, "create_identities")]')))
+                 '//button[contains(@name, "create_identities")]')))
         create_identities_button.click()
         message = driver.wait.until(
             EC.visibility_of_element_located((By.ID, 'status')))
