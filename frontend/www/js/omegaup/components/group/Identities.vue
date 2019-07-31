@@ -30,9 +30,9 @@
           </thead>
           <tbody>
             <tr v-for="identity in identities">
-              <td><strong>{{ identity.username }}</strong></td>
+              <td class="username"><strong>{{ identity.username }}</strong></td>
               <td>{{ identity.name }}</td>
-              <th>{{ identity.password }}</th>
+              <td class="password">{{ identity.password }}</td>
               <td>{{ identity.country_id }}</td>
               <td>{{ identity.state_id }}</td>
               <td>{{ identity.gender }}</td>
@@ -42,7 +42,7 @@
         </table>
         <div class="panel-heading">
           <button class="btn btn-primary"
-               name="create_identities"
+               name="create-identities"
                v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
         </div>
         <div>

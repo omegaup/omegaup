@@ -200,7 +200,7 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
     assert len(scoreboard_events) == num_elements, len(scoreboard_events)
 
 
-def create_identities_course(driver, course_alias):
+def add_identities_course(driver, course_alias):
     '''Upload and create identities into the group belongs to given course'''
 
     driver.wait.until(
@@ -216,7 +216,7 @@ def create_identities_course(driver, course_alias):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//a[contains(@href, "/group/%s/edit")]' %
+                 ('//a[contains(@href, "/group/%s/edit/")]' %
                   course_alias)))).click()
 
     driver.wait.until(
@@ -228,26 +228,28 @@ def create_identities_course(driver, course_alias):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
-             '//div[@class = "upload-csv"]/div/a'))).click()
-    xpath_table = '//table[starts-with(@class, "identities-table")]/tbody/tr'
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH, xpath_table)))
-    identity1 = driver.browser.find_element_by_xpath('%s[1]/td/strong' %
-                                                     xpath_table).text
-    password1 = driver.browser.find_element_by_xpath('%s[1]/th' %
-                                                     xpath_table).text
-    identity2 = driver.browser.find_element_by_xpath('%s[2]/td/strong' %
-                                                     xpath_table).text
-    password2 = driver.browser.find_element_by_xpath('%s[2]/th' %
-                                                     xpath_table).text
+             '//div[contains(concat(" ", normalize-space(@class), " "), '
+             '" upload-csv ")]/div/a'))).click()
+
+    usernames_webdriver_elements = driver.browser.find_elements_by_xpath(
+        '//td[contains(concat(" ", normalize-space(@class), " "), " username "'
+        ')]/strong')
+    passwords_webdriver_elements = driver.browser.find_elements_by_xpath(
+        '//td[contains(concat(" ", normalize-space(@class), " "), " password "'
+        ')]')
+    usernames = [username.text for username in usernames_webdriver_elements]
+    passwords = [password.text for password in passwords_webdriver_elements]
+
+    identities = zip(usernames, passwords)
+
     create_identities_button = driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
-             '//button[starts-with(@name, "create_identities")]')))
+             '//button[starts-with(@name, "create-identities")]')))
     create_identities_button.click()
     message = driver.wait.until(
         EC.visibility_of_element_located((By.ID, 'status')))
     message_class = message.get_attribute('class')
     assert 'success' in message_class, message_class
-    return [(identity1, password1), (identity2, password2)]
+
+    return identities

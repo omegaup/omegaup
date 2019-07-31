@@ -91,15 +91,20 @@ def test_create_identities_for_course(driver):
     password = 'p@ssw0rd'
     driver.register_user(username, password)
 
+    # Admin creates a course with one assignment and one problem, and then
+    # creates some identities associated with the course group
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
-        identities = util.create_identities_course(driver, course_alias)
-        (unassociated_identity, unassociated_password) = identities[0]
-        (associated_identity, associated_password) = identities[1]
+        unassoc, assoc, _, _, _ = util.add_identities_course(driver,
+                                                             course_alias)
 
-    with driver.login(unassociated_identity, unassociated_password):
+        (associated_username, associated_password) = assoc
+
+    # Unassociated identity joins the course which it was created for and
+    # creates a new run
+    with driver.login(unassoc[0], unassoc[1]):
         enter_course(driver, course_alias, assignment_alias)
 
         driver.wait.until(
@@ -119,6 +124,7 @@ def test_create_identities_for_course(driver):
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
 
+    # Registred user associates a new identity
     with driver.login(username, password):
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -138,25 +144,27 @@ def test_create_identities_for_course(driver):
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//input[contains(@class, "username-input")]'
-                 ))).send_keys(associated_identity)
+                 '//input[contains(concat(" ", normalize-space(@class), " "), '
+                 '" username-input ")]'))).send_keys(associated_username)
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//input[contains(@class, "password-input")]'
+                 '//input[contains(concat(" ", normalize-space(@class), " "), '
+                 '" password-input ")]'
                  ))).send_keys(associated_password)
 
-        associate_identity_button = driver.wait.until(
+        driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//form[contains(@class, "add-identity-form")]/div/button')))
-        associate_identity_button.click()
+                 '//form[contains(concat(" ", normalize-space(@class), " "), '
+                 '" add-identity-form ")]/div/button'))).click()
 
         associated_identities = driver.browser.find_element_by_xpath(
-            '//tr/td[text()="%s"]' % (associated_identity))
+            '//tr/td[text() = "%s"]' % (associated_username))
         assert associated_identities is not None, 'No identity matches'
 
-    with driver.login(associated_identity, associated_password):
+    # The new associated identity joins the course
+    with driver.login(associated_username, associated_password):
         enter_course(driver, course_alias, assignment_alias)
 
 
