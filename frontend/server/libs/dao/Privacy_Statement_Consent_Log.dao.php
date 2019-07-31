@@ -23,7 +23,14 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
         return $conn->GetOne($sql, [$identity_id, $privacystatement_id]) > 0;
     }
 
-    public static function saveLog($identity_id, $privacystatement_id) {
+    /**
+     * Saves the user's consent into the database.
+     *
+     * @param int $identityId the identity of the user giving consent.
+     * @param int $privacyStatementId the id of the privacy statement.
+     * @return the ID of the newly inserted consent.
+     */
+    public static function saveLog(int $identityId, int $privacyStatementId) : int {
         $sql = 'INSERT INTO
                   PrivacyStatement_Consent_Log (
                     `identity_id`,
@@ -31,13 +38,19 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
                   )
                 VALUES
                   (?, ?)';
-        $params = [$identity_id, $privacystatement_id];
         global $conn;
-        $conn->Execute($sql, $params);
+        $conn->Execute($sql, [$identityId, $privacyStatementId]);
         return $conn->Insert_ID();
     }
 
-    public static function getId($identity_id, $privacystatement_id) {
+    /**
+     * Gets the user's consent ID from the database.
+     *
+     * @param int $identityId the identity of the user giving consent.
+     * @param int $privacyStatementId the id of the privacy statement.
+     * @return the ID of the consent, null if missing.
+     */
+    public static function getId(int $identityId, int $privacyStatementId) : ?int {
         $sql = 'SELECT
                   `privacystatement_consent_id`
                 FROM
@@ -49,6 +62,6 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
                   privacystatement_id DESC
                 LIMIT 1';
         global $conn;
-        return $conn->GetOne($sql, [$identity_id, $privacystatement_id]);
+        return $conn->GetOne($sql, [$identityId, $privacyStatementId]);
     }
 }
