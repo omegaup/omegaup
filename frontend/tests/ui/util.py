@@ -11,6 +11,7 @@ import functools
 import re
 import sys
 import traceback
+import collections
 
 from urllib.parse import urlparse
 from selenium.webdriver.common.by import By
@@ -231,16 +232,18 @@ def add_identities_course(driver, course_alias):
              '//div[contains(concat(" ", normalize-space(@class), " "), '
              '" upload-csv ")]/div/a'))).click()
 
-    usernames_webdriver_elements = driver.browser.find_elements_by_xpath(
-        '//td[contains(concat(" ", normalize-space(@class), " "), " username "'
-        ')]/strong')
-    passwords_webdriver_elements = driver.browser.find_elements_by_xpath(
-        '//td[contains(concat(" ", normalize-space(@class), " "), " password "'
-        ')]')
-    usernames = [username.text for username in usernames_webdriver_elements]
-    passwords = [password.text for password in passwords_webdriver_elements]
-
-    identities = zip(usernames, passwords)
+    username_elements = driver.browser.find_elements_by_xpath(
+        '//table[contains(concat(" ", normalize-space(@class), " "), " '
+        'identities-table ")]/tbody/tr/td[contains(concat(" ", '
+        'normalize-space(@class), " "), " username ")]/strong')
+    password_elements = driver.browser.find_elements_by_xpath(
+        '//table[contains(concat(" ", normalize-space(@class), " "), " '
+        'identities-table ")]/tbody/tr/td[contains(concat(" ", '
+        'normalize-space(@class), " "), " password ")]')
+    usernames = [username.text for username in username_elements]
+    passwords = [password.text for password in password_elements]
+    Identity = collections.namedtuple('Identity', ['username', 'password'])
+    identities = [Identity(*x) for x in zip(usernames, passwords)]
 
     create_identities_button = driver.wait.until(
         EC.element_to_be_clickable(

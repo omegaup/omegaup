@@ -97,14 +97,12 @@ def test_create_identities_for_course(driver):
         create_course(driver, course_alias, school_name)
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
-        unassoc, assoc, _, _, _ = util.add_identities_course(driver,
-                                                             course_alias)
-
-        (associated_username, associated_password) = assoc
+        unassociated, associated = util.add_identities_course(driver,
+                                                              course_alias)[:2]
 
     # Unassociated identity joins the course which it was created for and
     # creates a new run
-    with driver.login(unassoc[0], unassoc[1]):
+    with driver.login(unassociated.username, unassociated.password):
         enter_course(driver, course_alias, assignment_alias)
 
         driver.wait.until(
@@ -145,13 +143,13 @@ def test_create_identities_for_course(driver):
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '//input[contains(concat(" ", normalize-space(@class), " "), '
-                 '" username-input ")]'))).send_keys(associated_username)
+                 '" username-input ")]'))).send_keys(associated.username)
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '//input[contains(concat(" ", normalize-space(@class), " "), '
                  '" password-input ")]'
-                 ))).send_keys(associated_password)
+                 ))).send_keys(associated.password)
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -160,11 +158,11 @@ def test_create_identities_for_course(driver):
                  '" add-identity-form ")]/div/button'))).click()
 
         associated_identities = driver.browser.find_element_by_xpath(
-            '//tr/td[text() = "%s"]' % (associated_username))
+            '//tr/td[text() = "%s"]' % (associated.username))
         assert associated_identities is not None, 'No identity matches'
 
     # The new associated identity joins the course
-    with driver.login(associated_username, associated_password):
+    with driver.login(associated.username, associated.password):
         enter_course(driver, course_alias, assignment_alias)
 
 
