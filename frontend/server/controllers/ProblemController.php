@@ -926,6 +926,7 @@ class ProblemController extends Controller {
      */
     private static function updateLooseFile(
         Request $r,
+        Problems $problem,
         string $directory,
         string $contents
     ): array {
@@ -940,7 +941,6 @@ class ProblemController extends Controller {
             $updatePublished = $r['update_published'];
         }
 
-        $problem = $r['problem'];
         $updatedFileLanguages = [];
         try {
             $problemDeployer = new ProblemDeployer($r['problem_alias']);
@@ -987,7 +987,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['statement'], 'statement');
-        $updatedFileLanguages = self::updateLooseFile($r, 'statements', $r['statement']);
+        $updatedFileLanguages = self::updateLooseFile($r, $r['problem'], 'statements', $r['statement']);
         self::invalidateCache($r['problem'], $updatedFileLanguages);
         return [
             'status' => 'ok'
@@ -1006,7 +1006,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['solution'], 'solution');
-        $updatedFileLanguages = self::updateLooseFile($r, 'solutions', $r['solution']);
+        $updatedFileLanguages = self::updateLooseFile($r, $r['problem'], 'solutions', $r['solution']);
         self::invalidateSolutionCache($r['problem'], $updatedFileLanguages);
         return [
             'status' => 'ok'
