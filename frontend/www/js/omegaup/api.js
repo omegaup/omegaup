@@ -292,13 +292,9 @@ export default {
     listCourses: _call('/api/course/listCourses/',
                        function(result) {
                          for (var i = 0; i < result.admin.length; ++i) {
-                           result.admin[i].unix_finish_time =
-                               result.admin[i].finish_time * 1000;
                            omegaup.OmegaUp.convertTimes(result.admin[i]);
                          }
                          for (var i = 0; i < result.student.length; ++i) {
-                           result.student[i].unix_finish_time =
-                               result.student[i].finish_time * 1000;
                            omegaup.OmegaUp.convertTimes(result.student[i]);
                          }
                          return result;

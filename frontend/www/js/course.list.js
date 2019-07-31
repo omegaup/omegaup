@@ -13,7 +13,7 @@ omegaup.OmegaUp.on('ready', function() {
       course.submissionsListUrl = '/course/' + course.alias + '/list/';
       course.submissionsList = omegaup.T.courseListSubmissionsByGroup;
       course.activity = omegaup.T.wordsActivityReport;
-      if (course.unix_finish_time > Date.now()) {
+      if (course.finish_time.getTime() > Date.now()) {
         current.push(course);
       } else {
         past.push(course);
