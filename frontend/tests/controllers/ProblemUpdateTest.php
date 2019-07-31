@@ -299,6 +299,33 @@ class UpdateProblemTest extends OmegaupTestCase {
     }
 
     /**
+     * Test apiUpdateSolution
+     */
+    public function testProblemSolutionUpdate() {
+        $problemData = ProblemsFactory::createProblem();
+
+        // Update solution
+        $solution = 'La nueva solución \$x\$';
+        $login = self::login($problemData['author']);
+        $response = ProblemController::apiUpdateSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'message' => 'Solution modified for test.',
+            'solution' => $solution
+        ]));
+
+        $this->assertEquals($response['status'], 'ok');
+
+        // Check solution contents
+        $response = ProblemController::apiSolution(new Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+
+        $this->assertContains($solution, $response['solution']['markdown']);
+    }
+
+    /**
      * Test apiUpdateStatement with embedded imgs via data URI
      */
     public function testProblemStatementUpdateWithImagesAsDataURI() {
@@ -620,7 +647,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Ban the problem.
         $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
-        ProblemsDAO::save($problem);
+        ProblemsDAO::update($problem);
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
@@ -660,7 +687,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Promote the problem.
         $problem->visibility = ProblemController::VISIBILITY_PROMOTED;
-        ProblemsDAO::save($problem);
+        ProblemsDAO::update($problem);
 
         ProblemController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,

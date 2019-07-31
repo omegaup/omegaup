@@ -15,6 +15,13 @@
  * @access public
  */
 class ProblemOfTheWeek extends VO {
+    const FIELD_NAMES = [
+        'problem_of_the_week_id' => true,
+        'problem_id' => true,
+        'time' => true,
+        'difficulty' => true,
+    ];
+
     /**
      * Constructor de ProblemOfTheWeek
      *
@@ -22,9 +29,13 @@ class ProblemOfTheWeek extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_of_the_week_id'])) {
             $this->problem_of_the_week_id = (int)$data['problem_of_the_week_id'];
@@ -43,7 +54,7 @@ class ProblemOfTheWeek extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -56,28 +67,28 @@ class ProblemOfTheWeek extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problem_of_the_week_id;
 
     /**
       * El id del problema escogido como problema de la semana.
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problem_id;
 
     /**
       * El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.
       * @access public
-      * @var date
-      */
-    public $time;
+      * @var string
+     */
+    public $time = '2000-01-01';
 
     /**
       * En algún momento tendremos un problema fácil y uno difícil.
       * @access public
-      * @var enum('easy','hard')
-      */
+      * @var string
+     */
     public $difficulty;
 }

@@ -33,8 +33,11 @@ abstract class GroupsIdentitiesDAOBase {
      * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(GroupsIdentities $Groups_Identities) {
-        if (is_null(self::getByPK($Groups_Identities->group_id, $Groups_Identities->identity_id))) {
+    final public static function save(GroupsIdentities $Groups_Identities) : int {
+        if (is_null($Groups_Identities->group_id) ||
+            is_null($Groups_Identities->identity_id) ||
+            is_null(self::getByPK($Groups_Identities->group_id, $Groups_Identities->identity_id))
+        ) {
             return GroupsIdentitiesDAOBase::create($Groups_Identities);
         }
         return GroupsIdentitiesDAOBase::update($Groups_Identities);
@@ -47,14 +50,14 @@ abstract class GroupsIdentitiesDAOBase {
      * @return Filas afectadas
      * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a actualizar.
      */
-    final public static function update(GroupsIdentities $Groups_Identities) {
+    final public static function update(GroupsIdentities $Groups_Identities) : int {
         $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ?, `privacystatement_consent_id` = ?, `accept_teacher` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
         $params = [
             is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
             is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,
-            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
-            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
+            (int)$Groups_Identities->group_id,
+            (int)$Groups_Identities->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -70,10 +73,7 @@ abstract class GroupsIdentitiesDAOBase {
      * @static
      * @return @link GroupsIdentities Un objeto del tipo {@link GroupsIdentities}. NULL si no hay tal registro.
      */
-    final public static function getByPK($group_id, $identity_id) {
-        if (is_null($group_id) || is_null($identity_id)) {
-            return null;
-        }
+    final public static function getByPK(int $group_id, int $identity_id) : ?GroupsIdentities {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$group_id, $identity_id];
         global $conn;
@@ -100,7 +100,7 @@ abstract class GroupsIdentitiesDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a eliminar
      */
-    final public static function delete(GroupsIdentities $Groups_Identities) {
+    final public static function delete(GroupsIdentities $Groups_Identities) : void {
         $sql = 'DELETE FROM `Groups_Identities` WHERE group_id = ? AND identity_id = ?;';
         $params = [$Groups_Identities->group_id, $Groups_Identities->identity_id];
         global $conn;
@@ -128,7 +128,12 @@ abstract class GroupsIdentitiesDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link GroupsIdentities}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` from Groups_Identities';
         global $conn;
         if (!is_null($orden)) {
@@ -154,22 +159,22 @@ abstract class GroupsIdentitiesDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param GroupsIdentities [$Groups_Identities] El objeto de tipo GroupsIdentities a crear.
      */
-    final public static function create(GroupsIdentities $Groups_Identities) {
+    final public static function create(GroupsIdentities $Groups_Identities) : int {
         $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
-            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
+            (int)$Groups_Identities->group_id,
+            (int)$Groups_Identities->identity_id,
             is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
             is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

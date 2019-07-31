@@ -15,6 +15,11 @@
  * @access public
  */
 class Countries extends VO {
+    const FIELD_NAMES = [
+        'country_id' => true,
+        'name' => true,
+    ];
+
     /**
      * Constructor de Countries
      *
@@ -22,9 +27,13 @@ class Countries extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['country_id'])) {
             $this->country_id = $data['country_id'];
@@ -37,7 +46,7 @@ class Countries extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -49,14 +58,14 @@ class Countries extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var char(3)
-      */
+      * @var string
+     */
     public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $name;
 }

@@ -143,12 +143,12 @@ class Utils {
 
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
-            SubmissionsDAO::save($submission);
+            SubmissionsDAO::update($submission);
             $run->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
         }
 
-        RunsDAO::save($run);
+        RunsDAO::update($run);
 
         Grader::getInstance()->setGraderResourceForTesting(
             $run,
@@ -183,7 +183,7 @@ class Utils {
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));
-        ACLsDAO::save(new ACLs([
+        ACLsDAO::create(new ACLs([
             'acl_id' => Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,
         ]));

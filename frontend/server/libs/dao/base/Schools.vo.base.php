@@ -15,6 +15,13 @@
  * @access public
  */
 class Schools extends VO {
+    const FIELD_NAMES = [
+        'school_id' => true,
+        'country_id' => true,
+        'state_id' => true,
+        'name' => true,
+    ];
+
     /**
      * Constructor de Schools
      *
@@ -22,9 +29,13 @@ class Schools extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['school_id'])) {
             $this->school_id = (int)$data['school_id'];
@@ -43,7 +54,7 @@ class Schools extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -56,28 +67,28 @@ class Schools extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $school_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $country_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(3)
-      */
+      * @var ?string
+     */
     public $state_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(128)
-      */
+      * @var string
+     */
     public $name;
 }

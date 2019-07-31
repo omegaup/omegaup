@@ -15,6 +15,15 @@
  * @access public
  */
 class ProblemsetIdentityRequestHistory extends VO {
+    const FIELD_NAMES = [
+        'history_id' => true,
+        'identity_id' => true,
+        'problemset_id' => true,
+        'time' => true,
+        'accepted' => true,
+        'admin_id' => true,
+    ];
+
     /**
      * Constructor de ProblemsetIdentityRequestHistory
      *
@@ -22,9 +31,13 @@ class ProblemsetIdentityRequestHistory extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['history_id'])) {
             $this->history_id = (int)$data['history_id'];
@@ -39,7 +52,7 @@ class ProblemsetIdentityRequestHistory extends VO {
             $this->time = $data['time'];
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'] == '1';
+            $this->accepted = boolval($data['accepted']);
         }
         if (isset($data['admin_id'])) {
             $this->admin_id = (int)$data['admin_id'];
@@ -49,7 +62,7 @@ class ProblemsetIdentityRequestHistory extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -62,42 +75,42 @@ class ProblemsetIdentityRequestHistory extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $history_id;
 
     /**
       * Identidad del usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $identity_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(4)
-      */
+      * @var bool
+     */
     public $accepted;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $admin_id;
 }

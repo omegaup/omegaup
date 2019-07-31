@@ -9,26 +9,21 @@ class IdentityController extends Controller {
     /**
      * Given a username or a email, returns the identity object
      *
-     * @param type $userOrEmail
-     * @return Identity
+     * @param ?string $userOrEmail
+     * @return Identities
      * @throws ApiException
      */
-    public static function resolveIdentity($userOrEmail) {
+    public static function resolveIdentity(?string $userOrEmail) : Identities {
         Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
-        try {
-            $identity = IdentitiesDAO::FindByEmail($userOrEmail);
-            if (!is_null($identity)) {
-                return $identity;
-            }
-
-            $identity = IdentitiesDAO::findByUsername($userOrEmail);
-            if (!is_null($identity)) {
-                return $identity;
-            }
-            throw new NotFoundException('userOrMailNotFound');
-        } catch (ApiException $apiException) {
-            throw $apiException;
+        $identity = IdentitiesDAO::findByUsername($userOrEmail);
+        if (!is_null($identity)) {
+            return $identity;
         }
+        $identity = IdentitiesDAO::FindByEmail($userOrEmail);
+        if (!is_null($identity)) {
+            return $identity;
+        }
+        throw new NotFoundException('userOrMailNotFound');
     }
 
     /**
@@ -46,7 +41,7 @@ class IdentityController extends Controller {
             throw new LoginDisabledException('loginThroughThirdParty');
         }
 
-        if (strlen($identity->password) === 0) {
+        if (empty($identity->password)) {
             throw new LoginDisabledException('loginDisabled');
         }
 
@@ -197,9 +192,9 @@ class IdentityController extends Controller {
      */
     private static function saveIdentityGroup(Identities $identity, $groupId) {
         try {
-            IdentitiesDAO::save($identity);
+            IdentitiesDAO::create($identity);
 
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $groupId,
                 'identity_id' => $identity->identity_id,
             ]));
@@ -240,7 +235,7 @@ class IdentityController extends Controller {
         $identity->identity_id = $originalIdentity->identity_id;
 
         // Save in DB
-        IdentitiesDAO::save($identity);
+        IdentitiesDAO::update($identity);
 
         Cache::deleteFromCache(Cache::USER_PROFILE, $identity->username);
 
@@ -269,7 +264,7 @@ class IdentityController extends Controller {
         // Save object into DB
         try {
             // Update password
-            IdentitiesDAO::save($identity);
+            IdentitiesDAO::update($identity);
         } catch (ApiException $e) {
             throw $e;
         }
@@ -370,20 +365,15 @@ class IdentityController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'Identity');
         }
 
-        $response = [];
-
-        Cache::getFromCacheOrSet(
+        $response = Cache::getFromCacheOrSet(
             Cache::USER_PROFILE,
             $identity->username,
-            [$identity, $user],
-            function (array $params) {
-                [$identity, $user] = $params;
+            function () use ($identity, $user) {
                 if (!is_null($user)) {
                     return UserController::getProfileImpl($user, $identity);
                 }
                 return IdentityController::getProfileImpl($identity);
-            },
-            $response
+            }
         );
 
         if ($omitRank) {

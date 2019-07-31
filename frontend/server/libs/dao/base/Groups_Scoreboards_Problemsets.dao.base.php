@@ -33,8 +33,11 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) {
-        if (is_null(self::getByPK($Groups_Scoreboards_Problemsets->group_scoreboard_id, $Groups_Scoreboards_Problemsets->problemset_id))) {
+    final public static function save(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
+        if (is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ||
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ||
+            is_null(self::getByPK($Groups_Scoreboards_Problemsets->group_scoreboard_id, $Groups_Scoreboards_Problemsets->problemset_id))
+        ) {
             return GroupsScoreboardsProblemsetsDAOBase::create($Groups_Scoreboards_Problemsets);
         }
         return GroupsScoreboardsProblemsetsDAOBase::update($Groups_Scoreboards_Problemsets);
@@ -47,13 +50,13 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @return Filas afectadas
      * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets a actualizar.
      */
-    final public static function update(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) {
+    final public static function update(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
         $sql = 'UPDATE `Groups_Scoreboards_Problemsets` SET `only_ac` = ?, `weight` = ? WHERE `group_scoreboard_id` = ? AND `problemset_id` = ?;';
         $params = [
-            is_null($Groups_Scoreboards_Problemsets->only_ac) ? null : (int)$Groups_Scoreboards_Problemsets->only_ac,
-            is_null($Groups_Scoreboards_Problemsets->weight) ? null : (int)$Groups_Scoreboards_Problemsets->weight,
-            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            (int)$Groups_Scoreboards_Problemsets->only_ac,
+            (int)$Groups_Scoreboards_Problemsets->weight,
+            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            (int)$Groups_Scoreboards_Problemsets->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -69,10 +72,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @static
      * @return @link GroupsScoreboardsProblemsets Un objeto del tipo {@link GroupsScoreboardsProblemsets}. NULL si no hay tal registro.
      */
-    final public static function getByPK($group_scoreboard_id, $problemset_id) {
-        if (is_null($group_scoreboard_id) || is_null($problemset_id)) {
-            return null;
-        }
+    final public static function getByPK(int $group_scoreboard_id, int $problemset_id) : ?GroupsScoreboardsProblemsets {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` FROM Groups_Scoreboards_Problemsets WHERE (group_scoreboard_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id, $problemset_id];
         global $conn;
@@ -99,7 +99,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets a eliminar
      */
-    final public static function delete(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) {
+    final public static function delete(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : void {
         $sql = 'DELETE FROM `Groups_Scoreboards_Problemsets` WHERE group_scoreboard_id = ? AND problemset_id = ?;';
         $params = [$Groups_Scoreboards_Problemsets->group_scoreboard_id, $Groups_Scoreboards_Problemsets->problemset_id];
         global $conn;
@@ -127,7 +127,12 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link GroupsScoreboardsProblemsets}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` from Groups_Scoreboards_Problemsets';
         global $conn;
         if (!is_null($orden)) {
@@ -153,7 +158,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets a crear.
      */
-    final public static function create(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) {
+    final public static function create(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
         if (is_null($Groups_Scoreboards_Problemsets->only_ac)) {
             $Groups_Scoreboards_Problemsets->only_ac = false;
         }
@@ -162,18 +167,18 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
         }
         $sql = 'INSERT INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
-            is_null($Groups_Scoreboards_Problemsets->only_ac) ? null : (int)$Groups_Scoreboards_Problemsets->only_ac,
-            is_null($Groups_Scoreboards_Problemsets->weight) ? null : (int)$Groups_Scoreboards_Problemsets->weight,
+            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            (int)$Groups_Scoreboards_Problemsets->only_ac,
+            (int)$Groups_Scoreboards_Problemsets->weight,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

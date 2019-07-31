@@ -13,10 +13,7 @@ class AuthorizationController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $identity = IdentityController::resolveIdentity($r['username']);
-        if (is_null($identity)) {
-            throw new NotFoundException('userOrMailNotFound');
-        }
+        $resolvedIdentity = IdentityController::resolveIdentity($r['username']);
 
         try {
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -28,11 +25,11 @@ class AuthorizationController extends Controller {
             throw new NotFoundException('problemNotFound');
         }
 
-        $isAdmin = Authorization::isProblemAdmin($identity, $problem);
-        $canEdit = $isAdmin || Authorization::canEditProblem($identity, $problem);
+        $isAdmin = Authorization::isProblemAdmin($resolvedIdentity, $problem);
+        $canEdit = $isAdmin || Authorization::canEditProblem($resolvedIdentity, $problem);
         return [
             'status' => 'ok',
-            'has_solved' => ProblemsDAO::isProblemSolved($problem, $identity->identity_id),
+            'has_solved' => ProblemsDAO::isProblemSolved($problem, $resolvedIdentity->identity_id),
             'is_admin' => $isAdmin,
             'can_view' => $canEdit || ProblemsDAO::isVisible($problem),
             'can_edit' => $canEdit,

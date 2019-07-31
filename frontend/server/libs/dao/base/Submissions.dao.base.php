@@ -33,8 +33,10 @@ abstract class SubmissionsDAOBase {
      * @param Submissions [$Submissions] El objeto de tipo Submissions
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Submissions $Submissions) {
-        if (is_null(self::getByPK($Submissions->submission_id))) {
+    final public static function save(Submissions $Submissions) : int {
+        if (is_null($Submissions->submission_id) ||
+            is_null(self::getByPK($Submissions->submission_id))
+        ) {
             return SubmissionsDAOBase::create($Submissions);
         }
         return SubmissionsDAOBase::update($Submissions);
@@ -47,19 +49,19 @@ abstract class SubmissionsDAOBase {
      * @return Filas afectadas
      * @param Submissions [$Submissions] El objeto de tipo Submissions a actualizar.
      */
-    final public static function update(Submissions $Submissions) {
+    final public static function update(Submissions $Submissions) : int {
         $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
         $params = [
             is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
-            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
-            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
+            (int)$Submissions->identity_id,
+            (int)$Submissions->problem_id,
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
             $Submissions->time,
-            is_null($Submissions->submit_delay) ? null : (int)$Submissions->submit_delay,
+            (int)$Submissions->submit_delay,
             $Submissions->type,
-            is_null($Submissions->submission_id) ? null : (int)$Submissions->submission_id,
+            (int)$Submissions->submission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,10 +77,7 @@ abstract class SubmissionsDAOBase {
      * @static
      * @return @link Submissions Un objeto del tipo {@link Submissions}. NULL si no hay tal registro.
      */
-    final public static function getByPK($submission_id) {
-        if (is_null($submission_id)) {
-            return null;
-        }
+    final public static function getByPK(int $submission_id) : ?Submissions {
         $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
         $params = [$submission_id];
         global $conn;
@@ -105,7 +104,7 @@ abstract class SubmissionsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Submissions [$Submissions] El objeto de tipo Submissions a eliminar
      */
-    final public static function delete(Submissions $Submissions) {
+    final public static function delete(Submissions $Submissions) : void {
         $sql = 'DELETE FROM `Submissions` WHERE submission_id = ?;';
         $params = [$Submissions->submission_id];
         global $conn;
@@ -133,7 +132,12 @@ abstract class SubmissionsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Submissions}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` from Submissions';
         global $conn;
         if (!is_null($orden)) {
@@ -159,7 +163,7 @@ abstract class SubmissionsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Submissions [$Submissions] El objeto de tipo Submissions a crear.
      */
-    final public static function create(Submissions $Submissions) {
+    final public static function create(Submissions $Submissions) : int {
         if (is_null($Submissions->time)) {
             $Submissions->time = gmdate('Y-m-d H:i:s', Time::get());
         }
@@ -172,23 +176,23 @@ abstract class SubmissionsDAOBase {
         $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
-            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
-            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
+            (int)$Submissions->identity_id,
+            (int)$Submissions->problem_id,
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
             $Submissions->time,
-            is_null($Submissions->submit_delay) ? null : (int)$Submissions->submit_delay,
+            (int)$Submissions->submit_delay,
             $Submissions->type,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Submissions->submission_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

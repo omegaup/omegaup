@@ -33,8 +33,10 @@ abstract class ClarificationsDAOBase {
      * @param Clarifications [$Clarifications] El objeto de tipo Clarifications
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Clarifications $Clarifications) {
-        if (is_null(self::getByPK($Clarifications->clarification_id))) {
+    final public static function save(Clarifications $Clarifications) : int {
+        if (is_null($Clarifications->clarification_id) ||
+            is_null(self::getByPK($Clarifications->clarification_id))
+        ) {
             return ClarificationsDAOBase::create($Clarifications);
         }
         return ClarificationsDAOBase::update($Clarifications);
@@ -47,18 +49,18 @@ abstract class ClarificationsDAOBase {
      * @return Filas afectadas
      * @param Clarifications [$Clarifications] El objeto de tipo Clarifications a actualizar.
      */
-    final public static function update(Clarifications $Clarifications) {
+    final public static function update(Clarifications $Clarifications) : int {
         $sql = 'UPDATE `Clarifications` SET `author_id` = ?, `receiver_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `problemset_id` = ?, `public` = ? WHERE `clarification_id` = ?;';
         $params = [
-            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
+            (int)$Clarifications->author_id,
             is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
             $Clarifications->time,
             is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
-            is_null($Clarifications->public) ? null : (int)$Clarifications->public,
-            is_null($Clarifications->clarification_id) ? null : (int)$Clarifications->clarification_id,
+            (int)$Clarifications->problemset_id,
+            (int)$Clarifications->public,
+            (int)$Clarifications->clarification_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -74,10 +76,7 @@ abstract class ClarificationsDAOBase {
      * @static
      * @return @link Clarifications Un objeto del tipo {@link Clarifications}. NULL si no hay tal registro.
      */
-    final public static function getByPK($clarification_id) {
-        if (is_null($clarification_id)) {
-            return null;
-        }
+    final public static function getByPK(int $clarification_id) : ?Clarifications {
         $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` FROM Clarifications WHERE (clarification_id = ?) LIMIT 1;';
         $params = [$clarification_id];
         global $conn;
@@ -104,7 +103,7 @@ abstract class ClarificationsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Clarifications [$Clarifications] El objeto de tipo Clarifications a eliminar
      */
-    final public static function delete(Clarifications $Clarifications) {
+    final public static function delete(Clarifications $Clarifications) : void {
         $sql = 'DELETE FROM `Clarifications` WHERE clarification_id = ?;';
         $params = [$Clarifications->clarification_id];
         global $conn;
@@ -132,7 +131,12 @@ abstract class ClarificationsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Clarifications}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` from Clarifications';
         global $conn;
         if (!is_null($orden)) {
@@ -158,7 +162,7 @@ abstract class ClarificationsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Clarifications [$Clarifications] El objeto de tipo Clarifications a crear.
      */
-    final public static function create(Clarifications $Clarifications) {
+    final public static function create(Clarifications $Clarifications) : int {
         if (is_null($Clarifications->time)) {
             $Clarifications->time = gmdate('Y-m-d H:i:s', Time::get());
         }
@@ -167,23 +171,23 @@ abstract class ClarificationsDAOBase {
         }
         $sql = 'INSERT INTO Clarifications (`author_id`, `receiver_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
+            (int)$Clarifications->author_id,
             is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
             $Clarifications->time,
             is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
-            is_null($Clarifications->public) ? null : (int)$Clarifications->public,
+            (int)$Clarifications->problemset_id,
+            (int)$Clarifications->public,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Clarifications->clarification_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

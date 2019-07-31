@@ -15,6 +15,12 @@
  * @access public
  */
 class ProblemsForfeited extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'problem_id' => true,
+        'forfeited_date' => true,
+    ];
+
     /**
      * Constructor de ProblemsForfeited
      *
@@ -22,9 +28,13 @@ class ProblemsForfeited extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -40,7 +50,7 @@ class ProblemsForfeited extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['forfeited_date']);
             return;
@@ -52,22 +62,22 @@ class ProblemsForfeited extends VO {
       * Identificador de usuario
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problem_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $forfeited_date;
+      * @var string
+     */
+    public $forfeited_date = null;
 }

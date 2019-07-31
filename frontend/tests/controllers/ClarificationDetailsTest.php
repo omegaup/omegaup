@@ -173,7 +173,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         // Manually set the just created clarification to PUBLIC
         $clarification = ClarificationsDAO::getByPK($clarificationData['response']['clarification_id']);
         $clarification->public = '1';
-        ClarificationsDAO::save($clarification);
+        ClarificationsDAO::update($clarification);
 
         // Prepare the request object
         $r = new Request();

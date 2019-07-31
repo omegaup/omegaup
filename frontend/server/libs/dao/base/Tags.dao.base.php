@@ -33,8 +33,10 @@ abstract class TagsDAOBase {
      * @param Tags [$Tags] El objeto de tipo Tags
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Tags $Tags) {
-        if (is_null(self::getByPK($Tags->tag_id))) {
+    final public static function save(Tags $Tags) : int {
+        if (is_null($Tags->tag_id) ||
+            is_null(self::getByPK($Tags->tag_id))
+        ) {
             return TagsDAOBase::create($Tags);
         }
         return TagsDAOBase::update($Tags);
@@ -47,11 +49,11 @@ abstract class TagsDAOBase {
      * @return Filas afectadas
      * @param Tags [$Tags] El objeto de tipo Tags a actualizar.
      */
-    final public static function update(Tags $Tags) {
+    final public static function update(Tags $Tags) : int {
         $sql = 'UPDATE `Tags` SET `name` = ? WHERE `tag_id` = ?;';
         $params = [
             $Tags->name,
-            is_null($Tags->tag_id) ? null : (int)$Tags->tag_id,
+            (int)$Tags->tag_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -67,10 +69,7 @@ abstract class TagsDAOBase {
      * @static
      * @return @link Tags Un objeto del tipo {@link Tags}. NULL si no hay tal registro.
      */
-    final public static function getByPK($tag_id) {
-        if (is_null($tag_id)) {
-            return null;
-        }
+    final public static function getByPK(int $tag_id) : ?Tags {
         $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` FROM Tags WHERE (tag_id = ?) LIMIT 1;';
         $params = [$tag_id];
         global $conn;
@@ -97,7 +96,7 @@ abstract class TagsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Tags [$Tags] El objeto de tipo Tags a eliminar
      */
-    final public static function delete(Tags $Tags) {
+    final public static function delete(Tags $Tags) : void {
         $sql = 'DELETE FROM `Tags` WHERE tag_id = ?;';
         $params = [$Tags->tag_id];
         global $conn;
@@ -125,7 +124,12 @@ abstract class TagsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Tags}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` from Tags';
         global $conn;
         if (!is_null($orden)) {
@@ -151,19 +155,19 @@ abstract class TagsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Tags [$Tags] El objeto de tipo Tags a crear.
      */
-    final public static function create(Tags $Tags) {
+    final public static function create(Tags $Tags) : int {
         $sql = 'INSERT INTO Tags (`name`) VALUES (?);';
         $params = [
             $Tags->name,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Tags->tag_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

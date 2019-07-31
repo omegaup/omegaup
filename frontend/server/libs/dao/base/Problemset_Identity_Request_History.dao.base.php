@@ -33,8 +33,10 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @param ProblemsetIdentityRequestHistory [$Problemset_Identity_Request_History] El objeto de tipo ProblemsetIdentityRequestHistory
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) {
-        if (is_null(self::getByPK($Problemset_Identity_Request_History->history_id))) {
+    final public static function save(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
+        if (is_null($Problemset_Identity_Request_History->history_id) ||
+            is_null(self::getByPK($Problemset_Identity_Request_History->history_id))
+        ) {
             return ProblemsetIdentityRequestHistoryDAOBase::create($Problemset_Identity_Request_History);
         }
         return ProblemsetIdentityRequestHistoryDAOBase::update($Problemset_Identity_Request_History);
@@ -47,15 +49,15 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @return Filas afectadas
      * @param ProblemsetIdentityRequestHistory [$Problemset_Identity_Request_History] El objeto de tipo ProblemsetIdentityRequestHistory a actualizar.
      */
-    final public static function update(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) {
+    final public static function update(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
         $sql = 'UPDATE `Problemset_Identity_Request_History` SET `identity_id` = ?, `problemset_id` = ?, `time` = ?, `accepted` = ?, `admin_id` = ? WHERE `history_id` = ?;';
         $params = [
-            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
-            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
+            (int)$Problemset_Identity_Request_History->identity_id,
+            (int)$Problemset_Identity_Request_History->problemset_id,
             $Problemset_Identity_Request_History->time,
-            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
-            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
-            is_null($Problemset_Identity_Request_History->history_id) ? null : (int)$Problemset_Identity_Request_History->history_id,
+            (int)$Problemset_Identity_Request_History->accepted,
+            (int)$Problemset_Identity_Request_History->admin_id,
+            (int)$Problemset_Identity_Request_History->history_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,10 +73,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @static
      * @return @link ProblemsetIdentityRequestHistory Un objeto del tipo {@link ProblemsetIdentityRequestHistory}. NULL si no hay tal registro.
      */
-    final public static function getByPK($history_id) {
-        if (is_null($history_id)) {
-            return null;
-        }
+    final public static function getByPK(int $history_id) : ?ProblemsetIdentityRequestHistory {
         $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` FROM Problemset_Identity_Request_History WHERE (history_id = ?) LIMIT 1;';
         $params = [$history_id];
         global $conn;
@@ -101,7 +100,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemsetIdentityRequestHistory [$Problemset_Identity_Request_History] El objeto de tipo ProblemsetIdentityRequestHistory a eliminar
      */
-    final public static function delete(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) {
+    final public static function delete(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : void {
         $sql = 'DELETE FROM `Problemset_Identity_Request_History` WHERE history_id = ?;';
         $params = [$Problemset_Identity_Request_History->history_id];
         global $conn;
@@ -129,7 +128,12 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetIdentityRequestHistory}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` from Problemset_Identity_Request_History';
         global $conn;
         if (!is_null($orden)) {
@@ -155,26 +159,26 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsetIdentityRequestHistory [$Problemset_Identity_Request_History] El objeto de tipo ProblemsetIdentityRequestHistory a crear.
      */
-    final public static function create(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) {
+    final public static function create(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
         if (is_null($Problemset_Identity_Request_History->time)) {
             $Problemset_Identity_Request_History->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
-            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
+            (int)$Problemset_Identity_Request_History->identity_id,
+            (int)$Problemset_Identity_Request_History->problemset_id,
             $Problemset_Identity_Request_History->time,
-            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
-            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
+            (int)$Problemset_Identity_Request_History->accepted,
+            (int)$Problemset_Identity_Request_History->admin_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Problemset_Identity_Request_History->history_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

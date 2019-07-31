@@ -437,7 +437,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             );
 
             if ($problem->quality != null || $problem->difficulty != null) {
-                ProblemsDAO::save($problem);
+                ProblemsDAO::update($problem);
             }
             // TODO(heduenas): Get threshold parameter from DB for each problem independently.
             $tags = self::mostVotedTags($problemAggregates['tags'], 0.25);

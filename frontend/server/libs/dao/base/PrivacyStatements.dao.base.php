@@ -33,8 +33,10 @@ abstract class PrivacyStatementsDAOBase {
      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(PrivacyStatements $PrivacyStatements) {
-        if (is_null(self::getByPK($PrivacyStatements->privacystatement_id))) {
+    final public static function save(PrivacyStatements $PrivacyStatements) : int {
+        if (is_null($PrivacyStatements->privacystatement_id) ||
+            is_null(self::getByPK($PrivacyStatements->privacystatement_id))
+        ) {
             return PrivacyStatementsDAOBase::create($PrivacyStatements);
         }
         return PrivacyStatementsDAOBase::update($PrivacyStatements);
@@ -47,12 +49,12 @@ abstract class PrivacyStatementsDAOBase {
      * @return Filas afectadas
      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a actualizar.
      */
-    final public static function update(PrivacyStatements $PrivacyStatements) {
+    final public static function update(PrivacyStatements $PrivacyStatements) : int {
         $sql = 'UPDATE `PrivacyStatements` SET `git_object_id` = ?, `type` = ? WHERE `privacystatement_id` = ?;';
         $params = [
             $PrivacyStatements->git_object_id,
             $PrivacyStatements->type,
-            is_null($PrivacyStatements->privacystatement_id) ? null : (int)$PrivacyStatements->privacystatement_id,
+            (int)$PrivacyStatements->privacystatement_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -68,10 +70,7 @@ abstract class PrivacyStatementsDAOBase {
      * @static
      * @return @link PrivacyStatements Un objeto del tipo {@link PrivacyStatements}. NULL si no hay tal registro.
      */
-    final public static function getByPK($privacystatement_id) {
-        if (is_null($privacystatement_id)) {
-            return null;
-        }
+    final public static function getByPK(int $privacystatement_id) : ?PrivacyStatements {
         $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` FROM PrivacyStatements WHERE (privacystatement_id = ?) LIMIT 1;';
         $params = [$privacystatement_id];
         global $conn;
@@ -98,7 +97,7 @@ abstract class PrivacyStatementsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a eliminar
      */
-    final public static function delete(PrivacyStatements $PrivacyStatements) {
+    final public static function delete(PrivacyStatements $PrivacyStatements) : void {
         $sql = 'DELETE FROM `PrivacyStatements` WHERE privacystatement_id = ?;';
         $params = [$PrivacyStatements->privacystatement_id];
         global $conn;
@@ -126,7 +125,12 @@ abstract class PrivacyStatementsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link PrivacyStatements}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` from PrivacyStatements';
         global $conn;
         if (!is_null($orden)) {
@@ -152,7 +156,7 @@ abstract class PrivacyStatementsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param PrivacyStatements [$PrivacyStatements] El objeto de tipo PrivacyStatements a crear.
      */
-    final public static function create(PrivacyStatements $PrivacyStatements) {
+    final public static function create(PrivacyStatements $PrivacyStatements) : int {
         if (is_null($PrivacyStatements->type)) {
             $PrivacyStatements->type = 'privacy_policy';
         }
@@ -163,12 +167,12 @@ abstract class PrivacyStatementsDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $PrivacyStatements->privacystatement_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

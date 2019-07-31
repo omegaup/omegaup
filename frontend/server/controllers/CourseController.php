@@ -359,8 +359,7 @@ class CourseController extends Controller {
 
         try {
             $acl = new ACLs(['owner_id' => $creator->user_id]);
-
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
 
             GroupRolesDAO::create(new GroupRoles([
                 'group_id' => $group->group_id,
@@ -1042,14 +1041,10 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
-        if (is_null($r['identity'])) {
-            throw new NotFoundException('userOrMailNotFound');
-        }
-
+        $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
         if (is_null(GroupsIdentitiesDAO::getByPK(
             $course->group_id,
-            $r['identity']->identity_id
+            $resolvedIdentity->identity_id
         ))) {
             throw new NotFoundException(
                 'courseStudentNotInCourse'
@@ -1071,7 +1066,7 @@ class CourseController extends Controller {
             $runsArray = RunsDAO::getForProblemDetails(
                 (int)$problem['problem_id'],
                 (int)$r['assignment']->problemset_id,
-                (int)$r['identity']->identity_id
+                (int)$resolvedIdentity->identity_id
             );
             $problem['runs'] = [];
             foreach ($runsArray as $run) {
@@ -1148,15 +1143,12 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
-        if (is_null($r['identity'])) {
-            throw new NotFoundException('userOrMailNotFound');
-        }
+        $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         // Only course admins or users adding themselves when the course is public
         if (!Authorization::isCourseAdmin($r->identity, $course)
             && ($course->public == false
-            || $r['identity']->identity_id !== $r->identity->identity_id)
+            || $resolvedIdentity->identity_id !== $r->identity->identity_id)
             && $course->requests_user_information == 'no'
             && is_null($r['accept_teacher'])
         ) {
@@ -1165,7 +1157,7 @@ class CourseController extends Controller {
 
         $groupIdentity = new GroupsIdentities([
             'group_id' => $course->group_id,
-            'identity_id' => $r['identity']->identity_id,
+            'identity_id' => $resolvedIdentity->identity_id,
             'share_user_information' => $r['share_user_information'],
             'accept_teacher' => $r['accept_teacher'],
         ]);
@@ -1175,30 +1167,30 @@ class CourseController extends Controller {
         try {
             GroupsIdentitiesDAO::save(new GroupsIdentities([
                 'group_id' => $course->group_id,
-                'identity_id' => $r['identity']->identity_id
+                'identity_id' => $resolvedIdentity->identity_id
             ]));
 
             // Only users adding themselves are saved in consent log
-            if ($r['identity']->identity_id === $r->identity->identity_id
+            if ($resolvedIdentity->identity_id === $r->identity->identity_id
                  && $course->requests_user_information != 'no') {
                 $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
-                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($r['identity']->identity_id, $privacystatement_id)) {
+                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($resolvedIdentity->identity_id, $privacystatement_id)) {
                     $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
-                        $r['identity']->identity_id,
+                        $resolvedIdentity->identity_id,
                         $privacystatement_id
                     );
                 } else {
-                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::getId($r['identity']->identity_id, $privacystatement_id);
+                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::getId($resolvedIdentity->identity_id, $privacystatement_id);
                 }
 
                 $groupIdentity->privacystatement_consent_id = $privacystatement_consent_id;
             }
-            if ($r['identity']->identity_id === $r->identity->identity_id
+            if ($resolvedIdentity->identity_id === $r->identity->identity_id
                  && !empty($r['accept_teacher'])) {
                 $privacystatement_id = PrivacyStatementsDAO::getId($r['accept_teacher_git_object_id'], 'accept_teacher');
-                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($r['identity']->identity_id, $privacystatement_id)) {
+                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($resolvedIdentity->identity_id, $privacystatement_id)) {
                     PrivacyStatementConsentLogDAO::saveLog(
-                        $r['identity']->identity_id,
+                        $resolvedIdentity->identity_id,
                         $privacystatement_id
                     );
                 }
@@ -1232,14 +1224,11 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $r['identity'] = IdentityController::resolveIdentity($r['usernameOrEmail']);
-        if (is_null($r['identity'])) {
-            throw new NotFoundException('userOrMailNotFound');
-        }
+        $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         if (is_null(GroupsIdentitiesDAO::getByPK(
             $course->group_id,
-            $r['identity']->identity_id
+            $resolvedIdentity->identity_id
         ))) {
             throw new NotFoundException('courseStudentNotInCourse');
         }
@@ -1247,7 +1236,7 @@ class CourseController extends Controller {
         try {
             GroupsIdentitiesDAO::delete(new GroupsIdentities([
                 'group_id' => $course->group_id,
-                'identity_id' => $r['identity']->identity_id,
+                'identity_id' => $resolvedIdentity->identity_id,
             ]));
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
@@ -1305,7 +1294,7 @@ class CourseController extends Controller {
         // Check course_alias
         Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        $user = UserController::resolveUser($r['usernameOrEmail']);
+        $resolvedUser = UserController::resolveUser($r['usernameOrEmail']);
 
         try {
             $course = CoursesDAO::getByAlias($r['course_alias']);
@@ -1319,7 +1308,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        ACLController::addUser($course->acl_id, $user->user_id);
+        ACLController::addUser($course->acl_id, $resolvedUser->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1339,12 +1328,12 @@ class CourseController extends Controller {
         // Check course_alias
         Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        $user = UserController::resolveUser($r['usernameOrEmail']);
-        // Unassociated identities can't be course admins
-        if (is_null($user)) {
+        $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+        if (is_null($resolvedIdentity->user_id)) {
+            // Unassociated identities can't be course admins
             throw new ForbiddenAccessException();
         }
-        $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+        $resolvedUser = UsersDAO::getByPK($resolvedIdentity->user_id);
 
         try {
             $course = CoursesDAO::getByAlias($r['course_alias']);
@@ -1359,11 +1348,11 @@ class CourseController extends Controller {
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isCourseAdmin($identity, $course)) {
+        if (!Authorization::isCourseAdmin($resolvedIdentity, $course)) {
             throw new NotFoundException();
         }
 
-        ACLController::removeUser($course->acl_id, $user->user_id);
+        ACLController::removeUser($course->acl_id, $resolvedUser->user_id);
 
         return ['status' => 'ok'];
     }
