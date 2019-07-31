@@ -2454,15 +2454,17 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
 
         try {
-            $response = PrivacyStatementConsentLogDAO::saveLog(
+            PrivacyStatementConsentLogDAO::saveLog(
                 $identity->identity_id,
                 $privacystatement_id
             );
-            $sessionController = new SessionController();
-            $sessionController->InvalidateCache();
         } catch (Exception $e) {
-            throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+            if (DAO::isDuplicateEntryException($e)) {
+                throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+            }
+            throw new InvalidDatabaseOperationException($e);
         }
+        (new SessionController())->InvalidateCache();
 
         return ['status' => 'ok'];
     }

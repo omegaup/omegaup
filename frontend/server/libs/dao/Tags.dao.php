@@ -31,7 +31,7 @@ class TagsDAO extends TagsDAOBase {
 
     public static function findByName(string $name) : array {
         global $conn;
-        $sql = "SELECT name FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
+        $sql = "SELECT * FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
         $rs = $conn->GetAll($sql, $args);
