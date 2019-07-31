@@ -88,5 +88,6 @@
     });
   }
 
-  google.setOnLoadCallback(OnLoad);
+  google.charts.load('current', {packages: ['corechart']});
+  google.charts.setOnLoadCallback(OnLoad);
 })();
