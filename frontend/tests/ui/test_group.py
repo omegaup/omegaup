@@ -56,7 +56,8 @@ def create_group(driver, group_title, description):
             driver.wait.until(
                 EC.visibility_of_element_located(
                     (By.XPATH,
-                     '//form[@class = "new_group_form"]'))).submit()
+                     '//form[contains(concat(" ", normalize-space(@class), '
+                     '" "), " new-group-form ")]'))).submit()
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[contains(@href, "#identities")]'))).click()
@@ -66,15 +67,17 @@ def create_group(driver, group_title, description):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//div[@class = "upload-csv"]/div/a'))).click()
+                 '//div[contains(concat(" ", normalize-space(@class), " "),'
+                 ' " upload-csv ")]/div/a'))).click()
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//table[contains(@class, "identities-table")]/tbody/tr')))
+                 '//table[contains(concat(" ", normalize-space(@class), " "),'
+                 ' " identities-table ")]/tbody/tr')))
         create_identities_button = driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//button[contains(@name, "create_identities")]')))
+                 '//button[@name = "create-identities"]')))
         create_identities_button.click()
         message = driver.wait.until(
             EC.visibility_of_element_located((By.ID, 'status')))

@@ -42,7 +42,7 @@
         </table>
         <div class="panel-heading">
           <button class="btn btn-primary"
-               name="create_identities"
+               name="create-identities"
                v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
         </div>
         <div>
