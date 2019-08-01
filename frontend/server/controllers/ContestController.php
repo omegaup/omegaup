@@ -633,16 +633,26 @@ class ContestController extends Controller {
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
             if ($requestsUserInformation != 'no') {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
-                $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
-                    $r->identity->identity_id,
-                    $privacystatement_id
+                $privacyStatementId = PrivacyStatementsDAO::getId(
+                    $r['privacy_git_object_id'],
+                    $r['statement_type']
                 );
+
+                $privacyStatementConsentId = PrivacyStatementConsentLogDAO::getId(
+                    $r->identity->identity_id,
+                    $privacyStatementId
+                );
+                if (is_null($privacyStatementConsentId)) {
+                    $privacyStatementConsentId = PrivacyStatementConsentLogDAO::saveLog(
+                        $r->identity->identity_id,
+                        $privacyStatementId
+                    );
+                }
 
                 ProblemsetIdentitiesDAO::updatePrivacyStatementConsent(new ProblemsetIdentities([
                     'identity_id' => $r->identity->identity_id,
                     'problemset_id' => $response['contest']->problemset_id,
-                    'privacystatement_consent_id' => $privacystatement_consent_id
+                    'privacystatement_consent_id' => $privacyStatementConsentId,
                 ]));
             }
 
