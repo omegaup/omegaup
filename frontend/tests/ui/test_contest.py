@@ -281,7 +281,7 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     '//small/a[contains(@href, "%s")]' % contest_url
+                     '//small/a[starts-with(@href, "%s")]' % contest_url
                      ))).click()
         assert (contest_alias in
                 driver.browser.current_url), driver.browser.current_url

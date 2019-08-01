@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
+from typing import NamedTuple, Text
 
 CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
@@ -29,6 +30,8 @@ MESSAGE_WHITELIST = ('/api/grader/status/',)
 sys.path.append(os.path.join(OMEGAUP_ROOT, 'stuff'))
 # pylint: disable=wrong-import-position,unused-import
 import database_utils  # NOQA
+
+Identity = NamedTuple('Identity', [('username', Text), ('password', Text)])
 
 
 # pylint: disable=too-many-arguments
@@ -242,7 +245,7 @@ def add_identities_course(driver, course_alias):
         'normalize-space(@class), " "), " password ")]')
     usernames = [username.text for username in username_elements]
     passwords = [password.text for password in password_elements]
-    Identity = collections.namedtuple('Identity', ['username', 'password'])
+
     identities = [Identity(*x) for x in zip(usernames, passwords)]
 
     create_identities_button = driver.wait.until(
