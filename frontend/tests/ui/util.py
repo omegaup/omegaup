@@ -11,13 +11,12 @@ import functools
 import re
 import sys
 import traceback
-import collections
 
 from urllib.parse import urlparse
+from typing import NamedTuple, Text
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
-from typing import NamedTuple, Text
 
 CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
