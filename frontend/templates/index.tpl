@@ -35,7 +35,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				{include file='rank.table.tpl' length=5 is_index=true}
+				{include file='rank.table.tpl' payload=$payload}
 			</div>
 
 			{if isset($schoolRankPayload)}

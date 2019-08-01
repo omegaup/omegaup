@@ -1,29 +1,22 @@
 <?php
-
 require_once('../server/bootstrap_smarty.php');
 
-$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
-$length = isset($_GET['length']) ? $_GET['length'] : 100;
-$filter = isset($_GET['filter']) ? $_GET['filter'] : null;
-
-$r = new Request($_REQUEST);
-$availableFilters = [];
-$session = SessionController::apiCurrentSession($r)['session'];
-if ($session['auth_token']) {
-    if (!is_null($session['identity']->country_id)) {
-        $availableFilters['country'] = $smarty->getConfigVars('wordsFilterByCountry');
-    }
-    if (!is_null($session['identity']->state_id)) {
-        $availableFilters['state'] = $smarty->getConfigVars('wordsFilterByState');
-    }
-    if (!is_null($session['identity']->school_id)) {
-        $availableFilters['school'] = $smarty->getConfigVars('wordsFilterBySchool');
-    }
+try {
+    $session = SessionController::apiCurrentSession(
+        new Request($_REQUEST)
+    )['session'];
+    $smartyProperties = UserController::getRankDetailsForSmarty(
+        new Request($_REQUEST),
+        $session,
+        $smarty
+    );
+} catch (ApiException $e) {
+    header('HTTP/1.1 404 Not Found');
+    die(file_get_contents('../404.html'));
 }
 
-$smarty->assign('page', $page);
-$smarty->assign('length', $length);
-$smarty->assign('filter', $filter);
-$smarty->assign('availableFilters', $availableFilters);
+foreach ($smartyProperties as $key => $value) {
+    $smarty->assign($key, $value);
+}
 
 $smarty->display('../templates/rank.tpl');

@@ -105,6 +105,7 @@ export default class RankTable extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
   @Prop() isIndex!: boolean;
+  @Prop() isLogged!: boolean;
   @Prop() availableFilters!: { [key: string]: string };
   @Prop() filter!: string;
   @Prop() ranking!: Rank[];
@@ -113,6 +114,17 @@ export default class RankTable extends Vue {
   T = T;
   UI = UI;
   searchedUsername = '';
+
+  mounted() {
+    if (!this.isLogged && !this.isIndex) {
+      UI.info(T.mustLoginToFilterUsers);
+    } else if (
+      Object.keys(this.availableFilters).length == 0 &&
+      !this.isIndex
+    ) {
+      UI.info(T.mustUpdateBasicInfoToFilterUsers);
+    }
+  }
 
   onSubmit(): void {
     window.location.href = `/profile/${encodeURIComponent(

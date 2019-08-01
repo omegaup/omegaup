@@ -2564,6 +2564,58 @@ class UserController extends Controller {
     public static function isMainIdentity(Users $user, Identities $identity) : bool {
         return $identity->identity_id == $user->main_identity_id;
     }
+
+    /**
+     * Prepare all the properties to be sent to the rank table view via smarty
+     * @param Request $r
+     * @param array $session
+     * @return Smarty $smarty
+     */
+    public static function getRankDetailsForSmarty(
+        Request $r,
+        array $session,
+        Smarty $smarty
+    ) : array {
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+        Validators::validateInEnum(
+            $r['filter'],
+            'filter',
+            ['', 'country', 'state', 'school'],
+            /*$required=*/false
+        );
+
+        $page = $r['page'] ?? 1;
+        $length = $r['length'] ?? 100;
+        $filter = $r['filter'] ?? '';
+
+        $availableFilters = [];
+        if (!is_null($session['identity'])) {
+            if (!is_null($session['identity']->country_id)) {
+                $availableFilters['country'] =
+                    $smarty->getConfigVars('wordsFilterByCountry');
+            }
+            if (!is_null($session['identity']->state_id)) {
+                $availableFilters['state'] =
+                    $smarty->getConfigVars('wordsFilterByState');
+            }
+            if (!is_null($session['identity']->school_id)) {
+                $availableFilters['school'] =
+                    $smarty->getConfigVars('wordsFilterBySchool');
+            }
+        }
+
+        return [
+            'payload' => [
+                'isLogged' => !is_null($session['identity']),
+                'page' => $page,
+                'length' => $length,
+                'filter' => $filter,
+                'availableFilters' => $availableFilters,
+                'isIndex' => false,
+            ],
+        ];
+    }
 }
 
 UserController::$urlHelper = new UrlHelper();
