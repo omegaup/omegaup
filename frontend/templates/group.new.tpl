@@ -19,7 +19,7 @@
 	{/if}
 
 	<div class="panel-body">
-		<form class="new_group_form">
+		<form class="new-group-form">
 			<div class="row">
 				<div class="form-group col-md-6">
 					<label for="title">{#wordsName#}</label>

@@ -17,6 +17,11 @@ class ProblemController extends Controller {
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROMOTED = 2;
 
+    // SOLUTION STATUS
+    const SOLUTION_NOT_FOUND = 'not_found';
+    const SOLUTION_UNLOCKED = 'unlocked';
+    const SOLUTION_LOCKED = 'locked';
+
     const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
 
@@ -907,22 +912,17 @@ class ProblemController extends Controller {
      * Updates loose file
      *
      * @param Request $r
-     * @return void
+     * @return array The updated file languages
      * @throws ApiException
      * @throws InvalidDatabaseOperationException
      */
     private static function updateLooseFile(
         Request $r,
+        Problems $problem,
         string $directory,
         string $contents
-    ): void {
-        self::authenticateRequest($r);
-        self::validateCreateOrUpdate($r, true);
-
-        $problem = $r['problem'];
-
+    ): array {
         Validators::validateStringNonEmpty($r['message'], 'message');
-
         // Check that lang is in the ISO 639-1 code list, default is "es".
         Validators::validateInEnum($r['lang'], 'lang', ProblemController::ISO639_1, false /* is_required */);
         if (is_null($r['lang'])) {
@@ -964,7 +964,7 @@ class ProblemController extends Controller {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        self::invalidateCache($problem, $updatedFileLanguages);
+        return $updatedFileLanguages;
     }
 
     /**
@@ -976,8 +976,11 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateStatement(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['statement'], 'statement');
-        self::updateLooseFile($r, 'statements', $r['statement']);
+        $updatedFileLanguages = self::updateLooseFile($r, $r['problem'], 'statements', $r['statement']);
+        self::invalidateCache($r['problem'], $updatedFileLanguages);
         return [
             'status' => 'ok'
         ];
@@ -992,8 +995,11 @@ class ProblemController extends Controller {
      * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateSolution(Request $r) {
+        self::authenticateRequest($r);
+        self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['solution'], 'solution');
-        self::updateLooseFile($r, 'solutions', $r['solution']);
+        $updatedFileLanguages = self::updateLooseFile($r, $r['problem'], 'solutions', $r['solution']);
+        self::invalidateSolutionCache($r['problem'], $updatedFileLanguages);
         return [
             'status' => 'ok'
         ];
@@ -1003,17 +1009,19 @@ class ProblemController extends Controller {
      * Invalidates the various caches of the problem, as well as updating the
      * languages.
      *
-     * @param Problems $problem                   the problem
-     * @param array    $updatedStatementLanguages the array of updated
-     *                                            statement languages.
+     * @param Problems $problem the problem
+     * @param array $updatedLanguages the array of updated statement file languages.
      *
      * @return void
      */
-    private static function invalidateCache(Problems $problem, array $updatedStatementLanguages) {
+    private static function invalidateCache(
+        Problems $problem,
+        array $updatedLanguages
+    ): void {
         self::updateLanguages($problem);
 
-        // Invalidate problem statement cache
-        foreach ($updatedStatementLanguages as $lang) {
+        // Invalidate problem statement or solution cache
+        foreach ($updatedLanguages as $lang) {
             Cache::deleteFromCache(
                 Cache::PROBLEM_STATEMENT,
                 "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
@@ -1021,6 +1029,31 @@ class ProblemController extends Controller {
         }
         Cache::deleteFromCache(
             Cache::PROBLEM_SETTINGS_DISTRIB,
+            "{$problem->alias}-{$problem->commit}"
+        );
+    }
+
+    /**
+     * Invalidates the problem solution cache
+     *
+     * @param Problems $problem the problem
+     * @param array $updatedLanguages the array of updated loose file languages.
+     *
+     * @return void
+     */
+    private static function invalidateSolutionCache(
+        Problems $problem,
+        array $updatedLanguages
+    ): void {
+        // Invalidate problem solution cache
+        foreach ($updatedLanguages as $lang) {
+            Cache::deleteFromCache(
+                Cache::PROBLEM_SOLUTION,
+                "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
+            );
+        }
+        Cache::deleteFromCache(
+            Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}"
         );
     }
@@ -1200,8 +1233,8 @@ class ProblemController extends Controller {
      * Gets the problem solution from the gitserver.
      *
      * @param Problems $problem  The problem.
-     * @param string   $commit   The git commit at which to get the statement.
-     * @param string   $language The language of the problem. Will default to
+     * @param string   $commit   The git commit at which to get the solution.
+     * @param string   $language The language of the solution. Will default to
      *                           Spanish if not found.
      *
      * @return array The contents of the file.
@@ -1649,7 +1682,7 @@ class ProblemController extends Controller {
         }
 
         if (!Authorization::canViewProblemSolution($r->identity, $problem)) {
-            $r->ensureBool('forefeit_problem', false /*isRequired*/);
+            $r->ensureBool('forfeit_problem', false /*isRequired*/);
             if ($r['forfeit_problem'] !== true) {
                 throw new ForbiddenAccessException('problemSolutionNotVisible');
             }
@@ -2691,6 +2724,69 @@ class ProblemController extends Controller {
             ) && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
                 $r->user
             );
+        $result['payload']['solution_status'] = self::getProblemSolutionStatus($problem, $r->identity);
         return $result;
+    }
+
+    /**
+     * Returns true if the problem's solution exists, otherwise returns false.
+     *
+     * @param Problems $problem The problem object.
+     * @return bool The problem solution status.
+     * @throws InvalidFilesystemOperationException
+     */
+    private static function getProblemSolutionExistenceImpl(
+        Problems $problem
+    ): bool {
+        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
+        $existingFiles = $problemArtifacts->lsTree('solutions');
+        foreach ($existingFiles as $file) {
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            if ($extension !== 'markdown') {
+                continue;
+            }
+
+            $lang = pathinfo($file['name'], PATHINFO_FILENAME);
+            if (in_array($lang, self::ISO639_1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function getProblemSolutionExistence(
+        Problems $problem
+    ): bool {
+        return Cache::getFromCacheOrSet(
+            Cache::PROBLEM_SOLUTION_EXISTS,
+            "{$problem->alias}-{$problem->commit}",
+            function () use ($problem) {
+                return ProblemController::getProblemSolutionExistenceImpl(
+                    $problem
+                );
+            },
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+    }
+
+    /**
+     * Returns the status for a problem solution.
+     *
+     * @param Problems $problem
+     * @param Identity $user
+     * @return string The status for the problem solution.
+     */
+    public static function getProblemSolutionStatus(
+        Problems $problem,
+        Identities $identity
+    ) : string {
+        $exists = self::getProblemSolutionExistence($problem);
+        if (!$exists) {
+            return self::SOLUTION_NOT_FOUND;
+        }
+        if (Authorization::canViewProblemSolution($identity, $problem)) {
+            return self::SOLUTION_UNLOCKED;
+        }
+        return self::SOLUTION_LOCKED;
     }
 }

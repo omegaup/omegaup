@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-body">
-      <div>
+      <div class="upload-csv">
         <div class="panel-heading">
           {{ T.groupsUploadCsvFile }} <input name="identities"
                type="file">
@@ -12,11 +12,11 @@
         </div>
       </div><br>
       <div class="panel panel-default no-bottom-margin"
-           v-show="identities">
+           v-show="identities.length &gt; 0">
         <div class="panel-heading">
           <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
         </div>
-        <table class="table">
+        <table class="identities-table table">
           <thead>
             <tr>
               <th>{{ T.profileUsername }}</th>
@@ -41,8 +41,9 @@
           </tbody>
         </table>
         <div class="panel-heading">
-          <a class="btn btn-primary"
-               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</a>
+          <button class="btn btn-primary"
+               name="create-identities"
+               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
         </div>
         <div>
           {{ T.groupsIdentityWarning }}

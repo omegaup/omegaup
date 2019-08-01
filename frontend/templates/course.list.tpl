@@ -115,7 +115,7 @@
                                     data: { listName: '{#courseListStudentCurrentCourses#}',
                                             course: studentCoursesCurrent() }  }"></div>
                 </div>
-                <div class="tab-pane" id="tab-student-courses-current">
+                <div class="tab-pane" id="tab-student-courses-past">
                     <div id="student-courses-past"
              data-bind="template: { name: 'student-course-list',
                                     if: studentCoursesPast().length > 0,
