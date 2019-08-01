@@ -7,17 +7,17 @@ var formAlias = formData.attr('data-alias');
 
 $(function() {
   if (formPage === 'new') {
-    $('.new_group_form')
+    $('.new-group-form')
         .on('submit', function() {
           omegaup.API.Group.create({
-                             alias: $('.new_group_form #alias').val(),
-                             name: $('.new_group_form #title').val(),
+                             alias: $('.new-group-form #alias').val(),
+                             name: $('.new-group-form #title').val(),
                              description:
-                                 $('.new_group_form #description').val(),
+                                 $('.new-group-form #description').val(),
                            })
               .then(function(data) {
                 window.location.replace('/group/' +
-                                        $('.new_group_form #alias').val() +
+                                        $('.new-group-form #alias').val() +
                                         '/edit/#members');
               })
               .fail(omegaup.UI.apiError);

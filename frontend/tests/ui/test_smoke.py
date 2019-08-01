@@ -5,8 +5,6 @@
 
 import os
 
-import pytest
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -38,8 +36,6 @@ def test_login(driver):
         pass
 
 
-@pytest.mark.skipif(util.CI,
-                    reason='https://github.com/omegaup/omegaup/issues/2110')
 @util.no_javascript_errors()
 @util.annotate
 def test_create_problem(driver):

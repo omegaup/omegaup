@@ -90,7 +90,14 @@ class UserController extends Controller {
                 'username' => $r['username'],
                 'password' => $hashedPassword
             ]);
-            UsersDAO::savePassword($user);
+            try {
+                UsersDAO::savePassword($user);
+            } catch (Exception $e) {
+                if (DAO::isDuplicateEntryException($e)) {
+                    throw new DuplicatedEntryInDatabaseException('usernameInUse');
+                }
+                throw new InvalidDatabaseOperationException($e);
+            }
 
             return [
                 'status' => 'ok',
@@ -2000,9 +2007,8 @@ class UserController extends Controller {
         } catch (Exception $e) {
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('mailInUse');
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw new InvalidDatabaseOperationException($e);
         }
 
         // Delete profile cache
@@ -2448,15 +2454,17 @@ class UserController extends Controller {
         $identity = self::resolveTargetIdentity($r);
 
         try {
-            $response = PrivacyStatementConsentLogDAO::saveLog(
+            PrivacyStatementConsentLogDAO::saveLog(
                 $identity->identity_id,
                 $privacystatement_id
             );
-            $sessionController = new SessionController();
-            $sessionController->InvalidateCache();
         } catch (Exception $e) {
-            throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+            if (DAO::isDuplicateEntryException($e)) {
+                throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+            }
+            throw new InvalidDatabaseOperationException($e);
         }
+        (new SessionController())->InvalidateCache();
 
         return ['status' => 'ok'];
     }
