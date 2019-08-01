@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-body">
-      <div>
+      <div class="upload-csv">
         <div class="panel-heading">
           {{ T.groupsUploadCsvFile }} <input name="identities"
                type="file">
@@ -12,11 +12,11 @@
         </div>
       </div><br>
       <div class="panel panel-default no-bottom-margin"
-           v-show="identities">
+           v-show="identities.length &gt; 0">
         <div class="panel-heading">
           <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
         </div>
-        <table class="table">
+        <table class="identities-table table">
           <thead>
             <tr>
               <th>{{ T.profileUsername }}</th>
@@ -30,9 +30,9 @@
           </thead>
           <tbody>
             <tr v-for="identity in identities">
-              <td><strong>{{ identity.username }}</strong></td>
+              <td class="username"><strong>{{ identity.username }}</strong></td>
               <td>{{ identity.name }}</td>
-              <th>{{ identity.password }}</th>
+              <td class="password">{{ identity.password }}</td>
               <td>{{ identity.country_id }}</td>
               <td>{{ identity.state_id }}</td>
               <td>{{ identity.gender }}</td>
@@ -41,8 +41,9 @@
           </tbody>
         </table>
         <div class="panel-heading">
-          <a class="btn btn-primary"
-               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</a>
+          <button class="btn btn-primary"
+               name="create-identities"
+               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
         </div>
         <div>
           {{ T.groupsIdentityWarning }}
