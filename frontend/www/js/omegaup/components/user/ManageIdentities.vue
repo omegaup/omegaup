@@ -3,8 +3,8 @@
     <div class="panel-heading">
       <h2 class="panel-title">{{ T.profileManageIdentities }}</h2>
     </div>
-    <div class="panel-body">
-      <form class="form"
+    <div class="panel-body add-identity-panel">
+      <form class="form add-identity-form"
             v-on:submit.prevent="onAddIdentity(username, password)">
         <div class="form-group">
           <label>{{ T.wordsIdentity }}</label> <span aria-hidden="true"
@@ -12,14 +12,14 @@
                data-placement="top"
                data-toggle="tooltip"
                v-bind:title="T.profileAddIdentitiesTooltip"></span> <input autocomplete="off"
-               class="form-control"
+               class="form-control username-input"
                size="20"
                type="text"
                v-model="username">
         </div>
         <div class="form-group">
           <label>{{ T.loginPassword }}</label> <input autocomplete="off"
-               class="form-control"
+               class="form-control password-input"
                size="20"
                type="password"
                v-model="password">

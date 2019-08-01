@@ -54,7 +54,7 @@
               {include file='common.navbar.notifications.tpl'}
             {/if}
             <li id="notifications-list"></li>
-            <li class="dropdown">
+            <li id="nav-user" class="dropdown">
               <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">
                 {$CURRENT_USER_GRAVATAR_URL_51}
                 <span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span>
