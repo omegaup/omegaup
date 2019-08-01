@@ -36,7 +36,8 @@ legend {
 #problem,
 #ranking,
 #clarifications,
-#runs {
+#runs,
+#solution {
 	display: none;
 }
 

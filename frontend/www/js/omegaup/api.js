@@ -487,6 +487,16 @@ export default {
 
     selectVersion: _call('/api/problem/selectVersion/'),
 
+    solution: _call('/api/problem/solution/',
+                    function(result) {
+                      if (result.exists && result.solution) {
+                        const mdConverter = UI.markdownConverter();
+                        result.solution = mdConverter.makeHtmlWithImages(
+                            result.solution.markdown, result.solution.images);
+                      }
+                      return result;
+                    }),
+
     stats: _call('/api/problem/stats/'),
 
     tags: _call('/api/problem/tags/'),
@@ -496,6 +506,10 @@ export default {
     updateStatement: _call('/api/problem/updateStatement/'),
 
     versions: _call('/api/problem/versions/'),
+  },
+
+  ProblemForfeited: {
+    getCounts: _call('/api/problemForfeited/getCounts/'),
   },
 
   Problemset: {
