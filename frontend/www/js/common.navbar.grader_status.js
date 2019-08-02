@@ -1,14 +1,10 @@
 (function() {
-  var graderStatus = $('#grader-status > a');
-  var graderCount = $('#grader-count');
-  var graderDropDown = $('#grader-status .dropdown-menu');
+  var graderCount = $('.grader-count');
 
   function updateGraderStatus() {
-    graderStatus.removeClass(
+    graderCount.removeClass(
         'grader-error grader-ok grader-warning grader-unknown');
-    graderCount.html("<img src='/media/waitcircle.gif' />");
-    var html = '<li><a href="/arena/admin/">' +
-               omegaup.T.wordsLatestSubmissions + '</a></li>';
+    graderCount.text('…');
     omegaup.API.Grader.status()
         .then(function(stats) {
           var graderInfo = stats.grader;
@@ -19,34 +15,31 @@
                             graderInfo.queue.running.length;
             }
             if (queueLength < 5) {
-              graderStatus.addClass('grader-ok');
+              graderCount.addClass('grader-ok');
             } else {
-              graderStatus.addClass('grader-warning');
+              graderCount.addClass('grader-warning');
             }
-            html += '<li><a>Grader OK</a></li>';
-            html += '<li><a>Broadcaster sockets: ' +
-                    graderInfo.broadcaster_sockets + '</a></li>';
-            html += '<li><a>Embedded runner: ' + graderInfo.embedded_runner +
-                    '</a></li>';
-            html += '<li><a>Queues: <pre style="width: 50em;">' +
-                    omegaup.UI.prettyPrintJSON(graderInfo.queue) +
-                    '</pre></a></li>';
+            $('.grader-status').text('Grader OK');
+            $('.grader-broadcaster-sockets')
+                .text('Broadcaster sockets: ' + graderInfo.broadcaster_sockets);
+            $('.grader-embedded-runner')
+                .text('Embedded runner: ' + graderInfo.embedded_runner);
+            $('.grader-queues')
+                .html('Queues: <pre style="width: 50em;">' +
+                      omegaup.UI.prettyPrintJSON(graderInfo.queue) + '</pre>');
           } else {
-            graderStatus.addClass('grader-error');
-            html += '<li><a>Grader DOWN</a></li>';
+            graderCount.addClass('grader-error');
+            $('.grader-status').text('Grader DOWN');
           }
-
           graderCount.text(queueLength);
-          graderDropDown.html(html);
         })
         .fail(function(stats) {
-          graderStatus.addClass('grader-unknown');
-          html += '<li><a>Grader DOWN</a></li>';
-          html += '<li><a>API api/grader/status call failed:';
-          html += omegaup.UI.escape(stats.error);
-          html += '</a></li>';
+          graderCount.addClass('grader-error');
+          $('.grader-status').text('Grader DOWN');
+          $('.grader-broadcaster-sockets')
+              .text('API api/grader/status call failed: ' +
+                    omegaup.UI.escape(stats.error));
           graderCount.text('?');
-          graderDropDown.html(html);
         });
   }
 

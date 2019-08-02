@@ -33,8 +33,10 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @param PrivacyStatementConsentLog [$PrivacyStatement_Consent_Log] El objeto de tipo PrivacyStatementConsentLog
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
-        if (is_null(self::getByPK($PrivacyStatement_Consent_Log->privacystatement_consent_id))) {
+    final public static function save(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
+        if (is_null($PrivacyStatement_Consent_Log->privacystatement_consent_id) ||
+            is_null(self::getByPK($PrivacyStatement_Consent_Log->privacystatement_consent_id))
+        ) {
             return PrivacyStatementConsentLogDAOBase::create($PrivacyStatement_Consent_Log);
         }
         return PrivacyStatementConsentLogDAOBase::update($PrivacyStatement_Consent_Log);
@@ -47,13 +49,13 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @return Filas afectadas
      * @param PrivacyStatementConsentLog [$PrivacyStatement_Consent_Log] El objeto de tipo PrivacyStatementConsentLog a actualizar.
      */
-    final public static function update(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
+    final public static function update(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         $sql = 'UPDATE `PrivacyStatement_Consent_Log` SET `identity_id` = ?, `privacystatement_id` = ?, `timestamp` = ? WHERE `privacystatement_consent_id` = ?;';
         $params = [
-            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
-            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
+            (int)$PrivacyStatement_Consent_Log->identity_id,
+            (int)$PrivacyStatement_Consent_Log->privacystatement_id,
             $PrivacyStatement_Consent_Log->timestamp,
-            is_null($PrivacyStatement_Consent_Log->privacystatement_consent_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
+            (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -69,10 +71,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @static
      * @return @link PrivacyStatementConsentLog Un objeto del tipo {@link PrivacyStatementConsentLog}. NULL si no hay tal registro.
      */
-    final public static function getByPK($privacystatement_consent_id) {
-        if (is_null($privacystatement_consent_id)) {
-            return null;
-        }
+    final public static function getByPK(int $privacystatement_consent_id) : ?PrivacyStatementConsentLog {
         $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` FROM PrivacyStatement_Consent_Log WHERE (privacystatement_consent_id = ?) LIMIT 1;';
         $params = [$privacystatement_consent_id];
         global $conn;
@@ -99,7 +98,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param PrivacyStatementConsentLog [$PrivacyStatement_Consent_Log] El objeto de tipo PrivacyStatementConsentLog a eliminar
      */
-    final public static function delete(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
+    final public static function delete(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : void {
         $sql = 'DELETE FROM `PrivacyStatement_Consent_Log` WHERE privacystatement_consent_id = ?;';
         $params = [$PrivacyStatement_Consent_Log->privacystatement_consent_id];
         global $conn;
@@ -127,7 +126,12 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link PrivacyStatementConsentLog}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` from PrivacyStatement_Consent_Log';
         global $conn;
         if (!is_null($orden)) {
@@ -153,24 +157,24 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param PrivacyStatementConsentLog [$PrivacyStatement_Consent_Log] El objeto de tipo PrivacyStatementConsentLog a crear.
      */
-    final public static function create(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) {
+    final public static function create(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         if (is_null($PrivacyStatement_Consent_Log->timestamp)) {
-            $PrivacyStatement_Consent_Log->timestamp = gmdate('Y-m-d H:i:s');
+            $PrivacyStatement_Consent_Log->timestamp = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?);';
         $params = [
-            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
-            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
+            (int)$PrivacyStatement_Consent_Log->identity_id,
+            (int)$PrivacyStatement_Consent_Log->privacystatement_id,
             $PrivacyStatement_Consent_Log->timestamp,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $PrivacyStatement_Consent_Log->privacystatement_consent_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

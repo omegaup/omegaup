@@ -33,8 +33,10 @@ abstract class QualityNominationLogDAOBase {
      * @param QualityNominationLog [$QualityNomination_Log] El objeto de tipo QualityNominationLog
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(QualityNominationLog $QualityNomination_Log) {
-        if (is_null(self::getByPK($QualityNomination_Log->qualitynomination_log_id))) {
+    final public static function save(QualityNominationLog $QualityNomination_Log) : int {
+        if (is_null($QualityNomination_Log->qualitynomination_log_id) ||
+            is_null(self::getByPK($QualityNomination_Log->qualitynomination_log_id))
+        ) {
             return QualityNominationLogDAOBase::create($QualityNomination_Log);
         }
         return QualityNominationLogDAOBase::update($QualityNomination_Log);
@@ -47,16 +49,16 @@ abstract class QualityNominationLogDAOBase {
      * @return Filas afectadas
      * @param QualityNominationLog [$QualityNomination_Log] El objeto de tipo QualityNominationLog a actualizar.
      */
-    final public static function update(QualityNominationLog $QualityNomination_Log) {
+    final public static function update(QualityNominationLog $QualityNomination_Log) : int {
         $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
         $params = [
-            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
+            (int)$QualityNomination_Log->qualitynomination_id,
             $QualityNomination_Log->time,
-            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
+            (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,
-            is_null($QualityNomination_Log->qualitynomination_log_id) ? null : (int)$QualityNomination_Log->qualitynomination_log_id,
+            (int)$QualityNomination_Log->qualitynomination_log_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -72,10 +74,7 @@ abstract class QualityNominationLogDAOBase {
      * @static
      * @return @link QualityNominationLog Un objeto del tipo {@link QualityNominationLog}. NULL si no hay tal registro.
      */
-    final public static function getByPK($qualitynomination_log_id) {
-        if (is_null($qualitynomination_log_id)) {
-            return null;
-        }
+    final public static function getByPK(int $qualitynomination_log_id) : ?QualityNominationLog {
         $sql = 'SELECT `QualityNomination_Log`.`qualitynomination_log_id`, `QualityNomination_Log`.`qualitynomination_id`, `QualityNomination_Log`.`time`, `QualityNomination_Log`.`user_id`, `QualityNomination_Log`.`from_status`, `QualityNomination_Log`.`to_status`, `QualityNomination_Log`.`rationale` FROM QualityNomination_Log WHERE (qualitynomination_log_id = ?) LIMIT 1;';
         $params = [$qualitynomination_log_id];
         global $conn;
@@ -102,7 +101,7 @@ abstract class QualityNominationLogDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param QualityNominationLog [$QualityNomination_Log] El objeto de tipo QualityNominationLog a eliminar
      */
-    final public static function delete(QualityNominationLog $QualityNomination_Log) {
+    final public static function delete(QualityNominationLog $QualityNomination_Log) : void {
         $sql = 'DELETE FROM `QualityNomination_Log` WHERE qualitynomination_log_id = ?;';
         $params = [$QualityNomination_Log->qualitynomination_log_id];
         global $conn;
@@ -130,7 +129,12 @@ abstract class QualityNominationLogDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link QualityNominationLog}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `QualityNomination_Log`.`qualitynomination_log_id`, `QualityNomination_Log`.`qualitynomination_id`, `QualityNomination_Log`.`time`, `QualityNomination_Log`.`user_id`, `QualityNomination_Log`.`from_status`, `QualityNomination_Log`.`to_status`, `QualityNomination_Log`.`rationale` from QualityNomination_Log';
         global $conn;
         if (!is_null($orden)) {
@@ -156,9 +160,9 @@ abstract class QualityNominationLogDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param QualityNominationLog [$QualityNomination_Log] El objeto de tipo QualityNominationLog a crear.
      */
-    final public static function create(QualityNominationLog $QualityNomination_Log) {
+    final public static function create(QualityNominationLog $QualityNomination_Log) : int {
         if (is_null($QualityNomination_Log->time)) {
-            $QualityNomination_Log->time = gmdate('Y-m-d H:i:s');
+            $QualityNomination_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($QualityNomination_Log->from_status)) {
             $QualityNomination_Log->from_status = 'open';
@@ -168,21 +172,21 @@ abstract class QualityNominationLogDAOBase {
         }
         $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
+            (int)$QualityNomination_Log->qualitynomination_id,
             $QualityNomination_Log->time,
-            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
+            (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $QualityNomination_Log->qualitynomination_log_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

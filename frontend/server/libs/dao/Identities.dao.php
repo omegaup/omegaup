@@ -32,7 +32,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return new Identities($rs);
     }
 
-    public static function FindByUsername($username) {
+    public static function findByUsername(string $username) : ?Identities {
         global  $conn;
         $sql = 'SELECT
                    i.*
@@ -50,18 +50,49 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         return new Identities($rs);
     }
 
-    public static function FindByUserId($user_id) {
+    public static function findByUsernameOrName(string $usernameOrName) : array {
+        global  $conn;
+        $sql = "
+            SELECT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                i.username = ? OR i.name = ?
+            UNION DISTINCT
+            SELECT DISTINCT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                i.username LIKE CONCAT('%', ?, '%') OR
+                i.username LIKE CONCAT('%', ?, '%')
+            LIMIT 100";
+        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
+
+        $rs = $conn->GetAll($sql, $args);
+        $result = [];
+        foreach ($rs as $identityData) {
+            array_push($result, new Identities($identityData));
+        }
+        return $result;
+    }
+
+    public static function findByUserId(int $userId) : ?Identities {
         global  $conn;
         $sql = 'SELECT
                   i.*
                 FROM
                   `Identities` i
+                INNER JOIN
+                  `Users` u
+                ON
+                  i.identity_id = u.main_identity_id
                 WHERE
                   i.user_id = ?
                 LIMIT
                   0, 1';
-        $params = [ $user_id ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = $conn->GetRow($sql, [$userId]);
         if (empty($rs)) {
             return null;
         }
@@ -159,7 +190,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LEFT JOIN
                     Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
-                    Languages l ON u.language_id = l.language_id
+                    Languages l ON i.language_id = l.language_id
                 WHERE
                     i.`identity_id` = ?
                 LIMIT

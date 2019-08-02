@@ -33,8 +33,11 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @param ProblemsetIdentityRequest [$Problemset_Identity_Request] El objeto de tipo ProblemsetIdentityRequest
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetIdentityRequest $Problemset_Identity_Request) {
-        if (is_null(self::getByPK($Problemset_Identity_Request->identity_id, $Problemset_Identity_Request->problemset_id))) {
+    final public static function save(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
+        if (is_null($Problemset_Identity_Request->identity_id) ||
+            is_null($Problemset_Identity_Request->problemset_id) ||
+            is_null(self::getByPK($Problemset_Identity_Request->identity_id, $Problemset_Identity_Request->problemset_id))
+        ) {
             return ProblemsetIdentityRequestDAOBase::create($Problemset_Identity_Request);
         }
         return ProblemsetIdentityRequestDAOBase::update($Problemset_Identity_Request);
@@ -47,15 +50,15 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @return Filas afectadas
      * @param ProblemsetIdentityRequest [$Problemset_Identity_Request] El objeto de tipo ProblemsetIdentityRequest a actualizar.
      */
-    final public static function update(ProblemsetIdentityRequest $Problemset_Identity_Request) {
+    final public static function update(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
         $sql = 'UPDATE `Problemset_Identity_Request` SET `request_time` = ?, `last_update` = ?, `accepted` = ?, `extra_note` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
             $Problemset_Identity_Request->request_time,
             $Problemset_Identity_Request->last_update,
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
-            is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
-            is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
+            (int)$Problemset_Identity_Request->identity_id,
+            (int)$Problemset_Identity_Request->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,10 +74,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @static
      * @return @link ProblemsetIdentityRequest Un objeto del tipo {@link ProblemsetIdentityRequest}. NULL si no hay tal registro.
      */
-    final public static function getByPK($identity_id, $problemset_id) {
-        if (is_null($identity_id) || is_null($problemset_id)) {
-            return null;
-        }
+    final public static function getByPK(int $identity_id, int $problemset_id) : ?ProblemsetIdentityRequest {
         $sql = 'SELECT `Problemset_Identity_Request`.`identity_id`, `Problemset_Identity_Request`.`problemset_id`, `Problemset_Identity_Request`.`request_time`, `Problemset_Identity_Request`.`last_update`, `Problemset_Identity_Request`.`accepted`, `Problemset_Identity_Request`.`extra_note` FROM Problemset_Identity_Request WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
@@ -101,7 +101,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param ProblemsetIdentityRequest [$Problemset_Identity_Request] El objeto de tipo ProblemsetIdentityRequest a eliminar
      */
-    final public static function delete(ProblemsetIdentityRequest $Problemset_Identity_Request) {
+    final public static function delete(ProblemsetIdentityRequest $Problemset_Identity_Request) : void {
         $sql = 'DELETE FROM `Problemset_Identity_Request` WHERE identity_id = ? AND problemset_id = ?;';
         $params = [$Problemset_Identity_Request->identity_id, $Problemset_Identity_Request->problemset_id];
         global $conn;
@@ -129,7 +129,12 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetIdentityRequest}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problemset_Identity_Request`.`identity_id`, `Problemset_Identity_Request`.`problemset_id`, `Problemset_Identity_Request`.`request_time`, `Problemset_Identity_Request`.`last_update`, `Problemset_Identity_Request`.`accepted`, `Problemset_Identity_Request`.`extra_note` from Problemset_Identity_Request';
         global $conn;
         if (!is_null($orden)) {
@@ -155,14 +160,14 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param ProblemsetIdentityRequest [$Problemset_Identity_Request] El objeto de tipo ProblemsetIdentityRequest a crear.
      */
-    final public static function create(ProblemsetIdentityRequest $Problemset_Identity_Request) {
+    final public static function create(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
         if (is_null($Problemset_Identity_Request->request_time)) {
-            $Problemset_Identity_Request->request_time = gmdate('Y-m-d H:i:s');
+            $Problemset_Identity_Request->request_time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
-            is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
+            (int)$Problemset_Identity_Request->identity_id,
+            (int)$Problemset_Identity_Request->problemset_id,
             $Problemset_Identity_Request->request_time,
             $Problemset_Identity_Request->last_update,
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
@@ -170,11 +175,11 @@ abstract class ProblemsetIdentityRequestDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

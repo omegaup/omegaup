@@ -35,8 +35,10 @@ abstract class {{ table.class_name }}DAOBase {
      * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save({{ table.class_name }} ${{ table.name }}) {
-        if (is_null(self::getByPK({{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(', ') }}))) {
+    final public static function save({{ table.class_name }} ${{ table.name }}) : int {
+        if ({{ table.columns|selectattr('primary_key')|listformat('is_null(${table.name}->{.name})', table=table)|join(' ||\n            ') }} ||
+            is_null(self::getByPK({{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(', ') }}))
+        ) {
             return {{ table.class_name }}DAOBase::create(${{ table.name }});
         }
         return {{ table.class_name }}DAOBase::update(${{ table.name }});
@@ -49,27 +51,31 @@ abstract class {{ table.class_name }}DAOBase {
      * @return Filas afectadas
      * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a actualizar.
      */
-    final public static function update({{ table.class_name }} ${{ table.name }}) {
+    final public static function update({{ table.class_name }} ${{ table.name }}) : int {
         $sql = 'UPDATE `{{ table.name }}` SET {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(', ') }} WHERE {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND ') }};';
         $params = [
 {%- for column in table.columns|rejectattr('primary_key') %}
-{%- if 'tinyint' in column.type %}
+{%- if column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif 'int' in column.type %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif 'double' in column.type %}
+{%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+{%- elif column.php_type in ('bool', 'int') %}
+            (int)${{ table.name }}->{{ column.name }},
+{%- elif column.php_type == 'float' %}
+            (float)${{ table.name }}->{{ column.name }},
 {%- else %}
             ${{ table.name }}->{{ column.name }},
 {%- endif %}
 {%- endfor %}
 {%- for column in table.columns|selectattr('primary_key') %}
-{%- if 'tinyint' in column.type %}
+{%- if column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif 'int' in column.type %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif 'double' in column.type %}
+{%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+{%- elif column.php_type in ('bool', 'int') %}
+            (int)${{ table.name }}->{{ column.name }},
+{%- elif column.php_type == 'float' %}
+            (float)${{ table.name }}->{{ column.name }},
 {%- else %}
             ${{ table.name }}->{{ column.name }},
 {%- endif %}
@@ -89,10 +95,12 @@ abstract class {{ table.class_name }}DAOBase {
      * @static
      * @return @link {{ table.class_name }} Un objeto del tipo {@link {{ table.class_name }}}. NULL si no hay tal registro.
      */
-    final public static function getByPK({{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}) {
-        if ({{ table.columns|selectattr('primary_key')|listformat('is_null(${.name})')|join(' || ') }}) {
+    final public static function getByPK({{ table.columns|selectattr('primary_key')|listformat('{0.php_type} ${0.name}')|join(', ') }}) : ?{{ table.class_name }} {
+{%- if table.columns|selectattr('primary_key')|rejectattr('not_null')|list|length %}
+        if ({{ table.columns|selectattr('primary_key')|rejectattr('not_null')|listformat('is_null(${.name})')|join(' || ') }}) {
             return null;
         }
+{%- endif %}
         $sql = 'SELECT {{ table.fieldnames }} FROM {{ table.name }} WHERE ({{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }}) LIMIT 1;';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
         global $conn;
@@ -119,7 +127,7 @@ abstract class {{ table.class_name }}DAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a eliminar
      */
-    final public static function delete({{ table.class_name }} ${{ table.name }}) {
+    final public static function delete({{ table.class_name }} ${{ table.name }}) : void {
         $sql = 'DELETE FROM `{{ table.name }}` WHERE {{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }};';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(', ') }}];
         global $conn;
@@ -147,7 +155,12 @@ abstract class {{ table.class_name }}DAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link {{ table.class_name }}}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT {{ table.fieldnames }} from {{ table.name }}';
         global $conn;
         if (!is_null($orden)) {
@@ -178,17 +191,17 @@ abstract class {{ table.class_name }}DAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a crear.
      */
-    final public static function create({{ table.class_name }} ${{ table.name }}) {
+    final public static function create({{ table.class_name }} ${{ table.name }}) : int {
 {%- for column in table.columns|selectattr('default') %}
         if (is_null(${{ table.name }}->{{ column.name }})) {
 {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s');
-{%- elif 'tinyint' in column.type %}
+            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
+{%- elif column.php_primitive_type == 'bool' %}
             ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
-{%- elif 'int' in column.type %}
-            ${{ table.name }}->{{ column.name }} = {{ column.default }};
-{%- elif 'double' in column.type %}
-            ${{ table.name }}->{{ column.name }} = (float){{ column.default }};
+{%- elif column.php_primitive_type == 'int' %}
+            ${{ table.name }}->{{ column.name }} = {{ '%d'|format(column.default|int) }};
+{%- elif column.php_primitive_type == 'float' %}
+            ${{ table.name }}->{{ column.name }} = {{ '%.2f'|format(column.default|float) }};
 {%- else %}
             ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
 {%- endif %}
@@ -197,12 +210,14 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(', ') }});';
         $params = [
 {%- for column in table.columns|rejectattr('auto_increment') %}
-{%- if 'tinyint' in column.type %}
+{%- if column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif 'int' in column.type %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif 'double' in column.type %}
+{%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+{%- elif column.php_type in ('bool', 'int') %}
+            (int)${{ table.name }}->{{ column.name }},
+{%- elif column.php_type == 'float' %}
+            (float)${{ table.name }}->{{ column.name }},
 {%- else %}
             ${{ table.name }}->{{ column.name }},
 {%- endif %}
@@ -210,15 +225,15 @@ abstract class {{ table.class_name }}DAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 {%- for column in table.columns|selectattr('auto_increment') %}
         ${{ table.name }}->{{ column.name }} = $conn->Insert_ID();
 {%- endfor %}
 
-        return $ar;
+        return $affectedRows;
     }
 }
 

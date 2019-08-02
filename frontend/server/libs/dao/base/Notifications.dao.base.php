@@ -33,8 +33,10 @@ abstract class NotificationsDAOBase {
      * @param Notifications [$Notifications] El objeto de tipo Notifications
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Notifications $Notifications) {
-        if (is_null(self::getByPK($Notifications->notification_id))) {
+    final public static function save(Notifications $Notifications) : int {
+        if (is_null($Notifications->notification_id) ||
+            is_null(self::getByPK($Notifications->notification_id))
+        ) {
             return NotificationsDAOBase::create($Notifications);
         }
         return NotificationsDAOBase::update($Notifications);
@@ -47,14 +49,14 @@ abstract class NotificationsDAOBase {
      * @return Filas afectadas
      * @param Notifications [$Notifications] El objeto de tipo Notifications a actualizar.
      */
-    final public static function update(Notifications $Notifications) {
+    final public static function update(Notifications $Notifications) : int {
         $sql = 'UPDATE `Notifications` SET `user_id` = ?, `timestamp` = ?, `read` = ?, `contents` = ? WHERE `notification_id` = ?;';
         $params = [
-            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
+            (int)$Notifications->user_id,
             $Notifications->timestamp,
-            is_null($Notifications->read) ? null : (int)$Notifications->read,
+            (int)$Notifications->read,
             $Notifications->contents,
-            is_null($Notifications->notification_id) ? null : (int)$Notifications->notification_id,
+            (int)$Notifications->notification_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -70,10 +72,7 @@ abstract class NotificationsDAOBase {
      * @static
      * @return @link Notifications Un objeto del tipo {@link Notifications}. NULL si no hay tal registro.
      */
-    final public static function getByPK($notification_id) {
-        if (is_null($notification_id)) {
-            return null;
-        }
+    final public static function getByPK(int $notification_id) : ?Notifications {
         $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`contents` FROM Notifications WHERE (notification_id = ?) LIMIT 1;';
         $params = [$notification_id];
         global $conn;
@@ -100,7 +99,7 @@ abstract class NotificationsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Notifications [$Notifications] El objeto de tipo Notifications a eliminar
      */
-    final public static function delete(Notifications $Notifications) {
+    final public static function delete(Notifications $Notifications) : void {
         $sql = 'DELETE FROM `Notifications` WHERE notification_id = ?;';
         $params = [$Notifications->notification_id];
         global $conn;
@@ -128,7 +127,12 @@ abstract class NotificationsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Notifications}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`contents` from Notifications';
         global $conn;
         if (!is_null($orden)) {
@@ -154,28 +158,28 @@ abstract class NotificationsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Notifications [$Notifications] El objeto de tipo Notifications a crear.
      */
-    final public static function create(Notifications $Notifications) {
+    final public static function create(Notifications $Notifications) : int {
         if (is_null($Notifications->timestamp)) {
-            $Notifications->timestamp = gmdate('Y-m-d H:i:s');
+            $Notifications->timestamp = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($Notifications->read)) {
             $Notifications->read = false;
         }
         $sql = 'INSERT INTO Notifications (`user_id`, `timestamp`, `read`, `contents`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
+            (int)$Notifications->user_id,
             $Notifications->timestamp,
-            is_null($Notifications->read) ? null : (int)$Notifications->read,
+            (int)$Notifications->read,
             $Notifications->contents,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Notifications->notification_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

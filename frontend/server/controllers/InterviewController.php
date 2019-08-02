@@ -39,7 +39,7 @@ class InterviewController extends Controller {
         try {
             DAO::transBegin();
 
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
             $interview->acl_id = $acl->acl_id;
 
             $problemset = new Problemsets([
@@ -48,13 +48,13 @@ class InterviewController extends Controller {
                 'scoreboard_url' => SecurityTools::randomString(30),
                 'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::create($problemset);
             $interview->problemset_id = $problemset->problemset_id;
-            InterviewsDAO::save($interview);
+            InterviewsDAO::create($interview);
 
             // Update interview_id in problemset object
             $problemset->interview_id = $interview->interview_id;
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::update($problemset);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -165,14 +165,14 @@ class InterviewController extends Controller {
 
         // Only director is allowed to add people to interview
         if (is_null($r->identity)
-            || !Authorization::isInterviewAdmin($r->identity->identity_id, $r['interview'])
+            || !Authorization::isInterviewAdmin($r->identity, $r['interview'])
         ) {
             throw new ForbiddenAccessException();
         }
 
         // add the user to the interview
         try {
-            ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
+            ProblemsetIdentitiesDAO::create(new ProblemsetIdentities([
                 'problemset_id' => $r['interview']->problemset_id,
                 'identity_id' => $r['user']->main_identity_id,
                 'access_time' => null,
@@ -211,7 +211,7 @@ class InterviewController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isInterviewAdmin($r->identity->identity_id, $interview)) {
+        if (!Authorization::isInterviewAdmin($r->identity, $interview)) {
             throw new ForbiddenAccessException();
         }
 
@@ -263,6 +263,9 @@ class InterviewController extends Controller {
     }
 
     public static function showIntro(Request $r) {
-        return ContestController::showContestIntro($r)['shouldShowIntro'];
+        $contest = ContestController::validateContest($r['contest_alias'] ?? '');
+        // TODO: Arreglar esto para que Problemsets se encargue de obtener
+        //       la info correcta
+        return ContestController::shouldShowIntro($r, $contest);
     }
 }

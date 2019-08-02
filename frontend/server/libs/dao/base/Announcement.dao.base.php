@@ -33,8 +33,10 @@ abstract class AnnouncementDAOBase {
      * @param Announcement [$Announcement] El objeto de tipo Announcement
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Announcement $Announcement) {
-        if (is_null(self::getByPK($Announcement->announcement_id))) {
+    final public static function save(Announcement $Announcement) : int {
+        if (is_null($Announcement->announcement_id) ||
+            is_null(self::getByPK($Announcement->announcement_id))
+        ) {
             return AnnouncementDAOBase::create($Announcement);
         }
         return AnnouncementDAOBase::update($Announcement);
@@ -47,13 +49,13 @@ abstract class AnnouncementDAOBase {
      * @return Filas afectadas
      * @param Announcement [$Announcement] El objeto de tipo Announcement a actualizar.
      */
-    final public static function update(Announcement $Announcement) {
+    final public static function update(Announcement $Announcement) : int {
         $sql = 'UPDATE `Announcement` SET `user_id` = ?, `time` = ?, `description` = ? WHERE `announcement_id` = ?;';
         $params = [
-            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
+            (int)$Announcement->user_id,
             $Announcement->time,
             $Announcement->description,
-            is_null($Announcement->announcement_id) ? null : (int)$Announcement->announcement_id,
+            (int)$Announcement->announcement_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -69,10 +71,7 @@ abstract class AnnouncementDAOBase {
      * @static
      * @return @link Announcement Un objeto del tipo {@link Announcement}. NULL si no hay tal registro.
      */
-    final public static function getByPK($announcement_id) {
-        if (is_null($announcement_id)) {
-            return null;
-        }
+    final public static function getByPK(int $announcement_id) : ?Announcement {
         $sql = 'SELECT `Announcement`.`announcement_id`, `Announcement`.`user_id`, `Announcement`.`time`, `Announcement`.`description` FROM Announcement WHERE (announcement_id = ?) LIMIT 1;';
         $params = [$announcement_id];
         global $conn;
@@ -99,7 +98,7 @@ abstract class AnnouncementDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Announcement [$Announcement] El objeto de tipo Announcement a eliminar
      */
-    final public static function delete(Announcement $Announcement) {
+    final public static function delete(Announcement $Announcement) : void {
         $sql = 'DELETE FROM `Announcement` WHERE announcement_id = ?;';
         $params = [$Announcement->announcement_id];
         global $conn;
@@ -127,7 +126,12 @@ abstract class AnnouncementDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Announcement}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Announcement`.`announcement_id`, `Announcement`.`user_id`, `Announcement`.`time`, `Announcement`.`description` from Announcement';
         global $conn;
         if (!is_null($orden)) {
@@ -153,24 +157,24 @@ abstract class AnnouncementDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Announcement [$Announcement] El objeto de tipo Announcement a crear.
      */
-    final public static function create(Announcement $Announcement) {
+    final public static function create(Announcement $Announcement) : int {
         if (is_null($Announcement->time)) {
-            $Announcement->time = gmdate('Y-m-d H:i:s');
+            $Announcement->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
+            (int)$Announcement->user_id,
             $Announcement->time,
             $Announcement->description,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Announcement->announcement_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

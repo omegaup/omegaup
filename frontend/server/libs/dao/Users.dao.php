@@ -47,34 +47,6 @@ class UsersDAO extends UsersDAOBase {
         return $conn->GetOne($sql, $params) > 0;
     }
 
-    public static function FindByUsernameOrName($usernameOrName) {
-        global  $conn;
-        $sql = "
-            SELECT
-                u.*
-            FROM
-                Users u
-            WHERE
-                u.username = ? OR u.name = ?
-            UNION DISTINCT
-            SELECT DISTINCT
-                u.*
-            FROM
-                Users u
-            WHERE
-                u.username LIKE CONCAT('%', ?, '%') OR
-                u.username LIKE CONCAT('%', ?, '%')
-            LIMIT 10";
-        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
-
-        $rs = $conn->GetAll($sql, $args);
-        $result = [];
-        foreach ($rs as $user_data) {
-            array_push($result, new Users($user_data));
-        }
-        return $result;
-    }
-
     public static function FindResetInfoByEmail($email) {
         $user = self::FindByEmail($email);
         if (is_null($user)) {
@@ -112,22 +84,27 @@ class UsersDAO extends UsersDAOBase {
         }
         $sql = 'SELECT
                     COALESCE(c.`name`, "xx") AS country,
+                    c.`country_id` AS country_id,
                     s.`name` AS state,
+                    s.`state_id` AS state_id,
                     sc.`name` AS school,
+                    sc.`school_id` AS school_id,
                     e.`email`,
                     l.`name` AS locale
                 FROM
                     Users u
                 INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                INNER JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
-                    Countries c ON u.country_id = c.country_id
+                    Countries c ON i.country_id = c.country_id
                 LEFT JOIN
-                    States s ON u.state_id = s.state_id AND s.country_id = c.country_id
+                    States s ON i.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
-                    Schools sc ON u.school_id = sc.school_id
+                    Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
-                    Languages l ON u.language_id = l.language_id
+                    Languages l ON i.language_id = l.language_id
                 WHERE
                     u.`user_id` = ?
                 LIMIT
@@ -222,5 +199,14 @@ class UsersDAO extends UsersDAOBase {
             array_push($users, new Users($row));
         }
         return $users;
+    }
+
+    public static function getUsersCount() {
+        $sql = 'SELECT
+                    COUNT(*) AS total
+                FROM
+                    Users;';
+        global $conn;
+        return $conn->GetRow($sql)['total'];
     }
 }

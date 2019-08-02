@@ -15,6 +15,13 @@
  * @access public
  */
 class UsersBadges extends VO {
+    const FIELD_NAMES = [
+        'user_badge_id' => true,
+        'user_id' => true,
+        'badge_alias' => true,
+        'assignation_time' => true,
+    ];
+
     /**
      * Constructor de UsersBadges
      *
@@ -22,9 +29,13 @@ class UsersBadges extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_badge_id'])) {
             $this->user_badge_id = (int)$data['user_badge_id'];
@@ -43,7 +54,7 @@ class UsersBadges extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['assignation_time']);
             return;
@@ -56,28 +67,28 @@ class UsersBadges extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_badge_id;
 
     /**
       * Identificador de usuario
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       * Identificador de badge
       * @access public
-      * @var varchar(32)
-      */
+      * @var string
+     */
     public $badge_alias;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $assignation_time;
+      * @var string
+     */
+    public $assignation_time = null;
 }

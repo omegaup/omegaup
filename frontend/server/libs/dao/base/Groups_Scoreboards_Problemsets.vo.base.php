@@ -15,6 +15,13 @@
  * @access public
  */
 class GroupsScoreboardsProblemsets extends VO {
+    const FIELD_NAMES = [
+        'group_scoreboard_id' => true,
+        'problemset_id' => true,
+        'only_ac' => true,
+        'weight' => true,
+    ];
+
     /**
      * Constructor de GroupsScoreboardsProblemsets
      *
@@ -22,9 +29,13 @@ class GroupsScoreboardsProblemsets extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_scoreboard_id'])) {
             $this->group_scoreboard_id = (int)$data['group_scoreboard_id'];
@@ -33,7 +44,7 @@ class GroupsScoreboardsProblemsets extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['only_ac'])) {
-            $this->only_ac = $data['only_ac'] == '1';
+            $this->only_ac = boolval($data['only_ac']);
         }
         if (isset($data['weight'])) {
             $this->weight = (int)$data['weight'];
@@ -43,7 +54,7 @@ class GroupsScoreboardsProblemsets extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -55,29 +66,29 @@ class GroupsScoreboardsProblemsets extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $group_scoreboard_id;
 
     /**
       * Conjunto de problemas del scoreboard
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var tinyint(1)
-      */
-    public $only_ac;
+      * @var bool
+     */
+    public $only_ac = false;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $weight;
+      * @var int
+     */
+    public $weight = 1;
 }

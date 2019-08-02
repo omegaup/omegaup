@@ -127,7 +127,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertNotNull($submission);
 
         // Get contest from DB to check times with respect to contest start
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = ContestsDAO::getByAlias($r['contest_alias'] ?? '');
 
         // Validate data
         $this->assertEquals($r['language'], $submission->language);
@@ -269,7 +269,7 @@ class RunCreateTest extends OmegaupTestCase {
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -298,7 +298,7 @@ class RunCreateTest extends OmegaupTestCase {
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
 
         // Call API, send a run for the first problem
         $response = RunController::apiCreate($r);
@@ -438,7 +438,7 @@ class RunCreateTest extends OmegaupTestCase {
         // Manually set the contest start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10);
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -485,7 +485,7 @@ class RunCreateTest extends OmegaupTestCase {
         // Set submissions gap of 20 seconds
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -839,8 +839,11 @@ class RunCreateTest extends OmegaupTestCase {
         RunsFactory::gradeRun($waRunData, 0, 'WA', 60);
 
         // Contestant should be able to view run (but not the run details).
+        $contestantIdentity = IdentityController::resolveIdentity(
+            $contestant->username
+        );
         $this->assertFalse(Authorization::isProblemAdmin(
-            $contestant->main_identity_id,
+            $contestantIdentity,
             $problemData['problem']
         ));
         $response = RunController::apiDetails(new Request([

@@ -4,7 +4,7 @@ require_once('../server/bootstrap_smarty.php');
 
 $c_Session = new SessionController;
 
-if ($c_Session->CurrentSessionAvailable()) {
+if ($c_Session->currentSessionAvailable()) {
     $c_Session->UnRegisterSession();
 }
 

@@ -252,6 +252,19 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         with self.page_transition():
             self.browser.find_element_by_id('register-form').submit()
 
+        # Enable experiment
+        user_id = util.database_utils.mysql(
+            ('''
+            SELECT
+                `user_id`
+            FROM
+                `Users`
+            WHERE
+                `username` = '%s';
+            ''') % (user),
+            dbname='omegaup', auth=self.mysql_auth())
+        self.enable_experiment_identities_to_user(user_id)
+
         # Home screen
         with self.page_transition():
             self.browser.get(self.url(_BLANK))
@@ -360,12 +373,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         user_id = util.database_utils.mysql(
             ('''
             INSERT INTO
-                Users(`username`, `password`, `verified`, `name`)
+                Users(`username`, `password`, `verified`)
             VALUES
-                ('%s', '%s', 1, '%s');
+                ('%s', '%s', 1);
             SELECT LAST_INSERT_ID();
-            ''') % (username, password, username),
+            ''') % (username, password),
             dbname='omegaup', auth=self.mysql_auth())
+
+        # Enable experiment
+        self.enable_experiment_identities_to_user(user_id)
+
         identity_id = util.database_utils.mysql(
             ('''
             INSERT INTO
@@ -395,6 +412,19 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 ''') % (user_id,),
                 dbname='omegaup', auth=self.mysql_auth())
         return username
+
+    def enable_experiment_identities_to_user(self, user_id):
+        ''' Enable identities experiment to users can use functions of
+        identity refactor
+        '''
+        util.database_utils.mysql(
+            ('''
+            INSERT INTO
+                Users_Experiments(`user_id`, `experiment`)
+            VALUES
+                ('%s', 'identities');
+            ''') % (user_id),
+            dbname='omegaup', auth=self.mysql_auth())
 
 
 @pytest.hookimpl(hookwrapper=True)

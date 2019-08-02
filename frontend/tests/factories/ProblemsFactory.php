@@ -166,11 +166,14 @@ class ProblemsFactory {
         // Get a user
         $problemData = self::getRequest($params);
         $r = $problemData['request'];
-        $problemAuthor = $problemData['author'];
+        $problemAuthorUser = $problemData['author'];
+        $problemAuthorIdentity = IdentitiesDAO::getByPK(
+            $problemData['author']->main_identity_id
+        );
 
         if ($login == null) {
             // Login user
-            $login = OmegaupTestCase::login($problemAuthor);
+            $login = OmegaupTestCase::login($problemAuthorUser);
         }
         $r['auth_token'] = $login->auth_token;
 
@@ -187,7 +190,7 @@ class ProblemsFactory {
             || $visibility == ProblemController::VISIBILITY_PROMOTED
         ) {
             $problem->visibility = $visibility;
-            ProblemsDAO::save($problem);
+            ProblemsDAO::update($problem);
         }
 
         // Clean up our mess
@@ -195,7 +198,8 @@ class ProblemsFactory {
 
         return  [
             'request' => $r,
-            'author' => $problemAuthor,
+            'author' => $problemAuthorUser,
+            'authorIdentity' => $problemAuthorIdentity,
             'problem' => $problem,
         ];
     }

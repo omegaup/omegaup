@@ -15,6 +15,21 @@
  * @access public
  */
 class Runs extends VO {
+    const FIELD_NAMES = [
+        'run_id' => true,
+        'submission_id' => true,
+        'version' => true,
+        'status' => true,
+        'verdict' => true,
+        'runtime' => true,
+        'penalty' => true,
+        'memory' => true,
+        'score' => true,
+        'contest_score' => true,
+        'time' => true,
+        'judged_by' => true,
+    ];
+
     /**
      * Constructor de Runs
      *
@@ -22,9 +37,13 @@ class Runs extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['run_id'])) {
             $this->run_id = (int)$data['run_id'];
@@ -67,7 +86,7 @@ class Runs extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -80,84 +99,84 @@ class Runs extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $run_id;
 
     /**
       * El envío
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $submission_id;
 
     /**
       * El hash SHA1 del árbol de la rama private.
       * @access public
-      * @var char(40)
-      */
+      * @var string
+     */
     public $version;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('new','waiting','compiling','running','ready')
-      */
-    public $status;
+      * @var string
+     */
+    public $status = 'new';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('ac','pa','pe','wa','tle','ole','mle','rte','rfe','ce','je')
-      */
+      * @var string
+     */
     public $verdict;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $runtime;
+      * @var int
+     */
+    public $runtime = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $penalty;
+      * @var int
+     */
+    public $penalty = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
-    public $memory;
+      * @var int
+     */
+    public $memory = 0;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
-    public $score;
+      * @var float
+     */
+    public $score = 0.00;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
+      * @var ?float
+     */
     public $contest_score;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var char(32)
-      */
+      * @var ?string
+     */
     public $judged_by;
 }

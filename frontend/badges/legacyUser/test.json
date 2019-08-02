@@ -1,0 +1,104 @@
+{
+  "testType": "apicall",
+  "actions": [
+    {
+      "type": "changeTime",
+      "time": "2011-05-01"
+    },
+    {
+      "type": "apicalls",
+      "apicalls": [
+        {
+          "username": "admintest",
+          "password": "testtesttest",
+          "requests": [
+            {
+              "api": "ProblemController::apiCreate",
+              "params": {
+                "visibility": 1,
+                "title": "Sumas",
+                "problem_alias": "sumas",
+                "validator": "token-numeric",
+                "time_limit": 1000,
+                "validator_time_limit": 0,
+                "overall_wall_time_limit": 1000,
+                "extra_wall_time": 0,
+                "memory_limit": 32768,
+                "output_limit": 10240,
+                "input_limit": 10240,
+                "source": "omegaUp classics",
+                "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+                "email_clarifications": 1
+              },
+              "files": {
+                "problem_contents": "frontend/tests/resources/testproblem.zip"
+              }
+            },
+            {
+              "api": "UserController::apiCreate",
+              "params": {
+                "username": "test_user_0",
+                "email": "user_0@domain.com",
+                "password": "test_user_0"
+              }
+            },
+            {
+              "api": "UserController::apiCreate",
+              "params": {
+                "username": "test_user_1",
+                "email": "user_1@domain.com",
+                "password": "test_user_1"
+              }
+            }
+          ]
+        },
+        {
+          "username": "test_user_0",
+          "password": "test_user_0",
+          "requests": [
+            {
+              "api": "RunController::apiCreate",
+              "params": {
+                "problem_alias": "sumas",
+                "language": "py",
+                "source": "print sum(map(int, raw_input().strip().split()))"
+              },
+              "gradeResult": {
+                "verdict": "PE"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "changeTime",
+      "time": "2017-05-01"
+    },
+    {
+      "type": "apicalls",
+      "apicalls": [
+        {
+          "username": "test_user_1",
+          "password": "test_user_1",
+          "requests": [
+            {
+              "api": "RunController::apiCreate",
+              "params": {
+                "problem_alias": "sumas",
+                "language": "py",
+                "source": "print sum(map(int, raw_input().strip().split()))"
+              },
+              "gradeResult": {
+                "verdict": "WA"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "expectedResults": [
+    "test_user_0"
+  ]
+}

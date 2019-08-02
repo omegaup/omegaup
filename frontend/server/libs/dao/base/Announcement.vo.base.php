@@ -15,6 +15,13 @@
  * @access public
  */
 class Announcement extends VO {
+    const FIELD_NAMES = [
+        'announcement_id' => true,
+        'user_id' => true,
+        'time' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de Announcement
      *
@@ -22,9 +29,13 @@ class Announcement extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['announcement_id'])) {
             $this->announcement_id = (int)$data['announcement_id'];
@@ -43,7 +54,7 @@ class Announcement extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -56,28 +67,28 @@ class Announcement extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $announcement_id;
 
     /**
       * UserID del autor de este aviso
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       * Fecha de creacion de este aviso
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       * Mensaje de texto del aviso
       * @access public
-      * @var text
-      */
+      * @var string
+     */
     public $description;
 }

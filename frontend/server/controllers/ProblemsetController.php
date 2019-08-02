@@ -5,16 +5,15 @@ require_once('libs/dao/Problemset_Problems.dao.php');
 
 class ProblemsetController extends Controller {
     public static function validateAddProblemToProblemset(
-        $problemset_id,
         Problems $problem,
-        $current_identity_id
+        Identities $identity
     ) {
         if ($problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
             $problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
             throw new ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem)
-            && !Authorization::isProblemAdmin($current_identity_id, $problem)
+            && !Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new ForbiddenAccessException('problemIsPrivate');
         }
@@ -25,15 +24,17 @@ class ProblemsetController extends Controller {
         Problems $problem,
         string $commit,
         string $currentVersion,
-        $current_identity_id,
-        $points,
-        $order_in_contest = 1
+        Identities $identity,
+        int $points,
+        int $order_in_contest = 1,
+        bool $validateVisibility = true
     ) {
-        ProblemsetController::validateAddProblemToProblemset(
-            $problemset_id,
-            $problem,
-            $current_identity_id
-        );
+        if ($validateVisibility) {
+            ProblemsetController::validateAddProblemToProblemset(
+                $problem,
+                $identity
+            );
+        }
 
         try {
             self::updateProblemsetProblem(new ProblemsetProblems([
@@ -61,7 +62,7 @@ class ProblemsetController extends Controller {
             $updatedProblemsetProblem->problem_id
         );
         if (is_null($oldProblemsetProblem)) {
-            ProblemsetProblemsDAOBase::save($updatedProblemsetProblem);
+            ProblemsetProblemsDAOBase::create($updatedProblemsetProblem);
             return;
         }
         ProblemsetProblemsDAOBase::update($updatedProblemsetProblem);

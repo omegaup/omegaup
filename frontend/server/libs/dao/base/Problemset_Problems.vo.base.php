@@ -15,6 +15,15 @@
  * @access public
  */
 class ProblemsetProblems extends VO {
+    const FIELD_NAMES = [
+        'problemset_id' => true,
+        'problem_id' => true,
+        'commit' => true,
+        'version' => true,
+        'points' => true,
+        'order' => true,
+    ];
+
     /**
      * Constructor de ProblemsetProblems
      *
@@ -22,9 +31,13 @@ class ProblemsetProblems extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = (int)$data['problemset_id'];
@@ -49,7 +62,7 @@ class ProblemsetProblems extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -61,43 +74,43 @@ class ProblemsetProblems extends VO {
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problemset_id;
 
     /**
       *  [Campo no documentado]
       * Llave Primaria
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $problem_id;
 
     /**
       * El hash SHA1 del commit en la rama master del problema.
       * @access public
-      * @var char(40)
-      */
-    public $commit;
+      * @var string
+     */
+    public $commit = 'published';
 
     /**
       * El hash SHA1 del árbol de la rama private.
       * @access public
-      * @var char(40)
-      */
+      * @var string
+     */
     public $version;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
-    public $points;
+      * @var float
+     */
+    public $points = 1.00;
 
     /**
       * Define el orden de aparición de los problemas en una lista de problemas
       * @access public
-      * @var int(11)
-      */
-    public $order;
+      * @var int
+     */
+    public $order = 1;
 }

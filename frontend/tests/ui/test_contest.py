@@ -217,11 +217,11 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
                     (By.XPATH,
                      '//a[starts-with(@href, "%s")]' % contest_url))).click()
 
-        # User checks the score, it might be be 0 because broadcaster is turned
+        # User checks the score, it might be 0 because broadcaster is turned
         # off in Travis, and the only way to get updated results while we are
         # on the same page is going back to the page.
         check_ranking(driver, problem, driver.user_username,
-                      scores=['0.00', '100.00'])
+                      scores=['0.00', '+100.00'])
 
         # User enters to problem in contest, the ranking for this problem
         # should update.
@@ -235,8 +235,9 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
         driver.browser.find_element_by_xpath(
             '//a[contains(@href, "problems/%s")]' % problem).click()
 
-        # Now, user checks the score again, ranking should be 100
-        check_ranking(driver, problem, driver.user_username, scores=['100.00'])
+        # Now, user checks the score again, ranking should be +100
+        check_ranking(driver, problem, driver.user_username,
+                      scores=['+100.00'])
 
 
 @util.annotate
@@ -280,7 +281,8 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     '//a[starts-with(@href, "%s")]' % contest_url))).click()
+                     '//small/a[starts-with(@href, "%s")]' % contest_url
+                     ))).click()
         assert (contest_alias in
                 driver.browser.current_url), driver.browser.current_url
 

@@ -114,7 +114,7 @@ OmegaUp.on('ready', function() {
                                admission_mode: ev.admissionMode
                              })
                       .then(function(response) {
-                        UI.contestUpdated(response);
+                        UI.contestUpdated(response, contestAlias);
                         refresh(ev, API.Contest.adminDetails, 'contest');
                       })
                       .fail(UI.apiError);

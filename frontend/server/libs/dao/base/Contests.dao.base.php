@@ -33,8 +33,10 @@ abstract class ContestsDAOBase {
      * @param Contests [$Contests] El objeto de tipo Contests
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(Contests $Contests) {
-        if (is_null(self::getByPK($Contests->contest_id))) {
+    final public static function save(Contests $Contests) : int {
+        if (is_null($Contests->contest_id) ||
+            is_null(self::getByPK($Contests->contest_id))
+        ) {
             return ContestsDAOBase::create($Contests);
         }
         return ContestsDAOBase::update($Contests);
@@ -47,33 +49,33 @@ abstract class ContestsDAOBase {
      * @return Filas afectadas
      * @param Contests [$Contests] El objeto de tipo Contests a actualizar.
      */
-    final public static function update(Contests $Contests) {
+    final public static function update(Contests $Contests) : int {
         $sql = 'UPDATE `Contests` SET `problemset_id` = ?, `acl_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `last_updated` = ?, `window_length` = ?, `rerun_id` = ?, `admission_mode` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `urgent` = ?, `languages` = ?, `recommended` = ? WHERE `contest_id` = ?;';
         $params = [
-            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
-            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
+            (int)$Contests->problemset_id,
+            (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
             $Contests->start_time,
             $Contests->finish_time,
             $Contests->last_updated,
             is_null($Contests->window_length) ? null : (int)$Contests->window_length,
-            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
+            (int)$Contests->rerun_id,
             $Contests->admission_mode,
             $Contests->alias,
-            is_null($Contests->scoreboard) ? null : (int)$Contests->scoreboard,
-            is_null($Contests->points_decay_factor) ? null : (float)$Contests->points_decay_factor,
-            is_null($Contests->partial_score) ? null : (int)$Contests->partial_score,
-            is_null($Contests->submissions_gap) ? null : (int)$Contests->submissions_gap,
+            (int)$Contests->scoreboard,
+            (float)$Contests->points_decay_factor,
+            (int)$Contests->partial_score,
+            (int)$Contests->submissions_gap,
             $Contests->feedback,
-            is_null($Contests->penalty) ? null : (int)$Contests->penalty,
+            (int)$Contests->penalty,
             $Contests->penalty_type,
             $Contests->penalty_calc_policy,
-            is_null($Contests->show_scoreboard_after) ? null : (int)$Contests->show_scoreboard_after,
-            is_null($Contests->urgent) ? null : (int)$Contests->urgent,
+            (int)$Contests->show_scoreboard_after,
+            (int)$Contests->urgent,
             $Contests->languages,
-            is_null($Contests->recommended) ? null : (int)$Contests->recommended,
-            is_null($Contests->contest_id) ? null : (int)$Contests->contest_id,
+            (int)$Contests->recommended,
+            (int)$Contests->contest_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -89,10 +91,7 @@ abstract class ContestsDAOBase {
      * @static
      * @return @link Contests Un objeto del tipo {@link Contests}. NULL si no hay tal registro.
      */
-    final public static function getByPK($contest_id) {
-        if (is_null($contest_id)) {
-            return null;
-        }
+    final public static function getByPK(int $contest_id) : ?Contests {
         $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` FROM Contests WHERE (contest_id = ?) LIMIT 1;';
         $params = [$contest_id];
         global $conn;
@@ -119,7 +118,7 @@ abstract class ContestsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param Contests [$Contests] El objeto de tipo Contests a eliminar
      */
-    final public static function delete(Contests $Contests) {
+    final public static function delete(Contests $Contests) : void {
         $sql = 'DELETE FROM `Contests` WHERE contest_id = ?;';
         $params = [$Contests->contest_id];
         global $conn;
@@ -147,7 +146,12 @@ abstract class ContestsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link Contests}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` from Contests';
         global $conn;
         if (!is_null($orden)) {
@@ -173,7 +177,7 @@ abstract class ContestsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param Contests [$Contests] El objeto de tipo Contests a crear.
      */
-    final public static function create(Contests $Contests) {
+    final public static function create(Contests $Contests) : int {
         if (is_null($Contests->start_time)) {
             $Contests->start_time = '2000-01-01 06:00:00';
         }
@@ -181,7 +185,7 @@ abstract class ContestsDAOBase {
             $Contests->finish_time = '2000-01-01 06:00:00';
         }
         if (is_null($Contests->last_updated)) {
-            $Contests->last_updated = gmdate('Y-m-d H:i:s');
+            $Contests->last_updated = gmdate('Y-m-d H:i:s', Time::get());
         }
         if (is_null($Contests->admission_mode)) {
             $Contests->admission_mode = 'private';
@@ -190,7 +194,7 @@ abstract class ContestsDAOBase {
             $Contests->scoreboard = 1;
         }
         if (is_null($Contests->points_decay_factor)) {
-            $Contests->points_decay_factor = (float)0;
+            $Contests->points_decay_factor = 0.00;
         }
         if (is_null($Contests->partial_score)) {
             $Contests->partial_score = true;
@@ -212,38 +216,38 @@ abstract class ContestsDAOBase {
         }
         $sql = 'INSERT INTO Contests (`problemset_id`, `acl_id`, `title`, `description`, `start_time`, `finish_time`, `last_updated`, `window_length`, `rerun_id`, `admission_mode`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `urgent`, `languages`, `recommended`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
-            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
+            (int)$Contests->problemset_id,
+            (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
             $Contests->start_time,
             $Contests->finish_time,
             $Contests->last_updated,
             is_null($Contests->window_length) ? null : (int)$Contests->window_length,
-            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
+            (int)$Contests->rerun_id,
             $Contests->admission_mode,
             $Contests->alias,
-            is_null($Contests->scoreboard) ? null : (int)$Contests->scoreboard,
-            is_null($Contests->points_decay_factor) ? null : (float)$Contests->points_decay_factor,
-            is_null($Contests->partial_score) ? null : (int)$Contests->partial_score,
-            is_null($Contests->submissions_gap) ? null : (int)$Contests->submissions_gap,
+            (int)$Contests->scoreboard,
+            (float)$Contests->points_decay_factor,
+            (int)$Contests->partial_score,
+            (int)$Contests->submissions_gap,
             $Contests->feedback,
-            is_null($Contests->penalty) ? null : (int)$Contests->penalty,
+            (int)$Contests->penalty,
             $Contests->penalty_type,
             $Contests->penalty_calc_policy,
-            is_null($Contests->show_scoreboard_after) ? null : (int)$Contests->show_scoreboard_after,
-            is_null($Contests->urgent) ? null : (int)$Contests->urgent,
+            (int)$Contests->show_scoreboard_after,
+            (int)$Contests->urgent,
             $Contests->languages,
-            is_null($Contests->recommended) ? null : (int)$Contests->recommended,
+            (int)$Contests->recommended,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $Contests->contest_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

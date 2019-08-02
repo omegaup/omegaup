@@ -33,8 +33,10 @@ abstract class UserRankDAOBase {
      * @param UserRank [$User_Rank] El objeto de tipo UserRank
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(UserRank $User_Rank) {
-        if (is_null(self::getByPK($User_Rank->user_id))) {
+    final public static function save(UserRank $User_Rank) : int {
+        if (is_null($User_Rank->user_id) ||
+            is_null(self::getByPK($User_Rank->user_id))
+        ) {
             return UserRankDAOBase::create($User_Rank);
         }
         return UserRankDAOBase::update($User_Rank);
@@ -47,18 +49,18 @@ abstract class UserRankDAOBase {
      * @return Filas afectadas
      * @param UserRank [$User_Rank] El objeto de tipo UserRank a actualizar.
      */
-    final public static function update(UserRank $User_Rank) {
+    final public static function update(UserRank $User_Rank) : int {
         $sql = 'UPDATE `User_Rank` SET `rank` = ?, `problems_solved_count` = ?, `score` = ?, `username` = ?, `name` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ? WHERE `user_id` = ?;';
         $params = [
-            is_null($User_Rank->rank) ? null : (int)$User_Rank->rank,
-            is_null($User_Rank->problems_solved_count) ? null : (int)$User_Rank->problems_solved_count,
-            is_null($User_Rank->score) ? null : (float)$User_Rank->score,
+            (int)$User_Rank->rank,
+            (int)$User_Rank->problems_solved_count,
+            (float)$User_Rank->score,
             $User_Rank->username,
             $User_Rank->name,
             $User_Rank->country_id,
             $User_Rank->state_id,
             is_null($User_Rank->school_id) ? null : (int)$User_Rank->school_id,
-            is_null($User_Rank->user_id) ? null : (int)$User_Rank->user_id,
+            (int)$User_Rank->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -74,10 +76,7 @@ abstract class UserRankDAOBase {
      * @static
      * @return @link UserRank Un objeto del tipo {@link UserRank}. NULL si no hay tal registro.
      */
-    final public static function getByPK($user_id) {
-        if (is_null($user_id)) {
-            return null;
-        }
+    final public static function getByPK(int $user_id) : ?UserRank {
         $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` FROM User_Rank WHERE (user_id = ?) LIMIT 1;';
         $params = [$user_id];
         global $conn;
@@ -104,7 +103,7 @@ abstract class UserRankDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param UserRank [$User_Rank] El objeto de tipo UserRank a eliminar
      */
-    final public static function delete(UserRank $User_Rank) {
+    final public static function delete(UserRank $User_Rank) : void {
         $sql = 'DELETE FROM `User_Rank` WHERE user_id = ?;';
         $params = [$User_Rank->user_id];
         global $conn;
@@ -132,7 +131,12 @@ abstract class UserRankDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link UserRank}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` from User_Rank';
         global $conn;
         if (!is_null($orden)) {
@@ -158,19 +162,19 @@ abstract class UserRankDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param UserRank [$User_Rank] El objeto de tipo UserRank a crear.
      */
-    final public static function create(UserRank $User_Rank) {
+    final public static function create(UserRank $User_Rank) : int {
         if (is_null($User_Rank->problems_solved_count)) {
             $User_Rank->problems_solved_count = 0;
         }
         if (is_null($User_Rank->score)) {
-            $User_Rank->score = (float)0;
+            $User_Rank->score = 0.00;
         }
         $sql = 'INSERT INTO User_Rank (`user_id`, `rank`, `problems_solved_count`, `score`, `username`, `name`, `country_id`, `state_id`, `school_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($User_Rank->user_id) ? null : (int)$User_Rank->user_id,
-            is_null($User_Rank->rank) ? null : (int)$User_Rank->rank,
-            is_null($User_Rank->problems_solved_count) ? null : (int)$User_Rank->problems_solved_count,
-            is_null($User_Rank->score) ? null : (float)$User_Rank->score,
+            (int)$User_Rank->user_id,
+            (int)$User_Rank->rank,
+            (int)$User_Rank->problems_solved_count,
+            (float)$User_Rank->score,
             $User_Rank->username,
             $User_Rank->name,
             $User_Rank->country_id,
@@ -179,11 +183,11 @@ abstract class UserRankDAOBase {
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

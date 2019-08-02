@@ -143,19 +143,16 @@ class ContestsDAO extends ContestsDAOBase {
                                 rerun_id
                                 ';
 
-    final public static function getByAlias($alias) {
+    final public static function getByAlias(string $alias) : ?Contests {
         $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
-        $params = [$alias];
 
         global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = $conn->GetRow($sql, [$alias]);
         if (empty($rs)) {
             return null;
         }
 
-        $contest = new Contests($rs);
-
-        return $contest;
+        return new Contests($rs);
     }
 
     final public static function getByTitle($title) {
@@ -796,8 +793,8 @@ class ContestsDAO extends ContestsDAOBase {
             throw new NotFoundException('problemsetNotFound');
         }
         return [
-            'needs_basic_information' => $rs['needs_basic_information'] == '1',
-            'requests_user_information' => $rs['requests_user_information']
+            'needsBasicInformation' => $rs['needs_basic_information'] == '1',
+            'requestsUserInformation' => $rs['requests_user_information']
         ];
     }
 
@@ -846,7 +843,7 @@ class ContestsDAO extends ContestsDAOBase {
     public static function getContestantsInfo($contestId) {
         $sql = '
             SELECT
-                u.name,
+                i.name,
                 u.username,
                 IF(pi.share_user_information, e.email, NULL) AS email,
                 IF(pi.share_user_information, st.name, NULL) AS state,
@@ -855,15 +852,17 @@ class ContestsDAO extends ContestsDAOBase {
             FROM
                 Users u
             INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
+            INNER JOIN
                 Emails e ON e.email_id = u.main_email_id
             LEFT JOIN
-                States st ON st.state_id = u.state_id AND st.country_id = u.country_id
+                States st ON st.state_id = i.state_id AND st.country_id = i.country_id
             LEFT JOIN
-                Countries cn ON cn.country_id = u.country_id
+                Countries cn ON cn.country_id = i.country_id
             LEFT JOIN
-                Schools sc ON sc.school_id = u.school_id
+                Schools sc ON sc.school_id = i.school_id
             INNER JOIN
-                Problemset_Identities pi ON pi.identity_id = u.main_identity_id
+                Problemset_Identities pi ON pi.identity_id = i.identity_id
             INNER JOIN
                 Contests c ON c.problemset_id = pi.problemset_id
             WHERE

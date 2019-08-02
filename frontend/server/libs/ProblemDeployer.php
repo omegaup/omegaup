@@ -18,7 +18,7 @@ class ProblemDeployer {
     private $zipPath = null;
     public $privateTreeHash = null;
     public $publishedCommit = null;
-    private $updatedStatementLanguages = [];
+    private $updatedLanguages = [];
     private $acceptsSubmissions = true;
     private $updatePublished = true;
 
@@ -115,7 +115,14 @@ class ProblemDeployer {
                     $updated_file['path'],
                     $matches
                 ) === 1) {
-                    $this->updatedStatementLanguages[] = $matches[1];
+                    $this->updatedLanguages[] = $matches[1];
+                }
+                if (preg_match(
+                    '%solutions/([a-z]{2})\\.markdown%',
+                    $updated_file['path'],
+                    $matches
+                ) === 1) {
+                    $this->updatedLanguages[] = $matches[1];
                 }
                 if (preg_match(
                     '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
@@ -189,12 +196,12 @@ class ProblemDeployer {
     }
 
     /**
-     * Updates statements.
+     * Updates loose files.
      *
      * @param Request $r
      * @throws ProblemDeploymentFailedException
      */
-    public function commitStatements($message, $user, $blobUpdate) {
+    public function commitLooseFiles($message, $user, $blobUpdate) {
         $tmpfile = tmpfile();
         try {
             $zipPath = stream_get_meta_data($tmpfile)['uri'];
@@ -232,12 +239,13 @@ class ProblemDeployer {
     }
 
     /**
-     * Returns the list of languages of updated statement files.
+     * Returns the list of languages of updated statement or solution files.
      *
+     * @param string The filetype
      * @return array The list of updated languages
      */
-    public function getUpdatedStatementLanguages() {
-        return $this->updatedStatementLanguages;
+    public function getUpdatedLanguages() {
+        return $this->updatedLanguages;
     }
 
     private function executeRaw(array $args, string $cwd) : array {
@@ -332,9 +340,7 @@ class ProblemDeployer {
             );
             $output = curl_exec($curl);
             $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($output !== false && $retval == 200) {
-                $retval = 0;
-            }
+            $retval = ($output !== false && $retval == 200) ? 0 : 1;
             $result = [
                 'retval' => $retval,
                 'output' => (string)$output,
@@ -368,6 +374,7 @@ class ProblemDeployer {
                     'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
                     'review-bad-layout' => 'problemDeployerReviewBadLayout',
                     'slow-rejected' => 'problemDeployerSlowRejected',
+                    'tests-bad-layout' => 'problemDeployerTestsBadLayout',
                     'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
                 ];
                 $tokens = explode(': ', $output->error, 2);

@@ -15,6 +15,16 @@
  * @access public
  */
 class QualityNominationLog extends VO {
+    const FIELD_NAMES = [
+        'qualitynomination_log_id' => true,
+        'qualitynomination_id' => true,
+        'time' => true,
+        'user_id' => true,
+        'from_status' => true,
+        'to_status' => true,
+        'rationale' => true,
+    ];
+
     /**
      * Constructor de QualityNominationLog
      *
@@ -22,9 +32,13 @@ class QualityNominationLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['qualitynomination_log_id'])) {
             $this->qualitynomination_log_id = (int)$data['qualitynomination_log_id'];
@@ -52,7 +66,7 @@ class QualityNominationLog extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime(['time']);
             return;
@@ -65,49 +79,49 @@ class QualityNominationLog extends VO {
       * Llave Primaria
       * Auto Incremento
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $qualitynomination_log_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $qualitynomination_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var timestamp
-      */
-    public $time;
+      * @var string
+     */
+    public $time = null;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var int(11)
-      */
+      * @var int
+     */
     public $user_id;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $from_status;
+      * @var string
+     */
+    public $from_status = 'open';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $to_status;
+      * @var string
+     */
+    public $to_status = 'open';
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var text
-      */
+      * @var ?string
+     */
     public $rationale;
 }

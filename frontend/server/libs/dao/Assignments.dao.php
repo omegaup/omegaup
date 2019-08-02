@@ -11,7 +11,7 @@ include('base/Assignments.vo.base.php');
   *
   */
 class AssignmentsDAO extends AssignmentsDAOBase {
-    public static function GetProblemset($courseId, $assignmentAlias = null) {
+    public static function getProblemset($courseId, $assignmentAlias = null) {
         $sql = 'SELECT
                     p.*
                 FROM

@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
@@ -10,6 +11,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const WrapperPlugin = require('wrapper-webpack-plugin');
 
 const omegaupStylesRegExp = /omegaup_styles\.js/;
+const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
 let config = [
   {
@@ -24,6 +26,8 @@ let config = [
       admin_user: './frontend/www/js/omegaup/admin/user.js',
       admin_roles: './frontend/www/js/omegaup/admin/roles.js',
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
+      badge_details: './frontend/www/js/omegaup/badge/details.js',
+      badge_list: './frontend/www/js/omegaup/badge/list.js',
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
       coder_of_the_month_notice:
           './frontend/www/js/omegaup/coderofthemonth/notice.js',
@@ -46,6 +50,7 @@ let config = [
       course_submissions_list:
           './frontend/www/js/omegaup/course/submissions_list.js',
       group_list: './frontend/www/js/omegaup/group/list.js',
+      notification_list: './frontend/www/js/omegaup/notification/list.js',
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
@@ -216,6 +221,17 @@ let config = [
       new MonacoWebpackPlugin({
         output: './js/dist',
       }),
+      new CopyWebpackPlugin([{
+        from: './frontend/badges/**/query.sql',
+        to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
+        transform(content, filepath) {
+          const iconPath = `${path.dirname(filepath)}/icon.svg`;
+          return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) : defaultBadgeIcon;
+        },
+        transformPath(targetPath, absolutePath) {
+          return `media/dist/badges/${path.basename(path.dirname(absolutePath))}.svg`;
+        },
+      }]),
     ],
     output: {
       path: path.resolve(__dirname, './frontend/www/'),

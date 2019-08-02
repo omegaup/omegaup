@@ -35,7 +35,12 @@ abstract class IdentityLoginLogDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link IdentityLoginLog}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Identity_Login_Log`.`identity_id`, `Identity_Login_Log`.`ip`, `Identity_Login_Log`.`time` from Identity_Login_Log';
         global $conn;
         if (!is_null($orden)) {
@@ -61,23 +66,23 @@ abstract class IdentityLoginLogDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param IdentityLoginLog [$Identity_Login_Log] El objeto de tipo IdentityLoginLog a crear.
      */
-    final public static function create(IdentityLoginLog $Identity_Login_Log) {
+    final public static function create(IdentityLoginLog $Identity_Login_Log) : int {
         if (is_null($Identity_Login_Log->time)) {
-            $Identity_Login_Log->time = gmdate('Y-m-d H:i:s');
+            $Identity_Login_Log->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Identity_Login_Log->identity_id) ? null : (int)$Identity_Login_Log->identity_id,
-            is_null($Identity_Login_Log->ip) ? null : (int)$Identity_Login_Log->ip,
+            (int)$Identity_Login_Log->identity_id,
+            (int)$Identity_Login_Log->ip,
             $Identity_Login_Log->time,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 
-        return $ar;
+        return $affectedRows;
     }
 }

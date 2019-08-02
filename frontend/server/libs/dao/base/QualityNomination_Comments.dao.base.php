@@ -33,8 +33,10 @@ abstract class QualityNominationCommentsDAOBase {
      * @param QualityNominationComments [$QualityNomination_Comments] El objeto de tipo QualityNominationComments
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(QualityNominationComments $QualityNomination_Comments) {
-        if (is_null(self::getByPK($QualityNomination_Comments->qualitynomination_comment_id))) {
+    final public static function save(QualityNominationComments $QualityNomination_Comments) : int {
+        if (is_null($QualityNomination_Comments->qualitynomination_comment_id) ||
+            is_null(self::getByPK($QualityNomination_Comments->qualitynomination_comment_id))
+        ) {
             return QualityNominationCommentsDAOBase::create($QualityNomination_Comments);
         }
         return QualityNominationCommentsDAOBase::update($QualityNomination_Comments);
@@ -47,15 +49,15 @@ abstract class QualityNominationCommentsDAOBase {
      * @return Filas afectadas
      * @param QualityNominationComments [$QualityNomination_Comments] El objeto de tipo QualityNominationComments a actualizar.
      */
-    final public static function update(QualityNominationComments $QualityNomination_Comments) {
+    final public static function update(QualityNominationComments $QualityNomination_Comments) : int {
         $sql = 'UPDATE `QualityNomination_Comments` SET `qualitynomination_id` = ?, `user_id` = ?, `time` = ?, `vote` = ?, `contents` = ? WHERE `qualitynomination_comment_id` = ?;';
         $params = [
-            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
-            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
+            (int)$QualityNomination_Comments->qualitynomination_id,
+            (int)$QualityNomination_Comments->user_id,
             $QualityNomination_Comments->time,
-            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
+            (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
-            is_null($QualityNomination_Comments->qualitynomination_comment_id) ? null : (int)$QualityNomination_Comments->qualitynomination_comment_id,
+            (int)$QualityNomination_Comments->qualitynomination_comment_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -71,10 +73,7 @@ abstract class QualityNominationCommentsDAOBase {
      * @static
      * @return @link QualityNominationComments Un objeto del tipo {@link QualityNominationComments}. NULL si no hay tal registro.
      */
-    final public static function getByPK($qualitynomination_comment_id) {
-        if (is_null($qualitynomination_comment_id)) {
-            return null;
-        }
+    final public static function getByPK(int $qualitynomination_comment_id) : ?QualityNominationComments {
         $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` FROM QualityNomination_Comments WHERE (qualitynomination_comment_id = ?) LIMIT 1;';
         $params = [$qualitynomination_comment_id];
         global $conn;
@@ -101,7 +100,7 @@ abstract class QualityNominationCommentsDAOBase {
      * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      * @param QualityNominationComments [$QualityNomination_Comments] El objeto de tipo QualityNominationComments a eliminar
      */
-    final public static function delete(QualityNominationComments $QualityNomination_Comments) {
+    final public static function delete(QualityNominationComments $QualityNomination_Comments) : void {
         $sql = 'DELETE FROM `QualityNomination_Comments` WHERE qualitynomination_comment_id = ?;';
         $params = [$QualityNomination_Comments->qualitynomination_comment_id];
         global $conn;
@@ -129,7 +128,12 @@ abstract class QualityNominationCommentsDAOBase {
      * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      * @return Array Un arreglo que contiene objetos del tipo {@link QualityNominationComments}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        ?int $filasPorPagina = null,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` from QualityNomination_Comments';
         global $conn;
         if (!is_null($orden)) {
@@ -155,26 +159,26 @@ abstract class QualityNominationCommentsDAOBase {
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      * @param QualityNominationComments [$QualityNomination_Comments] El objeto de tipo QualityNominationComments a crear.
      */
-    final public static function create(QualityNominationComments $QualityNomination_Comments) {
+    final public static function create(QualityNominationComments $QualityNomination_Comments) : int {
         if (is_null($QualityNomination_Comments->time)) {
-            $QualityNomination_Comments->time = gmdate('Y-m-d H:i:s');
+            $QualityNomination_Comments->time = gmdate('Y-m-d H:i:s', Time::get());
         }
         $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
-            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
+            (int)$QualityNomination_Comments->qualitynomination_id,
+            (int)$QualityNomination_Comments->user_id,
             $QualityNomination_Comments->time,
-            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
+            (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
         ];
         global $conn;
         $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        $affectedRows = $conn->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
         $QualityNomination_Comments->qualitynomination_comment_id = $conn->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

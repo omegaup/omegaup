@@ -15,6 +15,12 @@
  * @access public
  */
 class UserRankCutoffs extends VO {
+    const FIELD_NAMES = [
+        'score' => true,
+        'percentile' => true,
+        'classname' => true,
+    ];
+
     /**
      * Constructor de UserRankCutoffs
      *
@@ -22,9 +28,13 @@ class UserRankCutoffs extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['score'])) {
             $this->score = (float)$data['score'];
@@ -40,7 +50,7 @@ class UserRankCutoffs extends VO {
     /**
      * Converts date fields to timestamps
      */
-    public function toUnixTime(array $fields = []) {
+    public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
             parent::toUnixTime([]);
             return;
@@ -51,21 +61,21 @@ class UserRankCutoffs extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
+      * @var float
+     */
     public $score;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var double
-      */
+      * @var float
+     */
     public $percentile;
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var varchar(50)
-      */
+      * @var string
+     */
     public $classname;
 }

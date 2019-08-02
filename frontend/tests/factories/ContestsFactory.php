@@ -52,7 +52,7 @@ class ContestParams implements ArrayAccess {
         return new ContestParams([
             'title' => $contest->title,
             'admission_mode' => $contest->admission_mode,
-            'basic_information' => $contest->basic_information,
+            'needs_basic_information' => $contest->needs_basic_information,
             'contestDirector' => $contest->contestDirector,
             'languages' => $contest->languages,
             'start_time' => $contest->start_time,
@@ -124,16 +124,15 @@ class ContestsFactory {
             'penalty_type' => 'contest_start',
             'languages' => $params['languages'],
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
-            'basic_information' => $params['basic_information'], // This is just a default value.
+            'basic_information' => $params['basic_information'],
+            'requests_user_information' => $params['requests_user_information'],
+            'languages' => $params['languages'],
         ]);
         if ($params['penalty_calc_policy'] == null) {
             $r['penalty_calc_policy'] = 'sum';
         } else {
             $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
         }
-        $r['languages'] = $params['languages'];
-        $r['basic_information'] = $params['basic_information']; // This is just a default value.
-        $r['requests_user_information'] = $params['requests_user_information']; // This is just a default value.
 
         return [
             'request' => $r,
@@ -141,10 +140,29 @@ class ContestsFactory {
         ];
     }
 
+    /**
+     * Insert problems in a contest
+     *
+     * @param type $contestData
+     * @param type $numOfProblems
+     * @return array array of problemData
+     */
+    public static function insertProblemsInContest($contestData, $numOfProblems = 3) {
+        // Create problems
+        $problems = [];
+        for ($i = 0; $i < $numOfProblems; $i++) {
+            $problems[$i] = ProblemsFactory::createProblem();
+            ContestsFactory::addProblemToContest($problems[$i], $contestData);
+        }
+
+        return $problems;
+    }
+
     public static function createContest($params = null) {
         if (!($params instanceof ContestParams)) {
             $params = new ContestParams($params);
         }
+
         $privateParams = new ContestParams($params);
         // Create a valid contest Request object
         $privateParams['admission_mode'] = 'private';
@@ -248,11 +266,33 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
-    public static function addUser($contestData, $user) {
+    public static function addUser(
+        array $contestData,
+        Users $user
+    ) : void {
         // Prepare our request
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
         $r['usernameOrEmail'] = $user->username;
+
+        // Log in the contest director
+        $login = OmegaupTestCase::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ContestController::apiAddUser($r);
+
+        unset($_REQUEST);
+    }
+
+    public static function addIdentity(
+        array $contestData,
+        Identities $identitiy
+    ) : void {
+        // Prepare our request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['usernameOrEmail'] = $identitiy->username;
 
         // Log in the contest director
         $login = OmegaupTestCase::login($contestData['director']);
@@ -298,19 +338,19 @@ class ContestsFactory {
     public static function makeContestWindowLength($contestData, $windowLength = 20) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->window_length = $windowLength;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
     }
 
     public static function forcePublic($contestData, $last_updated = null) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->admission_mode = 'public';
         $contest->last_updated = gmdate('Y-m-d H:i:s', $last_updated);
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->scoreboard = $percentage;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
     }
 }
