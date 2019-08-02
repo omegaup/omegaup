@@ -2569,7 +2569,8 @@ class UserController extends Controller {
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param Request $r
      * @param Identities $identity
-     * @return Smarty $smarty
+     * @param Smarty $smarty
+     * @return array
      */
     public static function getRankDetailsForSmarty(
         Request $r,
@@ -2615,6 +2616,52 @@ class UserController extends Controller {
                 'isIndex' => false,
             ],
         ];
+    }
+
+    /**
+     * Prepare all the properties to be sent to the rank table view via smarty
+     * @param Request $r
+     * @param Identities $identity
+     * @return array
+     */
+    public static function getCoderOfTheMonthDetailsForSmarty(
+        Request $r,
+        ?Identities $identity
+    ) : array {
+        $currentTimeStamp = Time::get();
+        $currentDate = date('Y-m-d', $currentTimeStamp);
+        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $codersOfTheMonth = UserController::apiCoderOfTheMonthList(
+            new Request()
+        );
+        $codersOfPreviousMonth = UserController::apiCoderOfTheMonthList(
+            new Request(['date' => $currentDate])
+        );
+        $isMentor = !is_null($identity) && Authorization::isMentor($identity->identity_id);
+
+        $response = [
+            'codersOfCurrentMonth' => $codersOfTheMonth['coders'],
+            'codersOfPreviousMonth' => $codersOfPreviousMonth['coders'],
+            'isMentor' => $isMentor,
+        ];
+
+        if (!$isMentor) {
+            return ['payload' => $response];
+        }
+        $response['options'] = [
+            'bestCoders' =>
+                CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+                    $dateToSelect
+                ),
+            'canChooseCoder' =>
+                Authorization::canChooseCoder($currentTimeStamp),
+            'coderIsSelected' =>
+                !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
+        ];
+        return ['payload' => $response];
     }
 }
 

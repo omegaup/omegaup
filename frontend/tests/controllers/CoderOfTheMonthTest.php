@@ -37,6 +37,46 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $response = UserController::apiCoderOfTheMonthList($r);
 
         $this->assertEquals(1, count($response['coders']));
+
+        // Adding parameter date should return the same value, it helps
+        // to test getMonthlyList function, which never was tested
+        $r['date'] = date('Y-m-d', Time::get());
+        $response = UserController::apiCoderOfTheMonthList($r);
+        $this->assertEquals(1, count($response['coders']));
+    }
+
+    public function testCoderOfTheMonthDetailsForSmarty() {
+        // Test coder of the month details when user is not logged
+        $r = new Request();
+        $response = UserController::getCoderOfTheMonthDetailsForSmarty($r, null);
+        $this->assertArrayHasKey('payload', $response);
+        $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
+        $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
+        $this->assertFalse($response['payload']['isMentor']);
+        $this->assertArrayNotHasKey('options', $response['payload']);
+
+        // Test coder of the month details when common user is logged, it's the
+        // same that not logged user
+        $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $login = self::login($user);
+        $r['auth_token'] = $login->auth_token;
+        $response = UserController::getCoderOfTheMonthDetailsForSmarty($r, $identity);
+        $this->assertArrayHasKey('payload', $response);
+        $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
+        $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
+        $this->assertFalse($response['payload']['isMentor']);
+        $this->assertArrayNotHasKey('options', $response['payload']);
+
+        // Test coder of the month details when mentor user is logged
+        $mentor = UserFactory::createMentorIdentity();
+        $identity = IdentitiesDAO::getByPK($mentor->main_identity_id);
+        $login = self::login($mentor);
+        $r['auth_token'] = $login->auth_token;
+        $response = UserController::getCoderOfTheMonthDetailsForSmarty($r, $identity);
+        $this->assertTrue($response['payload']['isMentor']);
+        $this->assertArrayHasKey('payload', $response);
+        $this->assertArrayHasKey('options', $response['payload']);
     }
 
     public function testCoderOfTheMonthAfterYear() {
