@@ -14,14 +14,13 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testIdentityHasContestOrganizerRole() {
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorIdentity = IdentitiesDAO::getByPK($creator->main_identity_id);
-        $mentor = UserFactory::createMentorIdentity();
-        $mentorIdentity = IdentitiesDAO::getByPK($mentor->main_identity_id);
+        [, $mentorIdentity] = UserFactory::createMentorIdentity();
 
-        $isCreatorMember = Authorization::isGroupIdentityCreator($creatorIdentity->identity_id);
+        $isCreatorMember = Authorization::isGroupIdentityCreator($creatorIdentity);
         // Asserting that user belongs to the  identity creator group
         $this->assertTrue($isCreatorMember);
 
-        $isCreatorMember = Authorization::isGroupIdentityCreator($mentorIdentity->identity_id);
+        $isCreatorMember = Authorization::isGroupIdentityCreator($mentorIdentity);
         // Asserting that user doesn't belong to the identity creator group
         $this->assertFalse($isCreatorMember);
     }

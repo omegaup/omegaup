@@ -113,23 +113,23 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Logs in a identity an returns the auth_token
+     * Logs in a user and returns the auth_token
      *
-     * @param $identity the identity to be logged in
+     * @param Users $user to be logged in
      *
      * @return string auth_token
      */
-    public static function login($identity) {
+    public static function login($user) : ScopedLoginToken {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
         $oldCookieSetting = SessionController::$setCookieOnRegisterSession;
         SessionController::$setCookieOnRegisterSession = false;
 
-        // Inflate request with identity data
+        // Inflate request with user data
         $r = new Request([
-            'usernameOrEmail' => $identity->username,
-            'password' => $identity->password,
+            'usernameOrEmail' => $user->username,
+            'password' => $user->password,
         ]);
 
         // Call the API
