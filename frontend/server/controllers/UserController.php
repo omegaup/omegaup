@@ -2568,12 +2568,12 @@ class UserController extends Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param Request $r
-     * @param array $session
+     * @param Identities $identity
      * @return Smarty $smarty
      */
     public static function getRankDetailsForSmarty(
         Request $r,
-        array $session,
+        ?Identities $identity,
         Smarty $smarty
     ) : array {
         $r->ensureInt('page', null, null, false);
@@ -2590,24 +2590,24 @@ class UserController extends Controller {
         $filter = $r['filter'] ?? '';
 
         $availableFilters = [];
-        if (!is_null($session['identity'])) {
-            if (!is_null($session['identity']->country_id)) {
+        if (!is_null($identity)) {
+            if (!is_null($identity->country_id)) {
                 $availableFilters['country'] =
                     $smarty->getConfigVars('wordsFilterByCountry');
             }
-            if (!is_null($session['identity']->state_id)) {
+            if (!is_null($identity->state_id)) {
                 $availableFilters['state'] =
                     $smarty->getConfigVars('wordsFilterByState');
             }
-            if (!is_null($session['identity']->school_id)) {
+            if (!is_null($identity->school_id)) {
                 $availableFilters['school'] =
                     $smarty->getConfigVars('wordsFilterBySchool');
             }
         }
 
         return [
-            'payload' => [
-                'isLogged' => !is_null($session['identity']),
+            'rankTablePayload' => [
+                'isLogged' => !is_null($identity),
                 'page' => $page,
                 'length' => $length,
                 'filter' => $filter,

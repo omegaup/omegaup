@@ -7,7 +7,7 @@ try {
     )['session'];
     $smartyProperties = UserController::getRankDetailsForSmarty(
         new Request($_REQUEST),
-        $session,
+        $session['identity'],
         $smarty
     );
 } catch (ApiException $e) {

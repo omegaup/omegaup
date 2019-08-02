@@ -3,7 +3,8 @@ import Vue from 'vue';
 import {OmegaUp} from './omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const payload = JSON.parse(document.getElementById('payload').innerText);
+  const payload =
+      JSON.parse(document.getElementById('rank-table-payload').innerText);
 
   omegaup.API.User.rankByProblemsSolved({
                     offset: payload.page,

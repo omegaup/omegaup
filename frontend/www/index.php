@@ -16,12 +16,17 @@ try {
     // Show top 5 schools rank
     $smarty->assign(
         'schoolRankPayload',
-        ['rowCount' => 5, 'rank' => $schoolRankPayload['rank']
+        [
+            'rowCount' => 5,
+            'rank' => $schoolRankPayload['rank']
         ]
     );
     $smarty->assign(
-        'payload',
-        ['length' => 5, 'isIndex' => true, 'availableFilters' => []
+        'rankTablePayload',
+        [
+            'length' => 5,
+            'isIndex' => true,
+            'availableFilters' => [],
         ]
     );
 } catch (Exception $e) {

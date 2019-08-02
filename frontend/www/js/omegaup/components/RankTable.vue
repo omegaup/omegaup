@@ -37,6 +37,12 @@
           </option>
         </select>
       </template>
+      <template v-else-if="!isLogged &amp;&amp; !isIndex">
+        <span class="label label-info">{{ T.mustLoginToFilterUsers }}</span>
+      </template>
+      <template v-else-if="!isIndex">
+        <span class="label label-info">{{ T.mustUpdateBasicInfoToFilterUsers }}</span>
+      </template>
     </div>
     <table class="table">
       <thead>
@@ -114,17 +120,6 @@ export default class RankTable extends Vue {
   T = T;
   UI = UI;
   searchedUsername = '';
-
-  mounted() {
-    if (!this.isLogged && !this.isIndex) {
-      UI.info(T.mustLoginToFilterUsers);
-    } else if (
-      Object.keys(this.availableFilters).length == 0 &&
-      !this.isIndex
-    ) {
-      UI.info(T.mustUpdateBasicInfoToFilterUsers);
-    }
-  }
 
   onSubmit(): void {
     window.location.href = `/profile/${encodeURIComponent(
