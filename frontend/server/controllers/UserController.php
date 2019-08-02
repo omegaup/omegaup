@@ -1286,31 +1286,38 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiCoderOfTheMonthList(Request $r) {
+        $response = self::getCoderOfTheMonthList($r['date']);
+        $response['status'] = 'ok';
+        return $response;
+    }
+
+    private static function getCoderOfTheMonthList(?string $date) : array {
+        Validators::validateDate($date, 'date', false);
         $response = [];
         $response['coders'] = [];
         try {
             $coders = [];
-            if (!empty($r['date'])) {
-                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+            if (!is_null($date)) {
+                $coders = CoderOfTheMonthDAO::getMonthlyList($date);
             } else {
                 $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             }
-            foreach ($coders as $c) {
-                $userInfo = UsersDAO::FindByUsername($c['username']);
+            foreach ($coders as $coder) {
+                $userInfo = UsersDAO::FindByUsername($coder['username']);
                 $classname = UsersDAO::getRankingClassName($userInfo->user_id);
+                $hashEmail = md5($coder['email']);
+                $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
                 $response['coders'][] = [
-                    'username' => $c['username'],
-                    'country_id' => $c['country_id'],
-                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
-                    'date' => $c['time'],
+                    'username' => $coder['username'],
+                    'country_id' => $coder['country_id'],
+                    'gravatar_32' => $avatar,
+                    'date' => $coder['time'],
                     'classname' => $classname,
                 ];
             }
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-
-        $response['status'] = 'ok';
         return $response;
     }
 
@@ -2634,12 +2641,8 @@ class UserController extends Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $codersOfTheMonth = UserController::apiCoderOfTheMonthList(
-            new Request()
-        );
-        $codersOfPreviousMonth = UserController::apiCoderOfTheMonthList(
-            new Request(['date' => $currentDate])
-        );
+        $codersOfTheMonth = self::getCoderOfTheMonthList(/*$date=*/null);
+        $codersOfPreviousMonth = self::getCoderOfTheMonthList($currentDate);
         $isMentor = !is_null($identity) && Authorization::isMentor($identity->identity_id);
 
         $response = [
