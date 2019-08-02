@@ -512,4 +512,4 @@ def assert_run_verdict(driver, user, problem, *, classname):
         '//tr[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
         '/td[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
         % (user, problem))
-    assert classname in run_verdict.get_attribute('class'), run_verdict
+    assert classname in run_verdict.get_attribute('class').split(), run_verdict
