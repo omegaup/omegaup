@@ -63,15 +63,9 @@ def test_create_contest(driver):
                      ('//a[contains(@href, "/arena/%s/scoreboard/")]' %
                       contest_alias)))).click()
 
-        run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
-            '"user"]')
-        assert identity.username in run_accepted_user.text, run_accepted_user
-
-        run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[contains(@class, "wrong")]/preceding-sibling::td[@class='
-            '"user"]')
-        assert user in run_wrong_user.text, run_wrong_user
+        assert_run_verdict(driver, identity.username, problem,
+                           classname="accepted")
+        assert_run_verdict(driver, user, problem, classname="wrong")
 
 
 @util.no_javascript_errors()
@@ -91,7 +85,7 @@ def test_user_ranking_contest(driver):
 
     with driver.login_admin():
         group_alias = util.create_group(driver, group_title, description)
-        uninvited_identity = util.add_identities_group(driver, group_alias)[0]
+        uninvited_identity, *_ = util.add_identities_group(driver, group_alias)
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
@@ -165,10 +159,10 @@ def test_user_ranking_contest(driver):
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '#ranking')))
 
-        assert_run_statements(driver, user1, user2)
+        assert_run_verdict(driver, user1, problem, classname='accepted')
+        assert_run_verdict(driver, user2, problem, classname='wrong')
 
-        invited_users_set = {user1, user2, driver.user_username}
-        compare_contestants_list(driver, invited_users_set)
+        compare_contestants_list(driver, {user1, user2, driver.user_username})
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -511,15 +505,11 @@ def compare_contestants_list(driver, users_set):
 
 
 @util.annotate
-def assert_run_statements(driver, user_with_accepted_run, user_with_wrong_run):
-    ''' Add assertions when a run is accepted or not'''
+def assert_run_verdict(driver, user, problem, *, classname):
+    ''' Asserts that run verdict matches with expected classname. '''
 
-    run_accepted_user = driver.browser.find_element_by_xpath(
-        '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
-        '"user"]')
-    assert run_accepted_user.text == user_with_accepted_run, run_accepted_user
-
-    run_wrong_user = driver.browser.find_element_by_xpath(
-        '//td[contains(@class, "wrong")]/preceding-sibling::td[@class='
-        '"user"]')
-    assert run_wrong_user.text == user_with_wrong_run, run_wrong_user
+    run_verdict = driver.browser.find_element_by_xpath(
+        '//tr[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
+        '/td[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
+        % (user, problem))
+    assert classname in run_verdict.get_attribute('class'), run_verdict

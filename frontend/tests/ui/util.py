@@ -236,7 +236,7 @@ def create_group(driver, group_title, description):
                  '//form[contains(concat(" ", normalize-space(@class), '
                  '" "), " new-group-form ")]'))).submit()
 
-    group_alias = re.search(r"group\/([^']*)\/edit",
+    group_alias = re.search(r"/group/([^/]*)/edit/",
                             driver.browser.current_url).group(1)
 
     return group_alias
