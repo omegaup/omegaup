@@ -18,7 +18,7 @@ try {
         'schoolRankPayload',
         [
             'rowCount' => 5,
-            'rank' => $schoolRankPayload['rank']
+            'rank' => $schoolRankPayload['rank'],
         ]
     );
     $smarty->assign(
