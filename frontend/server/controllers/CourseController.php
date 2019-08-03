@@ -174,7 +174,7 @@ class CourseController extends Controller {
         // Only curator can set public
         if (!is_null($r['public'])
             && $r['public'] == true
-            && !Authorization::canCreatePublicCourse($r->identity->identity_id)) {
+            && !Authorization::canCreatePublicCourse($r->identity)) {
             throw new ForbiddenAccessException();
         }
     }
@@ -806,7 +806,7 @@ class CourseController extends Controller {
             (int)$problem->problem_id,
             (int)$problemSet->problemset_id
         ) > 0 &&
-            !Authorization::isSystemAdmin($r->identity->identity_id)) {
+            !Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
         ProblemsetProblemsDAO::delete($problemsetProblem);
@@ -955,7 +955,7 @@ class CourseController extends Controller {
         // Courses the user is an admin for.
         $admin_courses = [];
         try {
-            if (Authorization::isSystemAdmin($r->identity->identity_id)) {
+            if (Authorization::isSystemAdmin($r->identity)) {
                 $admin_courses = CoursesDAO::getAll(
                     $page,
                     $pageSize,

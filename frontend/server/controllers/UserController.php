@@ -450,7 +450,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+            if (!Authorization::isSupportTeamMember($r->identity)) {
                 throw new ForbiddenAccessException();
             }
 
@@ -511,7 +511,7 @@ class UserController extends Controller {
     public static function apiMailingListBackfill(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
+        if (!Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -625,7 +625,7 @@ class UserController extends Controller {
 
         $response = [];
 
-        $is_system_admin = Authorization::isSystemAdmin($r->identity->identity_id);
+        $is_system_admin = Authorization::isSystemAdmin($r->identity);
         if ($r['contest_type'] == 'OMI') {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
@@ -1146,7 +1146,7 @@ class UserController extends Controller {
         $response = IdentityController::getProfile($r, $r['identity'], $r['user'], boolval($r['omit_rank']));
         if ((is_null($r->identity) || $r->identity->username != $r['identity']->username)
             && (!is_null($r['user']) && $r['user']->is_private == 1)
-            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity->identity_id))
+            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity))
         ) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
@@ -1177,7 +1177,7 @@ class UserController extends Controller {
     public static function apiStatusVerified(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!Authorization::isSupportTeamMember($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1206,7 +1206,7 @@ class UserController extends Controller {
     public static function apiExtraInformation(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!Authorization::isSupportTeamMember($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1316,7 +1316,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         $currentTimestamp = Time::get();
 
-        if (!Authorization::isMentor($r->identity->identity_id)) {
+        if (!Authorization::isMentor($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         if (!Authorization::canChooseCoder($currentTimestamp)) {
@@ -1586,7 +1586,8 @@ class UserController extends Controller {
         }
 
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
-            && (is_null($r->identity) || (!is_null($r->identity) && !Authorization::isSystemAdmin($r->identity->identity_id)))
+            && (is_null($r->identity) || (!is_null($r->identity) &&
+                !Authorization::isSystemAdmin($r->identity)))
             && (!is_null($user) && $user->is_private == 1)
         ) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
@@ -2142,7 +2143,8 @@ class UserController extends Controller {
     }
 
     private static function validateAddRemoveRole(Request $r) {
-        if (!Authorization::isSystemAdmin($r->identity->identity_id) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+        if (!Authorization::isSystemAdmin($r->identity) &&
+            !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             throw new ForbiddenAccessException();
         }
 
@@ -2286,7 +2288,7 @@ class UserController extends Controller {
     private static function validateAddRemoveExperiment(Request $r) {
         global $experiments;
 
-        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
+        if (!Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -2623,7 +2625,7 @@ class UserController extends Controller {
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
         try {
-            $isMentor = !is_null($identity) && Authorization::isMentor($identity->identity_id);
+            $isMentor = !is_null($identity) && Authorization::isMentor($identity);
 
             $response = [
                 'codersOfCurrentMonth' => CoderOfTheMonthDAO::processCodersList(

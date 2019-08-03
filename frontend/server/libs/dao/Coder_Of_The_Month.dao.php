@@ -244,6 +244,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     }
 
     public static function processCodersList(array $coders) : array {
+        $response = [];
         foreach ($coders as $coder) {
             $userInfo = UsersDAO::FindByUsername($coder['username']);
             $classname = UsersDAO::getRankingClassName($userInfo->user_id);
