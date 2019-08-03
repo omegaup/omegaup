@@ -19,7 +19,7 @@ try {
         'auth_token' => $session['auth_token'],
         'date' => $currentDate,
     ]));
-    $isMentor = $session['valid'] && Authorization::isMentor($session['identity']->identity_id);
+    $isMentor = $session['valid'] && Authorization::isMentor($session['identity']);
 
     $response = [
         'codersOfCurrentMonth' => $responseCodersOfTheMonth['coders'],

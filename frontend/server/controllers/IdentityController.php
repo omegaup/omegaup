@@ -146,7 +146,7 @@ class IdentityController extends Controller {
      */
     private static function validateGroupOwnership(Request $r) {
         self::authenticateRequest($r);
-        if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
+        if (!Authorization::isGroupIdentityCreator($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         $group = GroupController::validateGroup($r['group_alias'], $r->identity);
@@ -280,7 +280,7 @@ class IdentityController extends Controller {
      */
     private static function validateUpdateRequest(Request $r) {
         self::authenticateRequest($r);
-        if (!Authorization::isGroupIdentityCreator($r->identity->identity_id)) {
+        if (!Authorization::isGroupIdentityCreator($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         GroupController::validateGroup($r['group_alias'], $r->identity);
@@ -386,7 +386,7 @@ class IdentityController extends Controller {
         // Do not leak plain emails in case the request is for a profile other than
         // the logged identity's one. Admins can see emails
         if (!is_null($r->identity)
-            && (Authorization::isSystemAdmin($r->identity->identity_id)
+            && (Authorization::isSystemAdmin($r->identity)
                 || $identity->identity_id == $r->identity->identity_id)
         ) {
             return $response;
@@ -394,7 +394,7 @@ class IdentityController extends Controller {
 
         // Mentors can see current coder of the month email.
         if (!is_null($r->identity)
-            && Authorization::canViewEmail($r->identity->identity_id)
+            && Authorization::canViewEmail($r->identity)
             && CoderOfTheMonthDAO::isLastCoderOfTheMonth($identity->username)
         ) {
             return $response;

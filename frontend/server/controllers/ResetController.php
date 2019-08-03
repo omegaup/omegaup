@@ -60,7 +60,7 @@ class ResetController extends Controller {
     public static function apiGenerateToken(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!Authorization::isSupportTeamMember($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -142,7 +142,7 @@ class ResetController extends Controller {
         }
 
         // Support doesn't need wait to resest passwords
-        if (!is_null($r->identity) && Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!is_null($r->identity) && Authorization::isSupportTeamMember($r->identity)) {
             return;
         }
 
