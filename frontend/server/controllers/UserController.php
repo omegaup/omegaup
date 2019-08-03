@@ -1287,19 +1287,15 @@ class UserController extends Controller {
      */
     public static function apiCoderOfTheMonthList(Request $r) {
         Validators::validateDate($r['date'], 'date', false);
-        try {
-            if (!is_null($r['date'])) {
-                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
-            } else {
-                $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
-            }
-            return [
-                'status' => 'ok',
-                'coders' => CoderOfTheMonthDAO::processCodersList($coders),
-            ];
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        if (!is_null($r['date'])) {
+            $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+        } else {
+            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
         }
+        return [
+            'status' => 'ok',
+            'coders' => self::processCodersList($coders),
+        ];
     }
 
     /**
@@ -2624,36 +2620,50 @@ class UserController extends Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        try {
-            $isMentor = !is_null($identity) && Authorization::isMentor($identity);
+        $isMentor = !is_null($identity) && Authorization::isMentor($identity);
 
-            $response = [
-                'codersOfCurrentMonth' => CoderOfTheMonthDAO::processCodersList(
-                    CoderOfTheMonthDAO::getCodersOfTheMonth()
-                ),
-                'codersOfPreviousMonth' => CoderOfTheMonthDAO::processCodersList(
-                    CoderOfTheMonthDAO::getMonthlyList($currentDate)
-                ),
-                'isMentor' => $isMentor,
-            ];
+        $response = [
+            'codersOfCurrentMonth' => self::processCodersList(
+                CoderOfTheMonthDAO::getCodersOfTheMonth()
+            ),
+            'codersOfPreviousMonth' => self::processCodersList(
+                CoderOfTheMonthDAO::getMonthlyList($currentDate)
+            ),
+            'isMentor' => $isMentor,
+        ];
 
-            if (!$isMentor) {
-                return ['payload' => $response];
-            }
-            $response['options'] = [
-                'bestCoders' =>
-                    CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
-                        $dateToSelect
-                    ),
-                'canChooseCoder' =>
-                    Authorization::canChooseCoder($currentTimeStamp),
-                'coderIsSelected' =>
-                    !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
-            ];
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        if (!$isMentor) {
+            return ['payload' => $response];
         }
+        $response['options'] = [
+            'bestCoders' =>
+                CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+                    $dateToSelect
+                ),
+            'canChooseCoder' =>
+                Authorization::canChooseCoder($currentTimeStamp),
+            'coderIsSelected' =>
+                !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
+        ];
         return ['payload' => $response];
+    }
+
+    private static function processCodersList(array $coders) : array {
+        $response = [];
+        foreach ($coders as $coder) {
+            $userInfo = UsersDAO::FindByUsername($coder['username']);
+            $classname = UsersDAO::getRankingClassName($userInfo->user_id);
+            $hashEmail = md5($coder['email']);
+            $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
+            $response[] = [
+                'username' => $coder['username'],
+                'country_id' => $coder['country_id'],
+                'gravatar_32' => $avatar,
+                'date' => $coder['time'],
+                'classname' => $classname,
+            ];
+        }
+        return $response;
     }
 }
 

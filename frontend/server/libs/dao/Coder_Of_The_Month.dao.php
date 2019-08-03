@@ -242,22 +242,4 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $endTime = $firstDayOfCurrentMonth->format('Y-m-d');
         return self::calculateCoderOfTheMonth($startTime, $endTime);
     }
-
-    public static function processCodersList(array $coders) : array {
-        $response = [];
-        foreach ($coders as $coder) {
-            $userInfo = UsersDAO::FindByUsername($coder['username']);
-            $classname = UsersDAO::getRankingClassName($userInfo->user_id);
-            $hashEmail = md5($coder['email']);
-            $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
-            $response[] = [
-                'username' => $coder['username'],
-                'country_id' => $coder['country_id'],
-                'gravatar_32' => $avatar,
-                'date' => $coder['time'],
-                'classname' => $classname,
-            ];
-        }
-        return $response;
-    }
 }
