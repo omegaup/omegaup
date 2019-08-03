@@ -450,7 +450,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+            if (!Authorization::isSupportTeamMember($r->identity)) {
                 throw new ForbiddenAccessException();
             }
 
@@ -511,7 +511,7 @@ class UserController extends Controller {
     public static function apiMailingListBackfill(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
+        if (!Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -625,7 +625,7 @@ class UserController extends Controller {
 
         $response = [];
 
-        $is_system_admin = Authorization::isSystemAdmin($r->identity->identity_id);
+        $is_system_admin = Authorization::isSystemAdmin($r->identity);
         if ($r['contest_type'] == 'OMI') {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
@@ -1146,7 +1146,7 @@ class UserController extends Controller {
         $response = IdentityController::getProfile($r, $r['identity'], $r['user'], boolval($r['omit_rank']));
         if ((is_null($r->identity) || $r->identity->username != $r['identity']->username)
             && (!is_null($r['user']) && $r['user']->is_private == 1)
-            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity->identity_id))
+            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity))
         ) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
@@ -1177,7 +1177,7 @@ class UserController extends Controller {
     public static function apiStatusVerified(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!Authorization::isSupportTeamMember($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1206,7 +1206,7 @@ class UserController extends Controller {
     public static function apiExtraInformation(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!Authorization::isSupportTeamMember($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -1286,32 +1286,16 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiCoderOfTheMonthList(Request $r) {
-        $response = [];
-        $response['coders'] = [];
-        try {
-            $coders = [];
-            if (!empty($r['date'])) {
-                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
-            } else {
-                $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
-            }
-            foreach ($coders as $c) {
-                $userInfo = UsersDAO::FindByUsername($c['username']);
-                $classname = UsersDAO::getRankingClassName($userInfo->user_id);
-                $response['coders'][] = [
-                    'username' => $c['username'],
-                    'country_id' => $c['country_id'],
-                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
-                    'date' => $c['time'],
-                    'classname' => $classname,
-                ];
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        Validators::validateDate($r['date'], 'date', false);
+        if (!is_null($r['date'])) {
+            $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+        } else {
+            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
         }
-
-        $response['status'] = 'ok';
-        return $response;
+        return [
+            'status' => 'ok',
+            'coders' => self::processCodersList($coders),
+        ];
     }
 
     /**
@@ -1328,7 +1312,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         $currentTimestamp = Time::get();
 
-        if (!Authorization::isMentor($r->identity->identity_id)) {
+        if (!Authorization::isMentor($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
         if (!Authorization::canChooseCoder($currentTimestamp)) {
@@ -1598,7 +1582,8 @@ class UserController extends Controller {
         }
 
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
-            && (is_null($r->identity) || (!is_null($r->identity) && !Authorization::isSystemAdmin($r->identity->identity_id)))
+            && (is_null($r->identity) || (!is_null($r->identity) &&
+                !Authorization::isSystemAdmin($r->identity)))
             && (!is_null($user) && $user->is_private == 1)
         ) {
             throw new ForbiddenAccessException('userProfileIsPrivate');
@@ -2154,7 +2139,8 @@ class UserController extends Controller {
     }
 
     private static function validateAddRemoveRole(Request $r) {
-        if (!Authorization::isSystemAdmin($r->identity->identity_id) && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+        if (!Authorization::isSystemAdmin($r->identity) &&
+            !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             throw new ForbiddenAccessException();
         }
 
@@ -2298,7 +2284,7 @@ class UserController extends Controller {
     private static function validateAddRemoveExperiment(Request $r) {
         global $experiments;
 
-        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
+        if (!Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -2563,6 +2549,121 @@ class UserController extends Controller {
      */
     public static function isMainIdentity(Users $user, Identities $identity) : bool {
         return $identity->identity_id == $user->main_identity_id;
+    }
+
+    /**
+     * Prepare all the properties to be sent to the rank table view via smarty
+     * @param Request $r
+     * @param Identities $identity
+     * @param Smarty $smarty
+     * @return array
+     */
+    public static function getRankDetailsForSmarty(
+        Request $r,
+        ?Identities $identity,
+        Smarty $smarty
+    ) : array {
+        $r->ensureInt('page', null, null, false);
+        $r->ensureInt('length', null, null, false);
+        Validators::validateInEnum(
+            $r['filter'],
+            'filter',
+            ['', 'country', 'state', 'school'],
+            /*$required=*/false
+        );
+
+        $page = $r['page'] ?? 1;
+        $length = $r['length'] ?? 100;
+        $filter = $r['filter'] ?? '';
+
+        $availableFilters = [];
+        if (!is_null($identity)) {
+            if (!is_null($identity->country_id)) {
+                $availableFilters['country'] =
+                    $smarty->getConfigVars('wordsFilterByCountry');
+            }
+            if (!is_null($identity->state_id)) {
+                $availableFilters['state'] =
+                    $smarty->getConfigVars('wordsFilterByState');
+            }
+            if (!is_null($identity->school_id)) {
+                $availableFilters['school'] =
+                    $smarty->getConfigVars('wordsFilterBySchool');
+            }
+        }
+
+        return [
+            'rankTablePayload' => [
+                'isLogged' => !is_null($identity),
+                'page' => $page,
+                'length' => $length,
+                'filter' => $filter,
+                'availableFilters' => $availableFilters,
+                'isIndex' => false,
+            ],
+        ];
+    }
+
+    /**
+     * Prepare all the properties to be sent to the rank table view via smarty
+     * @param Request $r
+     * @param Identities $identity
+     * @return array
+     */
+    public static function getCoderOfTheMonthDetailsForSmarty(
+        Request $r,
+        ?Identities $identity
+    ) : array {
+        $currentTimeStamp = Time::get();
+        $currentDate = date('Y-m-d', $currentTimeStamp);
+        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $isMentor = !is_null($identity) && Authorization::isMentor($identity);
+
+        $response = [
+            'codersOfCurrentMonth' => self::processCodersList(
+                CoderOfTheMonthDAO::getCodersOfTheMonth()
+            ),
+            'codersOfPreviousMonth' => self::processCodersList(
+                CoderOfTheMonthDAO::getMonthlyList($currentDate)
+            ),
+            'isMentor' => $isMentor,
+        ];
+
+        if (!$isMentor) {
+            return ['payload' => $response];
+        }
+        $response['options'] = [
+            'bestCoders' =>
+                CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+                    $dateToSelect
+                ),
+            'canChooseCoder' =>
+                Authorization::canChooseCoder($currentTimeStamp),
+            'coderIsSelected' =>
+                !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
+        ];
+        return ['payload' => $response];
+    }
+
+    private static function processCodersList(array $coders) : array {
+        $response = [];
+        foreach ($coders as $coder) {
+            $userInfo = UsersDAO::FindByUsername($coder['username']);
+            $classname = UsersDAO::getRankingClassName($userInfo->user_id);
+            $hashEmail = md5($coder['email']);
+            $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
+            $response[] = [
+                'username' => $coder['username'],
+                'country_id' => $coder['country_id'],
+                'gravatar_32' => $avatar,
+                'date' => $coder['time'],
+                'classname' => $classname,
+            ];
+        }
+        return $response;
     }
 }
 
