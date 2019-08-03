@@ -1286,39 +1286,20 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiCoderOfTheMonthList(Request $r) {
-        $response = self::getCoderOfTheMonthList($r['date']);
-        $response['status'] = 'ok';
-        return $response;
-    }
-
-    private static function getCoderOfTheMonthList(?string $date) : array {
-        Validators::validateDate($date, 'date', false);
-        $response = [];
-        $response['coders'] = [];
+        Validators::validateDate($r['date'], 'date', false);
         try {
-            $coders = [];
-            if (!is_null($date)) {
-                $coders = CoderOfTheMonthDAO::getMonthlyList($date);
+            if (!is_null($r['date'])) {
+                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
             } else {
                 $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
             }
-            foreach ($coders as $coder) {
-                $userInfo = UsersDAO::FindByUsername($coder['username']);
-                $classname = UsersDAO::getRankingClassName($userInfo->user_id);
-                $hashEmail = md5($coder['email']);
-                $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
-                $response['coders'][] = [
-                    'username' => $coder['username'],
-                    'country_id' => $coder['country_id'],
-                    'gravatar_32' => $avatar,
-                    'date' => $coder['time'],
-                    'classname' => $classname,
-                ];
-            }
+            return [
+                'status' => 'ok',
+                'coders' => CoderOfTheMonthDAO::processCodersList($coders),
+            ];
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
-        return $response;
     }
 
     /**
@@ -2641,29 +2622,35 @@ class UserController extends Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $codersOfTheMonth = self::getCoderOfTheMonthList(/*$date=*/null);
-        $codersOfPreviousMonth = self::getCoderOfTheMonthList($currentDate);
-        $isMentor = !is_null($identity) && Authorization::isMentor($identity->identity_id);
+        try {
+            $isMentor = !is_null($identity) && Authorization::isMentor($identity->identity_id);
 
-        $response = [
-            'codersOfCurrentMonth' => $codersOfTheMonth['coders'],
-            'codersOfPreviousMonth' => $codersOfPreviousMonth['coders'],
-            'isMentor' => $isMentor,
-        ];
-
-        if (!$isMentor) {
-            return ['payload' => $response];
-        }
-        $response['options'] = [
-            'bestCoders' =>
-                CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
-                    $dateToSelect
+            $response = [
+                'codersOfCurrentMonth' => CoderOfTheMonthDAO::processCodersList(
+                    CoderOfTheMonthDAO::getCodersOfTheMonth()
                 ),
-            'canChooseCoder' =>
-                Authorization::canChooseCoder($currentTimeStamp),
-            'coderIsSelected' =>
-                !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
-        ];
+                'codersOfPreviousMonth' => CoderOfTheMonthDAO::processCodersList(
+                    CoderOfTheMonthDAO::getMonthlyList($currentDate)
+                ),
+                'isMentor' => $isMentor,
+            ];
+
+            if (!$isMentor) {
+                return ['payload' => $response];
+            }
+            $response['options'] = [
+                'bestCoders' =>
+                    CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+                        $dateToSelect
+                    ),
+                'canChooseCoder' =>
+                    Authorization::canChooseCoder($currentTimeStamp),
+                'coderIsSelected' =>
+                    !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
+            ];
+        } catch (Exception $e) {
+            throw new InvalidDatabaseOperationException($e);
+        }
         return ['payload' => $response];
     }
 }
