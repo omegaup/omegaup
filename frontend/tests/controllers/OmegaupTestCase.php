@@ -119,7 +119,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      *
      * @return string auth_token
      */
-    public static function login($user) : ScopedLoginToken {
+    public static function login($identity) : ScopedLoginToken {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
@@ -128,8 +128,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
 
         // Inflate request with user data
         $r = new Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password,
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password,
         ]);
 
         // Call the API
