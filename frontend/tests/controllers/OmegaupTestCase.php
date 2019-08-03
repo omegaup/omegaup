@@ -113,9 +113,9 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Logs in a user and returns the auth_token
+     * Logs in an identity and returns the auth_token
      *
-     * @param Users $user to be logged in
+     * @param $identity to be logged in
      *
      * @return string auth_token
      */
@@ -126,7 +126,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         $oldCookieSetting = SessionController::$setCookieOnRegisterSession;
         SessionController::$setCookieOnRegisterSession = false;
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new Request([
             'usernameOrEmail' => $identity->username,
             'password' => $identity->password,
