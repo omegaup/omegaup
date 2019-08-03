@@ -496,8 +496,10 @@ def compare_contestants_list(driver, users_set):
 
     contestants_list = driver.browser.find_elements_by_xpath(
         '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
-    # Removing user's name in case they have registered it, in this case all
-    # the identities must be created with basic information
+    # Considering only the username. All unassociated identities are created
+    # with a name, which is appended after the username, like:
+    #
+    #     ut_group_w0_1564721415_4:identity_1 (Identity One)
     contestants_set = {item.text.split()[0] for item in contestants_list}
 
     different_users = contestants_set ^ users_set
