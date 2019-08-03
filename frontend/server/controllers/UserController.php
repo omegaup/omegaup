@@ -1286,32 +1286,16 @@ class UserController extends Controller {
      * @param Request $r
      */
     public static function apiCoderOfTheMonthList(Request $r) {
-        $response = [];
-        $response['coders'] = [];
-        try {
-            $coders = [];
-            if (!empty($r['date'])) {
-                $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
-            } else {
-                $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
-            }
-            foreach ($coders as $c) {
-                $userInfo = UsersDAO::FindByUsername($c['username']);
-                $classname = UsersDAO::getRankingClassName($userInfo->user_id);
-                $response['coders'][] = [
-                    'username' => $c['username'],
-                    'country_id' => $c['country_id'],
-                    'gravatar_32' => 'https://secure.gravatar.com/avatar/' . md5($c['email']) . '?s=32',
-                    'date' => $c['time'],
-                    'classname' => $classname,
-                ];
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        Validators::validateDate($r['date'], 'date', false);
+        if (!is_null($r['date'])) {
+            $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+        } else {
+            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
         }
-
-        $response['status'] = 'ok';
-        return $response;
+        return [
+            'status' => 'ok',
+            'coders' => self::processCodersList($coders),
+        ];
     }
 
     /**
@@ -2571,7 +2555,8 @@ class UserController extends Controller {
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param Request $r
      * @param Identities $identity
-     * @return Smarty $smarty
+     * @param Smarty $smarty
+     * @return array
      */
     public static function getRankDetailsForSmarty(
         Request $r,
@@ -2617,6 +2602,68 @@ class UserController extends Controller {
                 'isIndex' => false,
             ],
         ];
+    }
+
+    /**
+     * Prepare all the properties to be sent to the rank table view via smarty
+     * @param Request $r
+     * @param Identities $identity
+     * @return array
+     */
+    public static function getCoderOfTheMonthDetailsForSmarty(
+        Request $r,
+        ?Identities $identity
+    ) : array {
+        $currentTimeStamp = Time::get();
+        $currentDate = date('Y-m-d', $currentTimeStamp);
+        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $isMentor = !is_null($identity) && Authorization::isMentor($identity);
+
+        $response = [
+            'codersOfCurrentMonth' => self::processCodersList(
+                CoderOfTheMonthDAO::getCodersOfTheMonth()
+            ),
+            'codersOfPreviousMonth' => self::processCodersList(
+                CoderOfTheMonthDAO::getMonthlyList($currentDate)
+            ),
+            'isMentor' => $isMentor,
+        ];
+
+        if (!$isMentor) {
+            return ['payload' => $response];
+        }
+        $response['options'] = [
+            'bestCoders' =>
+                CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+                    $dateToSelect
+                ),
+            'canChooseCoder' =>
+                Authorization::canChooseCoder($currentTimeStamp),
+            'coderIsSelected' =>
+                !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
+        ];
+        return ['payload' => $response];
+    }
+
+    private static function processCodersList(array $coders) : array {
+        $response = [];
+        foreach ($coders as $coder) {
+            $userInfo = UsersDAO::FindByUsername($coder['username']);
+            $classname = UsersDAO::getRankingClassName($userInfo->user_id);
+            $hashEmail = md5($coder['email']);
+            $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
+            $response[] = [
+                'username' => $coder['username'],
+                'country_id' => $coder['country_id'],
+                'gravatar_32' => $avatar,
+                'date' => $coder['time'],
+                'classname' => $classname,
+            ];
+        }
+        return $response;
     }
 }
 
