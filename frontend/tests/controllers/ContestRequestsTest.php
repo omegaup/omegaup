@@ -56,7 +56,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         if (!$hasRequestResponse) {
             // No one has accepted or rejected the request
             $this->assertArrayNotHasKey('admin', $userRequest);
-            $this->assertNull($userRequest['accepted']);
+            $this->assertFalse($userRequest['accepted']);
             $this->assertNotEmpty($userRequest['request_time']);
         }
     }
@@ -74,7 +74,7 @@ class ContestRequestsTest extends OmegaupTestCase {
             $hasRequestResponse = false;
             if (in_array($contestants[$i]->username, $arbitratedUsers)) {
                 if (in_array($contestants[$i]->username, $acceptedUsers)) {
-                    $this->assertEquals(1, $result['users'][$i]['accepted']);
+                    $this->assertTrue($result['users'][$i]['accepted']);
                 }
                 $this->assertEquals(
                     $result['users'][$i]['admin']['user_id'],
