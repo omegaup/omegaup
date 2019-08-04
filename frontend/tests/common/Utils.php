@@ -290,6 +290,7 @@ class Utils {
             // Enabling them again
             $conn->Execute('SET foreign_key_checks = 1;');
         }
+        self::commit();
     }
 
     public static function RunUpdateUserRank() {

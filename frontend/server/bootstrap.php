@@ -192,8 +192,7 @@ Logger::configure([
 ]);
 $log = Logger::getLogger('bootstrap');
 
-require_once('libs/third_party/adodb/adodb.inc.php');
-require_once('libs/third_party/adodb/adodb-exceptions.inc.php');
+require_once('libs/Database.php');
 
 global $conn;
 $conn = null;
