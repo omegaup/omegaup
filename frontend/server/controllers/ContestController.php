@@ -2184,7 +2184,6 @@ class ContestController extends Controller {
             if (isset($requestsAdmins[$request['identity_id']])) {
                 $request['admin'] = $requestsAdmins[$request['identity_id']];
             }
-            $request['accepted'] = $request['accepted'] == '1';
             return $request;
         }, $resultRequests);
 
