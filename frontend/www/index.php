@@ -14,7 +14,21 @@ try {
 
     $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 100]));
     // Show top 5 schools rank
-    $smarty->assign('schoolRankPayload', ['rowCount' => 5, 'rank' => $schoolRankPayload['rank']]);
+    $smarty->assign(
+        'schoolRankPayload',
+        [
+            'rowCount' => 5,
+            'rank' => $schoolRankPayload['rank'],
+        ]
+    );
+    $smarty->assign(
+        'rankTablePayload',
+        [
+            'length' => 5,
+            'isIndex' => true,
+            'availableFilters' => [],
+        ]
+    );
 } catch (Exception $e) {
     // Oh, well...
 }

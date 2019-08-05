@@ -11,9 +11,7 @@ try {
         new Request($_REQUEST)
     );
 } catch (Exception $e) {
-    Logger::getLogger('course')->error('APIException ' . $e);
-    header('HTTP/1.1 404 Not Found');
-    die(file_get_contents('404.html'));
+    ApiCaller::handleException($e);
 }
 
 foreach ($smartyProperties as $key => $value) {

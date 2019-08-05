@@ -190,13 +190,13 @@ class UserFactory {
      * @param string $email
      * @return Identity
      */
-    public static function createMentorIdentity($params = null) {
+    public static function createMentorIdentity($params = null) : array {
         $user = self::createUser($params);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         self::addMentorRole($identity);
 
-        return $user;
+        return [$user, $identity];
     }
 
     /**
@@ -207,13 +207,13 @@ class UserFactory {
      * @param string $email
      * @return User
      */
-    public static function createSupportUser($params = null) {
+    public static function createSupportUser($params = null) : array {
         $user = self::createUser($params);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         self::addSupportRole($identity);
 
-        return $user;
+        return [$user, $identity];
     }
 
     /**
@@ -224,7 +224,7 @@ class UserFactory {
      * @param string $email
      * @return User
      */
-    public static function createGroupIdentityCreator($params = null) {
+    public static function createGroupIdentityCreator($params = null) : Users {
         $user = self::createUser($params);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 

@@ -7,7 +7,8 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::isSystemAdmin($r->identity->identity_id) && !UsersDAO::IsUserInterviewer($r->user->user_id)) {
+        if (!Authorization::isSystemAdmin($r->identity) &&
+            !UsersDAO::IsUserInterviewer($r->user->user_id)) {
             throw new ForbiddenAccessException();
         }
 

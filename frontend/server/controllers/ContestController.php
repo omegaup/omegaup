@@ -83,7 +83,7 @@ class ContestController extends Controller {
                 $contests = ContestsDAO::getContestsParticipating($r->identity->identity_id, $page, $page_size, $query);
             } elseif ($public) {
                 $contests = ContestsDAO::getRecentPublicContests($r->identity->identity_id, $page, $page_size, $query);
-            } elseif (Authorization::isSystemAdmin($r->identity->identity_id)) {
+            } elseif (Authorization::isSystemAdmin($r->identity)) {
                 // Get all contests
                 $contests = Cache::getFromCacheOrSet(
                     Cache::CONTESTS_LIST_SYSTEM_ADMIN,
@@ -151,7 +151,7 @@ class ContestController extends Controller {
         // Create array of relevant columns
         $contests = null;
         try {
-            if (Authorization::isSystemAdmin($r->identity->identity_id)) {
+            if (Authorization::isSystemAdmin($r->identity)) {
                 $contests = ContestsDAO::getAllContestsWithScoreboard(
                     $page,
                     $pageSize,
@@ -1603,7 +1603,7 @@ class ContestController extends Controller {
             (int)$problem->problem_id,
             (int)$contest->problemset_id
         ) > 0 &&
-            !Authorization::isSystemAdmin($identity->identity_id)) {
+            !Authorization::isSystemAdmin($identity)) {
             throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
 
@@ -1711,7 +1711,7 @@ class ContestController extends Controller {
 
         // Save the contest to the DB
         try {
-            ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
+            ProblemsetIdentitiesDAO::replace(new ProblemsetIdentities([
                 'problemset_id' => $contest->problemset_id,
                 'identity_id' => $identity->identity_id,
                 'access_time' => null,
@@ -2822,7 +2822,7 @@ class ContestController extends Controller {
         try {
             if ($r['contest_alias'] == 'all-events') {
                 self::authenticateRequest($r);
-                if (Authorization::isSystemAdmin($r->identity->identity_id)) {
+                if (Authorization::isSystemAdmin($r->identity)) {
                     return [
                         'status' => 'ok',
                         'admin' => true
@@ -2856,7 +2856,7 @@ class ContestController extends Controller {
     public static function apiSetRecommended(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
+        if (!Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 

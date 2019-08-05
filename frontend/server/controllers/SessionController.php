@@ -164,7 +164,7 @@ class SessionController extends Controller {
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
+            'is_admin' => Authorization::isSystemAdmin($currentIdentity),
         ];
     }
 
@@ -227,7 +227,7 @@ class SessionController extends Controller {
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
         try {
-            AuthTokensDAO::save(new AuthTokens([
+            AuthTokensDAO::replace(new AuthTokens([
                 'user_id' => $identity->user_id,
                 'identity_id' => $identity->identity_id,
                 'token' => $token,

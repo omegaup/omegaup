@@ -25,22 +25,40 @@ abstract class ProblemsetIdentitiesDAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param ProblemsetIdentities [$Problemset_Identities] El objeto de tipo ProblemsetIdentities
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetIdentities $Problemset_Identities) : int {
-        if (is_null($Problemset_Identities->identity_id) ||
-            is_null($Problemset_Identities->problemset_id) ||
-            is_null(self::getByPK($Problemset_Identities->identity_id, $Problemset_Identities->problemset_id))
-        ) {
-            return ProblemsetIdentitiesDAOBase::create($Problemset_Identities);
+    final public static function replace(ProblemsetIdentities $Problemset_Identities) : int {
+        if (is_null($Problemset_Identities->identity_id) || is_null($Problemset_Identities->problemset_id)) {
+            throw new NotFoundException('recordNotFound');
         }
-        return ProblemsetIdentitiesDAOBase::update($Problemset_Identities);
+        if (is_null($Problemset_Identities->score)) {
+            $Problemset_Identities->score = 1;
+        }
+        if (is_null($Problemset_Identities->time)) {
+            $Problemset_Identities->time = 1;
+        }
+        if (is_null($Problemset_Identities->is_invited)) {
+            $Problemset_Identities->is_invited = false;
+        }
+        $sql = 'REPLACE INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+        $params = [
+            (int)$Problemset_Identities->identity_id,
+            (int)$Problemset_Identities->problemset_id,
+            $Problemset_Identities->access_time,
+            (int)$Problemset_Identities->score,
+            (int)$Problemset_Identities->time,
+            is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
+            is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
+            (int)$Problemset_Identities->is_invited,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -93,7 +111,7 @@ abstract class ProblemsetIdentitiesDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemsetIdentities suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

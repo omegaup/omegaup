@@ -37,6 +37,12 @@
           </option>
         </select>
       </template>
+      <template v-else-if="!isLogged &amp;&amp; !isIndex">
+        <span class="label label-info">{{ T.mustLoginToFilterUsers }}</span>
+      </template>
+      <template v-else-if="!isIndex">
+        <span class="label label-info">{{ T.mustUpdateBasicInfoToFilterUsers }}</span>
+      </template>
     </div>
     <table class="table">
       <thead>
@@ -105,6 +111,7 @@ export default class RankTable extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
   @Prop() isIndex!: boolean;
+  @Prop() isLogged!: boolean;
   @Prop() availableFilters!: { [key: string]: string };
   @Prop() filter!: string;
   @Prop() ranking!: Rank[];

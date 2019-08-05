@@ -115,7 +115,7 @@ class RunController extends Controller {
                         (int)$r['problem']->problem_id,
                         (int)$r->identity->identity_id
                     )
-                            && !Authorization::isSystemAdmin($r->identity->identity_id)) {
+                            && !Authorization::isSystemAdmin($r->identity)) {
                             throw new NotAllowedToSubmitException('runWaitGap');
                     }
 
@@ -835,7 +835,7 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
+        if (!Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 

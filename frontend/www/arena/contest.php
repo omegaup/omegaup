@@ -13,9 +13,8 @@ try {
         $contest,
         $shouldShowIntro
     );
-} catch (ApiException $e) {
-    header('HTTP/1.1 404 Not Found');
-    die(file_get_contents('../404.html'));
+} catch (Exception $e) {
+    ApiCaller::handleException($e);
 }
 
 foreach ($result as $key => $value) {
