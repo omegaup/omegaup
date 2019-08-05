@@ -1,21 +1,31 @@
 <template>
   <div class="panel">
-    <div class="solution"
-         v-html="solution"
-         v-if="status === 'unlocked'"></div>
     <div class="interstitial"
-         v-else="">
-      <p>{{ statusMessage }}</p>
-      <div v-if="status === 'locked'">
-        <p>{{ T.solutionTokenDescription }}</p>
-        <p class="solution-tokens"
-           v-html=
-           "UI.formatString(T.solutionTokens, { available: availableTokens, total: allTokens, })">
-           </p>
-        <div class="text-center"
-             v-if="availableTokens &gt; 0">
-          <a class="btn btn-primary btn-md"
-               v-on:click="$emit('unlock-solution')">Desbloquear Solución</a>
+         v-if="showSolutionPanel">
+      <p>{{ T.solutionConfirm }}</p>
+      <div class="text-center">
+        <a class="btn btn-primary btn-md"
+             v-on:click="showPanel">{{ T.wordsSeeSolution }}</a>
+      </div>
+    </div>
+    <div v-else="">
+      <div class="solution"
+           v-html="solution"
+           v-if="status === 'unlocked'"></div>
+      <div class="interstitial"
+           v-else="">
+        <p>{{ statusMessage }}</p>
+        <div v-if="status === 'locked'">
+          <p>{{ T.solutionTokenDescription }}</p>
+          <p class="solution-tokens"
+             v-html=
+             "UI.formatString(T.solutionTokens, { available: availableTokens, total: allTokens, })">
+             </p>
+          <div class="text-center"
+               v-if="availableTokens &gt; 0">
+            <a class="btn btn-primary btn-md"
+                 v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
+          </div>
         </div>
       </div>
     </div>
@@ -50,6 +60,7 @@ export default class ProblemSolution extends Vue {
 
   T = T;
   UI = UI;
+  showSolutionPanel = true;
 
   get statusMessage(): string {
     switch (this.status) {
@@ -62,6 +73,11 @@ export default class ProblemSolution extends Vue {
       default:
         return '';
     }
+  }
+
+  showPanel(): void {
+    this.showSolutionPanel = false;
+    this.$emit('get-initial-content');
   }
 }
 

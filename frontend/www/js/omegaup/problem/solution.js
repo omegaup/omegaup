@@ -23,13 +23,36 @@ OmegaUp.on('ready', function() {
                          'forfeit_problem': true
                        })
                 .then(function(data) {
-                  if (data.exists && data.solution) {
-                    problemSolution.solution = mdConverter.makeHtmlWithImages(
-                        data.solution.markdown, data.solution.images);
-                    problemSolution.status = 'unlocked';
+                  if (!data.exists || !data.solution) {
+                    return;
                   }
+                  problemSolution.solution = mdConverter.makeHtmlWithImages(
+                      data.solution.markdown, data.solution.images);
+                  problemSolution.status = 'unlocked';
                 })
                 .fail(omegaup.UI.apiError);
+          },
+          'get-initial-content': function() {
+            if (payload['solution_status'] === 'unlocked') {
+              API.Problem.solution({'problem_alias': payload['alias']})
+                  .then(function(data) {
+                    if (!data.exists || !data.solution) {
+                      return;
+                    }
+                    problemSolution.solution = mdConverter.makeHtmlWithImages(
+                        data.solution.markdown, data.solution.images);
+                  })
+                  .fail(omegaup.UI.apiError);
+            }
+
+            if (payload['solution_status'] === 'locked') {
+              API.ProblemForfeited.getCounts({})
+                  .then(function(data) {
+                    problemSolution.allTokens = data.allowed;
+                    problemSolution.availableTokens = data.allowed - data.seen;
+                  })
+                  .fail(omegaup.UI.apiError);
+            }
           }
         }
       });
@@ -45,24 +68,4 @@ OmegaUp.on('ready', function() {
       'omegaup-problem-solution': problem_Solution,
     }
   });
-
-  if (payload['solution_status'] === 'unlocked') {
-    API.Problem.solution({'problem_alias': payload['alias']})
-        .then(function(data) {
-          if (data.exists && data.solution) {
-            problemSolution.solution = mdConverter.makeHtmlWithImages(
-                data.solution.markdown, data.solution.images);
-          }
-        })
-        .fail(omegaup.UI.apiError);
-  }
-
-  if (payload['solution_status'] === 'locked') {
-    API.ProblemForfeited.getCounts({})
-        .then(function(data) {
-          problemSolution.allTokens = data.allowed;
-          problemSolution.availableTokens = data.allowed - data.seen;
-        })
-        .fail(omegaup.UI.apiError);
-  }
 });
