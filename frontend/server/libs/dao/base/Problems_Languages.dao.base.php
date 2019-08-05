@@ -44,7 +44,7 @@ abstract class ProblemsLanguagesDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemsLanguages suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

@@ -144,11 +144,17 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $date = date('Y-m-01', strtotime($firstDay));
         $sql = '
           SELECT
-            cm.time, u.username, COALESCE(u.country_id, "xx") AS country_id, e.email, u.user_id
+            cm.time,
+            i.username,
+            COALESCE(i.country_id, "xx") AS country_id,
+            e.email,
+            u.user_id
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
             Users u ON u.user_id = cm.user_id
+          INNER JOIN
+            Identities i ON u.user_id = i.user_id
           LEFT JOIN
             Emails e ON e.user_id = u.user_id
           WHERE

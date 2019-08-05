@@ -25,22 +25,33 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        if (is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ||
-            is_null($Groups_Scoreboards_Problemsets->problemset_id) ||
-            is_null(self::getByPK($Groups_Scoreboards_Problemsets->group_scoreboard_id, $Groups_Scoreboards_Problemsets->problemset_id))
-        ) {
-            return GroupsScoreboardsProblemsetsDAOBase::create($Groups_Scoreboards_Problemsets);
+    final public static function replace(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
+        if (is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) || is_null($Groups_Scoreboards_Problemsets->problemset_id)) {
+            throw new NotFoundException('recordNotFound');
         }
-        return GroupsScoreboardsProblemsetsDAOBase::update($Groups_Scoreboards_Problemsets);
+        if (is_null($Groups_Scoreboards_Problemsets->only_ac)) {
+            $Groups_Scoreboards_Problemsets->only_ac = false;
+        }
+        if (is_null($Groups_Scoreboards_Problemsets->weight)) {
+            $Groups_Scoreboards_Problemsets->weight = 1;
+        }
+        $sql = 'REPLACE INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
+        $params = [
+            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            (int)$Groups_Scoreboards_Problemsets->only_ac,
+            (int)$Groups_Scoreboards_Problemsets->weight,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -89,7 +100,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto GroupsScoreboardsProblemsets suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

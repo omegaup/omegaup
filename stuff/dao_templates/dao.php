@@ -18,8 +18,7 @@
  *
  */
 abstract class {{ table.class_name }}DAOBase {
-{%- if table.columns|selectattr('primary_key')|list %}
-{%- if table.columns|rejectattr('primary_key')|list %}
+{%- if table.columns|selectattr('primary_key')|list and table.columns|rejectattr('primary_key')|list and not table.columns|selectattr('auto_increment')|list %}
     /**
      * Guardar registros.
      *
@@ -27,23 +26,54 @@ abstract class {{ table.class_name }}DAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save({{ table.class_name }} ${{ table.name }}) : int {
-        if ({{ table.columns|selectattr('primary_key')|listformat('is_null(${table.name}->{.name})', table=table)|join(' ||\n            ') }} ||
-            is_null(self::getByPK({{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(', ') }}))
-        ) {
-            return {{ table.class_name }}DAOBase::create(${{ table.name }});
+    final public static function replace({{ table.class_name }} ${{ table.name }}) : int {
+        if ({{ table.columns|selectattr('primary_key')|listformat('is_null(${table.name}->{.name})', table=table)|join(' || ') }}) {
+            throw new NotFoundException('recordNotFound');
         }
-        return {{ table.class_name }}DAOBase::update(${{ table.name }});
+  {%- for column in table.columns|selectattr('default') %}
+        if (is_null(${{ table.name }}->{{ column.name }})) {
+    {%- if column.default == 'CURRENT_TIMESTAMP' %}
+            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
+    {%- elif column.php_primitive_type == 'bool' %}
+            ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
+    {%- elif column.php_primitive_type == 'int' %}
+            ${{ table.name }}->{{ column.name }} = {{ '%d'|format(column.default|int) }};
+    {%- elif column.php_primitive_type == 'float' %}
+            ${{ table.name }}->{{ column.name }} = {{ '%.2f'|format(column.default|float) }};
+    {%- else %}
+            ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
+    {%- endif %}
+        }
+  {%- endfor %}
+        $sql = 'REPLACE INTO {{ table.name }} ({{ table.columns|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|listformat('?', table=table)|join(', ') }});';
+        $params = [
+  {%- for column in table.columns %}
+    {%- if column.php_type in ('?bool', '?int') %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+    {%- elif column.php_type == '?float' %}
+            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+    {%- elif column.php_type in ('bool', 'int') %}
+            (int)${{ table.name }}->{{ column.name }},
+    {%- elif column.php_type == 'float' %}
+            (float)${{ table.name }}->{{ column.name }},
+    {%- else %}
+            ${{ table.name }}->{{ column.name }},
+    {%- endif %}
+  {%- endfor %}
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
-
+{% endif %}
+{%- if table.columns|selectattr('primary_key')|list and table.columns|rejectattr('primary_key')|list %}
     /**
      * Actualizar registros.
      *
@@ -54,38 +84,39 @@ abstract class {{ table.class_name }}DAOBase {
     final public static function update({{ table.class_name }} ${{ table.name }}) : int {
         $sql = 'UPDATE `{{ table.name }}` SET {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(', ') }} WHERE {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND ') }};';
         $params = [
-{%- for column in table.columns|rejectattr('primary_key') %}
-{%- if column.php_type in ('?bool', '?int') %}
+  {%- for column in table.columns|rejectattr('primary_key') %}
+    {%- if column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type == '?float' %}
+    {%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type in ('bool', 'int') %}
+    {%- elif column.php_type in ('bool', 'int') %}
             (int)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type == 'float' %}
+    {%- elif column.php_type == 'float' %}
             (float)${{ table.name }}->{{ column.name }},
-{%- else %}
+    {%- else %}
             ${{ table.name }}->{{ column.name }},
-{%- endif %}
-{%- endfor %}
-{%- for column in table.columns|selectattr('primary_key') %}
-{%- if column.php_type in ('?bool', '?int') %}
+    {%- endif %}
+  {%- endfor %}
+  {%- for column in table.columns|selectattr('primary_key') %}
+    {%- if column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type == '?float' %}
+    {%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type in ('bool', 'int') %}
+    {%- elif column.php_type in ('bool', 'int') %}
             (int)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type == 'float' %}
+    {%- elif column.php_type == 'float' %}
             (float)${{ table.name }}->{{ column.name }},
-{%- else %}
+    {%- else %}
             ${{ table.name }}->{{ column.name }},
-{%- endif %}
-{%- endfor %}
+    {%- endif %}
+  {%- endfor %}
         ];
         global $conn;
         $conn->Execute($sql, $params);
         return $conn->Affected_Rows();
     }
 {% endif %}
+{%- if table.columns|selectattr('primary_key')|list %}
     /**
      * Obtener {@link {{ table.class_name }}} por llave primaria.
      *
@@ -96,11 +127,11 @@ abstract class {{ table.class_name }}DAOBase {
      * @return @link {{ table.class_name }} Un objeto del tipo {@link {{ table.class_name }}}. NULL si no hay tal registro.
      */
     final public static function getByPK({{ table.columns|selectattr('primary_key')|listformat('{0.php_type} ${0.name}')|join(', ') }}) : ?{{ table.class_name }} {
-{%- if table.columns|selectattr('primary_key')|rejectattr('not_null')|list|length %}
+  {%- if table.columns|selectattr('primary_key')|rejectattr('not_null')|list|length %}
         if ({{ table.columns|selectattr('primary_key')|rejectattr('not_null')|listformat('is_null(${.name})')|join(' || ') }}) {
             return null;
         }
-{%- endif %}
+  {%- endif %}
         $sql = 'SELECT {{ table.fieldnames }} FROM {{ table.name }} WHERE ({{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }}) LIMIT 1;';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
         global $conn;
@@ -117,7 +148,7 @@ abstract class {{ table.class_name }}DAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto {{ table.class_name }} suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será
@@ -194,33 +225,33 @@ abstract class {{ table.class_name }}DAOBase {
     final public static function create({{ table.class_name }} ${{ table.name }}) : int {
 {%- for column in table.columns|selectattr('default') %}
         if (is_null(${{ table.name }}->{{ column.name }})) {
-{%- if column.default == 'CURRENT_TIMESTAMP' %}
+  {%- if column.default == 'CURRENT_TIMESTAMP' %}
             ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
-{%- elif column.php_primitive_type == 'bool' %}
+  {%- elif column.php_primitive_type == 'bool' %}
             ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
-{%- elif column.php_primitive_type == 'int' %}
+  {%- elif column.php_primitive_type == 'int' %}
             ${{ table.name }}->{{ column.name }} = {{ '%d'|format(column.default|int) }};
-{%- elif column.php_primitive_type == 'float' %}
+  {%- elif column.php_primitive_type == 'float' %}
             ${{ table.name }}->{{ column.name }} = {{ '%.2f'|format(column.default|float) }};
-{%- else %}
+  {%- else %}
             ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
-{%- endif %}
+  {%- endif %}
         }
 {%- endfor %}
         $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(', ') }});';
         $params = [
 {%- for column in table.columns|rejectattr('auto_increment') %}
-{%- if column.php_type in ('?bool', '?int') %}
+  {%- if column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type == '?float' %}
+  {%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type in ('bool', 'int') %}
+  {%- elif column.php_type in ('bool', 'int') %}
             (int)${{ table.name }}->{{ column.name }},
-{%- elif column.php_type == 'float' %}
+  {%- elif column.php_type == 'float' %}
             (float)${{ table.name }}->{{ column.name }},
-{%- else %}
+  {%- else %}
             ${{ table.name }}->{{ column.name }},
-{%- endif %}
+  {%- endif %}
 {%- endfor %}
         ];
         global $conn;

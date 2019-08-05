@@ -1,25 +1,6 @@
 <?php
 
 class UserRankTest extends OmegaupTestCase {
-    private static function commit() {
-        global $conn;
-        $conn->Execute('COMMIT');
-    }
-
-    private function refreshUserRank() {
-        // Ensure all suggestions are written to the database before invoking
-        // the external script.
-        self::commit();
-        shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
-                 ' --quiet ' .
-                 ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-                 ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-                 ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-                 ' --password ' . escapeshellarg(OMEGAUP_DB_PASS));
-
-        UserController::deleteProblemsSolvedRankCacheList();
-    }
-
     /**
      * Tests apiRankByProblemsSolved
      */
@@ -34,7 +15,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request());
@@ -64,7 +45,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataPrivate);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request());
@@ -102,7 +83,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataPrivate);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request());
@@ -138,7 +119,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
@@ -160,7 +141,7 @@ class UserRankTest extends OmegaupTestCase {
         );
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
@@ -201,7 +182,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataContestant);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
@@ -289,7 +270,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runDataContestantFromMassachusetts);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiRankByProblemsSolved(new Request([
@@ -321,7 +302,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         // Call API
         $response = UserController::apiProfile(new Request([
@@ -365,7 +346,7 @@ class UserRankTest extends OmegaupTestCase {
         RunsFactory::gradeRun($run);
 
         // Refresh Rank
-        $this->refreshUserRank();
+        Utils::RunUpdateUserRank();
 
         $firstPlaceUserRank = UserController::apiRankByProblemsSolved(new Request([
             'username' => $firstPlaceUser->username

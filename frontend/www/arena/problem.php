@@ -8,9 +8,8 @@ try {
     $smartyProperties = ProblemController::getProblemDetailsForSmarty(
         new Request($_REQUEST)
     );
-} catch (ApiException $e) {
-    header('HTTP/1.1 404 Not Found');
-    die(file_get_contents('../404.html'));
+} catch (Exception $e) {
+    ApiCaller::handleException($e);
 }
 
 foreach ($smartyProperties as $key => $value) {

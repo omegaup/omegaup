@@ -19,30 +19,6 @@
  */
 abstract class ProblemsDAOBase {
     /**
-     * Guardar registros.
-     *
-     * Este metodo guarda el estado actual del objeto {@link Problems}
-     * pasado en la base de datos. La llave primaria indicará qué instancia va
-     * a ser actualizada en base de datos. Si la llave primara o combinación de
-     * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
-     *
-     * @static
-     * @throws Exception si la operacion fallo.
-     * @param Problems [$Problems] El objeto de tipo Problems
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     */
-    final public static function save(Problems $Problems) : int {
-        if (is_null($Problems->problem_id) ||
-            is_null(self::getByPK($Problems->problem_id))
-        ) {
-            return ProblemsDAOBase::create($Problems);
-        }
-        return ProblemsDAOBase::update($Problems);
-    }
-
-    /**
      * Actualizar registros.
      *
      * @static
@@ -105,7 +81,7 @@ abstract class ProblemsDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto Problems suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será
