@@ -3,7 +3,6 @@
 init_submodules() {
 	git submodule update --init --recursive \
 		stuff/hook_tools \
-		frontend/server/libs/third_party/adodb \
 		frontend/server/libs/third_party/constant_time_encoding \
 		frontend/server/libs/third_party/facebook-php-graph-sdk \
 		frontend/server/libs/third_party/google-api-php-client \
