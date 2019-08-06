@@ -66,9 +66,11 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
             ORDER BY
                 i.identity_id;';
 
-        return array_map(function ($request) {
-                $request['accepted'] = $request['accepted'] == '1';
-                return $request;
-        }, $conn->GetAll($sql, [$problemsetId]));
+        $result = [];
+        foreach ($conn->GetAll($sql, [$problemsetId]) as $row) {
+            $row['accepted'] = $row['accepted'] == '1';
+            $result[] = $row;
+        }
+        return $result;
     }
 }
