@@ -290,9 +290,14 @@ class Utils {
             // Enabling them again
             $conn->Execute('SET foreign_key_checks = 1;');
         }
+        self::commit();
     }
 
     public static function RunUpdateUserRank() {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+
         shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
         ' --quiet ' .
         ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
@@ -303,7 +308,11 @@ class Utils {
 
     public static function Commit() {
         global $conn;
-        $conn->Execute('COMMIT');
+        try {
+            $conn->StartTrans();
+        } finally {
+            $conn->CompleteTrans();
+        }
     }
 
     public static function RunAggregateFeedback() {

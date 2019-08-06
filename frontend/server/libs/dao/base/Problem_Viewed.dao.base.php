@@ -25,22 +25,29 @@ abstract class ProblemViewedDAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param ProblemViewed [$Problem_Viewed] El objeto de tipo ProblemViewed
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemViewed $Problem_Viewed) : int {
-        if (is_null($Problem_Viewed->problem_id) ||
-            is_null($Problem_Viewed->identity_id) ||
-            is_null(self::getByPK($Problem_Viewed->problem_id, $Problem_Viewed->identity_id))
-        ) {
-            return ProblemViewedDAOBase::create($Problem_Viewed);
+    final public static function replace(ProblemViewed $Problem_Viewed) : int {
+        if (is_null($Problem_Viewed->problem_id) || is_null($Problem_Viewed->identity_id)) {
+            throw new NotFoundException('recordNotFound');
         }
-        return ProblemViewedDAOBase::update($Problem_Viewed);
+        if (is_null($Problem_Viewed->view_time)) {
+            $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s', Time::get());
+        }
+        $sql = 'REPLACE INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
+        $params = [
+            (int)$Problem_Viewed->problem_id,
+            (int)$Problem_Viewed->identity_id,
+            $Problem_Viewed->view_time,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -88,7 +95,7 @@ abstract class ProblemViewedDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemViewed suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

@@ -6,7 +6,7 @@ que son las librerias auxiliares, escritas en su mayoria por terceros.
 Existen 2 capaz entre la logica del negocio y la base de datos:
 
 * ORM
-* [AdoDB](https://adodb.org)
+* [Database.php](https://github.com/omegaup/omegaup/blob/master/frontend/server/libs/Database.php)
 
 La carpeta `libs/dao` contiene las clases  Consiste en los Data Access Objects
 (DAO) y los Value Objects (VO). Los  V son clases que se mapean directamente a
