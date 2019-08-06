@@ -185,12 +185,17 @@ class RunController extends Controller {
             }
 
             // No one should submit after the deadline. Not even admins.
+            $startTime = $r['container']->start_time;
+            $finishTime = $r['container']->finish_time;
+            $r['container']->toUnixTime();
             if (ProblemsetsDAO::isLateSubmission(
                 $r['container'],
                 $problemsetIdentity
             )) {
                 throw new NotAllowedToSubmitException('runNotInsideContest');
             }
+            $r['container']->start_time = $startTime;
+            $r['container']->finish_time = $finishTime;
         } catch (ApiException $apiException) {
             // Propagate ApiException
             throw $apiException;

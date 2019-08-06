@@ -45,7 +45,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     ) : bool {
         if (is_null($problemsetIdentity)) {
             return isset($container->finish_time) &&
-                   (Time::get() > strtotime($container->finish_time));
+                   (Time::get() > $container->finish_time);
         }
         return Time::get() > strtotime($problemsetIdentity->end_time);
     }

@@ -20,16 +20,15 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     public static function checkAndSaveFirstTimeAccess(
         int $identityId,
         int $problemsetId,
+        int $finishTime,
         ?int $windowLength,
         bool $grantAccess = false,
-        ?int $finishTime = null,
         bool $shareUserInformation = false
     ) : ProblemsetIdentities {
         $currentTime = Time::get();
         $problemsetIdentity = self::getByPK($identityId, $problemsetId);
-        $isNewProblemsetIdentity = false;
-        if (is_null($problemsetIdentity)) {
-            $isNewProblemsetIdentity = true;
+        $isNewProblemsetIdentity = is_null($problemsetIdentity);
+        if ($isNewProblemsetIdentity) {
             if (!$grantAccess) {
                 // User was not authorized to do this.
                 throw new ForbiddenAccessException();
@@ -47,11 +46,6 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemsetIdentity->access_time = gmdate('Y-m-d H:i:s', $currentTime);
             if (!is_null($windowLength)) {
                 $finishTime = min($currentTime + $windowLength * 60, $finishTime);
-            }
-            if (is_null($finishTime)) {
-                $finishTime = AssignmentsDAO::getFinishTimeByProblemsetId(
-                    $problemsetId
-                );
             }
             $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $finishTime);
             $problemsetIdentity->share_user_information = $shareUserInformation;

@@ -628,9 +628,9 @@ class ContestController extends Controller {
             ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r->identity->identity_id,
                 $response['contest']->problemset_id,
-                $response['contest']->window_length,
-                true,
                 $response['contest']->finish_time,
+                $response['contest']->window_length,
+                /*$grantAccess=*/true,
                 $r['share_user_information'] ?: false
             );
 
@@ -793,9 +793,9 @@ class ContestController extends Controller {
                 $problemsetIdentity = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                     $r->identity->identity_id,
                     $response['contest']->problemset_id,
+                    $response['contest']->finish_time,
                     $response['contest']->window_length,
-                    false,
-                    $response['contest']->finish_time
+                    /*$grantAccess=*/false
                 );
             } catch (ApiException $e) {
                 throw $e;
@@ -2511,13 +2511,15 @@ class ContestController extends Controller {
             ]));
             $contest->last_updated = $timestamp;
         }
-        if (($original_contest->finish_time !== $contest->finish_time) || ($original_contest->window_length !== $contest->window_length)) {
-            ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime($contest);
+        if (($original_contest->finish_time !== $contest->finish_time) ||
+            ($original_contest->window_length !== $contest->window_length)) {
             if (!is_null($contest->window_length)) {
                 // When window length is enabled, end time value is access time + window length
                 ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
                     $contest
                 );
+            } else {
+                ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime($contest);
             }
         }
 

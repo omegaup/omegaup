@@ -10,7 +10,7 @@ INNER JOIN
 ON
     Contests.problemset_id = Problemset_Identities.problemset_id
 SET
-    `end_time` = LEAST(`finish_time`, DATE_ADD(`access_time`, INTERVAL `window_length` MINUTE))
+    `end_time` = LEAST(`Contests`.`finish_time`, DATE_ADD(`access_time`, INTERVAL `Contests`.`window_length` MINUTE))
 WHERE
-    `window_length` IS NOT NULL
+    `Contests`.`window_length` IS NOT NULL
     AND `access_time` IS NOT NULL;
