@@ -51,7 +51,6 @@ export default class ProblemSolution extends Vue {
 
   T = T;
   UI = UI;
-  showSolutionPanel = true;
 
   get statusMessage(): string {
     switch (this.status) {

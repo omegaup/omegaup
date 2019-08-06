@@ -13,8 +13,6 @@ OmegaUp.on('ready', function() {
         props: {
           status: this.status,
           solution: this.solution,
-          availableTokens: this.availableTokens,
-          allTokens: this.allTokens,
         },
         on: {
           'unlock-solution': function() {
