@@ -20,6 +20,7 @@ final class DAO {
     final public static function transRollback() : void {
         global $conn;
         $conn->FailTrans();
+        $conn->CompleteTrans();
     }
 
     public static function isDuplicateEntryException(Exception $e) : bool {

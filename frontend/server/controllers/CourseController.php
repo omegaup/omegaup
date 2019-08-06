@@ -174,7 +174,7 @@ class CourseController extends Controller {
         // Only curator can set public
         if (!is_null($r['public'])
             && $r['public'] == true
-            && !Authorization::canCreatePublicCourse($r->identity->identity_id)) {
+            && !Authorization::canCreatePublicCourse($r->identity)) {
             throw new ForbiddenAccessException();
         }
     }
@@ -806,7 +806,7 @@ class CourseController extends Controller {
             (int)$problem->problem_id,
             (int)$problemSet->problemset_id
         ) > 0 &&
-            !Authorization::isSystemAdmin($r->identity->identity_id)) {
+            !Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
         ProblemsetProblemsDAO::delete($problemsetProblem);
@@ -955,7 +955,7 @@ class CourseController extends Controller {
         // Courses the user is an admin for.
         $admin_courses = [];
         try {
-            if (Authorization::isSystemAdmin($r->identity->identity_id)) {
+            if (Authorization::isSystemAdmin($r->identity)) {
                 $admin_courses = CoursesDAO::getAll(
                     $page,
                     $pageSize,
@@ -1165,11 +1165,6 @@ class CourseController extends Controller {
         DAO::transBegin();
 
         try {
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
-                'group_id' => $course->group_id,
-                'identity_id' => $resolvedIdentity->identity_id
-            ]));
-
             // Only users adding themselves are saved in consent log
             if ($resolvedIdentity->identity_id === $r->identity->identity_id
                  && $course->requests_user_information != 'no') {
@@ -1195,7 +1190,7 @@ class CourseController extends Controller {
                     );
                 }
             }
-            GroupsIdentitiesDAO::save($groupIdentity);
+            GroupsIdentitiesDAO::replace($groupIdentity);
 
             DAO::transEnd();
         } catch (Exception $e) {

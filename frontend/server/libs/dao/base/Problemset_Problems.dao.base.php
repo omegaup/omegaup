@@ -25,22 +25,38 @@ abstract class ProblemsetProblemsDAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetProblems $Problemset_Problems) : int {
-        if (is_null($Problemset_Problems->problemset_id) ||
-            is_null($Problemset_Problems->problem_id) ||
-            is_null(self::getByPK($Problemset_Problems->problemset_id, $Problemset_Problems->problem_id))
-        ) {
-            return ProblemsetProblemsDAOBase::create($Problemset_Problems);
+    final public static function replace(ProblemsetProblems $Problemset_Problems) : int {
+        if (is_null($Problemset_Problems->problemset_id) || is_null($Problemset_Problems->problem_id)) {
+            throw new NotFoundException('recordNotFound');
         }
-        return ProblemsetProblemsDAOBase::update($Problemset_Problems);
+        if (is_null($Problemset_Problems->commit)) {
+            $Problemset_Problems->commit = 'published';
+        }
+        if (is_null($Problemset_Problems->points)) {
+            $Problemset_Problems->points = 1.00;
+        }
+        if (is_null($Problemset_Problems->order)) {
+            $Problemset_Problems->order = 1;
+        }
+        $sql = 'REPLACE INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
+        $params = [
+            (int)$Problemset_Problems->problemset_id,
+            (int)$Problemset_Problems->problem_id,
+            $Problemset_Problems->commit,
+            $Problemset_Problems->version,
+            (float)$Problemset_Problems->points,
+            (int)$Problemset_Problems->order,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -91,7 +107,7 @@ abstract class ProblemsetProblemsDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemsetProblems suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

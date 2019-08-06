@@ -48,7 +48,7 @@ class ProblemsTagsDAO extends ProblemsTagsDAOBase {
             foreach ($listOfTags as $tag) {
                 $tagId = TagsDAO::getByName($tag)->tag_id;
 
-                self::save(new ProblemsTags([
+                ProblemsTagsDAO::replace(new ProblemsTags([
                     'problem_id' => $problem->problem_id,
                     'tag_id' => $tagId,
                     'public' => true,

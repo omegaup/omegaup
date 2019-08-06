@@ -93,7 +93,7 @@ class ProblemController extends Controller {
                   $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED)
                     && array_key_exists('visibility', $r)
                     && $r['problem']->visibility != $r['visibility']
-                    && !Authorization::isQualityReviewer($r->identity->identity_id)) {
+                    && !Authorization::isQualityReviewer($r->identity)) {
                 throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
             }
 
@@ -721,18 +721,25 @@ class ProblemController extends Controller {
         // Call Grader
         $runs = [];
         try {
-            $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
+            try {
+                DAO::transBegin();
+                $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
 
-            foreach ($runs as $run) {
-                $run->status = 'new';
-                $run->version = $r['problem']->current_version;
-                $run->verdict = 'JE';
-                $run->score = 0;
-                $run->contest_score = 0;
-                RunsDAO::update($run);
+                foreach ($runs as $run) {
+                    $run->status = 'new';
+                    $run->version = $r['problem']->current_version;
+                    $run->verdict = 'JE';
+                    $run->score = 0;
+                    $run->contest_score = 0;
+                    RunsDAO::update($run);
 
-                // Expire details of the run
-                RunController::invalidateCacheOnRejudge($run);
+                    // Expire details of the run
+                    RunController::invalidateCacheOnRejudge($run);
+                }
+                DAO::transEnd();
+            } catch (Exception $e) {
+                DAO::transRollback();
+                throw $e;
             }
             Grader::getInstance()->rejudge($runs, false);
         } catch (Exception $e) {
@@ -2310,9 +2317,9 @@ class ProblemController extends Controller {
                 $authorUserId = intval($r->user->user_id);
             }
 
-            if (Authorization::isSystemAdmin($r->identity->identity_id) ||
+            if (Authorization::isSystemAdmin($r->identity) ||
                 Authorization::hasRole(
-                    $r->identity->identity_id,
+                    $r->identity,
                     Authorization::SYSTEM_ACL,
                     Authorization::REVIEWER_ROLE
                 )
@@ -2380,7 +2387,7 @@ class ProblemController extends Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         try {
-            if (Authorization::isSystemAdmin($r->identity->identity_id)) {
+            if (Authorization::isSystemAdmin($r->identity)) {
                 $problems = ProblemsDAO::getAll(
                     $page,
                     $pageSize,
@@ -2634,9 +2641,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         return [
-            'isSysadmin' => Authorization::isSystemAdmin(
-                $r->identity->identity_id
-            ),
+            'isSysadmin' => Authorization::isSystemAdmin($r->identity),
         ];
     }
 
