@@ -18,21 +18,37 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'unlock-solution': function() {
-            API.Problem.solution({
-                         'problem_alias': payload['alias'],
-                         'forfeit_problem': true
-                       })
+            API.ProblemForfeited.getCounts({})
                 .then(function(data) {
-                  if (!data.exists || !data.solution) {
+                  const allTokens = data.allowed;
+                  const availableTokens = data.allowed - data.seen;
+                  if (availableTokens <= 0) {
+                    UI.warning(T.solutionNoTokens);
                     return;
                   }
-                  problemSolution.solution = mdConverter.makeHtmlWithImages(
-                      data.solution.markdown, data.solution.images);
-                  problemSolution.status = 'unlocked';
+                  API.Problem.solution({
+                               'problem_alias': payload['alias'],
+                               'forfeit_problem': true
+                             })
+                      .then(function(data) {
+                        if (!data.exists || !data.solution) {
+                          UI.error(T.wordsProblemOrSolutionNotExist);
+                          return;
+                        }
+                        problemSolution.solution =
+                            mdConverter.makeHtmlWithImages(
+                                data.solution.markdown, data.solution.images);
+                        problemSolution.status = 'unlocked';
+                        UI.info(UI.formatString(T.solutionTokens, {
+                          available: availableTokens - 1,
+                          total: allTokens,
+                        }));
+                      })
+                      .fail(omegaup.UI.apiError);
                 })
                 .fail(omegaup.UI.apiError);
           },
-          'get-initial-content': function() {
+          'get-solution': function() {
             if (payload['solution_status'] === 'unlocked') {
               API.Problem.solution({'problem_alias': payload['alias']})
                   .then(function(data) {
@@ -44,15 +60,6 @@ OmegaUp.on('ready', function() {
                   })
                   .fail(omegaup.UI.apiError);
             }
-
-            if (payload['solution_status'] === 'locked') {
-              API.ProblemForfeited.getCounts({})
-                  .then(function(data) {
-                    problemSolution.allTokens = data.allowed;
-                    problemSolution.availableTokens = data.allowed - data.seen;
-                  })
-                  .fail(omegaup.UI.apiError);
-            }
           }
         }
       });
@@ -61,8 +68,6 @@ OmegaUp.on('ready', function() {
       status: payload['solution_status'] ? payload['solution_status'] :
                                            'not_logged_in',
       solution: null,
-      availableTokens: 0,
-      allTokens: 0,
     },
     components: {
       'omegaup-problem-solution': problem_Solution,

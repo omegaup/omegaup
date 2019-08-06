@@ -1,31 +1,24 @@
 <template>
   <div class="panel">
+    <div class="solution"
+         v-html="solution"
+         v-if="status === 'unlocked' &amp;&amp; solution !== null"></div>
     <div class="interstitial"
-         v-if="showSolutionPanel">
+         v-else-if="status === 'unlocked' &amp;&amp; solution === null">
       <p>{{ T.solutionConfirm }}</p>
       <div class="text-center">
         <a class="btn btn-primary btn-md"
-             v-on:click="showPanel">{{ T.wordsSeeSolution }}</a>
+             v-on:click="$emit('get-solution');">{{ T.wordsSeeSolution }}</a>
       </div>
     </div>
-    <div v-else="">
-      <div class="solution"
-           v-html="solution"
-           v-if="status === 'unlocked'"></div>
-      <div class="interstitial"
-           v-else="">
-        <p>{{ statusMessage }}</p>
-        <div v-if="status === 'locked'">
-          <p>{{ T.solutionTokenDescription }}</p>
-          <p class="solution-tokens"
-             v-html=
-             "UI.formatString(T.solutionTokens, { available: availableTokens, total: allTokens, })">
-             </p>
-          <div class="text-center"
-               v-if="availableTokens &gt; 0">
-            <a class="btn btn-primary btn-md"
-                 v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
-          </div>
+    <div class="interstitial"
+         v-else="">
+      <p>{{ statusMessage }}</p>
+      <div v-if="status === 'locked'">
+        <p>{{ T.solutionTokenDescription }}</p>
+        <div class="text-center">
+          <a class="btn btn-primary btn-md"
+               v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
         </div>
       </div>
     </div>
@@ -55,8 +48,6 @@ import UI from '../../ui.js';
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
   @Prop() solution!: string;
-  @Prop() availableTokens!: number;
-  @Prop() allTokens!: number;
 
   T = T;
   UI = UI;
@@ -73,11 +64,6 @@ export default class ProblemSolution extends Vue {
       default:
         return '';
     }
-  }
-
-  showPanel(): void {
-    this.showSolutionPanel = false;
-    this.$emit('get-initial-content');
   }
 }
 
