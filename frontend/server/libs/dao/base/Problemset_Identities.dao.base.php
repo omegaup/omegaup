@@ -45,11 +45,12 @@ abstract class ProblemsetIdentitiesDAOBase {
         if (is_null($Problemset_Identities->is_invited)) {
             $Problemset_Identities->is_invited = false;
         }
-        $sql = 'REPLACE INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'REPLACE INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `end_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             (int)$Problemset_Identities->identity_id,
             (int)$Problemset_Identities->problemset_id,
             $Problemset_Identities->access_time,
+            $Problemset_Identities->end_time,
             (int)$Problemset_Identities->score,
             (int)$Problemset_Identities->time,
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
