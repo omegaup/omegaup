@@ -535,6 +535,7 @@ CREATE TABLE `Problemset_Identities` (
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `problemset_id` int(11) NOT NULL,
   `access_time` datetime DEFAULT NULL COMMENT 'Hora a la que entró el usuario al concurso',
+  `end_time` datetime DEFAULT NULL COMMENT 'Hora en la que finaliza un concurso para el usuario cuando se habilita la opción de inicios diferentes',
   `score` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el puntaje que obtuvo el usuario en el concurso',
   `time` int(11) NOT NULL DEFAULT '1' COMMENT 'Indica el tiempo que acumulo en usuario en el concurso',
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.',

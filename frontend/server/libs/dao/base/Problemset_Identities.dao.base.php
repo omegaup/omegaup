@@ -51,9 +51,10 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @param ProblemsetIdentities [$Problemset_Identities] El objeto de tipo ProblemsetIdentities a actualizar.
      */
     final public static function update(ProblemsetIdentities $Problemset_Identities) : int {
-        $sql = 'UPDATE `Problemset_Identities` SET `access_time` = ?, `score` = ?, `time` = ?, `share_user_information` = ?, `privacystatement_consent_id` = ?, `is_invited` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
+        $sql = 'UPDATE `Problemset_Identities` SET `access_time` = ?, `end_time` = ?, `score` = ?, `time` = ?, `share_user_information` = ?, `privacystatement_consent_id` = ?, `is_invited` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
             $Problemset_Identities->access_time,
+            $Problemset_Identities->end_time,
             (int)$Problemset_Identities->score,
             (int)$Problemset_Identities->time,
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
@@ -77,7 +78,7 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @return @link ProblemsetIdentities Un objeto del tipo {@link ProblemsetIdentities}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $identity_id, int $problemset_id) : ?ProblemsetIdentities {
-        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
+        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`end_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
         $row = $conn->GetRow($sql, $params);
@@ -137,7 +138,7 @@ abstract class ProblemsetIdentitiesDAOBase {
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
-        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` from Problemset_Identities';
+        $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`end_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` from Problemset_Identities';
         global $conn;
         if (!is_null($orden)) {
             $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
@@ -172,11 +173,12 @@ abstract class ProblemsetIdentitiesDAOBase {
         if (is_null($Problemset_Identities->is_invited)) {
             $Problemset_Identities->is_invited = false;
         }
-        $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+        $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `end_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             (int)$Problemset_Identities->identity_id,
             (int)$Problemset_Identities->problemset_id,
             $Problemset_Identities->access_time,
+            $Problemset_Identities->end_time,
             (int)$Problemset_Identities->score,
             (int)$Problemset_Identities->time,
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,

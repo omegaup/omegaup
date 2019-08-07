@@ -621,13 +621,15 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('contestBasicInformationNeeded');
         }
 
+        $r->ensureBool('share_user_information', false);
         DAO::transBegin();
         try {
+            $response['contest']->toUnixTime();
             ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
-                $r->identity->identity_id,
-                $response['contest']->problemset_id,
-                true,
-                $r['share_user_information']
+                $r->identity,
+                $response['contest'],
+                /*$grantAccess=*/true,
+                $r['share_user_information'] ?: false
             );
 
             // Insert into PrivacyStatement_Consent_Log whether request
@@ -783,9 +785,10 @@ class ContestController extends Controller {
             // want this to get generally cached for everybody
             // Save the time of the first access
             try {
+                $response['contest']->toUnixTime();
                 $problemset_user = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
-                    $r->identity->identity_id,
-                    $response['contest']->problemset_id
+                    $r->identity,
+                    $response['contest']
                 );
             } catch (ApiException $e) {
                 throw $e;
@@ -1715,6 +1718,7 @@ class ContestController extends Controller {
                 'problemset_id' => $contest->problemset_id,
                 'identity_id' => $identity->identity_id,
                 'access_time' => null,
+                'end_time' => null,
                 'score' => '0',
                 'time' => '0',
                 'is_invited' => '1',
@@ -2401,7 +2405,7 @@ class ContestController extends Controller {
             DAO::transBegin();
 
             // Save the contest object with data sent by user to the database
-            self::updateContest($contest, $originalContest, $r->user->user_id);
+            self::updateContest($contest, $originalContest, $r->identity);
 
             if ($updateProblemset) {
                 // Save the problemset object with data sent by user to the database
@@ -2442,20 +2446,36 @@ class ContestController extends Controller {
     /**
      * This function reviews changes in penalty type and admission mode
      */
-    private static function updateContest(Contests $contest, Contests $original_contest, $user_id) {
-        if ($original_contest->admission_mode !== $contest->admission_mode) {
+    private static function updateContest(
+        Contests $contest,
+        Contests $originalContest,
+        Identities $identity
+    ) : void {
+        if ($originalContest->admission_mode !== $contest->admission_mode) {
             $timestamp = gmdate('Y-m-d H:i:s', Time::get());
             ContestLogDAO::create(new ContestLog([
                 'contest_id' => $contest->contest_id,
-                'user_id' => $user_id,
-                'from_admission_mode' => $original_contest->admission_mode,
+                'user_id' => $identity->user_id,
+                'from_admission_mode' => $originalContest->admission_mode,
                 'to_admission_mode' => $contest->admission_mode,
                 'time' => $timestamp
             ]));
             $contest->last_updated = $timestamp;
         }
+        if (($originalContest->finish_time !== $contest->finish_time) ||
+            ($originalContest->window_length !== $contest->window_length)) {
+            if (!is_null($contest->window_length)) {
+                // When window length is enabled, end time value is access time + window length
+                ProblemsetIdentitiesDAO::recalculateEndTimeForProblemsetIdentities(
+                    $contest
+                );
+            } else {
+                ProblemsetIdentitiesDAO::recalculateEndTimeAsFinishTime($contest);
+            }
+        }
+
         ContestsDAO::update($contest);
-        if ($original_contest->penalty_type == $contest->penalty_type) {
+        if ($originalContest->penalty_type == $contest->penalty_type) {
             return;
         }
         RunsDAO::recalculatePenaltyForContest($contest);
