@@ -4,6 +4,28 @@
          v-html="solution"
          v-if="status === 'unlocked' &amp;&amp; solution !== null"></div>
     <div class="interstitial"
+         v-else="">
+      <p>{{ statusMessage }}</p>
+      <div class="text-center">
+        <a class="btn btn-primary btn-md"
+             v-if="status === 'locked'"
+             v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a> <a class=
+             "btn btn-primary btn-md"
+             v-if="status === 'unlocked'"
+             v-on:click="$emit('get-solution');">{{ T.wordsSeeSolution }}</a>
+      </div>
+    </div>
+    <div class="interstitial"
+         v-else="">
+      <div v-if="status === 'locked'">
+        <p>{{ T.solutionTokenDescription }}</p>
+        <div class="text-center">
+          <a class="btn btn-primary btn-md"
+               v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
+        </div>
+      </div>
+    </div><!--
+    <div class="interstitial"
          v-else-if="status === 'unlocked' &amp;&amp; solution === null">
       <p>{{ T.solutionConfirm }}</p>
       <div class="text-center">
@@ -22,6 +44,7 @@
         </div>
       </div>
     </div>
+    -->
   </div>
 </template>
 
@@ -54,6 +77,8 @@ export default class ProblemSolution extends Vue {
 
   get statusMessage(): string {
     switch (this.status) {
+      case 'unlocked':
+        return this.T.solutionConfirm;
       case 'locked':
         return this.T.solutionLocked;
       case 'not_found':
