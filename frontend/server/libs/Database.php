@@ -1,21 +1,9 @@
 <?php
-define('ADODB_FETCH_ASSOC', 2);
-
 /**
  * A minimalistic database access layer that has an interface mostly compatible
  * with ADOdb.
  */
 class MySQLConnection {
-    /**
-     * Unused. Only for compatibility with ADOdb.
-     */
-    public $debug = false;
-
-    /**
-     * List of flags that are passed to mysqli_options().
-     */
-    public $optionFlags = [[MYSQLI_READ_DEFAULT_GROUP, false]];
-
     /**
      * The MySQLi connection.
      */
@@ -37,7 +25,39 @@ class MySQLConnection {
      */
     private $_needsFlushing = false;
 
-    public function __construct() {
+    public function __construct(
+        string $hostname,
+        string $username,
+        string $password,
+        string $databaseName
+    ) {
+        $this->_connection = @mysqli_init();
+        if (is_null($this->_connection)) {
+            throw new DatabaseOperationException('Failed to initialize MySQLi connection');
+        }
+        $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
+        $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
+
+        if (!$this->_connection->real_connect(
+            "p:{$hostname}",
+            $username,
+            $password,
+            $databaseName
+        )) {
+            throw new DatabaseOperationException(
+                'Failed to connect to MySQL (' . mysqli_connect_errno() . '): '
+                . mysqli_connect_error()
+            );
+        }
+        $this->_connection->autocommit(false);
+        $this->_connection->set_charset('utf8');
+        $this->_connection->query('SET NAMES "utf8";', MYSQLI_STORE_RESULT);
+
+        // Even though the connection's destructor will call Flush(), this
+        // ensures that it is also called if die() is invoked.
+        register_shutdown_function(function () {
+            $this->Flush();
+        });
     }
 
     public function __destruct() {
@@ -64,66 +84,6 @@ class MySQLConnection {
     }
 
     /**
-     * Unused. Only for compatibility with ADOdb.
-     */
-    public function SetFetchMode(int $mode) : int {
-        return ADODB_FETCH_ASSOC;
-    }
-
-    /**
-     * Sets the connection character set.
-     */
-    public function SetCharSet(string $charset) : bool {
-        return $this->_connection->set_charset($charset);
-    }
-
-    /**
-     * Connects to the MySQL database.
-     */
-    public function PConnect(
-        string $hostname,
-        string $username,
-        string $password,
-        string $databaseName
-    ) : bool {
-        if (!is_null($this->_connection)) {
-            throw new ADODB_Exception('Alraedy connected to MySQL');
-        }
-
-        $connection = @mysqli_init();
-        if (is_null($connection)) {
-            throw new ADODB_Exception('Failed to initialize MySQLi connection');
-        }
-
-        foreach ($this->optionFlags as $arr) {
-            $connection->options($arr[0], $arr[1]);
-        }
-
-        if (!$connection->real_connect(
-            "p:{$hostname}",
-            $username,
-            $password,
-            $databaseName
-        )) {
-            throw new ADODB_Exception(
-                'Failed to connect to MySQL (' . mysqli_connect_errno() . ') '
-                . mysqli_connect_error(),
-                mysqli_connect_errno()
-            );
-        }
-        $connection->autocommit(false);
-
-        $this->_connection = $connection;
-        // Even though the connection's destructor will call Flush(), this
-        // ensures that it is also called if die() is invoked.
-        register_shutdown_function(function () {
-            $this->Flush();
-        });
-
-        return true;
-    }
-
-    /**
      * Binds the query parameters and returns a query that can be passed into
      * mysqli_query.
      */
@@ -134,7 +94,7 @@ class MySQLConnection {
 
         $inputChunks = explode('?', $sql);
         if (count($params) != count($inputChunks) - 1) {
-            throw new ADODB_Exception(
+            throw new DatabaseOperationException(
                 'Mismatched number of parameters. Expected '
                         . (count($inputChunks) - 1) . ', got ' . count($params)
             );
@@ -163,9 +123,8 @@ class MySQLConnection {
     private function Query(string $sql, array $params, int $resultmode) : ?mysqli_result {
         $result = $this->_connection->query($this->BindQueryParams($sql, $params), $resultmode);
         if ($result === false) {
-            throw new ADODB_Exception(
-                'Failed to query MySQL (' . $this->_connection->errno . ') '
-                . $this->_connection->error,
+            throw new DatabaseOperationException(
+                "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}",
                 $this->_connection->errno
             );
         } elseif ($result === true) {
@@ -266,7 +225,7 @@ class MySQLConnection {
      */
     public function CompleteTrans() : bool {
         if ($this->_transactionCount <= 0) {
-            throw new ADODB_Exception('Called FailTrans() outside of a transaction');
+            throw new DatabaseOperationException('Called FailTrans() outside of a transaction');
         }
         if (--$this->_transactionCount > 0) {
             return true;
@@ -286,24 +245,8 @@ class MySQLConnection {
      */
     public function FailTrans() : void {
         if ($this->_transactionCount <= 0) {
-            throw new ADODB_Exception('Called FailTrans() outside of a transaction');
+            throw new DatabaseOperationException('Called FailTrans() outside of a transaction');
         }
         $this->_transactionOk = false;
     }
-}
-
-/**
- * An exception class compatible with ADOdb's ADODB_Exception.
- */
-class ADODB_Exception extends Exception {
-    public function __construct(string $message = '', int $code = 0, Throwable $previous = null) {
-        parent::__construct($message, $code, $previous);
-    }
-}
-
-/**
- * Create a new database connection.
- */
-function ADONewConnection(string $unusedDriverName) : MySQLConnection {
-    return new MySQLConnection();
 }

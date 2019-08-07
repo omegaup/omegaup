@@ -121,8 +121,8 @@ class ResetController extends Controller {
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
-            self::$log->error('Failed to reset password: ' . $e->getMessage());
-            throw new InvalidDatabaseOperationException($e);
+            self::$log->error('Failed to reset password', $e);
+            throw $e;
         }
 
         return [
