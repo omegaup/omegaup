@@ -1095,12 +1095,10 @@ class ContestController extends Controller {
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
             DAO::transRollback();
-
             if (DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
+                throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
             }
+            throw $e;
         }
 
         // Expire contest-list cache

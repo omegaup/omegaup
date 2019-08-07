@@ -94,9 +94,9 @@ class UserController extends Controller {
                 UsersDAO::savePassword($user);
             } catch (Exception $e) {
                 if (DAO::isDuplicateEntryException($e)) {
-                    throw new DuplicatedEntryInDatabaseException('usernameInUse');
+                    throw new DuplicatedEntryInDatabaseException('usernameInUse', $e);
                 }
-                throw new InvalidDatabaseOperationException($e);
+                throw $e;
             }
 
             return [
@@ -1969,6 +1969,8 @@ class UserController extends Controller {
         Validators::validateEmail($r['email'], 'email');
 
         try {
+            DAO::transBegin();
+
             // Update email
             $email = EmailsDAO::getByPK($r->user->main_email_id);
             $email->email = $r['email'];
@@ -1989,11 +1991,14 @@ class UserController extends Controller {
                     }
                 }
             }
+
+            DAO::transEnd();
         } catch (Exception $e) {
+            DAO::transRollback();
             if (DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('mailInUse');
+                throw new DuplicatedEntryInDatabaseException('mailInUse', $e);
             }
-            throw new InvalidDatabaseOperationException($e);
+            throw $e;
         }
 
         // Delete profile cache
@@ -2446,9 +2451,9 @@ class UserController extends Controller {
             );
         } catch (Exception $e) {
             if (DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy');
+                throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy', $e);
             }
-            throw new InvalidDatabaseOperationException($e);
+            throw $e;
         }
         (new SessionController())->InvalidateCache();
 

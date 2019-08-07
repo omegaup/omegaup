@@ -24,10 +24,10 @@ final class DAO {
     }
 
     public static function isDuplicateEntryException(Exception $e) : bool {
-        if (!($e instanceof ADODB_Exception)) {
+        if (!($e instanceof DatabaseOperationException)) {
             return false;
         }
-        return $e->getCode() == 1062;
+        return $e->isDuplicate();
     }
 }
 

@@ -64,9 +64,8 @@ class InterviewController extends Controller {
 
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
 
         self::$log->info('Created new interview ' . $r['alias']);

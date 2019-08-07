@@ -259,10 +259,9 @@ class ProblemController extends Controller {
             DAO::transRollback();
 
             if (DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('problemTitleExists');
-            } else {
-                throw new InvalidDatabaseOperationException($e);
+                throw new DuplicatedEntryInDatabaseException('problemTitleExists', $e);
             }
+            throw $e;
         }
 
         self::updateLanguages($problem);

@@ -192,18 +192,21 @@ class IdentityController extends Controller {
      */
     private static function saveIdentityGroup(Identities $identity, $groupId) {
         try {
-            IdentitiesDAO::create($identity);
+            DAO::transBegin();
 
+            IdentitiesDAO::create($identity);
             GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $groupId,
                 'identity_id' => $identity->identity_id,
             ]));
+
+            DAO::transEnd();
         } catch (Exception $e) {
+            DAO::transRollback();
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
     }
 

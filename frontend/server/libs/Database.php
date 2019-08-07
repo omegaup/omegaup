@@ -33,7 +33,7 @@ class MySQLConnection {
     ) {
         $this->_connection = @mysqli_init();
         if (is_null($this->_connection)) {
-            throw new ADODB_Exception('Failed to initialize MySQLi connection');
+            throw new DatabaseOperationException('Failed to initialize MySQLi connection');
         }
         $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
         $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
@@ -44,10 +44,9 @@ class MySQLConnection {
             $password,
             $databaseName
         )) {
-            throw new ADODB_Exception(
-                'Failed to connect to MySQL (' . mysqli_connect_errno() . ') '
-                . mysqli_connect_error(),
-                mysqli_connect_errno()
+            throw new DatabaseOperationException(
+                'Failed to connect to MySQL (' . mysqli_connect_errno() . '): '
+                . mysqli_connect_error()
             );
         }
         $this->_connection->autocommit(false);
@@ -95,7 +94,7 @@ class MySQLConnection {
 
         $inputChunks = explode('?', $sql);
         if (count($params) != count($inputChunks) - 1) {
-            throw new ADODB_Exception(
+            throw new DatabaseOperationException(
                 'Mismatched number of parameters. Expected '
                         . (count($inputChunks) - 1) . ', got ' . count($params)
             );
@@ -124,9 +123,8 @@ class MySQLConnection {
     private function Query(string $sql, array $params, int $resultmode) : ?mysqli_result {
         $result = $this->_connection->query($this->BindQueryParams($sql, $params), $resultmode);
         if ($result === false) {
-            throw new ADODB_Exception(
-                'Failed to query MySQL (' . $this->_connection->errno . ') '
-                . $this->_connection->error,
+            throw new DatabaseOperationException(
+                "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}",
                 $this->_connection->errno
             );
         } elseif ($result === true) {
@@ -227,7 +225,7 @@ class MySQLConnection {
      */
     public function CompleteTrans() : bool {
         if ($this->_transactionCount <= 0) {
-            throw new ADODB_Exception('Called FailTrans() outside of a transaction');
+            throw new DatabaseOperationException('Called FailTrans() outside of a transaction');
         }
         if (--$this->_transactionCount > 0) {
             return true;
@@ -247,17 +245,8 @@ class MySQLConnection {
      */
     public function FailTrans() : void {
         if ($this->_transactionCount <= 0) {
-            throw new ADODB_Exception('Called FailTrans() outside of a transaction');
+            throw new DatabaseOperationException('Called FailTrans() outside of a transaction');
         }
         $this->_transactionOk = false;
-    }
-}
-
-/**
- * An exception class compatible with ADOdb's ADODB_Exception.
- */
-class ADODB_Exception extends Exception {
-    public function __construct(string $message = '', int $code = 0, Throwable $previous = null) {
-        parent::__construct($message, $code, $previous);
     }
 }
