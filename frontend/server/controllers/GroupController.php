@@ -33,12 +33,10 @@ class GroupController extends Controller {
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
-
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
 
         return $group;
