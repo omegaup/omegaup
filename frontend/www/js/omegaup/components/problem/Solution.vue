@@ -6,45 +6,22 @@
     <div class="interstitial"
          v-else="">
       <p>{{ statusMessage }}</p>
+      <p v-html=
+      "UI.formatString(T.solutionTokens, { available: availableTokens, total: allTokens, })"
+         v-show="allTokens !== null &amp;&amp; availableTokens !== null"></p>
       <div class="text-center">
         <a class="btn btn-primary btn-md"
-             v-if="status === 'locked'"
-             v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a> <a class=
-             "btn btn-primary btn-md"
              v-if="status === 'unlocked'"
-             v-on:click="$emit('get-solution');">{{ T.wordsSeeSolution }}</a>
+             v-on:click="$emit('get-solution');">{{ T.wordsSeeSolution }}</a> <a class=
+             "btn btn-primary btn-md"
+             v-else-if=
+             "status === 'locked' &amp;&amp; allTokens === null &amp;&amp; availableTokens === null"
+             v-on:click="$emit('get-tokens')">{{ T.solutionViewCurrentTokens }}</a> <a class=
+             "btn btn-primary btn-md"
+             v-else-if="status === 'locked' &amp;&amp; availableTokens &gt; 0"
+             v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
       </div>
     </div>
-    <div class="interstitial"
-         v-else="">
-      <div v-if="status === 'locked'">
-        <p>{{ T.solutionTokenDescription }}</p>
-        <div class="text-center">
-          <a class="btn btn-primary btn-md"
-               v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
-        </div>
-      </div>
-    </div><!--
-    <div class="interstitial"
-         v-else-if="status === 'unlocked' &amp;&amp; solution === null">
-      <p>{{ T.solutionConfirm }}</p>
-      <div class="text-center">
-        <a class="btn btn-primary btn-md"
-             v-on:click="$emit('get-solution');">{{ T.wordsSeeSolution }}</a>
-      </div>
-    </div>
-    <div class="interstitial"
-         v-else="">
-      <p>{{ statusMessage }}</p>
-      <div v-if="status === 'locked'">
-        <p>{{ T.solutionTokenDescription }}</p>
-        <div class="text-center">
-          <a class="btn btn-primary btn-md"
-               v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
-        </div>
-      </div>
-    </div>
-    -->
   </div>
 </template>
 
@@ -71,6 +48,8 @@ import UI from '../../ui.js';
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
   @Prop() solution!: string;
+  @Prop() availableTokens!: number;
+  @Prop() allTokens!: number;
 
   T = T;
   UI = UI;
