@@ -97,8 +97,10 @@ def test_create_identities_for_course(driver):
         create_course(driver, course_alias, school_name)
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
-        unassociated, associated = util.add_identities_course(driver,
-                                                              course_alias)[:2]
+        # The function require the group alias. We are assuming that it is the
+        # same as the course alias, since that is the default
+        unassociated, associated = util.add_identities_group(driver,
+                                                             course_alias)[:2]
 
     # Unassociated identity joins the course which it was created for and
     # creates a new run

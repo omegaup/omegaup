@@ -52,13 +52,14 @@ class ContestRequestsTest extends OmegaupTestCase {
         $this->assertArrayHasKey('request_time', $userRequest);
         $this->assertArrayHasKey('accepted', $userRequest);
         $this->assertArrayHasKey('last_update', $userRequest);
-        $this->assertArrayHasKey('admin', $userRequest);
 
+        $this->assertNotEmpty($userRequest['request_time']);
         if (!$hasRequestResponse) {
             // No one has accepted or rejected the request
-            $this->assertEmpty($userRequest['admin']);
-            $this->assertNull($userRequest['accepted']);
-            $this->assertNotEmpty($userRequest['request_time']);
+            $this->assertArrayNotHasKey('admin', $userRequest);
+            $this->assertFalse($userRequest['accepted']);
+        } else {
+            $this->assertNotEmpty($userRequest['admin']);
         }
     }
 

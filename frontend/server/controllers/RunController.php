@@ -307,12 +307,19 @@ class RunController extends Controller {
         ]);
 
         try {
-            // Push run into DB
-            SubmissionsDAO::create($submission);
-            $run->submission_id = $submission->submission_id;
-            RunsDAO::create($run);
-            $submission->current_run_id = $run->run_id;
-            SubmissionsDAO::update($submission);
+            try {
+                DAO::transBegin();
+                // Push run into DB
+                SubmissionsDAO::create($submission);
+                $run->submission_id = $submission->submission_id;
+                RunsDAO::create($run);
+                $submission->current_run_id = $run->run_id;
+                SubmissionsDAO::update($submission);
+                DAO::transEnd();
+            } catch (Exception $e) {
+                DAO::transRollback();
+                throw $e;
+            }
 
             // Call Grader
             try {
@@ -479,8 +486,15 @@ class RunController extends Controller {
         self::$log->info('Run being rejudged!!');
 
         // Reset fields.
-        $r['run']->status = 'new';
-        RunsDAO::update($r['run']);
+        try {
+            DAO::transBegin();
+            $r['run']->status = 'new';
+            RunsDAO::update($r['run']);
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw $e;
+        }
 
         try {
             Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);

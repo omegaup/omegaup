@@ -1714,7 +1714,7 @@ class ContestController extends Controller {
 
         // Save the contest to the DB
         try {
-            ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
+            ProblemsetIdentitiesDAO::replace(new ProblemsetIdentities([
                 'problemset_id' => $contest->problemset_id,
                 'identity_id' => $identity->identity_id,
                 'access_time' => null,
@@ -2154,67 +2154,48 @@ class ContestController extends Controller {
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         try {
-            $db_results = ProblemsetIdentityRequestDAO::getRequestsForProblemset($contest->problemset_id);
+            $resultAdmins =
+                ProblemsetIdentityRequestDAO::getFirstAdminForProblemsetRequest(
+                    $contest->problemset_id
+                );
+            $resultRequests =
+                ProblemsetIdentityRequestDAO::getRequestsForProblemset(
+                    $contest->problemset_id
+                );
         } catch (Exception $e) {
             throw new InvalidDatabaseOperationException($e);
         }
 
-        // @TODO prefetch an alias-user_id map so that we dont need
-        // a getbypk (sql select query) on every iteration of the following loop
-
-        // Precalculate all admin profiles.
-        $admin_infos = [];
-        foreach ($db_results as $result) {
-            $admin_id = $result['admin_id'];
-            if (!empty($admin_id) && !array_key_exists($admin_id, $admin_infos)) {
-                $data = IdentitiesDAO::findByUserId($admin_id);
+        $admins = [];
+        $requestsAdmins = [];
+        foreach ($resultAdmins as $result) {
+            $adminId = $result['admin_id'];
+            if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
+                $admin = [];
+                $data = IdentitiesDAO::findByUserId($adminId);
                 if (!is_null($data)) {
-                    $admin_infos[$admin_id]['user_id'] = $data->user_id;
-                    $admin_infos[$admin_id]['username'] = $data->username;
-                    $admin_infos[$admin_id]['name'] = $data->name;
+                    $admin = [
+                        'user_id' => $data->user_id,
+                        'username' => $data->username,
+                        'name' => $data->name,
+                    ];
                 }
+                $requestsAdmins[$result['identity_id']] = $admin;
             }
         }
 
-        $users = [];
-        foreach ($db_results as $result) {
-            $admin_id = $result['admin_id'];
-
-            $result = new ProblemsetIdentityRequest(
-                array_intersect_key($result, ProblemsetIdentityRequest::FIELD_NAMES)
-            );
-            $identity_id = $result->identity_id;
-            $user = IdentitiesDAO::getByPK($identity_id);
-
-            // Get user profile. Email, school, etc.
-            $profile_request = new Request();
-            $profile_request['username'] = $user->username;
-            $profile_request['omit_rank'] = true;
-
-            $userprofile = UserController::apiProfile($profile_request);
-            $adminprofile = [];
-
-            if (array_key_exists($admin_id, $admin_infos)) {
-                $adminprofile = $admin_infos[$admin_id];
+        $usersRequests = array_map(function ($request) use ($requestsAdmins) {
+            if (isset($requestsAdmins[$request['identity_id']])) {
+                $request['admin'] = $requestsAdmins[$request['identity_id']];
             }
+            return $request;
+        }, $resultRequests);
 
-            $users[] = array_merge(
-                $userprofile['userinfo'],
-                [
-                    'last_update' => $result->last_update,
-                    'accepted' => $result->accepted,
-                    'extra_note' => $result->extra_note,
-                    'admin' => $adminprofile,
-                    'request_time' => $result->request_time]
-            );
-        }
-
-        $response = [];
-        $response['users'] = $users;
-        $response['contest_alias'] = $r['contest_alias'];
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'users' => $usersRequests,
+            'contest_alias' => $r['contest_alias'],
+            'status' => 'ok',
+        ];
     }
 
     public static function apiArbitrateRequest(Request $r) {

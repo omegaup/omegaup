@@ -25,22 +25,32 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param ProblemsetIdentityRequest [$Problemset_Identity_Request] El objeto de tipo ProblemsetIdentityRequest
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
-        if (is_null($Problemset_Identity_Request->identity_id) ||
-            is_null($Problemset_Identity_Request->problemset_id) ||
-            is_null(self::getByPK($Problemset_Identity_Request->identity_id, $Problemset_Identity_Request->problemset_id))
-        ) {
-            return ProblemsetIdentityRequestDAOBase::create($Problemset_Identity_Request);
+    final public static function replace(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
+        if (is_null($Problemset_Identity_Request->identity_id) || is_null($Problemset_Identity_Request->problemset_id)) {
+            throw new NotFoundException('recordNotFound');
         }
-        return ProblemsetIdentityRequestDAOBase::update($Problemset_Identity_Request);
+        if (is_null($Problemset_Identity_Request->request_time)) {
+            $Problemset_Identity_Request->request_time = gmdate('Y-m-d H:i:s', Time::get());
+        }
+        $sql = 'REPLACE INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
+        $params = [
+            (int)$Problemset_Identity_Request->identity_id,
+            (int)$Problemset_Identity_Request->problemset_id,
+            $Problemset_Identity_Request->request_time,
+            $Problemset_Identity_Request->last_update,
+            is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
+            $Problemset_Identity_Request->extra_note,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -91,7 +101,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemsetIdentityRequest suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

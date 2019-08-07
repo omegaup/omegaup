@@ -1165,11 +1165,6 @@ class CourseController extends Controller {
         DAO::transBegin();
 
         try {
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
-                'group_id' => $course->group_id,
-                'identity_id' => $resolvedIdentity->identity_id
-            ]));
-
             // Only users adding themselves are saved in consent log
             if ($resolvedIdentity->identity_id === $r->identity->identity_id
                  && $course->requests_user_information != 'no') {
@@ -1195,7 +1190,7 @@ class CourseController extends Controller {
                     );
                 }
             }
-            GroupsIdentitiesDAO::save($groupIdentity);
+            GroupsIdentitiesDAO::replace($groupIdentity);
 
             DAO::transEnd();
         } catch (Exception $e) {
