@@ -45,7 +45,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
             $problemsetIdentity->access_time = gmdate('Y-m-d H:i:s', $currentTime);
-            if (!is_null($container->window_length)) {
+            if (!empty($container->window_length)) {
                 $container->finish_time = min(
                     $currentTime + $container->window_length * 60,
                     $container->finish_time

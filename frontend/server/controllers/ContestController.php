@@ -734,10 +734,10 @@ class ContestController extends Controller {
 
             // Add time left to response
             if ($response['contest']->window_length === null) {
-                $result['submission_deadline'] = strtotime($response['contest']->finish_time);
+                $result['submission_deadline'] = $response['contest']->finish_time;
             } else {
                 $result['submission_deadline'] = min(
-                    strtotime($response['contest']->finish_time),
+                    $response['contest']->finish_time,
                     strtotime($problemsetUser->access_time) + $response['contest']->window_length * 60
                 );
             }
