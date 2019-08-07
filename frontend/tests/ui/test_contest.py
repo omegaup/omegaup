@@ -267,7 +267,7 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
     '''Creates a contest as an admin.'''
 
     with driver.login_admin():
-        create_contest(driver, contest_alias, **kwargs)
+        util.create_contest(driver, contest_alias, **kwargs)
 
         assert (('/contest/%s/edit/' % contest_alias) in
                 driver.browser.current_url), driver.browser.current_url
@@ -338,35 +338,6 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
              'button.details'))).click()
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
-
-
-@util.annotate
-def create_contest(driver, contest_alias, scoreboard_time_percent=100):
-    '''Creates a new contest.'''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/contest/new/"]')))).click()
-
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.ID, ('title')))).send_keys(contest_alias)
-    driver.browser.find_element_by_id('alias').send_keys(
-        contest_alias)
-    driver.browser.find_element_by_id('description').send_keys(
-        'contest description')
-    scoreboard_element = driver.browser.find_element_by_id('scoreboard')
-    scoreboard_element.clear()
-    scoreboard_element.send_keys(scoreboard_time_percent)
-
-    with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
 
 
 @util.annotate

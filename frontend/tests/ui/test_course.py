@@ -25,7 +25,7 @@ def test_user_ranking_course(driver):
     problem = 'sumas'
 
     with driver.login_admin():
-        create_course(driver, course_alias, school_name)
+        util.create_course(driver, course_alias, school_name)
         add_students_course(driver, [driver.user_username])
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
@@ -94,7 +94,7 @@ def test_create_identities_for_course(driver):
     # Admin creates a course with one assignment and one problem, and then
     # creates some identities associated with the course group
     with driver.login_admin():
-        create_course(driver, course_alias, school_name)
+        util.create_course(driver, course_alias, school_name)
         add_assignment(driver, assignment_alias)
         add_problem_to_assignment(driver, assignment_alias, problem)
         # The function require the group alias. We are assuming that it is the
@@ -182,37 +182,6 @@ def enter_course_assignments_page(driver, course_alias):
             EC.element_to_be_clickable(
                 (By.XPATH,
                  '//a[@href = "%s"]' % course_url))).click()
-
-
-@util.annotate
-def create_course(driver, course_alias, school_name):
-    '''Creates one course with a new school.'''
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, ('//a[@href = "/course/new/"]')))).click()
-
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CLASS_NAME, ('name')))).send_keys(course_alias)
-    driver.browser.find_element_by_class_name('alias').send_keys(
-        course_alias)
-    driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
-                            school_name,
-                            select_suggestion=False)
-    driver.browser.find_element_by_tag_name('textarea').send_keys(
-        'course description')
-
-    with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
-    assert (('/course/%s/edit/' % course_alias) in
-            driver.browser.current_url), driver.browser.current_url
 
 
 @util.annotate

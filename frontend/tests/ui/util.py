@@ -22,7 +22,7 @@ CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('/api/grader/status/',)
+MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -297,3 +297,161 @@ def add_identities_group(driver, group_alias):
     assert 'success' in message_class, message_class
 
     return identities
+
+
+def create_contest(driver, contest_alias, scoreboard_time_percent=100,
+                   has_privileges=True):
+    '''Creates a new contest.'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.ID, 'nav-contests'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//li[@id = "nav-contests"]'
+                  '//a[@href = "/contest/new/"]')))).click()
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.ID, ('title')))).send_keys(contest_alias)
+    driver.browser.find_element_by_id('alias').send_keys(
+        contest_alias)
+    driver.browser.find_element_by_id('description').send_keys(
+        'contest description')
+    scoreboard_element = driver.browser.find_element_by_id('scoreboard')
+    scoreboard_element.clear()
+    scoreboard_element.send_keys(scoreboard_time_percent)
+
+    if has_privileges:
+        with driver.page_transition():
+            driver.browser.find_element_by_tag_name('form').submit()
+    else:
+        submit_element = driver.browser.find_element_by_tag_name('form')
+        assert_get_alert(driver, submit_element)
+
+
+def create_course(driver, course_alias, school_name, has_privileges=True):
+    '''Creates one course with a new school.'''
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//a[@href = "/schools/"]'))).click()
+
+    if has_privileges is False:
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, '//a[@href = "/course/"]'))).click()
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, ('//a[@href = "/course/new/"]')))).click()
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CLASS_NAME, ('name')))).send_keys(course_alias)
+    driver.browser.find_element_by_class_name('alias').send_keys(
+        course_alias)
+    driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
+                            school_name,
+                            select_suggestion=False)
+    driver.browser.find_element_by_tag_name('textarea').send_keys(
+        'course description')
+
+    if has_privileges:
+        with driver.page_transition():
+            driver.browser.find_element_by_tag_name('form').submit()
+        assert (('/course/%s/edit/' % course_alias) in
+                driver.browser.current_url), driver.browser.current_url
+    else:
+        submit_element = driver.browser.find_element_by_tag_name('form')
+        assert_get_alert(driver, submit_element)
+
+
+def create_problem(driver, problem_alias, has_privileges=True):
+    '''Create a problem.'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.ID, 'nav-problems'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//li[@id = "nav-problems"]'
+                  '//a[@href = "/problem/new/"]')))).click()
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[@name = "alias"]'))).send_keys(problem_alias)
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[@name = "title"]'))).send_keys(problem_alias)
+    input_limit = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[@name = "input_limit"]')))
+    input_limit.clear()
+    input_limit.send_keys('1024')
+    # Alias should be set automatically
+    driver.browser.find_element_by_name('source').send_keys('test')
+    # Make the problem public
+    driver.browser.find_element_by_xpath(
+        '//input[@name="visibility" and @value = "1"]').click()
+    contents_element = driver.browser.find_element_by_name(
+        'problem_contents')
+    contents_element.send_keys(os.path.join(
+        OMEGAUP_ROOT, 'frontend/tests/resources/triangulos.zip'))
+
+    if has_privileges:
+        with driver.page_transition(wait_for_ajax=False):
+            contents_element.submit()
+        assert (('/problem/%s/edit/' % problem_alias) in
+                driver.browser.current_url), driver.browser.current_url
+    else:
+        assert_get_alert(driver, contents_element)
+
+
+def assert_get_alert(driver, submit_element):
+    ''' When an identity tries to create something it should get a message. '''
+
+    submit_element.submit()
+
+    message = driver.wait.until(
+        EC.visibility_of_element_located((By.ID, 'status')))
+    message_class = message.get_attribute('class')
+
+    assert 'danger' in message_class, message_class
+
+
+def assert_page_not_found(driver, page):
+    ''' Asserts user or identity does not have access to the page. '''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.ID, 'nav-%ss' % (page)))).click()
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//li[@id = "nav-%ss"]'
+                  '//a[@href = "/%s/mine/"]' % (page, page))))).click()
+
+    error_page = driver.wait.until(
+        EC.visibility_of_element_located((By.XPATH, '//h1/strong')))
+    error_symbol = error_page.get_attribute('title')
+
+    assert 'omega' in error_symbol, error_symbol
+
+    error_page = driver.wait.until(
+        EC.visibility_of_element_located((By.XPATH, '//h1/span')))
+    error_down = error_page.get_attribute('title')
+
+    assert 'Down' in error_down, error_down
