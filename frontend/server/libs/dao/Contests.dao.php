@@ -761,16 +761,7 @@ class ContestsDAO extends ContestsDAOBase {
             return null;
         }
 
-        try {
-            $contest = ContestsDAO::getByProblemset($problemset_id);
-            if (!empty($contest)) {
-                return $contest;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return null;
+        return ContestsDAO::getByProblemset($problemset_id);
     }
 
     public static function getNeedsInformation($problemset_id) {

@@ -58,16 +58,7 @@ class InterviewsDAO extends InterviewsDAOBase {
             return null;
         }
 
-        try {
-            $interview = self::getByProblemset($problemset_id);
-            if (!is_null($interview)) {
-                return $interviews;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return null;
+        return self::getByProblemset($problemset_id);
     }
 
     public static function getByProblemset($problemset_id) {

@@ -15,12 +15,7 @@ class AuthorizationController extends Controller {
 
         $resolvedIdentity = IdentityController::resolveIdentity($r['username']);
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
