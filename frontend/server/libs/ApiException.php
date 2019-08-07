@@ -195,20 +195,6 @@ class DatabaseOperationException extends ApiException {
 }
 
 /**
- * DuplicatedEntryInDatabaseException
- *
- */
-class InvalidDatabaseOperationException extends ApiException {
-    /**
-     *
-     * @param Exception $previous
-     */
-    public function __construct(Exception $previous = null) {
-        parent::__construct('generalError', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
-    }
-}
-
-/**
  * NotFoundException
  *
  */

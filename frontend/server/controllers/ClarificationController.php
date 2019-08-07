@@ -22,7 +22,6 @@ class ClarificationController extends Controller {
      * Validate the request of apiCreate
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     private static function validateCreate(Request $r) {
@@ -32,14 +31,10 @@ class ClarificationController extends Controller {
         Validators::validateStringNonEmpty($r['message'], 'message');
         Validators::validateStringOfLengthInRange($r['message'], 'message', null, 200);
 
-        try {
-            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            $r['identity'] = !is_null($r['username']) ?
-                IdentitiesDAO::findByUsername($r['username']) : null;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        $r['identity'] = !is_null($r['username']) ?
+            IdentitiesDAO::findByUsername($r['username']) : null;
 
         if (is_null($r['contest'])) {
             throw new NotFoundException('contestNotFound');
@@ -60,7 +55,6 @@ class ClarificationController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiCreate(Request $r) {
         // Authenticate user
@@ -81,15 +75,7 @@ class ClarificationController extends Controller {
             'public' => $receiver_id == $r->identity->identity_id ? '1' : '0',
         ]);
 
-        // Insert new Clarification
-        try {
-            // Save the clarification object with data sent by user to the database
-            ClarificationsDAO::create($r['clarification']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        ClarificationsDAO::create($r['clarification']);
         self::clarificationUpdated($r, $time);
 
         return [
@@ -102,7 +88,6 @@ class ClarificationController extends Controller {
      * Validate Details API request
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -110,12 +95,7 @@ class ClarificationController extends Controller {
         $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists
-        try {
-            $r['clarification'] = ClarificationsDAO::getByPK($r['clarification_id']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $r['clarification'] = ClarificationsDAO::getByPK($r['clarification_id']);
         if (is_null($r['clarification'])) {
             throw new NotFoundException('clarificationNotFound');
         }
@@ -158,7 +138,6 @@ class ClarificationController extends Controller {
      * Validate update API request
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     private static function validateUpdate(Request $r) {
@@ -168,10 +147,9 @@ class ClarificationController extends Controller {
         Validators::validateStringNonEmpty($r['message'], 'message', false /* not required */);
 
         // Check that clarification exists
-        try {
-            $r['clarification'] = ClarificationsDAO::GetByPK($r['clarification_id']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        $r['clarification'] = ClarificationsDAO::GetByPK($r['clarification_id']);
+        if (is_null($r['clarification'])) {
+            throw new NotFoundException('clarificationNotFound');
         }
 
         if (!Authorization::canEditClarification(
@@ -187,7 +165,6 @@ class ClarificationController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdate(Request $r) {
         // Authenticate user
@@ -211,12 +188,7 @@ class ClarificationController extends Controller {
         $clarification->time = gmdate('Y-m-d H:i:s', $time);
 
         // Save the clarification
-        try {
-            ClarificationsDAO::update($clarification);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ClarificationsDAO::update($clarification);
 
         $r['problem'] = $r['contest'] = $r['user'] = null;
         self::clarificationUpdated($r, $time);

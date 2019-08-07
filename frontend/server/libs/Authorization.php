@@ -73,11 +73,7 @@ class Authorization {
         Identities $identity,
         Submissions $submission
     ) : bool {
-        try {
-            $problem = ProblemsDAO::getByPK($submission->problem_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByPK($submission->problem_id);
         if (is_null($problem)) {
             return false;
         }
@@ -87,11 +83,7 @@ class Authorization {
         }
 
         if (!is_null($submission->problemset_id)) {
-            try {
-                $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
+            $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
             if (!is_null($problemset) && Authorization::isAdmin(
                 $identity,
                 $problemset
@@ -113,11 +105,7 @@ class Authorization {
             return true;
         }
 
-        try {
-            $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         if (is_null($problemset)) {
             return false;
         }
@@ -129,20 +117,12 @@ class Authorization {
         Identities $identity,
         Clarifications $clarification
     ) : bool {
-        try {
-            $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         if (is_null($problemset)) {
             return false;
         }
 
-        try {
-            $problem = ProblemsDAO::getByPK($clarification->problem_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByPK($clarification->problem_id);
         if (is_null($problem)) {
             return false;
         }
@@ -341,11 +321,7 @@ class Authorization {
     }
 
     private static function isOwner(Identities $identity, int $aclId) : bool {
-        try {
-            $acl = ACLsDAO::getByPK($aclId);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $acl = ACLsDAO::getByPK($aclId);
         return $acl->owner_id == $identity->user_id;
     }
 
@@ -369,14 +345,10 @@ class Authorization {
         if (Authorization::isSystemAdmin($identity)) {
             return true;
         }
-        try {
-            $groupUsers = GroupsIdentitiesDAO::getByPK(
-                $group->group_id,
-                $identity->identity_id
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $groupUsers = GroupsIdentitiesDAO::getByPK(
+            $group->group_id,
+            $identity->identity_id
+        );
         return !empty($groupUsers);
     }
 
