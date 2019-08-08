@@ -600,7 +600,7 @@
 	"problemEditFormTokenCaseless": "Token by Token, ignoring upper/lowercase",
 	"problemEditFormUpdateMarkdown": "Update statement",
 	"problemEditFormUpdateProblem": "Update problem",
-	"problemEditFormUpdateSolution": "Actualizar soluci\u00f3n",
+	"problemEditFormUpdateSolution": "Update solution",
 	"problemEditFormValidatorTimeLimit": "Validator time limit (ms)",
 	"problemEditFormValidatorType": "Validator type",
 	"problemEditFormWallTimeLimit": "Total time limit (ms)",

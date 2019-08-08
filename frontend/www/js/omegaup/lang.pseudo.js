@@ -601,7 +601,7 @@ const translations = {
 	problemEditFormTokenCaseless: "(T0k3n by T0k3n, ign0ring upp3r/10w3rca53)",
 	problemEditFormUpdateMarkdown: "(Upda73 57a73m3n7)",
 	problemEditFormUpdateProblem: "(Upda73 pr0b13m)",
-	problemEditFormUpdateSolution: "(Ac7ua1izar 501uci\u00f3n)",
+	problemEditFormUpdateSolution: "(Upda73 501u7i0n)",
 	problemEditFormValidatorTimeLimit: "(Va1ida70r 7im3 1imi7 (m5))",
 	problemEditFormValidatorType: "(Va1ida70r 7yp3)",
 	problemEditFormWallTimeLimit: "(T07a1 7im3 1imi7 (m5))",
