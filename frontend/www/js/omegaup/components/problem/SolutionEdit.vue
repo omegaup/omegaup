@@ -1,45 +1,71 @@
 <template>
   <div class="panel panel-primary">
-    <form class="panel-body form" method="post" enctype="multipart/form-data">
+    <form class="panel-body form"
+          enctype="multipart/form-data"
+          method="post">
       <div class="row">
-        <label for="solution-language">{{ T.statementLanguage }}</label>
-        <select v-model="currentLanguage" name="solution-language">
-          <option v-for="(markdown, language) in solutions" v-bind:markdown-contents.sync="currentMarkdown" v-bind:value="language">{{ getLanguageNameText(language) }}</option>
+        <label for="solution-language">{{ T.statementLanguage }}</label> <select name=
+        "solution-language"
+             v-model="currentLanguage">
+          <option v-bind:markdown-contents.sync="currentMarkdown"
+                  v-bind:value="language"
+                  v-for="(markdown, language) in solutions">
+            {{ getLanguageNameText(language) }}
+          </option>
         </select>
       </div>
       <div class="row">
         <div class="col-md-12">
           <div class="panel">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#solution-source" data-toggle="tab">Source</a></li>
-              <li><a href="#solution-preview" data-toggle="tab">Preview</a></li>
+              <li class="active">
+                <a data-toggle="tab"
+                    href="#solution-source">Source</a>
+              </li>
+              <li>
+                <a data-toggle="tab"
+                    href="#solution-preview">Preview</a>
+              </li>
             </ul>
-
             <div class="tab-content">
-              <div class="tab-pane active" id="solution-source">
+              <!-- id-lint off -->
+              <div class="tab-pane active"
+                   id="solution-source">
                 <div id="wmd-button-bar-solution"></div>
-                <textarea class="wmd-input" id="wmd-input-solution" name="wmd-input-solution" v-model="currentMarkdown"></textarea>
+                <textarea class="wmd-input"
+                     id="wmd-input-solution"
+                     name="wmd-input-solution"
+                     v-model="currentMarkdown"></textarea>
               </div>
-
-              <div class="tab-pane" id="solution-preview">
-                <h1 style="text-align: center;" class="title"></h1>
-                <div class="no-bottom-margin" id="wmd-preview-solution" v-html="markdownPreview"></div>
+              <div class="tab-pane"
+                   id="solution-preview">
+                <h1 class="title"
+                    style="text-align: center;"></h1>
+                <div class="no-bottom-margin"
+                     id="wmd-preview-solution"
+                     v-html="markdownPreview"></div><!-- id-lint on -->
               </div>
             </div>
           </div>
         </div>
       </div>
-
       <div class="row">
-        <div class="form-group  col-md-6">
-          <label class="control-label" for="markdown-message">{{ T.problemEditCommitMessage }}</label>
-          <input v-model="commitMessage" name="message" type="text" class="form-control" />
+        <div class="form-group col-md-6">
+          <label class="control-label"
+               for="markdown-message">{{ T.problemEditCommitMessage }}</label> <input class=
+               "form-control"
+               name="message"
+               type="text"
+               v-model="commitMessage">
         </div>
       </div>
-
       <div class="row">
         <div class="col-md-12">
-          <button type='submit' v-bind:disabled="commitMessage === ''" v-on:click.prevent="handleEditSolution" class="btn btn-primary">{{ T.problemEditFormUpdateSolution }}</button>
+          <button class="btn btn-primary"
+               type='submit'
+               v-bind:disabled="commitMessage === ''"
+               v-on:click.prevent="handleEditSolution">{{ T.problemEditFormUpdateSolution
+               }}</button>
         </div>
       </div>
     </form>
@@ -47,6 +73,7 @@
 </template>
 
 <style>
+
 </style>
 
 <script lang="ts">
@@ -66,22 +93,22 @@ export default class ProblemSolutionEdit extends Vue {
   currentLanguage = 'es';
   currentMarkdown = this.markdownContents;
   solutions: omegaup.Solutions = {
-    'en': {
-      'searched': false,
-      'markdown': '',
+    en: {
+      searched: false,
+      markdown: '',
     },
-    'es': {
-      'searched': true,
-      'markdown': '',
+    es: {
+      searched: true,
+      markdown: '',
     },
-    'pt': {
-      'searched': false,
-      'markdown': '',
-    }
-  }
+    pt: {
+      searched: false,
+      markdown: '',
+    },
+  };
 
   getLanguageNameText(language: string): string {
-    switch(language) {
+    switch (language) {
       case 'en':
         return this.T.statementLanguageEn;
       case 'es':
@@ -102,7 +129,12 @@ export default class ProblemSolutionEdit extends Vue {
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
     this.solutions[oldLanguage].markdown = this.currentMarkdown;
-    this.$emit('update-markdown-contents', this.solutions, newLanguage, this.currentMarkdown);
+    this.$emit(
+      'update-markdown-contents',
+      this.solutions,
+      newLanguage,
+      this.currentMarkdown,
+    );
     if (!this.solutions[newLanguage].searched) {
       this.solutions[newLanguage].searched = true;
     }
@@ -112,22 +144,23 @@ export default class ProblemSolutionEdit extends Vue {
     this.solutions[this.currentLanguage].markdown = this.currentMarkdown;
     this.$emit('edit-solution', this.solutions, this.commitMessage);
     this.solutions = {
-      'en': {
-        'searched': false,
-        'markdown': '',
+      en: {
+        searched: false,
+        markdown: '',
       },
-      'es': {
-        'searched': true,
-        'markdown': '',
+      es: {
+        searched: true,
+        markdown: '',
       },
-      'pt': {
-        'searched': false,
-        'markdown': '',
-      }
-    }
+      pt: {
+        searched: false,
+        markdown: '',
+      },
+    };
     this.commitMessage = '';
     this.currentMarkdown = '';
     this.currentLanguage = 'es';
   }
 }
+
 </script>
