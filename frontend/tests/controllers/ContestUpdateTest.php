@@ -442,7 +442,6 @@ class UpdateContestTest extends OmegaupTestCase {
     /**
      * Creates a contest with window length, and then update window_length
      * again
-     *
      */
     public function testUpdateWindowLengthAtTheEndOfAContest() {
         // Get a problem

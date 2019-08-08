@@ -214,7 +214,6 @@ class CreateContestTest extends OmegaupTestCase {
     /**
      * Creates a contest with window length, and review contestant
      * only can create run inside sumbission window
-     *
      */
     public function testCreateContestWithWindowLength() {
         // Get a problem

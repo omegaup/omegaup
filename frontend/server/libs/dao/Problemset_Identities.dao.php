@@ -28,8 +28,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $identity->identity_id,
             $container->problemset_id
         );
-        $isNewProblemsetIdentity = is_null($problemsetIdentity);
-        if ($isNewProblemsetIdentity) {
+        if (is_null($problemsetIdentity)) {
             if (!$grantAccess) {
                 // User was not authorized to do this.
                 throw new ForbiddenAccessException();
@@ -45,19 +44,16 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
             $problemsetIdentity->access_time = gmdate('Y-m-d H:i:s', $currentTime);
+            $finishTime = $container->finish_time;
             if (!empty($container->window_length)) {
-                $container->finish_time = min(
+                $finishTime = min(
                     $currentTime + $container->window_length * 60,
                     $container->finish_time
                 );
             }
-            $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $container->finish_time);
+            $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $finishTime);
             $problemsetIdentity->share_user_information = $shareUserInformation;
-            if ($isNewProblemsetIdentity) {
-                self::create($problemsetIdentity);
-            } else {
-                self::update($problemsetIdentity);
-            }
+            ProblemsetIdentitiesDAO::replace($problemsetIdentity);
         }
         return $problemsetIdentity;
     }

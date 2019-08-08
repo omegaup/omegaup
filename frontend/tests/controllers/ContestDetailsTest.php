@@ -198,10 +198,9 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testAccessTimeIsAlwaysFirstAccessForWindowLength() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
-
-        // Convert contest into WindowLength one
-        ContestsFactory::makeContestWindowLength($contestData, 20);
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'window_length' => 20
+        ]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
