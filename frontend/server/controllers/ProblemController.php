@@ -74,11 +74,7 @@ class ProblemController extends Controller {
             // We need to check problem_alias
             Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-            try {
-                $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
+            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
                 throw new NotFoundException('Problem not found');
             }
@@ -181,7 +177,6 @@ class ProblemController extends Controller {
      *
      * @throws ApiException
      * @throws DuplicatedEntryInDatabaseException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
@@ -259,10 +254,9 @@ class ProblemController extends Controller {
             DAO::transRollback();
 
             if (DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('problemTitleExists');
-            } else {
-                throw new InvalidDatabaseOperationException($e);
+                throw new DuplicatedEntryInDatabaseException('problemTitleExists', $e);
             }
+            throw $e;
         }
 
         self::updateLanguages($problem);
@@ -282,11 +276,7 @@ class ProblemController extends Controller {
         // We need to check problem_alias
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
             throw new NotFoundException('problemNotFound');
         }
@@ -307,7 +297,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
@@ -323,12 +312,7 @@ class ProblemController extends Controller {
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -348,7 +332,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
@@ -368,12 +351,7 @@ class ProblemController extends Controller {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -393,7 +371,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiAddTag(Request $r) {
@@ -431,36 +408,20 @@ class ProblemController extends Controller {
             throw new InvalidParameterException('tagRestricted', 'name');
         }
 
-        try {
-            $tag = TagsDAO::getByName($tagName);
-        } catch (Exception $e) {
-            self::$log->info("Failed to fetch tag {$tagName}", $e);
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $tag = TagsDAO::getByName($tagName);
         if (is_null($tag)) {
-            try {
-                $tag = new Tags([
-                    'name' => $tagName,
-                ]);
-                TagsDAO::create($tag);
-            } catch (Exception $e) {
-                self::$log->info("Failed to create tag {$tagName}", $e);
-                throw new InvalidDatabaseOperationException($e);
-            }
+            $tag = new Tags([
+                'name' => $tagName,
+            ]);
+            TagsDAO::create($tag);
         }
 
-        try {
-            ProblemsTagsDAO::create(new ProblemsTags([
-                'problem_id' => $problem->problem_id,
-                'tag_id' => $tag->tag_id,
-                'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
-                'autogenerated' => 0,
-            ]));
-        } catch (Exception $e) {
-            self::$log->error("Failed to save tag {$tagName}", $e);
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ProblemsTagsDAO::create(new ProblemsTags([
+            'problem_id' => $problem->problem_id,
+            'tag_id' => $tag->tag_id,
+            'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
+            'autogenerated' => 0,
+        ]));
     }
 
     /**
@@ -468,7 +429,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveAdmin(Request $r) {
@@ -480,12 +440,7 @@ class ProblemController extends Controller {
 
         $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -510,7 +465,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(Request $r) {
@@ -526,12 +480,7 @@ class ProblemController extends Controller {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -551,7 +500,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveTag(Request $r) {
@@ -562,15 +510,12 @@ class ProblemController extends Controller {
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         Validators::validateStringNonEmpty($r['name'], 'name');
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-            $tag = TagsDAO::getByName($r['name']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problem');
         }
+
+        $tag = TagsDAO::getByName($r['name']);
         if (is_null($tag)) {
             throw new NotFoundException('tag');
         }
@@ -583,15 +528,10 @@ class ProblemController extends Controller {
             throw new InvalidParameterException('tagRestricted', 'name');
         }
 
-        try {
-            ProblemsTagsDAO::delete(new ProblemsTags([
-                'problem_id' => $problem->problem_id,
-                'tag_id' => $tag->tag_id,
-            ]));
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ProblemsTagsDAO::delete(new ProblemsTags([
+            'problem_id' => $problem->problem_id,
+            'tag_id' => $tag->tag_id,
+        ]));
 
         return ['status' => 'ok'];
     }
@@ -601,7 +541,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiDelete(Request $r) {
@@ -611,12 +550,7 @@ class ProblemController extends Controller {
         // Check whether problem exists
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -629,12 +563,7 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException('problemHasBeenUsedInContestOrCourse');
         }
 
-        try {
-            ProblemsDAO::deleteProblem($problem->problem_id);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        ProblemsDAO::deleteProblem($problem->problem_id);
 
         return ['status' => 'ok'];
     }
@@ -644,7 +573,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiAdmins(Request $r) {
         // Authenticate request
@@ -652,11 +580,7 @@ class ProblemController extends Controller {
 
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -677,7 +601,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiTags(Request $r) {
         // Authenticate request
@@ -685,11 +608,7 @@ class ProblemController extends Controller {
 
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         $includeAutogenerated = ($r['include_autogenerated'] == 'true');
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -711,7 +630,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiRejudge(Request $r) {
         self::authenticateRequest($r);
@@ -721,32 +639,26 @@ class ProblemController extends Controller {
         // Call Grader
         $runs = [];
         try {
-            try {
-                DAO::transBegin();
-                $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
+            DAO::transBegin();
+            $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
 
-                foreach ($runs as $run) {
-                    $run->status = 'new';
-                    $run->version = $r['problem']->current_version;
-                    $run->verdict = 'JE';
-                    $run->score = 0;
-                    $run->contest_score = 0;
-                    RunsDAO::update($run);
+            foreach ($runs as $run) {
+                $run->status = 'new';
+                $run->version = $r['problem']->current_version;
+                $run->verdict = 'JE';
+                $run->score = 0;
+                $run->contest_score = 0;
+                RunsDAO::update($run);
 
-                    // Expire details of the run
-                    RunController::invalidateCacheOnRejudge($run);
-                }
-                DAO::transEnd();
-            } catch (Exception $e) {
-                DAO::transRollback();
-                throw $e;
+                // Expire details of the run
+                RunController::invalidateCacheOnRejudge($run);
             }
-            Grader::getInstance()->rejudge($runs, false);
+            DAO::transEnd();
         } catch (Exception $e) {
-            self::$log->error('Failed to rejudge runs after problem update');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
+            DAO::transRollback();
+            throw $e;
         }
+        Grader::getInstance()->rejudge($runs, false);
 
         $response = [];
 
@@ -761,7 +673,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
@@ -864,7 +775,7 @@ class ProblemController extends Controller {
             self::$log->error('Failed to update problem');
             self::$log->error($e);
 
-            throw new InvalidDatabaseOperationException($e);
+            throw $e;
         }
 
         if ($response['rejudged'] && OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
@@ -921,7 +832,6 @@ class ProblemController extends Controller {
      * @param Request $r
      * @return array The updated file languages
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      */
     private static function updateLooseFile(
         Request $r,
@@ -967,8 +877,6 @@ class ProblemController extends Controller {
             $updatedFileLanguages = $problemDeployer->getUpdatedLanguages();
         } catch (ApiException $e) {
             throw $e;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
         }
 
         return $updatedFileLanguages;
@@ -980,7 +888,6 @@ class ProblemController extends Controller {
      * @param Request $r
      * @return array
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateStatement(Request $r) {
         self::authenticateRequest($r);
@@ -999,7 +906,6 @@ class ProblemController extends Controller {
      * @param Request $r
      * @return array
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateSolution(Request $r) {
         self::authenticateRequest($r);
@@ -1071,7 +977,6 @@ class ProblemController extends Controller {
      * @param Request $r
      * @return Array
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -1086,11 +991,7 @@ class ProblemController extends Controller {
             $r['lang'] = IdentityController::getPreferredLanguage($r);
         }
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             return [
                 'status' => 'ok',
@@ -1309,7 +1210,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws InvalidFilesystemOperationException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiDownload(Request $r) {
         self::authenticateRequest($r);
@@ -1334,18 +1234,13 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateDownload(Request $r) {
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -1365,42 +1260,29 @@ class ProblemController extends Controller {
      * @param $contestAlias
      * @return Array
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     private static function validateProblemset(Problems $problem, $problemsetId, $contestAlias = null) {
         $problemNotFound = null;
         $response = [];
         if (!empty($contestAlias)) {
-            try {
-                // Is it a valid contest_alias?
-                $response['contest'] = ContestsDAO::getByAlias($contestAlias);
-                if (is_null($response['contest'])) {
-                    throw new NotFoundException('contestNotFound');
-                }
-                $response['problemset'] = ProblemsetsDAO::getByPK($response['contest']->problemset_id);
-                if (is_null($response['problemset'])) {
-                    throw new NotFoundException('contestNotFound');
-                }
-                $problemNotFound = 'problemNotFoundInContest';
-            } catch (ApiException $apiException) {
-                throw $apiException;
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
+            // Is it a valid contest_alias?
+            $response['contest'] = ContestsDAO::getByAlias($contestAlias);
+            if (is_null($response['contest'])) {
+                throw new NotFoundException('contestNotFound');
             }
+            $response['problemset'] = ProblemsetsDAO::getByPK($response['contest']->problemset_id);
+            if (is_null($response['problemset'])) {
+                throw new NotFoundException('contestNotFound');
+            }
+            $problemNotFound = 'problemNotFoundInContest';
         } elseif (!is_null($problemsetId)) {
-            try {
-                // Is it a valid problemset_id?
-                $response['problemset'] = ProblemsetsDAO::getByPK($problemsetId);
-                if (is_null($response['problemset'])) {
-                    throw new NotFoundException('problemsetNotFound');
-                }
-                $problemNotFound = 'problemNotFoundInProblemset';
-            } catch (ApiException $apiException) {
-                throw $apiException;
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
+            // Is it a valid problemset_id?
+            $response['problemset'] = ProblemsetsDAO::getByPK($problemsetId);
+            if (is_null($response['problemset'])) {
+                throw new NotFoundException('problemsetNotFound');
             }
+            $problemNotFound = 'problemNotFoundInProblemset';
         } else {
             // Nothing to see here, move along.
             return null;
@@ -1423,7 +1305,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws InvalidFilesystemOperationException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiDetails(Request $r) : array {
         $r->ensureBool('show_solvers', /*required=*/false);
@@ -1471,7 +1352,6 @@ class ProblemController extends Controller {
      * @param Problems $problem
      * @param bool $showSolvers
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     private static function getProblemDetails(
         Request $r,
@@ -1554,16 +1434,11 @@ class ProblemController extends Controller {
 
         if (!is_null($r->identity)) {
             // Get all the available runs done by the current_user
-            try {
-                $runsArray = RunsDAO::getForProblemDetails(
-                    (int)$problem->problem_id,
-                    $problemsetId,
-                    (int)$r->identity->identity_id
-                );
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
-            }
+            $runsArray = RunsDAO::getForProblemDetails(
+                (int)$problem->problem_id,
+                $problemsetId,
+                (int)$r->identity->identity_id
+            );
 
             // Add each filtered run to an array
             $response['runs'] = [];
@@ -1580,21 +1455,18 @@ class ProblemController extends Controller {
             $result['admin'] = Authorization::isAdmin($r->identity, $problemset);
             if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
                 // At this point, contestant_user relationship should be established.
-                try {
-                    ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
-                        $r->identity->identity_id,
-                        $problemset->problemset_id,
-                        Authorization::canSubmitToProblemset(
-                            $r->identity,
-                            $problemset
-                        )
-                    );
-                } catch (ApiException $e) {
-                    throw $e;
-                } catch (Exception $e) {
-                    // Operation failed in the data layer
-                    throw new InvalidDatabaseOperationException($e);
-                }
+                $container = ProblemsetsDAO::getProblemsetContainer(
+                    $problemset->problemset_id
+                );
+                $container->toUnixTime();
+                ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
+                    $r->identity,
+                    $container,
+                    Authorization::canSubmitToProblemset(
+                        $r->identity,
+                        $problemset
+                    )
+                );
             }
 
             // As last step, register the problem as opened
@@ -1603,18 +1475,12 @@ class ProblemController extends Controller {
                 $problem->problem_id,
                 $r->identity->identity_id
             )) {
-                try {
-                    // Save object in the DB
-                    ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
-                        'problemset_id' => $problemset->problemset_id,
-                        'problem_id' => $problem->problem_id,
-                        'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
-                        'identity_id' => $r->identity->identity_id
-                    ]));
-                } catch (Exception $e) {
-                    // Operation failed in the data layer
-                    throw new InvalidDatabaseOperationException($e);
-                }
+                ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
+                    'problemset_id' => $problemset->problemset_id,
+                    'problem_id' => $problem->problem_id,
+                    'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
+                    'identity_id' => $r->identity->identity_id
+                ]));
             }
         } elseif ($showSolvers) {
             $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem(
@@ -1654,7 +1520,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws InvalidFilesystemOperationException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiSolution(Request $r) {
         self::authenticateRequest($r);
@@ -1722,7 +1587,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     public static function apiVersions(Request $r) {
@@ -1730,11 +1594,7 @@ class ProblemController extends Controller {
 
         Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -1774,7 +1634,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     public static function apiSelectVersion(Request $r) {
@@ -1800,11 +1659,7 @@ class ProblemController extends Controller {
             $updatePublished = $r['update_published'];
         }
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -1857,17 +1712,12 @@ class ProblemController extends Controller {
             ProblemsDAO::update($problem);
 
             DAO::transEnd();
-        } catch (ApiException $e) {
-            // Operation failed in the data layer, rollback transaction
-            DAO::transRollback();
-
-            throw $e;
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
             DAO::transRollback();
             self::$log->error('Failed to update problem: ', $e);
 
-            throw new InvalidDatabaseOperationException($e);
+            throw $e;
         }
 
         if (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
@@ -1912,11 +1762,7 @@ class ProblemController extends Controller {
         Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
         Validators::validateStringNonEmpty($r['version'], 'version');
 
-        try {
-            $problem = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -1984,7 +1830,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -1992,11 +1837,7 @@ class ProblemController extends Controller {
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Is the problem valid?
-        try {
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
             throw new NotFoundException('problemNotFound');
         }
@@ -2007,7 +1848,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws InvalidFilesystemOperationException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiRuns(Request $r) {
         // Get user
@@ -2029,57 +1869,47 @@ class ProblemController extends Controller {
                     throw new NotFoundException('userNotFound');
                 }
             }
-            try {
-                $runs = RunsDAO::getAllRuns(
-                    null,
-                    $r['status'],
-                    $r['verdict'],
-                    $r['problem']->problem_id,
-                    $r['language'],
-                    !is_null($r['identity']) ? $r['identity']->identity_id : null,
-                    $r['offset'],
-                    $r['rowcount']
-                );
+            $runs = RunsDAO::getAllRuns(
+                null,
+                $r['status'],
+                $r['verdict'],
+                $r['problem']->problem_id,
+                $r['language'],
+                !is_null($r['identity']) ? $r['identity']->identity_id : null,
+                $r['offset'],
+                $r['rowcount']
+            );
 
-                $result = [];
+            $result = [];
 
-                foreach ($runs as $run) {
-                    $run['time'] = (int)$run['time'];
-                    $run['score'] = round((float)$run['score'], 4);
-                    if ($run['contest_score'] != null) {
-                        $run['contest_score'] = round((float)$run['contest_score'], 2);
-                    }
-                    array_push($result, $run);
+            foreach ($runs as $run) {
+                $run['time'] = (int)$run['time'];
+                $run['score'] = round((float)$run['score'], 4);
+                if ($run['contest_score'] != null) {
+                    $run['contest_score'] = round((float)$run['contest_score'], 2);
                 }
-
-                $response['runs'] = $result;
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
+                array_push($result, $run);
             }
+
+            $response['runs'] = $result;
         } else {
             // Get all the available runs
-            try {
-                $runsArray = RunsDAO::getForProblemDetails(
-                    (int)$r['problem']->problem_id,
-                    null,
-                    (int)$r->identity->identity_id
-                );
+            $runsArray = RunsDAO::getForProblemDetails(
+                (int)$r['problem']->problem_id,
+                null,
+                (int)$r->identity->identity_id
+            );
 
-                // Add each filtered run to an array
-                $response['runs'] = [];
-                if (!empty($runsArray)) {
-                    foreach ($runsArray as $run) {
-                        $run['time'] = (int)$run['time'];
-                        $run['contest_score'] = (float)$run['contest_score'];
-                        $run['username'] = $r->identity->username;
-                        $run['alias'] = $r['problem']->alias;
-                        array_push($response['runs'], $run);
-                    }
+            // Add each filtered run to an array
+            $response['runs'] = [];
+            if (!empty($runsArray)) {
+                foreach ($runsArray as $run) {
+                    $run['time'] = (int)$run['time'];
+                    $run['contest_score'] = (float)$run['contest_score'];
+                    $run['username'] = $r->identity->username;
+                    $run['alias'] = $r['problem']->alias;
+                    array_push($response['runs'], $run);
                 }
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
             }
         }
 
@@ -2092,7 +1922,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws InvalidFilesystemOperationException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiClarifications(Request $r) {
         // Get user
@@ -2104,18 +1933,13 @@ class ProblemController extends Controller {
             $r['problem']
         );
 
-        try {
-            $clarifications = ClarificationsDAO::GetProblemClarifications(
-                $r['problem']->problem_id,
-                $is_problem_admin,
-                $r->identity->identity_id,
-                $r['offset'],
-                $r['rowcount']
-            );
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $clarifications = ClarificationsDAO::GetProblemClarifications(
+            $r['problem']->problem_id,
+            $is_problem_admin,
+            $r->identity->identity_id,
+            $r['offset'],
+            $r['rowcount']
+        );
 
         foreach ($clarifications as &$clar) {
             $clar['time'] = (int)$clar['time'];
@@ -2135,7 +1959,6 @@ class ProblemController extends Controller {
      * @param Request $r
      * @return array
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiStats(Request $r) {
         // Get user
@@ -2149,80 +1972,76 @@ class ProblemController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        try {
-            // Array of GUIDs of pending runs
-            $pendingRunsGuids = RunsDAO::getPendingRunsOfProblem(
-                (int)$r['problem']->problem_id
-            );
+        // Array of GUIDs of pending runs
+        $pendingRunsGuids = RunsDAO::getPendingRunsOfProblem(
+            (int)$r['problem']->problem_id
+        );
 
-            // Count of pending runs (int)
-            $totalRunsCount = SubmissionsDAO::countTotalSubmissionsOfProblem(
-                (int)$r['problem']->problem_id
-            );
+        // Count of pending runs (int)
+        $totalRunsCount = SubmissionsDAO::countTotalSubmissionsOfProblem(
+            (int)$r['problem']->problem_id
+        );
 
-            // List of verdicts
-            $verdict_counts = [];
+        // List of verdicts
+        $verdict_counts = [];
 
-            foreach (self::$verdicts as $verdict) {
-                $verdict_counts[$verdict] = RunsDAO::countTotalRunsOfProblemByVerdict(
-                    (int)$r['problem']->problem_id,
-                    $verdict
-                );
-            }
-
-            // Array to count AC stats per case.
-            // Let's try to get the last snapshot from cache.
-            $problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r['problem']->alias);
-            $casesStats = $problemStatsCache->get();
-            if (is_null($casesStats)) {
-                // Initialize the array at counts = 0
-                $casesStats = [];
-                $casesStats['counts'] = [];
-
-                // We need to save the last_submission_id that we processed, so next time we do not repeat this
-                $casesStats['last_submission_id'] = 0;
-            }
-
-            // Get all runs of this problem after the last id we had
-            $runs = RunsDAO::searchWithRunIdGreaterThan(
+        foreach (self::$verdicts as $verdict) {
+            $verdict_counts[$verdict] = RunsDAO::countTotalRunsOfProblemByVerdict(
                 (int)$r['problem']->problem_id,
-                (int)$casesStats['last_submission_id']
+                $verdict
             );
+        }
 
-            // For each run we got
-            foreach ($runs as $run) {
-                // Skip it if it failed to compile.
-                if ($run->verdict == 'CE') {
-                    continue;
-                }
+        // Array to count AC stats per case.
+        // Let's try to get the last snapshot from cache.
+        $problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r['problem']->alias);
+        $casesStats = $problemStatsCache->get();
+        if (is_null($casesStats)) {
+            // Initialize the array at counts = 0
+            $casesStats = [];
+            $casesStats['counts'] = [];
 
-                // Try to open the details file. It's okay if the file is missing.
-                $details = Grader::getInstance()->getGraderResource(
-                    $run,
-                    'details.json',
-                    /*passthru=*/false,
-                    /*missingOk=*/true
-                );
-                if (!is_null($details)) {
-                    $details = json_decode($details);
-                    foreach ($details as $group) {
-                        if (!isset($group->cases) || !is_array($group->cases)) {
+            // We need to save the last_submission_id that we processed, so next time we do not repeat this
+            $casesStats['last_submission_id'] = 0;
+        }
+
+        // Get all runs of this problem after the last id we had
+        $runs = RunsDAO::searchWithRunIdGreaterThan(
+            (int)$r['problem']->problem_id,
+            (int)$casesStats['last_submission_id']
+        );
+
+        // For each run we got
+        foreach ($runs as $run) {
+            // Skip it if it failed to compile.
+            if ($run->verdict == 'CE') {
+                continue;
+            }
+
+            // Try to open the details file. It's okay if the file is missing.
+            $details = Grader::getInstance()->getGraderResource(
+                $run,
+                'details.json',
+                /*passthru=*/false,
+                /*missingOk=*/true
+            );
+            if (!is_null($details)) {
+                $details = json_decode($details);
+                foreach ($details as $group) {
+                    if (!isset($group->cases) || !is_array($group->cases)) {
+                        continue;
+                    }
+                    foreach ($group->cases as $case) {
+                        if (!array_key_exists($case->name, $casesStats['counts'])) {
+                            $casesStats['counts'][$case->name] = 0;
+                        }
+                        if ($case->score == 0) {
                             continue;
                         }
-                        foreach ($group->cases as $case) {
-                            if (!array_key_exists($case->name, $casesStats['counts'])) {
-                                $casesStats['counts'][$case->name] = 0;
-                            }
-                            if ($case->score == 0) {
-                                continue;
-                            }
-                            $casesStats['counts'][$case->name]++;
-                        }
+                        $casesStats['counts'][$case->name]++;
                     }
                 }
             }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
         }
 
         // Save the last id we saw in case we saw something
@@ -2268,7 +2087,6 @@ class ProblemController extends Controller {
      * List of public and user's private problems
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
         // Authenticate request
@@ -2375,7 +2193,6 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiAdminList(Request $r) {
         self::authenticateRequest($r);
@@ -2386,23 +2203,19 @@ class ProblemController extends Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
-        try {
-            if (Authorization::isSystemAdmin($r->identity)) {
-                $problems = ProblemsDAO::getAll(
-                    $page,
-                    $pageSize,
-                    'problem_id',
-                    'DESC'
-                );
-            } else {
-                $problems = ProblemsDAO::getAllProblemsAdminedByIdentity(
-                    $r->identity->identity_id,
-                    $page,
-                    $pageSize
-                );
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        if (Authorization::isSystemAdmin($r->identity)) {
+            $problems = ProblemsDAO::getAll(
+                $page,
+                $pageSize,
+                'problem_id',
+                'DESC'
+            );
+        } else {
+            $problems = ProblemsDAO::getAllProblemsAdminedByIdentity(
+                $r->identity->identity_id,
+                $page,
+                $pageSize
+            );
         }
 
         $addedProblems = [];
@@ -2435,15 +2248,11 @@ class ProblemController extends Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
-        try {
-            $problems = ProblemsDAO::getAllProblemsOwnedByUser(
-                $r->user->user_id,
-                $page,
-                $pageSize
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problems = ProblemsDAO::getAllProblemsOwnedByUser(
+            $r->user->user_id,
+            $page,
+            $pageSize
+        );
 
         $addedProblems = [];
 
@@ -2499,7 +2308,6 @@ class ProblemController extends Controller {
      * @param $currentLoggedIdentityId
      * @param Identities $identity
      * @return float
-     * @throws InvalidDatabaseOperationException
      */
     private static function bestScore(
         Problems $problem,
@@ -2511,23 +2319,19 @@ class ProblemController extends Controller {
         $currentIdentityId = (is_null($identity) ? $currentLoggedIdentityId : $identity->identity_id);
 
         $score = 0.0;
-        try {
-            // Add best score info
-            $problemset = self::validateProblemset($problem, $problemsetId, $contestAlias);
-            if (is_null($problemset['problemset'])) {
-                $score = (float)RunsDAO::getBestProblemScore(
-                    (int)$problem->problem_id,
-                    (int)$currentIdentityId
-                );
-            } else {
-                $score = (float)RunsDAO::getBestProblemScoreInProblemset(
-                    (int)$problemset['problemset']->problemset_id,
-                    (int)$problem->problem_id,
-                    (int)$currentIdentityId
-                );
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        // Add best score info
+        $problemset = self::validateProblemset($problem, $problemsetId, $contestAlias);
+        if (is_null($problemset['problemset'])) {
+            $score = (float)RunsDAO::getBestProblemScore(
+                (int)$problem->problem_id,
+                (int)$currentIdentityId
+            );
+        } else {
+            $score = (float)RunsDAO::getBestProblemScoreInProblemset(
+                (int)$problemset['problemset']->problemset_id,
+                (int)$problem->problem_id,
+                (int)$currentIdentityId
+            );
         }
 
         return round($score, 2);
@@ -2537,7 +2341,6 @@ class ProblemController extends Controller {
      * Save language data for a problem.
      * @param Request $r
      * @return Array
-     * @throws InvalidDatabaseOperationException
      */
     private static function updateLanguages(Problems $problem) {
         $problemArtifacts = new ProblemArtifacts($problem->alias);
@@ -2562,7 +2365,7 @@ class ProblemController extends Controller {
         } catch (ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
             DAO::transRollback();
-            throw new InvalidDatabaseOperationException($e);
+            throw $e;
         }
     }
 

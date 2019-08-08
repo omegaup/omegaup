@@ -23,10 +23,9 @@ class SchoolController extends Controller {
             throw new InvalidParameterException('parameterEmpty', 'query');
         }
 
-        try {
-            $schools = SchoolsDAO::findByName($r[$param]);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        $schools = SchoolsDAO::findByName($r[$param]);
+        if (is_null($schools)) {
+            throw new NotFoundException('schoolNotFound');
         }
 
         $response = [];
@@ -43,7 +42,6 @@ class SchoolController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
@@ -74,17 +72,13 @@ class SchoolController extends Controller {
         ]);
 
         $school_id = 0;
-        try {
-            $existing = SchoolsDAO::findByName($name);
-            if (!empty($existing)) {
-                return $existing[0]->school_id;
-            }
-            // Save in db
-            SchoolsDAO::create($school);
-            return $school->school_id;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        $existing = SchoolsDAO::findByName($name);
+        if (!empty($existing)) {
+            return $existing[0]->school_id;
         }
+        // Save in db
+        SchoolsDAO::create($school);
+        return $school->school_id;
     }
 
     /**
@@ -92,7 +86,6 @@ class SchoolController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
@@ -132,16 +125,12 @@ class SchoolController extends Controller {
         }
 
         $fetch = function () use ($r) {
-            try {
-                return SchoolsDAO::getRankByUsersAndProblemsWithAC(
-                    $r['start_time'],
-                    $r['finish_time'],
-                    $r['offset'],
-                    $r['rowcount']
-                );
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
+            return SchoolsDAO::getRankByUsersAndProblemsWithAC(
+                $r['start_time'],
+                $r['finish_time'],
+                $r['offset'],
+                $r['rowcount']
+            );
         };
 
         if ($canUseCache) {
@@ -161,7 +150,6 @@ class SchoolController extends Controller {
     /**
      * @param $countryId
      * @param $stateId
-     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      */
     public static function getStateIdFromCountryAndState($countryId, $stateId) {
@@ -169,10 +157,6 @@ class SchoolController extends Controller {
             // Both state and country must be specified together.
             return null;
         }
-        try {
-            return StatesDAO::getByPK($countryId, $stateId);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        return StatesDAO::getByPK($countryId, $stateId);
     }
 }

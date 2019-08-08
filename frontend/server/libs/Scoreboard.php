@@ -163,29 +163,25 @@ class Scoreboard {
             }
         }
 
-        try {
-            // Get all distinct contestants participating in the given contest
-            $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
-                (int)$this->params['problemset_id'],
-                (int)$this->params['acl_id'],
-                true /* show all runs */,
-                $filterUsersBy,
-                empty($this->params['group_id']) ? null : (int)$this->params['group_id'],
-                !$this->params['virtual'] /* Treat admin as contestant in virtual contest*/
-            );
+        // Get all distinct contestants participating in the given contest
+        $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
+            (int)$this->params['problemset_id'],
+            (int)$this->params['acl_id'],
+            true /* show all runs */,
+            $filterUsersBy,
+            empty($this->params['group_id']) ? null : (int)$this->params['group_id'],
+            !$this->params['virtual'] /* Treat admin as contestant in virtual contest*/
+        );
 
-            // Get all problems given problemset
-            $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
-            $rawProblemsetProblems =
-                ProblemsetProblemsDAO::getRelevantProblems($problemset);
+        // Get all problems given problemset
+        $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
+        $rawProblemsetProblems =
+            ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
-            $contestRuns = RunsDAO::getProblemsetRuns(
-                $problemset,
-                $this->params['only_ac']
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $contestRuns = RunsDAO::getProblemsetRuns(
+            $problemset,
+            $this->params['only_ac']
+        );
 
         $problemMapping = [];
 
@@ -249,26 +245,22 @@ class Scoreboard {
             return $result;
         }
 
-        try {
-            // Get all distinct contestants participating in the given contest
-            $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
-                (int)$this->params['problemset_id'],
-                (int)$this->params['acl_id'],
-                $this->params['admin'],
-                null,
-                null,
-                !$this->params['virtual'] /* Treat admin as contestant */
-            );
+        // Get all distinct contestants participating in the given contest
+        $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
+            (int)$this->params['problemset_id'],
+            (int)$this->params['acl_id'],
+            $this->params['admin'],
+            null,
+            null,
+            !$this->params['virtual'] /* Treat admin as contestant */
+        );
 
-            // Get all problems given problemset
-            $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
-            $rawProblemsetProblems =
-                ProblemsetProblemsDAO::getRelevantProblems($problemset);
+        // Get all problems given problemset
+        $problemset = ProblemsetsDAO::getByPK($this->params['problemset_id']);
+        $rawProblemsetProblems =
+            ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
-            $contestRuns = RunsDAO::getProblemsetRuns($problemset);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $contestRuns = RunsDAO::getProblemsetRuns($problemset);
 
         $problemMapping = [];
 
@@ -322,26 +314,22 @@ class Scoreboard {
      * @param  ScoreboardParams $params
      */
     public static function refreshScoreboardCache(ScoreboardParams $params) {
-        try {
-            $problemset = ProblemsetsDAO::getByPK($params['problemset_id']);
-            $contestRuns = RunsDAO::getProblemsetRuns($problemset);
+        $problemset = ProblemsetsDAO::getByPK($params['problemset_id']);
+        $contestRuns = RunsDAO::getProblemsetRuns($problemset);
 
-            // Get all distinct contestants participating in the contest
-            $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
-                (int)$params['problemset_id'],
-                (int)$params['acl_id'],
-                true /* show all runs */,
-                null,
-                null,
-                !$params['virtual'] /* Treat admin as contestant in virtual contest */
-            );
+        // Get all distinct contestants participating in the contest
+        $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
+            (int)$params['problemset_id'],
+            (int)$params['acl_id'],
+            true /* show all runs */,
+            null,
+            null,
+            !$params['virtual'] /* Treat admin as contestant in virtual contest */
+        );
 
-            // Get all problems given problemset
-            $rawProblemsetProblems =
-                ProblemsetProblemsDAO::getRelevantProblems($problemset);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        // Get all problems given problemset
+        $rawProblemsetProblems =
+            ProblemsetProblemsDAO::getRelevantProblems($problemset);
 
         $problemMapping = [];
 
