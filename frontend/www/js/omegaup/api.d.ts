@@ -60,6 +60,15 @@ declare namespace omegaup {
     name?: string;
     problems_solved: number;
   }
+
+  export interface Solutions {
+    [language: string]: Solution;
+  }
+
+  export interface Solution {
+    markdown: string;
+    searched?: boolean;
+  }
 }
 
 export default omegaup;

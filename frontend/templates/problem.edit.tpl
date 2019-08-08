@@ -14,7 +14,7 @@
   <li class="active"><a href="#edit" data-toggle="tab">{#problemEditEditProblem#}</a></li>
   <li><a href="#markdown" data-toggle="tab">{#problemEditEditMarkdown#}</a></li>
   <li><a href="#version" data-toggle="tab">{#problemEditChooseVersion#}</a></li>
-  <li><a href="#solution" data-toggle="tab">Editar Soluci�n</a></li>
+  <li><a href="#solution" data-toggle="tab">{#problemEditSolution#}</a></li>
   <li><a href="#admins" data-toggle="tab">{#problemEditAddAdmin#}</a></li>
   <li><a href="#tags" data-toggle="tab">{#problemEditAddTags#}</a></li>
   <li><a href="#download" data-toggle="tab">{#wordsDownload#}</a></li>

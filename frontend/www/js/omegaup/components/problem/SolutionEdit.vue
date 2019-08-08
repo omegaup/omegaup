@@ -1,6 +1,6 @@
 <template>
   <div class="panel panel-primary">
-    <form class="panel-body form" method="post" action="{$smarty.server.REQUEST_URI}" enctype="multipart/form-data">
+    <form class="panel-body form" method="post" enctype="multipart/form-data">
       <div class="row">
         <label for="solution-language">{{ T.statementLanguage }}</label>
         <select v-model="currentLanguage" name="solution-language">
@@ -12,7 +12,7 @@
           <div class="panel">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#solution-source" data-toggle="tab">Source</a></li>
-              <li><a id="solution-preview-link" href="#solution-preview" data-toggle="tab">Preview</a></li>
+              <li><a href="#solution-preview" data-toggle="tab">Preview</a></li>
             </ul>
 
             <div class="tab-content">
@@ -23,7 +23,7 @@
 
               <div class="tab-pane" id="solution-preview">
                 <h1 style="text-align: center;" class="title"></h1>
-                <div class="no-bottom-margin statement" id="wmd-preview-solution" v-html="markdownPreview"></div>
+                <div class="no-bottom-margin" id="wmd-preview-solution" v-html="markdownPreview"></div>
               </div>
             </div>
           </div>
@@ -31,7 +31,7 @@
       </div>
 
       <div class="row">
-        <div class="form-group  col-md-6" id="markdown-message-group">
+        <div class="form-group  col-md-6">
           <label class="control-label" for="markdown-message">{{ T.problemEditCommitMessage }}</label>
           <input v-model="commitMessage" name="message" type="text" class="form-control" />
         </div>
@@ -39,7 +39,7 @@
 
       <div class="row">
         <div class="col-md-12">
-          <button type='submit' v-bind:disabled="commitMessage === ''" v-on:click.prevent="handleEditSolution" class="btn btn-primary">Editar Soluci�n</button>
+          <button type='submit' v-bind:disabled="commitMessage === ''" v-on:click.prevent="handleEditSolution" class="btn btn-primary">{{ T.problemEditFormUpdateSolution }}</button>
         </div>
       </div>
     </form>
@@ -54,7 +54,6 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import omegaup from '../../api.js';
-
 
 @Component
 export default class ProblemSolutionEdit extends Vue {
