@@ -48,7 +48,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             if (!empty($container->window_length)) {
                 $finishTime = min(
                     $currentTime + $container->window_length * 60,
-                    $container->finish_time
+                    $finishTime
                 );
             }
             $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $finishTime);

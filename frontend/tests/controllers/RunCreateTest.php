@@ -47,7 +47,6 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Create an empty request
         $login = self::login($this->contestant);
-        $directorLogin = self::login($this->contestData['director']);
         $r = new Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $this->contestData['request']['alias'],
