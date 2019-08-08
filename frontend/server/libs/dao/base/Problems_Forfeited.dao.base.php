@@ -25,22 +25,29 @@ abstract class ProblemsForfeitedDAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsForfeited $Problems_Forfeited) : int {
-        if (is_null($Problems_Forfeited->user_id) ||
-            is_null($Problems_Forfeited->problem_id) ||
-            is_null(self::getByPK($Problems_Forfeited->user_id, $Problems_Forfeited->problem_id))
-        ) {
-            return ProblemsForfeitedDAOBase::create($Problems_Forfeited);
+    final public static function replace(ProblemsForfeited $Problems_Forfeited) : int {
+        if (is_null($Problems_Forfeited->user_id) || is_null($Problems_Forfeited->problem_id)) {
+            throw new NotFoundException('recordNotFound');
         }
-        return ProblemsForfeitedDAOBase::update($Problems_Forfeited);
+        if (is_null($Problems_Forfeited->forfeited_date)) {
+            $Problems_Forfeited->forfeited_date = gmdate('Y-m-d H:i:s', Time::get());
+        }
+        $sql = 'REPLACE INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
+        $params = [
+            (int)$Problems_Forfeited->user_id,
+            (int)$Problems_Forfeited->problem_id,
+            $Problems_Forfeited->forfeited_date,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -88,7 +95,7 @@ abstract class ProblemsForfeitedDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemsForfeited suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

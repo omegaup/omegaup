@@ -36,7 +36,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     }
 
     /**
-     *  Check if a submission is before the deadline.
+     *  Check whether a submission is before the deadline.
      *  No one, including admins, can submit after the deadline.
      */
     public static function isLateSubmission(

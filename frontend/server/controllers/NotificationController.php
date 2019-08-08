@@ -11,7 +11,6 @@ class NotificationController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
@@ -28,7 +27,6 @@ class NotificationController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiReadNotifications(Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);

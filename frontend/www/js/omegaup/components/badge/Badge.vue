@@ -20,6 +20,7 @@
 .badge-icon {
   display: block;
   height: 70%;
+  width: 100%;
 }
 .badge-icon img {
   max-height: 100%;

@@ -25,23 +25,30 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
      * @static
      * @throws Exception si la operacion fallo.
      * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened
      * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
-        if (is_null($Problemset_Problem_Opened->problemset_id) ||
-            is_null($Problemset_Problem_Opened->problem_id) ||
-            is_null($Problemset_Problem_Opened->identity_id) ||
-            is_null(self::getByPK($Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id))
-        ) {
-            return ProblemsetProblemOpenedDAOBase::create($Problemset_Problem_Opened);
+    final public static function replace(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
+        if (is_null($Problemset_Problem_Opened->problemset_id) || is_null($Problemset_Problem_Opened->problem_id) || is_null($Problemset_Problem_Opened->identity_id)) {
+            throw new NotFoundException('recordNotFound');
         }
-        return ProblemsetProblemOpenedDAOBase::update($Problemset_Problem_Opened);
+        if (is_null($Problemset_Problem_Opened->open_time)) {
+            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s', Time::get());
+        }
+        $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
+        $params = [
+            (int)$Problemset_Problem_Opened->problemset_id,
+            (int)$Problemset_Problem_Opened->problem_id,
+            (int)$Problemset_Problem_Opened->identity_id,
+            $Problemset_Problem_Opened->open_time,
+        ];
+        global $conn;
+        $conn->Execute($sql, $params);
+        return $conn->Affected_Rows();
     }
 
     /**
@@ -90,7 +97,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemsetProblemOpened suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
      * Si no puede encontrar el registro a eliminar, {@link Exception} será

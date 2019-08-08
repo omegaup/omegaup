@@ -18,43 +18,46 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     }
 
     public static function checkAndSaveFirstTimeAccess(
-        int $identityId,
-        int $problemsetId,
-        int $finishTime,
-        ?int $windowLength,
+        Identities $identity,
+        Object $container,
         bool $grantAccess = false,
         bool $shareUserInformation = false
     ) : ProblemsetIdentities {
         $currentTime = Time::get();
-        $problemsetIdentity = self::getByPK($identityId, $problemsetId);
-        $isNewProblemsetIdentity = is_null($problemsetIdentity);
-        if ($isNewProblemsetIdentity) {
+        $problemsetIdentity  = self::getByPK(
+            $identity->identity_id,
+            $container->problemset_id
+        );
+        if (is_null($problemsetIdentity)) {
             if (!$grantAccess) {
                 // User was not authorized to do this.
                 throw new ForbiddenAccessException();
             }
             $problemsetIdentity = new ProblemsetIdentities([
-                'identity_id' => $identityId,
-                'problemset_id' => $problemsetId,
+                'identity_id' => $identity->identity_id,
+                'problemset_id' => $container->problemset_id,
                 'score' => 0,
                 'time' => 0,
                 'is_invited' => 0,
             ]);
         }
+
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
             $problemsetIdentity->access_time = gmdate('Y-m-d H:i:s', $currentTime);
-            if (!is_null($windowLength)) {
-                $finishTime = min($currentTime + $windowLength * 60, $finishTime);
+            $finishTime = $container->finish_time;
+            if (!empty($container->window_length)) {
+                $finishTime = min(
+                    $currentTime + $container->window_length * 60,
+                    $finishTime
+                );
             }
             $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $finishTime);
             $problemsetIdentity->share_user_information = $shareUserInformation;
-            if ($isNewProblemsetIdentity) {
-                self::create($problemsetIdentity);
-            } else {
-                self::update($problemsetIdentity);
-            }
+            ProblemsetIdentitiesDAO::replace($problemsetIdentity);
         }
+
+        $problemsetIdentity->toUnixTime();
         return $problemsetIdentity;
     }
 
@@ -124,13 +127,9 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
-                INNER JOIN
-                    `Contests`
-                ON
-                    Problemset_Identities.problemset_id = Contests.problemset_id
                 SET
                     `end_time` = LEAST(
-                        `finish_time`,
+                        ?,
                         DATE_ADD(`access_time`, INTERVAL ? MINUTE)
                      )
                 WHERE
@@ -138,7 +137,11 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     AND `access_time` IS NOT NULL;';
 
         global $conn;
-        $conn->Execute($sql, [$contest->window_length, $contest->problemset_id]);
+        $conn->Execute($sql, [
+            $contest->finish_time,
+            $contest->window_length,
+            $contest->problemset_id
+        ]);
 
         return $conn->Affected_Rows();
     }

@@ -192,18 +192,17 @@ Logger::configure([
 ]);
 $log = Logger::getLogger('bootstrap');
 
-require_once('libs/third_party/adodb/adodb.inc.php');
-require_once('libs/third_party/adodb/adodb-exceptions.inc.php');
+require_once('libs/Database.php');
 
 global $conn;
-$conn = null;
 
 try {
-    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
-    $conn->debug = OMEGAUP_DB_DEBUG;
-    array_push($conn->optionFlags, [MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true]);
-    $conn->SetFetchMode(ADODB_FETCH_ASSOC);
-    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
+    $conn = new MySQLConnection(
+        OMEGAUP_DB_HOST,
+        OMEGAUP_DB_USER,
+        OMEGAUP_DB_PASS,
+        OMEGAUP_DB_NAME
+    );
 } catch (Exception $databaseConectionException) {
     $log->error($databaseConectionException);
 
@@ -218,8 +217,6 @@ try {
         'errorcode' => 1,
     ]));
 }
-$conn->SetCharSet('utf8');
-$conn->EXECUTE('SET NAMES \'utf8\';');
 
 $session = SessionController::apiCurrentSession(new Request($_REQUEST))['session'];
 $experiments = new Experiments(

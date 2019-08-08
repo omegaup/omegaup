@@ -1,6 +1,7 @@
 declare namespace omegaup {
   export interface UI {
     buildURLQuery: (queryParameters: { [key: string]: string; }) => string;
+    info: (message: string) => void;
     error: (message: string) => void;
     escape: (s: string) => string;
     formatDate: (date: Date) => string;

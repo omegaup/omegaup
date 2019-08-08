@@ -20,13 +20,14 @@ final class DAO {
     final public static function transRollback() : void {
         global $conn;
         $conn->FailTrans();
+        $conn->CompleteTrans();
     }
 
     public static function isDuplicateEntryException(Exception $e) : bool {
-        if (!($e instanceof ADODB_Exception)) {
+        if (!($e instanceof DatabaseOperationException)) {
             return false;
         }
-        return $e->getCode() == 1062;
+        return $e->isDuplicate();
     }
 }
 

@@ -14,14 +14,13 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testIdentityHasContestOrganizerRole() {
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorIdentity = IdentitiesDAO::getByPK($creator->main_identity_id);
-        $mentor = UserFactory::createMentorIdentity();
-        $mentorIdentity = IdentitiesDAO::getByPK($mentor->main_identity_id);
+        [, $mentorIdentity] = UserFactory::createMentorIdentity();
 
-        $isCreatorMember = Authorization::isGroupIdentityCreator($creatorIdentity->identity_id);
+        $isCreatorMember = Authorization::isGroupIdentityCreator($creatorIdentity);
         // Asserting that user belongs to the  identity creator group
         $this->assertTrue($isCreatorMember);
 
-        $isCreatorMember = Authorization::isGroupIdentityCreator($mentorIdentity->identity_id);
+        $isCreatorMember = Authorization::isGroupIdentityCreator($mentorIdentity);
         // Asserting that user doesn't belong to the identity creator group
         $this->assertFalse($isCreatorMember);
     }
@@ -200,6 +199,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'identities' => IdentityFactory::getCsvData('duplicated_identities.csv', $group['group']->alias),
                 'group_alias' => $group['group']->alias,
             ]));
+            $this->fail('Should not have allowed bulk user creation');
         } catch (DuplicatedEntryInDatabaseException $e) {
             // OK.
         }
@@ -207,7 +207,6 @@ class IdentityCreateTest extends OmegaupTestCase {
 
     /**
      * Test for uploading csv file with wrong country_id
-     * @throws InvalidDatabaseOperationException
      */
     public function testUploadCsvFileWithWrongCountryId() {
         // Identity creator group member will upload csv file
@@ -222,7 +221,8 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'identities' => IdentityFactory::getCsvData('identities_wrong_country_id.csv', $group['group']->alias),
                 'group_alias' => $group['group']->alias,
             ]));
-        } catch (InvalidDatabaseOperationException $e) {
+            $this->fail('Should not have allowed bulk user creation');
+        } catch (DatabaseOperationException $e) {
             // OK.
         }
     }

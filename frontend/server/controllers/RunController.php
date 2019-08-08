@@ -33,7 +33,6 @@ class RunController extends Controller {
      *
      * @param Request $r
      * @throws ApiException
-     * @throws InvalidDatabaseOperationException
      * @throws NotAllowedToSubmitException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException
@@ -45,163 +44,156 @@ class RunController extends Controller {
         }
 
         $allowedLanguages = array_keys(RunController::$kSupportedLanguages);
-        try {
-            Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-            // Check that problem exists
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        // Check that problem exists
+        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
 
-            if ($r['problem']->deprecated) {
-                throw new PreconditionFailedException('problemDeprecated');
-            }
-            // check that problem is not publicly or privately banned.
-            if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
-                throw new NotFoundException('problemNotfound');
-            }
+        if ($r['problem']->deprecated) {
+            throw new PreconditionFailedException('problemDeprecated');
+        }
+        // check that problem is not publicly or privately banned.
+        if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+            throw new NotFoundException('problemNotfound');
+        }
 
-            $allowedLanguages = array_intersect(
-                $allowedLanguages,
-                explode(',', $r['problem']->languages)
+        $allowedLanguages = array_intersect(
+            $allowedLanguages,
+            explode(',', $r['problem']->languages)
+        );
+        Validators::validateInEnum(
+            $r['language'],
+            'language',
+            $allowedLanguages
+        );
+        Validators::validateStringNonEmpty($r['source'], 'source');
+
+        // Can't set both problemset_id and contest_alias at the same time.
+        if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
+            throw new InvalidParameterException(
+                'incompatibleArgs',
+                'problemset_id and contest_alias'
             );
-            Validators::validateInEnum(
-                $r['language'],
-                'language',
-                $allowedLanguages
-            );
-            Validators::validateStringNonEmpty($r['source'], 'source');
+        }
 
-            // Can't set both problemset_id and contest_alias at the same time.
-            if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
-                throw new InvalidParameterException(
-                    'incompatibleArgs',
-                    'problemset_id and contest_alias'
-                );
+        $problemset_id = null;
+        if (!empty($r['problemset_id'])) {
+            // Got a problemset id directly.
+            $problemset_id = intval($r['problemset_id']);
+            $r['container'] = ProblemsetsDAO::getProblemsetContainer($problemset_id);
+        } elseif (!empty($r['contest_alias'])) {
+            // Got a contest alias, need to fetch the problemset id.
+            // Validate contest
+            Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+            $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+
+            if ($r['contest'] == null) {
+                throw new InvalidParameterException('parameterNotFound', 'contest_alias');
             }
 
-            $problemset_id = null;
-            if (!empty($r['problemset_id'])) {
-                // Got a problemset id directly.
-                $problemset_id = intval($r['problemset_id']);
-                $r['container'] = ProblemsetsDAO::getProblemsetContainer($problemset_id);
-            } elseif (!empty($r['contest_alias'])) {
-                // Got a contest alias, need to fetch the problemset id.
-                // Validate contest
-                Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
-                $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
+            $problemset_id = $r['contest']->problemset_id;
+            $r['container'] = $r['contest'];
 
-                if ($r['contest'] == null) {
-                    throw new InvalidParameterException('parameterNotFound', 'contest_alias');
-                }
-
-                $problemset_id = $r['contest']->problemset_id;
-                $r['container'] = $r['contest'];
-
-                // Update list of valid languages.
-                if ($r['contest']->languages !== null) {
-                    $allowedLanguages = array_intersect(
-                        $allowedLanguages,
-                        explode(',', $r['contest']->languages)
-                    );
-                }
-            } else {
-                // Check for practice or public problem, there is no contest info
-                // in this scenario.
-                if (ProblemsDAO::isVisible($r['problem']) ||
-                      Authorization::isProblemAdmin($r->identity, $r['problem']) ||
-                      Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
-                    if (!RunsDAO::isRunInsideSubmissionGap(
-                        null,
-                        null,
-                        (int)$r['problem']->problem_id,
-                        (int)$r->identity->identity_id
-                    )
-                            && !Authorization::isSystemAdmin($r->identity->identity_id)) {
-                            throw new NotAllowedToSubmitException('runWaitGap');
-                    }
-
-                    self::$practice = true;
-                    return;
-                } else {
-                    throw new NotAllowedToSubmitException('problemIsNotPublic');
-                }
-            }
-
-            $r['problemset'] = ProblemsetsDAO::getByPK($problemset_id);
-            if ($r['problemset'] == null) {
-                throw new InvalidParameterException('parameterNotFound', 'problemset_id');
-            }
-
-            // Validate the language.
-            if ($r['problemset']->languages !== null) {
+            // Update list of valid languages.
+            if ($r['contest']->languages !== null) {
                 $allowedLanguages = array_intersect(
                     $allowedLanguages,
-                    explode(',', $r['problemset']->languages)
+                    explode(',', $r['contest']->languages)
                 );
             }
-            Validators::validateInEnum(
-                $r['language'],
-                'language',
-                $allowedLanguages
-            );
-
-            // Validate that the combination problemset_id problem_id is valid
-            if (!ProblemsetProblemsDAO::getByPK(
-                $problemset_id,
-                $r['problem']->problem_id
-            )) {
-                throw new InvalidParameterException('parameterNotFound', 'problem_alias');
-            }
-
-            $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
-                $r->identity->identity_id,
-                $problemset_id
-            );
-            // Contest admins can skip following checks
-            if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
-                // Before submit something, user had to open the problem/problemset.
-                if (is_null($problemsetIdentity) &&
-                    !Authorization::canSubmitToProblemset(
-                        $r->identity,
-                        $r['problemset']
-                    )
-                ) {
-                    throw new NotAllowedToSubmitException('runNotEvenOpened');
-                }
-
-                // Validate that the run is timely inside contest
-                if (!ProblemsetsDAO::isSubmissionWindowOpen($r['container'])) {
-                    throw new NotAllowedToSubmitException('runNotInsideContest');
-                }
-
-                // Validate if the user is allowed to submit given the submissions_gap
+        } else {
+            // Check for practice or public problem, there is no contest info
+            // in this scenario.
+            if (ProblemsDAO::isVisible($r['problem']) ||
+                  Authorization::isProblemAdmin($r->identity, $r['problem']) ||
+                  Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                 if (!RunsDAO::isRunInsideSubmissionGap(
-                    (int)$problemset_id,
-                    $r['contest'],
+                    null,
+                    null,
                     (int)$r['problem']->problem_id,
                     (int)$r->identity->identity_id
-                )) {
-                    throw new NotAllowedToSubmitException('runWaitGap');
+                )
+                        && !Authorization::isSystemAdmin($r->identity)) {
+                        throw new NotAllowedToSubmitException('runWaitGap');
                 }
+
+                self::$practice = true;
+                return;
+            } else {
+                throw new NotAllowedToSubmitException('problemIsNotPublic');
+            }
+        }
+
+        $r['problemset'] = ProblemsetsDAO::getByPK($problemset_id);
+        if ($r['problemset'] == null) {
+            throw new InvalidParameterException('parameterNotFound', 'problemset_id');
+        }
+
+        // Validate the language.
+        if ($r['problemset']->languages !== null) {
+            $allowedLanguages = array_intersect(
+                $allowedLanguages,
+                explode(',', $r['problemset']->languages)
+            );
+        }
+        Validators::validateInEnum(
+            $r['language'],
+            'language',
+            $allowedLanguages
+        );
+
+        // Validate that the combination problemset_id problem_id is valid
+        if (!ProblemsetProblemsDAO::getByPK(
+            $problemset_id,
+            $r['problem']->problem_id
+        )) {
+            throw new InvalidParameterException('parameterNotFound', 'problem_alias');
+        }
+
+        $prblemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+            $r->identity->identity_id,
+            $problemset_id
+        );
+
+        // No one should submit after the deadline. Not even admins.
+        $startTime = $r['container']->start_time;
+        $finishTime = $r['container']->finish_time;
+        $r['container']->toUnixTime();
+        if (ProblemsetsDAO::isLateSubmission(
+            $r['container'],
+            $prblemsetIdentity
+        )) {
+            throw new NotAllowedToSubmitException('runNotInsideContest');
+        }
+        $r['container']->start_time = $startTime;
+        $r['container']->finish_time = $finishTime;
+
+        // Contest admins can skip following checks
+        if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
+            // Before submit something, user had to open the problem/problemset.
+            if (!$prblemsetIdentity &&
+                !Authorization::canSubmitToProblemset(
+                    $r->identity,
+                    $r['problemset']
+                )
+            ) {
+                throw new NotAllowedToSubmitException('runNotEvenOpened');
             }
 
-            // No one should submit after the deadline. Not even admins.
-            $startTime = $r['container']->start_time;
-            $finishTime = $r['container']->finish_time;
-            $r['container']->toUnixTime();
-            if (ProblemsetsDAO::isLateSubmission(
-                $r['container'],
-                $problemsetIdentity
-            )) {
+            // Validate that the run is timely inside contest
+            if (!ProblemsetsDAO::isSubmissionWindowOpen($r['container'])) {
                 throw new NotAllowedToSubmitException('runNotInsideContest');
             }
-            $r['container']->start_time = $startTime;
-            $r['container']->finish_time = $finishTime;
-        } catch (ApiException $apiException) {
-            // Propagate ApiException
-            throw $apiException;
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
+
+            // Validate if the user is allowed to submit given the submissions_gap
+            if (!RunsDAO::isRunInsideSubmissionGap(
+                (int)$problemset_id,
+                $r['contest'],
+                (int)$r['problem']->problem_id,
+                (int)$r->identity->identity_id
+            )) {
+                throw new NotAllowedToSubmitException('runWaitGap');
+            }
         }
     }
 
@@ -211,7 +203,6 @@ class RunController extends Controller {
      * @param Request $r
      * @return array
      * @throws Exception
-     * @throws InvalidDatabaseOperationException
      * @throws InvalidFilesystemOperationException
      */
     public static function apiCreate(Request $r) {
@@ -231,12 +222,12 @@ class RunController extends Controller {
                 throw new ForbiddenAccessException('lockdown');
             }
             $submit_delay = 0;
-            $problemset_id = null;
+            $problemsetId = null;
             $type = 'normal';
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
-            $problemset_id = (int)$r['problemset']->problemset_id;
+            $problemsetId = (int)$r['problemset']->problemset_id;
             if (isset($r['contest'])) {
                 $penalty_type = $r['contest']->penalty_type;
 
@@ -251,7 +242,7 @@ class RunController extends Controller {
                         // submit delay is calculated from the
                         // time the user opened the problem
                         $opened = ProblemsetProblemOpenedDAO::getByPK(
-                            $problemset_id,
+                            $problemsetId,
                             $r['problem']->problem_id,
                             $r->identity->identity_id
                         );
@@ -300,7 +291,7 @@ class RunController extends Controller {
         $submission = new Submissions([
             'identity_id' => $r->identity->identity_id,
             'problem_id' => $r['problem']->problem_id,
-            'problemset_id' => $problemset_id,
+            'problemset_id' => $problemsetId,
             'guid' => md5(uniqid(rand(), true)),
             'language' => $r['language'],
             'time' => gmdate('Y-m-d H:i:s', Time::get()),
@@ -315,65 +306,71 @@ class RunController extends Controller {
             'time' => gmdate('Y-m-d H:i:s', Time::get()),
             'memory' => 0,
             'score' => 0,
-            'contest_score' => $problemset_id != null ? 0 : null,
+            'contest_score' => $problemsetId != null ? 0 : null,
             'verdict' => 'JE',
         ]);
 
         try {
+            DAO::transBegin();
             // Push run into DB
             SubmissionsDAO::create($submission);
             $run->submission_id = $submission->submission_id;
             RunsDAO::create($run);
             $submission->current_run_id = $run->run_id;
             SubmissionsDAO::update($submission);
-
-            // Call Grader
-            try {
-                Grader::getInstance()->grade($run, trim($r['source']));
-            } catch (Exception $e) {
-                // Welp, it failed. We cannot make this a real transaction
-                // because the Run row would not be visible from the Grader
-                // process, so we attempt to roll it back by hand.
-                // We need to unlink the current run and submission prior to
-                // deleting the rows. Otherwise we would have a foreign key
-                // violation.
-                $submission->current_run_id = null;
-                SubmissionsDAO::update($submission);
-                RunsDAO::delete($run);
-                SubmissionsDAO::delete($submission);
-                self::$log->error("Call to Grader::grade() failed: $e");
-                throw $e;
-            }
-
-            SubmissionLogDAO::create(new SubmissionLog([
-                'user_id' => $r->identity->user_id,
-                'identity_id' => $r->identity->identity_id,
-                'submission_id' => $submission->submission_id,
-                'problemset_id' => $submission->problemset_id,
-                'ip' => ip2long($_SERVER['REMOTE_ADDR'])
-            ]));
-
-            $r['problem']->submissions++;
-            ProblemsDAO::update($r['problem']);
+            DAO::transEnd();
         } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
+            DAO::transRollback();
+            throw $e;
         }
+
+        // Call Grader
+        try {
+            Grader::getInstance()->grade($run, trim($r['source']));
+        } catch (Exception $e) {
+            // Welp, it failed. We cannot make this a real transaction
+            // because the Run row would not be visible from the Grader
+            // process, so we attempt to roll it back by hand.
+            // We need to unlink the current run and submission prior to
+            // deleting the rows. Otherwise we would have a foreign key
+            // violation.
+            $submission->current_run_id = null;
+            SubmissionsDAO::update($submission);
+            RunsDAO::delete($run);
+            SubmissionsDAO::delete($submission);
+            self::$log->error("Call to Grader::grade() failed: $e");
+            throw $e;
+        }
+
+        SubmissionLogDAO::create(new SubmissionLog([
+            'user_id' => $r->identity->user_id,
+            'identity_id' => $r->identity->identity_id,
+            'submission_id' => $submission->submission_id,
+            'problemset_id' => $submission->problemset_id,
+            'ip' => ip2long($_SERVER['REMOTE_ADDR'])
+        ]));
+
+        $r['problem']->submissions++;
+        ProblemsDAO::update($r['problem']);
 
         if (self::$practice) {
             $response['submission_deadline'] = 0;
         } else {
             // Add remaining time to the response
-            try {
-                $contestIdentity = ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset_id);
-                if (!is_null($contestIdentity) && !is_null($contestIdentity->end_time)) {
-                    $response['submission_deadline'] = strtotime($contestIdentity->end_time);
-                } elseif (isset($r['container']->finish_time)) {
-                    $response['submission_deadline'] = strtotime($r['container']->finish_time);
-                }
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
+            $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+                $r->identity->identity_id,
+                $problemsetId
+            );
+            if (!is_null($problemsetIdentity) && !is_null(
+                $problemsetIdentity->end_time
+            )) {
+                $response['submission_deadline'] = strtotime(
+                    $problemsetIdentity->end_time
+                );
+            } elseif (isset($r['container']->finish_time)) {
+                $response['submission_deadline'] = strtotime(
+                    $r['container']->finish_time
+                );
             }
         }
 
@@ -394,7 +391,6 @@ class RunController extends Controller {
      * Validate request of details
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -402,20 +398,12 @@ class RunController extends Controller {
         Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
 
         // If user is not judge, must be the run's owner.
-        try {
-            $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
         if (is_null($r['submission'])) {
             throw new NotFoundException('runNotFound');
         }
 
-        try {
-            $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
         if (is_null($r['run'])) {
             throw new NotFoundException('runNotFound');
         }
@@ -466,7 +454,6 @@ class RunController extends Controller {
      * Re-sends a problem to Grader.
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiRejudge(Request $r) {
         self::$practice = false;
@@ -483,8 +470,15 @@ class RunController extends Controller {
         self::$log->info('Run being rejudged!!');
 
         // Reset fields.
-        $r['run']->status = 'new';
-        RunsDAO::update($r['run']);
+        try {
+            DAO::transBegin();
+            $r['run']->status = 'new';
+            RunsDAO::update($r['run']);
+            DAO::transEnd();
+        } catch (Exception $e) {
+            DAO::transRollback();
+            throw $e;
+        }
 
         try {
             Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);
@@ -507,7 +501,6 @@ class RunController extends Controller {
      * Disqualify a submission
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiDisqualify(Request $r) {
         // Get the user who is calling this API
@@ -561,7 +554,6 @@ class RunController extends Controller {
      * Gets the details of a run. Includes admin details if admin.
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiDetails(Request $r) {
         // Get the user who is calling this API
@@ -569,12 +561,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        try {
-            $r['problem'] = ProblemsDAO::getByPK($r['submission']->problem_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $r['problem'] = ProblemsDAO::getByPK($r['submission']->problem_id);
         if (is_null($r['problem'])) {
             throw new NotFoundException('problemNotFound');
         }
@@ -687,30 +674,17 @@ class RunController extends Controller {
         Identities $identity,
         bool $passthru
     ) {
-        try {
-            $submission = SubmissionsDAO::getByGuid($guid);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $submission = SubmissionsDAO::getByGuid($guid);
         if (is_null($submission)) {
             throw new NotFoundException('runNotFound');
         }
 
-        try {
-            $run = RunsDAO::getByPK($submission->current_run_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $run = RunsDAO::getByPK($submission->current_run_id);
         if (is_null($run)) {
             throw new NotFoundException('runNotFound');
         }
 
-        try {
-            $problem = ProblemsDAO::getByPK($submission->problem_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $problem = ProblemsDAO::getByPK($submission->problem_id);
         if (is_null($problem)) {
             throw new NotFoundException('problemNotFound');
         }
@@ -797,7 +771,6 @@ class RunController extends Controller {
      *
      * @param Request $r
      * @return type
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiCounts(Request $r) : array {
         return Cache::getFromCacheOrSet(
@@ -807,15 +780,11 @@ class RunController extends Controller {
                 $totals = [];
                 $totals['total'] = [];
                 $totals['ac'] = [];
-                try {
-                    $runCounts = RunCountsDAO::getAll(1, 90, 'date', 'DESC');
+                $runCounts = RunCountsDAO::getAll(1, 90, 'date', 'DESC');
 
-                    foreach ($runCounts as $runCount) {
-                        $totals['total'][$runCount->date] = $runCount->total;
-                        $totals['ac'][$runCount->date] = $runCount->ac_count;
-                    }
-                } catch (Exception $e) {
-                    throw new InvalidDatabaseOperationException($e);
+                foreach ($runCounts as $runCount) {
+                    $totals['total'][$runCount->date] = $runCount->total;
+                    $totals['ac'][$runCount->date] = $runCount->ac_count;
                 }
 
                 return $totals;
@@ -829,7 +798,6 @@ class RunController extends Controller {
      *
      * @param Request $r
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     private static function validateList(Request $r) {
@@ -841,7 +809,7 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        if (!Authorization::isSystemAdmin($r->identity->identity_id)) {
+        if (!Authorization::isSystemAdmin($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
@@ -854,13 +822,7 @@ class RunController extends Controller {
         if (!is_null($r['problem_alias'])) {
             Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
-            try {
-                $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
-            }
-
+            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
                 throw new NotFoundException('problemNotFound');
             }
@@ -890,28 +852,22 @@ class RunController extends Controller {
      *
      * @param Request $r
      * @return string
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
         // Authenticate request
         self::authenticateRequest($r);
         self::validateList($r);
 
-        try {
-            $runs = RunsDAO::getAllRuns(
-                null,
-                $r['status'],
-                $r['verdict'],
-                !is_null($r['problem']) ? $r['problem']->problem_id : null,
-                $r['language'],
-                !is_null($r['identity']) ? $r['identity']->identity_id : null,
-                $r['offset'],
-                $r['rowcount']
-            );
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $runs = RunsDAO::getAllRuns(
+            null,
+            $r['status'],
+            $r['verdict'],
+            !is_null($r['problem']) ? $r['problem']->problem_id : null,
+            $r['language'],
+            !is_null($r['identity']) ? $r['identity']->identity_id : null,
+            $r['offset'],
+            $r['rowcount']
+        );
 
         $result = [];
 

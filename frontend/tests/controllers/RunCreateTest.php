@@ -16,12 +16,17 @@ class RunCreateTest extends OmegaupTestCase {
      *
      * @return Request
      */
-    private function setValidRequest($admission_mode = 'public') {
+    private function setValidRequest(
+        ?ContestParams $contestParams = null
+    ) : Request {
+        if (is_null($contestParams)) {
+            $contestParams = new ContestParams();
+        }
         // Get a problem
         $problemData = ProblemsFactory::createProblem();
 
         // Get a contest
-        $this->contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => $admission_mode]));
+        $this->contestData = ContestsFactory::createContest($contestParams);
 
         // Add the problem to the contest
         ContestsFactory::addProblemToContest($problemData, $this->contestData);
@@ -30,7 +35,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->contestant = UserFactory::createUser();
 
         // If the contest is private, add the user
-        if ($admission_mode === 'private') {
+        if ($contestParams['admission_mode'] === 'private') {
             ContestsFactory::addUser($this->contestData, $this->contestant);
         }
 
@@ -172,27 +177,33 @@ class RunCreateTest extends OmegaupTestCase {
 
     /**
      * Cannot submit run when contest ended
-     *
-     * @expectedException NotAllowedToSubmitException
      */
     public function testRunWhenContestExpired() {
-        $r = $this->setValidRequest();
+        $startTime = Time::get() - 60 * 60;
+        $r = $this->setValidRequest(new ContestParams([
+            'start_time' => $startTime,
+            'finish_time' => $startTime + 2 * 60 * 60
+        ]));
 
-        // Manually expire the contest
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - (60 * 2) - 2);
-        $contest->finish_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - (60 * 2) - 1);
-        ContestsDAO::update($contest);
-        Time::setTimeForTesting(Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp()));
-        // Call API
-        RunController::apiCreate($r);
+        // Now is one second after contest finishes
+        Time::setTimeForTesting($startTime + (2 * 60 * 60) + 1);
+
+        try {
+            // Call API
+            RunController::apiCreate($r);
+            $this->fail('api should have not created run, because contest has expired.');
+        } catch (NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
     }
 
     /**
      * Test a valid submission to a private contest
      */
     public function testRunToValidPrivateContest() {
-        $r = $this->setValidRequest('private' /* admission mode */);
+        $r = $this->setValidRequest(new ContestParams([
+            'admission_mode' => 'private'
+        ]));
         $detourGrader = new ScopedGraderDetour();
 
         // Call API
@@ -209,7 +220,9 @@ class RunCreateTest extends OmegaupTestCase {
      * @expectedException NotAllowedToSubmitException
      */
     public function testRunPrivateContestWithUserNotRegistred() {
-        $r = $this->setValidRequest('private' /* admission mode */);
+        $r = $this->setValidRequest(new ContestParams([
+            'admission_mode' => 'private'
+        ]));
 
         // Create a second user not regitered to private contest
         $contestant2 = UserFactory::createUser();
@@ -224,19 +237,24 @@ class RunCreateTest extends OmegaupTestCase {
 
     /**
      * Cannot submit run when contest not started yet
-     *
-     * @expectedException NotAllowedToSubmitException
      */
     public function testRunWhenContestNotStarted() {
-        $r = $this->setValidRequest();
+        $startTime = Time::get();
+        $r = $this->setValidRequest(new ContestParams([
+            'start_time' => $startTime,
+            'finish_time' => $startTime + 2 * 60 * 60
+        ]));
 
-        // Manually expire contest
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10);
-        ContestsDAO::update($contest);
+        // get back in time ten minutes before Contest starts
+        Time::setTimeForTesting($startTime - (10 * 60));
 
-        // Call API
-        RunController::apiCreate($r);
+        try {
+            // Call API
+            RunController::apiCreate($r);
+            $this->fail('api should have not created run, because contest has not started yet.');
+        } catch (NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
     }
 
     /**
@@ -355,16 +373,9 @@ class RunCreateTest extends OmegaupTestCase {
      * Test valid window length
      */
     public function testNewRunInWindowLengthPublicContest() {
-        // Set the context for the first contest
-        $r = $this->setValidRequest();
+        // Set the context for the first contest, with 20 minutes of window length
+        $r = $this->setValidRequest(new ContestParams(['window_length' => 20]));
         $detourGrader = new ScopedGraderDetour();
-
-        // Alter Contest window length to 20
-        // This means: once I started the contest, I have 20 more mins
-        // to finish it.
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->window_length = 20;
-        ContestsDAO::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -374,29 +385,22 @@ class RunCreateTest extends OmegaupTestCase {
 
     /**
      * Test sending runs after the window length expired
-     *
-     * @expectedException NotAllowedToSubmitException
      */
     public function testNewRunOutWindowLengthPublicContest() {
-        // Set the context for the first contest
-        $r = $this->setValidRequest();
+        // Set the context for the first contest, with 20 minutes of window length
+        $r = $this->setValidRequest(new ContestParams(['window_length' => 20]));
 
-        // Alter Contest window length to 20
-        // This means: once I started the contest, I have 20 more mins
-        // to finish it.
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->window_length = 20;
-        ContestsDAO::update($contest);
-
-         // Alter first access time of our contestant such that he started
+        // Alter time for testing such that contestant started
         // 21 minutes ago, this is, window length has expired by 1 minute
-        $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK($this->contestant->main_identity_id, $contest->problemset_id);
-        $problemsetIdentity->access_time = date('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp() - 21 * 60); //Window length is in minutes
-        $problemsetIdentity->end_time = date('Y-m-d H:i:s', Utils::GetPhpUnixTimestamp() - 1 * 60); //Window length is in minutes
-        ProblemsetIdentitiesDAO::update($problemsetIdentity);
+        Time::setTimeForTesting(Time::get() + (21 * 60));
 
-        // Call API
-        RunController::apiCreate($r);
+        try {
+            // Call API
+            RunController::apiCreate($r);
+            $this->fail('Contestant should not submitted a run because windows length has expired');
+        } catch (NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
     }
 
     /**
@@ -428,17 +432,18 @@ class RunCreateTest extends OmegaupTestCase {
      * @expectedException NotAllowedToSubmitException
      */
     public function testRunWhenContestEndedForContestDirector() {
-        // Set the context for the first contest
-        $r = $this->setValidRequest();
+        $startTime = Time::get() - 60 * 60;
+        $r = $this->setValidRequest(new ContestParams([
+            'start_time' => $startTime,
+            'finish_time' => $startTime + 2 * 60 * 60
+        ]));
+
+        // Now is one second after contest finishes
+        Time::setTimeForTesting($startTime + (2 * 60 * 60) + 1);
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
         $r['auth_token'] = $login->auth_token;
-
-        // Manually set the contest start 10 mins in the future
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->finish_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() - 1);
-        ContestsDAO::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -740,7 +745,7 @@ class RunCreateTest extends OmegaupTestCase {
             'finish_time' => Utils::GetPhpUnixTimestamp() - 1,
         ]));
         // Creating a submission in the future
-        Time::setTimeForTesting(Time::get() + 3600);
+        Time::setTimeForTesting(Time::get() + 60 * 60);
 
         $login = self::login($this->student);
         $r['auth_token'] = $login->auth_token;
