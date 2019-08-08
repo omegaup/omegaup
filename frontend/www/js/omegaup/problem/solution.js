@@ -65,8 +65,7 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      status: payload['solution_status'] ? payload['solution_status'] :
-                                           'not_logged_in',
+      status: payload['solution_status'] || 'not_logged_in',
       solution: null,
       allTokens: null,
       availableTokens: null,
