@@ -150,7 +150,7 @@ class RunController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        $prblemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+        $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
             $r->identity->identity_id,
             $problemset_id
         );
@@ -161,7 +161,7 @@ class RunController extends Controller {
         $r['container']->toUnixTime();
         if (ProblemsetsDAO::isLateSubmission(
             $r['container'],
-            $prblemsetIdentity
+            $problemsetIdentity
         )) {
             throw new NotAllowedToSubmitException('runNotInsideContest');
         }
@@ -171,7 +171,7 @@ class RunController extends Controller {
         // Contest admins can skip following checks
         if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
             // Before submit something, user had to open the problem/problemset.
-            if (!$prblemsetIdentity &&
+            if (!$problemsetIdentity &&
                 !Authorization::canSubmitToProblemset(
                     $r->identity,
                     $r['problemset']

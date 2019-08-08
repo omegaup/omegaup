@@ -41,7 +41,6 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 'is_invited' => 0,
             ]);
         }
-
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
             $problemsetIdentity->access_time = gmdate('Y-m-d H:i:s', $currentTime);
@@ -56,7 +55,6 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemsetIdentity->share_user_information = $shareUserInformation;
             ProblemsetIdentitiesDAO::replace($problemsetIdentity);
         }
-
         $problemsetIdentity->toUnixTime();
         return $problemsetIdentity;
     }

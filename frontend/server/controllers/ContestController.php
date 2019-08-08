@@ -736,9 +736,6 @@ class ContestController extends Controller {
             if (is_null($response['contest']->window_length)) {
                 $result['submission_deadline'] = $response['contest']->finish_time;
             } else {
-                // $problemsetIdentity->toUnixTime();
-                // error_log(print_r($problemsetIdentity->access_time, true));
-                // error_log(print_r($response['contest'], true));
                 $result['submission_deadline'] = min(
                     $response['contest']->finish_time,
                     strtotime($problemsetIdentity->access_time) + $response['contest']->window_length * 60
@@ -2308,7 +2305,6 @@ class ContestController extends Controller {
             ]));
             $contest->last_updated = $timestamp;
         }
-
         if (($originalContest->finish_time !== $contest->finish_time) ||
             ($originalContest->window_length !== $contest->window_length)) {
             if (!is_null($contest->window_length)) {
