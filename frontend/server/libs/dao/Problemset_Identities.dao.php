@@ -125,13 +125,9 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
-                INNER JOIN
-                    `Contests`
-                ON
-                    Problemset_Identities.problemset_id = Contests.problemset_id
                 SET
                     `end_time` = LEAST(
-                        `finish_time`,
+                        ?,
                         DATE_ADD(`access_time`, INTERVAL ? MINUTE)
                      )
                 WHERE
@@ -139,7 +135,11 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     AND `access_time` IS NOT NULL;';
 
         global $conn;
-        $conn->Execute($sql, [$contest->window_length, $contest->problemset_id]);
+        $conn->Execute($sql, [
+            $contest->finish_time,
+            $contest->window_length,
+            $contest->problemset_id
+        ]);
 
         return $conn->Affected_Rows();
     }
