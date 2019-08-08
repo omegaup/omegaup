@@ -209,12 +209,12 @@ class RunController extends Controller {
                 throw new ForbiddenAccessException('lockdown');
             }
             $submit_delay = 0;
-            $problemset_id = null;
+            $problemsetId = null;
             $type = 'normal';
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
-            $problemset_id = (int)$r['problemset']->problemset_id;
+            $problemsetId = (int)$r['problemset']->problemset_id;
             if (isset($r['contest'])) {
                 $penalty_type = $r['contest']->penalty_type;
 
@@ -229,7 +229,7 @@ class RunController extends Controller {
                         // submit delay is calculated from the
                         // time the user opened the problem
                         $opened = ProblemsetProblemOpenedDAO::getByPK(
-                            $problemset_id,
+                            $problemsetId,
                             $r['problem']->problem_id,
                             $r->identity->identity_id
                         );
@@ -278,7 +278,7 @@ class RunController extends Controller {
         $submission = new Submissions([
             'identity_id' => $r->identity->identity_id,
             'problem_id' => $r['problem']->problem_id,
-            'problemset_id' => $problemset_id,
+            'problemset_id' => $problemsetId,
             'guid' => md5(uniqid(rand(), true)),
             'language' => $r['language'],
             'time' => gmdate('Y-m-d H:i:s', Time::get()),
@@ -292,7 +292,7 @@ class RunController extends Controller {
             'penalty' => $submit_delay,
             'memory' => 0,
             'score' => 0,
-            'contest_score' => $problemset_id != null ? 0 : null,
+            'contest_score' => $problemsetId != null ? 0 : null,
             'verdict' => 'JE',
         ]);
 
@@ -343,18 +343,20 @@ class RunController extends Controller {
             $response['submission_deadline'] = 0;
         } else {
             // Add remaining time to the response
-            $contest_user = ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset_id);
-
-            if (isset($r['container']->finish_time)) {
-                $response['submission_deadline'] = strtotime($r['container']->finish_time);
-                if (isset($r['container']->window_length)) {
-                    $response['submission_deadline'] = min(
-                        strtotime($r['container']->finish_time),
-                        strtotime($contest_user->access_time) + $r['container']->window_length * 60
-                    );
-                }
-            } elseif (isset($r['container']->window_length)) {
-                $response['submission_deadline'] = strtotime($contest_user->access_time) + $r['container']->window_length * 60;
+            $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+                $r->identity->identity_id,
+                $problemsetId
+            );
+            if (!is_null($problemsetIdentity) && !is_null(
+                $problemsetIdentity->end_time
+            )) {
+                $response['submission_deadline'] = strtotime(
+                    $problemsetIdentity->end_time
+                );
+            } elseif (isset($r['container']->finish_time)) {
+                $response['submission_deadline'] = strtotime(
+                    $r['container']->finish_time
+                );
             }
         }
 

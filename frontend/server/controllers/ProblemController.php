@@ -1455,9 +1455,13 @@ class ProblemController extends Controller {
             $result['admin'] = Authorization::isAdmin($r->identity, $problemset);
             if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
                 // At this point, contestant_user relationship should be established.
+                $container = ProblemsetsDAO::getProblemsetContainer(
+                    $problemset->problemset_id
+                );
+                $container->toUnixTime();
                 ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
-                    $r->identity->identity_id,
-                    $problemset->problemset_id,
+                    $r->identity,
+                    $container,
                     Authorization::canSubmitToProblemset(
                         $r->identity,
                         $problemset
