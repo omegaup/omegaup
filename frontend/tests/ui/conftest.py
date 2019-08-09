@@ -300,7 +300,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
     def update_score_in_course(self, problem_alias, assignment_alias,
                                verdict='AC', score=1):
-        '''Set verdict and score of latest run'''
+        '''Set verdict and score of latest run in a course'''
 
         run_id = util.database_utils.mysql(
             ('''
@@ -324,11 +324,12 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 AND `a`.`alias` = '%s';
             ''') % (problem_alias, assignment_alias),
             dbname='omegaup', auth=self.mysql_auth())
+        print(run_id)
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score_in_contest(self, problem_alias, contest_alias,
                                 verdict='AC', score=1):
-        '''Set verdict and score of latest run'''
+        '''Set verdict and score of latest run in a contest'''
 
         run_id = util.database_utils.mysql(
             ('''
@@ -352,6 +353,29 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 AND `c`.`alias` = '%s';
             ''') % (problem_alias, contest_alias),
             dbname='omegaup', auth=self.mysql_auth())
+        print(run_id)
+        self.update_run_score(int(run_id.strip()), verdict, score)
+
+    def update_score(self, problem_alias, verdict='AC', score=1):
+        '''Set verdict and score of latest run doesn't belong to problemset.'''
+
+        run_id = util.database_utils.mysql(
+            ('''
+            SELECT
+                MAX(`r`.`run_id`)
+            FROM
+                `Submissions` AS `s`
+            INNER JOIN
+                `Runs` AS `r` ON
+                `r`.`run_id` = `s`.`current_run_id`
+            INNER JOIN
+                `Problems` AS `p` ON
+                `p`.`problem_id` = `s`.`problem_id`
+            WHERE
+                `p`.`alias` = '%s';
+            ''') % (problem_alias),
+            dbname='omegaup', auth=self.mysql_auth())
+        print(run_id)
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def create_user(self, admin=False):

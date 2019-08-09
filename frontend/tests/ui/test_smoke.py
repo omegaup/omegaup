@@ -45,27 +45,7 @@ def test_create_problem(driver):
     create_problem(driver, problem_alias)
 
     with driver.login_user():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.ID, 'nav-problems'))).click()
-        with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//li[@id = "nav-problems"]'
-                      '//a[@href = "/problem/"]')))).click()
-
-        search_box_element = driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.ID, 'problem-search-box')))
-        search_box_element.send_keys(problem_alias)
-        with driver.page_transition():
-            search_box_element.submit()
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[text() = "%s"]' % problem_alias))).click()
+        prepare_run(driver, problem_alias)
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
 
@@ -104,6 +84,44 @@ def test_create_problem(driver):
                     assert (row in textarea.text), row
 
         driver.browser.find_element_by_id('overlay').click()
+        driver.update_score(problem_alias)
+
+    with driver.login_user():
+        prepare_run(driver, problem_alias)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//div[contains(concat(" ", normalize-space(@class), " "), '
+                 '" qualitynomination-popup ")]/form[contains(concat(" ", '
+                 'normalize-space(@class), " "), " popup ")]')))
+
+
+@util.annotate
+@util.no_javascript_errors()
+def prepare_run(driver, problem_alias):
+    ''' Entering to a problem page to create a submission.'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.ID, 'nav-problems'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//li[@id = "nav-problems"]'
+                  '//a[@href = "/problem/"]')))).click()
+
+    search_box_element = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.ID, 'problem-search-box')))
+    search_box_element.send_keys(problem_alias)
+    with driver.page_transition():
+        search_box_element.submit()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//a[text() = "%s"]' % problem_alias))).click()
 
 
 @util.annotate
