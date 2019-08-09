@@ -165,8 +165,6 @@ class RunController extends Controller {
         )) {
             throw new NotAllowedToSubmitException('runNotInsideContest');
         }
-        $r['container']->start_time = $startTime;
-        $r['container']->finish_time = $finishTime;
 
         // Contest admins can skip following checks
         if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
@@ -272,7 +270,7 @@ class RunController extends Controller {
             if (!is_null($start)) {
                 //ok, what time is it now?
                 $c_time = Time::get();
-                $start = strtotime($start);
+                $start = $start;
 
                 //asuming submit_delay is in minutes
                 $submit_delay = (int) (( $c_time - $start ) / 60);

@@ -2248,7 +2248,6 @@ class ContestController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     public static function apiUpdateEndTimeForIdentity(Request $r) {
@@ -2265,20 +2264,18 @@ class ContestController extends Controller {
         Validators::validateStringNonEmpty($r['username'], 'username');
         Validators::validateNumber($r['end_time'], 'end_time');
 
-        try {
-            $updatedEntries = ProblemsetIdentitiesDAO::updateEndTimeForIdentity(
-                $contest->problemset_id,
-                $r['username'],
-                $r['end_time']
-            );
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
+        $identity = IdentityController::resolveIdentity($r['username']);
+        if (is_null($identity)) {
+            throw new NotFoundException('userNotFound');
         }
 
-        if (!$updatedEntries) {
-            throw new NotFoundException('problemsetIdentityNotFound');
-        }
+        $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+            $identity->identity_id,
+            $contest->problemset_id
+        );
+
+        $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $r['end_time']);
+        ProblemsetIdentitiesDAO::update($problemsetIdentity);
 
         return [
             'status' => 'ok',

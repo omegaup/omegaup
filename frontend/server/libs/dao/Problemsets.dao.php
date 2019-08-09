@@ -52,7 +52,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
 
     public static function isSubmissionWindowOpen(Object $container) : bool {
         return isset($container->start_time) &&
-                Time::get() >= strtotime($container->start_time);
+                Time::get() >= $container->start_time;
     }
 
     public static function getWithTypeByPK($problemset_id) {

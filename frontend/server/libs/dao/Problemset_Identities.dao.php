@@ -160,27 +160,6 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         return $conn->Affected_Rows();
     }
 
-    public static function updateEndTimeForIdentity($problemsetId, $username, $endTime) {
-        $sql = 'UPDATE
-                    `Problemset_Identities` `pi`
-                INNER JOIN
-                    `Identities` `i` ON `pi`.`identity_id` = `i`.`identity_id`
-                SET
-                    `end_time` = FROM_UNIXTIME(?)
-                WHERE
-                    `i`.`username` = ?
-                    AND `pi`.`problemset_id` = ?;';
-        $params = [
-            $endTime,
-            $username,
-            $problemsetId,
-        ];
-
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
-    }
-
     public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {
         $sql = 'UPDATE
                     `Problemset_Identities`

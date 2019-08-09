@@ -449,7 +449,7 @@ class UpdateContestTest extends OmegaupTestCase {
 
         try {
             // Trying to create a run out of contest time
-            $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+            RunsFactory::createRun($problemData, $contestData, $contestant);
             $this->fail('User could not create a run when is out of contest time');
         } catch (NotAllowedToSubmitException $e) {
             // Pass
@@ -472,7 +472,7 @@ class UpdateContestTest extends OmegaupTestCase {
 
         try {
             // Call API
-            $response = ContestController::apiUpdate($r);
+            ContestController::apiUpdate($r);
             $this->fail('Only numbers are allowed in window_length field');
         } catch (InvalidParameterException $e) {
             // Pass
@@ -528,7 +528,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $windowLength = 140;
         $r['window_length'] = $windowLength;
         try {
-            $response = ContestController::apiUpdate($r);
+            ContestController::apiUpdate($r);
             $this->fail('Window length can not greater than contest length');
         } catch (InvalidParameterException $e) {
             // Pass
@@ -577,12 +577,11 @@ class UpdateContestTest extends OmegaupTestCase {
             'window_length' => 30,
         ]));
 
+        // 15 minutes later User can not create a run because the contest is over
+        $updatedTime = $updatedTime + 15 * 60;
+        Time::setTimeForTesting($updatedTime);
         try {
-            // 15 minutes later User can not create a run because the contest is over
-            $updatedTime = $updatedTime + 15 * 60;
-            Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $contestant);
-            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('Contestant should not create a run after contest finishes');
         } catch (NotAllowedToSubmitException $e) {
             // Pass
@@ -637,13 +636,12 @@ class UpdateContestTest extends OmegaupTestCase {
         $run = RunsFactory::createRun($problem, $contest, $contestant);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
+        // 20 minutes later is no longer available because window_length has
+        // expired
+        $updatedTime = $updatedTime + 20 * 60;
+        Time::setTimeForTesting($updatedTime);
         try {
-            // 20 minutes later is no longer available because window_length has
-            // expired
-            $updatedTime = $updatedTime + 20 * 60;
-            Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $contestant);
-            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('Contestant should not create a run after window length expires');
         } catch (NotAllowedToSubmitException $e) {
             // Pass
@@ -749,12 +747,11 @@ class UpdateContestTest extends OmegaupTestCase {
         $run = RunsFactory::createRun($problem, $contest, $contestant);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
+        // User tries to create another run 20 minutes later, it should fail
+        $updatedTime = $updatedTime + 20 * 60;
+        Time::setTimeForTesting($updatedTime);
         try {
-            // User tries to create another run 20 minutes later, it should fail
-            $updatedTime = $updatedTime + 20 * 60;
-            Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $contestant);
-            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('User should not be able to send runs beause window_length is over');
         } catch (NotAllowedToSubmitException $e) {
             // Pass
@@ -776,12 +773,11 @@ class UpdateContestTest extends OmegaupTestCase {
         $run = RunsFactory::createRun($problem, $contest, $contestant);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
+        // User tries to create another run 30 minutes later, it should fail
+        $updatedTime = $updatedTime + 30 * 60;
+        Time::setTimeForTesting($updatedTime);
         try {
-            // User tries to create another run 30 minutes later, it should fail
-            $updatedTime = $updatedTime + 30 * 60;
-            Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $contestant);
-            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+            RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('User should not be able to send runs beause window_length is over');
         } catch (NotAllowedToSubmitException $e) {
             // Pass
