@@ -324,7 +324,6 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 AND `a`.`alias` = '%s';
             ''') % (problem_alias, assignment_alias),
             dbname='omegaup', auth=self.mysql_auth())
-        print(run_id)
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score_in_contest(self, problem_alias, contest_alias,
@@ -353,7 +352,6 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 AND `c`.`alias` = '%s';
             ''') % (problem_alias, contest_alias),
             dbname='omegaup', auth=self.mysql_auth())
-        print(run_id)
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def update_score(self, problem_alias, verdict='AC', score=1):
@@ -375,7 +373,6 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 `p`.`alias` = '%s';
             ''') % (problem_alias),
             dbname='omegaup', auth=self.mysql_auth())
-        print(run_id)
         self.update_run_score(int(run_id.strip()), verdict, score)
 
     def create_user(self, admin=False):
