@@ -9,7 +9,7 @@
              v-model="currentLanguage">
           <option v-bind:markdown-contents.sync="currentMarkdown"
                   v-bind:value="language"
-                  v-for="(markdown, language) in solutions">
+                  v-for="language in languages">
             {{ getLanguageNameText(language) }}
           </option>
         </select>
@@ -86,26 +86,15 @@ import omegaup from '../../api.js';
 export default class ProblemStatementEdit extends Vue {
   @Prop() markdownContents!: string;
   @Prop() markdownPreview!: string;
+  @Prop() initialLanguage!: string;
 
   T = T;
   UI = UI;
   commitMessage = '';
   currentLanguage = 'es';
   currentMarkdown = this.markdownContents;
-  solutions: omegaup.Solutions = {
-    en: {
-      searched: false,
-      markdown: '',
-    },
-    es: {
-      searched: true,
-      markdown: '',
-    },
-    pt: {
-      searched: false,
-      markdown: '',
-    },
-  };
+  languages = ['es', 'en', 'pt'];
+  solutions: omegaup.Solutions = {};
 
   getLanguageNameText(language: string): string {
     switch (language) {
@@ -120,46 +109,37 @@ export default class ProblemStatementEdit extends Vue {
     }
   }
 
+  @Watch('initialLanguage')
+  onInitialLanguageChange(newInitial: string): void {
+    this.currentLanguage = newInitial;
+  }
+
   @Watch('markdownContents')
   onMarkdownContentsChange(newMarkdown: string): void {
     this.currentMarkdown = newMarkdown;
-    this.solutions[this.currentLanguage].markdown = newMarkdown;
+    this.solutions[this.currentLanguage] = newMarkdown;
   }
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
-    this.solutions[oldLanguage].markdown = this.currentMarkdown;
+    this.solutions[oldLanguage] = this.currentMarkdown;
     this.$emit(
       'update-markdown-contents',
       this.solutions,
       newLanguage,
       this.currentMarkdown,
     );
-    if (!this.solutions[newLanguage].searched) {
-      this.solutions[newLanguage].searched = true;
-    }
   }
 
   handleEditSolution(): void {
-    this.solutions[this.currentLanguage].markdown = this.currentMarkdown;
-    this.$emit('edit-solution', this.solutions, this.commitMessage);
-    this.solutions = {
-      en: {
-        searched: false,
-        markdown: '',
-      },
-      es: {
-        searched: true,
-        markdown: '',
-      },
-      pt: {
-        searched: false,
-        markdown: '',
-      },
-    };
-    this.commitMessage = '';
-    this.currentMarkdown = '';
-    this.currentLanguage = 'es';
+    this.solutions[this.currentLanguage] = this.currentMarkdown;
+    this.$emit(
+      'edit-solution',
+      this.solutions,
+      this.commitMessage,
+      this.currentLanguage,
+    );
+    this.solutions = {};
   }
 }
 

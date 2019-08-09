@@ -338,6 +338,7 @@ OmegaUp.on('ready', function() {
         props: {
           markdownContents: this.markdownContents,
           markdownPreview: this.markdownPreview,
+          initialLanguage: this.initialLanguage,
         },
         on: {
           'update-markdown-contents': function(solutions, language,
@@ -346,8 +347,8 @@ OmegaUp.on('ready', function() {
             // component won't detect any change if two different language
             // solutions are the same.
             solutionEdit.markdownContents = currentMarkdown;
-            if (solutions[language].searched) {
-              solutionEdit.updateAndRefresh(solutions[language].markdown);
+            if (solutions.hasOwnProperty(language)) {
+              solutionEdit.updateAndRefresh(solutions[language]);
               return;
             }
             API.Problem.solution({
@@ -366,16 +367,15 @@ OmegaUp.on('ready', function() {
                 })
                 .fail(UI.apiError);
           },
-          'edit-solution': function(solutions, commitMessage) {
+          'edit-solution': function(solutions, commitMessage, currentLanguage) {
             let promises = [];
             for (const lang in solutions) {
-              if (!solutions[lang].searched) continue;
-              if (solutions[lang].markdown === solutionEdit.solutions[lang])
-                continue;
+              if (!solutions.hasOwnProperty(lang)) continue;
+              if (solutions[lang] === solutionEdit.solutions[lang]) continue;
               promises.push(new Promise(function(resolve, reject) {
                 API.Problem.updateSolution({
                              problem_alias: problemAlias,
-                             solution: solutions[lang].markdown,
+                             solution: solutions[lang],
                              message: commitMessage,
                              lang: lang,
                            })
@@ -383,19 +383,15 @@ OmegaUp.on('ready', function() {
                     .fail(UI.apiError);
               }));
             }
-            solutionEdit.solutions = {
-              'en': null,
-              'es': null,
-              'pt': null,
-            };
+            solutionEdit.solutions = {};
             Promise.all(promises)
                 .then(function() {
                   UI.success(T.problemEditUpdatedSuccessfully);
-                  solutionEdit.getInitialContents();
+                  solutionEdit.getInitialContents(currentLanguage);
                 })
                 .catch(function(error) {
                   UI.apiError(error);
-                  solutionEdit.getInitialContents();
+                  solutionEdit.getInitialContents(currentLanguage);
                 });
           },
         },
@@ -411,11 +407,8 @@ OmegaUp.on('ready', function() {
       markdownContents: null,
       markdownPreview: '',
       markdownEditor: null,
-      solutions: {
-        'en': null,
-        'es': null,
-        'pt': null,
-      }
+      initialLanguage: null,
+      solutions: {},
     },
     methods: {
       updateAndRefresh(markdown) {
@@ -423,21 +416,27 @@ OmegaUp.on('ready', function() {
         this.markdownPreview =
             this.markdownEditor.getConverter().makeHtml(markdown);
       },
-      getInitialContents() {
+      getInitialContents(language = null) {
         let self = this;
         self.updateAndRefresh('');
-        API.Problem.solution({
-                     'problem_alias': problemAlias,
-                     'lang': 'es',
-                   })
+
+        let request = {
+          'problem_alias': problemAlias,
+        };
+        if (language) request['lang'] = language;
+
+        API.Problem.solution(request)
             .then(function(response) {
               if (!response.exists || !response.solution) {
                 return;
               }
-              if (response.solution.language !== 'es') {
+              if (language && response.solution.language !== language) {
                 response.solution.markdown = '';
+                response.solution.language = language;
               }
-              self.solutions['es'] = response.solution.markdown;
+              const lang = response.solution.language;
+              self.initialLanguage = lang;
+              self.solutions[lang] = response.solution.markdown;
               self.updateAndRefresh(response.solution.markdown);
             })
             .fail(UI.apiError);
