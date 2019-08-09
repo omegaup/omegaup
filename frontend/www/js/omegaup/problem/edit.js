@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import problem_Versions from '../components/problem/Versions.vue';
-import problem_SolutionEdit from '../components/problem/SolutionEdit.vue';
+import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import {OmegaUp, T, API} from '../omegaup.js';
 import UI from '../ui.js';
 
@@ -444,7 +444,7 @@ OmegaUp.on('ready', function() {
       }
     },
     components: {
-      'omegaup-problem-solution-edit': problem_SolutionEdit,
+      'omegaup-problem-solution-edit': problem_StatementEdit,
     }
   });
   solutionEdit.getInitialContents();

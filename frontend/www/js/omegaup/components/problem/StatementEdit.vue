@@ -20,11 +20,11 @@
             <ul class="nav nav-tabs">
               <li class="active">
                 <a data-toggle="tab"
-                    href="#solution-source">Source</a>
+                    href="#solution-source">{{ T.wordsSource }}</a>
               </li>
               <li>
                 <a data-toggle="tab"
-                    href="#solution-preview">Preview</a>
+                    href="#solution-preview">{{ T. wordsPreview }}</a>
               </li>
             </ul>
             <div class="tab-content">
@@ -83,7 +83,7 @@ import UI from '../../ui.js';
 import omegaup from '../../api.js';
 
 @Component
-export default class ProblemSolutionEdit extends Vue {
+export default class ProblemStatementEdit extends Vue {
   @Prop() markdownContents!: string;
   @Prop() markdownPreview!: string;
 
