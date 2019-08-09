@@ -299,6 +299,7 @@ def add_identities_group(driver, group_alias):
     return identities
 
 
+@contextlib.contextmanager
 def create_contest(driver, contest_alias, scoreboard_time_percent=100,
                    has_privileges=True):
     '''Creates a new contest.'''
@@ -330,8 +331,15 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100,
     else:
         submit_element = driver.browser.find_element_by_tag_name('form')
         assert_get_alert(driver, submit_element)
+        try:
+            yield {}
+        except AssertionError as err:
+            print(' ERROR:', err)
+        finally:
+            pass
 
 
+@contextlib.contextmanager
 def create_course(driver, course_alias, school_name, has_privileges=True):
     '''Creates one course with a new school.'''
 
@@ -370,8 +378,15 @@ def create_course(driver, course_alias, school_name, has_privileges=True):
     else:
         submit_element = driver.browser.find_element_by_tag_name('form')
         assert_get_alert(driver, submit_element)
+        try:
+            yield {}
+        except AssertionError as err:
+            print(' ERROR:', err)
+        finally:
+            pass
 
 
+@contextlib.contextmanager
 def create_problem(driver, problem_alias, has_privileges=True):
     '''Create a problem.'''
 
@@ -416,6 +431,12 @@ def create_problem(driver, problem_alias, has_privileges=True):
                 driver.browser.current_url), driver.browser.current_url
     else:
         assert_get_alert(driver, contents_element)
+        try:
+            yield {}
+        except AssertionError as err:
+            print(' ERROR:', err)
+        finally:
+            pass
 
 
 def assert_get_alert(driver, submit_element):
@@ -430,6 +451,7 @@ def assert_get_alert(driver, submit_element):
     assert 'danger' in message_class, message_class
 
 
+@contextlib.contextmanager
 def assert_page_not_found(driver, page):
     ''' Asserts user or identity does not have access to the page. '''
 
@@ -443,6 +465,12 @@ def assert_page_not_found(driver, page):
                 (By.XPATH,
                  ('//li[@id = "nav-%ss"]'
                   '//a[@href = "/%s/mine/"]' % (page, page))))).click()
+        try:
+            yield {}
+        except AssertionError as err:
+            print(' ERROR:', err)
+        finally:
+            pass
 
     error_page = driver.wait.until(
         EC.visibility_of_element_located((By.XPATH, '//h1/strong')))
