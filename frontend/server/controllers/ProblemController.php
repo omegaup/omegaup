@@ -2518,6 +2518,7 @@ class ProblemController extends Controller {
         );
         $nominationStatus['problem_alias'] = $details['alias'];
         $nominationStatus['language'] = $details['statement']['language'];
+        $nominationStatus['can_nominate_problem'] = !is_null($r->user);
         $user = [
             'logged_in' => true,
             'admin' => $isProblemAdmin
