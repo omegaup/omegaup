@@ -245,8 +245,8 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'name' => Utils::CreateRandomString(),
                 'alias' => Utils::CreateRandomString(),
                 'description' => Utils::CreateRandomString(),
-                'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-                'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+                'start_time' => (Time::get() + 60),
+                'finish_time' => (Time::get() + 120)
             ]));
             $this->fail("{$identityStatus} identity can not create courses");
         } catch (ForbiddenAccessException $e) {

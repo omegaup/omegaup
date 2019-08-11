@@ -40,7 +40,9 @@ abstract class {{ table.class_name }}DAOBase {
   {%- for column in table.columns|selectattr('default') %}
         if (is_null(${{ table.name }}->{{ column.name }})) {
     {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
+            ${{ table.name }}->{{ column.name }} = Time::get();
+    {%- elif 'timestamp' in column.type %}
+            ${{ table.name }}->{{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
     {%- elif column.php_primitive_type == 'bool' %}
             ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
     {%- elif column.php_primitive_type == 'int' %}
@@ -232,7 +234,9 @@ abstract class {{ table.class_name }}DAOBase {
 {%- for column in table.columns|selectattr('default') %}
         if (is_null(${{ table.name }}->{{ column.name }})) {
   {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
+            ${{ table.name }}->{{ column.name }} = Time::get();
+  {%- elif 'timestamp' in column.type %}
+            ${{ table.name }}->{{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
   {%- elif column.php_primitive_type == 'bool' %}
             ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
   {%- elif column.php_primitive_type == 'int' %}

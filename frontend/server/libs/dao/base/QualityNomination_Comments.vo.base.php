@@ -49,7 +49,7 @@ class QualityNominationComments extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
         if (isset($data['vote'])) {
             $this->vote = (int)$data['vote'];
@@ -96,9 +96,9 @@ class QualityNominationComments extends VO {
     /**
       * Fecha de creacion de este comentario
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 
     /**
       * El voto emitido en este comentario. En el rango de [-2, +2]

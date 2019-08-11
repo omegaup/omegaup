@@ -37,7 +37,7 @@ abstract class SubmissionLogDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Submission_Log->time)) {
-            $Submission_Log->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Submission_Log->time = Time::get();
         }
         $sql = 'REPLACE INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
@@ -172,7 +172,7 @@ abstract class SubmissionLogDAOBase {
      */
     final public static function create(SubmissionLog $Submission_Log) : int {
         if (is_null($Submission_Log->time)) {
-            $Submission_Log->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Submission_Log->time = Time::get();
         }
         $sql = 'INSERT INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [

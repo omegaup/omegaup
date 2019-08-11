@@ -46,10 +46,10 @@ class ProblemsetIdentityRequest extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['request_time'])) {
-            $this->request_time = $data['request_time'];
+            $this->request_time = DAO::fromMySQLTimestamp($data['request_time']);
         }
         if (isset($data['last_update'])) {
-            $this->last_update = $data['last_update'];
+            $this->last_update = DAO::fromMySQLTimestamp($data['last_update']);
         }
         if (isset($data['accepted'])) {
             $this->accepted = boolval($data['accepted']);
@@ -89,14 +89,14 @@ class ProblemsetIdentityRequest extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $request_time = null;
+    public $request_time = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var ?string
+      * @var ?int
      */
     public $last_update;
 

@@ -2254,7 +2254,7 @@ class ContestController extends Controller {
                 'user_id' => $identity->user_id,
                 'from_admission_mode' => $originalContest->admission_mode,
                 'to_admission_mode' => $contest->admission_mode,
-                'time' => $timestamp
+                'time' => $timestamp,
             ]));
             $contest->last_updated = $timestamp;
         }

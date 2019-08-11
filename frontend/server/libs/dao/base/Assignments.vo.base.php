@@ -74,10 +74,10 @@ class Assignments extends VO {
             $this->assignment_type = $data['assignment_type'];
         }
         if (isset($data['start_time'])) {
-            $this->start_time = $data['start_time'];
+            $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
-            $this->finish_time = $data['finish_time'];
+            $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['max_points'])) {
             $this->max_points = (float)$data['max_points'];
@@ -166,16 +166,16 @@ class Assignments extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $start_time = '2000-01-01 06:00:00';
+    public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $finish_time = '2000-01-01 06:00:00';
+    public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
       * La cantidad total de puntos que se pueden obtener.

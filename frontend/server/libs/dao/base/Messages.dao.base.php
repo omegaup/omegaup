@@ -140,7 +140,7 @@ abstract class MessagesDAOBase {
             $Messages->read = false;
         }
         if (is_null($Messages->date)) {
-            $Messages->date = gmdate('Y-m-d H:i:s', Time::get());
+            $Messages->date = Time::get();
         }
         $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [

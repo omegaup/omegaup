@@ -46,7 +46,7 @@ class Groups extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['create_time'])) {
-            $this->create_time = $data['create_time'];
+            $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
         }
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
@@ -89,9 +89,9 @@ class Groups extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $create_time = null;
+    public $create_time = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]

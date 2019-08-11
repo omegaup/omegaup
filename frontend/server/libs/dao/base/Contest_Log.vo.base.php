@@ -55,7 +55,7 @@ class ContestLog extends VO {
             $this->to_admission_mode = $data['to_admission_mode'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
     }
 
@@ -110,7 +110,7 @@ class ContestLog extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 }

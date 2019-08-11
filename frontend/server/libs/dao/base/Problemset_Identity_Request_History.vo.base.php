@@ -49,7 +49,7 @@ class ProblemsetIdentityRequestHistory extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
         if (isset($data['accepted'])) {
             $this->accepted = boolval($data['accepted']);
@@ -96,9 +96,9 @@ class ProblemsetIdentityRequestHistory extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]

@@ -94,7 +94,7 @@ class Problems extends VO {
             $this->difficulty = (float)$data['difficulty'];
         }
         if (isset($data['creation_date'])) {
-            $this->creation_date = $data['creation_date'];
+            $this->creation_date = DAO::fromMySQLTimestamp($data['creation_date']);
         }
         if (isset($data['source'])) {
             $this->source = $data['source'];
@@ -226,9 +226,9 @@ class Problems extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $creation_date = null;
+    public $creation_date = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]

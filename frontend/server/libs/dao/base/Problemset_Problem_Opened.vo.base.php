@@ -47,7 +47,7 @@ class ProblemsetProblemOpened extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['open_time'])) {
-            $this->open_time = $data['open_time'];
+            $this->open_time = DAO::fromMySQLTimestamp($data['open_time']);
         }
     }
 
@@ -89,7 +89,7 @@ class ProblemsetProblemOpened extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $open_time = null;
+    public $open_time = null;  // CURRENT_TIMESTAMP
 }

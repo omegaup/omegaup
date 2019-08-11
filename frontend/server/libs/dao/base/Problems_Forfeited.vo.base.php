@@ -43,7 +43,7 @@ class ProblemsForfeited extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['forfeited_date'])) {
-            $this->forfeited_date = $data['forfeited_date'];
+            $this->forfeited_date = DAO::fromMySQLTimestamp($data['forfeited_date']);
         }
     }
 
@@ -77,7 +77,7 @@ class ProblemsForfeited extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $forfeited_date = null;
+    public $forfeited_date = null;  // CURRENT_TIMESTAMP
 }
