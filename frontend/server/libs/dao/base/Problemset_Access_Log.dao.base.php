@@ -75,7 +75,7 @@ abstract class ProblemsetAccessLogDAOBase {
             (int)$Problemset_Access_Log->problemset_id,
             (int)$Problemset_Access_Log->identity_id,
             (int)$Problemset_Access_Log->ip,
-            $Problemset_Access_Log->time,
+            DAO::toMySQLTimestamp($Problemset_Access_Log->time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

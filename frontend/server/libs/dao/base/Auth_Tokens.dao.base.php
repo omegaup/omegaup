@@ -44,7 +44,7 @@ abstract class AuthTokensDAOBase {
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->token,
-            $Auth_Tokens->create_time,
+            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -63,7 +63,7 @@ abstract class AuthTokensDAOBase {
         $params = [
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             (int)$Auth_Tokens->identity_id,
-            $Auth_Tokens->create_time,
+            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
             $Auth_Tokens->token,
         ];
         global $conn;
@@ -175,7 +175,7 @@ abstract class AuthTokensDAOBase {
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->token,
-            $Auth_Tokens->create_time,
+            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

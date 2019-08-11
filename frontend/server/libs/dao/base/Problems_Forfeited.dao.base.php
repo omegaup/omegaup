@@ -43,7 +43,7 @@ abstract class ProblemsForfeitedDAOBase {
         $params = [
             (int)$Problems_Forfeited->user_id,
             (int)$Problems_Forfeited->problem_id,
-            $Problems_Forfeited->forfeited_date,
+            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -60,7 +60,7 @@ abstract class ProblemsForfeitedDAOBase {
     final public static function update(ProblemsForfeited $Problems_Forfeited) : int {
         $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
-            $Problems_Forfeited->forfeited_date,
+            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
             (int)$Problems_Forfeited->user_id,
             (int)$Problems_Forfeited->problem_id,
         ];
@@ -172,7 +172,7 @@ abstract class ProblemsForfeitedDAOBase {
         $params = [
             (int)$Problems_Forfeited->user_id,
             (int)$Problems_Forfeited->problem_id,
-            $Problems_Forfeited->forfeited_date,
+            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;
         $conn->Execute($sql, $params);

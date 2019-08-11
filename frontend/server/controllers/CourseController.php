@@ -39,8 +39,8 @@ class CourseController extends Controller {
      */
     private static function validateCreateAssignment(Request $r, Courses $course) : void {
         $isRequired = true;
-        $courseStartTime = strtotime($course->start_time);
-        $courseFinishTime = strtotime($course->finish_time);
+        $courseStartTime = DAO::fromMySQLTimestamp($course->start_time);
+        $courseFinishTime = DAO::fromMySQLTimestamp($course->finish_time);
 
         Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
         Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
@@ -1519,8 +1519,8 @@ class CourseController extends Controller {
                 'description' => $course->description,
                 'alias' => $course->alias,
                 'school_id' => $course->school_id,
-                'start_time' => strtotime($course->start_time),
-                'finish_time' => strtotime($course->finish_time),
+                'start_time' => DAO::fromMySQLTimestamp($course->start_time),
+                'finish_time' => DAO::fromMySQLTimestamp($course->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $course->public,
                 'basic_information_required' => boolval($course->needs_basic_information),

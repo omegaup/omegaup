@@ -32,7 +32,7 @@ abstract class QualityNominationsDAOBase {
             (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
-            $QualityNominations->time,
+            DAO::toMySQLTimestamp($QualityNominations->time),
             $QualityNominations->status,
             (int)$QualityNominations->qualitynomination_id,
         ];
@@ -152,7 +152,7 @@ abstract class QualityNominationsDAOBase {
             (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
-            $QualityNominations->time,
+            DAO::toMySQLTimestamp($QualityNominations->time),
             $QualityNominations->status,
         ];
         global $conn;

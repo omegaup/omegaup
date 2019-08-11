@@ -43,7 +43,7 @@ abstract class ProblemViewedDAOBase {
         $params = [
             (int)$Problem_Viewed->problem_id,
             (int)$Problem_Viewed->identity_id,
-            $Problem_Viewed->view_time,
+            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -60,7 +60,7 @@ abstract class ProblemViewedDAOBase {
     final public static function update(ProblemViewed $Problem_Viewed) : int {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
-            $Problem_Viewed->view_time,
+            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
             (int)$Problem_Viewed->problem_id,
             (int)$Problem_Viewed->identity_id,
         ];
@@ -172,7 +172,7 @@ abstract class ProblemViewedDAOBase {
         $params = [
             (int)$Problem_Viewed->problem_id,
             (int)$Problem_Viewed->identity_id,
-            $Problem_Viewed->view_time,
+            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
