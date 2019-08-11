@@ -29,7 +29,7 @@ abstract class GroupsDAOBase {
         $sql = 'UPDATE `Groups` SET `acl_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
         $params = [
             (int)$Groups->acl_id,
-            $Groups->create_time,
+            DAO::toMySQLTimestamp($Groups->create_time),
             $Groups->alias,
             $Groups->name,
             $Groups->description,
@@ -142,7 +142,7 @@ abstract class GroupsDAOBase {
         $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
             (int)$Groups->acl_id,
-            $Groups->create_time,
+            DAO::toMySQLTimestamp($Groups->create_time),
             $Groups->alias,
             $Groups->name,
             $Groups->description,

@@ -30,7 +30,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $params = [
             (int)$PrivacyStatement_Consent_Log->identity_id,
             (int)$PrivacyStatement_Consent_Log->privacystatement_id,
-            $PrivacyStatement_Consent_Log->timestamp,
+            DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
             (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
         global $conn;
@@ -141,7 +141,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $params = [
             (int)$PrivacyStatement_Consent_Log->identity_id,
             (int)$PrivacyStatement_Consent_Log->privacystatement_id,
-            $PrivacyStatement_Consent_Log->timestamp,
+            DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
         ];
         global $conn;
         $conn->Execute($sql, $params);

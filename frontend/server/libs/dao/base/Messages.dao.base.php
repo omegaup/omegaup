@@ -32,7 +32,7 @@ abstract class MessagesDAOBase {
             (int)$Messages->sender_id,
             (int)$Messages->recipient_id,
             $Messages->message,
-            $Messages->date,
+            DAO::toMySQLTimestamp($Messages->date),
             (int)$Messages->message_id,
         ];
         global $conn;
@@ -148,7 +148,7 @@ abstract class MessagesDAOBase {
             (int)$Messages->sender_id,
             (int)$Messages->recipient_id,
             $Messages->message,
-            $Messages->date,
+            DAO::toMySQLTimestamp($Messages->date),
         ];
         global $conn;
         $conn->Execute($sql, $params);

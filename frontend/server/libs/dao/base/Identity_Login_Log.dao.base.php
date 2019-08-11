@@ -74,7 +74,7 @@ abstract class IdentityLoginLogDAOBase {
         $params = [
             (int)$Identity_Login_Log->identity_id,
             (int)$Identity_Login_Log->ip,
-            $Identity_Login_Log->time,
+            DAO::toMySQLTimestamp($Identity_Login_Log->time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

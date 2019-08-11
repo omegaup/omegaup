@@ -191,9 +191,9 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $contest) {
-            $contest['start_time'] = strtotime($contest['start_time']);
-            $contest['finish_time'] = strtotime($contest['finish_time']);
-            $contest['last_updated'] = strtotime($contest['last_updated']);
+            $contest['start_time'] = DAO::fromMySQLTimestamp($contest['start_time']);
+            $contest['finish_time'] = DAO::fromMySQLTimestamp($contest['finish_time']);
+            $contest['last_updated'] = DAO::fromMySQLTimestamp($contest['last_updated']);
             $addedContests[] = $contest;
         }
 
@@ -530,8 +530,8 @@ class ContestController extends Controller {
             }
         }
 
-        $result['start_time'] = strtotime($result['start_time']);
-        $result['finish_time'] = strtotime($result['finish_time']);
+        $result['start_time'] = DAO::fromMySQLTimestamp($result['start_time']);
+        $result['finish_time'] = DAO::fromMySQLTimestamp($result['finish_time']);
 
         $result['status'] = 'ok';
 
@@ -659,8 +659,8 @@ class ContestController extends Controller {
                     'rerun_id',
                 ]);
 
-                $result['start_time'] = strtotime($result['start_time']);
-                $result['finish_time'] = strtotime($result['finish_time']);
+                $result['start_time'] = DAO::fromMySQLTimestamp($result['start_time']);
+                $result['finish_time'] = DAO::fromMySQLTimestamp($result['finish_time']);
                 $result['show_scoreboard_after'] = (bool)$result['show_scoreboard_after'];
                 $result['original_contest_alias'] = null;
                 $result['original_problemset_id'] = null;

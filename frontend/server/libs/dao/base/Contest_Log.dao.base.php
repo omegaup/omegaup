@@ -32,7 +32,7 @@ abstract class ContestLogDAOBase {
             (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            $Contest_Log->time,
+            DAO::toMySQLTimestamp($Contest_Log->time),
             (int)$Contest_Log->public_contest_id,
         ];
         global $conn;
@@ -145,7 +145,7 @@ abstract class ContestLogDAOBase {
             (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            $Contest_Log->time,
+            DAO::toMySQLTimestamp($Contest_Log->time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

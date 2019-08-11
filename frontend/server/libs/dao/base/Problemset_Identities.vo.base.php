@@ -76,7 +76,7 @@ class ProblemsetIdentities extends VO {
      */
     public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
-            parent::toUnixTime([]);
+            parent::toUnixTime(['access_time', 'end_time']);
             return;
         }
         parent::toUnixTime($fields);

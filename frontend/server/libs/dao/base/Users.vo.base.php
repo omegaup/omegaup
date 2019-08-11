@@ -112,7 +112,7 @@ class Users extends VO {
      */
     public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
-            parent::toUnixTime([]);
+            parent::toUnixTime(['reset_sent_at']);
             return;
         }
         parent::toUnixTime($fields);
