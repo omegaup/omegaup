@@ -54,7 +54,7 @@ class {{ table.class_name }} extends VO {
      */
     public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
-            parent::toUnixTime([{{ table.columns|selectattr('type', 'equalto', ('timestamp',))|map(attribute='name')|listformat("'{}'")|join(', ') }}]);
+            parent::toUnixTime([{{ table.columns|selectattr('type', 'in', [('timestamp',), ('datetime',)])|map(attribute='name')|listformat("'{}'")|join(', ') }}]);
             return;
         }
         parent::toUnixTime($fields);

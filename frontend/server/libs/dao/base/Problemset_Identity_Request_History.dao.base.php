@@ -30,7 +30,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $params = [
             (int)$Problemset_Identity_Request_History->identity_id,
             (int)$Problemset_Identity_Request_History->problemset_id,
-            $Problemset_Identity_Request_History->time,
+            DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
             (int)$Problemset_Identity_Request_History->accepted,
             (int)$Problemset_Identity_Request_History->admin_id,
             (int)$Problemset_Identity_Request_History->history_id,
@@ -143,7 +143,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $params = [
             (int)$Problemset_Identity_Request_History->identity_id,
             (int)$Problemset_Identity_Request_History->problemset_id,
-            $Problemset_Identity_Request_History->time,
+            DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
             (int)$Problemset_Identity_Request_History->accepted,
             (int)$Problemset_Identity_Request_History->admin_id,
         ];

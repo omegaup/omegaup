@@ -30,7 +30,7 @@ abstract class UsersBadgesDAOBase {
         $params = [
             (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
-            $Users_Badges->assignation_time,
+            DAO::toMySQLTimestamp($Users_Badges->assignation_time),
             (int)$Users_Badges->user_badge_id,
         ];
         global $conn;
@@ -141,7 +141,7 @@ abstract class UsersBadgesDAOBase {
         $params = [
             (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
-            $Users_Badges->assignation_time,
+            DAO::toMySQLTimestamp($Users_Badges->assignation_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -64,9 +64,8 @@ class InterviewController extends Controller {
 
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
 
         self::$log->info('Created new interview ' . $r['alias']);
@@ -102,13 +101,7 @@ class InterviewController extends Controller {
         Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
         // Does the interview exist ?
-        try {
-            $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($r['interview'])) {
             throw new NotFoundException('interviewNotFound');
         }
@@ -172,24 +165,16 @@ class InterviewController extends Controller {
         }
 
         // add the user to the interview
-        try {
-            ProblemsetIdentitiesDAO::create(new ProblemsetIdentities([
-                'problemset_id' => $r['interview']->problemset_id,
-                'identity_id' => $r['user']->main_identity_id,
-                'access_time' => null,
-                'score' => '0',
-                'time' => '0',
-            ]));
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to create new ProblemsetIdentity: ' . $e->getMessage());
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        try {
-            $email = EmailsDAO::getByPK($r['user']->main_email_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        ProblemsetIdentitiesDAO::create(new ProblemsetIdentities([
+            'problemset_id' => $r['interview']->problemset_id,
+            'identity_id' => $r['user']->main_identity_id,
+            'access_time' => null,
+            'score' => '0',
+            'time' => '0',
+        ]));
+        $email = EmailsDAO::getByPK($r['user']->main_email_id);
+        if (is_null($email)) {
+            throw new NotFoundException('userOrMailNotFound');
         }
 
         include_once 'libs/Email.php';
@@ -216,12 +201,7 @@ class InterviewController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        try {
-            $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
 
         $users = [];
 
@@ -252,15 +232,10 @@ class InterviewController extends Controller {
 
         $interviews = null;
 
-        try {
-            $interviews = InterviewsDAO::getMyInterviews($r->user->user_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response['results'] = $interviews;
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'result' => InterviewsDAO::getMyInterviews($r->user->user_id),
+        ];
     }
 
     public static function showIntro(Request $r) {

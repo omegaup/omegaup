@@ -30,7 +30,7 @@ abstract class QualityNominationCommentsDAOBase {
         $params = [
             (int)$QualityNomination_Comments->qualitynomination_id,
             (int)$QualityNomination_Comments->user_id,
-            $QualityNomination_Comments->time,
+            DAO::toMySQLTimestamp($QualityNomination_Comments->time),
             (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
             (int)$QualityNomination_Comments->qualitynomination_comment_id,
@@ -143,7 +143,7 @@ abstract class QualityNominationCommentsDAOBase {
         $params = [
             (int)$QualityNomination_Comments->qualitynomination_id,
             (int)$QualityNomination_Comments->user_id,
-            $QualityNomination_Comments->time,
+            DAO::toMySQLTimestamp($QualityNomination_Comments->time),
             (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
         ];

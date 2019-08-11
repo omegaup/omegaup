@@ -23,7 +23,6 @@ class Controller {
      *
      * @param Request $r
      * @param bool $requireMainUserIdentity
-     * @throws InvalidDatabaseOperationException
      * @throws UnauthorizedException
      */
     protected static function authenticateRequest(
@@ -76,7 +75,6 @@ class Controller {
      *
      * @param Request $r
      * @return Users
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     protected static function resolveTargetUser(Request $r) {
@@ -86,16 +84,9 @@ class Controller {
         if (!is_null($r['username'])) {
             Validators::validateStringNonEmpty($r['username'], 'username');
 
-            try {
-                $user = UsersDAO::FindByUsername($r['username']);
-
-                if (is_null($user)) {
-                    throw new NotFoundException('userNotExist');
-                }
-            } catch (ApiException $e) {
-                throw $e;
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
+            $user = UsersDAO::FindByUsername($r['username']);
+            if (is_null($user)) {
+                throw new NotFoundException('userNotExist');
             }
         }
 
@@ -111,7 +102,6 @@ class Controller {
      *
      * @param Request $r
      * @return Identity
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     protected static function resolveTargetIdentity(Request $r) {
@@ -123,12 +113,7 @@ class Controller {
         }
         Validators::validateStringNonEmpty($r['username'], 'username');
 
-        try {
-            $identity = IdentitiesDAO::findByUsername($r['username']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $identity = IdentitiesDAO::findByUsername($r['username']);
         if (is_null($identity)) {
             throw new NotFoundException('userNotExist');
         }

@@ -19,6 +19,7 @@ class ProblemsetIdentities extends VO {
         'identity_id' => true,
         'problemset_id' => true,
         'access_time' => true,
+        'end_time' => true,
         'score' => true,
         'time' => true,
         'share_user_information' => true,
@@ -50,6 +51,9 @@ class ProblemsetIdentities extends VO {
         if (isset($data['access_time'])) {
             $this->access_time = $data['access_time'];
         }
+        if (isset($data['end_time'])) {
+            $this->end_time = $data['end_time'];
+        }
         if (isset($data['score'])) {
             $this->score = (int)$data['score'];
         }
@@ -72,7 +76,7 @@ class ProblemsetIdentities extends VO {
      */
     public function toUnixTime(iterable $fields = []) : void {
         if (empty($fields)) {
-            parent::toUnixTime([]);
+            parent::toUnixTime(['access_time', 'end_time']);
             return;
         }
         parent::toUnixTime($fields);
@@ -100,6 +104,13 @@ class ProblemsetIdentities extends VO {
       * @var ?string
      */
     public $access_time;
+
+    /**
+      * Hora en la que finaliza un concurso para el usuario cuando se habilita la opción de inicios diferentes
+      * @access public
+      * @var ?string
+     */
+    public $end_time;
 
     /**
       * Indica el puntaje que obtuvo el usuario en el concurso

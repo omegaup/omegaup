@@ -86,14 +86,14 @@ def create_run(driver, problem_alias, filename):
     logging.debug('Run submitted.')
 
 
-def no_javascript_errors(*, path_whitelist=(), message_whitelist=()):
+def no_javascript_errors(*, path_whitelist=(), message_list=()):
     '''Decorator for javascript errors'''
     def _internal(f):
         @functools.wraps(f)
         def _wrapper(driver, *args, **kwargs):
             '''Wrapper for javascript errors'''
             with assert_no_js_errors(driver, path_whitelist=path_whitelist,
-                                     message_whitelist=message_whitelist):
+                                     message_list=message_list):
                 return f(driver, *args, **kwargs)
         return _wrapper
     return _internal
@@ -126,7 +126,7 @@ def annotate(f):
 
 
 @contextlib.contextmanager
-def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
+def assert_no_js_errors(driver, *, path_whitelist=(), message_list=()):
     '''Shows in a list unexpected errors in javascript console'''
     driver.log_collector.push()
     try:
@@ -139,10 +139,24 @@ def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
                 continue
             if is_path_whitelisted(entry['message'], path_whitelist):
                 continue
-            if is_message_whitelisted(entry['message'], message_whitelist):
+            if message_matches(entry['message'], message_list):
                 continue
             unexpected_errors.append(entry['message'])
         assert not unexpected_errors, '\n'.join(unexpected_errors)
+
+
+@contextlib.contextmanager
+def assert_js_errors(driver, *, message=()):
+    '''Shows in a list unexpected errors in javascript console'''
+    expected_error_is_found = True
+    driver.log_collector.push()
+    try:
+        yield
+    finally:
+        for entry in driver.log_collector.pop():
+            if message_matches(entry['message'], message):
+                expected_error_is_found = True
+        assert expected_error_is_found, '%s was not found' % message
 
 
 def is_path_whitelisted(message, path_whitelist):
@@ -161,8 +175,8 @@ def is_path_whitelisted(message, path_whitelist):
     return False
 
 
-def is_message_whitelisted(message, message_whitelist):
-    '''Checks whether string in message is whitelisted.
+def message_matches(message, message_list):
+    '''Checks whether string in message is listed.
 
     It only compares strings between double or single quotes.
     '''
@@ -173,8 +187,8 @@ def is_message_whitelisted(message, message_whitelist):
         return False
 
     quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
-    for whitelisted_message in message_whitelist + MESSAGE_WHITELIST:
-        if quoted_string == whitelisted_message:
+    for listed_message in message_list + MESSAGE_WHITELIST:
+        if quoted_string == listed_message:
             return True
 
     return False
@@ -331,12 +345,6 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100,
     else:
         submit_element = driver.browser.find_element_by_tag_name('form')
         assert_get_alert(driver, submit_element)
-        try:
-            yield {}
-        except AssertionError as err:
-            print(' ERROR:', err)
-        finally:
-            pass
 
 
 @contextlib.contextmanager
@@ -378,12 +386,6 @@ def create_course(driver, course_alias, school_name, has_privileges=True):
     else:
         submit_element = driver.browser.find_element_by_tag_name('form')
         assert_get_alert(driver, submit_element)
-        try:
-            yield {}
-        except AssertionError as err:
-            print(' ERROR:', err)
-        finally:
-            pass
 
 
 @contextlib.contextmanager
@@ -431,12 +433,6 @@ def create_problem(driver, problem_alias, has_privileges=True):
                 driver.browser.current_url), driver.browser.current_url
     else:
         assert_get_alert(driver, contents_element)
-        try:
-            yield {}
-        except AssertionError as err:
-            print(' ERROR:', err)
-        finally:
-            pass
 
 
 def assert_get_alert(driver, submit_element):
@@ -465,12 +461,6 @@ def assert_page_not_found(driver, page):
                 (By.XPATH,
                  ('//li[@id = "nav-%ss"]'
                   '//a[@href = "/%s/mine/"]' % (page, page))))).click()
-        try:
-            yield {}
-        except AssertionError as err:
-            print(' ERROR:', err)
-        finally:
-            pass
 
     error_page = driver.wait.until(
         EC.visibility_of_element_located((By.XPATH, '//h1/strong')))

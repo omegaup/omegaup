@@ -44,7 +44,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
             (int)$Problemset_Problem_Opened->problemset_id,
             (int)$Problemset_Problem_Opened->problem_id,
             (int)$Problemset_Problem_Opened->identity_id,
-            $Problemset_Problem_Opened->open_time,
+            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -61,7 +61,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
     final public static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
-            $Problemset_Problem_Opened->open_time,
+            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
             (int)$Problemset_Problem_Opened->problemset_id,
             (int)$Problemset_Problem_Opened->problem_id,
             (int)$Problemset_Problem_Opened->identity_id,
@@ -175,7 +175,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
             (int)$Problemset_Problem_Opened->problemset_id,
             (int)$Problemset_Problem_Opened->problem_id,
             (int)$Problemset_Problem_Opened->identity_id,
-            $Problemset_Problem_Opened->open_time,
+            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

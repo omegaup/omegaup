@@ -55,6 +55,7 @@ let config = [
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
       problem_stats: './frontend/www/js/omegaup/problem/stats.js',
+      problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       rank_table: './frontend/www/js/omegaup/ranktable.js',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       schools_rank: './frontend/www/js/omegaup/schools/rank.js',
