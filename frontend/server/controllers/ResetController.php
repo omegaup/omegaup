@@ -136,6 +136,7 @@ class ResetController extends Controller {
         if (is_null($user)) {
             throw new InvalidParameterException('invalidUser');
         }
+        $user->toUnixTime();
 
         if (!$user->verified) {
             throw new InvalidParameterException('unverifiedUser');
@@ -146,7 +147,7 @@ class ResetController extends Controller {
             return;
         }
 
-        $seconds = Time::get() - strtotime($user->reset_sent_at);
+        $seconds = Time::get() - $user->reset_sent_at;
         if ($seconds < PASSWORD_RESET_MIN_WAIT) {
             throw new InvalidParameterException('passwordResetMinWait');
         }
@@ -163,6 +164,7 @@ class ResetController extends Controller {
             || is_null($password_confirmation)) {
             throw new InvalidParameterException('invalidParameters');
         }
+        $user->toUnixtime();
 
         if ($user->reset_digest !== hash('sha1', $reset_token)) {
             throw new InvalidParameterException('invalidResetToken');
@@ -174,7 +176,7 @@ class ResetController extends Controller {
 
         SecurityTools::testStrongPassword($password);
 
-        $seconds = Time::get() - strtotime($user->reset_sent_at);
+        $seconds = Time::get() - $user->reset_sent_at;
         if ($seconds > PASSWORD_RESET_TIMEOUT) {
             throw new InvalidParameterException('passwordResetResetExpired');
         }

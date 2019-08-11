@@ -41,13 +41,13 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
      */
     public static function isLateSubmission($container) {
         return isset($container->finish_time) &&
-               (Time::get() > strtotime($container->finish_time));
+               (Time::get() > $container->finish_time);
     }
 
     public static function insideSubmissionWindow($container, $identity_id) {
         if (isset($container->finish_time)) {
-            if (Time::get() > strtotime($container->finish_time) ||
-                Time::get() < strtotime($container->start_time)) {
+            if (Time::get() > $container->finish_time ||
+                Time::get() < $container->start_time) {
                 return false;
             }
         }
@@ -56,13 +56,13 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             return true;
         }
 
-        $problemset_identity = ProblemsetIdentitiesDAO::getByPK(
+        $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
             $identity_id,
             $container->problemset_id
         );
-        $first_access_time = $problemset_identity->access_time;
+        $problemsetIdentity->toUnixTime();
 
-        return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
+        return Time::get() <= $problemsetIdentity->access_time + $container->window_length * 60;
     }
 
     public static function getWithTypeByPK($problemset_id) {

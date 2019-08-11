@@ -1065,9 +1065,9 @@ class UserController extends Controller {
         $response['userinfo'] = [
             'username' => $user->username,
             'name' => $identity->name,
-            'birth_date' => is_null($user->birth_date) ? null : strtotime($user->birth_date),
+            'birth_date' => is_null($user->birth_date) ? null : DAO::fromMySQLTimestamp($user->birth_date),
             'gender' => $identity->gender,
-            'graduation_date' => is_null($user->graduation_date) ? null : strtotime($user->graduation_date),
+            'graduation_date' => is_null($user->graduation_date) ? null : DAO::fromMySQLTimestamp($user->graduation_date),
             'scholar_degree' => $user->scholar_degree,
             'preferred_language' => $user->preferred_language,
             'is_private' => $user->is_private,
@@ -1334,26 +1334,25 @@ class UserController extends Controller {
         if (is_null($contest)) {
             throw new NotFoundException('interviewNotFound');
         }
+        $contest->toUnixTime();
 
         // Only admins can view interview details
         if (!Authorization::isContestAdmin($r->identity->identity_id, $contest)) {
             throw new ForbiddenAccessException();
         }
 
-        $response = [];
         $user = self::resolveTargetUser($r);
         $identity = self::resolveTargetIdentity($r);
 
-        $openedProblemset = self::userOpenedProblemset($contest->problemset_id, $user->user_id);
-
-        $response['user_verified'] = $user->verified === '1';
-        $response['interview_url'] = 'https://omegaup.com/interview/' . $contest->alias . '/arena';
-        $response['name_or_username'] = is_null($identity->name) ?
-                                          $identity->username : $identity->name;
-        $response['opened_interview'] = $openedProblemset;
-        $response['finished'] = !ProblemsetsDAO::insideSubmissionWindow($contest, $user->user_id);
-        $response['status'] = 'ok';
-        return $response;
+        return [
+            'status' => 'ok',
+            'user_verified' => $user->verified,
+            'interview_url' => "https://omegaup.com/interview/{$contest->alias}/arena/",
+            'name_or_username' => is_null($identity->name) ?
+                                              $identity->username : $identity->name,
+            'opened_interview' => self::userOpenedProblemset($contest->problemset_id, $user->user_id),
+            'finished' => !ProblemsetsDAO::insideSubmissionWindow($contest, $user->user_id),
+        ];
     }
 
     /**
@@ -1396,7 +1395,7 @@ class UserController extends Controller {
             $contests[$contest['alias']]['data'] = $contest;
             foreach ($contest as $key => $item) {
                 if ($key == 'start_time' || $key == 'finish_time' || $key == 'last_updated') {
-                    $contests[$contest['alias']][$key] = strtotime($item);
+                    $contests[$contest['alias']][$key] = DAO::fromMySQLTimestamp($item);
                 }
             }
         }
@@ -1679,7 +1678,6 @@ class UserController extends Controller {
             'username',
             'scholar_degree',
             'school_id',
-            'preferred_language',
             'graduation_date' => ['transform' => function ($value) {
                 return gmdate('Y-m-d', $value);
             }],
