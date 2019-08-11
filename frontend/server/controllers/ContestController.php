@@ -448,7 +448,6 @@ class ContestController extends Controller {
      */
     public static function validateDetails(Request $r) : Array {
         [$contest, $problemset] = self::validateBasicDetails($r['contest_alias']);
-        $contest->toUnixTime();
 
         $contestAdmin = false;
         $contestAlias = '';
@@ -578,7 +577,6 @@ class ContestController extends Controller {
         $r->ensureBool('share_user_information', false);
         DAO::transBegin();
         try {
-            $response['contest']->toUnixTime();
             ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r->identity,
                 $response['contest'],
@@ -727,12 +725,10 @@ class ContestController extends Controller {
             // Adding timer info separately as it depends on the current user and we don't
             // want this to get generally cached for everybody
             // Save the time of the first access
-            $response['contest']->toUnixTime();
             $problemsetUser = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r->identity,
                 $response['contest']
             );
-            $problemsetUser->toUnixTime();
 
             // Add time left to response
             if ($response['contest']->window_length === null) {
@@ -841,7 +837,6 @@ class ContestController extends Controller {
             $r['contest_alias'],
             $r->identity
         );
-        $originalContest->toUnixTime();
 
         $length = $originalContest->finish_time - $originalContest->start_time;
 
@@ -915,7 +910,6 @@ class ContestController extends Controller {
         if (is_null($originalContest)) {
             throw new NotFoundException('contestNotFound');
         }
-        $originalContest->toUnixTime();
 
         if ($originalContest->finish_time > Time::get()) {
             throw new ForbiddenAccessException('originalContestHasNotEnded');

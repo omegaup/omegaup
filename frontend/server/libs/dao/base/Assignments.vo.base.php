@@ -88,17 +88,6 @@ class Assignments extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['start_time', 'finish_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       *  [Campo no documentado]
       * Llave Primaria
       * Auto Incremento

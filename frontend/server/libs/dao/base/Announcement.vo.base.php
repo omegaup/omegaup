@@ -52,17 +52,6 @@ class Announcement extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       * Identificador del aviso
       * Llave Primaria
       * Auto Incremento

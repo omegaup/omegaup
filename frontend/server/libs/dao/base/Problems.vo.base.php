@@ -120,17 +120,6 @@ class Problems extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['creation_date']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       *  [Campo no documentado]
       * Llave Primaria
       * Auto Incremento

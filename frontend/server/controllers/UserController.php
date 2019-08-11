@@ -1334,7 +1334,6 @@ class UserController extends Controller {
         if (is_null($contest)) {
             throw new NotFoundException('interviewNotFound');
         }
-        $contest->toUnixTime();
 
         // Only admins can view interview details
         if (!Authorization::isContestAdmin($r->identity->identity_id, $contest)) {

@@ -50,17 +50,6 @@ class {{ table.class_name }} extends VO {
         }
 {%- endfor %}
     }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime([{{ table.columns|selectattr('type', 'in', [('timestamp',), ('datetime',)])|map(attribute='name')|listformat("'{}'")|join(', ') }}]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
 {%- for column in table.columns %}
 
     /**

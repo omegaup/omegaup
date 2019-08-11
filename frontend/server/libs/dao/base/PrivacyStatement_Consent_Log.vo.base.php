@@ -52,17 +52,6 @@ class PrivacyStatementConsentLog extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['timestamp']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       * Id del consentimiento de privacidad almacenado en el log
       * Llave Primaria
       * Auto Incremento

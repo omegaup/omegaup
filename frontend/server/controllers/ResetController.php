@@ -136,7 +136,6 @@ class ResetController extends Controller {
         if (is_null($user)) {
             throw new InvalidParameterException('invalidUser');
         }
-        $user->toUnixTime();
 
         if (!$user->verified) {
             throw new InvalidParameterException('unverifiedUser');
@@ -164,7 +163,6 @@ class ResetController extends Controller {
             || is_null($password_confirmation)) {
             throw new InvalidParameterException('invalidParameters');
         }
-        $user->toUnixtime();
 
         if ($user->reset_digest !== hash('sha1', $reset_token)) {
             throw new InvalidParameterException('invalidResetToken');

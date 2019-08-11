@@ -147,7 +147,6 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
 
         if (!is_null($contest)) {
-            $contest->toUnixTime();
             $this->assertEquals(
                 (Time::get() - $contest->start_time) / 60,
                 $run->penalty,
