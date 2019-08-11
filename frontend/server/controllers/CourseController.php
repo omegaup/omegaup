@@ -155,6 +155,7 @@ class CourseController extends Controller {
         );
 
         $r->ensureBool('public', false /*isRequired*/);
+        $r->ensureInt('school_id', null, null, false /*isRequired*/);
 
         if (is_null($r['school_id'])) {
             $school = null;
