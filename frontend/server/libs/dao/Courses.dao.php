@@ -64,8 +64,8 @@ class CoursesDAO extends CoursesDAOBase {
         foreach ($rs as $row) {
             unset($row['assignment_id']);
             unset($row['course_id']);
-            $row['start_time'] =  strtotime($row['start_time']);
-            $row['finish_time'] = strtotime($row['finish_time']);
+            $row['start_time'] =  DAO::fromMySQLTimestamp($row['start_time']);
+            $row['finish_time'] = DAO::fromMySQLTimestamp($row['finish_time']);
             array_push($ar, $row);
         }
 

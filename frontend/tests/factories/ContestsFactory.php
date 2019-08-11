@@ -320,10 +320,13 @@ class ContestsFactory {
         ContestController::apiAddGroupAdmin($r);
     }
 
-    public static function forcePublic($contestData, $last_updated = null) {
+    public static function forcePublic(
+        array $contestData,
+        ?int $lastUpdated = null
+    ) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->admission_mode = 'public';
-        $contest->last_updated = gmdate('Y-m-d H:i:s', $last_updated);
+        $contest->last_updated = $lastUpdated;
         ContestsDAO::update($contest);
     }
 

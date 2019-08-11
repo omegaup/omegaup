@@ -37,8 +37,10 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         // Build SQL statement
         $sql = '
             SELECT
-                a.name, a.alias AS assignment_alias,a.description, a.start_time,
-                a.finish_time, a.assignment_type, p.alias AS problem_alias,
+                a.name, a.alias AS assignment_alias,a.description,
+                UNIX_TIMESTAMP(a.start_time) AS start_time,
+                UNIX_TIMESTAMP(a.finish_time) AS finish_time,
+                a.assignment_type, p.alias AS problem_alias,
                 a.publish_time_delay, p.problem_id
             FROM
                 Problems p

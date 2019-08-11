@@ -43,7 +43,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         }
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
-            $problemsetIdentity->access_time = gmdate('Y-m-d H:i:s', $currentTime);
+            $problemsetIdentity->access_time = $currentTime;
             $finishTime = $container->finish_time;
             if (!empty($container->window_length)) {
                 $finishTime = min(
@@ -51,7 +51,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     $finishTime
                 );
             }
-            $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $finishTime);
+            $problemsetIdentity->end_time = $finishTime;
             $problemsetIdentity->share_user_information = $shareUserInformation;
             ProblemsetIdentitiesDAO::replace($problemsetIdentity);
         }

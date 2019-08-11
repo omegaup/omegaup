@@ -1011,8 +1011,12 @@ class ProblemController extends Controller {
             if (!Authorization::isAdmin($r->identity, $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
+                    $problemset['contest']->toUnixTime();
                     if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
-                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset['problemset']->problemset_id))) {
+                        if (is_null(ProblemsetIdentitiesDAO::getByPK(
+                            $r->identity->identity_id,
+                            $problemset['problemset']->problemset_id
+                        ))) {
                             throw new ForbiddenAccessException();
                         }
                     }
@@ -1024,8 +1028,7 @@ class ProblemController extends Controller {
                     if (!Authorization::canSubmitToProblemset(
                         $r->identity,
                         $problemset['problemset']
-                    )
-                    ) {
+                    )) {
                         throw new ForbiddenAccessException();
                     }
                     // TODO: Check start times.
@@ -1424,7 +1427,7 @@ class ProblemController extends Controller {
                 'name' => is_null($problemsetter->name) ?
                           $problemsetter->username :
                           $problemsetter->name,
-                'creation_date' => strtotime($response['creation_date']),
+                'creation_date' => DAO::fromMySQLTimestamp($response['creation_date']),
             ];
         } else {
             unset($response['source']);
@@ -1478,7 +1481,7 @@ class ProblemController extends Controller {
                 ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
                     'problem_id' => $problem->problem_id,
-                    'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
+                    'open_time' => Time::get(),
                     'identity_id' => $r->identity->identity_id
                 ]));
             }
