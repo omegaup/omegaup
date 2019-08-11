@@ -111,7 +111,6 @@ class CourseController extends Controller {
         // in case of update, parameters can be optional.
         $originalCourse = self::validateCourseExists($courseAlias);
 
-        $originalCourse->toUnixTime();
         if (is_null($r['start_time'])) {
             $r['start_time'] = $originalCourse->start_time;
         }
@@ -224,7 +223,6 @@ class CourseController extends Controller {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateClone($r);
         $originalCourse = self::validateCourseExists($r['course_alias']);
-        $originalCourse->toUnixTime();
 
         $offset = round($r['start_time']) - $originalCourse->start_time;
 
@@ -858,7 +856,6 @@ class CourseController extends Controller {
      * @return array
      */
     private static function convertCourseToArray(Courses $course) : array {
-        $course->toUnixTime();
         $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
         $arr = $course->asFilteredArray($relevant_columns);
 
@@ -982,7 +979,6 @@ class CourseController extends Controller {
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $r['assignment']->toUnixTime();
 
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
         $letter = 0;
@@ -1627,9 +1623,7 @@ class CourseController extends Controller {
         $courseAdmin = false;
 
         $course = self::validateCourseExists($courseAlias);
-        $course->toUnixTime();
         $assignment = self::validateCourseAssignmentAlias($course, $assignmentAlias);
-        $assignment->toUnixTime();
 
         $assignmentProblemset = AssignmentsDAO::getByIdWithScoreboardUrls($assignment->assignment_id);
         if (is_null($assignmentProblemset)) {
@@ -1669,12 +1663,10 @@ class CourseController extends Controller {
         if (is_null($course)) {
             throw new NotFoundException('courseNotFound');
         }
-        $course->toUnixTime();
         $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         if (is_null($assignment)) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $assignment->toUnixTime();
 
         // Admins are almighty, no need to check anything else.
         if (Authorization::isCourseAdmin($identity, $course)) {

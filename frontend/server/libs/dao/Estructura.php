@@ -110,10 +110,4 @@ abstract class VO {
         }
         return $returnArray;
     }
-
-    protected function toUnixTime(iterable $fieldNames) : void {
-        foreach ($fieldNames as $fieldName) {
-            $this->$fieldName = DAO::fromMySQLTimestamp($this->$fieldName);
-        }
-    }
 }

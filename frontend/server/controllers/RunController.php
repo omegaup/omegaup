@@ -151,7 +151,6 @@ class RunController extends Controller {
         }
 
         // No one should submit after the deadline. Not even admins.
-        $r['container']->toUnixTime();
         if (ProblemsetsDAO::isLateSubmission($r['container'])) {
             throw new NotAllowedToSubmitException('runNotInsideContest');
         }
@@ -217,7 +216,6 @@ class RunController extends Controller {
             $start = null;
             $problemsetId = (int)$r['problemset']->problemset_id;
             if (isset($r['contest'])) {
-                $r['contest']->toUnixTime();
                 $penalty_type = $r['contest']->penalty_type;
 
                 switch ($penalty_type) {
@@ -242,7 +240,6 @@ class RunController extends Controller {
                             //what should be done here?
                             throw new NotAllowedToSubmitException('runEvenOpened');
                         }
-                        $opened->toUnixTime();
 
                         $start = $opened->open_time;
                         break;
@@ -349,10 +346,8 @@ class RunController extends Controller {
             if (!is_null($problemsetIdentity) && !is_null(
                 $problemsetIdentity->end_time
             )) {
-                $problemsetIdentity->toUnixTime();
                 $response['submission_deadline'] = $problemsetIdentity->end_time;
             } elseif (isset($r['container']->finish_time)) {
-                $r['container']->toUnixTime();
                 $response['submission_deadline'] = $r['container']->finish_time;
             }
         }
@@ -410,7 +405,6 @@ class RunController extends Controller {
         }
 
         // Fill response
-        $r['submission']->toUnixTime();
         $filtered = (
             $r['submission']->asFilteredArray([
                 'guid', 'language', 'time', 'submit_delay',

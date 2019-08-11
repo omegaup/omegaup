@@ -60,7 +60,6 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             $identity_id,
             $container->problemset_id
         );
-        $problemsetIdentity->toUnixTime();
 
         return Time::get() <= $problemsetIdentity->access_time + $container->window_length * 60;
     }

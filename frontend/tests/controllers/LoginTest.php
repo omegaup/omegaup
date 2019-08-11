@@ -205,7 +205,6 @@ class LoginTest extends OmegaupTestCase {
 
         // Expire token manually
         $authToken = AuthTokensDAO::getByPK($login->auth_token);
-        $authToken->toUnixTime();
         $authToken->create_time -= 9 * 3600;  // 9 hours
         AuthTokensDAO::update($authToken);
 

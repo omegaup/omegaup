@@ -60,17 +60,6 @@ class ProblemsetIdentityRequest extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['request_time', 'last_update']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       * Identidad del usuario
       * Llave Primaria
       * @access public

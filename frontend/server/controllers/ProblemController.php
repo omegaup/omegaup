@@ -1011,7 +1011,6 @@ class ProblemController extends Controller {
             if (!Authorization::isAdmin($r->identity, $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
-                    $problemset['contest']->toUnixTime();
                     if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
                         if (is_null(ProblemsetIdentitiesDAO::getByPK(
                             $r->identity->identity_id,
@@ -1461,7 +1460,6 @@ class ProblemController extends Controller {
                 $container = ProblemsetsDAO::getProblemsetContainer(
                     $problemset->problemset_id
                 );
-                $container->toUnixTime();
                 ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                     $r->identity,
                     $container,

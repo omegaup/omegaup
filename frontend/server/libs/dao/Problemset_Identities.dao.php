@@ -55,7 +55,6 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemsetIdentity->share_user_information = $shareUserInformation;
             ProblemsetIdentitiesDAO::replace($problemsetIdentity);
         }
-        $problemsetIdentity->toUnixTime();
         return $problemsetIdentity;
     }
 

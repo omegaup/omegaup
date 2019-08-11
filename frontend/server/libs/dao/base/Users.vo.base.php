@@ -108,17 +108,6 @@ class Users extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['reset_sent_at']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       *  [Campo no documentado]
       * Llave Primaria
       * Auto Incremento
