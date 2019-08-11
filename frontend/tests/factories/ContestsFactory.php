@@ -22,9 +22,9 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
         ContestParams::validateParameter('window_length', $this->params, false);
         ContestParams::validateParameter('languages', $this->params, false);
-        ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
-        ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
-        ContestParams::validateParameter('last_updated', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
+        ContestParams::validateParameter('start_time', $this->params, false, (Time::get() - 60 * 60));
+        ContestParams::validateParameter('finish_time', $this->params, false, (Time::get() + 60 * 60));
+        ContestParams::validateParameter('last_updated', $this->params, false, (Time::get() + 60 * 60));
         ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
     }
 

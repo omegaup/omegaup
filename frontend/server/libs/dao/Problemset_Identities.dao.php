@@ -127,7 +127,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     `Problemset_Identities`
                 SET
                     `end_time` = LEAST(
-                        ?,
+                        FROM_UNIXTIME(?),
                         DATE_ADD(`access_time`, INTERVAL ? MINUTE)
                      )
                 WHERE
@@ -150,7 +150,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
-                    `end_time` = ?
+                    `end_time` = FROM_UNIXTIME(?)
                 WHERE
                     `problemset_id` = ?;';
 

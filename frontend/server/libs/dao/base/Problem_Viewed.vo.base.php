@@ -43,7 +43,7 @@ class ProblemViewed extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['view_time'])) {
-            $this->view_time = $data['view_time'];
+            $this->view_time = DAO::fromMySQLTimestamp($data['view_time']);
         }
     }
 
@@ -77,7 +77,7 @@ class ProblemViewed extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $view_time = null;
+    public $view_time = null;  // CURRENT_TIMESTAMP
 }

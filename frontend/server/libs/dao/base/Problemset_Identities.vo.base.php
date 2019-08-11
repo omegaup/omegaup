@@ -49,10 +49,10 @@ class ProblemsetIdentities extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['access_time'])) {
-            $this->access_time = $data['access_time'];
+            $this->access_time = DAO::fromMySQLTimestamp($data['access_time']);
         }
         if (isset($data['end_time'])) {
-            $this->end_time = $data['end_time'];
+            $this->end_time = DAO::fromMySQLTimestamp($data['end_time']);
         }
         if (isset($data['score'])) {
             $this->score = (int)$data['score'];

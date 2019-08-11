@@ -46,7 +46,7 @@ class GroupsScoreboards extends VO {
             $this->group_id = (int)$data['group_id'];
         }
         if (isset($data['create_time'])) {
-            $this->create_time = $data['create_time'];
+            $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
         }
         if (isset($data['alias'])) {
             $this->alias = $data['alias'];
@@ -89,9 +89,9 @@ class GroupsScoreboards extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $create_time = null;
+    public $create_time = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]

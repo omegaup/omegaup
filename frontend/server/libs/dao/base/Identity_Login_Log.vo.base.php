@@ -43,7 +43,7 @@ class IdentityLoginLog extends VO {
             $this->ip = (int)$data['ip'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
     }
 
@@ -75,7 +75,7 @@ class IdentityLoginLog extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 }

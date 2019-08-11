@@ -140,7 +140,7 @@ abstract class ClarificationsDAOBase {
      */
     final public static function create(Clarifications $Clarifications) : int {
         if (is_null($Clarifications->time)) {
-            $Clarifications->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Clarifications->time = Time::get();
         }
         if (is_null($Clarifications->public)) {
             $Clarifications->public = false;

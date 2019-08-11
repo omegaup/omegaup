@@ -144,10 +144,10 @@ abstract class AssignmentsDAOBase {
      */
     final public static function create(Assignments $Assignments) : int {
         if (is_null($Assignments->start_time)) {
-            $Assignments->start_time = '2000-01-01 06:00:00';
+            $Assignments->start_time = 946706400; // 2000-01-01 06:00:00
         }
         if (is_null($Assignments->finish_time)) {
-            $Assignments->finish_time = '2000-01-01 06:00:00';
+            $Assignments->finish_time = 946706400; // 2000-01-01 06:00:00
         }
         if (is_null($Assignments->max_points)) {
             $Assignments->max_points = 0.00;

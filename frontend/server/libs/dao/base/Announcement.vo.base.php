@@ -44,7 +44,7 @@ class Announcement extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
         if (isset($data['description'])) {
             $this->description = $data['description'];
@@ -81,9 +81,9 @@ class Announcement extends VO {
     /**
       * Fecha de creacion de este aviso
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 
     /**
       * Mensaje de texto del aviso

@@ -37,7 +37,7 @@ abstract class ProblemViewedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Problem_Viewed->view_time)) {
-            $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problem_Viewed->view_time = Time::get();
         }
         $sql = 'REPLACE INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
@@ -166,7 +166,7 @@ abstract class ProblemViewedDAOBase {
      */
     final public static function create(ProblemViewed $Problem_Viewed) : int {
         if (is_null($Problem_Viewed->view_time)) {
-            $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problem_Viewed->view_time = Time::get();
         }
         $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [

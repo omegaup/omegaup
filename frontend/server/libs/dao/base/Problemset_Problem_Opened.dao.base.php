@@ -37,7 +37,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problemset_Problem_Opened->open_time = Time::get();
         }
         $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
@@ -168,7 +168,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
      */
     final public static function create(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problemset_Problem_Opened->open_time = Time::get();
         }
         $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [

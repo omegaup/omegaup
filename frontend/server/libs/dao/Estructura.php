@@ -65,6 +65,9 @@ final class DAO {
         if (is_int($timestamp)) {
             return $timestamp;
         }
+        if (is_float($timestamp)) {
+            return intval($timestamp);
+        }
         return strtotime($timestamp);
     }
 }

@@ -65,7 +65,7 @@ class Submissions extends VO {
             $this->language = $data['language'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
         if (isset($data['submit_delay'])) {
             $this->submit_delay = (int)$data['submit_delay'];
@@ -140,9 +140,9 @@ class Submissions extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]

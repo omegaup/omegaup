@@ -74,15 +74,15 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals(0, count($response['runs']));
 
         // Verify that problem was marked as Opened
-        $problem_opened = ProblemsetProblemOpenedDAO::getByPK(
+        $problemOpened = ProblemsetProblemOpenedDAO::getByPK(
             $contestDAO->problemset_id,
             $problemDAO->problem_id,
             $contestantDAO->main_identity_id
         );
-        $this->assertNotNull($problem_opened);
+        $this->assertNotNull($problemOpened);
 
         // Verify open time
-        $this->assertEquals(Utils::GetPhpUnixTimestamp(), Utils::GetPhpUnixTimestamp($problem_opened->open_time));
+        $this->assertEquals(Time::get(), $problemOpened->open_time);
     }
 
     /**

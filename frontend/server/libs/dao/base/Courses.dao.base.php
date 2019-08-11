@@ -144,10 +144,10 @@ abstract class CoursesDAOBase {
      */
     final public static function create(Courses $Courses) : int {
         if (is_null($Courses->start_time)) {
-            $Courses->start_time = '2000-01-01 06:00:00';
+            $Courses->start_time = 946706400; // 2000-01-01 06:00:00
         }
         if (is_null($Courses->finish_time)) {
-            $Courses->finish_time = '2000-01-01 06:00:00';
+            $Courses->finish_time = 946706400; // 2000-01-01 06:00:00
         }
         if (is_null($Courses->public)) {
             $Courses->public = false;

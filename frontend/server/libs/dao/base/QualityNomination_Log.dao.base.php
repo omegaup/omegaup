@@ -138,7 +138,7 @@ abstract class QualityNominationLogDAOBase {
      */
     final public static function create(QualityNominationLog $QualityNomination_Log) : int {
         if (is_null($QualityNomination_Log->time)) {
-            $QualityNomination_Log->time = gmdate('Y-m-d H:i:s', Time::get());
+            $QualityNomination_Log->time = Time::get();
         }
         if (is_null($QualityNomination_Log->from_status)) {
             $QualityNomination_Log->from_status = 'open';

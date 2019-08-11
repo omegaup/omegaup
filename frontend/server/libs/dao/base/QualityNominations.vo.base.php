@@ -56,7 +56,7 @@ class QualityNominations extends VO {
             $this->contents = $data['contents'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
         if (isset($data['status'])) {
             $this->status = $data['status'];
@@ -114,9 +114,9 @@ class QualityNominations extends VO {
     /**
       * Fecha de creacion de esta nominación
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 
     /**
       * El estado de la nominación

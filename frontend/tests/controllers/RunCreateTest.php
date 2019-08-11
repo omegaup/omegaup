@@ -139,7 +139,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Validate next submission timestamp
         $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
-        $this->assertEquals(Utils::GetPhpUnixTimestamp() + $submission_gap, $response['nextSubmissionTimestamp']);
+        $this->assertEquals(Time::get() + $submission_gap, $response['nextSubmissionTimestamp']);
 
         $log = SubmissionLogDAO::getByPK($submission->submission_id);
 
@@ -149,7 +149,7 @@ class RunCreateTest extends OmegaupTestCase {
         if (!is_null($contest)) {
             $contest->toUnixTime();
             $this->assertEquals(
-                (Utils::GetPhpUnixTimestamp() - $contest->start_time) / 60,
+                (Time::get() - $contest->start_time) / 60,
                 $run->penalty,
                 '',
                 0.5
@@ -415,7 +415,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Manually set the contest start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 10);
+        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Time::get() + 10);
         ContestsDAO::update($contest);
 
         // Call API
@@ -739,8 +739,8 @@ class RunCreateTest extends OmegaupTestCase {
             'alias' => $this->courseData['request']['course']->alias,
             'course_alias' => $this->courseData['request']['course']->alias,
             'description' => $this->courseData['request']['course']->description,
-            'start_time' => Utils::GetPhpUnixTimestamp() - 10,
-            'finish_time' => Utils::GetPhpUnixTimestamp() - 1,
+            'start_time' => Time::get() - 10,
+            'finish_time' => Time::get() - 1,
         ]));
         // Creating a submission in the future
         Time::setTimeForTesting(Time::get() + 60 * 60);
