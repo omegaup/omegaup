@@ -91,7 +91,7 @@ export default class ProblemStatementEdit extends Vue {
   T = T;
   UI = UI;
   commitMessage = '';
-  currentLanguage = 'es';
+  currentLanguage = this.initialLanguage;
   currentMarkdown = this.markdownContents;
   languages = ['es', 'en', 'pt'];
   solutions: omegaup.Solutions = {};
@@ -122,7 +122,8 @@ export default class ProblemStatementEdit extends Vue {
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
-    this.solutions[oldLanguage] = this.currentMarkdown;
+    if (!!oldLanguage) this.solutions[oldLanguage] = this.currentMarkdown;
+
     this.$emit(
       'update-markdown-contents',
       this.solutions,
@@ -139,7 +140,6 @@ export default class ProblemStatementEdit extends Vue {
       this.commitMessage,
       this.currentLanguage,
     );
-    this.solutions = {};
   }
 }
 

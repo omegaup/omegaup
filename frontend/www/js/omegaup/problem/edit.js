@@ -383,16 +383,11 @@ OmegaUp.on('ready', function() {
                     .fail(UI.apiError);
               }));
             }
-            solutionEdit.solutions = {};
             Promise.all(promises)
                 .then(function() {
                   UI.success(T.problemEditUpdatedSuccessfully);
-                  solutionEdit.getInitialContents(currentLanguage);
                 })
-                .catch(function(error) {
-                  UI.apiError(error);
-                  solutionEdit.getInitialContents(currentLanguage);
-                });
+                .catch(function(error) { UI.apiError(error); });
           },
         },
       });
@@ -416,23 +411,14 @@ OmegaUp.on('ready', function() {
         this.markdownPreview =
             this.markdownEditor.getConverter().makeHtml(markdown);
       },
-      getInitialContents(language = null) {
+      getInitialContents() {
         let self = this;
-        self.updateAndRefresh('');
-
-        let request = {
-          'problem_alias': problemAlias,
-        };
-        if (language) request['lang'] = language;
-
-        API.Problem.solution(request)
+        API.Problem.solution({
+                     'problem_alias': problemAlias,
+                   })
             .then(function(response) {
               if (!response.exists || !response.solution) {
                 return;
-              }
-              if (language && response.solution.language !== language) {
-                response.solution.markdown = '';
-                response.solution.language = language;
               }
               const lang = response.solution.language;
               self.initialLanguage = lang;
