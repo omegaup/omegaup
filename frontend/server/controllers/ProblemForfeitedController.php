@@ -15,7 +15,6 @@ class ProblemForfeitedController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiGetCounts(Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);

@@ -37,14 +37,14 @@ abstract class ProblemsetProblemOpenedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problemset_Problem_Opened->open_time = Time::get();
         }
         $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
             (int)$Problemset_Problem_Opened->problemset_id,
             (int)$Problemset_Problem_Opened->problem_id,
             (int)$Problemset_Problem_Opened->identity_id,
-            $Problemset_Problem_Opened->open_time,
+            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -61,7 +61,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
     final public static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
-            $Problemset_Problem_Opened->open_time,
+            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
             (int)$Problemset_Problem_Opened->problemset_id,
             (int)$Problemset_Problem_Opened->problem_id,
             (int)$Problemset_Problem_Opened->identity_id,
@@ -168,14 +168,14 @@ abstract class ProblemsetProblemOpenedDAOBase {
      */
     final public static function create(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problemset_Problem_Opened->open_time = Time::get();
         }
         $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
             (int)$Problemset_Problem_Opened->problemset_id,
             (int)$Problemset_Problem_Opened->problem_id,
             (int)$Problemset_Problem_Opened->identity_id,
-            $Problemset_Problem_Opened->open_time,
+            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

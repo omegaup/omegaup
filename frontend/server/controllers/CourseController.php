@@ -19,16 +19,10 @@ class CourseController extends Controller {
      * @param Courses $course
      * @param string $assignmentAlias
      * @return Assignments
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     private static function validateCourseAssignmentAlias(Courses $course, string $assignmentAlias) : Assignments {
-        try {
-            $assignment = CoursesDAO::getAssignmentByAlias($course, $assignmentAlias);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $assignment = CoursesDAO::getAssignmentByAlias($course, $assignmentAlias);
         if (is_null($assignment)) {
             throw new NotFoundException('assignmentNotFound');
         }
@@ -45,8 +39,8 @@ class CourseController extends Controller {
      */
     private static function validateCreateAssignment(Request $r, Courses $course) : void {
         $isRequired = true;
-        $courseStartTime = strtotime($course->start_time);
-        $courseFinishTime = strtotime($course->finish_time);
+        $courseStartTime = DAO::fromMySQLTimestamp($course->start_time);
+        $courseFinishTime = DAO::fromMySQLTimestamp($course->finish_time);
 
         Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
         Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
@@ -117,7 +111,6 @@ class CourseController extends Controller {
         // in case of update, parameters can be optional.
         $originalCourse = self::validateCourseExists($courseAlias);
 
-        $originalCourse->toUnixTime();
         if (is_null($r['start_time'])) {
             $r['start_time'] = $originalCourse->start_time;
         }
@@ -161,6 +154,7 @@ class CourseController extends Controller {
         );
 
         $r->ensureBool('public', false /*isRequired*/);
+        $r->ensureInt('school_id', null, null, false /*isRequired*/);
 
         if (is_null($r['school_id'])) {
             $school = null;
@@ -184,17 +178,11 @@ class CourseController extends Controller {
      * course. Throws if not found.
      * @param string $courseAlias
      * @return Courses
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     private static function validateCourseExists(string $courseAlias) : Courses {
         Validators::validateStringNonEmpty($courseAlias, 'course_alias', true /*is_required*/);
-        try {
-            $course = CoursesDAO::getByAlias($courseAlias);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $course = CoursesDAO::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new NotFoundException('courseNotFound');
         }
@@ -206,7 +194,6 @@ class CourseController extends Controller {
      * @param Courses $course
      * @param Groups $group
      * @return Groups
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     private static function resolveGroup(Courses $course, ?Groups $group) : Groups {
@@ -214,11 +201,7 @@ class CourseController extends Controller {
             return $group;
         }
 
-        try {
-            $group = GroupsDAO::getByPK($course->group_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $group = GroupsDAO::getByPK($course->group_id);
         if (is_null($group)) {
             throw new NotFoundException();
         }
@@ -231,7 +214,6 @@ class CourseController extends Controller {
      * @return array
      * @throws InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiClone(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -242,7 +224,7 @@ class CourseController extends Controller {
         self::validateClone($r);
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
-        $offset = round($r['start_time']) - strtotime($originalCourse->start_time);
+        $offset = round($r['start_time']) - $originalCourse->start_time;
 
         DAO::transBegin();
 
@@ -253,8 +235,8 @@ class CourseController extends Controller {
                 'description' => $originalCourse->description,
                 'alias' => $r['alias'],
                 'school_id' => $originalCourse->school_id,
-                'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-                'finish_time' => gmdate('Y-m-d H:i:s', strtotime($originalCourse->finish_time) + $offset),
+                'start_time' => $r['start_time'],
+                'finish_time' => $originalCourse->finish_time + $offset,
                 'public' => 0,
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
@@ -273,8 +255,8 @@ class CourseController extends Controller {
                     'alias' => $assignmentProblems['assignment_alias'],
                     'publish_time_delay' => $assignmentProblems['publish_time_delay'],
                     'assignment_type' => $assignmentProblems['assignment_type'],
-                    'start_time' => gmdate('Y-m-d H:i:s', strtotime($assignmentProblems['start_time']) + $offset),
-                    'finish_time' => gmdate('Y-m-d H:i:s', strtotime($assignmentProblems['finish_time']) + $offset),
+                    'start_time' => $assignmentProblems['start_time'] + $offset,
+                    'finish_time' => $assignmentProblems['finish_time'] + $offset,
                 ]));
 
                 foreach ($assignmentProblems['problems'] as $problem) {
@@ -291,12 +273,9 @@ class CourseController extends Controller {
                 }
             }
             DAO::transEnd();
-        } catch (ApiException $e) {
-            DAO::transRollback();
-            throw $e;
         } catch (Exception $e) {
             DAO::transRollback();
-            throw new InvalidDatabaseOperationException($e);
+            throw $e;
         }
 
         return ['status' => 'ok', 'alias' => $r['alias']];
@@ -305,7 +284,6 @@ class CourseController extends Controller {
     /**
      * Create new course API
      *
-     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
@@ -322,8 +300,8 @@ class CourseController extends Controller {
             'description' => $r['description'],
             'alias' => $r['alias'],
             'school_id' => $r['school_id'],
-            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+            'start_time' => $r['start_time'],
+            'finish_time' => $r['finish_time'],
             'public' => $r['public'] ?: false,
             'show_scoreboard' => $r['show_scoreboard'],
             'needs_basic_information' => $r['needs_basic_information'],
@@ -375,14 +353,11 @@ class CourseController extends Controller {
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
-
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
-
         return $course;
     }
 
@@ -393,7 +368,6 @@ class CourseController extends Controller {
      * @param Assignment $assignment
      * @return Problemsets
      * @throws DuplicatedEntryInDatabaseException
-     * @throws InvalidDatabaseOperationException
      */
     private static function createAssignment(
         Courses $course,
@@ -423,9 +397,8 @@ class CourseController extends Controller {
             DAO::transRollback();
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
         return $problemset;
     }
@@ -478,7 +451,6 @@ class CourseController extends Controller {
      *
      * @param  Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiCreateAssignment(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -501,8 +473,8 @@ class CourseController extends Controller {
             'alias' => $r['alias'],
             'publish_time_delay' => $r['publish_time_delay'],
             'assignment_type' => $r['assignment_type'],
-            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+            'start_time' => $r['start_time'],
+            'finish_time' => $r['finish_time'],
         ]));
 
         return ['status' => 'ok'];
@@ -513,7 +485,6 @@ class CourseController extends Controller {
      *
      * @param  Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateAssignment(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -559,13 +530,9 @@ class CourseController extends Controller {
         if ($r['start_time'] != $assignment->start_time) {
             $runCount = 0;
 
-            try {
-                $runCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
-                    (int)$assignment->problemset_id
-                );
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
+            $runCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+                (int)$assignment->problemset_id
+            );
 
             if ($runCount > 0) {
                 throw new InvalidParameterException('courseUpdateAlreadyHasRuns');
@@ -575,21 +542,13 @@ class CourseController extends Controller {
         $valueProperties = [
             'name',
             'description',
-            'start_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
-            'finish_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
+            'start_time',
+            'finish_time',
             'assignment_type',
         ];
         self::updateValueProperties($r, $assignment, $valueProperties);
 
-        try {
-            AssignmentsDAO::update($assignment);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        AssignmentsDAO::update($assignment);
 
         return ['status' => 'ok'];
     }
@@ -599,7 +558,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiAddProblem(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -636,14 +594,10 @@ class CourseController extends Controller {
             $r['commit']
         );
 
-        try {
-            CoursesDAO::updateAssignmentMaxPoints(
-                $course,
-                $r['assignment_alias']
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        CoursesDAO::updateAssignmentMaxPoints(
+            $course,
+            $r['assignment_alias']
+        );
 
         return ['status' => 'ok'];
     }
@@ -652,7 +606,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateProblemsOrder(Request $r) {
         global $experiments;
@@ -702,7 +655,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdateAssignmentsOrder(Request $r) {
         global $experiments;
@@ -765,7 +717,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiRemoveProblem(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -811,14 +762,10 @@ class CourseController extends Controller {
         }
         ProblemsetProblemsDAO::delete($problemsetProblem);
 
-        try {
-            CoursesDAO::updateAssignmentMaxPoints(
-                $course,
-                $r['assignment_alias']
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        CoursesDAO::updateAssignmentMaxPoints(
+            $course,
+            $r['assignment_alias']
+        );
 
         return ['status' => 'ok'];
     }
@@ -827,7 +774,6 @@ class CourseController extends Controller {
      * List course assignments
      *
      * @throws InvalidParameterException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiListAssignments(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -847,13 +793,9 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        try {
-            $assignments = AssignmentsDAO::getSortedCourseAssignments(
-                $course->course_id
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $assignments = AssignmentsDAO::getSortedCourseAssignments(
+            $course->course_id
+        );
 
         $response = [
             'status' => 'ok',
@@ -861,13 +803,9 @@ class CourseController extends Controller {
         ];
         $time = Time::get();
         foreach ($assignments as $assignment) {
-            try {
-                $assignment['has_runs'] = SubmissionsDAO::countTotalSubmissionsOfProblemset(
-                    (int)$assignment['problemset_id']
-                ) > 0;
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
+            $assignment['has_runs'] = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+                (int)$assignment['problemset_id']
+            ) > 0;
             unset($assignment['problemset_id']);
             if ($assignment['start_time'] > $time &&
                 !Authorization::isCourseAdmin($r->identity, $course)
@@ -887,7 +825,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiRemoveAssignment(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -919,7 +856,6 @@ class CourseController extends Controller {
      * @return array
      */
     private static function convertCourseToArray(Courses $course) : array {
-        $course->toUnixTime();
         $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
         $arr = $course->asFilteredArray($relevant_columns);
 
@@ -936,7 +872,6 @@ class CourseController extends Controller {
      * for in which the user is a student.
      *
      * @throws InvalidParameterException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiListCourses(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -954,32 +889,23 @@ class CourseController extends Controller {
         // TODO(pablo): Cache
         // Courses the user is an admin for.
         $admin_courses = [];
-        try {
-            if (Authorization::isSystemAdmin($r->identity)) {
-                $admin_courses = CoursesDAO::getAll(
-                    $page,
-                    $pageSize,
-                    'course_id',
-                    'DESC'
-                );
-            } else {
-                $admin_courses = CoursesDAO::getAllCoursesAdminedByIdentity(
-                    $r->identity->identity_id,
-                    $page,
-                    $pageSize
-                );
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        if (Authorization::isSystemAdmin($r->identity)) {
+            $admin_courses = CoursesDAO::getAll(
+                $page,
+                $pageSize,
+                'course_id',
+                'DESC'
+            );
+        } else {
+            $admin_courses = CoursesDAO::getAllCoursesAdminedByIdentity(
+                $r->identity->identity_id,
+                $page,
+                $pageSize
+            );
         }
 
         // Courses the user is a student in.
-        $student_courses = [];
-        try {
-            $student_courses = CoursesDAO::getCoursesForStudent($r->identity->identity_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $student_courses = CoursesDAO::getCoursesForStudent($r->identity->identity_id);
 
         $response = [
             'admin' => [],
@@ -1013,15 +939,10 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $students = null;
-        try {
-            $students = CoursesDAO::getStudentsInCourseWithProgressPerAssignment(
-                $course->course_id,
-                $course->group_id
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $students = CoursesDAO::getStudentsInCourseWithProgressPerAssignment(
+            $course->course_id,
+            $course->group_id
+        );
 
         return [
             'students' => $students,
@@ -1058,7 +979,6 @@ class CourseController extends Controller {
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $r['assignment']->toUnixTime();
 
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
         $letter = 0;
@@ -1112,16 +1032,10 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException();
         }
 
-        $assignments = null;
-
-        try {
-            $assignments = CoursesDAO::getAssignmentsProgress(
-                $course->course_id,
-                $r->identity->identity_id
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $assignments = CoursesDAO::getAssignmentsProgress(
+            $course->course_id,
+            $r->identity->identity_id
+        );
 
         return [
             'status' => 'ok',
@@ -1195,7 +1109,7 @@ class CourseController extends Controller {
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
-            throw new InvalidDatabaseOperationException($e);
+            throw $e;
         }
 
         return ['status' => 'ok'];
@@ -1228,14 +1142,10 @@ class CourseController extends Controller {
             throw new NotFoundException('courseStudentNotInCourse');
         }
 
-        try {
-            GroupsIdentitiesDAO::delete(new GroupsIdentities([
-                'group_id' => $course->group_id,
-                'identity_id' => $resolvedIdentity->identity_id,
-            ]));
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        GroupsIdentitiesDAO::delete(new GroupsIdentities([
+            'group_id' => $course->group_id,
+            'identity_id' => $resolvedIdentity->identity_id,
+        ]));
 
         return ['status' => 'ok'];
     }
@@ -1245,7 +1155,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiAdmins(Request $r) {
         // Authenticate request
@@ -1253,10 +1162,9 @@ class CourseController extends Controller {
 
         Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        try {
-            $course = CoursesDAO::getByAlias($r['course_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        $course = CoursesDAO::getByAlias($r['course_alias']);
+        if (is_null($course)) {
+            throw new NotFoundException('courseNotFound');
         }
 
         if (!Authorization::isCourseAdmin($r->identity, $course)) {
@@ -1275,7 +1183,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiAddAdmin(Request $r) {
@@ -1291,11 +1198,9 @@ class CourseController extends Controller {
 
         $resolvedUser = UserController::resolveUser($r['usernameOrEmail']);
 
-        try {
-            $course = CoursesDAO::getByAlias($r['course_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
+        $course = CoursesDAO::getByAlias($r['course_alias']);
+        if (is_null($course)) {
+            throw new NotFoundException('courseNotFound');
         }
 
         // Only director is allowed to make modifications
@@ -1313,7 +1218,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveAdmin(Request $r) {
@@ -1330,11 +1234,9 @@ class CourseController extends Controller {
         }
         $resolvedUser = UsersDAO::getByPK($resolvedIdentity->user_id);
 
-        try {
-            $course = CoursesDAO::getByAlias($r['course_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
+        $course = CoursesDAO::getByAlias($r['course_alias']);
+        if (is_null($course)) {
+            throw new NotFoundException('courseNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -1357,7 +1259,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(Request $r) {
@@ -1377,11 +1278,9 @@ class CourseController extends Controller {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        try {
-            $course = CoursesDAO::getByAlias($r['course_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
+        $course = CoursesDAO::getByAlias($r['course_alias']);
+        if (is_null($course)) {
+            throw new NotFoundException('courseNotFound');
         }
 
         // Only admins are allowed to modify course
@@ -1399,7 +1298,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(Request $r) {
@@ -1415,11 +1313,9 @@ class CourseController extends Controller {
             throw new InvalidParameterException('invalidParameters');
         }
 
-        try {
-            $course = CoursesDAO::getByAlias($r['course_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
+        $course = CoursesDAO::getByAlias($r['course_alias']);
+        if (is_null($course)) {
+            throw new NotFoundException('courseNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -1616,8 +1512,8 @@ class CourseController extends Controller {
                 'description' => $course->description,
                 'alias' => $course->alias,
                 'school_id' => $course->school_id,
-                'start_time' => strtotime($course->start_time),
-                'finish_time' => strtotime($course->finish_time),
+                'start_time' => DAO::fromMySQLTimestamp($course->start_time),
+                'finish_time' => DAO::fromMySQLTimestamp($course->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $course->public,
                 'basic_information_required' => boolval($course->needs_basic_information),
@@ -1626,11 +1522,7 @@ class CourseController extends Controller {
             ];
 
             if ($isAdmin) {
-                try {
-                    $group = GroupsDAO::getByPK($course->group_id);
-                } catch (Exception $e) {
-                    throw new InvalidDatabaseOperationException($e);
-                }
+                $group = GroupsDAO::getByPK($course->group_id);
                 if (is_null($group)) {
                     throw new NotFoundException('courseGroupNotFound');
                 }
@@ -1675,7 +1567,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiActivityReport(Request $r) {
         self::authenticateRequest($r);
@@ -1701,7 +1592,6 @@ class CourseController extends Controller {
      * @param  string $token
      * @param  Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -1733,15 +1623,9 @@ class CourseController extends Controller {
         $courseAdmin = false;
 
         $course = self::validateCourseExists($courseAlias);
-        $course->toUnixTime();
         $assignment = self::validateCourseAssignmentAlias($course, $assignmentAlias);
-        $assignment->toUnixTime();
 
-        try {
-            $assignmentProblemset = AssignmentsDAO::getByIdWithScoreboardUrls($assignment->assignment_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $assignmentProblemset = AssignmentsDAO::getByIdWithScoreboardUrls($assignment->assignment_id);
         if (is_null($assignmentProblemset)) {
             throw new NotFoundException('assignmentNotFound');
         }
@@ -1779,12 +1663,10 @@ class CourseController extends Controller {
         if (is_null($course)) {
             throw new NotFoundException('courseNotFound');
         }
-        $course->toUnixTime();
         $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         if (is_null($assignment)) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $assignment->toUnixTime();
 
         // Admins are almighty, no need to check anything else.
         if (Authorization::isCourseAdmin($identity, $course)) {
@@ -1826,13 +1708,8 @@ class CourseController extends Controller {
         }
 
         $director = null;
-        try {
-            $acl = ACLsDAO::getByPK($tokenAuthenticationResult['course']->acl_id);
-            $director = UsersDAO::getByPK($acl->owner_id)->username;
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $acl = ACLsDAO::getByPK($tokenAuthenticationResult['course']->acl_id);
+        $director = UsersDAO::getByPK($acl->owner_id)->username;
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
@@ -1862,7 +1739,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiRuns(Request $r) {
         // Authenticate request
@@ -1872,21 +1748,16 @@ class CourseController extends Controller {
         self::validateRuns($r);
 
         // Get our runs
-        try {
-            $runs = RunsDAO::getAllRuns(
-                $r['assignment']->problemset_id,
-                $r['status'],
-                $r['verdict'],
-                !is_null($r['problem']) ? $r['problem']->problem_id : null,
-                $r['language'],
-                !is_null($r['identity']) ? $r['identity']->identity_id : null,
-                $r['offset'],
-                $r['rowcount']
-            );
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $runs = RunsDAO::getAllRuns(
+            $r['assignment']->problemset_id,
+            $r['status'],
+            $r['verdict'],
+            !is_null($r['problem']) ? $r['problem']->problem_id : null,
+            $r['language'],
+            !is_null($r['identity']) ? $r['identity']->identity_id : null,
+            $r['offset'],
+            $r['rowcount']
+        );
 
         $result = [];
 
@@ -1908,7 +1779,6 @@ class CourseController extends Controller {
      * Validates runs API
      *
      * @param Request $r
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -1924,15 +1794,10 @@ class CourseController extends Controller {
 
         $course = self::validateCourseExists($r['course_alias']);
 
-        try {
-            $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
-                $r['assignment_alias'],
-                $course->course_id
-            );
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
+            $r['assignment_alias'],
+            $course->course_id
+        );
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
@@ -1950,12 +1815,7 @@ class CourseController extends Controller {
         if (!is_null($r['problem_alias'])) {
             Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
-            try {
-                $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
-            } catch (Exception $e) {
-                // Operation failed in the data layer
-                throw new InvalidDatabaseOperationException($e);
-            }
+            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
 
             if (is_null($r['problem'])) {
                 throw new NotFoundException('problemNotFound');
@@ -2017,12 +1877,8 @@ class CourseController extends Controller {
             'alias',
             'name',
             'description',
-            'start_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
-            'finish_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
+            'start_time',
+            'finish_time',
             'school_id',
             'show_scoreboard' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;
@@ -2038,11 +1894,7 @@ class CourseController extends Controller {
         self::updateValueProperties($r, $originalCourse, $valueProperties);
 
         // Push changes
-        try {
-            CoursesDAO::update($originalCourse);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        CoursesDAO::update($originalCourse);
 
         // TODO: Expire cache
 
@@ -2098,7 +1950,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     public static function apiAssignmentScoreboardEvents(Request $r) {
@@ -2128,7 +1979,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return Problems array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiListSolvedProblems(Request $r) {
         self::authenticateRequest($r);
@@ -2137,11 +1987,7 @@ class CourseController extends Controller {
         if (!Authorization::isCourseAdmin($r->identity, $course)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
-        try {
-            $solvedProblems = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $solvedProblems = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
         $userProblems = [];
         foreach ($solvedProblems as $problem) {
             $userProblems[$problem['username']][] = $problem;
@@ -2154,7 +2000,6 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return Problems array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiListUnsolvedProblems(Request $r) {
         self::authenticateRequest($r);
@@ -2164,11 +2009,7 @@ class CourseController extends Controller {
             throw new ForbiddenAccessException('userNotAllowed');
         }
 
-        try {
-            $unsolvedProblems = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $unsolvedProblems = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
         $userProblems = [];
         foreach ($unsolvedProblems as $problem) {
             $userProblems[$problem['username']][] = $problem;

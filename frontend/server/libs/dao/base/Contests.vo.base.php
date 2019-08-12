@@ -73,13 +73,13 @@ class Contests extends VO {
             $this->description = $data['description'];
         }
         if (isset($data['start_time'])) {
-            $this->start_time = $data['start_time'];
+            $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
-            $this->finish_time = $data['finish_time'];
+            $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['last_updated'])) {
-            $this->last_updated = $data['last_updated'];
+            $this->last_updated = DAO::fromMySQLTimestamp($data['last_updated']);
         }
         if (isset($data['window_length'])) {
             $this->window_length = (int)$data['window_length'];
@@ -132,17 +132,6 @@ class Contests extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['start_time', 'finish_time', 'last_updated']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       * El identificador unico para cada concurso
       * Llave Primaria
       * Auto Incremento
@@ -182,23 +171,23 @@ class Contests extends VO {
     /**
       * Hora de inicio de este concurso
       * @access public
-      * @var string
+      * @var int
      */
-    public $start_time = '2000-01-01 06:00:00';
+    public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
       * Hora de finalizacion de este concurso
       * @access public
-      * @var string
+      * @var int
      */
-    public $finish_time = '2000-01-01 06:00:00';
+    public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
       * Indica la hora en que se actualizó de privado a público un concurso o viceversa
       * @access public
-      * @var string
+      * @var int
      */
-    public $last_updated = null;
+    public $last_updated = null;  // CURRENT_TIMESTAMP
 
     /**
       * Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso

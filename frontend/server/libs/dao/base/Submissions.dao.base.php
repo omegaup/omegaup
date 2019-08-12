@@ -34,7 +34,7 @@ abstract class SubmissionsDAOBase {
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
-            $Submissions->time,
+            DAO::toMySQLTimestamp($Submissions->time),
             (int)$Submissions->submit_delay,
             $Submissions->type,
             (int)$Submissions->submission_id,
@@ -141,7 +141,7 @@ abstract class SubmissionsDAOBase {
      */
     final public static function create(Submissions $Submissions) : int {
         if (is_null($Submissions->time)) {
-            $Submissions->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Submissions->time = Time::get();
         }
         if (is_null($Submissions->submit_delay)) {
             $Submissions->submit_delay = 0;
@@ -157,7 +157,7 @@ abstract class SubmissionsDAOBase {
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
-            $Submissions->time,
+            DAO::toMySQLTimestamp($Submissions->time),
             (int)$Submissions->submit_delay,
             $Submissions->type,
         ];

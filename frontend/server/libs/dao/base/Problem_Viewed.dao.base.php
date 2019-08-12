@@ -37,13 +37,13 @@ abstract class ProblemViewedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Problem_Viewed->view_time)) {
-            $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problem_Viewed->view_time = Time::get();
         }
         $sql = 'REPLACE INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
             (int)$Problem_Viewed->problem_id,
             (int)$Problem_Viewed->identity_id,
-            $Problem_Viewed->view_time,
+            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -60,7 +60,7 @@ abstract class ProblemViewedDAOBase {
     final public static function update(ProblemViewed $Problem_Viewed) : int {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
-            $Problem_Viewed->view_time,
+            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
             (int)$Problem_Viewed->problem_id,
             (int)$Problem_Viewed->identity_id,
         ];
@@ -166,13 +166,13 @@ abstract class ProblemViewedDAOBase {
      */
     final public static function create(ProblemViewed $Problem_Viewed) : int {
         if (is_null($Problem_Viewed->view_time)) {
-            $Problem_Viewed->view_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problem_Viewed->view_time = Time::get();
         }
         $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
             (int)$Problem_Viewed->problem_id,
             (int)$Problem_Viewed->identity_id,
-            $Problem_Viewed->view_time,
+            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -29,13 +29,12 @@ class TagController extends Controller {
             throw new InvalidParameterException('parameterEmpty', 'query');
         }
 
-        try {
-            $tags = TagsDAO::FindByName($r[$param]);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $tags = TagsDAO::FindByName($r[$param]);
 
         $response = [];
+        if (empty($tags)) {
+            return $response;
+        }
         foreach ($tags as $tag) {
             $entry = ['name' => $tag->name];
             array_push($response, $entry);

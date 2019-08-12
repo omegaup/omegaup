@@ -20,10 +20,11 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('basic_information', $this->params, false, 'false');
         ContestParams::validateParameter('requests_user_information', $this->params, false, 'no');
         ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
+        ContestParams::validateParameter('window_length', $this->params, false);
         ContestParams::validateParameter('languages', $this->params, false);
-        ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
-        ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
-        ContestParams::validateParameter('last_updated', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
+        ContestParams::validateParameter('start_time', $this->params, false, (Time::get() - 60 * 60));
+        ContestParams::validateParameter('finish_time', $this->params, false, (Time::get() + 60 * 60));
+        ContestParams::validateParameter('last_updated', $this->params, false, (Time::get() + 60 * 60));
         ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
     }
 
@@ -45,20 +46,6 @@ class ContestParams implements ArrayAccess {
 
     public function offsetUnset($offset) {
         unset($this->params[$offset]);
-    }
-
-    public static function fromContest(Contests $contest) {
-        return new ContestParams([
-            'title' => $contest->title,
-            'admission_mode' => $contest->admission_mode,
-            'needs_basic_information' => $contest->needs_basic_information,
-            'contestDirector' => $contest->contestDirector,
-            'languages' => $contest->languages,
-            'start_time' => $contest->start_time,
-            'finish_time' => $contest->finish_time,
-            'last_updated' => $contest->last_updated,
-            'penalty_calc_policy' => $contest->penalty_calc_policy,
-        ]);
     }
 
     /**
@@ -110,7 +97,7 @@ class ContestsFactory {
             'start_time' => $params['start_time'],
             'finish_time' => $params['finish_time'],
             'last_updated' => $params['last_updated'],
-            'window_length' => null,
+            'window_length' => $params['window_length'],
             'admission_mode' => $params['admission_mode'],
             'alias' => substr($params['title'], 0, 20),
             'points_decay_factor' => '0.02',
@@ -333,16 +320,13 @@ class ContestsFactory {
         ContestController::apiAddGroupAdmin($r);
     }
 
-    public static function makeContestWindowLength($contestData, $windowLength = 20) {
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->window_length = $windowLength;
-        ContestsDAO::update($contest);
-    }
-
-    public static function forcePublic($contestData, $last_updated = null) {
+    public static function forcePublic(
+        array $contestData,
+        ?int $lastUpdated = null
+    ) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->admission_mode = 'public';
-        $contest->last_updated = gmdate('Y-m-d H:i:s', $last_updated);
+        $contest->last_updated = $lastUpdated;
         ContestsDAO::update($contest);
     }
 

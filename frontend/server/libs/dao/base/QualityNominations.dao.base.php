@@ -32,7 +32,7 @@ abstract class QualityNominationsDAOBase {
             (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
-            $QualityNominations->time,
+            DAO::toMySQLTimestamp($QualityNominations->time),
             $QualityNominations->status,
             (int)$QualityNominations->qualitynomination_id,
         ];
@@ -141,7 +141,7 @@ abstract class QualityNominationsDAOBase {
             $QualityNominations->nomination = 'suggestion';
         }
         if (is_null($QualityNominations->time)) {
-            $QualityNominations->time = gmdate('Y-m-d H:i:s', Time::get());
+            $QualityNominations->time = Time::get();
         }
         if (is_null($QualityNominations->status)) {
             $QualityNominations->status = 'open';
@@ -152,7 +152,7 @@ abstract class QualityNominationsDAOBase {
             (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
-            $QualityNominations->time,
+            DAO::toMySQLTimestamp($QualityNominations->time),
             $QualityNominations->status,
         ];
         global $conn;

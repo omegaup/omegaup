@@ -25,7 +25,6 @@ class BadgeController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
         return self::getAllBadges();
@@ -36,7 +35,6 @@ class BadgeController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
         self::authenticateRequest($r);
@@ -53,23 +51,16 @@ class BadgeController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUserList(Request $r) {
-        try {
-            $user = UsersDAO::FindByUsername($r['target_username']);
-            if (is_null($user)) {
-                throw new NotFoundException('userNotExist');
-            }
-            return [
-                'status' => 'ok',
-                'badges' => UsersBadgesDAO::getUserOwnedBadges($user),
-            ];
-        } catch (ApiException $e) {
-            throw $e;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        $user = UsersDAO::FindByUsername($r['target_username']);
+        if (is_null($user)) {
+            throw new NotFoundException('userNotExist');
         }
+        return [
+            'status' => 'ok',
+            'badges' => UsersBadgesDAO::getUserOwnedBadges($user),
+        ];
     }
 
     /**
@@ -78,24 +69,17 @@ class BadgeController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiMyBadgeAssignationTime(Request $r) {
         self::authenticateRequest($r);
         Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
         Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
-        try {
-            return [
-                'status' => 'ok',
-                'assignation_time' => is_null($r->user) ?
-                    null :
-                    UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $r['badge_alias']),
-            ];
-        } catch (ApiException $e) {
-            throw $e;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        return [
+            'status' => 'ok',
+            'assignation_time' => is_null($r->user) ?
+                null :
+                UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $r['badge_alias']),
+        ];
     }
 
     /**
@@ -104,24 +88,17 @@ class BadgeController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiBadgeDetails(Request $r) {
         Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
         Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
-        try {
-            $totalUsers = max(UsersDAO::getUsersCount(), 1);
-            $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($r['badge_alias']);
-            $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($r['badge_alias']);
-            return [
-                'status' => 'ok',
-                'first_assignation' => $firstAssignation,
-                'owners_percentage' => (($ownersCount / $totalUsers) * 100)
-            ];
-        } catch (ApiException $e) {
-            throw $e;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $totalUsers = max(UsersDAO::getUsersCount(), 1);
+        $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($r['badge_alias']);
+        $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($r['badge_alias']);
+        return [
+            'status' => 'ok',
+            'first_assignation' => $firstAssignation,
+            'owners_percentage' => (($ownersCount / $totalUsers) * 100)
+        ];
     }
 }

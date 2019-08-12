@@ -37,14 +37,14 @@ abstract class ProblemsetIdentityRequestDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Problemset_Identity_Request->request_time)) {
-            $Problemset_Identity_Request->request_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problemset_Identity_Request->request_time = Time::get();
         }
         $sql = 'REPLACE INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             (int)$Problemset_Identity_Request->identity_id,
             (int)$Problemset_Identity_Request->problemset_id,
-            $Problemset_Identity_Request->request_time,
-            $Problemset_Identity_Request->last_update,
+            DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
+            DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
         ];
@@ -63,8 +63,8 @@ abstract class ProblemsetIdentityRequestDAOBase {
     final public static function update(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
         $sql = 'UPDATE `Problemset_Identity_Request` SET `request_time` = ?, `last_update` = ?, `accepted` = ?, `extra_note` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
-            $Problemset_Identity_Request->request_time,
-            $Problemset_Identity_Request->last_update,
+            DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
+            DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
             (int)$Problemset_Identity_Request->identity_id,
@@ -172,14 +172,14 @@ abstract class ProblemsetIdentityRequestDAOBase {
      */
     final public static function create(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
         if (is_null($Problemset_Identity_Request->request_time)) {
-            $Problemset_Identity_Request->request_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problemset_Identity_Request->request_time = Time::get();
         }
         $sql = 'INSERT INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             (int)$Problemset_Identity_Request->identity_id,
             (int)$Problemset_Identity_Request->problemset_id,
-            $Problemset_Identity_Request->request_time,
-            $Problemset_Identity_Request->last_update,
+            DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
+            DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
         ];

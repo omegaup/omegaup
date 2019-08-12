@@ -203,8 +203,47 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
     assert len(scoreboard_events) == num_elements, len(scoreboard_events)
 
 
-def add_identities_course(driver, course_alias):
-    '''Upload and create identities into the group belongs to given course'''
+def create_group(driver, group_title, description):
+    ''' Creates a group as an admin and returns a generated group alias. '''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.ID, 'nav-contests'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//li[@id = "nav-contests"]'
+                  '//a[@href = "/group/"]')))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[@href = "/group/new/"]')))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[@name = "title"]'))).send_keys(group_title)
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//textarea[@name = "description"]'))).send_keys(description)
+
+    with driver.page_transition():
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//form[contains(concat(" ", normalize-space(@class), '
+                 '" "), " new-group-form ")]'))).submit()
+
+    group_alias = re.search(r'/group/([^/]*)/edit/',
+                            driver.browser.current_url).group(1)
+
+    return group_alias
+
+
+def add_identities_group(driver, group_alias):
+    '''Upload csv and add identities into the group'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
@@ -220,7 +259,7 @@ def add_identities_course(driver, course_alias):
             EC.element_to_be_clickable(
                 (By.XPATH,
                  ('//a[contains(@href, "/group/%s/edit/")]' %
-                  course_alias)))).click()
+                  group_alias)))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(

@@ -36,18 +36,14 @@ class ProblemsetController extends Controller {
             );
         }
 
-        try {
-            self::updateProblemsetProblem(new ProblemsetProblems([
-                'problemset_id' => $problemset_id,
-                'problem_id' => $problem->problem_id,
-                'commit' => $commit,
-                'version' => $currentVersion,
-                'points' => $points,
-                'order' => $order_in_contest,
-            ]));
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        self::updateProblemsetProblem(new ProblemsetProblems([
+            'problemset_id' => $problemset_id,
+            'problem_id' => $problem->problem_id,
+            'commit' => $commit,
+            'version' => $currentVersion,
+            'points' => $points,
+            'order' => $order_in_contest,
+        ]));
     }
 
     /**
@@ -151,7 +147,6 @@ class ProblemsetController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     public static function apiScoreboardEvents(Request $r) {
@@ -184,19 +179,12 @@ class ProblemsetController extends Controller {
      * $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem)
      * $r['tokens'][2] = Id of entity ($tokens[2])
      * $r['tokens'][3] = Token given by the filter
-     * @throws InvalidDatabaseOperationException
      * @throws NotFoundException
      */
     public static function wrapRequest(Request $r) {
         $r->ensureInt('problemset_id');
 
-        try {
-            $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
         if (is_null($r['problemset'])) {
             throw new NotFoundException('problemsetNotFound');
         }
@@ -228,12 +216,7 @@ class ProblemsetController extends Controller {
      * @param $zip ZipStream The object that represents the .zip file.
      */
     public static function downloadRuns(int $problemsetId, ZipStream $zip): void {
-        try {
-            $runs = RunsDAO::getByProblemset($problemsetId);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $runs = RunsDAO::getByProblemset($problemsetId);
 
         $table = ['guid,user,problem,verdict,points'];
         foreach ($runs as $run) {

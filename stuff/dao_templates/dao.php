@@ -40,7 +40,9 @@ abstract class {{ table.class_name }}DAOBase {
   {%- for column in table.columns|selectattr('default') %}
         if (is_null(${{ table.name }}->{{ column.name }})) {
     {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
+            ${{ table.name }}->{{ column.name }} = Time::get();
+    {%- elif 'timestamp' in column.type %}
+            ${{ table.name }}->{{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
     {%- elif column.php_primitive_type == 'bool' %}
             ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
     {%- elif column.php_primitive_type == 'int' %}
@@ -55,7 +57,9 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'REPLACE INTO {{ table.name }} ({{ table.columns|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|listformat('?', table=table)|join(', ') }});';
         $params = [
   {%- for column in table.columns %}
-    {%- if column.php_type in ('?bool', '?int') %}
+    {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+    {%- elif column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
     {%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
@@ -85,7 +89,9 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'UPDATE `{{ table.name }}` SET {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(', ') }} WHERE {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND ') }};';
         $params = [
   {%- for column in table.columns|rejectattr('primary_key') %}
-    {%- if column.php_type in ('?bool', '?int') %}
+    {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+    {%- elif column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
     {%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
@@ -98,7 +104,9 @@ abstract class {{ table.class_name }}DAOBase {
     {%- endif %}
   {%- endfor %}
   {%- for column in table.columns|selectattr('primary_key') %}
-    {%- if column.php_type in ('?bool', '?int') %}
+    {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+    {%- elif column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
     {%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
@@ -226,7 +234,9 @@ abstract class {{ table.class_name }}DAOBase {
 {%- for column in table.columns|selectattr('default') %}
         if (is_null(${{ table.name }}->{{ column.name }})) {
   {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s', Time::get());
+            ${{ table.name }}->{{ column.name }} = Time::get();
+  {%- elif 'timestamp' in column.type %}
+            ${{ table.name }}->{{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
   {%- elif column.php_primitive_type == 'bool' %}
             ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
   {%- elif column.php_primitive_type == 'int' %}
@@ -241,7 +251,9 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(', ') }});';
         $params = [
 {%- for column in table.columns|rejectattr('auto_increment') %}
-  {%- if column.php_type in ('?bool', '?int') %}
+  {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+  {%- elif column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
   {%- elif column.php_type == '?float' %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},

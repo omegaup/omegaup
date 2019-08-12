@@ -37,13 +37,13 @@ abstract class ProblemsForfeitedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Problems_Forfeited->forfeited_date)) {
-            $Problems_Forfeited->forfeited_date = gmdate('Y-m-d H:i:s', Time::get());
+            $Problems_Forfeited->forfeited_date = Time::get();
         }
         $sql = 'REPLACE INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
         $params = [
             (int)$Problems_Forfeited->user_id,
             (int)$Problems_Forfeited->problem_id,
-            $Problems_Forfeited->forfeited_date,
+            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -60,7 +60,7 @@ abstract class ProblemsForfeitedDAOBase {
     final public static function update(ProblemsForfeited $Problems_Forfeited) : int {
         $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
-            $Problems_Forfeited->forfeited_date,
+            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
             (int)$Problems_Forfeited->user_id,
             (int)$Problems_Forfeited->problem_id,
         ];
@@ -166,13 +166,13 @@ abstract class ProblemsForfeitedDAOBase {
      */
     final public static function create(ProblemsForfeited $Problems_Forfeited) : int {
         if (is_null($Problems_Forfeited->forfeited_date)) {
-            $Problems_Forfeited->forfeited_date = gmdate('Y-m-d H:i:s', Time::get());
+            $Problems_Forfeited->forfeited_date = Time::get();
         }
         $sql = 'INSERT INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
         $params = [
             (int)$Problems_Forfeited->user_id,
             (int)$Problems_Forfeited->problem_id,
-            $Problems_Forfeited->forfeited_date,
+            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;
         $conn->Execute($sql, $params);

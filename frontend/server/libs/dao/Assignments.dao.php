@@ -58,16 +58,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
             return null;
         }
 
-        try {
-            $assignment = self::getByProblemset($problemset_id);
-            if (!is_null($assignment)) {
-                return $assignment;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return null;
+        return self::getByProblemset($problemset_id);
     }
 
     final public static function getByProblemset($problemset_id) {

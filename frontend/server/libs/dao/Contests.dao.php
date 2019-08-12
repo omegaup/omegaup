@@ -226,11 +226,11 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     public static function hasStarted(Contests $contest) {
-        return Time::get() >= strtotime($contest->start_time);
+        return Time::get() >= $contest->start_time;
     }
 
     public static function hasFinished(Contests $contest) {
-        return Time::get() >= strtotime($contest->finish_time);
+        return Time::get() >= $contest->finish_time;
     }
 
     public static function getContestsParticipated($identity_id) {
@@ -761,16 +761,7 @@ class ContestsDAO extends ContestsDAOBase {
             return null;
         }
 
-        try {
-            $contest = ContestsDAO::getByProblemset($problemset_id);
-            if (!empty($contest)) {
-                return $contest;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return null;
+        return ContestsDAO::getByProblemset($problemset_id);
     }
 
     public static function getNeedsInformation($problemset_id) {

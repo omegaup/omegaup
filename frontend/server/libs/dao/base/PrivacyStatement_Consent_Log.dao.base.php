@@ -30,7 +30,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $params = [
             (int)$PrivacyStatement_Consent_Log->identity_id,
             (int)$PrivacyStatement_Consent_Log->privacystatement_id,
-            $PrivacyStatement_Consent_Log->timestamp,
+            DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
             (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
         global $conn;
@@ -135,13 +135,13 @@ abstract class PrivacyStatementConsentLogDAOBase {
      */
     final public static function create(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         if (is_null($PrivacyStatement_Consent_Log->timestamp)) {
-            $PrivacyStatement_Consent_Log->timestamp = gmdate('Y-m-d H:i:s', Time::get());
+            $PrivacyStatement_Consent_Log->timestamp = Time::get();
         }
         $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?);';
         $params = [
             (int)$PrivacyStatement_Consent_Log->identity_id,
             (int)$PrivacyStatement_Consent_Log->privacystatement_id,
-            $PrivacyStatement_Consent_Log->timestamp,
+            DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -20,21 +20,25 @@ def test_create_contest(driver):
     run_id = driver.generate_id()
     contest_alias = 'ut_contest_%s' % run_id
     problem = 'sumas'
-    user1 = 'ut_user_1_%s' % run_id
-    user2 = 'ut_user_2_%s' % run_id
+    user = 'ut_user_%s' % run_id
     password = 'P@55w0rd'
+    group_title = 'ut_group_%s' % driver.generate_id()
+    description = 'group description'
 
-    driver.register_user(user1, password)
-    driver.register_user(user2, password)
+    with driver.login_admin():
+        group_alias = util.create_group(driver, group_title, description)
+        identity, *_ = util.add_identities_group(driver, group_alias)
 
-    create_contest_admin(driver, contest_alias, problem, [user1, user2],
-                         driver.user_username)
+    driver.register_user(user, password)
+    invited_users = [user, identity.username]
+    create_contest_admin(driver, contest_alias, problem, invited_users,
+                         driver.user_username, access_mode='Private')
 
-    with driver.login(user1, password):
+    with driver.login(identity.username, identity.password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
                         verdict='AC', score=1)
 
-    with driver.login(user2, password):
+    with driver.login(user, password):
         create_run_user(driver, contest_alias, problem, 'Main_wrong.cpp11',
                         verdict='WA', score=0)
 
@@ -59,15 +63,9 @@ def test_create_contest(driver):
                      ('//a[contains(@href, "/arena/%s/scoreboard/")]' %
                       contest_alias)))).click()
 
-        run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
-            '"user"]')
-        assert run_accepted_user.text == user1, run_accepted_user
-
-        run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[contains(@class, "wrong")]/preceding-sibling::td[@class='
-            '"user"]')
-        assert run_wrong_user.text == user2, run_wrong_user
+        assert_run_verdict(driver, identity.username, problem,
+                           classname="accepted")
+        assert_run_verdict(driver, user, problem, classname="wrong")
 
 
 @util.no_javascript_errors()
@@ -82,6 +80,12 @@ def test_user_ranking_contest(driver):
     user2 = 'ut_rank_user_2_%s' % run_id
     user3 = 'ut_rank_user_3_%s' % run_id
     password = 'P@55w0rd'
+    group_title = 'ut_group_%s' % driver.generate_id()
+    description = 'group description'
+
+    with driver.login_admin():
+        group_alias = util.create_group(driver, group_title, description)
+        uninvited_identity, *_ = util.add_identities_group(driver, group_alias)
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
@@ -102,6 +106,11 @@ def test_user_ranking_contest(driver):
         create_run_user(driver, contest_alias, problem, 'Main.cpp11',
                         verdict='AC', score=1)
 
+    with driver.login(uninvited_identity.username,
+                      uninvited_identity.password):
+        create_run_user(driver, contest_alias, problem, 'Main.cpp11',
+                        verdict='AC', score=1)
+
     update_scoreboard_for_contest(driver, contest_alias)
 
     with driver.login_admin():
@@ -117,7 +126,7 @@ def test_user_ranking_contest(driver):
 
         url = '/arena/%s/scoreboard' % (contest_alias)
         util.check_scoreboard_events(driver, contest_alias, url,
-                                     num_elements=2, scoreboard='Public')
+                                     num_elements=3, scoreboard='Public')
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -129,7 +138,7 @@ def test_user_ranking_contest(driver):
                      ('//li[@id = "nav-contests"]'
                       '//a[@href = "/contest/mine/"]')))).click()
         util.check_scoreboard_events(driver, contest_alias, url,
-                                     num_elements=2, scoreboard='Admin')
+                                     num_elements=3, scoreboard='Admin')
 
         with driver.page_transition():
             driver.wait.until(
@@ -150,24 +159,17 @@ def test_user_ranking_contest(driver):
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '#ranking')))
 
-        run_accepted_user = driver.browser.find_element_by_xpath(
-            '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
-            '"user"]')
-        assert run_accepted_user.text == user1, run_accepted_user
+        assert_run_verdict(driver, user1, problem, classname='accepted')
+        assert_run_verdict(driver, user2, problem, classname='wrong')
 
-        run_wrong_user = driver.browser.find_element_by_xpath(
-            '//td[contains(@class, "wrong")]/preceding-sibling::td[@class='
-            '"user"]')
-        assert run_wrong_user.text == user2, run_wrong_user
-
-        users_invited_set = {user1, user2, driver.user_username}
-        compare_contestants_list(driver, users_invited_set)
+        compare_contestants_list(driver, {user1, user2, driver.user_username})
 
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
 
-        users_full_set = {user1, user2, user3, driver.user_username}
+        users_full_set = {user1, user2, user3, driver.user_username,
+                          uninvited_identity.username}
         compare_contestants_list(driver, users_full_set)
 
 
@@ -258,9 +260,10 @@ def check_ranking(driver, problem, user, *, scores):
     assert ranking_problem.text in scores, ranking_problem
 
 
+# pylint: disable=too-many-arguments
 @util.annotate
 def create_contest_admin(driver, contest_alias, problem, users, user,
-                         **kwargs):
+                         access_mode='Public', **kwargs):
     '''Creates a contest as an admin.'''
 
     with driver.login_admin():
@@ -274,7 +277,7 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
         add_students_bulk(driver, users)
         add_students_contest(driver, [user])
 
-        change_contest_admission_mode(driver, 'Public')
+        change_contest_admission_mode(driver, access_mode)
 
         contest_url = '/arena/%s' % contest_alias
         with driver.page_transition():
@@ -493,6 +496,22 @@ def compare_contestants_list(driver, users_set):
 
     contestants_list = driver.browser.find_elements_by_xpath(
         '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
-    contestants_set = {item.text for item in contestants_list}
+    # Considering only the username. All unassociated identities are created
+    # with a name, which is appended after the username, like:
+    #
+    #     ut_group_w0_1564721415_4:identity_1 (Identity One)
+    contestants_set = {item.text.split()[0] for item in contestants_list}
+
     different_users = contestants_set ^ users_set
     assert contestants_set == users_set, different_users
+
+
+@util.annotate
+def assert_run_verdict(driver, user, problem, *, classname):
+    ''' Asserts that run verdict matches with expected classname. '''
+
+    run_verdict = driver.browser.find_element_by_xpath(
+        '//tr[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
+        '/td[contains(concat(" ", normalize-space(@class), " "), " %s ")]'
+        % (user, problem))
+    assert classname in run_verdict.get_attribute('class').split(), run_verdict

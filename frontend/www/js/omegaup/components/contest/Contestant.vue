@@ -32,7 +32,7 @@
           <tr v-for="user in users">
             <td><omegaup-user-username v-bind:linkify="true"
                                    v-bind:username="user.username"></omegaup-user-username></td>
-            <td>{{user.access_time}}</td>
+            <td>{{ UI.formatDateTime(user.access_time) }}</td>
             <td><button class="close"
                     type="button"
                     v-on:click="onRemove(user)">×</button></td>

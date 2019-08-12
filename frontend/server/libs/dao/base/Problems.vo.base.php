@@ -94,7 +94,7 @@ class Problems extends VO {
             $this->difficulty = (float)$data['difficulty'];
         }
         if (isset($data['creation_date'])) {
-            $this->creation_date = $data['creation_date'];
+            $this->creation_date = DAO::fromMySQLTimestamp($data['creation_date']);
         }
         if (isset($data['source'])) {
             $this->source = $data['source'];
@@ -117,17 +117,6 @@ class Problems extends VO {
         if (isset($data['difficulty_histogram'])) {
             $this->difficulty_histogram = $data['difficulty_histogram'];
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['creation_date']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -226,9 +215,9 @@ class Problems extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $creation_date = null;
+    public $creation_date = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]

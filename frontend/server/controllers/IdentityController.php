@@ -56,7 +56,6 @@ class IdentityController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
@@ -100,7 +99,6 @@ class IdentityController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
@@ -188,22 +186,24 @@ class IdentityController extends Controller {
      * This function is called inside a transaction.
      * @param Identities $identity
      * @param $groupId
-     * @throws InvalidDatabaseOperationException
      */
     private static function saveIdentityGroup(Identities $identity, $groupId) {
         try {
-            IdentitiesDAO::create($identity);
+            DAO::transBegin();
 
+            IdentitiesDAO::create($identity);
             GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $groupId,
                 'identity_id' => $identity->identity_id,
             ]));
+
+            DAO::transEnd();
         } catch (Exception $e) {
+            DAO::transRollback();
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
     }
 
@@ -212,7 +212,6 @@ class IdentityController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiUpdate(Request $r) {
         global $experiments;
@@ -249,7 +248,6 @@ class IdentityController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiChangePassword(Request $r) {
@@ -408,30 +406,25 @@ class IdentityController extends Controller {
      *
      * @param Identities $identity
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     private static function getProfileImpl(Identities $identity) {
-        try {
-            $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
+        $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
 
-            return [
-                'userinfo' => [
-                    'username' => $identity->username,
-                    'name' => $identity->name,
-                    'preferred_language' => null,
-                    'country' => $extendedProfile['country'],
-                    'country_id' => $identity->country_id,
-                    'state' => $extendedProfile['state'],
-                    'state_id' => $identity->state_id,
-                    'school' => $extendedProfile['school'],
-                    'school_id' => $identity->school_id,
-                    'is_private' => true,
-                    'locale' => IdentityController::convertToSupportedLanguage($extendedProfile['locale']),
-                ]
-            ];
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        return [
+            'userinfo' => [
+                'username' => $identity->username,
+                'name' => $identity->name,
+                'preferred_language' => null,
+                'country' => $extendedProfile['country'],
+                'country_id' => $identity->country_id,
+                'state' => $extendedProfile['state'],
+                'state_id' => $identity->state_id,
+                'school' => $extendedProfile['school'],
+                'school_id' => $identity->school_id,
+                'is_private' => true,
+                'locale' => IdentityController::convertToSupportedLanguage($extendedProfile['locale']),
+            ]
+        ];
     }
 
     /**

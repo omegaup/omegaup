@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 
+import datetime
 import os
 from typing import NamedTuple, Text, Sequence
 
@@ -29,6 +30,8 @@ class Column:
         self.comment = tokens.get('comment', None)
         if 'tinyint' in self.type:
             self.php_primitive_type = 'bool'
+        elif 'timestamp' in self.type:
+            self.php_primitive_type = 'int'
         elif 'int' in self.type:
             self.php_primitive_type = 'int'
         elif 'double' in self.type:
@@ -155,6 +158,12 @@ def _listformat(value, format: Text = '', **kwargs):
     return [format.format(element, **kwargs) for element in value]
 
 
+def _parse_date(value):
+    return int(datetime.datetime.strptime(
+        value,
+        '%Y-%m-%d %H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp())
+
+
 DaoFile = NamedTuple('DaoFile', [('filename', Text), ('contents', Text)])
 
 
@@ -173,6 +182,7 @@ def generate_dao(script: Text) -> Sequence[DaoFile]:
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), 'dao_templates')))
     env.filters['listformat'] = _listformat
+    env.filters['strtotime'] = _parse_date
     vo_template = env.get_template('vo.php')
     dao_template = env.get_template('dao.php')
     for table in tables:

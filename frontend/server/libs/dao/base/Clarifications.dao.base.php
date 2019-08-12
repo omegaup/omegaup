@@ -32,7 +32,7 @@ abstract class ClarificationsDAOBase {
             is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
-            $Clarifications->time,
+            DAO::toMySQLTimestamp($Clarifications->time),
             is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
             (int)$Clarifications->problemset_id,
             (int)$Clarifications->public,
@@ -140,7 +140,7 @@ abstract class ClarificationsDAOBase {
      */
     final public static function create(Clarifications $Clarifications) : int {
         if (is_null($Clarifications->time)) {
-            $Clarifications->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Clarifications->time = Time::get();
         }
         if (is_null($Clarifications->public)) {
             $Clarifications->public = false;
@@ -151,7 +151,7 @@ abstract class ClarificationsDAOBase {
             is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
-            $Clarifications->time,
+            DAO::toMySQLTimestamp($Clarifications->time),
             is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
             (int)$Clarifications->problemset_id,
             (int)$Clarifications->public,

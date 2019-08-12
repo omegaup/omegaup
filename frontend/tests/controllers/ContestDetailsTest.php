@@ -20,8 +20,8 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Assert we are getting correct data
         $this->assertEquals($contest->description, $response['description']);
-        $this->assertEquals(Utils::GetPhpUnixTimestamp($contest->start_time), $response['start_time']);
-        $this->assertEquals(Utils::GetPhpUnixTimestamp($contest->finish_time), $response['finish_time']);
+        $this->assertEquals($contest->start_time, $response['start_time']);
+        $this->assertEquals($contest->finish_time, $response['finish_time']);
         $this->assertEquals($contest->window_length, $response['window_length']);
         $this->assertEquals($contest->alias, $response['alias']);
         $this->assertEquals($contest->points_decay_factor, $response['points_decay_factor']);
@@ -198,10 +198,9 @@ class ContestDetailsTest extends OmegaupTestCase {
      */
     public function testAccessTimeIsAlwaysFirstAccessForWindowLength() {
         // Get a contest
-        $contestData = ContestsFactory::createContest();
-
-        // Convert contest into WindowLength one
-        ContestsFactory::makeContestWindowLength($contestData, 20);
+        $contestData = ContestsFactory::createContest(new ContestParams([
+            'window_length' => 20
+        ]));
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -316,7 +315,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Set contest to not started yet
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Utils::GetPhpUnixTimestamp() + 30);
+        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Time::get() + 30);
         ContestsDAO::update($contest);
 
         // Prepare our request

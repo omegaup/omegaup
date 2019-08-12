@@ -10,7 +10,6 @@ class ScoreboardController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiRefresh(Request $r) {
         // This is not supposed to be called by end-users, but by the

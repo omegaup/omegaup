@@ -226,15 +226,11 @@ class SessionController extends Controller {
         $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
-        try {
-            AuthTokensDAO::replace(new AuthTokens([
-                'user_id' => $identity->user_id,
-                'identity_id' => $identity->identity_id,
-                'token' => $token,
-            ]));
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        AuthTokensDAO::replace(new AuthTokens([
+            'user_id' => $identity->user_id,
+            'identity_id' => $identity->identity_id,
+            'token' => $token,
+        ]));
 
         if (self::$setCookieOnRegisterSession) {
             $this->getSessionManagerInstance()->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $token, 0, '/');

@@ -47,7 +47,7 @@ class QualityNominationLog extends VO {
             $this->qualitynomination_id = (int)$data['qualitynomination_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -61,17 +61,6 @@ class QualityNominationLog extends VO {
         if (isset($data['rationale'])) {
             $this->rationale = $data['rationale'];
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -93,9 +82,9 @@ class QualityNominationLog extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]
