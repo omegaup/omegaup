@@ -1012,7 +1012,10 @@ class ProblemController extends Controller {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
                     if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
-                        if (is_null(ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset['problemset']->problemset_id))) {
+                        if (is_null(ProblemsetIdentitiesDAO::getByPK(
+                            $r->identity->identity_id,
+                            $problemset['problemset']->problemset_id
+                        ))) {
                             throw new ForbiddenAccessException();
                         }
                     }
@@ -1024,8 +1027,7 @@ class ProblemController extends Controller {
                     if (!Authorization::canSubmitToProblemset(
                         $r->identity,
                         $problemset['problemset']
-                    )
-                    ) {
+                    )) {
                         throw new ForbiddenAccessException();
                     }
                     // TODO: Check start times.
@@ -1424,7 +1426,7 @@ class ProblemController extends Controller {
                 'name' => is_null($problemsetter->name) ?
                           $problemsetter->username :
                           $problemsetter->name,
-                'creation_date' => strtotime($response['creation_date']),
+                'creation_date' => DAO::fromMySQLTimestamp($response['creation_date']),
             ];
         } else {
             unset($response['source']);
@@ -1458,7 +1460,6 @@ class ProblemController extends Controller {
                 $container = ProblemsetsDAO::getProblemsetContainer(
                     $problemset->problemset_id
                 );
-                $container->toUnixTime();
                 ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                     $r->identity,
                     $container,
@@ -1478,7 +1479,7 @@ class ProblemController extends Controller {
                 ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
                     'problem_id' => $problem->problem_id,
-                    'open_time' => gmdate('Y-m-d H:i:s', Time::get()),
+                    'open_time' => Time::get(),
                     'identity_id' => $r->identity->identity_id
                 ]));
             }
@@ -2518,6 +2519,7 @@ class ProblemController extends Controller {
         );
         $nominationStatus['problem_alias'] = $details['alias'];
         $nominationStatus['language'] = $details['statement']['language'];
+        $nominationStatus['can_nominate_problem'] = !is_null($r->user);
         $user = [
             'logged_in' => true,
             'admin' => $isProblemAdmin

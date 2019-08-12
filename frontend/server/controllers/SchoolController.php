@@ -94,34 +94,32 @@ class SchoolController extends Controller {
         $r->ensureInt('start_time', null, null, false);
         $r->ensureInt('finish_time', null, null, false);
 
+        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
+
         try {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
-            if (!is_null($r['start_time']) || !is_null($r['finish_time'])) {
+            if (!is_null($r['start_time'])) {
                 throw new InvalidParameterException('paramterInvalid', 'start_time');
             }
+            if (!is_null($r['finish_time'])) {
+                throw new InvalidParameterException('paramterInvalid', 'finish_time');
+            }
+            // Both endpoints were not specified, so the API can be used
+            // unauthenticated since it'll be cached.
         }
 
-        // Defaults for offset and rowcount
-        if (null == $r['offset']) {
+        if (is_null($r['offset'])) {
             $r['offset'] = 0;
         }
-        if (null == $r['rowcount']) {
+        if (is_null($r['rowcount'])) {
             $r['rowcount'] = 100;
         }
-
-        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
-
         if (is_null($r['start_time'])) {
-            $r['start_time'] = date('Y-m-01', Time::get());
-        } else {
-            $r['start_time'] = gmdate('Y-m-d', $r['start_time']);
+            $r['start_time'] = strtotime('first day of month', Time::get());
         }
-
         if (is_null($r['finish_time'])) {
-            $r['finish_time'] = date('Y-m-d', strtotime('first day of next month'));
-        } else {
-            $r['finish_time'] = gmdate('Y-m-d', $r['finish_time']);
+            $r['finish_time'] = strtotime('first day of next month', Time::get());
         }
 
         $fetch = function () use ($r) {

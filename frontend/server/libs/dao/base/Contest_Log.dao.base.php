@@ -32,7 +32,7 @@ abstract class ContestLogDAOBase {
             (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            $Contest_Log->time,
+            DAO::toMySQLTimestamp($Contest_Log->time),
             (int)$Contest_Log->public_contest_id,
         ];
         global $conn;
@@ -137,7 +137,7 @@ abstract class ContestLogDAOBase {
      */
     final public static function create(ContestLog $Contest_Log) : int {
         if (is_null($Contest_Log->time)) {
-            $Contest_Log->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Contest_Log->time = Time::get();
         }
         $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [
@@ -145,7 +145,7 @@ abstract class ContestLogDAOBase {
             (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            $Contest_Log->time,
+            DAO::toMySQLTimestamp($Contest_Log->time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

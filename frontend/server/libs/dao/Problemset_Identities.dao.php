@@ -43,7 +43,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         }
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
-            $problemsetIdentity->access_time = gmdate('Y-m-d H:i:s', $currentTime);
+            $problemsetIdentity->access_time = $currentTime;
             $finishTime = $container->finish_time;
             if (!empty($container->window_length)) {
                 $finishTime = min(
@@ -51,17 +51,16 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     $finishTime
                 );
             }
-            $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $finishTime);
+            $problemsetIdentity->end_time = $finishTime;
             $problemsetIdentity->share_user_information = $shareUserInformation;
             ProblemsetIdentitiesDAO::replace($problemsetIdentity);
         }
-        $problemsetIdentity->toUnixTime();
         return $problemsetIdentity;
     }
 
     public static function getWithExtraInformation($problemset_id) {
         $sql = 'SELECT
-                    pi.access_time,
+                    UNIX_TIMESTAMP(pi.access_time) as access_time,
                     UNIX_TIMESTAMP(pi.end_time) as end_time,
                     i.username,
                     i.country_id,
@@ -127,7 +126,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     `Problemset_Identities`
                 SET
                     `end_time` = LEAST(
-                        ?,
+                        FROM_UNIXTIME(?),
                         DATE_ADD(`access_time`, INTERVAL ? MINUTE)
                      )
                 WHERE
@@ -150,7 +149,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
-                    `end_time` = ?
+                    `end_time` = FROM_UNIXTIME(?)
                 WHERE
                     `problemset_id` = ?;';
 

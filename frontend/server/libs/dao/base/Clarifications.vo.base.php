@@ -58,7 +58,7 @@ class Clarifications extends VO {
             $this->answer = $data['answer'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
         }
         if (isset($data['problem_id'])) {
             $this->problem_id = (int)$data['problem_id'];
@@ -69,17 +69,6 @@ class Clarifications extends VO {
         if (isset($data['public'])) {
             $this->public = boolval($data['public']);
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -122,9 +111,9 @@ class Clarifications extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $time = null;
+    public $time = null;  // CURRENT_TIMESTAMP
 
     /**
       * Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.

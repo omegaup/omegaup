@@ -37,14 +37,14 @@ abstract class AuthTokensDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Auth_Tokens->create_time)) {
-            $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Auth_Tokens->create_time = Time::get();
         }
         $sql = 'REPLACE INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
         $params = [
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->token,
-            $Auth_Tokens->create_time,
+            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -63,7 +63,7 @@ abstract class AuthTokensDAOBase {
         $params = [
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             (int)$Auth_Tokens->identity_id,
-            $Auth_Tokens->create_time,
+            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
             $Auth_Tokens->token,
         ];
         global $conn;
@@ -168,14 +168,14 @@ abstract class AuthTokensDAOBase {
      */
     final public static function create(AuthTokens $Auth_Tokens) : int {
         if (is_null($Auth_Tokens->create_time)) {
-            $Auth_Tokens->create_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Auth_Tokens->create_time = Time::get();
         }
         $sql = 'INSERT INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
         $params = [
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->token,
-            $Auth_Tokens->create_time,
+            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

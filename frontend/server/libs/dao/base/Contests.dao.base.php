@@ -32,9 +32,9 @@ abstract class ContestsDAOBase {
             (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
-            $Contests->start_time,
-            $Contests->finish_time,
-            $Contests->last_updated,
+            DAO::toMySQLTimestamp($Contests->start_time),
+            DAO::toMySQLTimestamp($Contests->finish_time),
+            DAO::toMySQLTimestamp($Contests->last_updated),
             is_null($Contests->window_length) ? null : (int)$Contests->window_length,
             (int)$Contests->rerun_id,
             $Contests->admission_mode,
@@ -155,13 +155,13 @@ abstract class ContestsDAOBase {
      */
     final public static function create(Contests $Contests) : int {
         if (is_null($Contests->start_time)) {
-            $Contests->start_time = '2000-01-01 06:00:00';
+            $Contests->start_time = 946706400; // 2000-01-01 06:00:00
         }
         if (is_null($Contests->finish_time)) {
-            $Contests->finish_time = '2000-01-01 06:00:00';
+            $Contests->finish_time = 946706400; // 2000-01-01 06:00:00
         }
         if (is_null($Contests->last_updated)) {
-            $Contests->last_updated = gmdate('Y-m-d H:i:s', Time::get());
+            $Contests->last_updated = Time::get();
         }
         if (is_null($Contests->admission_mode)) {
             $Contests->admission_mode = 'private';
@@ -196,9 +196,9 @@ abstract class ContestsDAOBase {
             (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
-            $Contests->start_time,
-            $Contests->finish_time,
-            $Contests->last_updated,
+            DAO::toMySQLTimestamp($Contests->start_time),
+            DAO::toMySQLTimestamp($Contests->finish_time),
+            DAO::toMySQLTimestamp($Contests->last_updated),
             is_null($Contests->window_length) ? null : (int)$Contests->window_length,
             (int)$Contests->rerun_id,
             $Contests->admission_mode,

@@ -63,20 +63,19 @@ class ClarificationController extends Controller {
         // Validate request
         self::validateCreate($r);
 
-        $time = Time::get();
-        $receiver_id = $r['identity'] ? $r['identity']->identity_id : null;
+        $receiverId = $r['identity'] ? $r['identity']->identity_id : null;
         $r['clarification'] = new Clarifications([
             'author_id' => $r->identity->identity_id,
-            'receiver_id' => $receiver_id,
+            'receiver_id' => $receiverId,
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
-            'time' => gmdate('Y-m-d H:i:s', $time),
-            'public' => $receiver_id == $r->identity->identity_id ? '1' : '0',
+            'time' => Time::get(),
+            'public' => $receiverId == $r->identity->identity_id ? '1' : '0',
         ]);
 
         ClarificationsDAO::create($r['clarification']);
-        self::clarificationUpdated($r, $time);
+        self::clarificationUpdated($r, $r['clarification']);
 
         return [
             'status' => 'ok',
@@ -183,15 +182,12 @@ class ClarificationController extends Controller {
         self::updateValueProperties($r, $clarification, $valueProperties);
         $r['clarification'] = $clarification;
 
-        // Let DB handle time update
-        $time = Time::get();
-        $clarification->time = gmdate('Y-m-d H:i:s', $time);
-
         // Save the clarification
+        $clarification->time = Time::get();
         ClarificationsDAO::update($clarification);
 
         $r['problem'] = $r['contest'] = $r['user'] = null;
-        self::clarificationUpdated($r, $time);
+        self::clarificationUpdated($r, $clarification);
 
         $response = [];
         $response['status'] = 'ok';
@@ -199,22 +195,22 @@ class ClarificationController extends Controller {
         return $response;
     }
 
-    private static function clarificationUpdated(Request $r, $time) {
+    private static function clarificationUpdated(Request $r, Clarifications $clarification) {
         try {
             if (is_null($r['problem'])) {
-                $r['problem'] = ProblemsDAO::GetByPK($r['clarification']->problem_id);
+                $r['problem'] = ProblemsDAO::GetByPK($clarification->problem_id);
             }
-            if (is_null($r['contest']) && !is_null($r['clarification']->problemset_id)) {
-                $r['contest'] = ContestsDAO::getByProblemset($r['clarification']->problemset_id);
+            if (is_null($r['contest']) && !is_null($clarification->problemset_id)) {
+                $r['contest'] = ContestsDAO::getByProblemset($clarification->problemset_id);
             }
             if (is_null($r['user'])) {
-                $r['user'] = IdentitiesDAO::GetByPK($r['clarification']->author_id);
+                $r['user'] = IdentitiesDAO::GetByPK($clarification->author_id);
             }
         } catch (Exception $e) {
-            self::$log->error('Failed to broadcast clarification: ' . $e);
+            self::$log->error('Failed to broadcast clarification', $e);
             return;
         }
         self::initializeBroadcaster();
-        self::$broadcaster->broadcastClarification($r, $time);
+        self::$broadcaster->broadcastClarification($r, $clarification);
     }
 }

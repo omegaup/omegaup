@@ -146,7 +146,7 @@ class ResetController extends Controller {
             return;
         }
 
-        $seconds = Time::get() - strtotime($user->reset_sent_at);
+        $seconds = Time::get() - $user->reset_sent_at;
         if ($seconds < PASSWORD_RESET_MIN_WAIT) {
             throw new InvalidParameterException('passwordResetMinWait');
         }
@@ -174,7 +174,7 @@ class ResetController extends Controller {
 
         SecurityTools::testStrongPassword($password);
 
-        $seconds = Time::get() - strtotime($user->reset_sent_at);
+        $seconds = Time::get() - $user->reset_sent_at;
         if ($seconds > PASSWORD_RESET_TIMEOUT) {
             throw new InvalidParameterException('passwordResetResetExpired');
         }

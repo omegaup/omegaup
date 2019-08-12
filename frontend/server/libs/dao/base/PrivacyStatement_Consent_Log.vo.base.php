@@ -47,19 +47,8 @@ class PrivacyStatementConsentLog extends VO {
             $this->privacystatement_id = (int)$data['privacystatement_id'];
         }
         if (isset($data['timestamp'])) {
-            $this->timestamp = $data['timestamp'];
+            $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['timestamp']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -88,7 +77,7 @@ class PrivacyStatementConsentLog extends VO {
     /**
       * Fecha y hora en la que el usuario acepta las nuevas políticas
       * @access public
-      * @var string
+      * @var int
      */
-    public $timestamp = null;
+    public $timestamp = null;  // CURRENT_TIMESTAMP
 }

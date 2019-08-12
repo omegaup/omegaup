@@ -48,17 +48,6 @@ class PrivacyStatements extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       * Id del documento de privacidad
       * Llave Primaria
       * Auto Incremento

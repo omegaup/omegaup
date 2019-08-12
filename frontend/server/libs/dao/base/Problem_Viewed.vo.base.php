@@ -43,19 +43,8 @@ class ProblemViewed extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['view_time'])) {
-            $this->view_time = $data['view_time'];
+            $this->view_time = DAO::fromMySQLTimestamp($data['view_time']);
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['view_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -77,7 +66,7 @@ class ProblemViewed extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $view_time = null;
+    public $view_time = null;  // CURRENT_TIMESTAMP
 }

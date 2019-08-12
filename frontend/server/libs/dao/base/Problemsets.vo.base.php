@@ -84,17 +84,6 @@ class Problemsets extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
-
-    /**
       * El identificador único para cada conjunto de problemas
       * Llave Primaria
       * Auto Incremento

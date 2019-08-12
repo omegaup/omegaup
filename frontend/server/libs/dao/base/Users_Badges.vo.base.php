@@ -47,19 +47,8 @@ class UsersBadges extends VO {
             $this->badge_alias = $data['badge_alias'];
         }
         if (isset($data['assignation_time'])) {
-            $this->assignation_time = $data['assignation_time'];
+            $this->assignation_time = DAO::fromMySQLTimestamp($data['assignation_time']);
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['assignation_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -88,7 +77,7 @@ class UsersBadges extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $assignation_time = null;
+    public $assignation_time = null;  // CURRENT_TIMESTAMP
 }
