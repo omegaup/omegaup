@@ -37,7 +37,7 @@ abstract class SubmissionLogDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         if (is_null($Submission_Log->time)) {
-            $Submission_Log->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Submission_Log->time = Time::get();
         }
         $sql = 'REPLACE INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
@@ -46,7 +46,7 @@ abstract class SubmissionLogDAOBase {
             is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
             (int)$Submission_Log->identity_id,
             (int)$Submission_Log->ip,
-            $Submission_Log->time,
+            DAO::toMySQLTimestamp($Submission_Log->time),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -67,7 +67,7 @@ abstract class SubmissionLogDAOBase {
             is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
             (int)$Submission_Log->identity_id,
             (int)$Submission_Log->ip,
-            $Submission_Log->time,
+            DAO::toMySQLTimestamp($Submission_Log->time),
             (int)$Submission_Log->submission_id,
         ];
         global $conn;
@@ -172,7 +172,7 @@ abstract class SubmissionLogDAOBase {
      */
     final public static function create(SubmissionLog $Submission_Log) : int {
         if (is_null($Submission_Log->time)) {
-            $Submission_Log->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Submission_Log->time = Time::get();
         }
         $sql = 'INSERT INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
@@ -181,7 +181,7 @@ abstract class SubmissionLogDAOBase {
             is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
             (int)$Submission_Log->identity_id,
             (int)$Submission_Log->ip,
-            $Submission_Log->time,
+            DAO::toMySQLTimestamp($Submission_Log->time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

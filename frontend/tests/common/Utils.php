@@ -36,46 +36,18 @@ class Utils {
         return $problem_id;
     }
 
-    public static function GetPhpUnixTimestamp($time = null) {
-        if (is_null($time)) {
-            return Time::get();
-        } else {
-            return strtotime($time);
-        }
-    }
-
     public static function GetDbDatetime() {
         // Go to the DB
         global $conn;
 
-        $sql = 'SELECT NOW() n';
-        $rs = $conn->GetRow($sql);
-
-        if (empty($rs)) {
-            return null;
-        }
-
-        return $rs['n'];
+        return $conn->GetOne('SELECT NOW();');
     }
 
     public static function GetTimeFromUnixTimestamp($time) {
         // Go to the DB to take the unix timestamp
         global $conn;
 
-        $sql = 'SELECT FROM_UNIXTIME(?) t';
-        $params = [$time];
-        $rs = $conn->GetRow($sql, $params);
-
-        if (empty($rs)) {
-            return null;
-        }
-
-        return $rs['t'];
-    }
-
-    public static function getNextTime() {
-        self::$counttime++;
-        return Utils::GetTimeFromUnixTimestamp(self::$inittime + self::$counttime);
+        return $conn->GetOne('SELECT FROM_UNIXTIME(?);', [$time]);
     }
 
     public static function CleanLog() {

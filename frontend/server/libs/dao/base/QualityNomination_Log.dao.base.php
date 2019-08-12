@@ -29,7 +29,7 @@ abstract class QualityNominationLogDAOBase {
         $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
         $params = [
             (int)$QualityNomination_Log->qualitynomination_id,
-            $QualityNomination_Log->time,
+            DAO::toMySQLTimestamp($QualityNomination_Log->time),
             (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
@@ -138,7 +138,7 @@ abstract class QualityNominationLogDAOBase {
      */
     final public static function create(QualityNominationLog $QualityNomination_Log) : int {
         if (is_null($QualityNomination_Log->time)) {
-            $QualityNomination_Log->time = gmdate('Y-m-d H:i:s', Time::get());
+            $QualityNomination_Log->time = Time::get();
         }
         if (is_null($QualityNomination_Log->from_status)) {
             $QualityNomination_Log->from_status = 'open';
@@ -149,7 +149,7 @@ abstract class QualityNominationLogDAOBase {
         $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             (int)$QualityNomination_Log->qualitynomination_id,
-            $QualityNomination_Log->time,
+            DAO::toMySQLTimestamp($QualityNomination_Log->time),
             (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,

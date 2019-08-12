@@ -40,7 +40,7 @@ abstract class ProblemsDAOBase {
             (int)$Problems->submissions,
             (int)$Problems->accepted,
             is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
-            $Problems->creation_date,
+            DAO::toMySQLTimestamp($Problems->creation_date),
             $Problems->source,
             $Problems->order,
             (int)$Problems->deprecated,
@@ -173,7 +173,7 @@ abstract class ProblemsDAOBase {
             $Problems->accepted = 0;
         }
         if (is_null($Problems->creation_date)) {
-            $Problems->creation_date = gmdate('Y-m-d H:i:s', Time::get());
+            $Problems->creation_date = Time::get();
         }
         if (is_null($Problems->order)) {
             $Problems->order = 'normal';
@@ -198,7 +198,7 @@ abstract class ProblemsDAOBase {
             (int)$Problems->submissions,
             (int)$Problems->accepted,
             is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
-            $Problems->creation_date,
+            DAO::toMySQLTimestamp($Problems->creation_date),
             $Problems->source,
             $Problems->order,
             (int)$Problems->deprecated,

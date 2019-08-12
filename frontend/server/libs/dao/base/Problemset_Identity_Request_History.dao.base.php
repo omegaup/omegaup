@@ -30,7 +30,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $params = [
             (int)$Problemset_Identity_Request_History->identity_id,
             (int)$Problemset_Identity_Request_History->problemset_id,
-            $Problemset_Identity_Request_History->time,
+            DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
             (int)$Problemset_Identity_Request_History->accepted,
             (int)$Problemset_Identity_Request_History->admin_id,
             (int)$Problemset_Identity_Request_History->history_id,
@@ -137,13 +137,13 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      */
     final public static function create(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
         if (is_null($Problemset_Identity_Request_History->time)) {
-            $Problemset_Identity_Request_History->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Problemset_Identity_Request_History->time = Time::get();
         }
         $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
         $params = [
             (int)$Problemset_Identity_Request_History->identity_id,
             (int)$Problemset_Identity_Request_History->problemset_id,
-            $Problemset_Identity_Request_History->time,
+            DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
             (int)$Problemset_Identity_Request_History->accepted,
             (int)$Problemset_Identity_Request_History->admin_id,
         ];

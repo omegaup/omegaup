@@ -484,7 +484,10 @@ class UpdateContestTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]));
 
-        $index = array_search($contestant->username, array_column($identities['users'], 'username'));
+        $index = array_search(
+            $contestant->username,
+            array_column($identities['users'], 'username')
+        );
 
         // Extend end_time for an indentity
         ContestController::apiUpdateEndTimeForIdentity(new Request([
@@ -502,10 +505,16 @@ class UpdateContestTest extends OmegaupTestCase {
         foreach ($identities['users'] as $identity) {
             if ($identity['username'] == $contestant->username) {
                 // Identity with extended time
-                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + 60 * 60);
+                $this->assertEquals(
+                    $identity['end_time'],
+                    strtotime($identity['access_time']) + 60 * 60
+                );
             } else {
                 // Other identities keep end time with window length
-                $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
+                $this->assertEquals(
+                    $identity['end_time'],
+                    strtotime($identity['access_time']) + $windowLength * 60
+                );
             }
         }
 

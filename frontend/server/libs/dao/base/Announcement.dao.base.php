@@ -29,7 +29,7 @@ abstract class AnnouncementDAOBase {
         $sql = 'UPDATE `Announcement` SET `user_id` = ?, `time` = ?, `description` = ? WHERE `announcement_id` = ?;';
         $params = [
             (int)$Announcement->user_id,
-            $Announcement->time,
+            DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
             (int)$Announcement->announcement_id,
         ];
@@ -135,12 +135,12 @@ abstract class AnnouncementDAOBase {
      */
     final public static function create(Announcement $Announcement) : int {
         if (is_null($Announcement->time)) {
-            $Announcement->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Announcement->time = Time::get();
         }
         $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [
             (int)$Announcement->user_id,
-            $Announcement->time,
+            DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
         ];
         global $conn;

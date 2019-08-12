@@ -30,7 +30,7 @@ abstract class UsersBadgesDAOBase {
         $params = [
             (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
-            $Users_Badges->assignation_time,
+            DAO::toMySQLTimestamp($Users_Badges->assignation_time),
             (int)$Users_Badges->user_badge_id,
         ];
         global $conn;
@@ -135,13 +135,13 @@ abstract class UsersBadgesDAOBase {
      */
     final public static function create(UsersBadges $Users_Badges) : int {
         if (is_null($Users_Badges->assignation_time)) {
-            $Users_Badges->assignation_time = gmdate('Y-m-d H:i:s', Time::get());
+            $Users_Badges->assignation_time = Time::get();
         }
         $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
         $params = [
             (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
-            $Users_Badges->assignation_time,
+            DAO::toMySQLTimestamp($Users_Badges->assignation_time),
         ];
         global $conn;
         $conn->Execute($sql, $params);

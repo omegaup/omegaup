@@ -47,7 +47,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             return isset($container->finish_time) &&
                    (Time::get() > $container->finish_time);
         }
-        return Time::get() > strtotime($problemsetIdentity->end_time);
+        return Time::get() > $problemsetIdentity->end_time;
     }
 
     public static function isSubmissionWindowOpen(Object $container) : bool {

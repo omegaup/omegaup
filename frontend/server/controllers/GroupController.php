@@ -255,7 +255,7 @@ class GroupController extends Controller {
             'name' => $r['name'],
             'description' =>$r['description'],
             'alias' => $r['alias'],
-            'create_time' => gmdate('Y-m-d H:i:s', Time::get())
+            'create_time' => Time::get(),
         ]));
 
         self::$log->info("New scoreboard created {$r['alias']}");

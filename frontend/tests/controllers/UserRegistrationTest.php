@@ -15,7 +15,7 @@ class UserRegistrationTest extends OmegaupTestCase {
      *          email=A@gmail.com
      */
     public function testUserNameCollision() {
-        $salt = Utils::GetPhpUnixTimestamp();
+        $salt = Time::get();
 
         // Test users should not exist
         $this->assertNull(UsersDAO::FindByUsername('A'.$salt));
@@ -37,7 +37,7 @@ class UserRegistrationTest extends OmegaupTestCase {
      * User logged via google, try log in with native mode
      */
     public function testUserLoggedViaGoogleAndThenNativeMode() {
-        $username = 'X'.Utils::GetPhpUnixTimestamp();
+        $username = 'X'.Time::get();
         $password = Utils::CreateRandomString();
 
         $c = new SessionController();
@@ -70,7 +70,7 @@ class UserRegistrationTest extends OmegaupTestCase {
      * different username
      */
     public function testUserLoggedViaGoogleAndThenNativeModeWithDifferentUsername() {
-        $username = 'Y'.Utils::GetPhpUnixTimestamp();
+        $username = 'Y'.Time::get();
         $email = $username.'@isp.com';
 
         $c = new SessionController();

@@ -37,7 +37,7 @@ abstract class RunsDAOBase {
             (int)$Runs->memory,
             (float)$Runs->score,
             is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
-            $Runs->time,
+            DAO::toMySQLTimestamp($Runs->time),
             $Runs->judged_by,
             (int)$Runs->run_id,
         ];
@@ -158,7 +158,7 @@ abstract class RunsDAOBase {
             $Runs->score = 0.00;
         }
         if (is_null($Runs->time)) {
-            $Runs->time = gmdate('Y-m-d H:i:s', Time::get());
+            $Runs->time = Time::get();
         }
         $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
@@ -171,7 +171,7 @@ abstract class RunsDAOBase {
             (int)$Runs->memory,
             (float)$Runs->score,
             is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
-            $Runs->time,
+            DAO::toMySQLTimestamp($Runs->time),
             $Runs->judged_by,
         ];
         global $conn;

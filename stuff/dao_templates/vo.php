@@ -38,7 +38,9 @@ class {{ table.class_name }} extends VO {
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {
-{%- if column.php_primitive_type == 'bool' %}
+{%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            $this->{{ column.name }} = DAO::fromMySQLTimestamp($data['{{ column.name }}']);
+{%- elif column.php_primitive_type == 'bool' %}
             $this->{{ column.name }} = boolval($data['{{ column.name }}']);
 {%- elif column.php_primitive_type in ('int', 'float') %}
             $this->{{ column.name }} = ({{ column.php_primitive_type }})$data['{{ column.name }}'];
@@ -47,17 +49,6 @@ class {{ table.class_name }} extends VO {
 {%- endif %}
         }
 {%- endfor %}
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime([{{ table.columns|selectattr('type', 'equalto', ('timestamp',))|map(attribute='name')|listformat("'{}'")|join(', ') }}]);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 {%- for column in table.columns %}
 
@@ -74,7 +65,9 @@ class {{ table.class_name }} extends VO {
      */
 {%- if column.default %}
 {%- if column.default == 'CURRENT_TIMESTAMP' %}
-    public ${{ column.name }} = null;
+    public ${{ column.name }} = null;  // CURRENT_TIMESTAMP
+{%- elif 'timestamp' in column.type %}
+    public ${{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
 {%- elif column.php_primitive_type == 'bool' %}
     public ${{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
 {%- elif column.php_primitive_type == 'int' %}

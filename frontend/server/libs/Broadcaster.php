@@ -10,18 +10,18 @@ class Broadcaster {
         $this->log = Logger::getLogger('broadcaster');
     }
 
-    public function broadcastClarification(Request $r, $time) {
+    public function broadcastClarification(Request $r, Clarifications $clarification) {
         try {
             $message = json_encode([
                 'message' => '/clarification/update/',
                 'clarification' => [
-                    'clarification_id' => (int)$r['clarification']->clarification_id,
+                    'clarification_id' => (int)$clarification->clarification_id,
                     'problem_alias' => $r['problem']->alias,
                     'author' => $r['user']->username,
-                    'message' => $r['clarification']->message,
-                    'answer' => $r['clarification']->answer,
-                    'time' => $time,
-                    'public' => $r['clarification']->public != '0'
+                    'message' => $clarification->message,
+                    'answer' => $clarification->answer,
+                    'time' => $clarification->time,
+                    'public' => boolval($clarification->public),
                 ]
             ]);
 
@@ -31,15 +31,15 @@ class Broadcaster {
                 is_null($r['contest']) ? null : (int)$r['contest']->problemset_id,
                 is_null($r['problem']) ? null : $r['problem']->alias,
                 $message,
-                $r['clarification']->public != '0',
+                boolval($clarification->public),
                 $r['user']->username,
-                (int)$r['clarification']->author_id,
+                (int)$clarification->author_id,
                 false  // user_only
             );
         } catch (Exception $e) {
-            $this->log->error('Failed to send to broadcaster ' . $e->getMessage());
+            $this->log->error('Failed to send to broadcaster', $e);
         }
-        $this->sendClarificationEmail($r, $time);
+        $this->sendClarificationEmail($r, $clarification->time);
     }
 
     protected function sendClarificationEmail(Request $r) {

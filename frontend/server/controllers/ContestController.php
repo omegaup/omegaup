@@ -191,9 +191,9 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $contest) {
-            $contest['start_time'] = strtotime($contest['start_time']);
-            $contest['finish_time'] = strtotime($contest['finish_time']);
-            $contest['last_updated'] = strtotime($contest['last_updated']);
+            $contest['start_time'] = DAO::fromMySQLTimestamp($contest['start_time']);
+            $contest['finish_time'] = DAO::fromMySQLTimestamp($contest['finish_time']);
+            $contest['last_updated'] = DAO::fromMySQLTimestamp($contest['last_updated']);
             $addedContests[] = $contest;
         }
 
@@ -462,7 +462,7 @@ class ContestController extends Controller {
             $contestAdmin = Authorization::isContestAdmin($r->identity, $contest);
             if (!ContestsDAO::hasStarted($contest) && !$contestAdmin) {
                 $exception = new PreconditionFailedException('contestNotStarted');
-                $exception->addCustomMessageToArray('start_time', strtotime($contest->start_time));
+                $exception->addCustomMessageToArray('start_time', $contest->start_time);
 
                 throw $exception;
             }
@@ -530,8 +530,8 @@ class ContestController extends Controller {
             }
         }
 
-        $result['start_time'] = strtotime($result['start_time']);
-        $result['finish_time'] = strtotime($result['finish_time']);
+        $result['start_time'] = DAO::fromMySQLTimestamp($result['start_time']);
+        $result['finish_time'] = DAO::fromMySQLTimestamp($result['finish_time']);
 
         $result['status'] = 'ok';
 
@@ -547,7 +547,7 @@ class ContestController extends Controller {
         ProblemsetIdentityRequestDAO::create(new ProblemsetIdentityRequest([
             'identity_id' => $r->identity->identity_id,
             'problemset_id' => $contest->problemset_id,
-            'request_time' => gmdate('Y-m-d H:i:s', Time::get()),
+            'request_time' => Time::get(),
         ]));
 
         return ['status' => 'ok'];
@@ -577,7 +577,6 @@ class ContestController extends Controller {
         $r->ensureBool('share_user_information', false);
         DAO::transBegin();
         try {
-            $response['contest']->toUnixTime();
             ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r->identity,
                 $response['contest'],
@@ -659,8 +658,8 @@ class ContestController extends Controller {
                     'rerun_id',
                 ]);
 
-                $result['start_time'] = strtotime($result['start_time']);
-                $result['finish_time'] = strtotime($result['finish_time']);
+                $result['start_time'] = DAO::fromMySQLTimestamp($result['start_time']);
+                $result['finish_time'] = DAO::fromMySQLTimestamp($result['finish_time']);
                 $result['show_scoreboard_after'] = (bool)$result['show_scoreboard_after'];
                 $result['original_contest_alias'] = null;
                 $result['original_problemset_id'] = null;
@@ -726,7 +725,6 @@ class ContestController extends Controller {
             // Adding timer info separately as it depends on the current user and we don't
             // want this to get generally cached for everybody
             // Save the time of the first access
-            $response['contest']->toUnixTime();
             $problemsetIdentity = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r->identity,
                 $response['contest']
@@ -738,7 +736,7 @@ class ContestController extends Controller {
             } else {
                 $result['submission_deadline'] = min(
                     $response['contest']->finish_time,
-                    strtotime($problemsetIdentity->access_time) + $response['contest']->window_length * 60
+                    $problemsetIdentity->access_time + $response['contest']->window_length * 60
                 );
             }
             $result['admin'] = Authorization::isContestAdmin(
@@ -840,8 +838,7 @@ class ContestController extends Controller {
             $r->identity
         );
 
-        $length = strtotime($originalContest->finish_time) -
-                  strtotime($originalContest->start_time);
+        $length = $originalContest->finish_time - $originalContest->start_time;
 
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
@@ -854,8 +851,8 @@ class ContestController extends Controller {
             'title' => $r['title'],
             'description' => $r['description'],
             'alias' => $r['alias'],
-            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-            'finish_time' => gmdate('Y-m-d H:i:s', $r['start_time'] + $length),
+            'start_time' => $r['start_time'],
+            'finish_time' => $r['start_time'] + $length,
             'scoreboard' => $originalContest->scoreboard,
             'points_decay_factor' => $originalContest->points_decay_factor,
             'submissions_gap' => $originalContest->submissions_gap,
@@ -914,44 +911,42 @@ class ContestController extends Controller {
             throw new NotFoundException('contestNotFound');
         }
 
-        $startTime = strtotime($originalContest->start_time);
-        $finishTime = strtotime($originalContest->finish_time);
-
-        if ($finishTime > Time::get()) {
+        if ($originalContest->finish_time > Time::get()) {
             throw new ForbiddenAccessException('originalContestHasNotEnded');
         }
 
         $virtualContestAlias = ContestsDAO::generateAlias($originalContest);
 
-        $contestLength = $finishTime - $startTime;
+        $contestLength = $originalContest->finish_time - $originalContest->start_time;
 
         $r->ensureInt('start_time', null, null, false);
         $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : Time::get();
 
         // Initialize contest
-        $contest = new Contests();
-        $contest->title = $originalContest->title;
-        $contest->description = $originalContest->description;
-        $contest->window_length = $originalContest->window_length;
-        $contest->public = 0; // Virtual contest must be private
-        $contest->start_time = gmdate('Y-m-d H:i:s', $r['start_time']);
-        $contest->finish_time = gmdate('Y-m-d H:i:s', $r['start_time'] + $contestLength);
-        $contest->scoreboard = 100; // Always show scoreboard in virtual contest
-        $contest->alias = $virtualContestAlias;
-        $contest->points_decay_factor = $originalContest->points_decay_factor;
-        $contest->submissions_gap = $originalContest->submissions_gap;
-        $contest->partial_score = $originalContest->partial_score;
-        $contest->feedback = $originalContest->feedback;
-        $contest->penalty = $originalContest->penalty;
-        $contest->penalty_type = $originalContest->penalty_type;
-        $contest->penalty_calc_policy = $originalContest->penalty_calc_policy;
-        $contest->show_scoreboard_after = true;
-        $contest->languages = $originalContest->languages;
-        $contest->rerun_id = $originalContest->contest_id;
+        $contest = new Contests([
+            'title' => $originalContest->title,
+            'description' => $originalContest->description,
+            'window_length' => $originalContest->window_length,
+            'start_time' => $r['start_time'],
+            'finish_time' => $r['start_time'] + $contestLength,
+            'scoreboard' => 100, // Always show scoreboard in virtual contest
+            'alias' => $virtualContestAlias,
+            'points_decay_factor' => $originalContest->points_decay_factor,
+            'submissions_gap' => $originalContest->submissions_gap,
+            'partial_score' => $originalContest->partial_score,
+            'feedback' => $originalContest->feedback,
+            'penalty' => $originalContest->penalty,
+            'penalty_type' => $originalContest->penalty_type,
+            'penalty_calc_policy' => $originalContest->penalty_calc_policy,
+            'show_scoreboard_after' => true,
+            'languages' => $originalContest->languages,
+            'rerun_id' => $originalContest->contest_id,
+        ]);
 
         $problemset = new Problemsets([
             'needs_basic_information' => false,
             'requests_user_information' => 'no',
+            'access_mode' => 'private', // Virtual contest must be private
         ]);
 
         self::createContest(
@@ -1065,8 +1060,8 @@ class ContestController extends Controller {
             'admission_mode' => 'private',
             'title' => $r['title'],
             'description' => $r['description'],
-            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+            'start_time' => $r['start_time'],
+            'finish_time' => $r['finish_time'],
             'window_length' => $r['window_length'] ?: null,
             'alias' => $r['alias'],
             'scoreboard' => $r['scoreboard'],
@@ -1103,8 +1098,8 @@ class ContestController extends Controller {
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
-        $start_time = !is_null($r['start_time']) ? $r['start_time'] : strtotime($contest->start_time);
-        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : strtotime($contest->finish_time);
+        $start_time = !is_null($r['start_time']) ? $r['start_time'] : DAO::fromMySQLTimestamp($contest->start_time);
+        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : DAO::fromMySQLTimestamp($contest->finish_time);
 
         // Validate start & finish time
         if ($start_time > $finish_time) {
@@ -1221,7 +1216,7 @@ class ContestController extends Controller {
         self::validateCommonCreateOrUpdate($r, $contest, false /* is required*/);
 
         // Prevent date changes if a contest already has runs
-        if (!is_null($r['start_time']) && $r['start_time'] != strtotime($contest->start_time)) {
+        if (!is_null($r['start_time']) && $r['start_time'] != DAO::fromMySQLTimestamp($contest->start_time)) {
             $runCount = 0;
 
             $runCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
@@ -2051,7 +2046,7 @@ class ContestController extends Controller {
 
         $request->accepted = $resolution;
         $request->extra_note = $r['note'];
-        $request->last_update = gmdate('Y-m-d H:i:s', Time::get());
+        $request->last_update = Time::get();
 
         ProblemsetIdentityRequestDAO::update($request);
 
@@ -2164,12 +2159,8 @@ class ContestController extends Controller {
         $valueProperties = [
             'title',
             'description',
-            'start_time'        => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
-            'finish_time'       => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
+            'start_time',
+            'finish_time',
             'window_length' => ['transform' => function ($value) {
                 return empty($value) ? null : $value;
             }],
@@ -2292,13 +2283,13 @@ class ContestController extends Controller {
         Identities $identity
     ) : void {
         if ($originalContest->admission_mode !== $contest->admission_mode) {
-            $timestamp = gmdate('Y-m-d H:i:s', Time::get());
+            $timestamp = Time::get();
             ContestLogDAO::create(new ContestLog([
                 'contest_id' => $contest->contest_id,
                 'user_id' => $identity->user_id,
                 'from_admission_mode' => $originalContest->admission_mode,
                 'to_admission_mode' => $contest->admission_mode,
-                'time' => $timestamp
+                'time' => $timestamp,
             ]));
             $contest->last_updated = $timestamp;
         }

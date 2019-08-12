@@ -65,10 +65,10 @@ class Courses extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['start_time'])) {
-            $this->start_time = $data['start_time'];
+            $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
-            $this->finish_time = $data['finish_time'];
+            $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['public'])) {
             $this->public = boolval($data['public']);
@@ -85,17 +85,6 @@ class Courses extends VO {
         if (isset($data['show_scoreboard'])) {
             $this->show_scoreboard = boolval($data['show_scoreboard']);
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['start_time', 'finish_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -145,16 +134,16 @@ class Courses extends VO {
     /**
       * Hora de inicio de este curso
       * @access public
-      * @var string
+      * @var int
      */
-    public $start_time = '2000-01-01 06:00:00';
+    public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
       * Hora de finalizacion de este curso
       * @access public
-      * @var string
+      * @var int
      */
-    public $finish_time = '2000-01-01 06:00:00';
+    public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
       * True implica que cualquier usuario puede entrar al curso

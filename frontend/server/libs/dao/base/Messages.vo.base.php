@@ -55,19 +55,8 @@ class Messages extends VO {
             $this->message = $data['message'];
         }
         if (isset($data['date'])) {
-            $this->date = $data['date'];
+            $this->date = DAO::fromMySQLTimestamp($data['date']);
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['date']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -110,7 +99,7 @@ class Messages extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $date = null;
+    public $date = null;  // CURRENT_TIMESTAMP
 }

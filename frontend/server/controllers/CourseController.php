@@ -39,8 +39,8 @@ class CourseController extends Controller {
      */
     private static function validateCreateAssignment(Request $r, Courses $course) : void {
         $isRequired = true;
-        $courseStartTime = strtotime($course->start_time);
-        $courseFinishTime = strtotime($course->finish_time);
+        $courseStartTime = DAO::fromMySQLTimestamp($course->start_time);
+        $courseFinishTime = DAO::fromMySQLTimestamp($course->finish_time);
 
         Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
         Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
@@ -111,7 +111,6 @@ class CourseController extends Controller {
         // in case of update, parameters can be optional.
         $originalCourse = self::validateCourseExists($courseAlias);
 
-        $originalCourse->toUnixTime();
         if (is_null($r['start_time'])) {
             $r['start_time'] = $originalCourse->start_time;
         }
@@ -155,6 +154,7 @@ class CourseController extends Controller {
         );
 
         $r->ensureBool('public', false /*isRequired*/);
+        $r->ensureInt('school_id', null, null, false /*isRequired*/);
 
         if (is_null($r['school_id'])) {
             $school = null;
@@ -224,7 +224,7 @@ class CourseController extends Controller {
         self::validateClone($r);
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
-        $offset = round($r['start_time']) - strtotime($originalCourse->start_time);
+        $offset = round($r['start_time']) - $originalCourse->start_time;
 
         DAO::transBegin();
 
@@ -235,8 +235,8 @@ class CourseController extends Controller {
                 'description' => $originalCourse->description,
                 'alias' => $r['alias'],
                 'school_id' => $originalCourse->school_id,
-                'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-                'finish_time' => gmdate('Y-m-d H:i:s', strtotime($originalCourse->finish_time) + $offset),
+                'start_time' => $r['start_time'],
+                'finish_time' => $originalCourse->finish_time + $offset,
                 'public' => 0,
                 'show_scoreboard' => $originalCourse->show_scoreboard,
                 'needs_basic_information' => $originalCourse->needs_basic_information,
@@ -255,8 +255,8 @@ class CourseController extends Controller {
                     'alias' => $assignmentProblems['assignment_alias'],
                     'publish_time_delay' => $assignmentProblems['publish_time_delay'],
                     'assignment_type' => $assignmentProblems['assignment_type'],
-                    'start_time' => gmdate('Y-m-d H:i:s', strtotime($assignmentProblems['start_time']) + $offset),
-                    'finish_time' => gmdate('Y-m-d H:i:s', strtotime($assignmentProblems['finish_time']) + $offset),
+                    'start_time' => $assignmentProblems['start_time'] + $offset,
+                    'finish_time' => $assignmentProblems['finish_time'] + $offset,
                 ]));
 
                 foreach ($assignmentProblems['problems'] as $problem) {
@@ -300,8 +300,8 @@ class CourseController extends Controller {
             'description' => $r['description'],
             'alias' => $r['alias'],
             'school_id' => $r['school_id'],
-            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+            'start_time' => $r['start_time'],
+            'finish_time' => $r['finish_time'],
             'public' => $r['public'] ?: false,
             'show_scoreboard' => $r['show_scoreboard'],
             'needs_basic_information' => $r['needs_basic_information'],
@@ -473,8 +473,8 @@ class CourseController extends Controller {
             'alias' => $r['alias'],
             'publish_time_delay' => $r['publish_time_delay'],
             'assignment_type' => $r['assignment_type'],
-            'start_time' => gmdate('Y-m-d H:i:s', $r['start_time']),
-            'finish_time' => gmdate('Y-m-d H:i:s', $r['finish_time']),
+            'start_time' => $r['start_time'],
+            'finish_time' => $r['finish_time'],
         ]));
 
         return ['status' => 'ok'];
@@ -542,12 +542,8 @@ class CourseController extends Controller {
         $valueProperties = [
             'name',
             'description',
-            'start_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
-            'finish_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
+            'start_time',
+            'finish_time',
             'assignment_type',
         ];
         self::updateValueProperties($r, $assignment, $valueProperties);
@@ -860,7 +856,6 @@ class CourseController extends Controller {
      * @return array
      */
     private static function convertCourseToArray(Courses $course) : array {
-        $course->toUnixTime();
         $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
         $arr = $course->asFilteredArray($relevant_columns);
 
@@ -984,7 +979,6 @@ class CourseController extends Controller {
         if (is_null($r['assignment'])) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $r['assignment']->toUnixTime();
 
         $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
         $letter = 0;
@@ -1518,8 +1512,8 @@ class CourseController extends Controller {
                 'description' => $course->description,
                 'alias' => $course->alias,
                 'school_id' => $course->school_id,
-                'start_time' => strtotime($course->start_time),
-                'finish_time' => strtotime($course->finish_time),
+                'start_time' => DAO::fromMySQLTimestamp($course->start_time),
+                'finish_time' => DAO::fromMySQLTimestamp($course->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $course->public,
                 'basic_information_required' => boolval($course->needs_basic_information),
@@ -1629,9 +1623,7 @@ class CourseController extends Controller {
         $courseAdmin = false;
 
         $course = self::validateCourseExists($courseAlias);
-        $course->toUnixTime();
         $assignment = self::validateCourseAssignmentAlias($course, $assignmentAlias);
-        $assignment->toUnixTime();
 
         $assignmentProblemset = AssignmentsDAO::getByIdWithScoreboardUrls($assignment->assignment_id);
         if (is_null($assignmentProblemset)) {
@@ -1671,12 +1663,10 @@ class CourseController extends Controller {
         if (is_null($course)) {
             throw new NotFoundException('courseNotFound');
         }
-        $course->toUnixTime();
         $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         if (is_null($assignment)) {
             throw new NotFoundException('assignmentNotFound');
         }
-        $assignment->toUnixTime();
 
         // Admins are almighty, no need to check anything else.
         if (Authorization::isCourseAdmin($identity, $course)) {
@@ -1887,12 +1877,8 @@ class CourseController extends Controller {
             'alias',
             'name',
             'description',
-            'start_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
-            'finish_time' => ['transform' => function ($value) {
-                return gmdate('Y-m-d H:i:s', $value);
-            }],
+            'start_time',
+            'finish_time',
             'school_id',
             'show_scoreboard' => ['transform' => function ($value) {
                 return $value == 'true' ? 1 : 0;

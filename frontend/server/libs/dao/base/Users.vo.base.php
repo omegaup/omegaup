@@ -91,7 +91,7 @@ class Users extends VO {
             $this->reset_digest = $data['reset_digest'];
         }
         if (isset($data['reset_sent_at'])) {
-            $this->reset_sent_at = $data['reset_sent_at'];
+            $this->reset_sent_at = DAO::fromMySQLTimestamp($data['reset_sent_at']);
         }
         if (isset($data['hide_problem_tags'])) {
             $this->hide_problem_tags = boolval($data['hide_problem_tags']);
@@ -105,17 +105,6 @@ class Users extends VO {
         if (isset($data['preferred_language'])) {
             $this->preferred_language = $data['preferred_language'];
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**

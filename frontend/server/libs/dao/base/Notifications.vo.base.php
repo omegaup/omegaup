@@ -45,7 +45,7 @@ class Notifications extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['timestamp'])) {
-            $this->timestamp = $data['timestamp'];
+            $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
         }
         if (isset($data['read'])) {
             $this->read = boolval($data['read']);
@@ -53,17 +53,6 @@ class Notifications extends VO {
         if (isset($data['contents'])) {
             $this->contents = $data['contents'];
         }
-    }
-
-    /**
-     * Converts date fields to timestamps
-     */
-    public function toUnixTime(iterable $fields = []) : void {
-        if (empty($fields)) {
-            parent::toUnixTime(['timestamp']);
-            return;
-        }
-        parent::toUnixTime($fields);
     }
 
     /**
@@ -85,9 +74,9 @@ class Notifications extends VO {
     /**
       *  [Campo no documentado]
       * @access public
-      * @var string
+      * @var int
      */
-    public $timestamp = null;
+    public $timestamp = null;  // CURRENT_TIMESTAMP
 
     /**
       *  [Campo no documentado]

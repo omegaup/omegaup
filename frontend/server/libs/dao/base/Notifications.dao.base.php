@@ -29,7 +29,7 @@ abstract class NotificationsDAOBase {
         $sql = 'UPDATE `Notifications` SET `user_id` = ?, `timestamp` = ?, `read` = ?, `contents` = ? WHERE `notification_id` = ?;';
         $params = [
             (int)$Notifications->user_id,
-            $Notifications->timestamp,
+            DAO::toMySQLTimestamp($Notifications->timestamp),
             (int)$Notifications->read,
             $Notifications->contents,
             (int)$Notifications->notification_id,
@@ -136,7 +136,7 @@ abstract class NotificationsDAOBase {
      */
     final public static function create(Notifications $Notifications) : int {
         if (is_null($Notifications->timestamp)) {
-            $Notifications->timestamp = gmdate('Y-m-d H:i:s', Time::get());
+            $Notifications->timestamp = Time::get();
         }
         if (is_null($Notifications->read)) {
             $Notifications->read = false;
@@ -144,7 +144,7 @@ abstract class NotificationsDAOBase {
         $sql = 'INSERT INTO Notifications (`user_id`, `timestamp`, `read`, `contents`) VALUES (?, ?, ?, ?);';
         $params = [
             (int)$Notifications->user_id,
-            $Notifications->timestamp,
+            DAO::toMySQLTimestamp($Notifications->timestamp),
             (int)$Notifications->read,
             $Notifications->contents,
         ];

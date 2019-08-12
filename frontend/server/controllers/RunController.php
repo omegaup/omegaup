@@ -156,9 +156,6 @@ class RunController extends Controller {
         );
 
         // No one should submit after the deadline. Not even admins.
-        $startTime = $r['container']->start_time;
-        $finishTime = $r['container']->finish_time;
-        $r['container']->toUnixTime();
         if (ProblemsetsDAO::isLateSubmission(
             $r['container'],
             $problemsetIdentity
@@ -219,7 +216,7 @@ class RunController extends Controller {
             if (OMEGAUP_LOCKDOWN) {
                 throw new ForbiddenAccessException('lockdown');
             }
-            $submit_delay = 0;
+            $submitDelay = 0;
             $problemsetId = null;
             $type = 'normal';
         } else {
@@ -268,14 +265,10 @@ class RunController extends Controller {
             }
 
             if (!is_null($start)) {
-                //ok, what time is it now?
-                $c_time = Time::get();
-                $start = $start;
-
                 //asuming submit_delay is in minutes
-                $submit_delay = (int) (( $c_time - $start ) / 60);
+                $submitDelay = (int) ((Time::get() - $start) / 60);
             } else {
-                $submit_delay = 0;
+                $submitDelay = 0;
             }
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
@@ -292,15 +285,15 @@ class RunController extends Controller {
             'problemset_id' => $problemsetId,
             'guid' => md5(uniqid(rand(), true)),
             'language' => $r['language'],
-            'time' => gmdate('Y-m-d H:i:s', Time::get()),
-            'submit_delay' => $submit_delay, /* based on penalty_type */
+            'time' => Time::get(),
+            'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
         $run = new Runs([
             'version' => $r['problem']->current_version,
             'status' => 'new',
             'runtime' => 0,
-            'penalty' => $submit_delay,
+            'penalty' => $submitDelay,
             'time' => gmdate('Y-m-d H:i:s', Time::get()),
             'memory' => 0,
             'score' => 0,
@@ -362,13 +355,9 @@ class RunController extends Controller {
             if (!is_null($problemsetIdentity) && !is_null(
                 $problemsetIdentity->end_time
             )) {
-                $response['submission_deadline'] = strtotime(
-                    $problemsetIdentity->end_time
-                );
+                $response['submission_deadline'] = $problemsetIdentity->end_time;
             } elseif (isset($r['container']->finish_time)) {
-                $response['submission_deadline'] = strtotime(
-                    $r['container']->finish_time
-                );
+                $response['submission_deadline'] = $r['container']->finish_time;
             }
         }
 
@@ -433,7 +422,7 @@ class RunController extends Controller {
                 'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
             ])
         );
-        $filtered['time'] = strtotime($filtered['time']);
+        $filtered['time'] = $filtered['time'];
         $filtered['score'] = round((float) $filtered['score'], 4);
         $filtered['runtime'] = (int)$filtered['runtime'];
         $filtered['penalty'] = (int)$filtered['penalty'];
