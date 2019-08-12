@@ -148,16 +148,18 @@ def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
 @contextlib.contextmanager
 def assert_js_errors(driver, *, message_list):
     '''Asserts that a JavaScript error is logged in the console'''
-    if message_list is None:
-        return
+    assert message_list, 'Message list cannot be empty'
+
     driver.log_collector.push()
     try:
         yield
     finally:
         for entry in driver.log_collector.pop():
             if message_matches(entry['message'], message_list):
-                return
-    assert False, '%r was not logged to the JavaScript console.' % message_list
+                break
+        else:
+            raise Exception('%r was not logged to the JavaScript console.' %
+                            message_list)
 
 
 def is_path_whitelisted(message, path_whitelist):
@@ -436,9 +438,7 @@ def create_problem(driver, problem_alias, has_privileges=True):
 
 
 def assert_alert_is_shown(driver):
-    '''When an identity tries to perform an action without permission,
-
-    a message is shown'''
+    '''An alert is shown when an action is attempted without permission.'''
 
     message = driver.wait.until(
         EC.visibility_of_element_located((By.ID, 'status')))
