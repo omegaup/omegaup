@@ -2262,7 +2262,7 @@ class ContestController extends Controller {
             $contest->problemset_id
         );
 
-        $problemsetIdentity->end_time = gmdate('Y-m-d H:i:s', $r['end_time']);
+        $problemsetIdentity->end_time = $r['end_time'];
         ProblemsetIdentitiesDAO::update($problemsetIdentity);
 
         return [

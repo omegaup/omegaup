@@ -494,7 +494,7 @@ class UpdateContestTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'username' => $contestant->username,
-            'end_time' => strtotime($identities['users'][$index]['access_time']) + 60 * 60,
+            'end_time' => $identities['users'][$index]['access_time'] + 60 * 60,
         ]));
 
         $identities = ContestController::apiUsers(new Request([
@@ -507,13 +507,13 @@ class UpdateContestTest extends OmegaupTestCase {
                 // Identity with extended time
                 $this->assertEquals(
                     $identity['end_time'],
-                    strtotime($identity['access_time']) + 60 * 60
+                    $identity['access_time'] + 60 * 60
                 );
             } else {
                 // Other identities keep end time with window length
                 $this->assertEquals(
                     $identity['end_time'],
-                    strtotime($identity['access_time']) + $windowLength * 60
+                    $identity['access_time'] + $windowLength * 60
                 );
             }
         }
@@ -530,7 +530,10 @@ class UpdateContestTest extends OmegaupTestCase {
 
         foreach ($identities['users'] as $identity) {
             // End time for all participants has been updated and extended time for the identity is no longer available
-            $this->assertEquals($identity['end_time'], strtotime($identity['access_time']) + $windowLength * 60);
+            $this->assertEquals(
+                $identity['end_time'],
+                $identity['access_time'] + $windowLength * 60
+            );
         }
 
         // Updating window_length in the contest out of the valid range

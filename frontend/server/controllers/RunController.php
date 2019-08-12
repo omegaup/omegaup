@@ -294,7 +294,7 @@ class RunController extends Controller {
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
-            'time' => gmdate('Y-m-d H:i:s', Time::get()),
+            'time' => Time::get(),
             'memory' => 0,
             'score' => 0,
             'contest_score' => $problemsetId != null ? 0 : null,
