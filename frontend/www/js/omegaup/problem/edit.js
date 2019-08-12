@@ -379,7 +379,7 @@ OmegaUp.on('ready', function() {
                              message: commitMessage,
                              lang: lang,
                            })
-                    .then(function(response) { resolve(response); })
+                    .then(resolve)
                     .fail(UI.apiError);
               }));
             }
