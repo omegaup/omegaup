@@ -86,14 +86,14 @@ def create_run(driver, problem_alias, filename):
     logging.debug('Run submitted.')
 
 
-def no_javascript_errors(*, path_whitelist=(), message_list=()):
+def no_javascript_errors(*, path_whitelist=(), message_whitelist=()):
     '''Decorator for javascript errors'''
     def _internal(f):
         @functools.wraps(f)
         def _wrapper(driver, *args, **kwargs):
             '''Wrapper for javascript errors'''
             with assert_no_js_errors(driver, path_whitelist=path_whitelist,
-                                     message_list=message_list):
+                                     message_whitelist=message_whitelist):
                 return f(driver, *args, **kwargs)
         return _wrapper
     return _internal
@@ -126,7 +126,7 @@ def annotate(f):
 
 
 @contextlib.contextmanager
-def assert_no_js_errors(driver, *, path_whitelist=(), message_list=()):
+def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
     '''Shows in a list unexpected errors in javascript console'''
     driver.log_collector.push()
     try:
@@ -139,24 +139,25 @@ def assert_no_js_errors(driver, *, path_whitelist=(), message_list=()):
                 continue
             if is_path_whitelisted(entry['message'], path_whitelist):
                 continue
-            if message_matches(entry['message'], message_list):
+            if message_matches(entry['message'], message_whitelist):
                 continue
             unexpected_errors.append(entry['message'])
         assert not unexpected_errors, '\n'.join(unexpected_errors)
 
 
 @contextlib.contextmanager
-def assert_js_errors(driver, *, message=()):
-    '''Shows in a list unexpected errors in javascript console'''
-    expected_error_is_found = True
+def assert_js_errors(driver, *, message_list):
+    '''Asserts that a JavaScript error is logged in the console'''
+    if message_list is None:
+        return
     driver.log_collector.push()
     try:
         yield
     finally:
         for entry in driver.log_collector.pop():
-            if message_matches(entry['message'], message):
-                expected_error_is_found = True
-        assert expected_error_is_found, '%s was not found' % message
+            if message_matches(entry['message'], message_list):
+                break
+    assert False, '%r was not logged to the JavaScript console.' % message_list
 
 
 def is_path_whitelisted(message, path_whitelist):
@@ -313,7 +314,6 @@ def add_identities_group(driver, group_alias):
     return identities
 
 
-@contextlib.contextmanager
 def create_contest(driver, contest_alias, scoreboard_time_percent=100,
                    has_privileges=True):
     '''Creates a new contest.'''
@@ -343,11 +343,10 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100,
         with driver.page_transition():
             driver.browser.find_element_by_tag_name('form').submit()
     else:
-        submit_element = driver.browser.find_element_by_tag_name('form')
-        assert_get_alert(driver, submit_element)
+        driver.browser.find_element_by_tag_name('form').submit()
+        assert_alert_is_shown(driver)
 
 
-@contextlib.contextmanager
 def create_course(driver, course_alias, school_name, has_privileges=True):
     '''Creates one course with a new school.'''
 
@@ -378,17 +377,17 @@ def create_course(driver, course_alias, school_name, has_privileges=True):
     driver.browser.find_element_by_tag_name('textarea').send_keys(
         'course description')
 
-    if has_privileges:
-        with driver.page_transition():
-            driver.browser.find_element_by_tag_name('form').submit()
-        assert (('/course/%s/edit/' % course_alias) in
-                driver.browser.current_url), driver.browser.current_url
-    else:
-        submit_element = driver.browser.find_element_by_tag_name('form')
-        assert_get_alert(driver, submit_element)
+    if not has_privileges:
+        driver.browser.find_element_by_tag_name('form').submit()
+        assert_alert_is_shown(driver)
+        return
+
+    with driver.page_transition():
+        driver.browser.find_element_by_tag_name('form').submit()
+    assert (('/course/%s/edit/' % course_alias) in
+            driver.browser.current_url), driver.browser.current_url
 
 
-@contextlib.contextmanager
 def create_problem(driver, problem_alias, has_privileges=True):
     '''Create a problem.'''
 
@@ -432,44 +431,17 @@ def create_problem(driver, problem_alias, has_privileges=True):
         assert (('/problem/%s/edit/' % problem_alias) in
                 driver.browser.current_url), driver.browser.current_url
     else:
-        assert_get_alert(driver, contents_element)
+        contents_element.submit()
+        assert_alert_is_shown(driver)
 
 
-def assert_get_alert(driver, submit_element):
-    ''' When an identity tries to create something it should get a message. '''
+def assert_alert_is_shown(driver):
+    '''When an identity tries to perform an action without permission,
 
-    submit_element.submit()
+    a message is shown'''
 
     message = driver.wait.until(
         EC.visibility_of_element_located((By.ID, 'status')))
     message_class = message.get_attribute('class')
 
     assert 'danger' in message_class, message_class
-
-
-@contextlib.contextmanager
-def assert_page_not_found(driver, page):
-    ''' Asserts user or identity does not have access to the page. '''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.ID, 'nav-%ss' % (page)))).click()
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-%ss"]'
-                  '//a[@href = "/%s/mine/"]' % (page, page))))).click()
-
-    error_page = driver.wait.until(
-        EC.visibility_of_element_located((By.XPATH, '//h1/strong')))
-    error_symbol = error_page.get_attribute('title')
-
-    assert 'omega' in error_symbol, error_symbol
-
-    error_page = driver.wait.until(
-        EC.visibility_of_element_located((By.XPATH, '//h1/span')))
-    error_down = error_page.get_attribute('title')
-
-    assert 'Down' in error_down, error_down
