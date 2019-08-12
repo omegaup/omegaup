@@ -156,7 +156,7 @@ def assert_js_errors(driver, *, message_list):
     finally:
         for entry in driver.log_collector.pop():
             if message_matches(entry['message'], message_list):
-                break
+                return
     assert False, '%r was not logged to the JavaScript console.' % message_list
 
 
