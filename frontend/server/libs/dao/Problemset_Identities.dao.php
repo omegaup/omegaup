@@ -60,7 +60,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
 
     public static function getWithExtraInformation($problemset_id) {
         $sql = 'SELECT
-                    pi.access_time,
+                    UNIX_TIMESTAMP(pi.access_time) as access_time,
                     UNIX_TIMESTAMP(pi.end_time) as end_time,
                     i.username,
                     i.country_id,

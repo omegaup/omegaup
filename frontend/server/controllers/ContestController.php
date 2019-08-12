@@ -2076,17 +2076,14 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
-
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
-        // Get identities from DB
-        $identities = ProblemsetIdentitiesDAO::getWithExtraInformation($contest->problemset_id);
-
-        $response = [];
-        $response['users'] = $identities;
-        $response['status'] = 'ok';
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'users' => ProblemsetIdentitiesDAO::getWithExtraInformation(
+                $contest->problemset_id
+            ),
+        ];
     }
 
     /**
