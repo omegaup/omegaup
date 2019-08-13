@@ -70,7 +70,7 @@ class Interviews extends VO {
       * @access public
       * @var int
      */
-    public $interview_id;
+    public $interview_id = 0;
 
     /**
       *  [Campo no documentado]

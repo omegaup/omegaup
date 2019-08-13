@@ -114,7 +114,7 @@ class Users extends VO {
       * @access public
       * @var int
      */
-    public $user_id;
+    public $user_id = 0;
 
     /**
       *  [Campo no documentado]

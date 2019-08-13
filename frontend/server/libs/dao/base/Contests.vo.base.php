@@ -138,7 +138,7 @@ class Contests extends VO {
       * @access public
       * @var int
      */
-    public $contest_id;
+    public $contest_id = 0;
 
     /**
       * La lista de problemas de este concurso

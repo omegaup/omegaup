@@ -70,7 +70,7 @@ class QualityNominationLog extends VO {
       * @access public
       * @var int
      */
-    public $qualitynomination_log_id;
+    public $qualitynomination_log_id = 0;
 
     /**
       *  [Campo no documentado]

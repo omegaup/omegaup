@@ -54,7 +54,7 @@ class Roles extends VO {
       * @access public
       * @var int
      */
-    public $role_id;
+    public $role_id = 0;
 
     /**
       * El nombre corto del rol.

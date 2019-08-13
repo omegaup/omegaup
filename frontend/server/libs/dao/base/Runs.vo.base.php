@@ -90,7 +90,7 @@ class Runs extends VO {
       * @access public
       * @var int
      */
-    public $run_id;
+    public $run_id = 0;
 
     /**
       * El envío

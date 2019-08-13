@@ -58,7 +58,7 @@ class Schools extends VO {
       * @access public
       * @var int
      */
-    public $school_id;
+    public $school_id = 0;
 
     /**
       *  [Campo no documentado]

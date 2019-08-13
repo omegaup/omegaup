@@ -27,10 +27,11 @@ abstract class ProblemsetProblemsDAOBase {
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @static
      * @throws Exception si la operacion fallo.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
+     *
+     * @param ProblemsetProblems $Problemset_Problems El objeto de tipo ProblemsetProblems
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemsetProblems $Problemset_Problems) : int {
         if (is_null($Problemset_Problems->problemset_id) || is_null($Problemset_Problems->problem_id)) {
@@ -62,9 +63,9 @@ abstract class ProblemsetProblemsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a actualizar.
+     * @param ProblemsetProblems $Problemset_Problems El objeto de tipo ProblemsetProblems a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(ProblemsetProblems $Problemset_Problems) : int {
         $sql = 'UPDATE `Problemset_Problems` SET `commit` = ?, `version` = ?, `points` = ?, `order` = ? WHERE `problemset_id` = ? AND `problem_id` = ?;';
@@ -87,8 +88,7 @@ abstract class ProblemsetProblemsDAOBase {
      * Este metodo cargará un objeto {@link ProblemsetProblems} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link ProblemsetProblems Un objeto del tipo {@link ProblemsetProblems}. NULL si no hay tal registro.
+     * @return ?ProblemsetProblems Un objeto del tipo {@link ProblemsetProblems}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $problemset_id, int $problem_id) : ?ProblemsetProblems {
         $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM Problemset_Problems WHERE (problemset_id = ? AND problem_id = ?) LIMIT 1;';
@@ -110,12 +110,12 @@ abstract class ProblemsetProblemsDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a eliminar
+     * @param ProblemsetProblems $Problemset_Problems El objeto de tipo ProblemsetProblems a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(ProblemsetProblems $Problemset_Problems) : void {
         $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ? AND problem_id = ?;';
@@ -138,16 +138,16 @@ abstract class ProblemsetProblemsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblems}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsetProblems}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -172,9 +172,9 @@ abstract class ProblemsetProblemsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto ProblemsetProblems suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param ProblemsetProblems [$Problemset_Problems] El objeto de tipo ProblemsetProblems a crear.
+     * @param ProblemsetProblems $Problemset_Problems El objeto de tipo ProblemsetProblems a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsetProblems $Problemset_Problems) : int {
         if (is_null($Problemset_Problems->commit)) {

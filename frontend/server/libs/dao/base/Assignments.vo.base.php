@@ -94,7 +94,7 @@ class Assignments extends VO {
       * @access public
       * @var int
      */
-    public $assignment_id;
+    public $assignment_id = 0;
 
     /**
       *  [Campo no documentado]

@@ -58,7 +58,7 @@ class UsersBadges extends VO {
       * @access public
       * @var int
      */
-    public $user_badge_id;
+    public $user_badge_id = 0;
 
     /**
       * Identificador de usuario

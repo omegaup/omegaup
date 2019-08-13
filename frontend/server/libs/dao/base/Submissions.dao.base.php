@@ -21,9 +21,9 @@ abstract class SubmissionsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param Submissions [$Submissions] El objeto de tipo Submissions a actualizar.
+     * @param Submissions $Submissions El objeto de tipo Submissions a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(Submissions $Submissions) : int {
         $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
@@ -50,8 +50,7 @@ abstract class SubmissionsDAOBase {
      * Este metodo cargará un objeto {@link Submissions} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Submissions Un objeto del tipo {@link Submissions}. NULL si no hay tal registro.
+     * @return ?Submissions Un objeto del tipo {@link Submissions}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $submission_id) : ?Submissions {
         $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
@@ -73,12 +72,12 @@ abstract class SubmissionsDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Submissions [$Submissions] El objeto de tipo Submissions a eliminar
+     * @param Submissions $Submissions El objeto de tipo Submissions a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(Submissions $Submissions) : void {
         $sql = 'DELETE FROM `Submissions` WHERE submission_id = ?;';
@@ -101,16 +100,16 @@ abstract class SubmissionsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Submissions}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link Submissions}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -135,9 +134,9 @@ abstract class SubmissionsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Submissions suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Submissions [$Submissions] El objeto de tipo Submissions a crear.
+     * @param Submissions $Submissions El objeto de tipo Submissions a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Submissions $Submissions) : int {
         if (is_null($Submissions->time)) {

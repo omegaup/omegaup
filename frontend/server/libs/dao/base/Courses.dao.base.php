@@ -21,9 +21,9 @@ abstract class CoursesDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param Courses [$Courses] El objeto de tipo Courses a actualizar.
+     * @param Courses $Courses El objeto de tipo Courses a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(Courses $Courses) : int {
         $sql = 'UPDATE `Courses` SET `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ?, `public` = ?, `school_id` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `show_scoreboard` = ? WHERE `course_id` = ?;';
@@ -53,8 +53,7 @@ abstract class CoursesDAOBase {
      * Este metodo cargará un objeto {@link Courses} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Courses Un objeto del tipo {@link Courses}. NULL si no hay tal registro.
+     * @return ?Courses Un objeto del tipo {@link Courses}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $course_id) : ?Courses {
         $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` FROM Courses WHERE (course_id = ?) LIMIT 1;';
@@ -76,12 +75,12 @@ abstract class CoursesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Courses [$Courses] El objeto de tipo Courses a eliminar
+     * @param Courses $Courses El objeto de tipo Courses a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(Courses $Courses) : void {
         $sql = 'DELETE FROM `Courses` WHERE course_id = ?;';
@@ -104,16 +103,16 @@ abstract class CoursesDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Courses}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link Courses}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -138,9 +137,9 @@ abstract class CoursesDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Courses suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Courses [$Courses] El objeto de tipo Courses a crear.
+     * @param Courses $Courses El objeto de tipo Courses a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Courses $Courses) : int {
         if (is_null($Courses->start_time)) {

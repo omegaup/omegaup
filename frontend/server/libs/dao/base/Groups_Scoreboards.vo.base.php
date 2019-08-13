@@ -66,7 +66,7 @@ class GroupsScoreboards extends VO {
       * @access public
       * @var int
      */
-    public $group_scoreboard_id;
+    public $group_scoreboard_id = 0;
 
     /**
       *  [Campo no documentado]

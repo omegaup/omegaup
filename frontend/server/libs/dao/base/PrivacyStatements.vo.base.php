@@ -54,7 +54,7 @@ class PrivacyStatements extends VO {
       * @access public
       * @var int
      */
-    public $privacystatement_id;
+    public $privacystatement_id = 0;
 
     /**
       * Id de la versión del documento en el que se almacena la nueva política

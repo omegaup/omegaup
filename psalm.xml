@@ -19,4 +19,8 @@
     <issueHandlers>
         <LessSpecificReturnType errorLevel="info" />
     </issueHandlers>
+
+    <globals>
+        <var name="conn" type="MySQLConnection" />
+    </globals>
 </psalm>

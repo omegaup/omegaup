@@ -62,7 +62,7 @@ class Notifications extends VO {
       * @access public
       * @var int
      */
-    public $notification_id;
+    public $notification_id = 0;
 
     /**
       * Identificador de usuario

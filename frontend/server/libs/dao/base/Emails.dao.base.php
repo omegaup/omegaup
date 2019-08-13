@@ -21,9 +21,9 @@ abstract class EmailsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param Emails [$Emails] El objeto de tipo Emails a actualizar.
+     * @param Emails $Emails El objeto de tipo Emails a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(Emails $Emails) : int {
         $sql = 'UPDATE `Emails` SET `email` = ?, `user_id` = ? WHERE `email_id` = ?;';
@@ -43,8 +43,7 @@ abstract class EmailsDAOBase {
      * Este metodo cargará un objeto {@link Emails} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Emails Un objeto del tipo {@link Emails}. NULL si no hay tal registro.
+     * @return ?Emails Un objeto del tipo {@link Emails}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $email_id) : ?Emails {
         $sql = 'SELECT `Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id` FROM Emails WHERE (email_id = ?) LIMIT 1;';
@@ -66,12 +65,12 @@ abstract class EmailsDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Emails [$Emails] El objeto de tipo Emails a eliminar
+     * @param Emails $Emails El objeto de tipo Emails a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(Emails $Emails) : void {
         $sql = 'DELETE FROM `Emails` WHERE email_id = ?;';
@@ -94,16 +93,16 @@ abstract class EmailsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Emails}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link Emails}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -128,9 +127,9 @@ abstract class EmailsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Emails suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Emails [$Emails] El objeto de tipo Emails a crear.
+     * @param Emails $Emails El objeto de tipo Emails a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Emails $Emails) : int {
         $sql = 'INSERT INTO Emails (`email`, `user_id`) VALUES (?, ?);';

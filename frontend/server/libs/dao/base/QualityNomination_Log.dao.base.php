@@ -21,9 +21,9 @@ abstract class QualityNominationLogDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param QualityNominationLog [$QualityNomination_Log] El objeto de tipo QualityNominationLog a actualizar.
+     * @param QualityNominationLog $QualityNomination_Log El objeto de tipo QualityNominationLog a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(QualityNominationLog $QualityNomination_Log) : int {
         $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
@@ -47,8 +47,7 @@ abstract class QualityNominationLogDAOBase {
      * Este metodo cargará un objeto {@link QualityNominationLog} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link QualityNominationLog Un objeto del tipo {@link QualityNominationLog}. NULL si no hay tal registro.
+     * @return ?QualityNominationLog Un objeto del tipo {@link QualityNominationLog}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $qualitynomination_log_id) : ?QualityNominationLog {
         $sql = 'SELECT `QualityNomination_Log`.`qualitynomination_log_id`, `QualityNomination_Log`.`qualitynomination_id`, `QualityNomination_Log`.`time`, `QualityNomination_Log`.`user_id`, `QualityNomination_Log`.`from_status`, `QualityNomination_Log`.`to_status`, `QualityNomination_Log`.`rationale` FROM QualityNomination_Log WHERE (qualitynomination_log_id = ?) LIMIT 1;';
@@ -70,12 +69,12 @@ abstract class QualityNominationLogDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param QualityNominationLog [$QualityNomination_Log] El objeto de tipo QualityNominationLog a eliminar
+     * @param QualityNominationLog $QualityNomination_Log El objeto de tipo QualityNominationLog a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(QualityNominationLog $QualityNomination_Log) : void {
         $sql = 'DELETE FROM `QualityNomination_Log` WHERE qualitynomination_log_id = ?;';
@@ -98,16 +97,16 @@ abstract class QualityNominationLogDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link QualityNominationLog}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link QualityNominationLog}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -132,9 +131,9 @@ abstract class QualityNominationLogDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto QualityNominationLog suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param QualityNominationLog [$QualityNomination_Log] El objeto de tipo QualityNominationLog a crear.
+     * @param QualityNominationLog $QualityNomination_Log El objeto de tipo QualityNominationLog a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(QualityNominationLog $QualityNomination_Log) : int {
         if (is_null($QualityNomination_Log->time)) {

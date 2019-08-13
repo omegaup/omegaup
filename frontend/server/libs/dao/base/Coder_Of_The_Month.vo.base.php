@@ -70,7 +70,7 @@ class CoderOfTheMonth extends VO {
       * @access public
       * @var int
      */
-    public $coder_of_the_month_id;
+    public $coder_of_the_month_id = 0;
 
     /**
       *  [Campo no documentado]

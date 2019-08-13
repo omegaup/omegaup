@@ -58,7 +58,7 @@ class PrivacyStatementConsentLog extends VO {
       * @access public
       * @var int
      */
-    public $privacystatement_consent_id;
+    public $privacystatement_consent_id = 0;
 
     /**
       * Identidad del usuario

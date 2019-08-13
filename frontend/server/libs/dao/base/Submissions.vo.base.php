@@ -82,7 +82,7 @@ class Submissions extends VO {
       * @access public
       * @var int
      */
-    public $submission_id;
+    public $submission_id = 0;
 
     /**
       * La evaluación actual del envío
