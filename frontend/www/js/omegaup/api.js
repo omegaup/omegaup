@@ -506,6 +506,8 @@ export default {
 
     updateStatement: _call('/api/problem/updateStatement/'),
 
+    updateSolution: _call('/api/problem/updateSolution/'),
+
     versions: _call('/api/problem/versions/'),
   },
 
