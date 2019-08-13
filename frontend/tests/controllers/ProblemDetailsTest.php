@@ -330,7 +330,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
      */
     public function testShowSolutionInexistent() {
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'zipName' => OMEGAUP_RESOURCES_ROOT . 'imagetest.zip',
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
         ]));
         $login = self::login($problemData['author']);
         {

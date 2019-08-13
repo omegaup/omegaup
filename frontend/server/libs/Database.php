@@ -38,6 +38,12 @@ class MySQLConnection {
         $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
         $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
+        if (defined('PSALM_VERSION')) {
+            // If we are running under psalm, avoid actually connecting to the
+            // database.
+            return;
+        }
+
         if (!$this->_connection->real_connect(
             "p:{$hostname}",
             $username,
