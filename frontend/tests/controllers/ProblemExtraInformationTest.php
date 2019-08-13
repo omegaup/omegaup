@@ -13,7 +13,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
     public function testProblemUpdateByReviewer() {
         // Create a private problem.
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip'
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
         // Annonymus user is able to see the problem
         $r = new Request([
@@ -41,7 +41,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
      */
     public function testProblemSolutionStatus() {
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'zipName' => OMEGAUP_RESOURCES_ROOT . 'triangulos.zip'
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
 
         // Problem author should get the problem as unlocked
@@ -63,7 +63,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
 
         // Problem with no solutions should return NOT_FOUND
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'zipName' => OMEGAUP_RESOURCES_ROOT . 'imagetest.zip'
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip'
         ]));
         $result = ProblemController::getProblemDetailsForSmarty(new Request([
             'problem_alias' => $problemData['request']['problem_alias'],

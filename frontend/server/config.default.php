@@ -1,9 +1,13 @@
 <?php
 if (!function_exists('try_define')) {
-    function try_define($name, $value) {
-        if (!defined($name)) {
-            define($name, $value);
+    /**
+     * @param mixed $value
+     */
+    function try_define(string $name, $value) : void {
+        if (defined($name)) {
+            return;
         }
+        define($name, $value);
     }
 }
 # ###################################
@@ -17,6 +21,12 @@ try_define('OMEGAUP_MD5_SALT', 'omegaup');
 try_define('OMEGAUP_URL', 'http://localhost');
 try_define('OMEGAUP_ENVIRONMENT', 'production');
 try_define('OMEGAUP_MAINTENANCE', null);
+
+# ####################################
+# TEST CONFIG
+# ####################################
+try_define('OMEGAUP_TEST_ROOT', OMEGAUP_ROOT . '/tests/controllers/');
+try_define('OMEGAUP_TEST_RESOURCES_ROOT', OMEGAUP_ROOT . '/tests/resources/');
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
 # ####################################

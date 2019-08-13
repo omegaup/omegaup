@@ -691,6 +691,7 @@ const translations = {
 	problemVersionUpdated: "Problem version updated.",
 	problemVersionUsername: "Username",
 	problemVersionVersion: "Problem version",
+	problemsetIdentityNotFound: "User or identity are not associated with this course, contest or task.",
 	problemsetNotFound: "Problemset does not exist.",
 	profile: "Name",
 	profileAddIdentitiesTooltip: "Add identities using their omegaUp username",

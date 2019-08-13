@@ -725,18 +725,18 @@ class ContestController extends Controller {
             // Adding timer info separately as it depends on the current user and we don't
             // want this to get generally cached for everybody
             // Save the time of the first access
-            $problemsetUser = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
+            $problemsetIdentity = ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r->identity,
                 $response['contest']
             );
 
             // Add time left to response
-            if ($response['contest']->window_length === null) {
+            if (is_null($response['contest']->window_length)) {
                 $result['submission_deadline'] = $response['contest']->finish_time;
             } else {
                 $result['submission_deadline'] = min(
                     $response['contest']->finish_time,
-                    $problemsetUser->access_time + $response['contest']->window_length * 60
+                    $problemsetIdentity->access_time + $response['contest']->window_length * 60
                 );
             }
             $result['admin'] = Authorization::isContestAdmin(
@@ -2231,7 +2231,48 @@ class ContestController extends Controller {
     }
 
     /**
-     * This function reviews changes in penalty type and admission mode
+     * Update Contest end time for an identity when window_length
+     * option is turned on
+     *
+     * @param Request $r
+     * @return array
+     * @throws NotFoundException
+     */
+    public static function apiUpdateEndTimeForIdentity(Request $r) {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        self::authenticateRequest($r);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
+
+        Validators::validateStringNonEmpty($r['username'], 'username');
+        Validators::validateNumber($r['end_time'], 'end_time');
+
+        $identity = IdentityController::resolveIdentity($r['username']);
+        if (is_null($identity)) {
+            throw new NotFoundException('userNotFound');
+        }
+
+        $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+            $identity->identity_id,
+            $contest->problemset_id
+        );
+
+        $problemsetIdentity->end_time = $r['end_time'];
+        ProblemsetIdentitiesDAO::update($problemsetIdentity);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * This function reviews changes in penalty type, admission mode, finish
+     * time and window length to recalcualte information previously stored
      */
     private static function updateContest(
         Contests $contest,

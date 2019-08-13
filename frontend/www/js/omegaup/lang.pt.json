@@ -690,6 +690,7 @@
 	"problemVersionUpdated": "Vers\u00e3o do problema atualizada.",
 	"problemVersionUsername": "Nome de usu\u00e1rio",
 	"problemVersionVersion": "Vers\u00e3o do problema",
+	"problemsetIdentityNotFound": "O usu\u00e1rio ou identidade n\u00e3o est\u00e1 associado ao curso, question\u00e1rio ou tarefa.",
 	"problemsetNotFound": "Conjunto de problemas n\u00e3o encontrado.",
 	"profile": "Nome",
 	"profileAddIdentitiesTooltip": "Adicionar identidades usando seu nome de usu\u00e1rio omegaUp",
