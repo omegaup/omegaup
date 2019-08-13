@@ -20,8 +20,12 @@ export default class CoderOfTheMonthNotice extends Vue {
   UI = UI;
 
   get show(): boolean {
-    return !!(this.currentUsername && this.coderUsername &&
-            this.coderUsername === this.currentUsername);
+    return !!(
+      this.currentUsername &&
+      this.coderUsername &&
+      this.coderUsername === this.currentUsername
+    );
   }
 }
+
 </script>
