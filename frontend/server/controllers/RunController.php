@@ -166,7 +166,7 @@ class RunController extends Controller {
         // Contest admins can skip following checks
         if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
             // Before submit something, user had to open the problem/problemset.
-            if (!$problemsetIdentity &&
+            if (is_null($problemsetIdentity) &&
                 !Authorization::canSubmitToProblemset(
                     $r->identity,
                     $r['problemset']
