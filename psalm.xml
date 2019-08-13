@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<psalm
+    totallyTyped="true"
+		autoloader="frontend/server/bootstrap.php"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="frontend" />
+        <ignoreFiles>
+            <directory name="vendor" />
+            <directory name="frontend/server/libs/third_party" />
+            <directory name="frontend/www" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <LessSpecificReturnType errorLevel="info" />
+    </issueHandlers>
+</psalm>
