@@ -66,7 +66,7 @@ class ContestLog extends VO {
       * @access public
       * @var int
      */
-    public $public_contest_id;
+    public $public_contest_id = 0;
 
     /**
       *  [Campo no documentado]

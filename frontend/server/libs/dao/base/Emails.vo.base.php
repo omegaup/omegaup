@@ -54,7 +54,7 @@ class Emails extends VO {
       * @access public
       * @var int
      */
-    public $email_id;
+    public $email_id = 0;
 
     /**
       *  [Campo no documentado]

@@ -66,7 +66,7 @@ class ProblemsetIdentityRequestHistory extends VO {
       * @access public
       * @var int
      */
-    public $history_id;
+    public $history_id = 0;
 
     /**
       * Identidad del usuario

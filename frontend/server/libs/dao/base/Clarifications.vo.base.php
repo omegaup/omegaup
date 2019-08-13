@@ -78,7 +78,7 @@ class Clarifications extends VO {
       * @access public
       * @var int
      */
-    public $clarification_id;
+    public $clarification_id = 0;
 
     /**
       * Autor de la clarificación.

@@ -27,10 +27,11 @@ abstract class UserRankDAOBase {
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @static
      * @throws Exception si la operacion fallo.
-     * @param UserRank [$User_Rank] El objeto de tipo UserRank
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
+     *
+     * @param UserRank $User_Rank El objeto de tipo UserRank
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(UserRank $User_Rank) : int {
         if (is_null($User_Rank->user_id)) {
@@ -62,9 +63,9 @@ abstract class UserRankDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param UserRank [$User_Rank] El objeto de tipo UserRank a actualizar.
+     * @param UserRank $User_Rank El objeto de tipo UserRank a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(UserRank $User_Rank) : int {
         $sql = 'UPDATE `User_Rank` SET `rank` = ?, `problems_solved_count` = ?, `score` = ?, `username` = ?, `name` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ? WHERE `user_id` = ?;';
@@ -90,8 +91,7 @@ abstract class UserRankDAOBase {
      * Este metodo cargará un objeto {@link UserRank} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link UserRank Un objeto del tipo {@link UserRank}. NULL si no hay tal registro.
+     * @return ?UserRank Un objeto del tipo {@link UserRank}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $user_id) : ?UserRank {
         $sql = 'SELECT `User_Rank`.`user_id`, `User_Rank`.`rank`, `User_Rank`.`problems_solved_count`, `User_Rank`.`score`, `User_Rank`.`username`, `User_Rank`.`name`, `User_Rank`.`country_id`, `User_Rank`.`state_id`, `User_Rank`.`school_id` FROM User_Rank WHERE (user_id = ?) LIMIT 1;';
@@ -113,12 +113,12 @@ abstract class UserRankDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param UserRank [$User_Rank] El objeto de tipo UserRank a eliminar
+     * @param UserRank $User_Rank El objeto de tipo UserRank a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(UserRank $User_Rank) : void {
         $sql = 'DELETE FROM `User_Rank` WHERE user_id = ?;';
@@ -141,16 +141,16 @@ abstract class UserRankDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link UserRank}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link UserRank}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -175,9 +175,9 @@ abstract class UserRankDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto UserRank suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param UserRank [$User_Rank] El objeto de tipo UserRank a crear.
+     * @param UserRank $User_Rank El objeto de tipo UserRank a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(UserRank $User_Rank) : int {
         if (is_null($User_Rank->problems_solved_count)) {

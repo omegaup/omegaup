@@ -66,7 +66,7 @@ class Messages extends VO {
       * @access public
       * @var int
      */
-    public $message_id;
+    public $message_id = 0;
 
     /**
       *  [Campo no documentado]

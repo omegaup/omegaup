@@ -70,7 +70,7 @@ class QualityNominations extends VO {
       * @access public
       * @var int
      */
-    public $qualitynomination_id;
+    public $qualitynomination_id = 0;
 
     /**
       * El usuario que nominó el problema

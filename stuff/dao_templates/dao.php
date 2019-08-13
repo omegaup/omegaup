@@ -28,10 +28,11 @@ abstract class {{ table.class_name }}DAOBase {
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @static
      * @throws Exception si la operacion fallo.
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
+     *
+     * @param {{ table.class_name }} ${{ table.name }} El objeto de tipo {{ table.class_name }}
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace({{ table.class_name }} ${{ table.name }}) : int {
         if ({{ table.columns|selectattr('primary_key')|listformat('is_null(${table.name}->{.name})', table=table)|join(' || ') }}) {
@@ -81,9 +82,9 @@ abstract class {{ table.class_name }}DAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a actualizar.
+     * @param {{ table.class_name }} ${{ table.name }} El objeto de tipo {{ table.class_name }} a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update({{ table.class_name }} ${{ table.name }}) : int {
         $sql = 'UPDATE `{{ table.name }}` SET {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(', ') }} WHERE {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND ') }};';
@@ -131,8 +132,7 @@ abstract class {{ table.class_name }}DAOBase {
      * Este metodo cargará un objeto {@link {{ table.class_name }}} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link {{ table.class_name }} Un objeto del tipo {@link {{ table.class_name }}}. NULL si no hay tal registro.
+     * @return ?{{ table.class_name }} Un objeto del tipo {@link {{ table.class_name }}}. NULL si no hay tal registro.
      */
     final public static function getByPK({{ table.columns|selectattr('primary_key')|listformat('{0.php_type} ${0.name}')|join(', ') }}) : ?{{ table.class_name }} {
   {%- if table.columns|selectattr('primary_key')|rejectattr('not_null')|list|length %}
@@ -159,12 +159,12 @@ abstract class {{ table.class_name }}DAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a eliminar
+     * @param {{ table.class_name }} ${{ table.name }} El objeto de tipo {{ table.class_name }} a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete({{ table.class_name }} ${{ table.name }}) : void {
         $sql = 'DELETE FROM `{{ table.name }}` WHERE {{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }};';
@@ -187,16 +187,16 @@ abstract class {{ table.class_name }}DAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link {{ table.class_name }}}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link {{ table.class_name }}}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -226,9 +226,9 @@ abstract class {{ table.class_name }}DAOBase {
      * {{ table.class_name }} dentro de la misma transacción.
      *
 {%- endif %}
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a crear.
+     * @param {{ table.class_name }} ${{ table.name }} El objeto de tipo {{ table.class_name }} a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create({{ table.class_name }} ${{ table.name }}) : int {
 {%- for column in table.columns|selectattr('default') %}

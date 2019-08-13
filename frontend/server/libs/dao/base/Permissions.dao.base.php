@@ -21,9 +21,9 @@ abstract class PermissionsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param Permissions [$Permissions] El objeto de tipo Permissions a actualizar.
+     * @param Permissions $Permissions El objeto de tipo Permissions a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(Permissions $Permissions) : int {
         $sql = 'UPDATE `Permissions` SET `name` = ?, `description` = ? WHERE `permission_id` = ?;';
@@ -43,8 +43,7 @@ abstract class PermissionsDAOBase {
      * Este metodo cargará un objeto {@link Permissions} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Permissions Un objeto del tipo {@link Permissions}. NULL si no hay tal registro.
+     * @return ?Permissions Un objeto del tipo {@link Permissions}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $permission_id) : ?Permissions {
         $sql = 'SELECT `Permissions`.`permission_id`, `Permissions`.`name`, `Permissions`.`description` FROM Permissions WHERE (permission_id = ?) LIMIT 1;';
@@ -66,12 +65,12 @@ abstract class PermissionsDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Permissions [$Permissions] El objeto de tipo Permissions a eliminar
+     * @param Permissions $Permissions El objeto de tipo Permissions a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(Permissions $Permissions) : void {
         $sql = 'DELETE FROM `Permissions` WHERE permission_id = ?;';
@@ -94,16 +93,16 @@ abstract class PermissionsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Permissions}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link Permissions}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -128,9 +127,9 @@ abstract class PermissionsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Permissions suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Permissions [$Permissions] El objeto de tipo Permissions a crear.
+     * @param Permissions $Permissions El objeto de tipo Permissions a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Permissions $Permissions) : int {
         $sql = 'INSERT INTO Permissions (`name`, `description`) VALUES (?, ?);';

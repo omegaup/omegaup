@@ -50,7 +50,7 @@ class Tags extends VO {
       * @access public
       * @var int
      */
-    public $tag_id;
+    public $tag_id = 0;
 
     /**
       *  [Campo no documentado]

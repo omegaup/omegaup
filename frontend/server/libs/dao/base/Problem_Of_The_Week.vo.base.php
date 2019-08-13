@@ -58,7 +58,7 @@ class ProblemOfTheWeek extends VO {
       * @access public
       * @var int
      */
-    public $problem_of_the_week_id;
+    public $problem_of_the_week_id = 0;
 
     /**
       * El id del problema escogido como problema de la semana.

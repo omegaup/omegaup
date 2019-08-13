@@ -82,7 +82,7 @@ class Identities extends VO {
       * @access public
       * @var int
      */
-    public $identity_id;
+    public $identity_id = 0;
 
     /**
       *  [Campo no documentado]

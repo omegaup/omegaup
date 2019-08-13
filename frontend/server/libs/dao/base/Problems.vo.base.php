@@ -126,7 +126,7 @@ class Problems extends VO {
       * @access public
       * @var int
      */
-    public $problem_id;
+    public $problem_id = 0;
 
     /**
       *  [Campo no documentado]

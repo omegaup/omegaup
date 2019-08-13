@@ -90,7 +90,7 @@ class Problemsets extends VO {
       * @access public
       * @var int
      */
-    public $problemset_id;
+    public $problemset_id = 0;
 
     /**
       * La lista de control de acceso compartida con su container

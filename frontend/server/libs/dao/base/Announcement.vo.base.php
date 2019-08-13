@@ -58,7 +58,7 @@ class Announcement extends VO {
       * @access public
       * @var int
      */
-    public $announcement_id;
+    public $announcement_id = 0;
 
     /**
       * UserID del autor de este aviso

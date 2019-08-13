@@ -66,7 +66,7 @@ class Groups extends VO {
       * @access public
       * @var int
      */
-    public $group_id;
+    public $group_id = 0;
 
     /**
       *  [Campo no documentado]

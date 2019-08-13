@@ -94,7 +94,7 @@ class Courses extends VO {
       * @access public
       * @var int
      */
-    public $course_id;
+    public $course_id = 0;
 
     /**
       *  [Campo no documentado]

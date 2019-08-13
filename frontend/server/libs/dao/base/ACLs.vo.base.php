@@ -50,7 +50,7 @@ class ACLs extends VO {
       * @access public
       * @var int
      */
-    public $acl_id;
+    public $acl_id = 0;
 
     /**
       * El usuario que creó el objeto y que tiene un rol de administrador implícito

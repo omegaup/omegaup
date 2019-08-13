@@ -54,7 +54,7 @@ class Permissions extends VO {
       * @access public
       * @var int
      */
-    public $permission_id;
+    public $permission_id = 0;
 
     /**
       * El nombre corto del permiso.

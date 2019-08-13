@@ -77,6 +77,8 @@ class {{ table.class_name }} extends VO {
 {%- else %}
     public ${{ column.name }} = '{{ column.default }}';
 {%- endif %}
+{%- elif column.auto_increment %}
+    public ${{ column.name }} = 0;
 {%- else %}
     public ${{ column.name }};
 {%- endif %}

@@ -66,7 +66,7 @@ class QualityNominationComments extends VO {
       * @access public
       * @var int
      */
-    public $qualitynomination_comment_id;
+    public $qualitynomination_comment_id = 0;
 
     /**
       *  [Campo no documentado]

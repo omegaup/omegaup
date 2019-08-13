@@ -24,8 +24,7 @@ abstract class UserRolesDAOBase {
      * Este metodo cargará un objeto {@link UserRoles} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link UserRoles Un objeto del tipo {@link UserRoles}. NULL si no hay tal registro.
+     * @return ?UserRoles Un objeto del tipo {@link UserRoles}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $user_id, int $role_id, int $acl_id) : ?UserRoles {
         $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` FROM User_Roles WHERE (user_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
@@ -47,12 +46,12 @@ abstract class UserRolesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param UserRoles [$User_Roles] El objeto de tipo UserRoles a eliminar
+     * @param UserRoles $User_Roles El objeto de tipo UserRoles a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(UserRoles $User_Roles) : void {
         $sql = 'DELETE FROM `User_Roles` WHERE user_id = ? AND role_id = ? AND acl_id = ?;';
@@ -75,16 +74,16 @@ abstract class UserRolesDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link UserRoles}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return array Un arreglo que contiene objetos del tipo {@link UserRoles}.
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -109,9 +108,9 @@ abstract class UserRolesDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto UserRoles suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param UserRoles [$User_Roles] El objeto de tipo UserRoles a crear.
+     * @param UserRoles $User_Roles El objeto de tipo UserRoles a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(UserRoles $User_Roles) : int {
         $sql = 'INSERT INTO User_Roles (`user_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
