@@ -9,10 +9,10 @@ declare namespace omegaup {
     addError: (error: any) => void;
     convertTimes: (item: any) => any;
     experiments?: omegaup.Experiments;
-    loggedIn: bool;
+    loggedIn: boolean;
     on: (events: string, handler: () => void) => void;
-    ready: bool;
-    remoteTime: (timestamp: int, options: {}) => Date;
+    ready: boolean;
+    remoteTime: (timestamp: number, options: {}) => Date;
     username?: string;
   };
 }

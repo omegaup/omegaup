@@ -1,5 +1,6 @@
 <template>
   <input class="form-control"
+        readonly
         size="16"
         type="text"
         v-bind:disabled="!enabled">
@@ -16,6 +17,8 @@ export default class DateTimePicker extends Vue {
   @Prop() value!: Date;
   @Prop({ default: true }) enabled!: boolean;
   @Prop({ default: T.dateTimePickerFormat }) format!: string;
+  @Prop({ default: null }) start!: Date;
+  @Prop({ default: null }) finish!: Date;
 
   mounted() {
     let self = this;
@@ -37,6 +40,16 @@ export default class DateTimePicker extends Vue {
     $(this.$el)
       .data('datetimepicker')
       .setDate(self.value);
+    if (self.start != null) {
+      $(this.$el)
+        .data('datetimepicker')
+        .setStartDate(self.start);
+    }
+    if (self.finish != null) {
+      $(this.$el)
+        .data('datetimepicker')
+        .setEndDate(self.finish);
+    }
   }
 
   @Watch('value')

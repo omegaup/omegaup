@@ -227,13 +227,19 @@ export default {
 
     update: _call('/api/contest/update/'),
 
+    updateEndTimeForIdentity: _call('/api/contest/updateEndTimeForIdentity/'),
+
     users: _call('/api/contest/users/',
                  function(result) {
                    for (const user of result.users) {
-                     user.access_time =
-                         omegaup.OmegaUp.remoteTime(user.access_time * 1000);
+                     user.access_time = user.access_time == null ?
+                                            null :
+                                            omegaup.OmegaUp.remoteTime(
+                                                user.access_time * 1000);
                      user.end_time =
-                         omegaup.OmegaUp.remoteTime(user.end_time * 1000);
+                         user.end_time == null ?
+                             null :
+                             omegaup.OmegaUp.remoteTime(user.end_time * 1000);
                    }
                    return result;
                  }),

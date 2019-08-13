@@ -23,7 +23,12 @@ OmegaUp.on('ready', function() {
          API.Contest.admins({contest_alias: contestAlias}), )
       .done((contest, problems, users, requests, admins) => {
         problems = problems.problems;
-        users = users.users;
+        users = users.users.map(user => {
+          user.access_time = user.access_time == null ?
+                                 null :
+                                 UI.formatDateTime(user.access_time);
+          return user;
+        });
         let groupAdmins = admins.group_admins;
         requests = requests.users;
         admins = admins.admins;
@@ -148,6 +153,20 @@ OmegaUp.on('ready', function() {
                         }
                         UI.success(T.userRemoveSuccess);
                         refresh(ev, API.Contest.users, 'users');
+                      })
+                      .fail(UI.apiError);
+                },
+                'save-end-time': function(selected) {
+                  API.Contest.updateEndTimeForIdentity({
+                               contest_alias: contestAlias,
+                               username: selected.username,
+                               end_time: (selected.end_time.getTime()) / 1000,
+                             })
+                      .then(function(response) {
+                        if (response.status != 'ok') {
+                          UI.error(response.error || 'error');
+                        }
+                        UI.success(T.userEndTimeUpdatedSuccessfully);
                       })
                       .fail(UI.apiError);
                 },
