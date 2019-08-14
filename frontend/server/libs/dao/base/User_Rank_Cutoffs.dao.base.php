@@ -33,7 +33,9 @@ abstract class UserRankCutoffsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link UserRankCutoffs}.
+     * @return UserRankCutoffs[] Un arreglo que contiene objetos del tipo {@link UserRankCutoffs}.
+     *
+     * @psalm-return array<int, UserRankCutoffs>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -69,8 +71,8 @@ abstract class UserRankCutoffsDAOBase {
     final public static function create(UserRankCutoffs $User_Rank_Cutoffs) : int {
         $sql = 'INSERT INTO User_Rank_Cutoffs (`score`, `percentile`, `classname`) VALUES (?, ?, ?);';
         $params = [
-            (float)$User_Rank_Cutoffs->score,
-            (float)$User_Rank_Cutoffs->percentile,
+            is_null($User_Rank_Cutoffs->score) ? null : (float)$User_Rank_Cutoffs->score,
+            is_null($User_Rank_Cutoffs->percentile) ? null : (float)$User_Rank_Cutoffs->percentile,
             $User_Rank_Cutoffs->classname,
         ];
         global $conn;

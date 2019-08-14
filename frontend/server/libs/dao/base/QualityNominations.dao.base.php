@@ -28,8 +28,8 @@ abstract class QualityNominationsDAOBase {
     final public static function update(QualityNominations $QualityNominations) : int {
         $sql = 'UPDATE `QualityNominations` SET `user_id` = ?, `problem_id` = ?, `nomination` = ?, `contents` = ?, `time` = ?, `status` = ? WHERE `qualitynomination_id` = ?;';
         $params = [
-            (int)$QualityNominations->user_id,
-            (int)$QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
+            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
             DAO::toMySQLTimestamp($QualityNominations->time),
@@ -102,7 +102,9 @@ abstract class QualityNominationsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link QualityNominations}.
+     * @return QualityNominations[] Un arreglo que contiene objetos del tipo {@link QualityNominations}.
+     *
+     * @psalm-return array<int, QualityNominations>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -136,19 +138,10 @@ abstract class QualityNominationsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(QualityNominations $QualityNominations) : int {
-        if (is_null($QualityNominations->nomination)) {
-            $QualityNominations->nomination = 'suggestion';
-        }
-        if (is_null($QualityNominations->time)) {
-            $QualityNominations->time = Time::get();
-        }
-        if (is_null($QualityNominations->status)) {
-            $QualityNominations->status = 'open';
-        }
         $sql = 'INSERT INTO QualityNominations (`user_id`, `problem_id`, `nomination`, `contents`, `time`, `status`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$QualityNominations->user_id,
-            (int)$QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
+            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
             DAO::toMySQLTimestamp($QualityNominations->time),

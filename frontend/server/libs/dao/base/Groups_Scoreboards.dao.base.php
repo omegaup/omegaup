@@ -28,7 +28,7 @@ abstract class GroupsScoreboardsDAOBase {
     final public static function update(GroupsScoreboards $Groups_Scoreboards) : int {
         $sql = 'UPDATE `Groups_Scoreboards` SET `group_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_scoreboard_id` = ?;';
         $params = [
-            (int)$Groups_Scoreboards->group_id,
+            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
             DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,
@@ -101,7 +101,9 @@ abstract class GroupsScoreboardsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link GroupsScoreboards}.
+     * @return GroupsScoreboards[] Un arreglo que contiene objetos del tipo {@link GroupsScoreboards}.
+     *
+     * @psalm-return array<int, GroupsScoreboards>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -135,12 +137,9 @@ abstract class GroupsScoreboardsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(GroupsScoreboards $Groups_Scoreboards) : int {
-        if (is_null($Groups_Scoreboards->create_time)) {
-            $Groups_Scoreboards->create_time = Time::get();
-        }
         $sql = 'INSERT INTO Groups_Scoreboards (`group_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            (int)$Groups_Scoreboards->group_id,
+            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
             DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,

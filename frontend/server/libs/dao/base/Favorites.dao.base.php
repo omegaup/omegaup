@@ -26,7 +26,7 @@ abstract class FavoritesDAOBase {
      *
      * @return ?Favorites Un objeto del tipo {@link Favorites}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $user_id, int $problem_id) : ?Favorites {
+    final public static function getByPK(?int $user_id, ?int $problem_id) : ?Favorites {
         $sql = 'SELECT `Favorites`.`user_id`, `Favorites`.`problem_id` FROM Favorites WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
         global $conn;
@@ -79,7 +79,9 @@ abstract class FavoritesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Favorites}.
+     * @return Favorites[] Un arreglo que contiene objetos del tipo {@link Favorites}.
+     *
+     * @psalm-return array<int, Favorites>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -115,8 +117,8 @@ abstract class FavoritesDAOBase {
     final public static function create(Favorites $Favorites) : int {
         $sql = 'INSERT INTO Favorites (`user_id`, `problem_id`) VALUES (?, ?);';
         $params = [
-            (int)$Favorites->user_id,
-            (int)$Favorites->problem_id,
+            is_null($Favorites->user_id) ? null : (int)$Favorites->user_id,
+            is_null($Favorites->problem_id) ? null : (int)$Favorites->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

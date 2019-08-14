@@ -34,15 +34,22 @@ abstract class GroupsIdentitiesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(GroupsIdentities $Groups_Identities) : int {
-        if (is_null($Groups_Identities->group_id) || is_null($Groups_Identities->identity_id)) {
+        if (empty($Groups_Identities->group_id) || empty($Groups_Identities->identity_id)) {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Groups_Identities->group_id,
-            (int)$Groups_Identities->identity_id,
-            is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
-            is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
+            !is_null($Groups_Identities->group_id) ? intval($Groups_Identities->group_id) : null,
+            !is_null($Groups_Identities->identity_id) ? intval($Groups_Identities->identity_id) : null,
+            !is_null($Groups_Identities->share_user_information) ? intval($Groups_Identities->share_user_information) : null,
+            !is_null($Groups_Identities->privacystatement_consent_id) ? intval($Groups_Identities->privacystatement_consent_id) : null,
             $Groups_Identities->accept_teacher,
         ];
         global $conn;
@@ -63,8 +70,8 @@ abstract class GroupsIdentitiesDAOBase {
             is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
             is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,
-            (int)$Groups_Identities->group_id,
-            (int)$Groups_Identities->identity_id,
+            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
+            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -79,7 +86,7 @@ abstract class GroupsIdentitiesDAOBase {
      *
      * @return ?GroupsIdentities Un objeto del tipo {@link GroupsIdentities}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $group_id, int $identity_id) : ?GroupsIdentities {
+    final public static function getByPK(?int $group_id, ?int $identity_id) : ?GroupsIdentities {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$group_id, $identity_id];
         global $conn;
@@ -132,7 +139,9 @@ abstract class GroupsIdentitiesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link GroupsIdentities}.
+     * @return GroupsIdentities[] Un arreglo que contiene objetos del tipo {@link GroupsIdentities}.
+     *
+     * @psalm-return array<int, GroupsIdentities>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -168,8 +177,8 @@ abstract class GroupsIdentitiesDAOBase {
     final public static function create(GroupsIdentities $Groups_Identities) : int {
         $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            (int)$Groups_Identities->group_id,
-            (int)$Groups_Identities->identity_id,
+            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
+            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
             is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
             is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,

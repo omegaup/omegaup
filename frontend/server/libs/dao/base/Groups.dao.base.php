@@ -28,7 +28,7 @@ abstract class GroupsDAOBase {
     final public static function update(Groups $Groups) : int {
         $sql = 'UPDATE `Groups` SET `acl_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
         $params = [
-            (int)$Groups->acl_id,
+            is_null($Groups->acl_id) ? null : (int)$Groups->acl_id,
             DAO::toMySQLTimestamp($Groups->create_time),
             $Groups->alias,
             $Groups->name,
@@ -101,7 +101,9 @@ abstract class GroupsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Groups}.
+     * @return Groups[] Un arreglo que contiene objetos del tipo {@link Groups}.
+     *
+     * @psalm-return array<int, Groups>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -135,12 +137,9 @@ abstract class GroupsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Groups $Groups) : int {
-        if (is_null($Groups->create_time)) {
-            $Groups->create_time = Time::get();
-        }
         $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            (int)$Groups->acl_id,
+            is_null($Groups->acl_id) ? null : (int)$Groups->acl_id,
             DAO::toMySQLTimestamp($Groups->create_time),
             $Groups->alias,
             $Groups->name,

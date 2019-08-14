@@ -51,44 +51,44 @@ class GroupsIdentities extends VO {
             $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
         }
         if (isset($data['accept_teacher'])) {
-            $this->accept_teacher = $data['accept_teacher'];
+            $this->accept_teacher = strval($data['accept_teacher']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $group_id;
+    public $group_id = null;
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
-      * @access public
-      * @var ?bool
+     * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
+     *
+     * @var bool|null
      */
-    public $share_user_information;
+    public $share_user_information = null;
 
     /**
-      * Id del documento con el consentimiento de privacidad
-      * @access public
-      * @var ?int
+     * Id del documento con el consentimiento de privacidad
+     *
+     * @var int|null
      */
-    public $privacystatement_consent_id;
+    public $privacystatement_consent_id = null;
 
     /**
-      * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
-      * @access public
-      * @var ?string
+     * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
+     *
+     * @var string|null
      */
-    public $accept_teacher;
+    public $accept_teacher = null;
 }

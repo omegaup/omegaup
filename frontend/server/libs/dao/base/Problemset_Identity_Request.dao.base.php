@@ -34,19 +34,23 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
-        if (is_null($Problemset_Identity_Request->identity_id) || is_null($Problemset_Identity_Request->problemset_id)) {
+        if (empty($Problemset_Identity_Request->identity_id) || empty($Problemset_Identity_Request->problemset_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Problemset_Identity_Request->request_time)) {
-            $Problemset_Identity_Request->request_time = Time::get();
-        }
         $sql = 'REPLACE INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Problemset_Identity_Request->identity_id,
-            (int)$Problemset_Identity_Request->problemset_id,
+            !is_null($Problemset_Identity_Request->identity_id) ? intval($Problemset_Identity_Request->identity_id) : null,
+            !is_null($Problemset_Identity_Request->problemset_id) ? intval($Problemset_Identity_Request->problemset_id) : null,
             DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
             DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
-            is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
+            !is_null($Problemset_Identity_Request->accepted) ? intval($Problemset_Identity_Request->accepted) : null,
             $Problemset_Identity_Request->extra_note,
         ];
         global $conn;
@@ -68,8 +72,8 @@ abstract class ProblemsetIdentityRequestDAOBase {
             DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
-            (int)$Problemset_Identity_Request->identity_id,
-            (int)$Problemset_Identity_Request->problemset_id,
+            is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
+            is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -84,7 +88,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
      *
      * @return ?ProblemsetIdentityRequest Un objeto del tipo {@link ProblemsetIdentityRequest}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $identity_id, int $problemset_id) : ?ProblemsetIdentityRequest {
+    final public static function getByPK(?int $identity_id, ?int $problemset_id) : ?ProblemsetIdentityRequest {
         $sql = 'SELECT `Problemset_Identity_Request`.`identity_id`, `Problemset_Identity_Request`.`problemset_id`, `Problemset_Identity_Request`.`request_time`, `Problemset_Identity_Request`.`last_update`, `Problemset_Identity_Request`.`accepted`, `Problemset_Identity_Request`.`extra_note` FROM Problemset_Identity_Request WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
@@ -137,7 +141,9 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsetIdentityRequest}.
+     * @return ProblemsetIdentityRequest[] Un arreglo que contiene objetos del tipo {@link ProblemsetIdentityRequest}.
+     *
+     * @psalm-return array<int, ProblemsetIdentityRequest>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -171,13 +177,10 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
-        if (is_null($Problemset_Identity_Request->request_time)) {
-            $Problemset_Identity_Request->request_time = Time::get();
-        }
         $sql = 'INSERT INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Problemset_Identity_Request->identity_id,
-            (int)$Problemset_Identity_Request->problemset_id,
+            is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
+            is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
             DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
             DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,

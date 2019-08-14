@@ -48,26 +48,26 @@ class UserRoles extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $role_id;
+    public $role_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $acl_id;
+    public $acl_id = null;
 }

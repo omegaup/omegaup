@@ -98,7 +98,9 @@ abstract class PrivacyStatementsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link PrivacyStatements}.
+     * @return PrivacyStatements[] Un arreglo que contiene objetos del tipo {@link PrivacyStatements}.
+     *
+     * @psalm-return array<int, PrivacyStatements>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -132,9 +134,6 @@ abstract class PrivacyStatementsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(PrivacyStatements $PrivacyStatements) : int {
-        if (is_null($PrivacyStatements->type)) {
-            $PrivacyStatements->type = 'privacy_policy';
-        }
         $sql = 'INSERT INTO PrivacyStatements (`git_object_id`, `type`) VALUES (?, ?);';
         $params = [
             $PrivacyStatements->git_object_id,

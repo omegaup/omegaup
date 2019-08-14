@@ -28,13 +28,13 @@ abstract class ClarificationsDAOBase {
     final public static function update(Clarifications $Clarifications) : int {
         $sql = 'UPDATE `Clarifications` SET `author_id` = ?, `receiver_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `problemset_id` = ?, `public` = ? WHERE `clarification_id` = ?;';
         $params = [
-            (int)$Clarifications->author_id,
+            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
             is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
             DAO::toMySQLTimestamp($Clarifications->time),
             is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            (int)$Clarifications->problemset_id,
+            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
             (int)$Clarifications->public,
             (int)$Clarifications->clarification_id,
         ];
@@ -104,7 +104,9 @@ abstract class ClarificationsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Clarifications}.
+     * @return Clarifications[] Un arreglo que contiene objetos del tipo {@link Clarifications}.
+     *
+     * @psalm-return array<int, Clarifications>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -138,21 +140,15 @@ abstract class ClarificationsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Clarifications $Clarifications) : int {
-        if (is_null($Clarifications->time)) {
-            $Clarifications->time = Time::get();
-        }
-        if (is_null($Clarifications->public)) {
-            $Clarifications->public = false;
-        }
         $sql = 'INSERT INTO Clarifications (`author_id`, `receiver_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Clarifications->author_id,
+            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
             is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
             $Clarifications->message,
             $Clarifications->answer,
             DAO::toMySQLTimestamp($Clarifications->time),
             is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            (int)$Clarifications->problemset_id,
+            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
             (int)$Clarifications->public,
         ];
         global $conn;

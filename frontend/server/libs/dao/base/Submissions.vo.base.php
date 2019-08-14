@@ -59,91 +59,97 @@ class Submissions extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['guid'])) {
-            $this->guid = $data['guid'];
+            $this->guid = strval($data['guid']);
         }
         if (isset($data['language'])) {
-            $this->language = $data['language'];
+            $this->language = strval($data['language']);
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['submit_delay'])) {
             $this->submit_delay = (int)$data['submit_delay'];
         }
         if (isset($data['type'])) {
-            $this->type = $data['type'];
+            $this->type = strval($data['type']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $submission_id = 0;
 
     /**
-      * La evaluación actual del envío
-      * @access public
-      * @var ?int
+     * La evaluación actual del envío
+     *
+     * @var int|null
      */
-    public $current_run_id;
+    public $current_run_id = null;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int
+     * Identidad del usuario
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $guid;
+    public $guid = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $language;
+    public $language = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $submit_delay = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?string
+     * [Campo no documentado]
+     *
+     * @var string
      */
     public $type = 'normal';
 }

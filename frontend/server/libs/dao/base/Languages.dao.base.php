@@ -98,7 +98,9 @@ abstract class LanguagesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Languages}.
+     * @return Languages[] Un arreglo que contiene objetos del tipo {@link Languages}.
+     *
+     * @psalm-return array<int, Languages>
      */
     final public static function getAll(
         ?int $pagina = null,

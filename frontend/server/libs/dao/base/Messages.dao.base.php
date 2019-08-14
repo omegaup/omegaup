@@ -29,8 +29,8 @@ abstract class MessagesDAOBase {
         $sql = 'UPDATE `Messages` SET `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE `message_id` = ?;';
         $params = [
             (int)$Messages->read,
-            (int)$Messages->sender_id,
-            (int)$Messages->recipient_id,
+            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
+            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
             DAO::toMySQLTimestamp($Messages->date),
             (int)$Messages->message_id,
@@ -101,7 +101,9 @@ abstract class MessagesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Messages}.
+     * @return Messages[] Un arreglo que contiene objetos del tipo {@link Messages}.
+     *
+     * @psalm-return array<int, Messages>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -135,17 +137,11 @@ abstract class MessagesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Messages $Messages) : int {
-        if (is_null($Messages->read)) {
-            $Messages->read = false;
-        }
-        if (is_null($Messages->date)) {
-            $Messages->date = Time::get();
-        }
         $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [
             (int)$Messages->read,
-            (int)$Messages->sender_id,
-            (int)$Messages->recipient_id,
+            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
+            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
             DAO::toMySQLTimestamp($Messages->date),
         ];

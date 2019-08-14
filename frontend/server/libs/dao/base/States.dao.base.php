@@ -34,10 +34,17 @@ abstract class StatesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(States $States) : int {
-        if (is_null($States->country_id) || is_null($States->state_id)) {
+        if (empty($States->country_id) || empty($States->state_id)) {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO States (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
             $States->country_id,
             $States->state_id,
@@ -75,7 +82,7 @@ abstract class StatesDAOBase {
      *
      * @return ?States Un objeto del tipo {@link States}. NULL si no hay tal registro.
      */
-    final public static function getByPK(string $country_id, string $state_id) : ?States {
+    final public static function getByPK(?string $country_id, ?string $state_id) : ?States {
         $sql = 'SELECT `States`.`country_id`, `States`.`state_id`, `States`.`name` FROM States WHERE (country_id = ? AND state_id = ?) LIMIT 1;';
         $params = [$country_id, $state_id];
         global $conn;
@@ -128,7 +135,9 @@ abstract class StatesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link States}.
+     * @return States[] Un arreglo que contiene objetos del tipo {@link States}.
+     *
+     * @psalm-return array<int, States>
      */
     final public static function getAll(
         ?int $pagina = null,

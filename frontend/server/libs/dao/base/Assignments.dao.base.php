@@ -28,9 +28,9 @@ abstract class AssignmentsDAOBase {
     final public static function update(Assignments $Assignments) : int {
         $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ?, `max_points` = ?, `order` = ? WHERE `assignment_id` = ?;';
         $params = [
-            (int)$Assignments->course_id,
-            (int)$Assignments->problemset_id,
-            (int)$Assignments->acl_id,
+            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
+            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
+            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,
@@ -108,7 +108,9 @@ abstract class AssignmentsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Assignments}.
+     * @return Assignments[] Un arreglo que contiene objetos del tipo {@link Assignments}.
+     *
+     * @psalm-return array<int, Assignments>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -142,23 +144,11 @@ abstract class AssignmentsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Assignments $Assignments) : int {
-        if (is_null($Assignments->start_time)) {
-            $Assignments->start_time = 946706400; // 2000-01-01 06:00:00
-        }
-        if (is_null($Assignments->finish_time)) {
-            $Assignments->finish_time = 946706400; // 2000-01-01 06:00:00
-        }
-        if (is_null($Assignments->max_points)) {
-            $Assignments->max_points = 0.00;
-        }
-        if (is_null($Assignments->order)) {
-            $Assignments->order = 1;
-        }
         $sql = 'INSERT INTO Assignments (`course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Assignments->course_id,
-            (int)$Assignments->problemset_id,
-            (int)$Assignments->acl_id,
+            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
+            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
+            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,

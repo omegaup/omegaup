@@ -44,18 +44,18 @@ class Favorites extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 }

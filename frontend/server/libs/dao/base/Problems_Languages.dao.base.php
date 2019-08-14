@@ -26,7 +26,7 @@ abstract class ProblemsLanguagesDAOBase {
      *
      * @return ?ProblemsLanguages Un objeto del tipo {@link ProblemsLanguages}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $problem_id, int $language_id) : ?ProblemsLanguages {
+    final public static function getByPK(?int $problem_id, ?int $language_id) : ?ProblemsLanguages {
         $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` FROM Problems_Languages WHERE (problem_id = ? AND language_id = ?) LIMIT 1;';
         $params = [$problem_id, $language_id];
         global $conn;
@@ -79,7 +79,9 @@ abstract class ProblemsLanguagesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsLanguages}.
+     * @return ProblemsLanguages[] Un arreglo que contiene objetos del tipo {@link ProblemsLanguages}.
+     *
+     * @psalm-return array<int, ProblemsLanguages>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -115,8 +117,8 @@ abstract class ProblemsLanguagesDAOBase {
     final public static function create(ProblemsLanguages $Problems_Languages) : int {
         $sql = 'INSERT INTO Problems_Languages (`problem_id`, `language_id`) VALUES (?, ?);';
         $params = [
-            (int)$Problems_Languages->problem_id,
-            (int)$Problems_Languages->language_id,
+            is_null($Problems_Languages->problem_id) ? null : (int)$Problems_Languages->problem_id,
+            is_null($Problems_Languages->language_id) ? null : (int)$Problems_Languages->language_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

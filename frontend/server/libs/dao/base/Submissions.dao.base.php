@@ -29,8 +29,8 @@ abstract class SubmissionsDAOBase {
         $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
         $params = [
             is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
-            (int)$Submissions->identity_id,
-            (int)$Submissions->problem_id,
+            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
+            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
@@ -105,7 +105,9 @@ abstract class SubmissionsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Submissions}.
+     * @return Submissions[] Un arreglo que contiene objetos del tipo {@link Submissions}.
+     *
+     * @psalm-return array<int, Submissions>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -139,20 +141,11 @@ abstract class SubmissionsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Submissions $Submissions) : int {
-        if (is_null($Submissions->time)) {
-            $Submissions->time = Time::get();
-        }
-        if (is_null($Submissions->submit_delay)) {
-            $Submissions->submit_delay = 0;
-        }
-        if (is_null($Submissions->type)) {
-            $Submissions->type = 'normal';
-        }
         $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
-            (int)$Submissions->identity_id,
-            (int)$Submissions->problem_id,
+            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
+            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,

@@ -33,7 +33,9 @@ abstract class IdentityLoginLogDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link IdentityLoginLog}.
+     * @return IdentityLoginLog[] Un arreglo que contiene objetos del tipo {@link IdentityLoginLog}.
+     *
+     * @psalm-return array<int, IdentityLoginLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -67,13 +69,10 @@ abstract class IdentityLoginLogDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(IdentityLoginLog $Identity_Login_Log) : int {
-        if (is_null($Identity_Login_Log->time)) {
-            $Identity_Login_Log->time = Time::get();
-        }
         $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Identity_Login_Log->identity_id,
-            (int)$Identity_Login_Log->ip,
+            is_null($Identity_Login_Log->identity_id) ? null : (int)$Identity_Login_Log->identity_id,
+            is_null($Identity_Login_Log->ip) ? null : (int)$Identity_Login_Log->ip,
             DAO::toMySQLTimestamp($Identity_Login_Log->time),
         ];
         global $conn;

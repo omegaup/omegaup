@@ -113,7 +113,9 @@ abstract class UsersDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Users}.
+     * @return Users[] Un arreglo que contiene objetos del tipo {@link Users}.
+     *
+     * @psalm-return array<int, Users>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -147,15 +149,6 @@ abstract class UsersDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Users $Users) : int {
-        if (is_null($Users->verified)) {
-            $Users->verified = false;
-        }
-        if (is_null($Users->in_mailing_list)) {
-            $Users->in_mailing_list = false;
-        }
-        if (is_null($Users->is_private)) {
-            $Users->is_private = false;
-        }
         $sql = 'INSERT INTO Users (`username`, `facebook_user_id`, `password`, `git_token`, `main_email_id`, `main_identity_id`, `scholar_degree`, `graduation_date`, `birth_date`, `verified`, `verification_id`, `reset_digest`, `reset_sent_at`, `hide_problem_tags`, `in_mailing_list`, `is_private`, `preferred_language`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Users->username,

@@ -35,39 +35,29 @@ abstract class {{ table.class_name }}DAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace({{ table.class_name }} ${{ table.name }}) : int {
-        if ({{ table.columns|selectattr('primary_key')|listformat('is_null(${table.name}->{.name})', table=table)|join(' || ') }}) {
+        if ({{ table.columns|selectattr('primary_key')|listformat('empty(${table.name}->{.name})', table=table)|join(' || ') }}) {
             throw new NotFoundException('recordNotFound');
         }
-  {%- for column in table.columns|selectattr('default') %}
-        if (is_null(${{ table.name }}->{{ column.name }})) {
-    {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = Time::get();
-    {%- elif 'timestamp' in column.type %}
-            ${{ table.name }}->{{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
-    {%- elif column.php_primitive_type == 'bool' %}
-            ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
-    {%- elif column.php_primitive_type == 'int' %}
-            ${{ table.name }}->{{ column.name }} = {{ '%d'|format(column.default|int) }};
-    {%- elif column.php_primitive_type == 'float' %}
-            ${{ table.name }}->{{ column.name }} = {{ '%.2f'|format(column.default|float) }};
-    {%- else %}
-            ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
-    {%- endif %}
-        }
-  {%- endfor %}
         $sql = 'REPLACE INTO {{ table.name }} ({{ table.columns|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|listformat('?', table=table)|join(', ') }});';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
   {%- for column in table.columns %}
     {%- if 'timestamp' in column.type or 'datetime' in column.type %}
             DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('?bool', '?int') %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+            !is_null(${{ table.name }}->{{ column.name }}) ? intval(${{ table.name }}->{{ column.name }}) : null,
     {%- elif column.php_type == '?float' %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+            !is_null(${{ table.name }}->{{ column.name }}) ? floatval(${{ table.name }}->{{ column.name }}) : null,
     {%- elif column.php_type in ('bool', 'int') %}
-            (int)${{ table.name }}->{{ column.name }},
+            intval(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type == 'float' %}
-            (float)${{ table.name }}->{{ column.name }},
+            floatval(${{ table.name }}->{{ column.name }}),
     {%- else %}
             ${{ table.name }}->{{ column.name }},
     {%- endif %}
@@ -192,7 +182,9 @@ abstract class {{ table.class_name }}DAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link {{ table.class_name }}}.
+     * @return {{ table.class_name }}[] Un arreglo que contiene objetos del tipo {@link {{ table.class_name }}}.
+     *
+     * @psalm-return array<int, {{ table.class_name }}>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -231,23 +223,6 @@ abstract class {{ table.class_name }}DAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create({{ table.class_name }} ${{ table.name }}) : int {
-{%- for column in table.columns|selectattr('default') %}
-        if (is_null(${{ table.name }}->{{ column.name }})) {
-  {%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = Time::get();
-  {%- elif 'timestamp' in column.type %}
-            ${{ table.name }}->{{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
-  {%- elif column.php_primitive_type == 'bool' %}
-            ${{ table.name }}->{{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
-  {%- elif column.php_primitive_type == 'int' %}
-            ${{ table.name }}->{{ column.name }} = {{ '%d'|format(column.default|int) }};
-  {%- elif column.php_primitive_type == 'float' %}
-            ${{ table.name }}->{{ column.name }} = {{ '%.2f'|format(column.default|float) }};
-  {%- else %}
-            ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
-  {%- endif %}
-        }
-{%- endfor %}
         $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(', ') }});';
         $params = [
 {%- for column in table.columns|rejectattr('auto_increment') %}

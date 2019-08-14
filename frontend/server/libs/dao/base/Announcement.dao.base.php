@@ -28,7 +28,7 @@ abstract class AnnouncementDAOBase {
     final public static function update(Announcement $Announcement) : int {
         $sql = 'UPDATE `Announcement` SET `user_id` = ?, `time` = ?, `description` = ? WHERE `announcement_id` = ?;';
         $params = [
-            (int)$Announcement->user_id,
+            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
             DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
             (int)$Announcement->announcement_id,
@@ -99,7 +99,9 @@ abstract class AnnouncementDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Announcement}.
+     * @return Announcement[] Un arreglo que contiene objetos del tipo {@link Announcement}.
+     *
+     * @psalm-return array<int, Announcement>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -133,12 +135,9 @@ abstract class AnnouncementDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Announcement $Announcement) : int {
-        if (is_null($Announcement->time)) {
-            $Announcement->time = Time::get();
-        }
         $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Announcement->user_id,
+            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
             DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
         ];

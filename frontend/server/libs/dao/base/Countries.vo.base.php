@@ -36,25 +36,25 @@ class Countries extends VO {
             throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['country_id'])) {
-            $this->country_id = $data['country_id'];
+            $this->country_id = strval($data['country_id']);
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var string|null
      */
-    public $country_id;
+    public $country_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $name;
+    public $name = null;
 }

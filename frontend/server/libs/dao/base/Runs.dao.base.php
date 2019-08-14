@@ -28,7 +28,7 @@ abstract class RunsDAOBase {
     final public static function update(Runs $Runs) : int {
         $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `judged_by` = ? WHERE `run_id` = ?;';
         $params = [
-            (int)$Runs->submission_id,
+            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
@@ -107,7 +107,9 @@ abstract class RunsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Runs}.
+     * @return Runs[] Un arreglo que contiene objetos del tipo {@link Runs}.
+     *
+     * @psalm-return array<int, Runs>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -141,27 +143,9 @@ abstract class RunsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Runs $Runs) : int {
-        if (is_null($Runs->status)) {
-            $Runs->status = 'new';
-        }
-        if (is_null($Runs->runtime)) {
-            $Runs->runtime = 0;
-        }
-        if (is_null($Runs->penalty)) {
-            $Runs->penalty = 0;
-        }
-        if (is_null($Runs->memory)) {
-            $Runs->memory = 0;
-        }
-        if (is_null($Runs->score)) {
-            $Runs->score = 0.00;
-        }
-        if (is_null($Runs->time)) {
-            $Runs->time = Time::get();
-        }
         $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Runs->submission_id,
+            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
             $Runs->version,
             $Runs->status,
             $Runs->verdict,

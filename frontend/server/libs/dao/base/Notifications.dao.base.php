@@ -28,7 +28,7 @@ abstract class NotificationsDAOBase {
     final public static function update(Notifications $Notifications) : int {
         $sql = 'UPDATE `Notifications` SET `user_id` = ?, `timestamp` = ?, `read` = ?, `contents` = ? WHERE `notification_id` = ?;';
         $params = [
-            (int)$Notifications->user_id,
+            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
             DAO::toMySQLTimestamp($Notifications->timestamp),
             (int)$Notifications->read,
             $Notifications->contents,
@@ -100,7 +100,9 @@ abstract class NotificationsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Notifications}.
+     * @return Notifications[] Un arreglo que contiene objetos del tipo {@link Notifications}.
+     *
+     * @psalm-return array<int, Notifications>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -134,15 +136,9 @@ abstract class NotificationsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Notifications $Notifications) : int {
-        if (is_null($Notifications->timestamp)) {
-            $Notifications->timestamp = Time::get();
-        }
-        if (is_null($Notifications->read)) {
-            $Notifications->read = false;
-        }
         $sql = 'INSERT INTO Notifications (`user_id`, `timestamp`, `read`, `contents`) VALUES (?, ?, ?, ?);';
         $params = [
-            (int)$Notifications->user_id,
+            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
             DAO::toMySQLTimestamp($Notifications->timestamp),
             (int)$Notifications->read,
             $Notifications->contents,

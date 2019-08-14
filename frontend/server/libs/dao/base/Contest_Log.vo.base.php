@@ -49,57 +49,63 @@ class ContestLog extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['from_admission_mode'])) {
-            $this->from_admission_mode = $data['from_admission_mode'];
+            $this->from_admission_mode = strval($data['from_admission_mode']);
         }
         if (isset($data['to_admission_mode'])) {
-            $this->to_admission_mode = $data['to_admission_mode'];
+            $this->to_admission_mode = strval($data['to_admission_mode']);
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $public_contest_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $contest_id;
+    public $contest_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $from_admission_mode;
+    public $from_admission_mode = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $to_admission_mode;
+    public $to_admission_mode = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 }
