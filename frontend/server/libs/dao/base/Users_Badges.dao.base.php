@@ -28,7 +28,7 @@ abstract class UsersBadgesDAOBase {
     final public static function update(UsersBadges $Users_Badges) : int {
         $sql = 'UPDATE `Users_Badges` SET `user_id` = ?, `badge_alias` = ?, `assignation_time` = ? WHERE `user_badge_id` = ?;';
         $params = [
-            (int)$Users_Badges->user_id,
+            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
             DAO::toMySQLTimestamp($Users_Badges->assignation_time),
             (int)$Users_Badges->user_badge_id,
@@ -99,7 +99,9 @@ abstract class UsersBadgesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link UsersBadges}.
+     * @return UsersBadges[] Un arreglo que contiene objetos del tipo {@link UsersBadges}.
+     *
+     * @psalm-return array<int, UsersBadges>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -133,12 +135,9 @@ abstract class UsersBadgesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(UsersBadges $Users_Badges) : int {
-        if (is_null($Users_Badges->assignation_time)) {
-            $Users_Badges->assignation_time = Time::get();
-        }
         $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Users_Badges->user_id,
+            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
             DAO::toMySQLTimestamp($Users_Badges->assignation_time),
         ];

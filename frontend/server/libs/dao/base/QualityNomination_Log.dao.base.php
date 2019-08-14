@@ -28,9 +28,9 @@ abstract class QualityNominationLogDAOBase {
     final public static function update(QualityNominationLog $QualityNomination_Log) : int {
         $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
         $params = [
-            (int)$QualityNomination_Log->qualitynomination_id,
+            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
             DAO::toMySQLTimestamp($QualityNomination_Log->time),
-            (int)$QualityNomination_Log->user_id,
+            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,
@@ -102,7 +102,9 @@ abstract class QualityNominationLogDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link QualityNominationLog}.
+     * @return QualityNominationLog[] Un arreglo que contiene objetos del tipo {@link QualityNominationLog}.
+     *
+     * @psalm-return array<int, QualityNominationLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -136,20 +138,11 @@ abstract class QualityNominationLogDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(QualityNominationLog $QualityNomination_Log) : int {
-        if (is_null($QualityNomination_Log->time)) {
-            $QualityNomination_Log->time = Time::get();
-        }
-        if (is_null($QualityNomination_Log->from_status)) {
-            $QualityNomination_Log->from_status = 'open';
-        }
-        if (is_null($QualityNomination_Log->to_status)) {
-            $QualityNomination_Log->to_status = 'open';
-        }
         $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$QualityNomination_Log->qualitynomination_id,
+            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
             DAO::toMySQLTimestamp($QualityNomination_Log->time),
-            (int)$QualityNomination_Log->user_id,
+            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,

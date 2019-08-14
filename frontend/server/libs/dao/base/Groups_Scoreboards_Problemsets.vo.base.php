@@ -52,32 +52,32 @@ class GroupsScoreboardsProblemsets extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $group_scoreboard_id;
+    public $group_scoreboard_id = null;
 
     /**
-      * Conjunto de problemas del scoreboard
-      * Llave Primaria
-      * @access public
-      * @var int
+     * Conjunto de problemas del scoreboard
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var bool
+     * [Campo no documentado]
+     *
+     * @var bool
      */
     public $only_ac = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $weight = 1;
 }

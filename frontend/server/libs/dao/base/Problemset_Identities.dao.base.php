@@ -34,29 +34,27 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemsetIdentities $Problemset_Identities) : int {
-        if (is_null($Problemset_Identities->identity_id) || is_null($Problemset_Identities->problemset_id)) {
+        if (empty($Problemset_Identities->identity_id) || empty($Problemset_Identities->problemset_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Problemset_Identities->score)) {
-            $Problemset_Identities->score = 1;
-        }
-        if (is_null($Problemset_Identities->time)) {
-            $Problemset_Identities->time = 1;
-        }
-        if (is_null($Problemset_Identities->is_invited)) {
-            $Problemset_Identities->is_invited = false;
-        }
         $sql = 'REPLACE INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `end_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Problemset_Identities->identity_id,
-            (int)$Problemset_Identities->problemset_id,
+            !is_null($Problemset_Identities->identity_id) ? intval($Problemset_Identities->identity_id) : null,
+            !is_null($Problemset_Identities->problemset_id) ? intval($Problemset_Identities->problemset_id) : null,
             DAO::toMySQLTimestamp($Problemset_Identities->access_time),
             DAO::toMySQLTimestamp($Problemset_Identities->end_time),
-            (int)$Problemset_Identities->score,
-            (int)$Problemset_Identities->time,
-            is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
-            is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
-            (int)$Problemset_Identities->is_invited,
+            intval($Problemset_Identities->score),
+            intval($Problemset_Identities->time),
+            !is_null($Problemset_Identities->share_user_information) ? intval($Problemset_Identities->share_user_information) : null,
+            !is_null($Problemset_Identities->privacystatement_consent_id) ? intval($Problemset_Identities->privacystatement_consent_id) : null,
+            intval($Problemset_Identities->is_invited),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -80,8 +78,8 @@ abstract class ProblemsetIdentitiesDAOBase {
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
             is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
             (int)$Problemset_Identities->is_invited,
-            (int)$Problemset_Identities->identity_id,
-            (int)$Problemset_Identities->problemset_id,
+            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
+            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -96,7 +94,7 @@ abstract class ProblemsetIdentitiesDAOBase {
      *
      * @return ?ProblemsetIdentities Un objeto del tipo {@link ProblemsetIdentities}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $identity_id, int $problemset_id) : ?ProblemsetIdentities {
+    final public static function getByPK(?int $identity_id, ?int $problemset_id) : ?ProblemsetIdentities {
         $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`end_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
         global $conn;
@@ -149,7 +147,9 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsetIdentities}.
+     * @return ProblemsetIdentities[] Un arreglo que contiene objetos del tipo {@link ProblemsetIdentities}.
+     *
+     * @psalm-return array<int, ProblemsetIdentities>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -183,19 +183,10 @@ abstract class ProblemsetIdentitiesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsetIdentities $Problemset_Identities) : int {
-        if (is_null($Problemset_Identities->score)) {
-            $Problemset_Identities->score = 1;
-        }
-        if (is_null($Problemset_Identities->time)) {
-            $Problemset_Identities->time = 1;
-        }
-        if (is_null($Problemset_Identities->is_invited)) {
-            $Problemset_Identities->is_invited = false;
-        }
         $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `end_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Problemset_Identities->identity_id,
-            (int)$Problemset_Identities->problemset_id,
+            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
+            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
             DAO::toMySQLTimestamp($Problemset_Identities->access_time),
             DAO::toMySQLTimestamp($Problemset_Identities->end_time),
             (int)$Problemset_Identities->score,

@@ -28,10 +28,10 @@ abstract class QualityNominationCommentsDAOBase {
     final public static function update(QualityNominationComments $QualityNomination_Comments) : int {
         $sql = 'UPDATE `QualityNomination_Comments` SET `qualitynomination_id` = ?, `user_id` = ?, `time` = ?, `vote` = ?, `contents` = ? WHERE `qualitynomination_comment_id` = ?;';
         $params = [
-            (int)$QualityNomination_Comments->qualitynomination_id,
-            (int)$QualityNomination_Comments->user_id,
+            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
+            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
             DAO::toMySQLTimestamp($QualityNomination_Comments->time),
-            (int)$QualityNomination_Comments->vote,
+            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
             (int)$QualityNomination_Comments->qualitynomination_comment_id,
         ];
@@ -101,7 +101,9 @@ abstract class QualityNominationCommentsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link QualityNominationComments}.
+     * @return QualityNominationComments[] Un arreglo que contiene objetos del tipo {@link QualityNominationComments}.
+     *
+     * @psalm-return array<int, QualityNominationComments>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -135,15 +137,12 @@ abstract class QualityNominationCommentsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(QualityNominationComments $QualityNomination_Comments) : int {
-        if (is_null($QualityNomination_Comments->time)) {
-            $QualityNomination_Comments->time = Time::get();
-        }
         $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            (int)$QualityNomination_Comments->qualitynomination_id,
-            (int)$QualityNomination_Comments->user_id,
+            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
+            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
             DAO::toMySQLTimestamp($QualityNomination_Comments->time),
-            (int)$QualityNomination_Comments->vote,
+            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
         ];
         global $conn;

@@ -52,13 +52,13 @@ class Runs extends VO {
             $this->submission_id = (int)$data['submission_id'];
         }
         if (isset($data['version'])) {
-            $this->version = $data['version'];
+            $this->version = strval($data['version']);
         }
         if (isset($data['status'])) {
-            $this->status = $data['status'];
+            $this->status = strval($data['status']);
         }
         if (isset($data['verdict'])) {
-            $this->verdict = $data['verdict'];
+            $this->verdict = strval($data['verdict']);
         }
         if (isset($data['runtime'])) {
             $this->runtime = (int)$data['runtime'];
@@ -76,96 +76,102 @@ class Runs extends VO {
             $this->contest_score = (float)$data['contest_score'];
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['judged_by'])) {
-            $this->judged_by = $data['judged_by'];
+            $this->judged_by = strval($data['judged_by']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $run_id = 0;
 
     /**
-      * El envío
-      * @access public
-      * @var int
+     * El envío
+     *
+     * @var int|null
      */
-    public $submission_id;
+    public $submission_id = null;
 
     /**
-      * El hash SHA1 del árbol de la rama private.
-      * @access public
-      * @var string
+     * El hash SHA1 del árbol de la rama private.
+     *
+     * @var string|null
      */
-    public $version;
+    public $version = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string
      */
     public $status = 'new';
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $verdict;
+    public $verdict = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $runtime = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $penalty = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $memory = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var float
+     * [Campo no documentado]
+     *
+     * @var float
      */
     public $score = 0.00;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?float
+     * [Campo no documentado]
+     *
+     * @var float|null
      */
-    public $contest_score;
+    public $contest_score = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $judged_by;
+    public $judged_by = null;
 }

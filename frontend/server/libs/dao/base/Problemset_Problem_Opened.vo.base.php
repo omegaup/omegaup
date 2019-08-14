@@ -47,38 +47,44 @@ class ProblemsetProblemOpened extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['open_time'])) {
+            /**
+             * @var string|int|float $data['open_time']
+             * @var int $this->open_time
+             */
             $this->open_time = DAO::fromMySQLTimestamp($data['open_time']);
+        } else {
+            $this->open_time = Time::get();
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $open_time = null;  // CURRENT_TIMESTAMP
+    public $open_time;  // CURRENT_TIMESTAMP
 }

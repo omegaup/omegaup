@@ -28,8 +28,8 @@ abstract class PrivacyStatementConsentLogDAOBase {
     final public static function update(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         $sql = 'UPDATE `PrivacyStatement_Consent_Log` SET `identity_id` = ?, `privacystatement_id` = ?, `timestamp` = ? WHERE `privacystatement_consent_id` = ?;';
         $params = [
-            (int)$PrivacyStatement_Consent_Log->identity_id,
-            (int)$PrivacyStatement_Consent_Log->privacystatement_id,
+            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
+            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
             DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
             (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
@@ -99,7 +99,9 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link PrivacyStatementConsentLog}.
+     * @return PrivacyStatementConsentLog[] Un arreglo que contiene objetos del tipo {@link PrivacyStatementConsentLog}.
+     *
+     * @psalm-return array<int, PrivacyStatementConsentLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -133,13 +135,10 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
-        if (is_null($PrivacyStatement_Consent_Log->timestamp)) {
-            $PrivacyStatement_Consent_Log->timestamp = Time::get();
-        }
         $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?);';
         $params = [
-            (int)$PrivacyStatement_Consent_Log->identity_id,
-            (int)$PrivacyStatement_Consent_Log->privacystatement_id,
+            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
+            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
             DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
         ];
         global $conn;

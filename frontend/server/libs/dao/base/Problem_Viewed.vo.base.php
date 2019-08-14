@@ -43,30 +43,36 @@ class ProblemViewed extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['view_time'])) {
+            /**
+             * @var string|int|float $data['view_time']
+             * @var int $this->view_time
+             */
             $this->view_time = DAO::fromMySQLTimestamp($data['view_time']);
+        } else {
+            $this->view_time = Time::get();
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $view_time = null;  // CURRENT_TIMESTAMP
+    public $view_time;  // CURRENT_TIMESTAMP
 }

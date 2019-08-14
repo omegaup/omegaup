@@ -33,7 +33,9 @@ abstract class UsersExperimentsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link UsersExperiments}.
+     * @return UsersExperiments[] Un arreglo que contiene objetos del tipo {@link UsersExperiments}.
+     *
+     * @psalm-return array<int, UsersExperiments>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -69,7 +71,7 @@ abstract class UsersExperimentsDAOBase {
     final public static function create(UsersExperiments $Users_Experiments) : int {
         $sql = 'INSERT INTO Users_Experiments (`user_id`, `experiment`) VALUES (?, ?);';
         $params = [
-            (int)$Users_Experiments->user_id,
+            is_null($Users_Experiments->user_id) ? null : (int)$Users_Experiments->user_id,
             $Users_Experiments->experiment,
         ];
         global $conn;

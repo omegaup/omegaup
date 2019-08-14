@@ -34,26 +34,24 @@ abstract class ProblemsetProblemsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemsetProblems $Problemset_Problems) : int {
-        if (is_null($Problemset_Problems->problemset_id) || is_null($Problemset_Problems->problem_id)) {
+        if (empty($Problemset_Problems->problemset_id) || empty($Problemset_Problems->problem_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Problemset_Problems->commit)) {
-            $Problemset_Problems->commit = 'published';
-        }
-        if (is_null($Problemset_Problems->points)) {
-            $Problemset_Problems->points = 1.00;
-        }
-        if (is_null($Problemset_Problems->order)) {
-            $Problemset_Problems->order = 1;
-        }
         $sql = 'REPLACE INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Problemset_Problems->problemset_id,
-            (int)$Problemset_Problems->problem_id,
+            !is_null($Problemset_Problems->problemset_id) ? intval($Problemset_Problems->problemset_id) : null,
+            !is_null($Problemset_Problems->problem_id) ? intval($Problemset_Problems->problem_id) : null,
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            (float)$Problemset_Problems->points,
-            (int)$Problemset_Problems->order,
+            floatval($Problemset_Problems->points),
+            intval($Problemset_Problems->order),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -74,8 +72,8 @@ abstract class ProblemsetProblemsDAOBase {
             $Problemset_Problems->version,
             (float)$Problemset_Problems->points,
             (int)$Problemset_Problems->order,
-            (int)$Problemset_Problems->problemset_id,
-            (int)$Problemset_Problems->problem_id,
+            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
+            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -90,7 +88,7 @@ abstract class ProblemsetProblemsDAOBase {
      *
      * @return ?ProblemsetProblems Un objeto del tipo {@link ProblemsetProblems}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $problemset_id, int $problem_id) : ?ProblemsetProblems {
+    final public static function getByPK(?int $problemset_id, ?int $problem_id) : ?ProblemsetProblems {
         $sql = 'SELECT `Problemset_Problems`.`problemset_id`, `Problemset_Problems`.`problem_id`, `Problemset_Problems`.`commit`, `Problemset_Problems`.`version`, `Problemset_Problems`.`points`, `Problemset_Problems`.`order` FROM Problemset_Problems WHERE (problemset_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$problemset_id, $problem_id];
         global $conn;
@@ -143,7 +141,9 @@ abstract class ProblemsetProblemsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsetProblems}.
+     * @return ProblemsetProblems[] Un arreglo que contiene objetos del tipo {@link ProblemsetProblems}.
+     *
+     * @psalm-return array<int, ProblemsetProblems>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -177,19 +177,10 @@ abstract class ProblemsetProblemsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsetProblems $Problemset_Problems) : int {
-        if (is_null($Problemset_Problems->commit)) {
-            $Problemset_Problems->commit = 'published';
-        }
-        if (is_null($Problemset_Problems->points)) {
-            $Problemset_Problems->points = 1.00;
-        }
-        if (is_null($Problemset_Problems->order)) {
-            $Problemset_Problems->order = 1;
-        }
         $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Problemset_Problems->problemset_id,
-            (int)$Problemset_Problems->problem_id,
+            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
+            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
             (float)$Problemset_Problems->points,

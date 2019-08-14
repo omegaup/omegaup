@@ -26,7 +26,7 @@ abstract class RolesPermissionsDAOBase {
      *
      * @return ?RolesPermissions Un objeto del tipo {@link RolesPermissions}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $role_id, int $permission_id) : ?RolesPermissions {
+    final public static function getByPK(?int $role_id, ?int $permission_id) : ?RolesPermissions {
         $sql = 'SELECT `Roles_Permissions`.`role_id`, `Roles_Permissions`.`permission_id` FROM Roles_Permissions WHERE (role_id = ? AND permission_id = ?) LIMIT 1;';
         $params = [$role_id, $permission_id];
         global $conn;
@@ -79,7 +79,9 @@ abstract class RolesPermissionsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link RolesPermissions}.
+     * @return RolesPermissions[] Un arreglo que contiene objetos del tipo {@link RolesPermissions}.
+     *
+     * @psalm-return array<int, RolesPermissions>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -115,8 +117,8 @@ abstract class RolesPermissionsDAOBase {
     final public static function create(RolesPermissions $Roles_Permissions) : int {
         $sql = 'INSERT INTO Roles_Permissions (`role_id`, `permission_id`) VALUES (?, ?);';
         $params = [
-            (int)$Roles_Permissions->role_id,
-            (int)$Roles_Permissions->permission_id,
+            is_null($Roles_Permissions->role_id) ? null : (int)$Roles_Permissions->role_id,
+            is_null($Roles_Permissions->permission_id) ? null : (int)$Roles_Permissions->permission_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

@@ -49,9 +49,17 @@ class ProblemsetIdentities extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['access_time'])) {
+            /**
+             * @var string|int|float $data['access_time']
+             * @var int $this->access_time
+             */
             $this->access_time = DAO::fromMySQLTimestamp($data['access_time']);
         }
         if (isset($data['end_time'])) {
+            /**
+             * @var string|int|float $data['end_time']
+             * @var int $this->end_time
+             */
             $this->end_time = DAO::fromMySQLTimestamp($data['end_time']);
         }
         if (isset($data['score'])) {
@@ -72,67 +80,67 @@ class ProblemsetIdentities extends VO {
     }
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      * Hora a la que entró el usuario al concurso
-      * @access public
-      * @var ?string
+     * Hora a la que entró el usuario al concurso
+     *
+     * @var int|null
      */
-    public $access_time;
+    public $access_time = null;
 
     /**
-      * Hora en la que finaliza un concurso para el usuario cuando se habilita la opción de inicios diferentes
-      * @access public
-      * @var ?string
+     * Hora en la que finaliza un concurso para el usuario cuando se habilita la opción de inicios diferentes
+     *
+     * @var int|null
      */
-    public $end_time;
+    public $end_time = null;
 
     /**
-      * Indica el puntaje que obtuvo el usuario en el concurso
-      * @access public
-      * @var int
+     * Indica el puntaje que obtuvo el usuario en el concurso
+     *
+     * @var int
      */
     public $score = 1;
 
     /**
-      * Indica el tiempo que acumulo en usuario en el concurso
-      * @access public
-      * @var int
+     * Indica el tiempo que acumulo en usuario en el concurso
+     *
+     * @var int
      */
     public $time = 1;
 
     /**
-      * Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.
-      * @access public
-      * @var ?bool
+     * Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.
+     *
+     * @var bool|null
      */
-    public $share_user_information;
+    public $share_user_information = null;
 
     /**
-      * Id del documento con el consentimiento de privacidad
-      * @access public
-      * @var ?int
+     * Id del documento con el consentimiento de privacidad
+     *
+     * @var int|null
      */
-    public $privacystatement_consent_id;
+    public $privacystatement_consent_id = null;
 
     /**
-      * Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos
-      * @access public
-      * @var bool
+     * Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos
+     *
+     * @var bool
      */
     public $is_invited = false;
 }

@@ -28,7 +28,7 @@ abstract class ProblemsDAOBase {
     final public static function update(Problems $Problems) : int {
         $sql = 'UPDATE `Problems` SET `acl_id` = ?, `visibility` = ?, `title` = ?, `alias` = ?, `commit` = ?, `current_version` = ?, `languages` = ?, `input_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `deprecated` = ?, `email_clarifications` = ?, `quality` = ?, `quality_histogram` = ?, `difficulty_histogram` = ? WHERE `problem_id` = ?;';
         $params = [
-            (int)$Problems->acl_id,
+            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
             (int)$Problems->visibility,
             $Problems->title,
             $Problems->alias,
@@ -116,7 +116,9 @@ abstract class ProblemsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Problems}.
+     * @return Problems[] Un arreglo que contiene objetos del tipo {@link Problems}.
+     *
+     * @psalm-return array<int, Problems>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -150,42 +152,9 @@ abstract class ProblemsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Problems $Problems) : int {
-        if (is_null($Problems->visibility)) {
-            $Problems->visibility = 1;
-        }
-        if (is_null($Problems->commit)) {
-            $Problems->commit = 'published';
-        }
-        if (is_null($Problems->languages)) {
-            $Problems->languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua';
-        }
-        if (is_null($Problems->input_limit)) {
-            $Problems->input_limit = 10240;
-        }
-        if (is_null($Problems->visits)) {
-            $Problems->visits = 0;
-        }
-        if (is_null($Problems->submissions)) {
-            $Problems->submissions = 0;
-        }
-        if (is_null($Problems->accepted)) {
-            $Problems->accepted = 0;
-        }
-        if (is_null($Problems->creation_date)) {
-            $Problems->creation_date = Time::get();
-        }
-        if (is_null($Problems->order)) {
-            $Problems->order = 'normal';
-        }
-        if (is_null($Problems->deprecated)) {
-            $Problems->deprecated = false;
-        }
-        if (is_null($Problems->email_clarifications)) {
-            $Problems->email_clarifications = false;
-        }
         $sql = 'INSERT INTO Problems (`acl_id`, `visibility`, `title`, `alias`, `commit`, `current_version`, `languages`, `input_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `deprecated`, `email_clarifications`, `quality`, `quality_histogram`, `difficulty_histogram`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Problems->acl_id,
+            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
             (int)$Problems->visibility,
             $Problems->title,
             $Problems->alias,

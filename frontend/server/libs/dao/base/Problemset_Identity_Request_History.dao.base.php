@@ -28,11 +28,11 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
     final public static function update(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
         $sql = 'UPDATE `Problemset_Identity_Request_History` SET `identity_id` = ?, `problemset_id` = ?, `time` = ?, `accepted` = ?, `admin_id` = ? WHERE `history_id` = ?;';
         $params = [
-            (int)$Problemset_Identity_Request_History->identity_id,
-            (int)$Problemset_Identity_Request_History->problemset_id,
+            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
+            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
             DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
-            (int)$Problemset_Identity_Request_History->accepted,
-            (int)$Problemset_Identity_Request_History->admin_id,
+            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
+            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
             (int)$Problemset_Identity_Request_History->history_id,
         ];
         global $conn;
@@ -101,7 +101,9 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsetIdentityRequestHistory}.
+     * @return ProblemsetIdentityRequestHistory[] Un arreglo que contiene objetos del tipo {@link ProblemsetIdentityRequestHistory}.
+     *
+     * @psalm-return array<int, ProblemsetIdentityRequestHistory>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -135,16 +137,13 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
-        if (is_null($Problemset_Identity_Request_History->time)) {
-            $Problemset_Identity_Request_History->time = Time::get();
-        }
         $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            (int)$Problemset_Identity_Request_History->identity_id,
-            (int)$Problemset_Identity_Request_History->problemset_id,
+            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
+            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
             DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
-            (int)$Problemset_Identity_Request_History->accepted,
-            (int)$Problemset_Identity_Request_History->admin_id,
+            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
+            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

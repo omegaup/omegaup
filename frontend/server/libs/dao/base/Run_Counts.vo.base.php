@@ -37,7 +37,7 @@ class RunCounts extends VO {
             throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['date'])) {
-            $this->date = $data['date'];
+            $this->date = strval($data['date']);
         }
         if (isset($data['total'])) {
             $this->total = (int)$data['total'];
@@ -48,24 +48,24 @@ class RunCounts extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var string|null
      */
-    public $date;
+    public $date = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $total = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $ac_count = 0;
 }

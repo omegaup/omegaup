@@ -40,33 +40,33 @@ class PrivacyStatements extends VO {
             $this->privacystatement_id = (int)$data['privacystatement_id'];
         }
         if (isset($data['git_object_id'])) {
-            $this->git_object_id = $data['git_object_id'];
+            $this->git_object_id = strval($data['git_object_id']);
         }
         if (isset($data['type'])) {
-            $this->type = $data['type'];
+            $this->type = strval($data['type']);
         }
     }
 
     /**
-      * Id del documento de privacidad
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * Id del documento de privacidad
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $privacystatement_id = 0;
 
     /**
-      * Id de la versión del documento en el que se almacena la nueva política
-      * @access public
-      * @var string
+     * Id de la versión del documento en el que se almacena la nueva política
+     *
+     * @var string|null
      */
-    public $git_object_id;
+    public $git_object_id = null;
 
     /**
-      * Tipo de documento de privacidad
-      * @access public
-      * @var string
+     * Tipo de documento de privacidad
+     *
+     * @var string
      */
     public $type = 'privacy_policy';
 }

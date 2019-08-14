@@ -34,10 +34,17 @@ abstract class CountriesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(Countries $Countries) : int {
-        if (is_null($Countries->country_id)) {
+        if (empty($Countries->country_id)) {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Countries (`country_id`, `name`) VALUES (?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
             $Countries->country_id,
             $Countries->name,
@@ -73,7 +80,7 @@ abstract class CountriesDAOBase {
      *
      * @return ?Countries Un objeto del tipo {@link Countries}. NULL si no hay tal registro.
      */
-    final public static function getByPK(string $country_id) : ?Countries {
+    final public static function getByPK(?string $country_id) : ?Countries {
         $sql = 'SELECT `Countries`.`country_id`, `Countries`.`name` FROM Countries WHERE (country_id = ?) LIMIT 1;';
         $params = [$country_id];
         global $conn;
@@ -126,7 +133,9 @@ abstract class CountriesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Countries}.
+     * @return Countries[] Un arreglo que contiene objetos del tipo {@link Countries}.
+     *
+     * @psalm-return array<int, Countries>
      */
     final public static function getAll(
         ?int $pagina = null,

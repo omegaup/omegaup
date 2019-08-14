@@ -97,7 +97,9 @@ abstract class TagsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Tags}.
+     * @return Tags[] Un arreglo que contiene objetos del tipo {@link Tags}.
+     *
+     * @psalm-return array<int, Tags>
      */
     final public static function getAll(
         ?int $pagina = null,

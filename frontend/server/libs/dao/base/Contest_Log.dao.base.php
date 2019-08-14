@@ -28,8 +28,8 @@ abstract class ContestLogDAOBase {
     final public static function update(ContestLog $Contest_Log) : int {
         $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_admission_mode` = ?, `to_admission_mode` = ?, `time` = ? WHERE `public_contest_id` = ?;';
         $params = [
-            (int)$Contest_Log->contest_id,
-            (int)$Contest_Log->user_id,
+            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
+            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             DAO::toMySQLTimestamp($Contest_Log->time),
@@ -101,7 +101,9 @@ abstract class ContestLogDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ContestLog}.
+     * @return ContestLog[] Un arreglo que contiene objetos del tipo {@link ContestLog}.
+     *
+     * @psalm-return array<int, ContestLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -135,13 +137,10 @@ abstract class ContestLogDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ContestLog $Contest_Log) : int {
-        if (is_null($Contest_Log->time)) {
-            $Contest_Log->time = Time::get();
-        }
         $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            (int)$Contest_Log->contest_id,
-            (int)$Contest_Log->user_id,
+            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
+            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             DAO::toMySQLTimestamp($Contest_Log->time),

@@ -28,7 +28,7 @@ abstract class ProblemOfTheWeekDAOBase {
     final public static function update(ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'UPDATE `Problem_Of_The_Week` SET `problem_id` = ?, `time` = ?, `difficulty` = ? WHERE `problem_of_the_week_id` = ?;';
         $params = [
-            (int)$Problem_Of_The_Week->problem_id,
+            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
             (int)$Problem_Of_The_Week->problem_of_the_week_id,
@@ -99,7 +99,9 @@ abstract class ProblemOfTheWeekDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemOfTheWeek}.
+     * @return ProblemOfTheWeek[] Un arreglo que contiene objetos del tipo {@link ProblemOfTheWeek}.
+     *
+     * @psalm-return array<int, ProblemOfTheWeek>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -133,12 +135,9 @@ abstract class ProblemOfTheWeekDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemOfTheWeek $Problem_Of_The_Week) : int {
-        if (is_null($Problem_Of_The_Week->time)) {
-            $Problem_Of_The_Week->time = '2000-01-01';
-        }
         $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Problem_Of_The_Week->problem_id,
+            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
         ];

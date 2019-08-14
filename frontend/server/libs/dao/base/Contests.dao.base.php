@@ -28,15 +28,15 @@ abstract class ContestsDAOBase {
     final public static function update(Contests $Contests) : int {
         $sql = 'UPDATE `Contests` SET `problemset_id` = ?, `acl_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `last_updated` = ?, `window_length` = ?, `rerun_id` = ?, `admission_mode` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `urgent` = ?, `languages` = ?, `recommended` = ? WHERE `contest_id` = ?;';
         $params = [
-            (int)$Contests->problemset_id,
-            (int)$Contests->acl_id,
+            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
+            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
             DAO::toMySQLTimestamp($Contests->start_time),
             DAO::toMySQLTimestamp($Contests->finish_time),
             DAO::toMySQLTimestamp($Contests->last_updated),
             is_null($Contests->window_length) ? null : (int)$Contests->window_length,
-            (int)$Contests->rerun_id,
+            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
             $Contests->admission_mode,
             $Contests->alias,
             (int)$Contests->scoreboard,
@@ -119,7 +119,9 @@ abstract class ContestsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Contests}.
+     * @return Contests[] Un arreglo que contiene objetos del tipo {@link Contests}.
+     *
+     * @psalm-return array<int, Contests>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -153,53 +155,17 @@ abstract class ContestsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Contests $Contests) : int {
-        if (is_null($Contests->start_time)) {
-            $Contests->start_time = 946706400; // 2000-01-01 06:00:00
-        }
-        if (is_null($Contests->finish_time)) {
-            $Contests->finish_time = 946706400; // 2000-01-01 06:00:00
-        }
-        if (is_null($Contests->last_updated)) {
-            $Contests->last_updated = Time::get();
-        }
-        if (is_null($Contests->admission_mode)) {
-            $Contests->admission_mode = 'private';
-        }
-        if (is_null($Contests->scoreboard)) {
-            $Contests->scoreboard = 1;
-        }
-        if (is_null($Contests->points_decay_factor)) {
-            $Contests->points_decay_factor = 0.00;
-        }
-        if (is_null($Contests->partial_score)) {
-            $Contests->partial_score = true;
-        }
-        if (is_null($Contests->submissions_gap)) {
-            $Contests->submissions_gap = 60;
-        }
-        if (is_null($Contests->penalty)) {
-            $Contests->penalty = 1;
-        }
-        if (is_null($Contests->show_scoreboard_after)) {
-            $Contests->show_scoreboard_after = true;
-        }
-        if (is_null($Contests->urgent)) {
-            $Contests->urgent = false;
-        }
-        if (is_null($Contests->recommended)) {
-            $Contests->recommended = false;
-        }
         $sql = 'INSERT INTO Contests (`problemset_id`, `acl_id`, `title`, `description`, `start_time`, `finish_time`, `last_updated`, `window_length`, `rerun_id`, `admission_mode`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `urgent`, `languages`, `recommended`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Contests->problemset_id,
-            (int)$Contests->acl_id,
+            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
+            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
             $Contests->title,
             $Contests->description,
             DAO::toMySQLTimestamp($Contests->start_time),
             DAO::toMySQLTimestamp($Contests->finish_time),
             DAO::toMySQLTimestamp($Contests->last_updated),
             is_null($Contests->window_length) ? null : (int)$Contests->window_length,
-            (int)$Contests->rerun_id,
+            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
             $Contests->admission_mode,
             $Contests->alias,
             (int)$Contests->scoreboard,
