@@ -2477,16 +2477,17 @@ class UserController extends Controller {
         if (!$isMentor) {
             return ['payload' => $response];
         }
-        $bestCoders = [];
         $candidates = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
             $dateToSelect
         );
-        if ($candidates == null) {
-            $candidates = [];
-        }
-        foreach ($candidates as $candidate) {
-            unset($candidate['user_id']);
-            $bestCoders[] = $candidate;
+        $bestCoders = $candidates;
+
+        if (!is_null($candidates)) {
+            $bestCoders = [];
+            foreach ($candidates as $candidate) {
+                unset($candidate['user_id']);
+                array_push($bestCoders, $candidate);
+            }
         }
         $response['options'] = [
             'bestCoders' => $bestCoders,
