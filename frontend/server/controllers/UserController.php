@@ -2485,7 +2485,7 @@ class UserController extends Controller {
             $candidates = [];
         }
         foreach ($candidates as $candidate) {
-            unset($candidate["user_id"]);
+            unset($candidate['user_id']);
             $bestCoders[] = $candidate;
         }
         $response['options'] = [
