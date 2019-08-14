@@ -27,28 +27,29 @@
 }
 </style>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
 import problemHistogram from './Histogram.vue';
 
-export default {
-  props: {
-    qualityHistogram: Array,
-    difficultyHistogram: Array,
-    qualityScore: Number,
-    difficultyScore: Number,
-  },
-  data: function() {
-    return { T, }
-  },
-  computed: {
-    containerClass: function() {
-      return this.qualityHistogram && this.difficultyHistogram ? 'col-md-6' :
-                                                                 'col-md-12';
-    }
-  },
+@Component({
   components: {
     'omegaup-problem-histogram': problemHistogram,
+  },
+})
+export default class ProblemFeedback extends Vue {
+  @Prop() qualityHistogram!: number[];
+  @Prop() difficultyHistogram!: number[];
+  @Prop() qualityScore!: number;
+  @Prop() difficultyScore!: number;
+
+  T = T;
+
+  get containerClass(): string {
+    return this.qualityHistogram && this.difficultyHistogram
+      ? 'col-md-6'
+      : 'col-md-12';
   }
 }
+
 </script>
