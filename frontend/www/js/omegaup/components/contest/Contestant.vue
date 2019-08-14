@@ -25,7 +25,7 @@
           <tr>
             <th>{{T.wordsUser}}</th>
             <th>{{T.contestAdduserRegisteredUserTime}}</th>
-            <th v-if="contest.window_length != null">{{T.wordsEndTimeContest}}</th>
+            <th v-if="contest.window_length !== null">{{T.wordsEndTimeContest}}</th>
             <th>{{T.contestAdduserRegisteredUserDelete}}</th>
           </tr>
         </thead>
@@ -33,16 +33,24 @@
           <tr v-for="user in users">
             <td><omegaup-user-username v-bind:linkify="true"
                                    v-bind:username="user.username"></omegaup-user-username></td>
-            <td>{{ user.access_time }}</td>
-            <td v-if="contest.window_length != null">
-              <omegaup-datetimepicker v-bind:finish="contest.finish_time"
-                  v-bind:start="contest.start_time"
-                  v-if="user.end_time"
-                  v-model="user.end_time"></omegaup-datetimepicker> <a class=
-                  "glyphicon glyphicon-floppy-disk"
-                  href="#contestants"
-                  v-if="user.end_time"
-                  v-on:click="onSaveEndTime(user)"></a>
+            <td>
+              <template v-if="user.access_time !== null">
+                {{ UI.formatDateTime(user.access_time) }}
+              </template>
+            </td>
+            <td v-if="contest.window_length !== null">
+              <div class="row"
+                   v-if="user.end_time">
+                <div class="col-xs-10">
+                  <omegaup-datetimepicker v-bind:finish="contest.finish_time"
+                       v-bind:start="contest.start_time"
+                       v-model="user.end_time"></omegaup-datetimepicker>
+                </div>
+                <div class="col-xs-2">
+                  <button class="btn-link glyphicon glyphicon-floppy-disk"
+                       v-on:click="onSaveEndTime(user)"></button>
+                </div>
+              </div>
             </td>
             <td><button class="close"
                     type="button"
@@ -54,6 +62,10 @@
     </div>
   </div>
 </template>
+
+<style>
+
+</style>
 
 <script lang="ts">
 import { Vue, Component, Emit, Prop } from 'vue-property-decorator';
@@ -99,13 +111,3 @@ export default class Contestant extends Vue {
 }
 
 </script>
-
-<style>
-  table.participants > tbody > tr > td > input {
-    width: initial;
-    display: initial;
-  }
-  table.participants > tbody > tr > td > a {
-    text-decoration: none;
-  }
-</style>

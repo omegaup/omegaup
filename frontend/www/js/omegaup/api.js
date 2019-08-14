@@ -232,14 +232,14 @@ export default {
     users: _call('/api/contest/users/',
                  function(result) {
                    for (const user of result.users) {
-                     user.access_time = user.access_time == null ?
-                                            null :
-                                            omegaup.OmegaUp.remoteTime(
-                                                user.access_time * 1000);
-                     user.end_time =
-                         user.end_time == null ?
-                             null :
-                             omegaup.OmegaUp.remoteTime(user.end_time * 1000);
+                     if (user.access_time !== null) {
+                       user.access_time =
+                           omegaup.OmegaUp.remoteTime(user.access_time * 1000);
+                     }
+                     if (user.end_time !== null) {
+                       user.end_time =
+                           omegaup.OmegaUp.remoteTime(user.end_time * 1000);
+                     }
                    }
                    return result;
                  }),

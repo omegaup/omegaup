@@ -40,12 +40,12 @@ export default class DateTimePicker extends Vue {
     $(this.$el)
       .data('datetimepicker')
       .setDate(self.value);
-    if (self.start != null) {
+    if (self.start !== null) {
       $(this.$el)
         .data('datetimepicker')
         .setStartDate(self.start);
     }
-    if (self.finish != null) {
+    if (self.finish !== null) {
       $(this.$el)
         .data('datetimepicker')
         .setEndDate(self.finish);
