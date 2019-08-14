@@ -1067,6 +1067,7 @@ const translations = {
 	wordsMedium: "M\u00e9dio",
 	wordsMember: "Membro",
 	wordsMemory: "Mem\u00f3ria",
+	wordsMemoryInMegabytes: "Mem\u00f3ria (MiB)",
 	wordsMemoryLimit: "Limite de mem\u00f3ria",
 	wordsMentor: "Mentor",
 	wordsMessage: "Mensagem",

@@ -83,7 +83,6 @@ declare namespace omegaup {
     judged_by: string;
     language: string;
     logs: string;
-    status: string;
   }
 
   export interface Profile {

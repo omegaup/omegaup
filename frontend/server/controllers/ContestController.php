@@ -2491,7 +2491,7 @@ class ContestController extends Controller {
     }
 
     /**
-     * Refactor of apiReport
+     * Returns a detailed report of the contest. Only Admins can get the report
      *
      * @param Request $r
      * @return array
@@ -2522,14 +2522,13 @@ class ContestController extends Controller {
      * @return array
      */
     public static function getContestReportDetailsForSmarty(Request $r) {
-        $contestReport = self::getContestReportDetails($r);
+        $contestReport = self::getContestReportDetails($r)['ranking'];
 
-        $response = $contestReport['ranking'];
-        for ($i = 0; $i < count($response); $i++) {
-            if (!isset($response[$i]['problems'])) {
+        foreach ($contestReport as &$user) {
+            if (!isset($user['problems'])) {
                 continue;
             }
-            foreach ($response[$i]['problems'] as &$problem) {
+            foreach ($user['problems'] as &$problem) {
                 if (!isset($problem['run_details']) ||
                     !isset($problem['run_details']['groups'])) {
                     continue;
@@ -2548,7 +2547,7 @@ class ContestController extends Controller {
         }
 
         return [
-            'contestReport' => $response,
+            'contestReport' => $contestReport,
         ];
     }
 

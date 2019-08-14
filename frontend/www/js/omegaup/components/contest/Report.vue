@@ -20,21 +20,21 @@
                   <th>{{ T.wordsCase }}</th>
                   <th>{{ T.wordsTimeInSeconds }}</th>
                   <th>{{ T.wordsWallTimeInSeconds }}</th>
-                  <th>{{ T.wordsMemory }} (MiB)</th>
+                  <th>{{ T.wordsMemoryInMegabytes }}</th>
                   <th>{{ T.wordsStatus }}</th>
                   <th>{{ T.rankScore }}</th>
                   <th>{{ T.wordsDifference }}</th>
                 </tr>
-                <tr v-for="temp in group.cases">
-                  <td>{{ group.group }}.{{ temp.name }}</td>
-                  <td class="numeric">{{ (temp.meta.time).toFixed(3) }}</td>
-                  <td class="numeric">{{ (temp.meta.wall_time).toFixed(3) }}</td>
-                  <td class="numeric">{{ (temp.meta.memory).toFixed(2) }}</td>
-                  <td>{{ temp.verdict }}</td>
-                  <td>{{ temp.score }}</td>
+                <tr v-for="groupCase in group.cases">
+                  <td>{{ group.group }}.{{ groupCase.name }}</td>
+                  <td class="numeric">{{ (groupCase.meta.time).toFixed(3) }}</td>
+                  <td class="numeric">{{ (groupCase.meta.wall_time).toFixed(3) }}</td>
+                  <td class="numeric">{{ (groupCase.meta.memory).toFixed(2) }}</td>
+                  <td>{{ groupCase.verdict }}</td>
+                  <td>{{ groupCase.score }}</td>
                   <td>
-                    <template v-if="temp.out_diff">
-                      {{ temp.out_diff }}
+                    <template v-if="groupCase.out_diff">
+                      {{ groupCase.out_diff }}
                     </template>
                   </td>
                 </tr>
