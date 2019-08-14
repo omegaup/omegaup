@@ -1788,8 +1788,10 @@ class UserController extends Controller {
 
                     if (!is_null($userRankEntries)) {
                         foreach ($userRankEntries['rows'] as $userRank) {
+                            $classname = UsersDAO::getRankingClassName($userRank->user_id);
                             array_push($response['rank'], [
                                 'username' => $userRank->username,
+                                'classname' => $classname,
                                 'name' => $userRank->name,
                                 'problems_solved' => $userRank->problems_solved_count,
                                 'rank' => $userRank->rank,
