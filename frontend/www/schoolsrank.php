@@ -1,13 +1,16 @@
 <?php
 require_once('../server/bootstrap_smarty.php');
 
-// Fetch ranking
 try {
-    $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 100]));
-    // Show top 100 schools rank
-    $smarty->assign('schoolRankPayload', ['rowCount' => 100, 'rank' => $schoolRankPayload['rank']]);
+    $smartyProperties = SchoolController::getSchoolsRankForSmarty(
+        new Request(['rowcount' => 100])
+    );
 } catch (Exception $e) {
-    // Oh, well...
+    ApiCaller::handleException($e);
+}
+
+foreach ($smartyProperties as $key => $value) {
+    $smarty->assign($key, $value);
 }
 
 $smarty->display('../templates/rank.schools.tpl');

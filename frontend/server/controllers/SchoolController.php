@@ -86,11 +86,23 @@ class SchoolController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
+        return [
+            'status' => 'ok',
+            'rank' => self::getSchoolsRank($r),
+        ];
+    }
+
+    /**
+     * Returns rank of best schools in last month
+     *
+     * @param Request $r
+     * @return array
+     */
+    private static function getSchoolsRank(Request $r) : array {
         $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', 100, 100, false);
+        $r->ensureInt('rowcount', 5, 100, false);
         $r->ensureInt('start_time', null, null, false);
         $r->ensureInt('finish_time', null, null, false);
 
@@ -116,7 +128,7 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
         if (is_null($r['start_time'])) {
-            $r['start_time'] = strtotime('first day of month', Time::get());
+            $r['start_time'] = strtotime('first day of this month', Time::get());
         }
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = strtotime('first day of next month', Time::get());
@@ -132,17 +144,39 @@ class SchoolController extends Controller {
         };
 
         if ($canUseCache) {
-            $result = Cache::getFromCacheOrSet(
+            return Cache::getFromCacheOrSet(
                 Cache::SCHOOL_RANK,
                 "{$r['offset']}-{$r['rowcount']}",
                 $fetch,
                 60 * 60 * 24 // 1 day
             );
-        } else {
-            $result = $fetch();
         }
+        return $fetch();
+    }
 
-        return ['status' => 'ok', 'rank' => $result];
+    /**
+     * Gets the rank of best schools in last month with smarty format
+     *
+     * @param Request $r
+     * @return array
+     */
+    public static function getSchoolsRankForSmarty(Request $r) : array {
+        $schoolsRank = [
+            'schoolRankPayload' => [
+                'rowCount' => $r['rowcount'],
+                'rank' => self::getSchoolsRank($r),
+            ]
+        ];
+        $r->ensureBool('is_index', false);
+        if (is_null($r['is_index']) || !$r['is_index']) {
+            return $schoolsRank;
+        }
+        $schoolsRank['rankTablePayload'] = [
+            'length' => $r['rowcount'],
+            'isIndex' => $r['is_index'],
+            'availableFilters' => [],
+        ];
+        return $schoolsRank;
     }
 
     /**
