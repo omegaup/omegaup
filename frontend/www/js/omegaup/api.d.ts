@@ -52,7 +52,6 @@ declare namespace omegaup {
   }
 
   export interface Profile {
-    user_id?: string;
     username: string;
     name: string;
     email: string;
