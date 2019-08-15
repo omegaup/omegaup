@@ -7,6 +7,12 @@ declare namespace omegaup {
     owners_percentage?: number;
   }
 
+  export interface CoderOfTheMonth extends Profile {
+    date?: string;
+    ProblemsSolved?: number;
+    score?: number;
+  }
+
   interface Case {
     contest_score: number;
     max_score: number;

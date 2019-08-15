@@ -6,18 +6,26 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 
-export default {
-  props: {coderUsername: String, currentUsername: String},
-  computed: {
-    show() {
-      return this.currentUsername && this.coderUsername &&
-             this.coderUsername == this.currentUsername;
-    }
-  },
-  data: function() { return {T: T, UI: UI};},
-};
+@Component
+export default class CoderOfTheMonthNotice extends Vue {
+  @Prop() coderUsername!: string;
+  @Prop() currentUsername!: string;
+
+  T = T;
+  UI = UI;
+
+  get show(): boolean {
+    return (
+      this.currentUsername !== null &&
+      this.coderUsername !== null &&
+      this.coderUsername === this.currentUsername
+    );
+  }
+}
+
 </script>
