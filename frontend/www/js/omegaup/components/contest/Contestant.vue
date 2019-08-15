@@ -81,13 +81,14 @@ import user_Username from '../user/Username.vue';
   },
 })
 export default class Contestant extends Vue {
-  @Prop() users!: omegaup.IdentityContest[];
+  @Prop() data!: omegaup.IdentityContest[];
   @Prop() contest!: omegaup.Contest;
 
   T = T;
   UI = UI;
   contestant = '';
   contestants = '';
+  users = this.data;
   selected = {};
 
   onSaveEndTime(user: omegaup.IdentityContest): void {
