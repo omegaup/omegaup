@@ -40,7 +40,7 @@ class Emails extends VO {
             $this->email_id = (int)$data['email_id'];
         }
         if (isset($data['email'])) {
-            $this->email = $data['email'];
+            $this->email = strval($data['email']);
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -48,25 +48,25 @@ class Emails extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $email_id;
+    public $email_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $email;
+    public $email = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 }

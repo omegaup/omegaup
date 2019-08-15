@@ -49,57 +49,63 @@ class QualityNominationComments extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['vote'])) {
             $this->vote = (int)$data['vote'];
         }
         if (isset($data['contents'])) {
-            $this->contents = $data['contents'];
+            $this->contents = strval($data['contents']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $qualitynomination_comment_id;
+    public $qualitynomination_comment_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $qualitynomination_id;
+    public $qualitynomination_id = null;
 
     /**
-      * El usuario que emitió el comentario
-      * @access public
-      * @var int
+     * El usuario que emitió el comentario
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      * Fecha de creacion de este comentario
-      * @access public
-      * @var int
+     * Fecha de creacion de este comentario
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      * El voto emitido en este comentario. En el rango de [-2, +2]
-      * @access public
-      * @var int
+     * El voto emitido en este comentario. En el rango de [-2, +2]
+     *
+     * @var int|null
      */
-    public $vote;
+    public $vote = null;
 
     /**
-      * El contenido de el comentario
-      * @access public
-      * @var string
+     * El contenido de el comentario
+     *
+     * @var string|null
      */
-    public $contents;
+    public $contents = null;
 }

@@ -27,27 +27,29 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @static
      * @throws Exception si la operacion fallo.
-     * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
+     *
+     * @param GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets El objeto de tipo GroupsScoreboardsProblemsets
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        if (is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) || is_null($Groups_Scoreboards_Problemsets->problemset_id)) {
+        if (empty($Groups_Scoreboards_Problemsets->group_scoreboard_id) || empty($Groups_Scoreboards_Problemsets->problemset_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Groups_Scoreboards_Problemsets->only_ac)) {
-            $Groups_Scoreboards_Problemsets->only_ac = false;
-        }
-        if (is_null($Groups_Scoreboards_Problemsets->weight)) {
-            $Groups_Scoreboards_Problemsets->weight = 1;
-        }
         $sql = 'REPLACE INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            (int)$Groups_Scoreboards_Problemsets->problemset_id,
-            (int)$Groups_Scoreboards_Problemsets->only_ac,
-            (int)$Groups_Scoreboards_Problemsets->weight,
+            !is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? intval($Groups_Scoreboards_Problemsets->group_scoreboard_id) : null,
+            !is_null($Groups_Scoreboards_Problemsets->problemset_id) ? intval($Groups_Scoreboards_Problemsets->problemset_id) : null,
+            intval($Groups_Scoreboards_Problemsets->only_ac),
+            intval($Groups_Scoreboards_Problemsets->weight),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -57,17 +59,17 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets a actualizar.
+     * @param GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets El objeto de tipo GroupsScoreboardsProblemsets a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
         $sql = 'UPDATE `Groups_Scoreboards_Problemsets` SET `only_ac` = ?, `weight` = ? WHERE `group_scoreboard_id` = ? AND `problemset_id` = ?;';
         $params = [
             (int)$Groups_Scoreboards_Problemsets->only_ac,
             (int)$Groups_Scoreboards_Problemsets->weight,
-            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -80,10 +82,9 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * Este metodo cargará un objeto {@link GroupsScoreboardsProblemsets} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link GroupsScoreboardsProblemsets Un objeto del tipo {@link GroupsScoreboardsProblemsets}. NULL si no hay tal registro.
+     * @return ?GroupsScoreboardsProblemsets Un objeto del tipo {@link GroupsScoreboardsProblemsets}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $group_scoreboard_id, int $problemset_id) : ?GroupsScoreboardsProblemsets {
+    final public static function getByPK(?int $group_scoreboard_id, ?int $problemset_id) : ?GroupsScoreboardsProblemsets {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` FROM Groups_Scoreboards_Problemsets WHERE (group_scoreboard_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id, $problemset_id];
         global $conn;
@@ -103,12 +104,12 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets a eliminar
+     * @param GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets El objeto de tipo GroupsScoreboardsProblemsets a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : void {
         $sql = 'DELETE FROM `Groups_Scoreboards_Problemsets` WHERE group_scoreboard_id = ? AND problemset_id = ?;';
@@ -131,16 +132,18 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link GroupsScoreboardsProblemsets}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return GroupsScoreboardsProblemsets[] Un arreglo que contiene objetos del tipo {@link GroupsScoreboardsProblemsets}.
+     *
+     * @psalm-return array<int, GroupsScoreboardsProblemsets>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -165,21 +168,15 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto GroupsScoreboardsProblemsets suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param GroupsScoreboardsProblemsets [$Groups_Scoreboards_Problemsets] El objeto de tipo GroupsScoreboardsProblemsets a crear.
+     * @param GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets El objeto de tipo GroupsScoreboardsProblemsets a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        if (is_null($Groups_Scoreboards_Problemsets->only_ac)) {
-            $Groups_Scoreboards_Problemsets->only_ac = false;
-        }
-        if (is_null($Groups_Scoreboards_Problemsets->weight)) {
-            $Groups_Scoreboards_Problemsets->weight = 1;
-        }
         $sql = 'INSERT INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
         $params = [
-            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
             (int)$Groups_Scoreboards_Problemsets->only_ac,
             (int)$Groups_Scoreboards_Problemsets->weight,
         ];

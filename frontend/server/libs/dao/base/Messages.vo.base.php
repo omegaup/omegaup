@@ -52,54 +52,60 @@ class Messages extends VO {
             $this->recipient_id = (int)$data['recipient_id'];
         }
         if (isset($data['message'])) {
-            $this->message = $data['message'];
+            $this->message = strval($data['message']);
         }
         if (isset($data['date'])) {
+            /**
+             * @var string|int|float $data['date']
+             * @var int $this->date
+             */
             $this->date = DAO::fromMySQLTimestamp($data['date']);
+        } else {
+            $this->date = Time::get();
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $message_id;
+    public $message_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var bool
+     * [Campo no documentado]
+     *
+     * @var bool
      */
     public $read = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $sender_id;
+    public $sender_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $recipient_id;
+    public $recipient_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $message;
+    public $message = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $date = null;  // CURRENT_TIMESTAMP
+    public $date;  // CURRENT_TIMESTAMP
 }

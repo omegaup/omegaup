@@ -47,13 +47,13 @@ class CoderOfTheMonth extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = strval($data['time']);
         }
         if (isset($data['interview_url'])) {
-            $this->interview_url = $data['interview_url'];
+            $this->interview_url = strval($data['interview_url']);
         }
         if (isset($data['rank'])) {
             $this->rank = (int)$data['rank'];
@@ -64,53 +64,53 @@ class CoderOfTheMonth extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $coder_of_the_month_id;
+    public $coder_of_the_month_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $description;
+    public $description = null;
 
     /**
-      * Fecha no es UNIQUE por si hay más de 1 coder de mes.
-      * @access public
-      * @var string
+     * Fecha no es UNIQUE por si hay más de 1 coder de mes.
+     *
+     * @var string
      */
     public $time = '2000-01-01';
 
     /**
-      * Para linekar a un post del blog con entrevistas.
-      * @access public
-      * @var ?string
+     * Para linekar a un post del blog con entrevistas.
+     *
+     * @var string|null
      */
-    public $interview_url;
+    public $interview_url = null;
 
     /**
-      * El lugar en el que el usuario estuvo durante ese mes
-      * @access public
-      * @var int
+     * El lugar en el que el usuario estuvo durante ese mes
+     *
+     * @var int|null
      */
-    public $rank;
+    public $rank = null;
 
     /**
-      * Id de la identidad que seleccionó al coder.
-      * @access public
-      * @var ?int
+     * Id de la identidad que seleccionó al coder.
+     *
+     * @var int|null
      */
-    public $selected_by;
+    public $selected_by = null;
 }

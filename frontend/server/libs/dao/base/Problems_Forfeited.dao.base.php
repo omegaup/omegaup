@@ -27,22 +27,27 @@ abstract class ProblemsForfeitedDAOBase {
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @static
      * @throws Exception si la operacion fallo.
-     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
+     *
+     * @param ProblemsForfeited $Problems_Forfeited El objeto de tipo ProblemsForfeited
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemsForfeited $Problems_Forfeited) : int {
-        if (is_null($Problems_Forfeited->user_id) || is_null($Problems_Forfeited->problem_id)) {
+        if (empty($Problems_Forfeited->user_id) || empty($Problems_Forfeited->problem_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Problems_Forfeited->forfeited_date)) {
-            $Problems_Forfeited->forfeited_date = Time::get();
-        }
         $sql = 'REPLACE INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Problems_Forfeited->user_id,
-            (int)$Problems_Forfeited->problem_id,
+            !is_null($Problems_Forfeited->user_id) ? intval($Problems_Forfeited->user_id) : null,
+            !is_null($Problems_Forfeited->problem_id) ? intval($Problems_Forfeited->problem_id) : null,
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;
@@ -53,16 +58,16 @@ abstract class ProblemsForfeitedDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a actualizar.
+     * @param ProblemsForfeited $Problems_Forfeited El objeto de tipo ProblemsForfeited a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(ProblemsForfeited $Problems_Forfeited) : int {
         $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
-            (int)$Problems_Forfeited->user_id,
-            (int)$Problems_Forfeited->problem_id,
+            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
+            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -75,10 +80,9 @@ abstract class ProblemsForfeitedDAOBase {
      * Este metodo cargará un objeto {@link ProblemsForfeited} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link ProblemsForfeited Un objeto del tipo {@link ProblemsForfeited}. NULL si no hay tal registro.
+     * @return ?ProblemsForfeited Un objeto del tipo {@link ProblemsForfeited}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $user_id, int $problem_id) : ?ProblemsForfeited {
+    final public static function getByPK(?int $user_id, ?int $problem_id) : ?ProblemsForfeited {
         $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
         global $conn;
@@ -98,12 +102,12 @@ abstract class ProblemsForfeitedDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a eliminar
+     * @param ProblemsForfeited $Problems_Forfeited El objeto de tipo ProblemsForfeited a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(ProblemsForfeited $Problems_Forfeited) : void {
         $sql = 'DELETE FROM `Problems_Forfeited` WHERE user_id = ? AND problem_id = ?;';
@@ -126,16 +130,18 @@ abstract class ProblemsForfeitedDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsForfeited}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return ProblemsForfeited[] Un arreglo que contiene objetos del tipo {@link ProblemsForfeited}.
+     *
+     * @psalm-return array<int, ProblemsForfeited>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -160,18 +166,15 @@ abstract class ProblemsForfeitedDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto ProblemsForfeited suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param ProblemsForfeited [$Problems_Forfeited] El objeto de tipo ProblemsForfeited a crear.
+     * @param ProblemsForfeited $Problems_Forfeited El objeto de tipo ProblemsForfeited a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsForfeited $Problems_Forfeited) : int {
-        if (is_null($Problems_Forfeited->forfeited_date)) {
-            $Problems_Forfeited->forfeited_date = Time::get();
-        }
         $sql = 'INSERT INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Problems_Forfeited->user_id,
-            (int)$Problems_Forfeited->problem_id,
+            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
+            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;

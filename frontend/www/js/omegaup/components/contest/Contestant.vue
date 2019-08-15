@@ -63,10 +63,6 @@
   </div>
 </template>
 
-<style>
-
-</style>
-
 <script lang="ts">
 import { Vue, Component, Emit, Prop } from 'vue-property-decorator';
 
@@ -85,14 +81,13 @@ import user_Username from '../user/Username.vue';
   },
 })
 export default class Contestant extends Vue {
-  @Prop() data!: omegaup.IdentityContest[];
+  @Prop() users!: omegaup.IdentityContest[];
   @Prop() contest!: omegaup.Contest;
 
   T = T;
   UI = UI;
   contestant = '';
   contestants = '';
-  users = this.data;
   selected = {};
 
   onSaveEndTime(user: omegaup.IdentityContest): void {

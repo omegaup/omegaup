@@ -50,13 +50,13 @@ class Courses extends VO {
             $this->course_id = (int)$data['course_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['group_id'])) {
             $this->group_id = (int)$data['group_id'];
@@ -65,9 +65,17 @@ class Courses extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['start_time'])) {
+            /**
+             * @var string|int|float $data['start_time']
+             * @var int $this->start_time
+             */
             $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
+            /**
+             * @var string|int|float $data['finish_time']
+             * @var int $this->finish_time
+             */
             $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['public'])) {
@@ -80,7 +88,7 @@ class Courses extends VO {
             $this->needs_basic_information = boolval($data['needs_basic_information']);
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = $data['requests_user_information'];
+            $this->requests_user_information = strval($data['requests_user_information']);
         }
         if (isset($data['show_scoreboard'])) {
             $this->show_scoreboard = boolval($data['show_scoreboard']);
@@ -88,95 +96,95 @@ class Courses extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $course_id;
+    public $course_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $name;
+    public $name = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $description;
+    public $description = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $alias;
+    public $alias = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $group_id;
+    public $group_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $acl_id;
+    public $acl_id = null;
 
     /**
-      * Hora de inicio de este curso
-      * @access public
-      * @var int
+     * Hora de inicio de este curso
+     *
+     * @var int
      */
     public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      * Hora de finalizacion de este curso
-      * @access public
-      * @var int
+     * Hora de finalizacion de este curso
+     *
+     * @var int
      */
     public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      * True implica que cualquier usuario puede entrar al curso
-      * @access public
-      * @var bool
+     * True implica que cualquier usuario puede entrar al curso
+     *
+     * @var bool
      */
     public $public = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $school_id;
+    public $school_id = null;
 
     /**
-      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil
-      * @access public
-      * @var bool
+     * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil
+     *
+     * @var bool
      */
     public $needs_basic_information = false;
 
     /**
-      * Se solicita información de los participantes para contactarlos posteriormente.
-      * @access public
-      * @var string
+     * Se solicita información de los participantes para contactarlos posteriormente.
+     *
+     * @var string
      */
     public $requests_user_information = 'no';
 
     /**
-      * Los estudiantes pueden visualizar el scoreboard de un curso.
-      * @access public
-      * @var bool
+     * Los estudiantes pueden visualizar el scoreboard de un curso.
+     *
+     * @var bool
      */
     public $show_scoreboard = false;
 }

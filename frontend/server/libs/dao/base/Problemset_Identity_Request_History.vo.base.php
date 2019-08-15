@@ -49,7 +49,13 @@ class ProblemsetIdentityRequestHistory extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['accepted'])) {
             $this->accepted = boolval($data['accepted']);
@@ -60,46 +66,46 @@ class ProblemsetIdentityRequestHistory extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $history_id;
+    public $history_id = 0;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int
+     * Identidad del usuario
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var bool
+     * [Campo no documentado]
+     *
+     * @var bool|null
      */
-    public $accepted;
+    public $accepted = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $admin_id;
+    public $admin_id = null;
 }

@@ -21,14 +21,14 @@ abstract class UsersBadgesDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a actualizar.
+     * @param UsersBadges $Users_Badges El objeto de tipo UsersBadges a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(UsersBadges $Users_Badges) : int {
         $sql = 'UPDATE `Users_Badges` SET `user_id` = ?, `badge_alias` = ?, `assignation_time` = ? WHERE `user_badge_id` = ?;';
         $params = [
-            (int)$Users_Badges->user_id,
+            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
             DAO::toMySQLTimestamp($Users_Badges->assignation_time),
             (int)$Users_Badges->user_badge_id,
@@ -44,8 +44,7 @@ abstract class UsersBadgesDAOBase {
      * Este metodo cargará un objeto {@link UsersBadges} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link UsersBadges Un objeto del tipo {@link UsersBadges}. NULL si no hay tal registro.
+     * @return ?UsersBadges Un objeto del tipo {@link UsersBadges}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $user_badge_id) : ?UsersBadges {
         $sql = 'SELECT `Users_Badges`.`user_badge_id`, `Users_Badges`.`user_id`, `Users_Badges`.`badge_alias`, `Users_Badges`.`assignation_time` FROM Users_Badges WHERE (user_badge_id = ?) LIMIT 1;';
@@ -67,12 +66,12 @@ abstract class UsersBadgesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a eliminar
+     * @param UsersBadges $Users_Badges El objeto de tipo UsersBadges a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(UsersBadges $Users_Badges) : void {
         $sql = 'DELETE FROM `Users_Badges` WHERE user_badge_id = ?;';
@@ -95,16 +94,18 @@ abstract class UsersBadgesDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link UsersBadges}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return UsersBadges[] Un arreglo que contiene objetos del tipo {@link UsersBadges}.
+     *
+     * @psalm-return array<int, UsersBadges>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -129,17 +130,14 @@ abstract class UsersBadgesDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto UsersBadges suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param UsersBadges [$Users_Badges] El objeto de tipo UsersBadges a crear.
+     * @param UsersBadges $Users_Badges El objeto de tipo UsersBadges a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(UsersBadges $Users_Badges) : int {
-        if (is_null($Users_Badges->assignation_time)) {
-            $Users_Badges->assignation_time = Time::get();
-        }
         $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Users_Badges->user_id,
+            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
             DAO::toMySQLTimestamp($Users_Badges->assignation_time),
         ];
