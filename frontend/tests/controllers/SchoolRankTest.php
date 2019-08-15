@@ -43,9 +43,28 @@ class SchoolRankTest extends OmegaupTestCase {
      *
      */
     public function testSchoolRankPositive() {
+        $currentTime = Time::get();
+        $pastMonthTime = strtotime('first day of last month', Time::get());
+
+        Time::setTimeForTesting($pastMonthTime);
+
         // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
-        // 1 in school #2 but PA, 1 with no school.
-        $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
+        // 1 in school #2 but PA, 1 with no school for the past month
+        $schoolsData = [
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool()
+        ];
+
+        $this->createRunsWithSchool($schoolsData);
+
+        Time::setTimeForTesting($currentTime);
+
+        // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
+        // 1 in school #2 but PA, 1 with no school for the current time
+        $schoolsData = [
+            SchoolsFactory::createSchool(),
+            SchoolsFactory::createSchool()
+        ];
 
         $this->createRunsWithSchool($schoolsData);
 
@@ -56,12 +75,19 @@ class SchoolRankTest extends OmegaupTestCase {
             'auth_token' => $rankViewerLogin->auth_token
         ]));
 
+        // Only runs of this month should be considered for the rank
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(2, count($response['rank']));
-        $this->assertEquals($schoolsData[0]['request']['name'], $response['rank'][0]['name']);
+        $this->assertEquals(
+            $schoolsData[0]['request']['name'],
+            $response['rank'][0]['name']
+        );
         $this->assertEquals(2, $response['rank'][0]['distinct_users']);
 
-        $this->assertEquals($schoolsData[1]['request']['name'], $response['rank'][1]['name']);
+        $this->assertEquals(
+            $schoolsData[1]['request']['name'],
+            $response['rank'][1]['name']
+        );
         $this->assertEquals(1, $response['rank'][1]['distinct_users']);
 
         $cachedResponse = SchoolController::apiRank(new Request([

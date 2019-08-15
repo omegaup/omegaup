@@ -7,15 +7,45 @@ declare namespace omegaup {
     owners_percentage?: number;
   }
 
+  export interface CoderOfTheMonth extends Profile {
+    date?: string;
+    ProblemsSolved?: number;
+    score?: number;
+  }
+
+  interface Case {
+    contest_score: number;
+    max_score: number;
+    meta: omegaup.Meta;
+    name: string;
+    score: number;
+    verdict: string;
+  }
+
   export interface Contest {
     alias: string;
     title: string;
+    window_length?: number;
+    start_time?: Date;
+    finish_time?: Date;
   }
 
   interface ContestResult {
     data: omegaup.Contest;
     length?: string;
     place: number;
+  }
+
+  interface DetailsGroup {
+    cases: omegaup.Case[];
+    contest_score: number;
+    group: string;
+    max_score: number;
+    score: number;
+  }
+
+  interface Details {
+    group: omegaup.DetailsGroup[];
   }
 
   export interface Identity {
@@ -25,6 +55,17 @@ declare namespace omegaup {
     school_id: number;
     country_id: string;
     state_id: string;
+  }
+
+  export interface IdentityContest {
+    username: string;
+    end_time: Date;
+  }
+
+  interface Meta {
+    time: number;
+    wall_time: number;
+    memory: number;
   }
 
   export interface Notification {
@@ -43,6 +84,19 @@ declare namespace omegaup {
     title: string;
     accepted: number;
     submissions: number;
+    penalty?: number;
+    percent?: number;
+    points?: number;
+    run_details?: omegaup.RunDetails;
+  }
+
+  interface RunDetails {
+    admin: boolean;
+    details: omegaup.Details;
+    guid: string;
+    judged_by: string;
+    language: string;
+    logs: string;
   }
 
   export interface Profile {
