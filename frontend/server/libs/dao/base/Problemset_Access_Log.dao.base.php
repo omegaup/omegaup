@@ -33,7 +33,9 @@ abstract class ProblemsetAccessLogDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsetAccessLog}.
+     * @return ProblemsetAccessLog[] Un arreglo que contiene objetos del tipo {@link ProblemsetAccessLog}.
+     *
+     * @psalm-return array<int, ProblemsetAccessLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -67,14 +69,11 @@ abstract class ProblemsetAccessLogDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsetAccessLog $Problemset_Access_Log) : int {
-        if (is_null($Problemset_Access_Log->time)) {
-            $Problemset_Access_Log->time = Time::get();
-        }
         $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
         $params = [
-            (int)$Problemset_Access_Log->problemset_id,
-            (int)$Problemset_Access_Log->identity_id,
-            (int)$Problemset_Access_Log->ip,
+            is_null($Problemset_Access_Log->problemset_id) ? null : (int)$Problemset_Access_Log->problemset_id,
+            is_null($Problemset_Access_Log->identity_id) ? null : (int)$Problemset_Access_Log->identity_id,
+            is_null($Problemset_Access_Log->ip) ? null : (int)$Problemset_Access_Log->ip,
             DAO::toMySQLTimestamp($Problemset_Access_Log->time),
         ];
         global $conn;

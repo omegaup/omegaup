@@ -116,7 +116,7 @@ class SchoolController extends Controller {
             $r['rowcount'] = 100;
         }
         if (is_null($r['start_time'])) {
-            $r['start_time'] = strtotime('first day of month', Time::get());
+            $r['start_time'] = strtotime('first day of this month', Time::get());
         }
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = strtotime('first day of next month', Time::get());

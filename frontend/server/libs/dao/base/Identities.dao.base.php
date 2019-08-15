@@ -105,7 +105,9 @@ abstract class IdentitiesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Identities}.
+     * @return Identities[] Un arreglo que contiene objetos del tipo {@link Identities}.
+     *
+     * @psalm-return array<int, Identities>
      */
     final public static function getAll(
         ?int $pagina = null,

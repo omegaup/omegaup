@@ -59,24 +59,32 @@ class Assignments extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['publish_time_delay'])) {
             $this->publish_time_delay = (int)$data['publish_time_delay'];
         }
         if (isset($data['assignment_type'])) {
-            $this->assignment_type = $data['assignment_type'];
+            $this->assignment_type = strval($data['assignment_type']);
         }
         if (isset($data['start_time'])) {
+            /**
+             * @var string|int|float $data['start_time']
+             * @var int $this->start_time
+             */
             $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
+            /**
+             * @var string|int|float $data['finish_time']
+             * @var int $this->finish_time
+             */
             $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['max_points'])) {
@@ -88,95 +96,95 @@ class Assignments extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $assignment_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $course_id;
+    public $course_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      * La lista de control de acceso compartida con el curso
-      * @access public
-      * @var int
+     * La lista de control de acceso compartida con el curso
+     *
+     * @var int|null
      */
-    public $acl_id;
+    public $acl_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $name;
+    public $name = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $description;
+    public $description = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $alias;
+    public $alias = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $publish_time_delay;
+    public $publish_time_delay = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $assignment_type;
+    public $assignment_type = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
     public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      * La cantidad total de puntos que se pueden obtener.
-      * @access public
-      * @var float
+     * La cantidad total de puntos que se pueden obtener.
+     *
+     * @var float
      */
     public $max_points = 0.00;
 
     /**
-      * Define el orden de aparición de los problemas/tareas
-      * @access public
-      * @var int
+     * Define el orden de aparición de los problemas/tareas
+     *
+     * @var int
      */
     public $order = 1;
 }

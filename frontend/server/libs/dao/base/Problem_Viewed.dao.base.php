@@ -34,16 +34,20 @@ abstract class ProblemViewedDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemViewed $Problem_Viewed) : int {
-        if (is_null($Problem_Viewed->problem_id) || is_null($Problem_Viewed->identity_id)) {
+        if (empty($Problem_Viewed->problem_id) || empty($Problem_Viewed->identity_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Problem_Viewed->view_time)) {
-            $Problem_Viewed->view_time = Time::get();
-        }
         $sql = 'REPLACE INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Problem_Viewed->problem_id,
-            (int)$Problem_Viewed->identity_id,
+            !is_null($Problem_Viewed->problem_id) ? intval($Problem_Viewed->problem_id) : null,
+            !is_null($Problem_Viewed->identity_id) ? intval($Problem_Viewed->identity_id) : null,
             DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         global $conn;
@@ -62,8 +66,8 @@ abstract class ProblemViewedDAOBase {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             DAO::toMySQLTimestamp($Problem_Viewed->view_time),
-            (int)$Problem_Viewed->problem_id,
-            (int)$Problem_Viewed->identity_id,
+            is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
+            is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,7 +82,7 @@ abstract class ProblemViewedDAOBase {
      *
      * @return ?ProblemViewed Un objeto del tipo {@link ProblemViewed}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $problem_id, int $identity_id) : ?ProblemViewed {
+    final public static function getByPK(?int $problem_id, ?int $identity_id) : ?ProblemViewed {
         $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time` FROM Problem_Viewed WHERE (problem_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$problem_id, $identity_id];
         global $conn;
@@ -131,7 +135,9 @@ abstract class ProblemViewedDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemViewed}.
+     * @return ProblemViewed[] Un arreglo que contiene objetos del tipo {@link ProblemViewed}.
+     *
+     * @psalm-return array<int, ProblemViewed>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -165,13 +171,10 @@ abstract class ProblemViewedDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemViewed $Problem_Viewed) : int {
-        if (is_null($Problem_Viewed->view_time)) {
-            $Problem_Viewed->view_time = Time::get();
-        }
         $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Problem_Viewed->problem_id,
-            (int)$Problem_Viewed->identity_id,
+            is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
+            is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
             DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         global $conn;

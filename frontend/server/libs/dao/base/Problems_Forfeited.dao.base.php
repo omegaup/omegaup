@@ -34,16 +34,20 @@ abstract class ProblemsForfeitedDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemsForfeited $Problems_Forfeited) : int {
-        if (is_null($Problems_Forfeited->user_id) || is_null($Problems_Forfeited->problem_id)) {
+        if (empty($Problems_Forfeited->user_id) || empty($Problems_Forfeited->problem_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Problems_Forfeited->forfeited_date)) {
-            $Problems_Forfeited->forfeited_date = Time::get();
-        }
         $sql = 'REPLACE INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Problems_Forfeited->user_id,
-            (int)$Problems_Forfeited->problem_id,
+            !is_null($Problems_Forfeited->user_id) ? intval($Problems_Forfeited->user_id) : null,
+            !is_null($Problems_Forfeited->problem_id) ? intval($Problems_Forfeited->problem_id) : null,
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;
@@ -62,8 +66,8 @@ abstract class ProblemsForfeitedDAOBase {
         $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
-            (int)$Problems_Forfeited->user_id,
-            (int)$Problems_Forfeited->problem_id,
+            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
+            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -78,7 +82,7 @@ abstract class ProblemsForfeitedDAOBase {
      *
      * @return ?ProblemsForfeited Un objeto del tipo {@link ProblemsForfeited}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $user_id, int $problem_id) : ?ProblemsForfeited {
+    final public static function getByPK(?int $user_id, ?int $problem_id) : ?ProblemsForfeited {
         $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
         global $conn;
@@ -131,7 +135,9 @@ abstract class ProblemsForfeitedDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ProblemsForfeited}.
+     * @return ProblemsForfeited[] Un arreglo que contiene objetos del tipo {@link ProblemsForfeited}.
+     *
+     * @psalm-return array<int, ProblemsForfeited>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -165,13 +171,10 @@ abstract class ProblemsForfeitedDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsForfeited $Problems_Forfeited) : int {
-        if (is_null($Problems_Forfeited->forfeited_date)) {
-            $Problems_Forfeited->forfeited_date = Time::get();
-        }
         $sql = 'INSERT INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Problems_Forfeited->user_id,
-            (int)$Problems_Forfeited->problem_id,
+            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
+            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;

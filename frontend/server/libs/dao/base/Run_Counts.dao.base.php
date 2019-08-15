@@ -34,20 +34,21 @@ abstract class RunCountsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(RunCounts $Run_Counts) : int {
-        if (is_null($Run_Counts->date)) {
+        if (empty($Run_Counts->date)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Run_Counts->total)) {
-            $Run_Counts->total = 0;
-        }
-        if (is_null($Run_Counts->ac_count)) {
-            $Run_Counts->ac_count = 0;
-        }
         $sql = 'REPLACE INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
             $Run_Counts->date,
-            (int)$Run_Counts->total,
-            (int)$Run_Counts->ac_count,
+            intval($Run_Counts->total),
+            intval($Run_Counts->ac_count),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -81,7 +82,7 @@ abstract class RunCountsDAOBase {
      *
      * @return ?RunCounts Un objeto del tipo {@link RunCounts}. NULL si no hay tal registro.
      */
-    final public static function getByPK(string $date) : ?RunCounts {
+    final public static function getByPK(?string $date) : ?RunCounts {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` FROM Run_Counts WHERE (date = ?) LIMIT 1;';
         $params = [$date];
         global $conn;
@@ -134,7 +135,9 @@ abstract class RunCountsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link RunCounts}.
+     * @return RunCounts[] Un arreglo que contiene objetos del tipo {@link RunCounts}.
+     *
+     * @psalm-return array<int, RunCounts>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -168,12 +171,6 @@ abstract class RunCountsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(RunCounts $Run_Counts) : int {
-        if (is_null($Run_Counts->total)) {
-            $Run_Counts->total = 0;
-        }
-        if (is_null($Run_Counts->ac_count)) {
-            $Run_Counts->ac_count = 0;
-        }
         $sql = 'INSERT INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
         $params = [
             $Run_Counts->date,

@@ -28,7 +28,7 @@ abstract class ProblemsetsDAOBase {
     final public static function update(Problemsets $Problemsets) : int {
         $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `type` = ?, `contest_id` = ?, `assignment_id` = ?, `interview_id` = ? WHERE `problemset_id` = ?;';
         $params = [
-            (int)$Problemsets->acl_id,
+            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
             (int)$Problemsets->needs_basic_information,
@@ -107,7 +107,9 @@ abstract class ProblemsetsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Problemsets}.
+     * @return Problemsets[] Un arreglo que contiene objetos del tipo {@link Problemsets}.
+     *
+     * @psalm-return array<int, Problemsets>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -141,21 +143,9 @@ abstract class ProblemsetsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Problemsets $Problemsets) : int {
-        if (is_null($Problemsets->access_mode)) {
-            $Problemsets->access_mode = 'public';
-        }
-        if (is_null($Problemsets->needs_basic_information)) {
-            $Problemsets->needs_basic_information = false;
-        }
-        if (is_null($Problemsets->requests_user_information)) {
-            $Problemsets->requests_user_information = 'no';
-        }
-        if (is_null($Problemsets->type)) {
-            $Problemsets->type = 'Contest';
-        }
         $sql = 'INSERT INTO Problemsets (`acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `scoreboard_url`, `scoreboard_url_admin`, `type`, `contest_id`, `assignment_id`, `interview_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Problemsets->acl_id,
+            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
             $Problemsets->access_mode,
             $Problemsets->languages,
             (int)$Problemsets->needs_basic_information,

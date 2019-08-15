@@ -50,67 +50,73 @@ class QualityNominations extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['nomination'])) {
-            $this->nomination = $data['nomination'];
+            $this->nomination = strval($data['nomination']);
         }
         if (isset($data['contents'])) {
-            $this->contents = $data['contents'];
+            $this->contents = strval($data['contents']);
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['status'])) {
-            $this->status = $data['status'];
+            $this->status = strval($data['status']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $qualitynomination_id = 0;
 
     /**
-      * El usuario que nominó el problema
-      * @access public
-      * @var int
+     * El usuario que nominó el problema
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      * El problema que fue nominado
-      * @access public
-      * @var int
+     * El problema que fue nominado
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      * El tipo de nominación
-      * @access public
-      * @var string
+     * El tipo de nominación
+     *
+     * @var string
      */
     public $nomination = 'suggestion';
 
     /**
-      * Un blob json con el contenido de la nominación
-      * @access public
-      * @var string
+     * Un blob json con el contenido de la nominación
+     *
+     * @var string|null
      */
-    public $contents;
+    public $contents = null;
 
     /**
-      * Fecha de creacion de esta nominación
-      * @access public
-      * @var int
+     * Fecha de creacion de esta nominación
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      * El estado de la nominación
-      * @access public
-      * @var string
+     * El estado de la nominación
+     *
+     * @var string
      */
     public $status = 'open';
 }

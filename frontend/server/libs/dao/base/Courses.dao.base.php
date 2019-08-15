@@ -31,8 +31,8 @@ abstract class CoursesDAOBase {
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            (int)$Courses->group_id,
-            (int)$Courses->acl_id,
+            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
+            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
             DAO::toMySQLTimestamp($Courses->start_time),
             DAO::toMySQLTimestamp($Courses->finish_time),
             (int)$Courses->public,
@@ -108,7 +108,9 @@ abstract class CoursesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Courses}.
+     * @return Courses[] Un arreglo que contiene objetos del tipo {@link Courses}.
+     *
+     * @psalm-return array<int, Courses>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -142,31 +144,13 @@ abstract class CoursesDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Courses $Courses) : int {
-        if (is_null($Courses->start_time)) {
-            $Courses->start_time = 946706400; // 2000-01-01 06:00:00
-        }
-        if (is_null($Courses->finish_time)) {
-            $Courses->finish_time = 946706400; // 2000-01-01 06:00:00
-        }
-        if (is_null($Courses->public)) {
-            $Courses->public = false;
-        }
-        if (is_null($Courses->needs_basic_information)) {
-            $Courses->needs_basic_information = false;
-        }
-        if (is_null($Courses->requests_user_information)) {
-            $Courses->requests_user_information = 'no';
-        }
-        if (is_null($Courses->show_scoreboard)) {
-            $Courses->show_scoreboard = false;
-        }
         $sql = 'INSERT INTO Courses (`name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`, `requests_user_information`, `show_scoreboard`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            (int)$Courses->group_id,
-            (int)$Courses->acl_id,
+            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
+            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
             DAO::toMySQLTimestamp($Courses->start_time),
             DAO::toMySQLTimestamp($Courses->finish_time),
             (int)$Courses->public,

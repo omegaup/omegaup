@@ -40,33 +40,33 @@ class Permissions extends VO {
             $this->permission_id = (int)$data['permission_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $permission_id = 0;
 
     /**
-      * El nombre corto del permiso.
-      * @access public
-      * @var string
+     * El nombre corto del permiso.
+     *
+     * @var string|null
      */
-    public $name;
+    public $name = null;
 
     /**
-      * La descripción humana del permiso.
-      * @access public
-      * @var string
+     * La descripción humana del permiso.
+     *
+     * @var string|null
      */
-    public $description;
+    public $description = null;
 }

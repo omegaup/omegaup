@@ -46,60 +46,70 @@ class ProblemsetIdentityRequest extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['request_time'])) {
+            /**
+             * @var string|int|float $data['request_time']
+             * @var int $this->request_time
+             */
             $this->request_time = DAO::fromMySQLTimestamp($data['request_time']);
+        } else {
+            $this->request_time = Time::get();
         }
         if (isset($data['last_update'])) {
+            /**
+             * @var string|int|float $data['last_update']
+             * @var int $this->last_update
+             */
             $this->last_update = DAO::fromMySQLTimestamp($data['last_update']);
         }
         if (isset($data['accepted'])) {
             $this->accepted = boolval($data['accepted']);
         }
         if (isset($data['extra_note'])) {
-            $this->extra_note = $data['extra_note'];
+            $this->extra_note = strval($data['extra_note']);
         }
     }
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $request_time = null;  // CURRENT_TIMESTAMP
+    public $request_time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $last_update;
+    public $last_update = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?bool
+     * [Campo no documentado]
+     *
+     * @var bool|null
      */
-    public $accepted;
+    public $accepted = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $extra_note;
+    public $extra_note = null;
 }

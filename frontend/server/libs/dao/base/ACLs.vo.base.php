@@ -44,18 +44,18 @@ class ACLs extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $acl_id = 0;
 
     /**
-      * El usuario que creó el objeto y que tiene un rol de administrador implícito
-      * @access public
-      * @var int
+     * El usuario que creó el objeto y que tiene un rol de administrador implícito
+     *
+     * @var int|null
      */
-    public $owner_id;
+    public $owner_id = null;
 }

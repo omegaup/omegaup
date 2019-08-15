@@ -34,21 +34,22 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        if (is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) || is_null($Groups_Scoreboards_Problemsets->problemset_id)) {
+        if (empty($Groups_Scoreboards_Problemsets->group_scoreboard_id) || empty($Groups_Scoreboards_Problemsets->problemset_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Groups_Scoreboards_Problemsets->only_ac)) {
-            $Groups_Scoreboards_Problemsets->only_ac = false;
-        }
-        if (is_null($Groups_Scoreboards_Problemsets->weight)) {
-            $Groups_Scoreboards_Problemsets->weight = 1;
-        }
         $sql = 'REPLACE INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            (int)$Groups_Scoreboards_Problemsets->problemset_id,
-            (int)$Groups_Scoreboards_Problemsets->only_ac,
-            (int)$Groups_Scoreboards_Problemsets->weight,
+            !is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? intval($Groups_Scoreboards_Problemsets->group_scoreboard_id) : null,
+            !is_null($Groups_Scoreboards_Problemsets->problemset_id) ? intval($Groups_Scoreboards_Problemsets->problemset_id) : null,
+            intval($Groups_Scoreboards_Problemsets->only_ac),
+            intval($Groups_Scoreboards_Problemsets->weight),
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -67,8 +68,8 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
         $params = [
             (int)$Groups_Scoreboards_Problemsets->only_ac,
             (int)$Groups_Scoreboards_Problemsets->weight,
-            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -83,7 +84,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      *
      * @return ?GroupsScoreboardsProblemsets Un objeto del tipo {@link GroupsScoreboardsProblemsets}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $group_scoreboard_id, int $problemset_id) : ?GroupsScoreboardsProblemsets {
+    final public static function getByPK(?int $group_scoreboard_id, ?int $problemset_id) : ?GroupsScoreboardsProblemsets {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` FROM Groups_Scoreboards_Problemsets WHERE (group_scoreboard_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id, $problemset_id];
         global $conn;
@@ -136,7 +137,9 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link GroupsScoreboardsProblemsets}.
+     * @return GroupsScoreboardsProblemsets[] Un arreglo que contiene objetos del tipo {@link GroupsScoreboardsProblemsets}.
+     *
+     * @psalm-return array<int, GroupsScoreboardsProblemsets>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -170,16 +173,10 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
-        if (is_null($Groups_Scoreboards_Problemsets->only_ac)) {
-            $Groups_Scoreboards_Problemsets->only_ac = false;
-        }
-        if (is_null($Groups_Scoreboards_Problemsets->weight)) {
-            $Groups_Scoreboards_Problemsets->weight = 1;
-        }
         $sql = 'INSERT INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
         $params = [
-            (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
             (int)$Groups_Scoreboards_Problemsets->only_ac,
             (int)$Groups_Scoreboards_Problemsets->weight,
         ];

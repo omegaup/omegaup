@@ -26,7 +26,7 @@ abstract class GroupRolesDAOBase {
      *
      * @return ?GroupRoles Un objeto del tipo {@link GroupRoles}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $group_id, int $role_id, int $acl_id) : ?GroupRoles {
+    final public static function getByPK(?int $group_id, ?int $role_id, ?int $acl_id) : ?GroupRoles {
         $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` FROM Group_Roles WHERE (group_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
         $params = [$group_id, $role_id, $acl_id];
         global $conn;
@@ -79,7 +79,9 @@ abstract class GroupRolesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link GroupRoles}.
+     * @return GroupRoles[] Un arreglo que contiene objetos del tipo {@link GroupRoles}.
+     *
+     * @psalm-return array<int, GroupRoles>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -115,9 +117,9 @@ abstract class GroupRolesDAOBase {
     final public static function create(GroupRoles $Group_Roles) : int {
         $sql = 'INSERT INTO Group_Roles (`group_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Group_Roles->group_id,
-            (int)$Group_Roles->role_id,
-            (int)$Group_Roles->acl_id,
+            is_null($Group_Roles->group_id) ? null : (int)$Group_Roles->group_id,
+            is_null($Group_Roles->role_id) ? null : (int)$Group_Roles->role_id,
+            is_null($Group_Roles->acl_id) ? null : (int)$Group_Roles->acl_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

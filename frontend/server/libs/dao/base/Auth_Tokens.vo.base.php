@@ -44,39 +44,45 @@ class AuthTokens extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['token'])) {
-            $this->token = $data['token'];
+            $this->token = strval($data['token']);
         }
         if (isset($data['create_time'])) {
+            /**
+             * @var string|int|float $data['create_time']
+             * @var int $this->create_time
+             */
             $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
+        } else {
+            $this->create_time = Time::get();
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int
+     * Identidad del usuario
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var string|null
      */
-    public $token;
+    public $token = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $create_time = null;  // CURRENT_TIMESTAMP
+    public $create_time;  // CURRENT_TIMESTAMP
 }

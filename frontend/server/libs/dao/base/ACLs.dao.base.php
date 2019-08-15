@@ -28,7 +28,7 @@ abstract class ACLsDAOBase {
     final public static function update(ACLs $ACLs) : int {
         $sql = 'UPDATE `ACLs` SET `owner_id` = ? WHERE `acl_id` = ?;';
         $params = [
-            (int)$ACLs->owner_id,
+            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
             (int)$ACLs->acl_id,
         ];
         global $conn;
@@ -97,7 +97,9 @@ abstract class ACLsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link ACLs}.
+     * @return ACLs[] Un arreglo que contiene objetos del tipo {@link ACLs}.
+     *
+     * @psalm-return array<int, ACLs>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -133,7 +135,7 @@ abstract class ACLsDAOBase {
     final public static function create(ACLs $ACLs) : int {
         $sql = 'INSERT INTO ACLs (`owner_id`) VALUES (?);';
         $params = [
-            (int)$ACLs->owner_id,
+            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

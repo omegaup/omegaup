@@ -26,7 +26,7 @@ abstract class QualityNominationReviewersDAOBase {
      *
      * @return ?QualityNominationReviewers Un objeto del tipo {@link QualityNominationReviewers}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $qualitynomination_id, int $user_id) : ?QualityNominationReviewers {
+    final public static function getByPK(?int $qualitynomination_id, ?int $user_id) : ?QualityNominationReviewers {
         $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` FROM QualityNomination_Reviewers WHERE (qualitynomination_id = ? AND user_id = ?) LIMIT 1;';
         $params = [$qualitynomination_id, $user_id];
         global $conn;
@@ -79,7 +79,9 @@ abstract class QualityNominationReviewersDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link QualityNominationReviewers}.
+     * @return QualityNominationReviewers[] Un arreglo que contiene objetos del tipo {@link QualityNominationReviewers}.
+     *
+     * @psalm-return array<int, QualityNominationReviewers>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -115,8 +117,8 @@ abstract class QualityNominationReviewersDAOBase {
     final public static function create(QualityNominationReviewers $QualityNomination_Reviewers) : int {
         $sql = 'INSERT INTO QualityNomination_Reviewers (`qualitynomination_id`, `user_id`) VALUES (?, ?);';
         $params = [
-            (int)$QualityNomination_Reviewers->qualitynomination_id,
-            (int)$QualityNomination_Reviewers->user_id,
+            is_null($QualityNomination_Reviewers->qualitynomination_id) ? null : (int)$QualityNomination_Reviewers->qualitynomination_id,
+            is_null($QualityNomination_Reviewers->user_id) ? null : (int)$QualityNomination_Reviewers->user_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

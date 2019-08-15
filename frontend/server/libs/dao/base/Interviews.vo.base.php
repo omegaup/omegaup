@@ -50,13 +50,13 @@ class Interviews extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['title'])) {
-            $this->title = $data['title'];
+            $this->title = strval($data['title']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['window_length'])) {
             $this->window_length = (int)$data['window_length'];
@@ -64,53 +64,53 @@ class Interviews extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $interview_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      * La lista de control de acceso del problema
-      * @access public
-      * @var int
+     * La lista de control de acceso del problema
+     *
+     * @var int|null
      */
-    public $acl_id;
+    public $acl_id = null;
 
     /**
-      * El alias de la entrevista
-      * @access public
-      * @var string
+     * El alias de la entrevista
+     *
+     * @var string|null
      */
-    public $alias;
+    public $alias = null;
 
     /**
-      * El titulo de la entrevista.
-      * @access public
-      * @var string
+     * El titulo de la entrevista.
+     *
+     * @var string|null
      */
-    public $title;
+    public $title = null;
 
     /**
-      * Una breve descripcion de la entrevista.
-      * @access public
-      * @var string
+     * Una breve descripcion de la entrevista.
+     *
+     * @var string|null
      */
-    public $description;
+    public $description = null;
 
     /**
-      * Indica el tiempo que tiene el usuario para envíar soluciones.
-      * @access public
-      * @var int
+     * Indica el tiempo que tiene el usuario para envíar soluciones.
+     *
+     * @var int|null
      */
-    public $window_length;
+    public $window_length = null;
 }

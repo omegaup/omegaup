@@ -28,12 +28,12 @@ abstract class InterviewsDAOBase {
     final public static function update(Interviews $Interviews) : int {
         $sql = 'UPDATE `Interviews` SET `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE `interview_id` = ?;';
         $params = [
-            (int)$Interviews->problemset_id,
-            (int)$Interviews->acl_id,
+            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
+            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            (int)$Interviews->window_length,
+            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
             (int)$Interviews->interview_id,
         ];
         global $conn;
@@ -102,7 +102,9 @@ abstract class InterviewsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return array Un arreglo que contiene objetos del tipo {@link Interviews}.
+     * @return Interviews[] Un arreglo que contiene objetos del tipo {@link Interviews}.
+     *
+     * @psalm-return array<int, Interviews>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -138,12 +140,12 @@ abstract class InterviewsDAOBase {
     final public static function create(Interviews $Interviews) : int {
         $sql = 'INSERT INTO Interviews (`problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$Interviews->problemset_id,
-            (int)$Interviews->acl_id,
+            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
+            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            (int)$Interviews->window_length,
+            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
         ];
         global $conn;
         $conn->Execute($sql, $params);

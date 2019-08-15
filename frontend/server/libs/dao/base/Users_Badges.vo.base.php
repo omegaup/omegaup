@@ -44,40 +44,46 @@ class UsersBadges extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['badge_alias'])) {
-            $this->badge_alias = $data['badge_alias'];
+            $this->badge_alias = strval($data['badge_alias']);
         }
         if (isset($data['assignation_time'])) {
+            /**
+             * @var string|int|float $data['assignation_time']
+             * @var int $this->assignation_time
+             */
             $this->assignation_time = DAO::fromMySQLTimestamp($data['assignation_time']);
+        } else {
+            $this->assignation_time = Time::get();
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $user_badge_id = 0;
 
     /**
-      * Identificador de usuario
-      * @access public
-      * @var int
+     * Identificador de usuario
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      * Identificador de badge
-      * @access public
-      * @var string
+     * Identificador de badge
+     *
+     * @var string|null
      */
-    public $badge_alias;
+    public $badge_alias = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $assignation_time = null;  // CURRENT_TIMESTAMP
+    public $assignation_time;  // CURRENT_TIMESTAMP
 }

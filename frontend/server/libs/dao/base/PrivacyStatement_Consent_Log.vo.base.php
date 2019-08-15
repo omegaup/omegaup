@@ -47,37 +47,43 @@ class PrivacyStatementConsentLog extends VO {
             $this->privacystatement_id = (int)$data['privacystatement_id'];
         }
         if (isset($data['timestamp'])) {
+            /**
+             * @var string|int|float $data['timestamp']
+             * @var int $this->timestamp
+             */
             $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
+        } else {
+            $this->timestamp = Time::get();
         }
     }
 
     /**
-      * Id del consentimiento de privacidad almacenado en el log
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * Id del consentimiento de privacidad almacenado en el log
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
     public $privacystatement_consent_id = 0;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int
+     * Identidad del usuario
+     *
+     * @var int|null
      */
-    public $identity_id;
+    public $identity_id = null;
 
     /**
-      * Id del documento de privacidad
-      * @access public
-      * @var int
+     * Id del documento de privacidad
+     *
+     * @var int|null
      */
-    public $privacystatement_id;
+    public $privacystatement_id = null;
 
     /**
-      * Fecha y hora en la que el usuario acepta las nuevas políticas
-      * @access public
-      * @var int
+     * Fecha y hora en la que el usuario acepta las nuevas políticas
+     *
+     * @var int
      */
-    public $timestamp = null;  // CURRENT_TIMESTAMP
+    public $timestamp;  // CURRENT_TIMESTAMP
 }
