@@ -21,15 +21,15 @@ abstract class QualityNominationsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param QualityNominations [$QualityNominations] El objeto de tipo QualityNominations a actualizar.
+     * @param QualityNominations $QualityNominations El objeto de tipo QualityNominations a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(QualityNominations $QualityNominations) : int {
         $sql = 'UPDATE `QualityNominations` SET `user_id` = ?, `problem_id` = ?, `nomination` = ?, `contents` = ?, `time` = ?, `status` = ? WHERE `qualitynomination_id` = ?;';
         $params = [
-            (int)$QualityNominations->user_id,
-            (int)$QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
+            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
             DAO::toMySQLTimestamp($QualityNominations->time),
@@ -47,8 +47,7 @@ abstract class QualityNominationsDAOBase {
      * Este metodo cargará un objeto {@link QualityNominations} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link QualityNominations Un objeto del tipo {@link QualityNominations}. NULL si no hay tal registro.
+     * @return ?QualityNominations Un objeto del tipo {@link QualityNominations}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $qualitynomination_id) : ?QualityNominations {
         $sql = 'SELECT `QualityNominations`.`qualitynomination_id`, `QualityNominations`.`user_id`, `QualityNominations`.`problem_id`, `QualityNominations`.`nomination`, `QualityNominations`.`contents`, `QualityNominations`.`time`, `QualityNominations`.`status` FROM QualityNominations WHERE (qualitynomination_id = ?) LIMIT 1;';
@@ -70,12 +69,12 @@ abstract class QualityNominationsDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param QualityNominations [$QualityNominations] El objeto de tipo QualityNominations a eliminar
+     * @param QualityNominations $QualityNominations El objeto de tipo QualityNominations a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(QualityNominations $QualityNominations) : void {
         $sql = 'DELETE FROM `QualityNominations` WHERE qualitynomination_id = ?;';
@@ -98,16 +97,18 @@ abstract class QualityNominationsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link QualityNominations}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return QualityNominations[] Un arreglo que contiene objetos del tipo {@link QualityNominations}.
+     *
+     * @psalm-return array<int, QualityNominations>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -132,24 +133,15 @@ abstract class QualityNominationsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto QualityNominations suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param QualityNominations [$QualityNominations] El objeto de tipo QualityNominations a crear.
+     * @param QualityNominations $QualityNominations El objeto de tipo QualityNominations a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(QualityNominations $QualityNominations) : int {
-        if (is_null($QualityNominations->nomination)) {
-            $QualityNominations->nomination = 'suggestion';
-        }
-        if (is_null($QualityNominations->time)) {
-            $QualityNominations->time = Time::get();
-        }
-        if (is_null($QualityNominations->status)) {
-            $QualityNominations->status = 'open';
-        }
         $sql = 'INSERT INTO QualityNominations (`user_id`, `problem_id`, `nomination`, `contents`, `time`, `status`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            (int)$QualityNominations->user_id,
-            (int)$QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
+            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
             DAO::toMySQLTimestamp($QualityNominations->time),

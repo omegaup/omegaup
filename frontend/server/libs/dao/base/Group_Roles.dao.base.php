@@ -24,10 +24,9 @@ abstract class GroupRolesDAOBase {
      * Este metodo cargará un objeto {@link GroupRoles} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link GroupRoles Un objeto del tipo {@link GroupRoles}. NULL si no hay tal registro.
+     * @return ?GroupRoles Un objeto del tipo {@link GroupRoles}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $group_id, int $role_id, int $acl_id) : ?GroupRoles {
+    final public static function getByPK(?int $group_id, ?int $role_id, ?int $acl_id) : ?GroupRoles {
         $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` FROM Group_Roles WHERE (group_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
         $params = [$group_id, $role_id, $acl_id];
         global $conn;
@@ -47,12 +46,12 @@ abstract class GroupRolesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param GroupRoles [$Group_Roles] El objeto de tipo GroupRoles a eliminar
+     * @param GroupRoles $Group_Roles El objeto de tipo GroupRoles a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(GroupRoles $Group_Roles) : void {
         $sql = 'DELETE FROM `Group_Roles` WHERE group_id = ? AND role_id = ? AND acl_id = ?;';
@@ -75,16 +74,18 @@ abstract class GroupRolesDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link GroupRoles}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return GroupRoles[] Un arreglo que contiene objetos del tipo {@link GroupRoles}.
+     *
+     * @psalm-return array<int, GroupRoles>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -109,16 +110,16 @@ abstract class GroupRolesDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto GroupRoles suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param GroupRoles [$Group_Roles] El objeto de tipo GroupRoles a crear.
+     * @param GroupRoles $Group_Roles El objeto de tipo GroupRoles a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(GroupRoles $Group_Roles) : int {
         $sql = 'INSERT INTO Group_Roles (`group_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
         $params = [
-            (int)$Group_Roles->group_id,
-            (int)$Group_Roles->role_id,
-            (int)$Group_Roles->acl_id,
+            is_null($Group_Roles->group_id) ? null : (int)$Group_Roles->group_id,
+            is_null($Group_Roles->role_id) ? null : (int)$Group_Roles->role_id,
+            is_null($Group_Roles->acl_id) ? null : (int)$Group_Roles->acl_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

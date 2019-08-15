@@ -44,40 +44,40 @@ class ProblemOfTheWeek extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = strval($data['time']);
         }
         if (isset($data['difficulty'])) {
-            $this->difficulty = $data['difficulty'];
+            $this->difficulty = strval($data['difficulty']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $problem_of_the_week_id;
+    public $problem_of_the_week_id = 0;
 
     /**
-      * El id del problema escogido como problema de la semana.
-      * @access public
-      * @var int
+     * El id del problema escogido como problema de la semana.
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      * El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.
-      * @access public
-      * @var string
+     * El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.
+     *
+     * @var string
      */
     public $time = '2000-01-01';
 
     /**
-      * En algún momento tendremos un problema fácil y uno difícil.
-      * @access public
-      * @var string
+     * En algún momento tendremos un problema fácil y uno difícil.
+     *
+     * @var string|null
      */
-    public $difficulty;
+    public $difficulty = null;
 }

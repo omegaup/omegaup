@@ -28,16 +28,18 @@ abstract class UsersExperimentsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link UsersExperiments}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return UsersExperiments[] Un arreglo que contiene objetos del tipo {@link UsersExperiments}.
+     *
+     * @psalm-return array<int, UsersExperiments>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -62,14 +64,14 @@ abstract class UsersExperimentsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto UsersExperiments suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param UsersExperiments [$Users_Experiments] El objeto de tipo UsersExperiments a crear.
+     * @param UsersExperiments $Users_Experiments El objeto de tipo UsersExperiments a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(UsersExperiments $Users_Experiments) : int {
         $sql = 'INSERT INTO Users_Experiments (`user_id`, `experiment`) VALUES (?, ?);';
         $params = [
-            (int)$Users_Experiments->user_id,
+            is_null($Users_Experiments->user_id) ? null : (int)$Users_Experiments->user_id,
             $Users_Experiments->experiment,
         ];
         global $conn;

@@ -44,40 +44,46 @@ class Announcement extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
     }
 
     /**
-      * Identificador del aviso
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * Identificador del aviso
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $announcement_id;
+    public $announcement_id = 0;
 
     /**
-      * UserID del autor de este aviso
-      * @access public
-      * @var int
+     * UserID del autor de este aviso
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      * Fecha de creacion de este aviso
-      * @access public
-      * @var int
+     * Fecha de creacion de este aviso
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      * Mensaje de texto del aviso
-      * @access public
-      * @var string
+     * Mensaje de texto del aviso
+     *
+     * @var string|null
      */
-    public $description;
+    public $description = null;
 }

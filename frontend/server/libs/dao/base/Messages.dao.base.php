@@ -21,16 +21,16 @@ abstract class MessagesDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param Messages [$Messages] El objeto de tipo Messages a actualizar.
+     * @param Messages $Messages El objeto de tipo Messages a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(Messages $Messages) : int {
         $sql = 'UPDATE `Messages` SET `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE `message_id` = ?;';
         $params = [
             (int)$Messages->read,
-            (int)$Messages->sender_id,
-            (int)$Messages->recipient_id,
+            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
+            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
             DAO::toMySQLTimestamp($Messages->date),
             (int)$Messages->message_id,
@@ -46,8 +46,7 @@ abstract class MessagesDAOBase {
      * Este metodo cargará un objeto {@link Messages} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Messages Un objeto del tipo {@link Messages}. NULL si no hay tal registro.
+     * @return ?Messages Un objeto del tipo {@link Messages}. NULL si no hay tal registro.
      */
     final public static function getByPK(int $message_id) : ?Messages {
         $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` FROM Messages WHERE (message_id = ?) LIMIT 1;';
@@ -69,12 +68,12 @@ abstract class MessagesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Messages [$Messages] El objeto de tipo Messages a eliminar
+     * @param Messages $Messages El objeto de tipo Messages a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(Messages $Messages) : void {
         $sql = 'DELETE FROM `Messages` WHERE message_id = ?;';
@@ -97,16 +96,18 @@ abstract class MessagesDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Messages}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return Messages[] Un arreglo que contiene objetos del tipo {@link Messages}.
+     *
+     * @psalm-return array<int, Messages>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -131,22 +132,16 @@ abstract class MessagesDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Messages suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Messages [$Messages] El objeto de tipo Messages a crear.
+     * @param Messages $Messages El objeto de tipo Messages a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Messages $Messages) : int {
-        if (is_null($Messages->read)) {
-            $Messages->read = false;
-        }
-        if (is_null($Messages->date)) {
-            $Messages->date = Time::get();
-        }
         $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [
             (int)$Messages->read,
-            (int)$Messages->sender_id,
-            (int)$Messages->recipient_id,
+            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
+            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
             DAO::toMySQLTimestamp($Messages->date),
         ];

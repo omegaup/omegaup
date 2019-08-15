@@ -24,10 +24,9 @@ abstract class FavoritesDAOBase {
      * Este metodo cargará un objeto {@link Favorites} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Favorites Un objeto del tipo {@link Favorites}. NULL si no hay tal registro.
+     * @return ?Favorites Un objeto del tipo {@link Favorites}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $user_id, int $problem_id) : ?Favorites {
+    final public static function getByPK(?int $user_id, ?int $problem_id) : ?Favorites {
         $sql = 'SELECT `Favorites`.`user_id`, `Favorites`.`problem_id` FROM Favorites WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
         global $conn;
@@ -47,12 +46,12 @@ abstract class FavoritesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Favorites [$Favorites] El objeto de tipo Favorites a eliminar
+     * @param Favorites $Favorites El objeto de tipo Favorites a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(Favorites $Favorites) : void {
         $sql = 'DELETE FROM `Favorites` WHERE user_id = ? AND problem_id = ?;';
@@ -75,16 +74,18 @@ abstract class FavoritesDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Favorites}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return Favorites[] Un arreglo que contiene objetos del tipo {@link Favorites}.
+     *
+     * @psalm-return array<int, Favorites>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -109,15 +110,15 @@ abstract class FavoritesDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Favorites suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Favorites [$Favorites] El objeto de tipo Favorites a crear.
+     * @param Favorites $Favorites El objeto de tipo Favorites a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(Favorites $Favorites) : int {
         $sql = 'INSERT INTO Favorites (`user_id`, `problem_id`) VALUES (?, ?);';
         $params = [
-            (int)$Favorites->user_id,
-            (int)$Favorites->problem_id,
+            is_null($Favorites->user_id) ? null : (int)$Favorites->user_id,
+            is_null($Favorites->problem_id) ? null : (int)$Favorites->problem_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);

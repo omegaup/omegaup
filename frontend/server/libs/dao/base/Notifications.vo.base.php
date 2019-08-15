@@ -45,50 +45,56 @@ class Notifications extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['timestamp'])) {
+            /**
+             * @var string|int|float $data['timestamp']
+             * @var int $this->timestamp
+             */
             $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
+        } else {
+            $this->timestamp = Time::get();
         }
         if (isset($data['read'])) {
             $this->read = boolval($data['read']);
         }
         if (isset($data['contents'])) {
-            $this->contents = $data['contents'];
+            $this->contents = strval($data['contents']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $notification_id;
+    public $notification_id = 0;
 
     /**
-      * Identificador de usuario
-      * @access public
-      * @var int
+     * Identificador de usuario
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $timestamp = null;  // CURRENT_TIMESTAMP
+    public $timestamp;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var bool
+     * [Campo no documentado]
+     *
+     * @var bool
      */
     public $read = false;
 
     /**
-      * JSON con el contenido de la notificación
-      * @access public
-      * @var string
+     * JSON con el contenido de la notificación
+     *
+     * @var string|null
      */
-    public $contents;
+    public $contents = null;
 }

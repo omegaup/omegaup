@@ -52,13 +52,19 @@ class Clarifications extends VO {
             $this->receiver_id = (int)$data['receiver_id'];
         }
         if (isset($data['message'])) {
-            $this->message = $data['message'];
+            $this->message = strval($data['message']);
         }
         if (isset($data['answer'])) {
-            $this->answer = $data['answer'];
+            $this->answer = strval($data['answer']);
         }
         if (isset($data['time'])) {
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['problem_id'])) {
             $this->problem_id = (int)$data['problem_id'];
@@ -72,67 +78,67 @@ class Clarifications extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $clarification_id;
+    public $clarification_id = 0;
 
     /**
-      * Autor de la clarificación.
-      * @access public
-      * @var int
+     * Autor de la clarificación.
+     *
+     * @var int|null
      */
-    public $author_id;
+    public $author_id = null;
 
     /**
-      * Usuario que recibirá el mensaje
-      * @access public
-      * @var ?int
+     * Usuario que recibirá el mensaje
+     *
+     * @var int|null
      */
-    public $receiver_id;
+    public $receiver_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $message;
+    public $message = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var ?string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $answer;
+    public $answer = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $time = null;  // CURRENT_TIMESTAMP
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      * Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.
-      * @access public
-      * @var ?int
+     * Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      * Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.
-      * @access public
-      * @var bool
+     * Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.
+     *
+     * @var bool
      */
     public $public = false;
 }

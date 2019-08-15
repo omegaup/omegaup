@@ -27,23 +27,28 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @static
      * @throws Exception si la operacion fallo.
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
+     *
+     * @param ProblemsetProblemOpened $Problemset_Problem_Opened El objeto de tipo ProblemsetProblemOpened
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
-        if (is_null($Problemset_Problem_Opened->problemset_id) || is_null($Problemset_Problem_Opened->problem_id) || is_null($Problemset_Problem_Opened->identity_id)) {
+        if (empty($Problemset_Problem_Opened->problemset_id) || empty($Problemset_Problem_Opened->problem_id) || empty($Problemset_Problem_Opened->identity_id)) {
             throw new NotFoundException('recordNotFound');
         }
-        if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = Time::get();
-        }
         $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
+        /**
+         * For some reason, psalm is not able to correctly assess the types in
+         * the ternary expressions below.
+         *
+         * @psalm-suppress DocblockTypeContradiction
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         $params = [
-            (int)$Problemset_Problem_Opened->problemset_id,
-            (int)$Problemset_Problem_Opened->problem_id,
-            (int)$Problemset_Problem_Opened->identity_id,
+            !is_null($Problemset_Problem_Opened->problemset_id) ? intval($Problemset_Problem_Opened->problemset_id) : null,
+            !is_null($Problemset_Problem_Opened->problem_id) ? intval($Problemset_Problem_Opened->problem_id) : null,
+            !is_null($Problemset_Problem_Opened->identity_id) ? intval($Problemset_Problem_Opened->identity_id) : null,
             DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         global $conn;
@@ -54,17 +59,17 @@ abstract class ProblemsetProblemOpenedDAOBase {
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a actualizar.
+     * @param ProblemsetProblemOpened $Problemset_Problem_Opened El objeto de tipo ProblemsetProblemOpened a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
     final public static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
-            (int)$Problemset_Problem_Opened->problemset_id,
-            (int)$Problemset_Problem_Opened->problem_id,
-            (int)$Problemset_Problem_Opened->identity_id,
+            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
+            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
+            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
         ];
         global $conn;
         $conn->Execute($sql, $params);
@@ -77,10 +82,9 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * Este metodo cargará un objeto {@link ProblemsetProblemOpened} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link ProblemsetProblemOpened Un objeto del tipo {@link ProblemsetProblemOpened}. NULL si no hay tal registro.
+     * @return ?ProblemsetProblemOpened Un objeto del tipo {@link ProblemsetProblemOpened}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $problemset_id, int $problem_id, int $identity_id) : ?ProblemsetProblemOpened {
+    final public static function getByPK(?int $problemset_id, ?int $problem_id, ?int $identity_id) : ?ProblemsetProblemOpened {
         $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM Problemset_Problem_Opened WHERE (problemset_id = ? AND problem_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$problemset_id, $problem_id, $identity_id];
         global $conn;
@@ -100,12 +104,12 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a eliminar
+     * @param ProblemsetProblemOpened $Problemset_Problem_Opened El objeto de tipo ProblemsetProblemOpened a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(ProblemsetProblemOpened $Problemset_Problem_Opened) : void {
         $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND identity_id = ?;';
@@ -128,16 +132,18 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemsetProblemOpened}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return ProblemsetProblemOpened[] Un arreglo que contiene objetos del tipo {@link ProblemsetProblemOpened}.
+     *
+     * @psalm-return array<int, ProblemsetProblemOpened>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
@@ -162,19 +168,16 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto ProblemsetProblemOpened suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param ProblemsetProblemOpened [$Problemset_Problem_Opened] El objeto de tipo ProblemsetProblemOpened a crear.
+     * @param ProblemsetProblemOpened $Problemset_Problem_Opened El objeto de tipo ProblemsetProblemOpened a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
-        if (is_null($Problemset_Problem_Opened->open_time)) {
-            $Problemset_Problem_Opened->open_time = Time::get();
-        }
         $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
-            (int)$Problemset_Problem_Opened->problemset_id,
-            (int)$Problemset_Problem_Opened->problem_id,
-            (int)$Problemset_Problem_Opened->identity_id,
+            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
+            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
+            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
             DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         global $conn;

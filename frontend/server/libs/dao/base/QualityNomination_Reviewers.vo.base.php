@@ -44,18 +44,18 @@ class QualityNominationReviewers extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $qualitynomination_id;
+    public $qualitynomination_id = null;
 
     /**
-      * El revisor al que fue asignado esta nominación
-      * Llave Primaria
-      * @access public
-      * @var int
+     * El revisor al que fue asignado esta nominación
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 }
