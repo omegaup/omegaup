@@ -2250,7 +2250,7 @@ class ContestController extends Controller {
         );
 
         Validators::validateStringNonEmpty($r['username'], 'username');
-        Validators::validateNumber($r['end_time'], 'end_time');
+        $r->ensureInt('end_time');
 
         $identity = IdentityController::resolveIdentity($r['username']);
         if (is_null($identity)) {

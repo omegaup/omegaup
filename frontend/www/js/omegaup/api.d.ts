@@ -19,6 +19,9 @@ declare namespace omegaup {
   export interface Contest {
     alias: string;
     title: string;
+    window_length?: number;
+    start_time?: Date;
+    finish_time?: Date;
   }
 
   interface ContestResult {
@@ -46,6 +49,11 @@ declare namespace omegaup {
     school_id: number;
     country_id: string;
     state_id: string;
+  }
+
+  export interface IdentityContest {
+    username: string;
+    end_time: Date;
   }
 
   interface Meta {
