@@ -2480,10 +2480,9 @@ class UserController extends Controller {
         $candidates = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
             $dateToSelect
         );
-        $bestCoders = $candidates;
+        $bestCoders = [];
 
         if (!is_null($candidates)) {
-            $bestCoders = [];
             foreach ($candidates as $candidate) {
                 unset($candidate['user_id']);
                 array_push($bestCoders, $candidate);
