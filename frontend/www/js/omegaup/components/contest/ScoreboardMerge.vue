@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="post">
-      <legend>Concurso: <select class="contests"
+      <legend>{{ T.wordsContest }}: <select class="contests"
               multiple="multiple"
               size="10"
               v-model="selectedContests">
@@ -11,7 +11,7 @@
         </option>
       </select></legend> <button class="btn"
            type="button"
-           v-on:click.prevent="displayTable">Ver scoreboard total</button>
+           v-on:click.prevent="onDisplayTable">{{ T.showTotalScoreboard }}</button>
     </div>
     <div class="post">
       <table class="merged-scoreboard"
@@ -55,27 +55,6 @@
   </div>
 </template>
 
-<script>
-import {T, UI} from '../../omegaup.js';
-
-export default {
-  props: {
-    availableContests: Array,
-    scoreboard: Array,
-    showPenalty: Number,
-    aliases: Array,
-  },
-  methods: {
-    displayTable: function() {
-      this.$emit('get-scoreboard', this.selectedContests);
-    }
-  },
-  data: function() {
-    return { T: T, selectedContests:[], UI: UI, }
-  }
-}
-</script>
-
 <style>
   .merged-scoreboard {
     background: white;
@@ -91,3 +70,28 @@ export default {
     color: red;
   }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
+
+@Component({})
+export default class ScoreboardMerge extends Vue {
+  @Prop() availableContests!: omegaup.Contest[];
+  @Prop() scoreboard!: omegaup.Scoreboard[];
+  @Prop() showPenalty!: number;
+  @Prop() aliases!: Array<string>;
+
+  T = T;
+  UI = UI;
+  selectedContests = [];
+
+  @Emit('get-scoreboard')
+  onDisplayTable(): Array<string> {
+    return this.selectedContests;
+  }
+}
+
+</script>
