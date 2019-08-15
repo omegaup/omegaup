@@ -20,7 +20,7 @@
                   <th>{{ T.wordsCase }}</th>
                   <th>{{ T.wordsTimeInSeconds }}</th>
                   <th>{{ T.wordsWallTimeInSeconds }}</th>
-                  <th>{{ T.wordsMemoryInMegabytes }}</th>
+                  <th>{{ T.wordsMemoryInMebibytes }}</th>
                   <th>{{ T.wordsStatus }}</th>
                   <th>{{ T.rankScore }}</th>
                   <th>{{ T.wordsDifference }}</th>
