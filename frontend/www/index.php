@@ -12,10 +12,10 @@ try {
     $smarty->assign('coderOfTheMonthData', $coderOfTheMonthResponse['userinfo']);
 
     $smartyProperties = SchoolController::getSchoolsRankForSmarty(
-        new Request(['rowcount' => 5, 'is_index' => true])
+        /*$rowCount=*/ 5,
+        /*$isIndex=*/true
     );
 } catch (Exception $e) {
-    // Oh, well...
      ApiCaller::handleException($e);
 }
 foreach ($smartyProperties as $key => $value) {
