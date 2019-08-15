@@ -2484,8 +2484,20 @@ class ContestController extends Controller {
      * @return array
      */
     public static function apiReport(Request $r) {
-        self::authenticateRequest($r);
+        $contestReport = self::getContestReportDetails($r);
 
+        $contestReport['status'] = 'ok';
+        return $contestReport;
+    }
+
+    /**
+     * Returns a detailed report of the contest. Only Admins can get the report
+     *
+     * @param Request $r
+     * @return array
+     */
+    private static function getContestReportDetails(Request $r) : array {
+        self::authenticateRequest($r);
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         $params = ScoreboardParams::fromContest($contest);
@@ -2496,14 +2508,47 @@ class ContestController extends Controller {
         // Check the filter if we have one
         Validators::validateStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);
 
-        $contestReport = $scoreboard->generate(
+        return $scoreboard->generate(
             true, // with run details for reporting
             true, // sort contestants by name,
             (isset($r['filterBy']) ? null : $r['filterBy'])
         );
+    }
 
-        $contestReport['status'] = 'ok';
-        return $contestReport;
+    /**
+     * Gets all details to show the report
+     *
+     * @param Request $r
+     * @return array
+     */
+    public static function getContestReportDetailsForSmarty(Request $r) {
+        $contestReport = self::getContestReportDetails($r)['ranking'];
+
+        foreach ($contestReport as &$user) {
+            if (!isset($user['problems'])) {
+                continue;
+            }
+            foreach ($user['problems'] as &$problem) {
+                if (!isset($problem['run_details']) ||
+                    !isset($problem['run_details']['groups'])) {
+                    continue;
+                }
+
+                foreach ($problem['run_details']['groups'] as &$group) {
+                    foreach ($group['cases'] as &$case) {
+                        $case['meta']['time'] = (float)$case['meta']['time'];
+                        $case['meta']['time-wall'] =
+                            (float)$case['meta']['time-wall'];
+                        $case['meta']['mem'] =
+                            (float)$case['meta']['mem'] / 1024.0 / 1024.0;
+                    }
+                }
+            }
+        }
+
+        return [
+            'contestReport' => $contestReport,
+        ];
     }
 
     /**
