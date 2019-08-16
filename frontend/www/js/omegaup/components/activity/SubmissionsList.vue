@@ -9,7 +9,7 @@
                v-for="(problems, user) in groupedSolvedProblems">
           <thead>
             <tr>
-              <th v-bind:colspan="columns">{{ user }}</th>
+              <th v-bind:colspan="NUM_COLUMNS">{{ user }}</th>
             </tr>
           </thead>
           <tbody>
@@ -30,7 +30,7 @@
                v-for="(problems, user) in groupedUnsolvedProblems">
           <thead>
             <tr>
-              <th v-bind:colspan="columns">{{ user }}</th>
+              <th v-bind:colspan="NUM_COLUMNS">{{ user }}</th>
             </tr>
           </thead>
           <tbody>
@@ -66,25 +66,28 @@ export default class ActivitySubmissionsList extends Vue {
   @Prop() unsolvedProblems!: CourseProblems;
 
   T = T;
-  columns = 3;
+  static readonly NUM_COLUMNS = 3;
 
   get groupedSolvedProblems(): GroupedCourseProblems {
-    return this.groupElements(this.solvedProblems, this.columns);
+    return this.groupElements(this.solvedProblems);
   }
 
   get groupedUnsolvedProblems(): GroupedCourseProblems {
-    return this.groupElements(this.unsolvedProblems, this.columns);
+    return this.groupElements(this.unsolvedProblems);
   }
 
-  groupElements(
-    elements: CourseProblems,
-    columns: number,
-  ): GroupedCourseProblems {
+  groupElements(elements: CourseProblems): GroupedCourseProblems {
     let groups: GroupedCourseProblems = {};
     for (let user in elements) {
       groups[user] = [];
-      for (let i = 0; i < elements[user].length; i += columns) {
-        groups[user].push(elements[user].slice(i, i + columns));
+      for (
+        let i = 0;
+        i < elements[user].length;
+        i += ActivitySubmissionsList.NUM_COLUMNS
+      ) {
+        groups[user].push(
+          elements[user].slice(i, i + ActivitySubmissionsList.NUM_COLUMNS),
+        );
       }
     }
     return groups;

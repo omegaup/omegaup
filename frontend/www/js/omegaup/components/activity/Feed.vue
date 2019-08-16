@@ -163,7 +163,7 @@ export default class ActivityFeed extends Vue {
   T = T;
   UI = UI;
 
-  addMapping(mapping: any, key: string, value: string): void {
+  addMapping(mapping: Mapping, key: string, value: string): void {
     if (key in mapping) {
       mapping[key].push(value);
     } else {
