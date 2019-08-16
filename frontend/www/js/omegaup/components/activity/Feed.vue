@@ -127,7 +127,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import {T} from '../../omegaup.js';
+import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import omegaup from '../../api.js';
 import user_Username from '../user/Username.vue';
@@ -153,7 +153,7 @@ interface Origin {
 @Component({
   components: {
     'omegaup-user-username': user_Username,
-  }
+  },
 })
 export default class ActivityFeed extends Vue {
   @Prop() type!: string;
@@ -172,9 +172,9 @@ export default class ActivityFeed extends Vue {
   }
 
   get wordsReportSummary(): string {
-    return this.type == 'contest' ?
-            this.T.wordsActivityReportSummaryContest :
-            this.T.wordsActivityReportSummaryCourse;
+    return this.type == 'contest'
+      ? this.T.wordsActivityReportSummaryContest
+      : this.T.wordsActivityReportSummaryCourse;
   }
 
   get classByUser(): { [key: string]: string } {
@@ -202,7 +202,7 @@ export default class ActivityFeed extends Vue {
       users.push({
         username: user,
         classname: self.classByUser[user],
-        ips: ips
+        ips: ips,
       });
     }
     return users;
@@ -223,12 +223,13 @@ export default class ActivityFeed extends Vue {
       users.sort();
       origins.push({
         origin: origin,
-        usernames: users.map((u) => {
-              return {username: u, classname: self.classByUser[u]}
+        usernames: users.map(u => {
+          return { username: u, classname: self.classByUser[u] };
         }),
       });
     }
     return origins;
   }
 }
+
 </script>

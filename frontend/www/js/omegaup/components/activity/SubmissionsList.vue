@@ -76,7 +76,10 @@ export default class ActivitySubmissionsList extends Vue {
     return this.groupElements(this.unsolvedProblems, this.columns);
   }
 
-  groupElements(elements: CourseProblems, columns: number): GroupedCourseProblems {
+  groupElements(
+    elements: CourseProblems,
+    columns: number,
+  ): GroupedCourseProblems {
     let groups: GroupedCourseProblems = {};
     for (let user in elements) {
       groups[user] = [];
@@ -87,4 +90,5 @@ export default class ActivitySubmissionsList extends Vue {
     return groups;
   }
 }
+
 </script>
