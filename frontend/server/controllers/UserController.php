@@ -1787,17 +1787,7 @@ class UserController extends Controller {
                     );
 
                     if (!is_null($userRankEntries)) {
-                        foreach ($userRankEntries['rows'] as $userRank) {
-                            array_push($response['rank'], [
-                                'username' => $userRank['username'],
-                                'classname' => $userRank['classname'],
-                                'name' => $userRank['name'],
-                                'problems_solved' => $userRank['problems_solved_count'],
-                                'rank' => $userRank['rank'],
-                                'score' => $userRank['score'],
-                                'country_id' => $userRank['country_id'],
-                            ]);
-                        }
+                        $response['rank'] = $userRankEntries['rows'];
                         $response['total'] = $userRankEntries['total'];
                     }
                     return $response;

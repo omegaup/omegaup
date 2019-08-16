@@ -22,7 +22,7 @@ class UserRankDAO extends UserRankDAOBase {
               SELECT
                 `ur`.`user_id`,
                 `ur`.`rank`,
-                `ur`.`problems_solved_count`,
+                `ur`.`problems_solved_count` as `problems_solved`,
                 `ur`.`score`,
                 `ur`.`username`,
                 `ur`.`name`,
@@ -70,11 +70,7 @@ class UserRankDAO extends UserRankDAOBase {
         $params = array_merge($params, $params_limit);
 
         // Get rows
-        $rs = $conn->GetAll($sql . $sql_from . $sql_limit, $params);
-        $allData = [];
-        foreach ($rs as $row) {
-            $allData[] = $row;
-        }
+        $allData = $conn->GetAll($sql . $sql_from . $sql_limit, $params);
         return [
             'rows' => $allData,
             'total' => $total_rows
