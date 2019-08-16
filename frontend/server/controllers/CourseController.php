@@ -922,6 +922,45 @@ class CourseController extends Controller {
     }
 
     /**
+     * Returns true when logged user has previous activity in any course
+     *
+     * @param Request $r
+     * @return bool
+     */
+    public static function userHasActivityInCourses(Request $r) : bool {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new ForbiddenAccessException('lockdown');
+        }
+
+        $identity = SessionController::apiCurrentSession($r)['session']['identity'];
+
+        // User doesn't have activity because is not logged.
+        if (is_null($identity)) {
+            return false;
+        }
+
+        if (!empty(CoursesDAO::getCoursesForStudent($identity->identity_id))) {
+            return true;
+        }
+
+        // Default values to search courses for legged user
+        $page = 1;
+        $pageSize = 1;
+        if (Authorization::isSystemAdmin($identity)) {
+            $result = CoursesDAO::getAll($page, $pageSize, 'course_id', 'DESC');
+            if (!empty($result)) {
+                return true;
+            }
+        }
+        $result = CoursesDAO::getAllCoursesAdminedByIdentity(
+            $identity->identity_id,
+            $page,
+            $pageSize
+        );
+        return !empty($result);
+    }
+
+    /**
      * List students in a course
      *
      * @param  Request $r

@@ -2477,11 +2477,19 @@ class UserController extends Controller {
         if (!$isMentor) {
             return ['payload' => $response];
         }
+        $candidates = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+            $dateToSelect
+        );
+        $bestCoders = [];
+
+        if (!is_null($candidates)) {
+            foreach ($candidates as $candidate) {
+                unset($candidate['user_id']);
+                array_push($bestCoders, $candidate);
+            }
+        }
         $response['options'] = [
-            'bestCoders' =>
-                CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
-                    $dateToSelect
-                ),
+            'bestCoders' => $bestCoders,
             'canChooseCoder' =>
                 Authorization::canChooseCoder($currentTimeStamp),
             'coderIsSelected' =>

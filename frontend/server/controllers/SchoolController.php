@@ -82,19 +82,16 @@ class SchoolController extends Controller {
     }
 
     /**
-     * Returns rank of best schools in last month
+     * Ensures that all the numeric parameters have valid values.
      *
      * @param Request $r
      * @return array
-     * @throws InvalidParameterException
      */
-    public static function apiRank(Request $r) {
+    private static function validateRankDetails(Request $r) : array {
         $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', 100, 100, false);
+        $r->ensureInt('rowcount', 5, 100, false);
         $r->ensureInt('start_time', null, null, false);
         $r->ensureInt('finish_time', null, null, false);
-
-        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
 
         try {
             self::authenticateRequest($r);
@@ -109,40 +106,112 @@ class SchoolController extends Controller {
             // unauthenticated since it'll be cached.
         }
 
-        if (is_null($r['offset'])) {
-            $r['offset'] = 0;
-        }
-        if (is_null($r['rowcount'])) {
-            $r['rowcount'] = 100;
-        }
-        if (is_null($r['start_time'])) {
-            $r['start_time'] = strtotime('first day of this month', Time::get());
-        }
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = strtotime('first day of next month', Time::get());
-        }
+        return [
+            'offset' => $r['offset'] ?: 0,
+            'rowcount' => $r['rowcount'] ?: 100,
+            'start_time' => $r['start_time'] ?:
+                            strtotime('first day of this month', Time::get()),
+            'finish_time' => $r['finish_time'] ?:
+                             strtotime('first day of next month', Time::get()),
+            'can_use_cache' => is_null($r['start_time']) && is_null($r['finish_time'])
+        ];
+    }
 
-        $fetch = function () use ($r) {
+    /**
+     * Returns rank of best schools in last month
+     *
+     * @param Request $r
+     * @return array
+     */
+    public static function apiRank(Request $r) {
+        [
+            'offset' => $offset,
+            'rowcount' => $rowCount,
+            'start_time' => $startTime,
+            'finish_time' => $finishTime,
+            'can_use_cache' => $canUseCache,
+        ] = self::validateRankDetails($r);
+        return [
+            'status' => 'ok',
+            'rank' => self::getSchoolsRank(
+                $offset,
+                $rowCount,
+                $startTime,
+                $finishTime,
+                $canUseCache
+            ),
+        ];
+    }
+
+    /**
+     * Returns rank of best schools in last month
+     *
+     * @param int $offset
+     * @param int $rowCount
+     * @param int $startTime
+     * @param int $finishTime
+     * @param bool $canUseCache
+     * @return array
+     */
+    private static function getSchoolsRank(
+        int $offset,
+        int $rowCount,
+        int $startTime,
+        int $finishTime,
+        bool $canUseCache
+    ) : array {
+        $fetch = function () use ($offset, $rowCount, $startTime, $finishTime) {
             return SchoolsDAO::getRankByUsersAndProblemsWithAC(
-                $r['start_time'],
-                $r['finish_time'],
-                $r['offset'],
-                $r['rowcount']
+                $startTime,
+                $finishTime,
+                $offset,
+                $rowCount
             );
         };
 
         if ($canUseCache) {
-            $result = Cache::getFromCacheOrSet(
+            return Cache::getFromCacheOrSet(
                 Cache::SCHOOL_RANK,
-                "{$r['offset']}-{$r['rowcount']}",
+                "{$offset}-{$rowCount}",
                 $fetch,
                 60 * 60 * 24 // 1 day
             );
-        } else {
-            $result = $fetch();
         }
+        return $fetch();
+    }
 
-        return ['status' => 'ok', 'rank' => $result];
+    /**
+     * Gets the rank of best schools in last month with smarty format
+     *
+     * @param int $rowCount
+     * @param bool $isIndex
+     * @return array
+     */
+    public static function getSchoolsRankForSmarty(
+        int $rowCount,
+        bool $isIndex
+    ) : array {
+        $schoolsRank = [
+            'schoolRankPayload' => [
+                'rowCount' => $rowCount,
+                'rank' => self::getSchoolsRank(
+                    /*$offset=*/0,
+                    $rowCount,
+                    /*$startTime=*/strtotime('first day of this month', Time::get()),
+                    /*$finishTime=*/strtotime('first day of next month', Time::get()),
+                    /*$canUseCache=*/true
+                ),
+            ]
+        ];
+        if (!$isIndex) {
+            return $schoolsRank;
+        }
+        $schoolsRank['rankTablePayload'] = [
+            'length' => $rowCount,
+            'isIndex' => $isIndex,
+            'availableFilters' => [],
+        ];
+        return $schoolsRank;
     }
 
     /**

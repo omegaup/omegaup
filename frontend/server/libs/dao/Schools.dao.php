@@ -59,7 +59,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         int $finishDate,
         int $offset,
         int $rowcount
-    ) {
+    ) : array {
         global  $conn;
 
         $sql = '
