@@ -115,6 +115,13 @@ declare namespace omegaup {
     problems_solved: number;
   }
 
+  export interface SchoolsRank {
+    country_id: string;
+    distinct_problems: number;
+    distinct_users: number;
+    name: string;
+  }
+
   export interface Solutions {
     [language: string]: string;
   }
