@@ -142,6 +142,7 @@ declare namespace omegaup {
   export interface Solutions {
     [language: string]: string;
   }
+
   export interface Stats {
     total_runs: string;
     pending_runs: Array<string>;

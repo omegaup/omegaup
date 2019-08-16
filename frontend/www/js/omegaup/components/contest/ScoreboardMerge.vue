@@ -69,6 +69,10 @@
     opacity: .7;
     color: red;
   }
+
+  .post {
+    overflow-x: scroll;
+  }
 </style>
 
 <script lang="ts">
@@ -81,12 +85,12 @@ import omegaup from '../../api.js';
 export default class ScoreboardMerge extends Vue {
   @Prop() availableContests!: omegaup.Contest[];
   @Prop() scoreboard!: omegaup.Scoreboard[];
-  @Prop() showPenalty!: number;
+  @Prop() showPenalty!: boolean;
   @Prop() aliases!: Array<string>;
 
   T = T;
   UI = UI;
-  selectedContests = [];
+  selectedContests: Array<string> = [];
 
   @Emit('get-scoreboard')
   onDisplayTable(): Array<string> {
