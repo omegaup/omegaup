@@ -9,6 +9,8 @@ OmegaUp.on('ready', function() {
   $.when(API.Course.listSolvedProblems({course_alias: course_alias}),
          API.Course.listUnsolvedProblems({course_alias: course_alias}))
       .then((solvedProblems, unsolvedProblems) => {
+        console.log(solvedProblems);
+        console.log(unsolvedProblems);
         let submissionsList = new Vue({
           el: '#course-submissions-list',
           render: function(createElement) {

@@ -47,36 +47,44 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {
-    solvedProblems: undefined,
-    unsolvedProblems: undefined,
-  },
-  computed: {
-    groupedSolvedProblems: function() {
-      return this.groupElements(this.solvedProblems, this.columns);
-    },
-    groupedUnsolvedProblems: function() {
-      return this.groupElements(this.unsolvedProblems, this.columns);
-    },
-  },
-  methods: {
-    groupElements(elements, columns) {
-      let groups = {};
-      for (let user in elements) {
-        groups[user] = [];
-        for (let i = 0; i < elements[user].length; i += columns) {
-          groups[user].push(elements[user].slice(i, i + columns));
-        }
+interface CourseProblems {
+  [user: string]: omegaup.Problem[];
+}
+
+interface GroupedCourseProblems {
+  [user: string]: omegaup.Problem[][];
+}
+
+@Component
+export default class ActivitySubmissionsList extends Vue {
+  @Prop() solvedProblems!: CourseProblems;
+  @Prop() unsolvedProblems!: CourseProblems;
+
+  T = T;
+  columns = 3;
+
+  get groupedSolvedProblems(): GroupedCourseProblems {
+    return this.groupElements(this.solvedProblems, this.columns);
+  }
+
+  get groupedUnsolvedProblems(): GroupedCourseProblems {
+    return this.groupElements(this.unsolvedProblems, this.columns);
+  }
+
+  groupElements(elements: CourseProblems, columns: number): GroupedCourseProblems {
+    let groups: GroupedCourseProblems = {};
+    for (let user in elements) {
+      groups[user] = [];
+      for (let i = 0; i < elements[user].length; i += columns) {
+        groups[user].push(elements[user].slice(i, i + columns));
       }
-      return groups;
-    },
-  },
-  data: function() {
-    return { T: T, columns: 3, }
+    }
+    return groups;
   }
 }
 </script>

@@ -42,7 +42,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="event in events">
+              <tr v-for="event in report">
                 <td>
                   <a v-bind:href=
                   "`/profile/${event.username}`"><strong><omegaup-user-username v-bind:classname=
@@ -50,8 +50,8 @@
                                          v-bind:username=
                                          "event.username"></omegaup-user-username></strong></a>
                 </td>
-                <td>{{ event.time }}</td>
-                <td>{{ event.ip }}</td>
+                <td>{{ UI.formatDateTime(event.time) }}</td>
+                <td>{{ event.ip.toString() }}</td>
                 <td>{{ event.event.name }}</td>
                 <td><span v-if="event.event.problem"><a v-bind:href=
                 "`/arena/problem/${event.event.problem}/`">{{ event.event.problem
@@ -125,91 +125,110 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import {T} from '../../omegaup.js';
 import UI from '../../ui.js';
+import omegaup from '../../api.js';
 import user_Username from '../user/Username.vue';
-export default {
-  props: {type: String, alias: String, report: Object},
-  data: function() {
-    return { T: T, UI: UI }
-  },
-  methods: {
-    addMapping: function(mapping, key, value) {
-      if (key in mapping) {
-        mapping[key].push(value);
-      } else {
-        mapping[key] = [value];
-      }
-    },
-  },
-  computed: {
-    wordsReportSummary: function() {
-      let self = this;
-      return self.type == 'contest' ? T.wordsActivityReportSummaryContest :
-                                      T.wordsActivityReportSummaryCourse
-    },
-    classByUser: function() {
-      let self = this;
-      let events = self.report.events;
-      let obj = {};
-      for (let evt of events) {
-        obj[evt.username] = evt.classname;
-      }
-      return obj;
-    },
-    events: function() {
-      let self = this;
-      let events = self.report.events;
-      return events;
-    },
-    users: function() {
-      let self = this;
-      let events = self.report.events;
-      let userMapping = {};
-      for (let evt of events) {
-        self.addMapping(userMapping, evt.username, evt.ip);
-        evt.ip = '' + evt.ip.toString();
-        evt.time = evt.time.toLocaleString();
-      }
-      let users = [];
-      let sortedUsers = Object.keys(userMapping);
-      sortedUsers.sort();
-      for (let user of sortedUsers) {
-        let ips = Array.from(new Set(userMapping[user]));
-        if (ips.length == 1) continue;
-        ips.sort();
-        users.push(
-            {username: user, classname: self.classByUser[user], ips: ips});
-      }
-      return users;
-    },
-    origins: function() {
-      let self = this;
-      let events = self.report.events;
-      let originMapping = {};
-      for (let evt of events) {
-        self.addMapping(originMapping, evt.ip, evt.username);
-        evt.ip = '' + evt.ip.toString();
-      }
-      let origins = [];
-      let sortedOrigins = Object.keys(originMapping);
-      sortedOrigins.sort();
-      for (let origin of sortedOrigins) {
-        let users = Array.from(new Set(originMapping[origin]));
-        if (users.length == 1) continue;
-        users.sort();
-        origins.push({
-          origin: origin,
-          usernames: users.map(
-              u => {return {username: u, classname: self.classByUser[u]}})
-        });
-      }
-      return origins;
-    }
-  },
+
+interface Mapping {
+  [key: string]: string[];
+}
+
+interface User {
+  username: string;
+  classname: string;
+  ips: string[];
+}
+
+interface Origin {
+  origin: string;
+  usernames: {
+    username: string;
+    classname: string;
+  }[];
+}
+
+@Component({
   components: {
     'omegaup-user-username': user_Username,
+  }
+})
+export default class ActivityFeed extends Vue {
+  @Prop() type!: string;
+  @Prop() alias!: string;
+  @Prop() report!: omegaup.Report[];
+
+  T = T;
+  UI = UI;
+
+  addMapping(mapping: any, key: string, value: string): void {
+    if (key in mapping) {
+      mapping[key].push(value);
+    } else {
+      mapping[key] = [value];
+    }
+  }
+
+  get wordsReportSummary(): string {
+    return this.type == 'contest' ?
+            this.T.wordsActivityReportSummaryContest :
+            this.T.wordsActivityReportSummaryCourse;
+  }
+
+  get classByUser(): { [key: string]: string } {
+    let events = this.report;
+    let obj: { [key: string]: string } = {};
+    for (let evt of events) {
+      obj[evt.username] = evt.classname;
+    }
+    return obj;
+  }
+
+  get users(): User[] {
+    let self = this;
+    let userMapping: Mapping = {};
+    for (let evt of this.report) {
+      self.addMapping(userMapping, evt.username, evt.ip);
+    }
+    let users: User[] = [];
+    let sortedUsers = Object.keys(userMapping);
+    sortedUsers.sort();
+    for (let user of sortedUsers) {
+      let ips: string[] = Array.from(new Set(userMapping[user]));
+      if (ips.length == 1) continue;
+      ips.sort();
+      users.push({
+        username: user,
+        classname: self.classByUser[user],
+        ips: ips
+      });
+    }
+    return users;
+  }
+
+  get origins(): Origin[] {
+    let self = this;
+    let originMapping: Mapping = {};
+    for (let evt of this.report) {
+      self.addMapping(originMapping, evt.ip, evt.username);
+    }
+    let origins: Origin[] = [];
+    let sortedOrigins = Object.keys(originMapping);
+    sortedOrigins.sort();
+    for (let origin of sortedOrigins) {
+      let users: string[] = Array.from(new Set(originMapping[origin]));
+      if (users.length == 1) continue;
+      users.sort();
+      origins.push({
+        origin: origin,
+        usernames: users.map((u) => {
+              return {username: u, classname: self.classByUser[u]}
+        }),
+      });
+    }
+    return origins;
   }
 }
 </script>

@@ -76,8 +76,8 @@ declare namespace omegaup {
   export interface Problem {
     alias: string;
     title: string;
-    accepted: number;
-    submissions: number;
+    accepted?: number;
+    submissions?: number;
     penalty?: number;
     percent?: number;
     points?: number;
@@ -107,6 +107,17 @@ declare namespace omegaup {
     rank: number;
     name?: string;
     problems_solved: number;
+  }
+
+  export interface Report {
+    classname: string;
+    event: {
+      name: string;
+      problem: string;
+    }
+    ip: string;
+    time: string;
+    username: string;
   }
 
   export interface Solutions {
