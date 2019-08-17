@@ -38,13 +38,6 @@ abstract class AuthTokensDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
             !is_null($Auth_Tokens->user_id) ? intval($Auth_Tokens->user_id) : null,
             !is_null($Auth_Tokens->identity_id) ? intval($Auth_Tokens->identity_id) : null,

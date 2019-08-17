@@ -38,16 +38,9 @@ abstract class ProblemsForfeitedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Problems_Forfeited->user_id) ? intval($Problems_Forfeited->user_id) : null,
-            !is_null($Problems_Forfeited->problem_id) ? intval($Problems_Forfeited->problem_id) : null,
+            $Problems_Forfeited->user_id,
+            $Problems_Forfeited->problem_id,
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         global $conn;

@@ -38,16 +38,9 @@ abstract class ProblemsetIdentityRequestDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Problemset_Identity_Request->identity_id) ? intval($Problemset_Identity_Request->identity_id) : null,
-            !is_null($Problemset_Identity_Request->problemset_id) ? intval($Problemset_Identity_Request->problemset_id) : null,
+            $Problemset_Identity_Request->identity_id,
+            $Problemset_Identity_Request->problemset_id,
             DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
             DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             !is_null($Problemset_Identity_Request->accepted) ? intval($Problemset_Identity_Request->accepted) : null,

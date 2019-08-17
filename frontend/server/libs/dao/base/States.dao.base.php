@@ -38,13 +38,6 @@ abstract class StatesDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO States (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
             $States->country_id,
             $States->state_id,

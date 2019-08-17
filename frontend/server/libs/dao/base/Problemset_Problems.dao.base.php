@@ -38,16 +38,9 @@ abstract class ProblemsetProblemsDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Problemset_Problems->problemset_id) ? intval($Problemset_Problems->problemset_id) : null,
-            !is_null($Problemset_Problems->problem_id) ? intval($Problemset_Problems->problem_id) : null,
+            $Problemset_Problems->problemset_id,
+            $Problemset_Problems->problem_id,
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
             floatval($Problemset_Problems->points),

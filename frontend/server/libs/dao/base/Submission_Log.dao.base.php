@@ -38,16 +38,9 @@ abstract class SubmissionLogDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
             !is_null($Submission_Log->problemset_id) ? intval($Submission_Log->problemset_id) : null,
-            !is_null($Submission_Log->submission_id) ? intval($Submission_Log->submission_id) : null,
+            $Submission_Log->submission_id,
             !is_null($Submission_Log->user_id) ? intval($Submission_Log->user_id) : null,
             !is_null($Submission_Log->identity_id) ? intval($Submission_Log->identity_id) : null,
             !is_null($Submission_Log->ip) ? intval($Submission_Log->ip) : null,
