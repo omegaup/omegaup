@@ -6,6 +6,7 @@ require_once 'libs/third_party/smarty/libs/Smarty.class.php';
 $smarty = new Smarty();
 $smarty->setTemplateDir(__DIR__ . '/../templates/');
 
+/** @psalm-suppress RedundantCondition IS_TEST may be defined as true in tests. */
 if (!defined('IS_TEST') || IS_TEST !== true) {
     $smarty->assign('CURRENT_USER_IS_ADMIN', 0);
     if (defined('SMARTY_CACHE_DIR')) {
@@ -72,7 +73,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     $session = ['valid' => false];
 }
 
-$smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
+$smarty->configLoad(__DIR__ . "/../templates/{$lang}.lang");
 $smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 
 $smarty->assign('ENABLED_EXPERIMENTS', $experiments->getEnabledExperiments());
