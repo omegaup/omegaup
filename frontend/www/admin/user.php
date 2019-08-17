@@ -2,8 +2,8 @@
 
 require_once('../../server/bootstrap_smarty.php');
 
-UITools::redirectToLoginIfNotLoggedIn();
-UITools::redirectIfNoAdmin();
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
+\OmegaUp\UITools::redirectIfNoAdmin();
 
 $user = UsersDAO::FindByUsername($_REQUEST['username']);
 if (is_null($user)) {
