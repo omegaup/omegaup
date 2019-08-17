@@ -146,13 +146,13 @@ class Scoreboard {
         // A few scoreboard options are not cacheable.
         if (!$sortByName && is_null($filterUsersBy) && !$this->params['only_ac']) {
             if ($this->params['admin']) {
-                $cache = new Cache(
-                    Cache::ADMIN_SCOREBOARD_PREFIX,
+                $cache = new \OmegaUp\Cache(
+                    \OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX,
                     $this->params['problemset_id']
                 );
             } else {
-                $cache = new Cache(
-                    Cache::CONTESTANT_SCOREBOARD_PREFIX,
+                $cache = new \OmegaUp\Cache(
+                    \OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX,
                     $this->params['problemset_id']
                 );
             }
@@ -227,8 +227,8 @@ class Scoreboard {
     public function events() {
         $result = null;
 
-        $contestantEventsCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->params['problemset_id']);
-        $adminEventsCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->params['problemset_id']);
+        $contestantEventsCache = new \OmegaUp\Cache(\OmegaUp\Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $this->params['problemset_id']);
+        $adminEventsCache = new \OmegaUp\Cache(\OmegaUp\Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $this->params['problemset_id']);
 
         $canUseContestantCache = !$this->params['admin'];
         $canUseAdminCache = $this->params['admin'];
@@ -300,12 +300,12 @@ class Scoreboard {
         $log->info('Invalidating scoreboard cache.');
 
         // Invalidar cache del contestant
-        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $params['problemset_id']);
-        Cache::deleteFromCache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX, $params['problemset_id']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
 
         // Invalidar cache del admin
-        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_PREFIX, $params['problemset_id']);
-        Cache::deleteFromCache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX, $params['problemset_id']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
     }
 
     /**
@@ -346,7 +346,7 @@ class Scoreboard {
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
         $timeout = max(0, $params['finish_time'] - \OmegaUp\Time::get());
-        $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $params['problemset_id']);
+        $contestantScoreboardCache = new \OmegaUp\Cache(\OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX, $params['problemset_id']);
         $contestantScoreboard = Scoreboard::getScoreboardFromRuns(
             $contestRuns,
             $rawContestIdentities,
@@ -361,7 +361,7 @@ class Scoreboard {
             false  /* sortByName */
         );
 
-        $contestantEventCache = new Cache(Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
+        $contestantEventCache = new \OmegaUp\Cache(\OmegaUp\Cache::CONTESTANT_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
         $contestantEventCache->set(Scoreboard::calculateEvents(
             $params,
             $contestRuns,
@@ -372,7 +372,7 @@ class Scoreboard {
         // Admin cache
         $params['admin'] = true; // Temporarily set for admin cache
         $contestantScoreboardCache->set($contestantScoreboard, $timeout);
-        $adminScoreboardCache = new Cache(Cache::ADMIN_SCOREBOARD_PREFIX, $params['problemset_id']);
+        $adminScoreboardCache = new \OmegaUp\Cache(\OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX, $params['problemset_id']);
         $scoreboardLimit = Scoreboard::getScoreboardTimeLimitUnixTimestamp($params);
         $adminScoreboard = Scoreboard::getScoreboardFromRuns(
             $contestRuns,
@@ -390,7 +390,7 @@ class Scoreboard {
         $adminScoreboardCache->set($adminScoreboard, $timeout);
         $params['admin'] = false;
 
-        $adminEventCache = new Cache(Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
+        $adminEventCache = new \OmegaUp\Cache(\OmegaUp\Cache::ADMIN_SCOREBOARD_EVENTS_PREFIX, $params['problemset_id']);
         $adminEventCache->set(Scoreboard::calculateEvents(
             $params,
             $contestRuns,

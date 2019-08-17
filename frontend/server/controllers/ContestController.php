@@ -64,8 +64,8 @@ class ContestController extends Controller {
         $cacheKey = "{$active_contests}-{$recommended}-{$page}-{$page_size}";
         if (is_null($r->identity)) {
             // Get all public contests
-            $contests = Cache::getFromCacheOrSet(
-                Cache::CONTESTS_LIST_PUBLIC,
+            $contests = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::CONTESTS_LIST_PUBLIC,
                 $cacheKey,
                 function () use ($page, $page_size, $active_contests, $recommended, $query) {
                     return ContestsDAO::getAllPublicContests(
@@ -83,8 +83,8 @@ class ContestController extends Controller {
             $contests = ContestsDAO::getRecentPublicContests($r->identity->identity_id, $page, $page_size, $query);
         } elseif (Authorization::isSystemAdmin($r->identity)) {
             // Get all contests
-            $contests = Cache::getFromCacheOrSet(
-                Cache::CONTESTS_LIST_SYSTEM_ADMIN,
+            $contests = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN,
                 $cacheKey,
                 function () use ($page, $page_size, $active_contests, $recommended, $query) {
                         return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended, $query);
@@ -198,8 +198,8 @@ class ContestController extends Controller {
         }
 
         // Expire contest-list cache
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         return [
             'status' => 'ok',
@@ -629,8 +629,8 @@ class ContestController extends Controller {
      * @param $result
      */
     private static function getCachedDetails(string $contestAlias, \OmegaUp\DAO\VO\Contests $contest) : array {
-        return Cache::getFromCacheOrSet(
-            Cache::CONTEST_INFO,
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::CONTEST_INFO,
             $contestAlias,
             function () use ($contest, &$result) {
                 // Initialize response to be the contest information
@@ -1023,8 +1023,8 @@ class ContestController extends Controller {
         }
 
         // Expire contest-list cache
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         self::$log->info('New Contest Created: ' . $contest->alias);
     }
@@ -1347,7 +1347,7 @@ class ContestController extends Controller {
         );
 
         // Invalidar cache
-        Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
         Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
@@ -1433,7 +1433,7 @@ class ContestController extends Controller {
         ]));
 
         // Invalidar cache
-        Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
         Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
@@ -2219,14 +2219,14 @@ class ContestController extends Controller {
         }
 
         // Expire contest-info cache
-        Cache::deleteFromCache(Cache::CONTEST_INFO, $r['contest_alias']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
 
         // Expire contest scoreboard cache
         Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($contest));
 
         // Expire contest-list cache
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_PUBLIC);
-        Cache::invalidateAllKeys(Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN);
 
         // Happy ending
         $response = [];

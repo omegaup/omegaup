@@ -473,7 +473,7 @@ class UserController extends Controller {
         }
 
         // Expire profile cache
-        Cache::deleteFromCache(Cache::USER_PROFILE, $user->username);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $user->username);
 
         return ['status' => 'ok'];
     }
@@ -1562,7 +1562,7 @@ class UserController extends Controller {
         }
 
         // Expire profile cache
-        Cache::deleteFromCache(Cache::USER_PROFILE, $r->user->username);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $r->user->username);
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
 
@@ -1715,7 +1715,7 @@ class UserController extends Controller {
         }
 
         // Expire profile cache
-        Cache::deleteFromCache(Cache::USER_PROFILE, $r->user->username);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $r->user->username);
         $sessionController = new SessionController();
         $sessionController->InvalidateCache();
 
@@ -1768,8 +1768,8 @@ class UserController extends Controller {
         if (is_null($identity)) {
             $selectedFilter = self::getSelectedFilter($r);
             $rankCacheName = "{$r['offset']}-{$r['rowcount']}-{$r['filter']}-{$selectedFilter['value']}";
-            $response = Cache::getFromCacheOrSet(
-                Cache::PROBLEMS_SOLVED_RANK,
+            $response = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::PROBLEMS_SOLVED_RANK,
                 $rankCacheName,
                 function () use ($r) {
                     $response = [];
@@ -1823,9 +1823,9 @@ class UserController extends Controller {
      * verdict = AC (and not test run)
      */
     public static function deleteProblemsSolvedRankCacheList() {
-        Cache::invalidateAllKeys(Cache::PROBLEMS_SOLVED_RANK);
-        Cache::invalidateAllKeys(Cache::CONTESTANT_SCOREBOARD_PREFIX);
-        Cache::invalidateAllKeys(Cache::ADMIN_SCOREBOARD_PREFIX);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::PROBLEMS_SOLVED_RANK);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX);
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX);
     }
 
     /**
@@ -1872,7 +1872,7 @@ class UserController extends Controller {
         }
 
         // Delete profile cache
-        Cache::deleteFromCache(Cache::USER_PROFILE, $r->user->username);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $r->user->username);
 
         // Send verification email
         $r['user'] = $r->user;

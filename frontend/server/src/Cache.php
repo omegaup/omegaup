@@ -1,28 +1,55 @@
 <?php
 
+namespace OmegaUp;
+
 /**
  * A class that abstracts away support for APC user cache for PHP7 / Travis.
  */
 abstract class CacheAdapter {
-    private static $sInstance = null;
+    /** @var CacheAdapter|null */
+    private static $_instance = null;
 
-    public static function getInstance() {
-        if (CacheAdapter::$sInstance == null) {
+    public static function getInstance() : CacheAdapter {
+        if (is_null(CacheAdapter::$_instance)) {
             if (function_exists('apcu_clear_cache')) {
-                CacheAdapter::$sInstance = new APCCacheAdapter();
+                CacheAdapter::$_instance = new APCCacheAdapter();
             } else {
-                CacheAdapter::$sInstance = new InProcessCacheAdapter();
+                CacheAdapter::$_instance = new InProcessCacheAdapter();
             }
         }
-        return CacheAdapter::$sInstance;
+        return CacheAdapter::$_instance;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $defaultVar
+     * @param int $ttl
+     * @return mixed
+     */
     abstract public function entry(string $key, $defaultVar, int $ttl = 0);
+
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     * @return bool
+     */
     abstract public function add(string $key, $var, int $ttl = 0) : bool;
     abstract public function cas(string $key, int $old, int $new) : bool;
-    abstract public function clear();
+    abstract public function clear() : void;
     abstract public function delete(string $key) : bool;
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
     abstract public function fetch(string $key);
+
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     */
     abstract public function store(string $key, $var, int $ttl = 0) : bool;
 }
 
@@ -30,12 +57,29 @@ abstract class CacheAdapter {
  * Implementation of CacheAdapter that uses the real APC functions.
  */
 class APCCacheAdapter extends CacheAdapter {
+    /**
+     * @param string $key
+     * @param mixed $defaultVar
+     * @param int $ttl
+     * @return mixed
+     */
     public function entry(string $key, $defaultVar, int $ttl = 0) {
-        return apcu_entry($key, function ($key) use ($defaultVar) {
-            return $defaultVar;
-        }, $ttl);
+        return apcu_entry(
+            $key,
+            /** @return mixed */
+            function (string $key) use ($defaultVar) {
+                return $defaultVar;
+            },
+            $ttl
+        );
     }
 
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     * @return bool
+     */
     public function add(string $key, $var, int $ttl = 0) : bool {
         return apcu_add($key, $var, $ttl);
     }
@@ -44,7 +88,7 @@ class APCCacheAdapter extends CacheAdapter {
         return apcu_cas($key, $old, $new);
     }
 
-    public function clear() {
+    public function clear() : void {
         apcu_clear_cache();
     }
 
@@ -52,10 +96,19 @@ class APCCacheAdapter extends CacheAdapter {
         return apcu_delete($key);
     }
 
+    /**
+     * @param string $key
+     * @return mixed
+     */
     public function fetch(string $key) {
         return apcu_fetch($key, $success);
     }
 
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     */
     public function store(string $key, $var, int $ttl = 0) : bool {
         return apcu_store($key, $var, $ttl);
     }
@@ -66,8 +119,15 @@ class APCCacheAdapter extends CacheAdapter {
  * not survive across test function invocations.
  */
 class InProcessCacheAdapter extends CacheAdapter {
+    /** @var array<string, mixed> */
     private $cache = [];
 
+    /**
+     * @param string $key
+     * @param mixed $defaultVar
+     * @param int $ttl
+     * @return mixed
+     */
     public function entry(string $key, $defaultVar, int $ttl = 0) {
         if (!array_key_exists($key, $this->cache)) {
             $this->cache[$key] = $defaultVar;
@@ -75,6 +135,12 @@ class InProcessCacheAdapter extends CacheAdapter {
         return $this->cache[$key];
     }
 
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     * @return bool
+     */
     public function add(string $key, $var, int $ttl = 0) : bool {
         if (array_key_exists($key, $this->cache)) {
             return false;
@@ -91,7 +157,7 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
-    public function clear() {
+    public function clear() : void {
         $this->cache = [];
     }
 
@@ -103,6 +169,10 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
+    /**
+     * @param string $key
+     * @return mixed
+     */
     public function fetch(string $key) {
         if (!array_key_exists($key, $this->cache)) {
             return false;
@@ -110,6 +180,11 @@ class InProcessCacheAdapter extends CacheAdapter {
         return $this->cache[$key];
     }
 
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     */
     public function store(string $key, $var, int $ttl = 0) : bool {
         $this->cache[$key] = $var;
         return true;
@@ -141,7 +216,10 @@ class Cache {
     const CONTESTS_LIST_USER_ID = 'contest-list-user-id';
     const SCHOOL_RANK = 'school-rank';
 
+    /** @var \Logger */
     private $log;
+
+    /** @var string */
     protected $key;
 
     /**
@@ -149,7 +227,7 @@ class Cache {
      * @param string $key el id del cache
      */
     public function __construct(string $prefix, string $id = '') {
-        $this->log = Logger::getLogger('cache');
+        $this->log = \Logger::getLogger('cache');
 
         if (!self::isEnabled()) {
             $this->log->debug('Cache disabled');
@@ -166,7 +244,7 @@ class Cache {
      *
      * Si el cache está prendido, guarda value en key con el timeout dado
      *
-     * @param string $value
+     * @param mixed $value
      * @param int $timeout (seconds)
      * @return boolean
      */
@@ -211,7 +289,9 @@ class Cache {
         if (!self::isEnabled()) {
             return null;
         }
-        if (($result = CacheAdapter::getInstance()->fetch($this->key)) === false) {
+        /** @var mixed */
+        $result = CacheAdapter::getInstance()->fetch($this->key);
+        if ($result === false) {
             $this->log->info("Cache miss for key: {$this->key}");
             return null;
         }
@@ -226,7 +306,7 @@ class Cache {
      *
      * @param string $prefix
      * @param string $id
-     * @param callable $setFunc
+     * @param callable():mixed $setFunc
      * @param int $timeout (seconds)
      * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
      * @return mixed the value returned from the cache or $setFunc().
@@ -238,7 +318,8 @@ class Cache {
         int $timeout = 0,
         ?bool &$cacheUsed = null
     ) {
-        $cache = new Cache($prefix, $id);
+        $cache = new \OmegaUp\Cache($prefix, $id);
+        /** @var mixed */
         $returnValue = $cache->get();
 
         // If there wasn't a value in the cache for the key ($prefix, $id)
@@ -250,6 +331,7 @@ class Cache {
         }
 
         // Get the value from the function provided
+        /** @var mixed */
         $returnValue = call_user_func($setFunc);
         $cache->set($returnValue, $timeout);
 
@@ -266,7 +348,7 @@ class Cache {
      * @param string $id
      */
     public static function deleteFromCache($prefix, $id = '') : void {
-        $cache = new Cache($prefix, $id);
+        $cache = new \OmegaUp\Cache($prefix, $id);
         $cache->delete();
     }
 

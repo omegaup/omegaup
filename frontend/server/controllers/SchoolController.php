@@ -170,8 +170,8 @@ class SchoolController extends Controller {
         };
 
         if ($canUseCache) {
-            return Cache::getFromCacheOrSet(
-                Cache::SCHOOL_RANK,
+            return \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::SCHOOL_RANK,
                 "{$offset}-{$rowCount}",
                 $fetch,
                 60 * 60 * 24 // 1 day

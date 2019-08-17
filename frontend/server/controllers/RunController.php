@@ -516,7 +516,7 @@ class RunController extends Controller {
     public static function invalidateCacheOnRejudge(\OmegaUp\DAO\VO\Runs $run) : void {
         try {
             // Expire details of the run
-            Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+            \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::RUN_ADMIN_DETAILS, $run->run_id);
 
             $submission = SubmissionsDAO::getByPK($run->submission_id);
             if (is_null($submission)) {
@@ -528,7 +528,7 @@ class RunController extends Controller {
 
             if (!is_null($problem)) {
                 // Invalidar cache stats
-                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
+                \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::PROBLEM_STATS, $problem->alias);
             }
         } catch (Exception $e) {
             // We did our best effort to invalidate the cache...
@@ -760,8 +760,8 @@ class RunController extends Controller {
      * @return type
      */
     public static function apiCounts(\OmegaUp\Request $r) : array {
-        return Cache::getFromCacheOrSet(
-            Cache::RUN_COUNTS,
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::RUN_COUNTS,
             '',
             function () use ($r) {
                 $totals = [];

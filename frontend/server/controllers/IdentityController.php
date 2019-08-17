@@ -219,7 +219,7 @@ class IdentityController extends Controller {
         // Save in DB
         IdentitiesDAO::update($identity);
 
-        Cache::deleteFromCache(Cache::USER_PROFILE, $identity->username);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $identity->username);
 
         return [
             'status' => 'ok',
@@ -346,8 +346,8 @@ class IdentityController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Identity');
         }
 
-        $response = Cache::getFromCacheOrSet(
-            Cache::USER_PROFILE,
+        $response = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
             function () use ($identity, $user) {
                 if (!is_null($user)) {
