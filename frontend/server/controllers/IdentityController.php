@@ -54,7 +54,7 @@ class IdentityController extends Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r) : array {
         global $experiments;
-        $experiments->ensureEnabled(Experiments::IDENTITIES);
+        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -93,7 +93,7 @@ class IdentityController extends Controller {
      */
     public static function apiBulkCreate(\OmegaUp\Request $r) : array {
         global $experiments;
-        $experiments->ensureEnabled(Experiments::IDENTITIES);
+        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -198,7 +198,7 @@ class IdentityController extends Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         global $experiments;
-        $experiments->ensureEnabled(Experiments::IDENTITIES);
+        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
 
@@ -235,7 +235,7 @@ class IdentityController extends Controller {
      */
     public static function apiChangePassword(\OmegaUp\Request $r) {
         global $experiments;
-        $experiments->ensureEnabled(Experiments::IDENTITIES);
+        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
 

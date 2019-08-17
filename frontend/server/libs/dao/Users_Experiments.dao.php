@@ -12,20 +12,24 @@ include('base/Users_Experiments.dao.base.php');
  * @access public
  */
 class UsersExperimentsDAO extends UsersExperimentsDAOBase {
-    public static function delete($user_id, $experiment) {
+    public static function delete(int $userId, string $experiment) : void {
         $sql = '
             DELETE FROM
                 Users_Experiments
             WHERE
                 user_id = ? AND experiment = ?;';
         $params = [
-            $user_id,
+            $userId,
             $experiment,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
     }
 
-    final public static function getByUserId($user_id) {
+    /**
+     * @param int $userId
+     * @return \OmegaUp\DAO\VO\UsersExperiments[]
+     */
+    final public static function getByUserId(int $userId) {
         $sql = 'SELECT
                     *
                 FROM
@@ -33,12 +37,11 @@ class UsersExperimentsDAO extends UsersExperimentsDAOBase {
                 WHERE
                     user_id = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$user_id]);
-
-        $users_experiments = [];
-        foreach ($rs as $row) {
-            array_push($users_experiments, new \OmegaUp\DAO\VO\UsersExperiments($row));
+        /** @var OmegaUp\DAO\VO\UsersExperiments[] */
+        $usersExperiments = [];
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]) as $row) {
+            array_push($usersExperiments, new \OmegaUp\DAO\VO\UsersExperiments($row));
         }
-        return $users_experiments;
+        return $usersExperiments;
     }
 }
