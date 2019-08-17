@@ -20,12 +20,23 @@ class UserRankDAO extends UserRankDAOBase {
     ) {
         $sql = '
               SELECT
-                user_id,
-                rank,
-                problems_solved_count,
-                score,
-                username, name,
-                country_id';
+                `ur`.`user_id`,
+                `ur`.`rank`,
+                `ur`.`problems_solved_count` as `problems_solved`,
+                `ur`.`score`,
+                `ur`.`username`,
+                `ur`.`name`,
+                `ur`.`country_id`,
+                (SELECT
+                    `urc`.`classname`
+                 FROM
+                    `User_Rank_Cutoffs` `urc`
+                 WHERE
+                    `urc`.`score` <= `ur`.`score`
+                 ORDER BY
+                    `urc`.`percentile` ASC
+                 LIMIT
+                    1) as `classname`';
         $sql_count = '
               SELECT
                 COUNT(1)';
@@ -33,18 +44,18 @@ class UserRankDAO extends UserRankDAOBase {
         $params = [];
         $sql_from = '
               FROM
-                User_Rank ';
+                `User_Rank` `ur`';
         if ($filteredBy == 'state') {
             $values = explode('-', $value);
             $params[] = $values[0];
             $params[] = $values[1];
-            $sql_from .= ' WHERE country_id = ? AND state_id = ?';
+            $sql_from .= ' WHERE `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sql_from .= ' WHERE ' . $conn->escape($filteredBy) . '_id = ?';
+            $sql_from .= ' WHERE `ur`.`' . $conn->escape($filteredBy) . '_id` = ?';
         }
         if (!is_null($order)) {
-            $sql_from .= ' ORDER BY ' . $conn->escape($order) . ' ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
+            $sql_from .= ' ORDER BY `ur`.`' . $conn->escape($order) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         $sql_limit = '';
         $params_limit = [];
@@ -59,11 +70,7 @@ class UserRankDAO extends UserRankDAOBase {
         $params = array_merge($params, $params_limit);
 
         // Get rows
-        $rs = $conn->GetAll($sql . $sql_from . $sql_limit, $params);
-        $allData = [];
-        foreach ($rs as $row) {
-            $allData[] = new UserRank($row);
-        }
+        $allData = $conn->GetAll($sql . $sql_from . $sql_limit, $params);
         return [
             'rows' => $allData,
             'total' => $total_rows
