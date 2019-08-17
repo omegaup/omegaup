@@ -20,7 +20,7 @@ $smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,lua,pas,py,rb');
 $smarty->assign('SELECTED_TAGS', '');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
-    $r = new Request([
+    $r = new \OmegaUp\Request([
                 'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                 'title' => $_POST['title'],
                 'problem_alias' => $_POST['alias'],

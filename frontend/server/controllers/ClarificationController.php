@@ -21,10 +21,10 @@ class ClarificationController extends Controller {
     /**
      * Validate the request of apiCreate
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateCreate(Request $r) {
+    private static function validateCreate(\OmegaUp\Request $r) {
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         Validators::validateStringNonEmpty($r['username'], 'username', false);
@@ -53,10 +53,10 @@ class ClarificationController extends Controller {
     /**
      * Creates a Clarification
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -86,11 +86,11 @@ class ClarificationController extends Controller {
     /**
      * Validate Details API request
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
-    private static function validateDetails(Request $r) {
+    private static function validateDetails(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists
@@ -113,10 +113,10 @@ class ClarificationController extends Controller {
     /**
      * API for getting a clarification
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         // Authenticate the user
         self::authenticateRequest($r);
 
@@ -136,10 +136,10 @@ class ClarificationController extends Controller {
     /**
      * Validate update API request
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws ForbiddenAccessException
      */
-    private static function validateUpdate(Request $r) {
+    private static function validateUpdate(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
         $r->ensureBool('public', false /* not required */);
         Validators::validateStringNonEmpty($r['answer'], 'answer', false /* not required */);
@@ -162,10 +162,10 @@ class ClarificationController extends Controller {
     /**
      * Update a clarification
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiUpdate(Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r) {
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -195,7 +195,7 @@ class ClarificationController extends Controller {
         return $response;
     }
 
-    private static function clarificationUpdated(Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
+    private static function clarificationUpdated(\OmegaUp\Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
         try {
             if (is_null($r['problem'])) {
                 $r['problem'] = ProblemsDAO::GetByPK($clarification->problem_id);

@@ -31,13 +31,13 @@ class RunController extends Controller {
      *
      * Validates Create Run request
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotAllowedToSubmitException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
-    private static function validateCreateRequest(Request $r) {
+    private static function validateCreateRequest(\OmegaUp\Request $r) {
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->identity->username == 'omi') {
             throw new ForbiddenAccessException();
@@ -195,12 +195,12 @@ class RunController extends Controller {
     /**
      * Create a new run
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws Exception
      * @throws InvalidFilesystemOperationException
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         self::$practice = false;
 
         // Authenticate user
@@ -377,11 +377,11 @@ class RunController extends Controller {
     /**
      * Validate request of details
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
-    private static function validateDetailsRequest(Request $r) {
+    private static function validateDetailsRequest(\OmegaUp\Request $r) {
         Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
 
         // If user is not judge, must be the run's owner.
@@ -399,11 +399,11 @@ class RunController extends Controller {
     /**
      * Get basic details of a run
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws InvalidFilesystemOperationException
      */
-    public static function apiStatus(Request $r) {
+    public static function apiStatus(\OmegaUp\Request $r) {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
@@ -440,9 +440,9 @@ class RunController extends Controller {
     /**
      * Re-sends a problem to Grader.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiRejudge(Request $r) {
+    public static function apiRejudge(\OmegaUp\Request $r) {
         self::$practice = false;
 
         // Get the user who is calling this API
@@ -487,9 +487,9 @@ class RunController extends Controller {
     /**
      * Disqualify a submission
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiDisqualify(Request $r) {
+    public static function apiDisqualify(\OmegaUp\Request $r) {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
@@ -540,9 +540,9 @@ class RunController extends Controller {
     /**
      * Gets the details of a run. Includes admin details if admin.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
@@ -585,10 +585,10 @@ class RunController extends Controller {
      * Given the run alias, returns the source code and any compile errors if any
      * Used in the arena, any contestant can view its own codes and compile errors
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws ForbiddenAccessException
      */
-    public static function apiSource(Request $r) {
+    public static function apiSource(\OmegaUp\Request $r) {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
@@ -635,10 +635,10 @@ class RunController extends Controller {
     /**
      * Given the run alias, returns a .zip file with all the .out files generated for a run.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws ForbiddenAccessException
      */
-    public static function apiDownload(Request $r) {
+    public static function apiDownload(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -756,10 +756,10 @@ class RunController extends Controller {
     /**
      * Get total of last 6 months
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return type
      */
-    public static function apiCounts(Request $r) : array {
+    public static function apiCounts(\OmegaUp\Request $r) : array {
         return Cache::getFromCacheOrSet(
             Cache::RUN_COUNTS,
             '',
@@ -783,11 +783,11 @@ class RunController extends Controller {
     /**
      * Validator for List API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateList(Request $r) {
+    private static function validateList(\OmegaUp\Request $r) {
         // Defaults for offset and rowcount
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
@@ -837,10 +837,10 @@ class RunController extends Controller {
     /**
      * Gets a list of latest runs overall
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return string
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
         self::authenticateRequest($r);
         self::validateList($r);

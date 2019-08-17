@@ -45,9 +45,9 @@ class GroupController extends Controller {
     /**
      * New group
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         Validators::validateValidAlias($r['alias'], 'alias', true);
@@ -104,9 +104,9 @@ class GroupController extends Controller {
     /**
      * Add identity to group
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiAddUser(Request $r) {
+    public static function apiAddUser(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
@@ -122,9 +122,9 @@ class GroupController extends Controller {
     /**
      * Remove user from group
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiRemoveUser(Request $r) {
+    public static function apiRemoveUser(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
@@ -147,9 +147,9 @@ class GroupController extends Controller {
     /**
      * Returns a list of groups by owner
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiMyList(Request $r) {
+    public static function apiMyList(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         $groups = GroupsDAO::getAllGroupsAdminedByUser(
@@ -171,9 +171,9 @@ class GroupController extends Controller {
      * Returns a list of groups that match a partial name. This returns an
      * array instead of an object since it is used by typeahead.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         if (is_null($r['query'])) {
@@ -195,9 +195,9 @@ class GroupController extends Controller {
     /**
      * Details of a group (scoreboards)
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
 
@@ -225,9 +225,9 @@ class GroupController extends Controller {
     /**
      * Members of a group (usernames only).
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiMembers(Request $r) {
+    public static function apiMembers(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
 
@@ -240,9 +240,9 @@ class GroupController extends Controller {
     /**
      * Create a scoreboard set to a group
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiCreateScoreboard(Request $r) {
+    public static function apiCreateScoreboard(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $group = self::validateGroup($r['group_alias'], $r->identity);
 

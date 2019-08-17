@@ -18,7 +18,7 @@ class GroupsTest extends OmegaupTestCase {
         $alias = Utils::CreateRandomString();
 
         $login = self::login($owner);
-        $response = GroupController::apiCreate(new Request([
+        $response = GroupController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $name,
             'alias' => $alias,
@@ -41,7 +41,7 @@ class GroupsTest extends OmegaupTestCase {
 
         try {
             $login = self::login($owner);
-            GroupController::apiCreate(new Request([
+            GroupController::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'name' => Utils::CreateRandomString(),
                 'alias' => 'omegaup',
@@ -62,7 +62,7 @@ class GroupsTest extends OmegaupTestCase {
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         $login = self::login($group['owner']);
-        $response = GroupController::apiAddUser(new Request([
+        $response = GroupController::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $group['group']->alias
@@ -84,7 +84,7 @@ class GroupsTest extends OmegaupTestCase {
         $userCalling = UserFactory::createUser();
 
         $login = self::login($userCalling);
-        $response = GroupController::apiAddUser(new Request([
+        $response = GroupController::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $group['group']->alias
@@ -100,7 +100,7 @@ class GroupsTest extends OmegaupTestCase {
         GroupsFactory::addUserToGroup($groupData, $user);
 
         $login = self::login($groupData['owner']);
-        $response = GroupController::apiRemoveUser(new Request([
+        $response = GroupController::apiRemoveUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $groupData['group']->alias
@@ -122,7 +122,7 @@ class GroupsTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($groupData['owner']);
-        GroupController::apiRemoveUser(new Request([
+        GroupController::apiRemoveUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $groupData['group']->alias
@@ -139,7 +139,7 @@ class GroupsTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        GroupController::apiRemoveUser(new Request([
+        GroupController::apiRemoveUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $groupData['group']->alias
@@ -163,7 +163,7 @@ class GroupsTest extends OmegaupTestCase {
 
         // Call API
         $login = self::login($owner);
-        $response = GroupController::apiMyList(new Request([
+        $response = GroupController::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -185,13 +185,13 @@ class GroupsTest extends OmegaupTestCase {
 
         // Call API
         $login = self::login($groupData['owner']);
-        $response = GroupController::apiDetails(new Request([
+        $response = GroupController::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias,
         ]));
         $this->assertEquals($groupData['group']->group_id, $response['group']['group_id']);
 
-        $response = GroupController::apiMembers(new Request([
+        $response = GroupController::apiMembers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias
         ]));
@@ -208,7 +208,7 @@ class GroupsTest extends OmegaupTestCase {
         $alias = Utils::CreateRandomString();
 
         $login = self::login($groupData['owner']);
-        $response = GroupController::apiCreateScoreboard(new Request([
+        $response = GroupController::apiCreateScoreboard(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias,
             'name' => $name,
@@ -235,7 +235,7 @@ class GroupsTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $groupData['owner']);
 
         $login = self::login($groupData['owner']);
-        $response = GroupScoreboardController::apiAddContest(new Request([
+        $response = GroupScoreboardController::apiAddContest(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],
@@ -265,7 +265,7 @@ class GroupsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         $login = self::login($groupData['owner']);
-        GroupScoreboardController::apiAddContest(new Request([
+        GroupScoreboardController::apiAddContest(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],
@@ -285,7 +285,7 @@ class GroupsTest extends OmegaupTestCase {
         GroupsFactory::addContestToScoreboard($contestData, $scoreboardData, $groupData);
 
         $login = self::login($groupData['owner']);
-        $response = GroupScoreboardController::apiRemoveContest(new Request([
+        $response = GroupScoreboardController::apiRemoveContest(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],
@@ -334,7 +334,7 @@ class GroupsTest extends OmegaupTestCase {
         }
 
         $login = self::login($groupData['owner']);
-        $response = GroupScoreboardController::apiDetails(new Request([
+        $response = GroupScoreboardController::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],
@@ -360,7 +360,7 @@ class GroupsTest extends OmegaupTestCase {
         }
 
         $login = self::login($groupData['owner']);
-        $response = GroupScoreboardController::apiList(new Request([
+        $response = GroupScoreboardController::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
         ]));
@@ -401,7 +401,7 @@ class GroupsTest extends OmegaupTestCase {
         }
 
         $login = self::login($groupData['owner']);
-        $response = GroupScoreboardController::apiDetails(new Request([
+        $response = GroupScoreboardController::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],

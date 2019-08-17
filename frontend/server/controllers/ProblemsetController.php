@@ -84,19 +84,19 @@ class ProblemsetController extends Controller {
      * @param $r
      * @return Array
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiDetails(
-                new Request([
+                new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'contest_alias' => $r['problemset']['contest_alias']
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
             return CourseController::apiAssignmentDetails(
-                new Request([
+                new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'course' => $r['problemset']['course'],
                     'assignment' => $r['problemset']['assignment'],
@@ -104,7 +104,7 @@ class ProblemsetController extends Controller {
             );
         } elseif ($r['problemset']['type'] == 'Interview') {
             return InterviewController::apiDetails(
-                new Request([
+                new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'interview_alias' => $r['problemset']['interview_alias'],
                 ])
@@ -117,12 +117,12 @@ class ProblemsetController extends Controller {
      * @param $r
      * @return Array
      */
-    public static function apiScoreboard(Request $r) {
+    public static function apiScoreboard(\OmegaUp\Request $r) {
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiScoreboard(
-                new Request([
+                new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
                     'contest_alias' => $r['problemset']['contest_alias']
@@ -130,7 +130,7 @@ class ProblemsetController extends Controller {
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
             return CourseController::apiAssignmentScoreboard(
-                new Request([
+                new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
                     'course' => $r['problemset']['course'],
@@ -145,23 +145,23 @@ class ProblemsetController extends Controller {
     /**
      * Returns the Scoreboard events
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    public static function apiScoreboardEvents(Request $r) {
+    public static function apiScoreboardEvents(\OmegaUp\Request $r) {
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
             return ContestController::apiScoreboardEvents(
-                new Request([
+                new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'contest_alias' => $r['problemset']['contest_alias'],
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
             return CourseController::apiAssignmentScoreboardEvents(
-                new Request([
+                new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'course' => $r['problemset']['course'],
                     'assignment' => $r['problemset']['assignment'],
@@ -174,14 +174,14 @@ class ProblemsetController extends Controller {
     }
 
     /**
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * $r['tokens'][0] = invalid filter
      * $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem)
      * $r['tokens'][2] = Id of entity ($tokens[2])
      * $r['tokens'][3] = Token given by the filter
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    public static function wrapRequest(Request $r) {
+    public static function wrapRequest(\OmegaUp\Request $r) {
         $r->ensureInt('problemset_id');
 
         $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
@@ -189,7 +189,7 @@ class ProblemsetController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
         if ($r['problemset']['type'] == 'Contest') {
-            $request = new Request([
+            $request = new \OmegaUp\Request([
                 'token' => $r['token'],
                 'problemset_id' => $r['problemset_id'],
                 'contest_alias' => $r['problemset']['contest_alias'],

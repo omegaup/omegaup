@@ -57,10 +57,10 @@ class ProblemController extends Controller {
     /**
      * Validates a Create or Update Problem API request
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateCreateOrUpdate(Request $r, $is_update = false) {
+    private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
         $is_required = true;
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->user->username == 'omi') {
@@ -178,7 +178,7 @@ class ProblemController extends Controller {
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws DuplicatedEntryInDatabaseException
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         // Validates request
@@ -269,10 +269,10 @@ class ProblemController extends Controller {
     /**
      * Validates a Rejudge Problem API request
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateRejudge(Request $r) {
+    private static function validateRejudge(\OmegaUp\Request $r) {
         // We need to check problem_alias
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
@@ -295,11 +295,11 @@ class ProblemController extends Controller {
     /**
      * Adds an admin to a problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiAddAdmin(Request $r) {
+    public static function apiAddAdmin(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -330,11 +330,11 @@ class ProblemController extends Controller {
     /**
      * Adds a group admin to a problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiAddGroupAdmin(Request $r) {
+    public static function apiAddGroupAdmin(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -369,11 +369,11 @@ class ProblemController extends Controller {
     /**
      * Adds a tag to a problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiAddTag(Request $r) {
+    public static function apiAddTag(\OmegaUp\Request $r) {
         // Check problem_alias
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         Validators::validateStringNonEmpty($r['name'], 'name');
@@ -427,11 +427,11 @@ class ProblemController extends Controller {
     /**
      * Removes an admin from a problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiRemoveAdmin(Request $r) {
+    public static function apiRemoveAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -463,11 +463,11 @@ class ProblemController extends Controller {
     /**
      * Removes a group admin from a problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiRemoveGroupAdmin(Request $r) {
+    public static function apiRemoveGroupAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -498,11 +498,11 @@ class ProblemController extends Controller {
     /**
      * Removes a tag from a contest
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiRemoveTag(Request $r) {
+    public static function apiRemoveTag(\OmegaUp\Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -539,11 +539,11 @@ class ProblemController extends Controller {
     /**
      * Removes a problem whether user is the creator
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiDelete(Request $r) {
+    public static function apiDelete(\OmegaUp\Request $r) {
         // Authenticate logged user
         self::authenticateRequest($r);
 
@@ -571,10 +571,10 @@ class ProblemController extends Controller {
     /**
      * Returns all problem administrators
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiAdmins(Request $r) {
+    public static function apiAdmins(\OmegaUp\Request $r) {
         // Authenticate request
         self::authenticateRequest($r);
 
@@ -599,10 +599,10 @@ class ProblemController extends Controller {
     /**
      * Returns every tag associated to a given problem.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiTags(Request $r) {
+    public static function apiTags(\OmegaUp\Request $r) {
         // Authenticate request
         self::authenticateRequest($r);
 
@@ -628,10 +628,10 @@ class ProblemController extends Controller {
     /**
      * Rejudge problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      */
-    public static function apiRejudge(Request $r) {
+    public static function apiRejudge(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         self::validateRejudge($r);
@@ -671,10 +671,10 @@ class ProblemController extends Controller {
     /**
      * Update problem contents
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      */
-    public static function apiUpdate(Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         self::validateCreateOrUpdate($r, true /* is update */);
@@ -829,12 +829,12 @@ class ProblemController extends Controller {
     /**
      * Updates loose file
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array The updated file languages
      * @throws \OmegaUp\Exceptions\ApiException
      */
     private static function updateLooseFile(
-        Request $r,
+        \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Problems $problem,
         string $directory,
         string $contents
@@ -885,11 +885,11 @@ class ProblemController extends Controller {
     /**
      * Updates problem statement only
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws \OmegaUp\Exceptions\ApiException
      */
-    public static function apiUpdateStatement(Request $r) {
+    public static function apiUpdateStatement(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['statement'], 'statement');
@@ -903,11 +903,11 @@ class ProblemController extends Controller {
     /**
      * Updates problem solution only
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws \OmegaUp\Exceptions\ApiException
      */
-    public static function apiUpdateSolution(Request $r) {
+    public static function apiUpdateSolution(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
         Validators::validateStringNonEmpty($r['solution'], 'solution');
@@ -974,13 +974,13 @@ class ProblemController extends Controller {
     /**
      * Validate problem Details API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return Array
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
-    private static function validateDetails(Request $r) {
+    private static function validateDetails(\OmegaUp\Request $r) {
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias', false);
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
@@ -1210,10 +1210,10 @@ class ProblemController extends Controller {
     /**
      * Entry point for Problem Download API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws InvalidFilesystemOperationException
      */
-    public static function apiDownload(Request $r) {
+    public static function apiDownload(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         // Validate request
@@ -1234,12 +1234,12 @@ class ProblemController extends Controller {
     /**
      * Validate problem Details API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
-    private static function validateDownload(Request $r) {
+    private static function validateDownload(\OmegaUp\Request $r) {
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -1305,10 +1305,10 @@ class ProblemController extends Controller {
     /**
      * Entry point for Problem Details API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws InvalidFilesystemOperationException
      */
-    public static function apiDetails(Request $r) : array {
+    public static function apiDetails(\OmegaUp\Request $r) : array {
         $r->ensureBool('show_solvers', /*required=*/false);
         $result = self::getValidProblemAndProblemset($r);
         [
@@ -1331,11 +1331,11 @@ class ProblemController extends Controller {
      * Get user. Allow unauthenticated requests if we are not opening a problem
      * inside a contest
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return \OmegaUp\DAO\VO\Problems
      * @throws UnauthorizedException
      */
-    private static function getValidProblemAndProblemset(Request $r) : array {
+    private static function getValidProblemAndProblemset(\OmegaUp\Request $r) : array {
         try {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
@@ -1350,13 +1350,13 @@ class ProblemController extends Controller {
 
     /**
      * Get the extra problem details with all the validations
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @param \OmegaUp\DAO\VO\Problems $problem
      * @param bool $showSolvers
      * @return array
      */
     private static function getProblemDetails(
-        Request $r,
+        \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
         bool $showSolvers
@@ -1392,7 +1392,7 @@ class ProblemController extends Controller {
         );
 
         // Add preferred language of the user.
-        $request = new Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
+        $request = new \OmegaUp\Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
         if (!is_null($r->identity)) {
             $userData = Cache::getFromCacheOrSet(
                 Cache::USER_PROFILE,
@@ -1519,10 +1519,10 @@ class ProblemController extends Controller {
     /**
      * Returns the solution for a problem if conditions are satisfied.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws InvalidFilesystemOperationException
      */
-    public static function apiSolution(Request $r) {
+    public static function apiSolution(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         // Validate request
@@ -1586,11 +1586,11 @@ class ProblemController extends Controller {
     /**
      * Entry point for Problem Versions API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    public static function apiVersions(Request $r) {
+    public static function apiVersions(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
@@ -1633,11 +1633,11 @@ class ProblemController extends Controller {
     /**
      * Change the version of the problem.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    public static function apiSelectVersion(Request $r) {
+    public static function apiSelectVersion(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
@@ -1757,7 +1757,7 @@ class ProblemController extends Controller {
     /**
      * Return a report of which runs would change due to a version change.
      */
-    public static function apiRunsDiff(Request $r) : array {
+    public static function apiRunsDiff(\OmegaUp\Request $r) : array {
         self::authenticateRequest($r);
 
         Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
@@ -1829,12 +1829,12 @@ class ProblemController extends Controller {
     /**
      * Validate problem Details API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
-    private static function validateRuns(Request $r) {
+    private static function validateRuns(\OmegaUp\Request $r) {
         Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Is the problem valid?
@@ -1847,10 +1847,10 @@ class ProblemController extends Controller {
     /**
      * Entry point for Problem runs API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws InvalidFilesystemOperationException
      */
-    public static function apiRuns(Request $r) {
+    public static function apiRuns(\OmegaUp\Request $r) {
         // Get user
         self::authenticateRequest($r);
 
@@ -1921,10 +1921,10 @@ class ProblemController extends Controller {
     /**
      * Entry point for Problem clarifications API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws InvalidFilesystemOperationException
      */
-    public static function apiClarifications(Request $r) {
+    public static function apiClarifications(\OmegaUp\Request $r) {
         // Get user
         self::authenticateRequest($r);
         self::validateRuns($r);
@@ -1957,11 +1957,11 @@ class ProblemController extends Controller {
     /**
      * Stats of a problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws ForbiddenAccessException
      */
-    public static function apiStats(Request $r) {
+    public static function apiStats(\OmegaUp\Request $r) {
         // Get user
         self::authenticateRequest($r);
 
@@ -2065,9 +2065,9 @@ class ProblemController extends Controller {
     /**
      * Validate list request
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    private static function validateList(Request $r) {
+    private static function validateList(\OmegaUp\Request $r) {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
 
@@ -2087,9 +2087,9 @@ class ProblemController extends Controller {
     /**
      * List of public and user's private problems
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
         try {
             self::authenticateRequest($r);
@@ -2192,10 +2192,10 @@ class ProblemController extends Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiAdminList(Request $r) {
+    public static function apiAdminList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         $r->ensureInt('page', null, null, false);
@@ -2237,9 +2237,9 @@ class ProblemController extends Controller {
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiMyList(Request $r) {
+    public static function apiMyList(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
         self::validateList($r);
 
@@ -2273,9 +2273,9 @@ class ProblemController extends Controller {
     /**
      * Returns the best score for a problem
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiBestScore(Request $r) {
+    public static function apiBestScore(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         // Uses same params as apiDetails, except for lang, which is optional
@@ -2340,7 +2340,7 @@ class ProblemController extends Controller {
 
     /**
      * Save language data for a problem.
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return Array
      */
     private static function updateLanguages(\OmegaUp\DAO\VO\Problems $problem) {
@@ -2402,9 +2402,9 @@ class ProblemController extends Controller {
      * Updates the Problem's settings with the values from the request.
      *
      * @param array $problemSettings the original problem settings.
-     * @param Request $r the request
+     * @param \OmegaUp\Request $r the request
      */
-    private static function updateProblemSettings(array &$problemSettings, Request $r) : void {
+    private static function updateProblemSettings(array &$problemSettings, \OmegaUp\Request $r) : void {
         if (!is_null($r['extra_wall_time'])) {
             $problemSettings['limits']['ExtraWallTime'] = (int)$r['extra_wall_time'] . 'ms';
         }
@@ -2441,7 +2441,7 @@ class ProblemController extends Controller {
         }
     }
 
-    public static function getProblemsMineInfoForSmarty(Request $r) : array {
+    public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r) : array {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         return [
@@ -2450,7 +2450,7 @@ class ProblemController extends Controller {
     }
 
     public static function getProblemDetailsForSmarty(
-        Request $r
+        \OmegaUp\Request $r
     ) : array {
         [
             'problem' => $problem,

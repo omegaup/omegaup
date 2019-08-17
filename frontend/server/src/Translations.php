@@ -28,7 +28,7 @@ class Translations {
      * Creates a new instance of Translations.
      */
     private function __construct() {
-        $lang = IdentityController::getPreferredLanguage(new Request());
+        $lang = IdentityController::getPreferredLanguage(new \OmegaUp\Request());
         $filename = OMEGAUP_ROOT . "/templates/{$lang}.lang";
         /** @var array<int, string> $match */
         foreach (new \RegexIterator(

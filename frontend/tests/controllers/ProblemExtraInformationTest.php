@@ -16,7 +16,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
         ]));
         // Annonymus user is able to see the problem
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
         ]);
         $result = ProblemController::getProblemDetailsForSmarty($r);
@@ -46,7 +46,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
 
         // Problem author should get the problem as unlocked
         $login = self::login($problemData['author']);
-        $result = ProblemController::getProblemDetailsForSmarty(new Request([
+        $result = ProblemController::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
@@ -55,7 +55,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         // Normal user should see the problem as locked
         $user = UserFactory::createUser();
         $login = self::login($user);
-        $result = ProblemController::getProblemDetailsForSmarty(new Request([
+        $result = ProblemController::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
@@ -65,7 +65,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip'
         ]));
-        $result = ProblemController::getProblemDetailsForSmarty(new Request([
+        $result = ProblemController::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));

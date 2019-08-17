@@ -108,7 +108,7 @@ class ProblemsFactory {
             $params = new ProblemParams($params);
         }
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'title' => $params['title'],
             'problem_alias' => substr(
                 preg_replace(
@@ -206,7 +206,7 @@ class ProblemsFactory {
 
     public static function addAdminUser($problemData, $user) {
         // Prepare our request
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['problem_alias'] = $problemData['request']['problem_alias'];
         $r['usernameOrEmail'] = $user->username;
 
@@ -222,7 +222,7 @@ class ProblemsFactory {
 
     public static function addGroupAdmin($problemData, \OmegaUp\DAO\VO\Groups $group) {
         // Prepare our request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'group' => $group->alias,
         ]);
@@ -237,7 +237,7 @@ class ProblemsFactory {
 
     public static function addTag($problemData, $tag, $public) {
         // Prepare our request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'name' => $tag,
             'public' => $public

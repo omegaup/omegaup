@@ -15,7 +15,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Prepare request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'contest_alias' => $contestData['request']['alias'],
@@ -40,7 +40,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Prepare request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'contest_alias' => $contestData['request']['alias'],
@@ -51,7 +51,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         unset($login);
 
         // Prepare request for an update
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
@@ -88,7 +88,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Prepare request for remove one admin
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'contest_alias' => $contestData['request']['alias'],
@@ -115,7 +115,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Prepare request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group' => $groupData['request']['alias'],
             'contest_alias' => $contestData['request']['alias'],
@@ -143,7 +143,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Prepare request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group' => $groupData['request']['alias'],
             'contest_alias' => $contestData['request']['alias'],
@@ -154,7 +154,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         unset($login);
 
         // Prepare request for an update
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
@@ -194,7 +194,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Prepare request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group' => $groupData['request']['alias'],
             'contest_alias' => $contestData['request']['alias'],
@@ -210,7 +210,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
 
         // Prepare request for remove the group
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group' => $groupData['request']['alias'],
             'contest_alias' => $contestData['request']['alias'],

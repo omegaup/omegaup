@@ -48,7 +48,7 @@ class QualityNominationFactory {
     }
 
     public static function createQualityNomination($login, $problemAlias, $type, $contents) {
-        $request = new Request([
+        $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemAlias,
             'nomination' => $type,

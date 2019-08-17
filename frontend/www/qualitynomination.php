@@ -5,13 +5,13 @@ $qualitynomination_id = isset($_GET['qualitynomination_id']) ? $_GET['qualitynom
 
 try {
     if ($qualitynomination_id != null) {
-        $payload = QualityNominationController::apiDetails(new Request([
+        $payload = QualityNominationController::apiDetails(new \OmegaUp\Request([
         'qualitynomination_id' => $qualitynomination_id
         ]));
         $template = '../templates/quality.nomination.details.tpl';
     } else {
         $payload = [
-        'nominations' => QualityNominationController::apiList(new Request([]))['nominations'],
+        'nominations' => QualityNominationController::apiList(new \OmegaUp\Request([]))['nominations'],
         'myView' => false,
         ];
         if ($session['valid']) {

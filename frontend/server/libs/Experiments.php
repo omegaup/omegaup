@@ -7,7 +7,7 @@
  * instance, if an API that is using the 'foo' experiment, it must contain the
  * following code at the beginning of the API function.
  *
- *     public static function apiFoo(Request $r) {
+ *     public static function apiFoo(\OmegaUp\Request $r) {
  *         $experiments->ensureEnabled(Experiments::FOO);
  *         //...
  *     }

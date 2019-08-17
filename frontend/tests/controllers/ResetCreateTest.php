@@ -4,7 +4,7 @@ class ResetCreateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testShouldRequireEmailParameter() {
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $response = ResetController::apiCreate($r);
     }
 
@@ -13,7 +13,7 @@ class ResetCreateTest extends OmegaupTestCase {
      */
     public function testShouldRefuseNotRegisteredEmailAddresses() {
         $email = Utils::CreateRandomString() . '@mail.com';
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $response = ResetController::apiCreate($r);
     }
 
@@ -21,7 +21,7 @@ class ResetCreateTest extends OmegaupTestCase {
         $message = null;
         try {
             $user_data = UserFactory::generateUser(false);
-            $r = new Request($user_data);
+            $r = new \OmegaUp\Request($user_data);
             ResetController::apiCreate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
@@ -31,7 +31,7 @@ class ResetCreateTest extends OmegaupTestCase {
 
     public function testShouldRefuseMultipleRequestsInShortInterval() {
         $user_data = UserFactory::generateUser();
-        $r = new Request(['email' => $user_data['email']]);
+        $r = new \OmegaUp\Request(['email' => $user_data['email']]);
         $response = ResetController::apiCreate($r);
 
         try {

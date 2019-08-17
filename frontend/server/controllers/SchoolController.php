@@ -9,9 +9,9 @@ class SchoolController extends Controller {
     /**
      * Gets a list of schools
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         $param = '';
@@ -40,10 +40,10 @@ class SchoolController extends Controller {
     /**
      * Api to create new school
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         Validators::validateStringNonEmpty($r['name'], 'name');
@@ -84,10 +84,10 @@ class SchoolController extends Controller {
     /**
      * Ensures that all the numeric parameters have valid values.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    private static function validateRankDetails(Request $r) : array {
+    private static function validateRankDetails(\OmegaUp\Request $r) : array {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', 5, 100, false);
         $r->ensureInt('start_time', null, null, false);
@@ -120,10 +120,10 @@ class SchoolController extends Controller {
     /**
      * Returns rank of best schools in last month
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiRank(Request $r) {
+    public static function apiRank(\OmegaUp\Request $r) {
         [
             'offset' => $offset,
             'rowcount' => $rowCount,

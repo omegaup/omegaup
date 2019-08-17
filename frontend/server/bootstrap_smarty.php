@@ -25,7 +25,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign('OMEGAUP_GA_TRACK', 0);
     }
 
-    $identityRequest = new Request($_REQUEST);
+    $identityRequest = new \OmegaUp\Request($_REQUEST);
     $session = SessionController::apiCurrentSession($identityRequest)['session'];
     if ($session['valid']) {
         $smarty->assign('LOGGED_IN', '1');

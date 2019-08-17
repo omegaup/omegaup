@@ -28,12 +28,6 @@ class IdentityController extends Controller {
 
     /**
      * Tests a if a password is valid for a given identity.
-     *
-     * @param \OmegaUp\DAO\VO\Identities $identity    The identity.
-     * @param string     $password    The password.
-     * @return bool                   Whether the password is valid.
-     * @throws LoginDisabledException When the identity is not allowed to login
-     *                                using a password.
      */
     public static function testPassword(\OmegaUp\DAO\VO\Identities $identity, string $password) : bool {
         if (is_null($identity->password)) {
@@ -54,11 +48,11 @@ class IdentityController extends Controller {
     /**
      * Entry point for Create an Identity API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws DuplicatedEntryInDatabaseException
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) : array {
         global $experiments;
         $experiments->ensureEnabled(Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
@@ -96,13 +90,8 @@ class IdentityController extends Controller {
 
     /**
      * Entry point for Create bulk Identities API
-     *
-     * @param Request $r
-     * @return array
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws DuplicatedEntryInDatabaseException
      */
-    public static function apiBulkCreate(Request $r) {
+    public static function apiBulkCreate(\OmegaUp\Request $r) : array {
         global $experiments;
         $experiments->ensureEnabled(Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
@@ -138,11 +127,7 @@ class IdentityController extends Controller {
         ];
     }
 
-    /**
-     * @param Request $r
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     */
-    private static function validateGroupOwnership(Request $r) {
+    private static function validateGroupOwnership(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         if (!Authorization::isGroupIdentityCreator($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
@@ -184,8 +169,6 @@ class IdentityController extends Controller {
     /**
      * Save object Identities in DB, and add user into group.
      * This function is called inside a transaction.
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     * @param $groupId
      */
     private static function saveIdentityGroup(\OmegaUp\DAO\VO\Identities $identity, $groupId) {
         try {
@@ -210,10 +193,10 @@ class IdentityController extends Controller {
     /**
      * Entry point for Update an Identity API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiUpdate(Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r) {
         global $experiments;
         $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
@@ -246,11 +229,11 @@ class IdentityController extends Controller {
     /**
      * Entry point for change passowrd of an identity
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws DuplicatedEntryInDatabaseException
      */
-    public static function apiChangePassword(Request $r) {
+    public static function apiChangePassword(\OmegaUp\Request $r) {
         global $experiments;
         $experiments->ensureEnabled(Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
@@ -273,10 +256,10 @@ class IdentityController extends Controller {
     }
 
     /**
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    private static function validateUpdateRequest(Request $r) {
+    private static function validateUpdateRequest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         if (!Authorization::isGroupIdentityCreator($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
@@ -348,13 +331,13 @@ class IdentityController extends Controller {
      * Get identity profile from cache
      * Requires $r["identity"] to be an actual Identity
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @param array $response
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return type
      */
     public static function getProfile(
-        Request $r,
+        \OmegaUp\Request $r,
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
         bool $omitRank
@@ -433,7 +416,7 @@ class IdentityController extends Controller {
      *
      * @return String
      */
-    public static function getPreferredLanguage(Request $r) {
+    public static function getPreferredLanguage(\OmegaUp\Request $r) {
         // for quick debugging
         if (isset($_GET['lang'])) {
             return self::convertToSupportedLanguage($_GET['lang']);

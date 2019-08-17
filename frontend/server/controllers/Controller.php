@@ -21,12 +21,12 @@ class Controller {
      * need to ensure that the request is made by the main identity of the
      * logged user
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @param bool $requireMainUserIdentity
      * @throws UnauthorizedException
      */
     protected static function authenticateRequest(
-        Request $r,
+        \OmegaUp\Request $r,
         bool $requireMainUserIdentity = false
     ) {
         $r->user = null;
@@ -53,9 +53,9 @@ class Controller {
      * This is to allow unauthenticated access to APIs that work for both
      * current authenticated user and a targeted user (via $r["username"])
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    protected static function authenticateOrAllowUnauthenticatedRequest(Request $r) {
+    protected static function authenticateOrAllowUnauthenticatedRequest(\OmegaUp\Request $r) {
         try {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
@@ -73,11 +73,11 @@ class Controller {
      *
      * Request must be authenticated before this function is called.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return \OmegaUp\DAO\VO\Users
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    protected static function resolveTargetUser(Request $r) {
+    protected static function resolveTargetUser(\OmegaUp\Request $r) {
         // By default use current user
         $user = $r->user;
 
@@ -100,11 +100,11 @@ class Controller {
      *
      * Request must be authenticated before this function is called.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return Identity
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    protected static function resolveTargetIdentity(Request $r) {
+    protected static function resolveTargetIdentity(\OmegaUp\Request $r) {
         // By default use current identity
         $identity = $r->identity;
 
@@ -135,13 +135,13 @@ class Controller {
      *     it into the proper form that should be stored in $object. For example:
      *     function($value) { return gmdate('Y-m-d H:i:s', $value); }
      *
-     * @param Request $request
+     * @param \OmegaUp\Request $request
      * @param object $object
      * @param array $properties
      * @return bool True if there were changes to any property marked as 'important'.
      */
     protected static function updateValueProperties(
-        Request $request,
+        \OmegaUp\Request $request,
         object $object,
         array $properties
     ) : bool {

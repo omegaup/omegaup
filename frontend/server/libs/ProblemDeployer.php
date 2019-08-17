@@ -198,7 +198,7 @@ class ProblemDeployer {
     /**
      * Updates loose files.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws ProblemDeploymentFailedException
      */
     public function commitLooseFiles($message, $user, $blobUpdate) {

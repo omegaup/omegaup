@@ -13,7 +13,7 @@ class RunsFactory {
      * @param type $problemData
      * @param type $contestData
      * @param type $contestant
-     * @return Request
+     * @return \OmegaUp\Request
      */
     private static function createRequestCommon($problemData, $contestData, $contestant, ScopedLoginToken $login = null) {
         if ($login == null) {
@@ -23,7 +23,7 @@ class RunsFactory {
 
         // Build request
         if (!is_null($contestData)) {
-            return new Request([
+            return new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -32,7 +32,7 @@ class RunsFactory {
             ]);
         }
 
-        return new Request([
+        return new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c',
@@ -46,7 +46,7 @@ class RunsFactory {
      * @param type $problemData
      * @param type $courseAssignmentData
      * @param type $participant
-     * @return Request
+     * @return \OmegaUp\Request
      */
     private static function createRequestCourseAssignmentCommon(
         $problemData,
@@ -60,7 +60,7 @@ class RunsFactory {
         }
         // Build request
         if (!is_null($courseAssignmentData)) {
-            return new Request([
+            return new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problemset_id' => $courseAssignmentData['assignment']->problemset_id,
                 'problem_alias' => $problemData['problem']->alias,
@@ -69,7 +69,7 @@ class RunsFactory {
             ]);
         }
 
-        return new Request([
+        return new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['problem']->alias,
             'language' => 'c',

@@ -8,7 +8,7 @@ class Broadcaster {
         $this->log = Logger::getLogger('broadcaster');
     }
 
-    public function broadcastClarification(Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
+    public function broadcastClarification(\OmegaUp\Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
         try {
             $message = json_encode([
                 'message' => '/clarification/update/',
@@ -40,7 +40,7 @@ class Broadcaster {
         $this->sendClarificationEmail($r, $clarification->time);
     }
 
-    protected function sendClarificationEmail(Request $r) {
+    protected function sendClarificationEmail(\OmegaUp\Request $r) {
         if (!is_null($r['clarification']->answer) ||
                 !$r['problem']->email_clarifications) {
             return;

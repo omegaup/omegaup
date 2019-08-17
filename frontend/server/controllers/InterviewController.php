@@ -1,7 +1,7 @@
 <?php
 
 class InterviewController extends Controller {
-    private static function validateCreateOrUpdate(Request $r, $is_update = false) {
+    private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
@@ -16,7 +16,7 @@ class InterviewController extends Controller {
         Validators::validateValidAlias($r['alias'], 'alias', $is_required);
     }
 
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -71,7 +71,7 @@ class InterviewController extends Controller {
         return ['status' => 'ok'];
     }
 
-    public static function apiAddUsers(Request $r) {
+    public static function apiAddUsers(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
             throw new ForbiddenAccessException('lockdown');
         }
@@ -83,7 +83,7 @@ class InterviewController extends Controller {
         $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
 
         foreach ($usersToAdd as $addThisUser) {
-            $requestToInternal = new Request($r);
+            $requestToInternal = new \OmegaUp\Request($r);
             $requestToInternal['usernameOrEmail'] = $addThisUser;
             $requestToInternal->user = $r->user;
             $requestToInternal->identity = $r->identity;
@@ -118,7 +118,7 @@ class InterviewController extends Controller {
             // create a new user
             self::$log->info('Could not find user, this must be a new email, registering: ' . $r['usernameOrEmail']);
 
-            $newUserRequest = new Request($r);
+            $newUserRequest = new \OmegaUp\Request($r);
             $newUserRequest['email'] = $r['usernameOrEmail'];
             $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
             $newUserRequest['password'] = SecurityTools::randomString(8);
@@ -183,7 +183,7 @@ class InterviewController extends Controller {
         return true;
     }
 
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
@@ -225,7 +225,7 @@ class InterviewController extends Controller {
         ];
     }
 
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         $interviews = null;
@@ -236,7 +236,7 @@ class InterviewController extends Controller {
         ];
     }
 
-    public static function showIntro(Request $r) {
+    public static function showIntro(\OmegaUp\Request $r) {
         $contest = ContestController::validateContest($r['contest_alias'] ?? '');
         // TODO: Arreglar esto para que Problemsets se encargue de obtener
         //       la info correcta
