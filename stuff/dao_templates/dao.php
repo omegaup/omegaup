@@ -39,18 +39,11 @@ abstract class {{ table.class_name }}DAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO {{ table.name }} ({{ table.columns|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|listformat('?', table=table)|join(', ') }});';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
   {%- for column in table.columns %}
     {%- if 'timestamp' in column.type or 'datetime' in column.type %}
             DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
-    {%- elif column.php_type in ('?bool', '?int') %}
+    {%- elif column.php_type in ('?bool', '?int') and not column.primary_key %}
             !is_null(${{ table.name }}->{{ column.name }}) ? intval(${{ table.name }}->{{ column.name }}) : null,
     {%- elif column.php_type == '?float' %}
             !is_null(${{ table.name }}->{{ column.name }}) ? floatval(${{ table.name }}->{{ column.name }}) : null,

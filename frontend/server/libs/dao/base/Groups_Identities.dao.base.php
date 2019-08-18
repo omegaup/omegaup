@@ -38,16 +38,9 @@ abstract class GroupsIdentitiesDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Groups_Identities->group_id) ? intval($Groups_Identities->group_id) : null,
-            !is_null($Groups_Identities->identity_id) ? intval($Groups_Identities->identity_id) : null,
+            $Groups_Identities->group_id,
+            $Groups_Identities->identity_id,
             !is_null($Groups_Identities->share_user_information) ? intval($Groups_Identities->share_user_information) : null,
             !is_null($Groups_Identities->privacystatement_consent_id) ? intval($Groups_Identities->privacystatement_consent_id) : null,
             $Groups_Identities->accept_teacher,

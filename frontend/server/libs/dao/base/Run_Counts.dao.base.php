@@ -38,13 +38,6 @@ abstract class RunCountsDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
             $Run_Counts->date,
             intval($Run_Counts->total),

@@ -38,16 +38,9 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? intval($Groups_Scoreboards_Problemsets->group_scoreboard_id) : null,
-            !is_null($Groups_Scoreboards_Problemsets->problemset_id) ? intval($Groups_Scoreboards_Problemsets->problemset_id) : null,
+            $Groups_Scoreboards_Problemsets->group_scoreboard_id,
+            $Groups_Scoreboards_Problemsets->problemset_id,
             intval($Groups_Scoreboards_Problemsets->only_ac),
             intval($Groups_Scoreboards_Problemsets->weight),
         ];

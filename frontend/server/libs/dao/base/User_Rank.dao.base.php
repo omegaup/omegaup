@@ -38,15 +38,8 @@ abstract class UserRankDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO User_Rank (`user_id`, `rank`, `problems_solved_count`, `score`, `username`, `name`, `country_id`, `state_id`, `school_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($User_Rank->user_id) ? intval($User_Rank->user_id) : null,
+            $User_Rank->user_id,
             !is_null($User_Rank->rank) ? intval($User_Rank->rank) : null,
             intval($User_Rank->problems_solved_count),
             floatval($User_Rank->score),

@@ -38,17 +38,10 @@ abstract class ProblemsetProblemOpenedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Problemset_Problem_Opened->problemset_id) ? intval($Problemset_Problem_Opened->problemset_id) : null,
-            !is_null($Problemset_Problem_Opened->problem_id) ? intval($Problemset_Problem_Opened->problem_id) : null,
-            !is_null($Problemset_Problem_Opened->identity_id) ? intval($Problemset_Problem_Opened->identity_id) : null,
+            $Problemset_Problem_Opened->problemset_id,
+            $Problemset_Problem_Opened->problem_id,
+            $Problemset_Problem_Opened->identity_id,
             DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         global $conn;

@@ -38,16 +38,9 @@ abstract class ProblemViewedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Problem_Viewed->problem_id) ? intval($Problem_Viewed->problem_id) : null,
-            !is_null($Problem_Viewed->identity_id) ? intval($Problem_Viewed->identity_id) : null,
+            $Problem_Viewed->problem_id,
+            $Problem_Viewed->identity_id,
             DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         global $conn;
