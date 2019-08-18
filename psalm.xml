@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <psalm
     totallyTyped="true"
-		autoloader="frontend/server/bootstrap.php"
+    autoloader="frontend/server/bootstrap.php"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
@@ -23,5 +23,7 @@
     <stubs>
        <!-- For PASSWORD_ARGON2ID -->
        <file name="vendor/jetbrains/phpstorm-stubs/standard/password.php" />
+
+       <file name="frontend/server/libs/third_party/stubs/paragonie_sodium_compat.php" />
     </stubs>
 </psalm>

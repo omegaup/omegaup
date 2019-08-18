@@ -379,8 +379,8 @@ class CourseController extends Controller {
             $problemset = new \OmegaUp\DAO\VO\Problemsets([
                 'acl_id' => $assignment->acl_id,
                 'type' => 'Assignment',
-                'scoreboard_url' => SecurityTools::randomString(30),
-                'scoreboard_url_admin' => SecurityTools::randomString(30),
+                'scoreboard_url' => \OmegaUp\SecurityTools::randomString(30),
+                'scoreboard_url_admin' => \OmegaUp\SecurityTools::randomString(30),
             ]);
 
             ProblemsetsDAO::create($problemset);
