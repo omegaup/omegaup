@@ -146,8 +146,7 @@ class ContestsDAO extends ContestsDAOBase {
     final public static function getByAlias(string $alias) : ?Contests {
         $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
 
-        global $conn;
-        $rs = $conn->GetRow($sql, [$alias]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($rs)) {
             return null;
         }
@@ -158,8 +157,7 @@ class ContestsDAO extends ContestsDAOBase {
     final public static function getByTitle($title) {
         $sql = 'SELECT * FROM Contests WHERE title = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$title]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$title]);
 
         $contests = [];
         foreach ($rs as $row) {
@@ -183,8 +181,7 @@ class ContestsDAO extends ContestsDAOBase {
                 WHERE c.alias = ? LIMIT 1;';
         $params = [$alias];
 
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -193,8 +190,7 @@ class ContestsDAO extends ContestsDAOBase {
 
     final public static function getByProblemset($problemset_id) {
         $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
-        global $conn;
-        $row = $conn->GetRow($sql, [$problemset_id]);
+        $row = MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
         if (empty($row)) {
             return null;
         }
@@ -215,8 +211,7 @@ class ContestsDAO extends ContestsDAOBase {
             admission_mode = \'private\' and a.owner_id = ?;';
         $params = [$user->user_id];
 
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
 
         if (!array_key_exists('total', $rs)) {
             return 0;
@@ -261,8 +256,7 @@ class ContestsDAO extends ContestsDAOBase {
                 contest_id DESC;';
         $params = [$identity_id];
 
-        global $conn;
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -320,8 +314,7 @@ class ContestsDAO extends ContestsDAOBase {
             $pageSize,
         ];
 
-        global $conn;
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -349,16 +342,15 @@ class ContestsDAO extends ContestsDAOBase {
             INNER JOIN
                 Problemsets ps ON ps.problemset_id = c.problemset_id';
 
-        global $conn;
         if (!is_null($order)) {
-            $sql .= ' ORDER BY `c`.`' . $conn->escape($order) . '` ' .
+            $sql .= ' ORDER BY `c`.`' . MySQLConnection::getInstance()->escape($order) . '` ' .
                     ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
             $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . (int)$pageSize;
         }
 
-        return $conn->GetAll($sql);
+        return MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -392,8 +384,7 @@ class ContestsDAO extends ContestsDAOBase {
             (int)$pageSize,
         ];
 
-        global $conn;
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -434,7 +425,6 @@ class ContestsDAO extends ContestsDAOBase {
                 recommended DESC,
                 finish_time DESC
             LIMIT ?, ?;";
-        global $conn;
         $params[] = $identity_id;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
@@ -445,7 +435,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = (int)$offset;
         $params[] = (int)$pageSize;
 
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -479,7 +469,6 @@ class ContestsDAO extends ContestsDAOBase {
                 `contest_id` DESC
             LIMIT ?, ?;";
 
-        global $conn;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
@@ -489,7 +478,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = (int)$offset;
         $params[] = (int)$pageSize;
 
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -513,7 +502,6 @@ class ContestsDAO extends ContestsDAOBase {
      * Todos los concursos públicos.
      *
      *
-     * @global type $conn
      * @param int $identity_id
      * @param int $pagina
      * @param int $renglones_por_pagina
@@ -668,8 +656,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = (int)$offset;
         $params[] = (int)$renglones_por_pagina;
-        global $conn;
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function getAllPublicContests(
@@ -704,7 +691,6 @@ class ContestsDAO extends ContestsDAOBase {
                 LIMIT ?, ?
                 ";
 
-        global $conn;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
@@ -713,7 +699,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = (int)$offset;
         $params[] = (int)$renglones_por_pagina;
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function getAllContests(
@@ -744,7 +730,6 @@ class ContestsDAO extends ContestsDAOBase {
                 LIMIT ?, ?
                 ";
 
-        global $conn;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
@@ -753,7 +738,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = (int)$offset;
         $params[] = (int)$renglones_por_pagina;
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     public static function getContestForProblemset($problemset_id) {
@@ -776,10 +761,9 @@ class ContestsDAO extends ContestsDAOBase {
                 LIMIT 1
                 ';
 
-        global $conn;
         $params = [$problemset_id];
 
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             throw new NotFoundException('problemsetNotFound');
         }
@@ -860,9 +844,7 @@ class ContestsDAO extends ContestsDAOBase {
                 c.contest_id = ?;
         ';
 
-        global $conn;
-
-        return $conn->GetAll($sql, [$contestId]);
+        return MySQLConnection::getInstance()->GetAll($sql, [$contestId]);
     }
 
     public static function requestsUserInformation($contestId) {
@@ -876,9 +858,7 @@ class ContestsDAO extends ContestsDAOBase {
             LIMIT 1;
         ';
 
-        global $conn;
-
-        $requestsUsersInfo = $conn->GetOne($sql, [$contestId]);
+        $requestsUsersInfo = MySQLConnection::getInstance()->GetOne($sql, [$contestId]);
 
         return $requestsUsersInfo == 'yes' || $requestsUsersInfo == 'optional';
     }

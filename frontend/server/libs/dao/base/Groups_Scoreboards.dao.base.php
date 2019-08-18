@@ -35,9 +35,8 @@ abstract class GroupsScoreboardsDAOBase {
             $Groups_Scoreboards->description,
             (int)$Groups_Scoreboards->group_scoreboard_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -51,8 +50,7 @@ abstract class GroupsScoreboardsDAOBase {
     final public static function getByPK(int $group_scoreboard_id) : ?GroupsScoreboards {
         $sql = 'SELECT `Groups_Scoreboards`.`group_scoreboard_id`, `Groups_Scoreboards`.`group_id`, `Groups_Scoreboards`.`create_time`, `Groups_Scoreboards`.`alias`, `Groups_Scoreboards`.`name`, `Groups_Scoreboards`.`description` FROM Groups_Scoreboards WHERE (group_scoreboard_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -78,10 +76,9 @@ abstract class GroupsScoreboardsDAOBase {
     final public static function delete(GroupsScoreboards $Groups_Scoreboards) : void {
         $sql = 'DELETE FROM `Groups_Scoreboards` WHERE group_scoreboard_id = ?;';
         $params = [$Groups_Scoreboards->group_scoreboard_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -112,15 +109,14 @@ abstract class GroupsScoreboardsDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Groups_Scoreboards`.`group_scoreboard_id`, `Groups_Scoreboards`.`group_id`, `Groups_Scoreboards`.`create_time`, `Groups_Scoreboards`.`alias`, `Groups_Scoreboards`.`name`, `Groups_Scoreboards`.`description` from Groups_Scoreboards';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new GroupsScoreboards($row);
         }
         return $allData;
@@ -145,13 +141,12 @@ abstract class GroupsScoreboardsDAOBase {
             $Groups_Scoreboards->name,
             $Groups_Scoreboards->description,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Groups_Scoreboards->group_scoreboard_id = $conn->Insert_ID();
+        $Groups_Scoreboards->group_scoreboard_id = MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

@@ -23,7 +23,6 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      * Gets the users that solved the most problems during the provided
      * time period.
      *
-     * @global type $conn
      * @param string (date) $startTime
      * @param string (date) $endTime
      * @return null|Users
@@ -93,8 +92,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $val = [$startTime, $endTime, $endTime];
 
-        global $conn;
-        $results = $conn->getAll($sql, $val);
+        $results = MySQLConnection::getInstance()->getAll($sql, $val);
         if (empty($results)) {
             return null;
         }
@@ -125,8 +123,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
         ';
 
-        global $conn;
-        $rs = $conn->GetAll($sql);
+        $rs = MySQLConnection::getInstance()->GetAll($sql);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = $row;
@@ -163,8 +160,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
           LIMIT 100
         ';
-        global $conn;
-        return $conn->getAll($sql, [$date]);
+        return MySQLConnection::getInstance()->getAll($sql, [$date]);
     }
 
     /**
@@ -188,8 +184,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 1
         ';
 
-        global $conn;
-        $rs = $conn->GetRow($sql, []);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, []);
         if (empty($rs)) {
             return false;
         }
@@ -206,8 +201,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                     `time` = ?
                 AND
                     `selected_by` ' . $clause . ';';
-        global $conn;
-        $rs = $conn->GetAll($sql, [$time]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -224,8 +218,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$time]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {

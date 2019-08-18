@@ -26,8 +26,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             $acl_id,
         ];
 
-        global $conn;
-        $admins = $conn->GetAll($sql, $params);
+        $admins = MySQLConnection::getInstance()->GetAll($sql, $params);
 
         for ($i = 0; $i < count($admins); $i++) {
             if ($admins[$i]['acl'] == Authorization::SYSTEM_ACL) {
@@ -57,8 +56,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             Authorization::SYSTEM_ACL,
             $acl_id,
         ];
-        global $conn;
-        return $conn->GetOne($sql, $params);
+        return MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     public static function isContestant($identity_id, $acl_id) {
@@ -76,8 +74,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             Authorization::CONTESTANT_ROLE,
             $acl_id,
         ];
-        global $conn;
-        return $conn->GetOne($sql, $params);
+        return MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     public static function getContestAdmins(Contests $contest) {
@@ -108,10 +105,9 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             $identity_id,
             Authorization::SYSTEM_ACL,
         ];
-        global $conn;
 
         $roles = [];
-        foreach ($conn->GetAll($sql, $params) as $role) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
             $roles[] = $role['name'];
         }
         return $roles;

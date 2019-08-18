@@ -26,8 +26,7 @@ class RolesDAO extends RolesDAOBase {
                 WHERE
                     name = ?';
 
-        global $conn;
-        $row = $conn->GetRow($sql, [$name]);
+        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }

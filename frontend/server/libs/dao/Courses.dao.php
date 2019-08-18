@@ -11,14 +11,12 @@ include('base/Courses.vo.base.php');
   */
 class CoursesDAO extends CoursesDAOBase {
     public static function findByName($name) {
-        global  $conn;
-
         $sql = "SELECT DISTINCT c.*
                 FROM Courses c
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        $resultRows = $conn->GetAll($sql, [$name]);
+        $resultRows = MySQLConnection::getInstance()->GetAll($sql, [$name]);
         $finalResult = [];
 
         foreach ($resultRows as $row) {
@@ -33,8 +31,6 @@ class CoursesDAO extends CoursesDAOBase {
       * that have not started, if not an admin.
       **/
     public static function getAllAssignments($alias, $isAdmin) {
-        global  $conn;
-
         // Non-admins should not be able to see assignments that have not
         // started.
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
@@ -58,7 +54,7 @@ class CoursesDAO extends CoursesDAOBase {
             ORDER BY
                 start_time;";
 
-        $rs = $conn->GetAll($sql, [$alias]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
         foreach ($rs as $row) {
@@ -73,7 +69,6 @@ class CoursesDAO extends CoursesDAOBase {
     }
 
     public static function getCoursesForStudent($identity_id) {
-        global  $conn;
         $sql = 'SELECT c.*
                 FROM Courses c
                 INNER JOIN (
@@ -84,7 +79,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        $rs = $conn->GetAll($sql, [$identity_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$identity_id]);
         $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
@@ -99,8 +94,6 @@ class CoursesDAO extends CoursesDAOBase {
      * @return Array Students data
      */
     public static function getStudentsInCourseWithProgressPerAssignment($course_id, $group_id) {
-        global  $conn;
-
         $sql = 'SELECT i.username, i.name, pr.alias as assignment_alias, pr.assignment_score
                 FROM Groups g
                 INNER JOIN Groups_Identities gi
@@ -128,7 +121,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) pr
                 ON pr.identity_id = i.identity_id';
 
-        $rs = $conn->GetAll($sql, [$group_id, $course_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$group_id, $course_id]);
         $progress = [];
         foreach ($rs as $row) {
             $username = $row['username'];
@@ -160,8 +153,6 @@ class CoursesDAO extends CoursesDAOBase {
      * @return Array Students data
      */
     public static function getAssignmentsProgress($course_id, $identity_id) {
-        global  $conn;
-
         $sql = 'SELECT a.alias as assignment, IFNULL(pr.total_score, 0) as score, a.max_points as max_score
                 FROM Assignments a
                 LEFT JOIN ( -- we want a score even if there are no submissions yet
@@ -186,7 +177,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ON a.assignment_id = pr.assignment_id
                 where a.course_id = ?';
 
-        $rs = $conn->GetAll($sql, [$course_id, $identity_id, $course_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$course_id, $identity_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {
@@ -246,8 +237,7 @@ class CoursesDAO extends CoursesDAOBase {
             (int)$pageSize,
         ];
 
-        global $conn;
-        $rs = $conn->GetAll($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
@@ -284,8 +274,7 @@ class CoursesDAO extends CoursesDAOBase {
             (int)$pageSize,
         ];
 
-        global $conn;
-        $rs = $conn->GetAll($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
@@ -298,8 +287,7 @@ class CoursesDAO extends CoursesDAOBase {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
         $params = [$alias];
 
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -311,8 +299,7 @@ class CoursesDAO extends CoursesDAOBase {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
         $params = [$assignmentAlias, $course->course_id];
 
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -335,10 +322,9 @@ class CoursesDAO extends CoursesDAOBase {
 
         $params = [$assignment_alias, $course->course_id];
 
-        global $conn;
-        $conn->Execute($sql, $params);
+        MySQLConnection::getInstance()->Execute($sql, $params);
 
-        return $conn->Affected_Rows();
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getSharingInformation($identity_id, Courses $course, Groups $group) {
@@ -363,8 +349,7 @@ class CoursesDAO extends CoursesDAOBase {
             $identity_id,
             $group->group_id,
         ];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }

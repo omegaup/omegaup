@@ -44,9 +44,8 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
             intval($Groups_Scoreboards_Problemsets->only_ac),
             intval($Groups_Scoreboards_Problemsets->weight),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -64,9 +63,8 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
             is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
             is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -80,8 +78,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
     final public static function getByPK(?int $group_scoreboard_id, ?int $problemset_id) : ?GroupsScoreboardsProblemsets {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` FROM Groups_Scoreboards_Problemsets WHERE (group_scoreboard_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$group_scoreboard_id, $problemset_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -107,10 +104,9 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
     final public static function delete(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : void {
         $sql = 'DELETE FROM `Groups_Scoreboards_Problemsets` WHERE group_scoreboard_id = ? AND problemset_id = ?;';
         $params = [$Groups_Scoreboards_Problemsets->group_scoreboard_id, $Groups_Scoreboards_Problemsets->problemset_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -141,15 +137,14 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Groups_Scoreboards_Problemsets`.`group_scoreboard_id`, `Groups_Scoreboards_Problemsets`.`problemset_id`, `Groups_Scoreboards_Problemsets`.`only_ac`, `Groups_Scoreboards_Problemsets`.`weight` from Groups_Scoreboards_Problemsets';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new GroupsScoreboardsProblemsets($row);
         }
         return $allData;
@@ -173,9 +168,8 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
             (int)$Groups_Scoreboards_Problemsets->only_ac,
             (int)$Groups_Scoreboards_Problemsets->weight,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

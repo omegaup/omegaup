@@ -86,8 +86,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                     1;';
         $params = [$problemset_id];
 
-        global $conn;
-        $problemset = $conn->GetRow($sql, $params);
+        $problemset = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($problemset)) {
             return null;
         }
@@ -124,7 +123,6 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             LIMIT
                 1;';
 
-        global $conn;
-        return $conn->GetOne($sql, [$user->user_id]) == '0';
+        return MySQLConnection::getInstance()->GetOne($sql, [$user->user_id]) == '0';
     }
 }

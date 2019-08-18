@@ -40,7 +40,6 @@ class UserRankDAO extends UserRankDAOBase {
         $sql_count = '
               SELECT
                 COUNT(1)';
-        global $conn;
         $params = [];
         $sql_from = '
               FROM
@@ -52,10 +51,10 @@ class UserRankDAO extends UserRankDAOBase {
             $sql_from .= ' WHERE `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sql_from .= ' WHERE `ur`.`' . $conn->escape($filteredBy) . '_id` = ?';
+            $sql_from .= ' WHERE `ur`.`' . MySQLConnection::getInstance()->escape($filteredBy) . '_id` = ?';
         }
         if (!is_null($order)) {
-            $sql_from .= ' ORDER BY `ur`.`' . $conn->escape($order) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
+            $sql_from .= ' ORDER BY `ur`.`' . MySQLConnection::getInstance()->escape($order) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         $sql_limit = '';
         $params_limit = [];
@@ -65,12 +64,12 @@ class UserRankDAO extends UserRankDAOBase {
             $sql_limit = ' LIMIT ?, ?';
         }
         // Get total rows
-        $total_rows = $conn->GetOne($sql_count . $sql_from, $params);
+        $total_rows = MySQLConnection::getInstance()->GetOne($sql_count . $sql_from, $params);
 
         $params = array_merge($params, $params_limit);
 
         // Get rows
-        $allData = $conn->GetAll($sql . $sql_from . $sql_limit, $params);
+        $allData = MySQLConnection::getInstance()->GetAll($sql . $sql_from . $sql_limit, $params);
         return [
             'rows' => $allData,
             'total' => $total_rows
