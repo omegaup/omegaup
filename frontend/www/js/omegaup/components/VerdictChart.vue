@@ -4,17 +4,17 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { oGraph } from '../../omegaup-graph.js';
 import { T } from '../omegaup.js';
 import UI from '../ui.js';
 import omegaup from '../api.js';
-import oGraph from '../../omegaup-graph.js';
 
 @Component({})
 export default class VerdictChart extends Vue {
-  @Prop() stats!: Object;
+  @Prop() stats!: omegaup.Stats;
   @Prop() title!: string;
 
-  runCountsChart = oGraph.verdictCounts(this.$el, this.title, this.stats);
+  runCountsChart: omegaup.Stats = null;
 
   mounted() {
     this.runCountsChart = oGraph.verdictCounts(

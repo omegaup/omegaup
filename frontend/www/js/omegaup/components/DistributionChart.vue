@@ -4,21 +4,17 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { oGraph } from '../../omegaup-graph.js';
 import { T } from '../omegaup.js';
 import UI from '../ui.js';
 import omegaup from '../api.js';
-import oGraph from '../../omegaup-graph.js';
 
 @Component({})
 export default class DistributionChart extends Vue {
-  @Prop() stats!: Object;
+  @Prop() stats!: omegaup.Stats;
   @Prop() title!: string;
 
-  distributionChart = oGraph.distributionChart(
-    this.$el,
-    this.title,
-    this.stats,
-  );
+  distributionChart: omegaup.Stats = null;
 
   mounted() {
     this.distributionChart = oGraph.distributionChart(

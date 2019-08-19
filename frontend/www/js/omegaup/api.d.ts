@@ -122,8 +122,16 @@ declare namespace omegaup {
     name: string;
   }
 
+  export interface Series {
+    setData(data: Array<number>): void; 
+  }
+
   export interface Solutions {
     [language: string]: string;
+  }
+
+  export interface Stats {
+    series: Series[];
   }
 }
 
