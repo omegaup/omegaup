@@ -38,9 +38,8 @@ abstract class ClarificationsDAOBase {
             (int)$Clarifications->public,
             (int)$Clarifications->clarification_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -54,8 +53,7 @@ abstract class ClarificationsDAOBase {
     final public static function getByPK(int $clarification_id) : ?Clarifications {
         $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` FROM Clarifications WHERE (clarification_id = ?) LIMIT 1;';
         $params = [$clarification_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -81,10 +79,9 @@ abstract class ClarificationsDAOBase {
     final public static function delete(Clarifications $Clarifications) : void {
         $sql = 'DELETE FROM `Clarifications` WHERE clarification_id = ?;';
         $params = [$Clarifications->clarification_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -115,15 +112,14 @@ abstract class ClarificationsDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` from Clarifications';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new Clarifications($row);
         }
         return $allData;
@@ -151,13 +147,12 @@ abstract class ClarificationsDAOBase {
             is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
             (int)$Clarifications->public,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Clarifications->clarification_id = $conn->Insert_ID();
+        $Clarifications->clarification_id = MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

@@ -44,15 +44,14 @@ abstract class ProblemsetAccessLogDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` from Problemset_Access_Log';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemsetAccessLog($row);
         }
         return $allData;
@@ -76,9 +75,8 @@ abstract class ProblemsetAccessLogDAOBase {
             is_null($Problemset_Access_Log->ip) ? null : (int)$Problemset_Access_Log->ip,
             DAO::toMySQLTimestamp($Problemset_Access_Log->time),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

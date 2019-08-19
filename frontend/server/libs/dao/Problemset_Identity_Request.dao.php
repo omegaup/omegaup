@@ -13,7 +13,6 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
     ) : ?array {
-        global $conn;
         $sql = '
             SELECT
                 r.*,
@@ -33,11 +32,10 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
             WHERE
                 r.problemset_id = ?;';
 
-        return $conn->GetAll($sql, [$problemsetId]);
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
 
     public static function getRequestsForProblemset(int $problemsetId) : array {
-        global  $conn;
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
@@ -67,7 +65,7 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
                 i.identity_id;';
 
         $result = [];
-        foreach ($conn->GetAll($sql, [$problemsetId]) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]) as $row) {
             $row['accepted'] = $row['accepted'] == '1';
             $result[] = $row;
         }

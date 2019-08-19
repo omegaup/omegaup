@@ -1180,8 +1180,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // Set date for all quality nominations as 1 week ago, so that they are eligible for
         // current problem of the week.
         $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
-        global $conn;
-        $conn->Execute('UPDATE `QualityNominations` SET `time` = ?', [$dateOneWeekAgo]);
+        MySQLConnection::getInstance()->Execute('UPDATE `QualityNominations` SET `time` = ?', [$dateOneWeekAgo]);
 
         return $problemData;
     }

@@ -21,8 +21,7 @@ class TagsDAO extends TagsDAOBase {
     final public static function getByName(string $name) : ?Tags {
         $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
 
-        global $conn;
-        $row = $conn->GetRow($sql, [$name]);
+        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }
@@ -30,11 +29,10 @@ class TagsDAO extends TagsDAOBase {
     }
 
     public static function findByName(string $name) : array {
-        global $conn;
         $sql = "SELECT * FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
-        $rs = $conn->GetAll($sql, $args);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $row) {
             array_push($result, new Tags($row));

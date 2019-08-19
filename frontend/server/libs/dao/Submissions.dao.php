@@ -15,8 +15,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -33,8 +32,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
             WHERE
                 s.guid = ?;
         ';
-        global $conn;
-        $conn->Execute($sql, [$guid]);
+        MySQLConnection::getInstance()->Execute($sql, [$guid]);
     }
 
     /**
@@ -53,8 +51,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemId];
 
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -77,8 +74,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemId, $problemsetId];
 
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -97,8 +93,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemsetId];
 
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -137,7 +132,6 @@ class SubmissionsDAO extends SubmissionsDAOBase {
             $val = [$identityId, $problemId, $problemsetId];
         }
 
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 }

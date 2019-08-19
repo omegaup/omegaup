@@ -43,9 +43,8 @@ abstract class ProblemsForfeitedDAOBase {
             $Problems_Forfeited->problem_id,
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -62,9 +61,8 @@ abstract class ProblemsForfeitedDAOBase {
             is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
             is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -78,8 +76,7 @@ abstract class ProblemsForfeitedDAOBase {
     final public static function getByPK(?int $user_id, ?int $problem_id) : ?ProblemsForfeited {
         $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -105,10 +102,9 @@ abstract class ProblemsForfeitedDAOBase {
     final public static function delete(ProblemsForfeited $Problems_Forfeited) : void {
         $sql = 'DELETE FROM `Problems_Forfeited` WHERE user_id = ? AND problem_id = ?;';
         $params = [$Problems_Forfeited->user_id, $Problems_Forfeited->problem_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -139,15 +135,14 @@ abstract class ProblemsForfeitedDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` from Problems_Forfeited';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemsForfeited($row);
         }
         return $allData;
@@ -170,9 +165,8 @@ abstract class ProblemsForfeitedDAOBase {
             is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
             DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

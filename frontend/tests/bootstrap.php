@@ -35,9 +35,6 @@ namespace {
     Cache::clearCacheForTesting();
     QualityNominationFactory::initQualityReviewers();
     QualityNominationFactory::initTags();
-    // Mock time
-    $currentTime = time();
-    Time::setTimeForTesting($currentTime);
-    $conn->Execute("SET TIMESTAMP = {$currentTime};");
+
     Grader::setInstanceForTesting(new NoOpGrader());
 }

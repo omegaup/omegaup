@@ -67,8 +67,7 @@ class RunsDAO extends RunsDAOBase {
                 Runs r ON r.run_id = s.current_run_id;';
         $val = [$problemId, $problemId];
 
-        global $conn;
-        return $conn->GetAll($sql, $val);
+        return MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
@@ -91,10 +90,8 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$problemsetId];
 
-        global $conn;
-
         $result = [];
-        foreach ($conn->GetAll($sql, $val) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -169,8 +166,7 @@ class RunsDAO extends RunsDAOBase {
             $val[] = (int) $rowcount;
         }
 
-        global $conn;
-        return $conn->GetAll($sql, $val);
+        return MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /*
@@ -192,9 +188,8 @@ class RunsDAO extends RunsDAOBase {
                 s.problem_id = ? AND r.status != "ready" AND s.`type` = "normal";';
         $val = [$problemId];
 
-        global $conn;
         $result = [];
-        foreach ($conn->GetAll($sql, $val) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -221,8 +216,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$problemsetId, $verdict];
 
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -246,8 +240,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$problemId, $verdict];
 
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -276,8 +269,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$identityId];
 
-        global $conn;
-        return $conn->GetAll($sql, $val);
+        return MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
@@ -303,8 +295,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$problemsetId];
 
-        global $conn;
-        $row = $conn->GetRow($sql, $val);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $val);
         if (empty($row)) {
             return null;
         }
@@ -397,8 +388,7 @@ class RunsDAO extends RunsDAOBase {
             $sql .= ';';
         }
 
-        global $conn;
-        $rs = $conn->GetAll($sql, $val);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $val);
 
         $ar = [];
         foreach ($rs as $row) {
@@ -439,8 +429,7 @@ class RunsDAO extends RunsDAOBase {
             ' ORDER BY s.submission_id;';
 
         $result = [];
-        global $conn;
-        foreach ($conn->GetAll($sql, [$problemset->problemset_id]) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$problemset->problemset_id]) as $row) {
             array_push($result, $row);
         }
         return $result;
@@ -471,8 +460,7 @@ class RunsDAO extends RunsDAOBase {
             LIMIT 1;
         ';
         $val = [$identityId, $problemsetId, $problemId];
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -499,8 +487,7 @@ class RunsDAO extends RunsDAOBase {
             LIMIT 1;
         ';
         $val = [$identityId, $problemId];
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     final public static function getByProblemset(int $problemsetId) : array {
@@ -532,8 +519,7 @@ class RunsDAO extends RunsDAOBase {
                 s.`time` DESC;
         ';
 
-        global $conn;
-        return $conn->GetAll($sql, [$problemsetId]);
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
 
     final public static function getByProblem(
@@ -552,8 +538,7 @@ class RunsDAO extends RunsDAOBase {
                 s.problem_id = ?;
         ';
         $params = [$problemId];
-        global $conn;
-        $rs = $conn->GetAll($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
         $runs = [];
         foreach ($rs as $row) {
             array_push($runs, new Runs($row));
@@ -585,8 +570,7 @@ class RunsDAO extends RunsDAOBase {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        global $conn;
-        return $conn->GetAll($sql, $params);
+        return MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function isRunInsideSubmissionGap(
@@ -646,9 +630,8 @@ class RunsDAO extends RunsDAOBase {
                 s.submission_id ASC;
         ';
 
-        global $conn;
         $result = [];
-        foreach ($conn->GetAll($sql, [$problemId, $submissionId]) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$problemId, $submissionId]) as $row) {
             array_push($result, new Runs($row));
         }
         return $result;
@@ -677,9 +660,8 @@ class RunsDAO extends RunsDAOBase {
             $problem_id
         ];
 
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -752,9 +734,8 @@ class RunsDAO extends RunsDAOBase {
             return 0;
         }
         $params = [$contest->problemset_id];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -766,8 +747,6 @@ class RunsDAO extends RunsDAOBase {
     final public static function createRunsForVersion(
         Problems $problem
     ) : void {
-        global $conn;
-
         $sql = '
             INSERT IGNORE INTO
                 Runs (
@@ -782,7 +761,7 @@ class RunsDAO extends RunsDAOBase {
             ORDER BY
                 s.submission_id;
         ';
-        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 
     /**
@@ -792,8 +771,6 @@ class RunsDAO extends RunsDAOBase {
      * @param Problems $problem the problem.
      */
     final public static function updateVersionToCurrent(Problems $problem) : void {
-        global $conn;
-
         $sql = '
             UPDATE
                 Submissions s
@@ -808,7 +785,7 @@ class RunsDAO extends RunsDAOBase {
                 r.version = ? AND
                 s.problem_id = ?;
         ';
-        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 
     /**
@@ -817,8 +794,6 @@ class RunsDAO extends RunsDAOBase {
      * @param Problems $problem the problem.
      */
     final public static function getNewRunsForVersion(Problems $problem) : array {
-        global $conn;
-
         $sql = '
             SELECT
                 r.run_id
@@ -836,7 +811,7 @@ class RunsDAO extends RunsDAOBase {
         $params = [$problem->current_version, $problem->problem_id];
 
         $result = [];
-        foreach ($conn->GetAll($sql, $params) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $row) {
             $result[] = new Runs($row);
         }
         return $result;
@@ -857,7 +832,6 @@ class RunsDAO extends RunsDAOBase {
         string $oldVersion,
         string $newVersion
     ) : array {
-        global $conn;
         $sql = '
             SELECT
                 i.username,
@@ -905,7 +879,7 @@ class RunsDAO extends RunsDAOBase {
             LIMIT 0, 1000;
         ';
 
-        $result = $conn->GetAll($sql, $params);
+        $result = MySQLConnection::getInstance()->GetAll($sql, $params);
         foreach ($result as &$row) {
             $row['old_score'] = floatval($row['old_score']);
             $row['new_score'] = floatval($row['new_score']);
