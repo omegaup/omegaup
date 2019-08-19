@@ -107,12 +107,12 @@ declare namespace omegaup {
   }
 
   export interface QueryParameters {
-    some_tags: string;
+    some_tags: boolean;
     min_difficulty: number;
     max_difficulty: number;
     order_by: string;
     mode: string;
-    only_karel?: string;
+    only_karel?: boolean;
     tag?: string[];
   }
 
