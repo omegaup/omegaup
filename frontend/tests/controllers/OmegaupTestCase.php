@@ -46,6 +46,11 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         UserController::$sendEmailOnVerify = false;
         SessionController::$setCookieOnRegisterSession = false;
 
+        // Mock time
+        $currentTime = time();
+        Time::setTimeForTesting($currentTime);
+        MySQLConnection::getInstance()->Execute("SET TIMESTAMP = {$currentTime};");
+
         //Clean $_REQUEST before each test
         unset($_REQUEST);
     }
@@ -432,7 +437,6 @@ class NoOpGrader extends Grader {
     private $_runs = [];
 
     public function grade(Runs $run, string $source) {
-        global $conn;
         $sql = '
             SELECT
                 s.guid
@@ -441,7 +445,7 @@ class NoOpGrader extends Grader {
             WHERE
                 s.submission_id = ?;
         ';
-        $guid = $conn->GetOne($sql, [$run->submission_id]);
+        $guid = MySQLConnection::getInstance()->GetOne($sql, [$run->submission_id]);
         $this->_submissions[$guid] = $source;
         array_push($this->_runs, $run);
     }

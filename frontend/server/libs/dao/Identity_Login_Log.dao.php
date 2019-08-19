@@ -18,8 +18,7 @@ class IdentityLoginLogDAO extends IdentityLoginLogDAOBase {
                 WHERE
                     identity_id = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$identityId]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
 
         $identityLoginLogs = [];
         foreach ($rs as $row) {

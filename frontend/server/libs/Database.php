@@ -29,27 +29,46 @@ class MySQLConnection {
      */
     private $_needsFlushing = false;
 
-    public function __construct(
-        string $hostname,
-        string $username,
-        string $password,
-        string $databaseName
-    ) {
+    /**
+     * The singleton instance of this class.
+     * @var null|MySQLConnection
+     */
+    private static $_instance = null;
+
+    /**
+     * Returns the singleton instance of this class. It also registers a
+     * shutdown function to flush any outstanding queries upon script
+     * termination.
+     */
+    public static function getInstance() : MySQLConnection {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new MySQLConnection();
+
+            register_shutdown_function(function () {
+                if (is_null(self::$_instance)) {
+                    return;
+                }
+                self::$_instance->Flush();
+                self::$_instance = null;
+            });
+        }
+        return self::$_instance;
+    }
+
+    private function __construct() {
+        $this->_connect();
+    }
+
+    private function _connect() : void {
         $this->_connection = mysqli_init();
         $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
         $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
-        if (defined('PSALM_VERSION')) {
-            // If we are running under psalm, avoid actually connecting to the
-            // database.
-            return;
-        }
-
         if (!$this->_connection->real_connect(
-            "p:{$hostname}",
-            $username,
-            $password,
-            $databaseName
+            'p:' . OMEGAUP_DB_HOST,
+            OMEGAUP_DB_USER,
+            OMEGAUP_DB_PASS,
+            OMEGAUP_DB_NAME
         )) {
             throw new DatabaseOperationException(
                 'Failed to connect to MySQL (' . mysqli_connect_errno() . '): '
@@ -60,16 +79,25 @@ class MySQLConnection {
         $this->_connection->autocommit(false);
         $this->_connection->set_charset('utf8');
         $this->_connection->query('SET NAMES "utf8";', MYSQLI_STORE_RESULT);
-
-        // Even though the connection's destructor will call Flush(), this
-        // ensures that it is also called if die() is invoked.
-        register_shutdown_function(function () {
-            $this->Flush();
-        });
     }
 
-    public function __destruct() {
+    /**
+     * Prepares to serialize the database connection. The database connection
+     * cannot really be serialized, so we need to just flush any outstanding
+     * queries.
+     *
+     * @return string[] The list of variables that will be serialized.
+     */
+    public function __sleep() : array {
         $this->Flush();
+        return [];
+    }
+
+    /**
+     * Deserializes the database connection. Just connects to the database again.
+     */
+    public function __wakeup() : void {
+        $this->_connect();
     }
 
     /**

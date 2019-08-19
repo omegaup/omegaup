@@ -11,9 +11,8 @@ include('base/Problem_Viewed.vo.base.php');
   */
 class ProblemViewedDAO extends ProblemViewedDAOBase {
     public static function MarkProblemViewed($identity_id, $problem_id) {
-        global $conn;
         $sql = 'INSERT IGNORE Problem_Viewed (identity_id, problem_id) VALUES (?, ?);';
         $values = [$identity_id, $problem_id];
-        $conn->Execute($sql, $values);
+        MySQLConnection::getInstance()->Execute($sql, $values);
     }
 }

@@ -38,24 +38,16 @@ abstract class SubmissionLogDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Submission_Log (`problemset_id`, `submission_id`, `user_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
             !is_null($Submission_Log->problemset_id) ? intval($Submission_Log->problemset_id) : null,
-            !is_null($Submission_Log->submission_id) ? intval($Submission_Log->submission_id) : null,
+            $Submission_Log->submission_id,
             !is_null($Submission_Log->user_id) ? intval($Submission_Log->user_id) : null,
             !is_null($Submission_Log->identity_id) ? intval($Submission_Log->identity_id) : null,
             !is_null($Submission_Log->ip) ? intval($Submission_Log->ip) : null,
             DAO::toMySQLTimestamp($Submission_Log->time),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -75,9 +67,8 @@ abstract class SubmissionLogDAOBase {
             DAO::toMySQLTimestamp($Submission_Log->time),
             is_null($Submission_Log->submission_id) ? null : (int)$Submission_Log->submission_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -91,8 +82,7 @@ abstract class SubmissionLogDAOBase {
     final public static function getByPK(?int $submission_id) : ?SubmissionLog {
         $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` FROM Submission_Log WHERE (submission_id = ?) LIMIT 1;';
         $params = [$submission_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -118,10 +108,9 @@ abstract class SubmissionLogDAOBase {
     final public static function delete(SubmissionLog $Submission_Log) : void {
         $sql = 'DELETE FROM `Submission_Log` WHERE submission_id = ?;';
         $params = [$Submission_Log->submission_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -152,15 +141,14 @@ abstract class SubmissionLogDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Submission_Log`.`problemset_id`, `Submission_Log`.`submission_id`, `Submission_Log`.`user_id`, `Submission_Log`.`identity_id`, `Submission_Log`.`ip`, `Submission_Log`.`time` from Submission_Log';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new SubmissionLog($row);
         }
         return $allData;
@@ -186,9 +174,8 @@ abstract class SubmissionLogDAOBase {
             is_null($Submission_Log->ip) ? null : (int)$Submission_Log->ip,
             DAO::toMySQLTimestamp($Submission_Log->time),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

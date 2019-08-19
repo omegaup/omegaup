@@ -36,13 +36,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         $response = UserController::apiCoderOfTheMonthList($r);
 
-        $this->assertEquals(1, count($response['coders']));
+        $this->assertCount(0, $response['coders']);
 
         // Adding parameter date should return the same value, it helps
         // to test getMonthlyList function, which never was tested
         $r['date'] = date('Y-m-d', Time::get());
         $response = UserController::apiCoderOfTheMonthList($r);
-        $this->assertEquals(1, count($response['coders']));
+        $this->assertCount(0, $response['coders']);
     }
 
     public function testCoderOfTheMonthDetailsForSmarty() {

@@ -99,9 +99,9 @@ declare namespace omegaup {
     quality?: number;
     ratio?: number;
     run_details?: omegaup.RunDetails;
-    tags?: Tag[];
     score?: number;
-    submissions: number;
+    submissions?: number;
+    tags?: Tag[];
     title: string;
     visibility?: number;
   }
@@ -129,6 +129,33 @@ declare namespace omegaup {
     judged_by: string;
     language: string;
     logs: string;
+  }
+
+  export interface Profile {
+    username: string;
+    name: string;
+    email: string;
+    country_id: string;
+    gravatar_92: string;
+    rankinfo: RankInfo;
+    classname: string;
+  }
+
+  export interface RankInfo {
+    rank: number;
+    name?: string;
+    problems_solved: number;
+  }
+
+  export interface Report {
+    classname: string;
+    event: {
+      name: string;
+      problem: string;
+    }
+    ip: string;
+    time: string;
+    username: string;
   }
 
   export interface SchoolsRank {

@@ -26,8 +26,7 @@ class StatesDAO extends StatesDAOBase {
                 WHERE
                     country_id = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$countryId]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$countryId]);
 
         $states = [];
         foreach ($rs as $row) {
