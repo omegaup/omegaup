@@ -48,12 +48,12 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign(
             'currentUserInfo',
             [
-                'username' => $session['username'],
+                'username' => $session['identity']->username,
             ]
         );
 
         UITools::$IsAdmin = $session['is_admin'];
-        $identityRequest['username'] = $session['username'];
+        $identityRequest['username'] = $session['identity']->username;
     } else {
         $identityRequest['username'] = null;
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="/media/avatar_92.png">');
