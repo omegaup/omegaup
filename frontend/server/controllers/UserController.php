@@ -1787,15 +1787,7 @@ class UserController extends Controller {
                     );
 
                     if (!is_null($userRankEntries)) {
-                        foreach ($userRankEntries['rows'] as $userRank) {
-                            array_push($response['rank'], [
-                                'username' => $userRank->username,
-                                'name' => $userRank->name,
-                                'problems_solved' => $userRank->problems_solved_count,
-                                'rank' => $userRank->rank,
-                                'score' => $userRank->score,
-                                'country_id' => $userRank->country_id]);
-                        }
+                        $response['rank'] = $userRankEntries['rows'];
                         $response['total'] = $userRankEntries['total'];
                     }
                     return $response;
@@ -2477,11 +2469,19 @@ class UserController extends Controller {
         if (!$isMentor) {
             return ['payload' => $response];
         }
+        $candidates = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+            $dateToSelect
+        );
+        $bestCoders = [];
+
+        if (!is_null($candidates)) {
+            foreach ($candidates as $candidate) {
+                unset($candidate['user_id']);
+                array_push($bestCoders, $candidate);
+            }
+        }
         $response['options'] = [
-            'bestCoders' =>
-                CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
-                    $dateToSelect
-                ),
+            'bestCoders' => $bestCoders,
             'canChooseCoder' =>
                 Authorization::canChooseCoder($currentTimeStamp),
             'coderIsSelected' =>

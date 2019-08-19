@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import problem_Versions from '../components/problem/Versions.vue';
+import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import {OmegaUp, T, API} from '../omegaup.js';
 import UI from '../ui.js';
 
@@ -329,6 +330,109 @@ OmegaUp.on('ready', function() {
         }
       })
       .fail(UI.apiError);
+
+  const solutionEdit = new Vue({
+    el: '#solution-edit',
+    render: function(createElement) {
+      return createElement('omegaup-problem-solution-edit', {
+        props: {
+          markdownContents: this.markdownContents,
+          markdownPreview: this.markdownPreview,
+          initialLanguage: this.initialLanguage,
+        },
+        on: {
+          'update-markdown-contents': function(solutions, language,
+                                               currentMarkdown) {
+            // First update markdown contents to current markdown, otherwise
+            // component won't detect any change if two different language
+            // solutions are the same.
+            solutionEdit.markdownContents = currentMarkdown;
+            if (solutions.hasOwnProperty(language)) {
+              solutionEdit.updateAndRefresh(solutions[language]);
+              return;
+            }
+            API.Problem.solution({
+                         'problem_alias': problemAlias,
+                         'lang': language,
+                       })
+                .then(function(response) {
+                  if (!response.exists || !response.solution) {
+                    return;
+                  }
+                  if (response.solution.language !== language) {
+                    response.solution.markdown = '';
+                  }
+                  solutionEdit.solutions[language] = response.solution.markdown;
+                  solutionEdit.updateAndRefresh(response.solution.markdown);
+                })
+                .fail(UI.apiError);
+          },
+          'edit-solution': function(solutions, commitMessage, currentLanguage) {
+            let promises = [];
+            for (const lang in solutions) {
+              if (!solutions.hasOwnProperty(lang)) continue;
+              if (solutions[lang] === solutionEdit.solutions[lang]) continue;
+              promises.push(new Promise(function(resolve, reject) {
+                API.Problem.updateSolution({
+                             problem_alias: problemAlias,
+                             solution: solutions[lang],
+                             message: commitMessage,
+                             lang: lang,
+                           })
+                    .then(resolve)
+                    .fail(UI.apiError);
+              }));
+            }
+            Promise.all(promises)
+                .then(function() {
+                  UI.success(T.problemEditUpdatedSuccessfully);
+                })
+                .catch(function(error) { UI.apiError(error); });
+          },
+        },
+      });
+    },
+    mounted: function() {
+      const markdownConverter =
+          UI.markdownConverter({preview: true, imageMapping: {}});
+      this.markdownEditor = new Markdown.Editor(markdownConverter, '-solution');
+      this.markdownEditor.run();
+    },
+    data: {
+      markdownContents: null,
+      markdownPreview: '',
+      markdownEditor: null,
+      initialLanguage: null,
+      solutions: {},
+    },
+    methods: {
+      updateAndRefresh(markdown) {
+        this.markdownContents = markdown;
+        this.markdownPreview =
+            this.markdownEditor.getConverter().makeHtml(markdown);
+      },
+      getInitialContents() {
+        let self = this;
+        API.Problem.solution({
+                     'problem_alias': problemAlias,
+                   })
+            .then(function(response) {
+              if (!response.exists || !response.solution) {
+                return;
+              }
+              const lang = response.solution.language;
+              self.initialLanguage = lang;
+              self.solutions[lang] = response.solution.markdown;
+              self.updateAndRefresh(response.solution.markdown);
+            })
+            .fail(UI.apiError);
+      }
+    },
+    components: {
+      'omegaup-problem-solution-edit': problem_StatementEdit,
+    }
+  });
+  solutionEdit.getInitialContents();
 
   $('#tags form')
       .on('submit', function() {

@@ -21,13 +21,10 @@ class SchoolsDAO extends SchoolsDAOBase {
     /**
      * Finds schools that cotains 'name'
      *
-     * @global type $conn
      * @param string $name
      * @return array Schools
      */
     public static function findByName($name) {
-        global  $conn;
-
         $sql = '
             SELECT
                 s.*
@@ -39,7 +36,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$name];
 
         $result = [];
-        foreach ($conn->GetAll($sql, $args) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
             $result[] = new Schools($row);
         }
         return $result;
@@ -59,9 +56,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         int $finishDate,
         int $offset,
         int $rowcount
-    ) {
-        global  $conn;
-
+    ) : array {
         $sql = '
             SELECT
               s.name,
@@ -91,7 +86,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
         $result = [];
-        foreach ($conn->GetAll($sql, $args) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
             $result[] = [
                 'name' => $row['name'],
                 'country_id' => $row['country_id'],

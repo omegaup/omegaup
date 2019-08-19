@@ -38,15 +38,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    T: Object,
-  },
-  data: function() { return {};},
-};
-</script>
-
 <style>
 .header-bg {
     background-image: url(/media/teacher3.jpg);
@@ -67,3 +58,15 @@ body {
     background: #fff;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+import { T } from '../../omegaup.js';
+
+@Component({})
+export default class Intro extends Vue {
+  T = T;
+}
+
+</script>

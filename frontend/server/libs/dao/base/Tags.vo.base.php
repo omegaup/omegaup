@@ -39,23 +39,23 @@ class Tags extends VO {
             $this->tag_id = (int)$data['tag_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $tag_id;
+    public $tag_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $name;
+    public $name = null;
 }

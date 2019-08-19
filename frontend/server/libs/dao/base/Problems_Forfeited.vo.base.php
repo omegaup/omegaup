@@ -43,30 +43,36 @@ class ProblemsForfeited extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['forfeited_date'])) {
+            /**
+             * @var string|int|float $data['forfeited_date']
+             * @var int $this->forfeited_date
+             */
             $this->forfeited_date = DAO::fromMySQLTimestamp($data['forfeited_date']);
+        } else {
+            $this->forfeited_date = Time::get();
         }
     }
 
     /**
-      * Identificador de usuario
-      * Llave Primaria
-      * @access public
-      * @var int
+     * Identificador de usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int
      */
-    public $forfeited_date = null;  // CURRENT_TIMESTAMP
+    public $forfeited_date;  // CURRENT_TIMESTAMP
 }

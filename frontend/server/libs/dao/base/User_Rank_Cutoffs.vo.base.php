@@ -43,28 +43,28 @@ class UserRankCutoffs extends VO {
             $this->percentile = (float)$data['percentile'];
         }
         if (isset($data['classname'])) {
-            $this->classname = $data['classname'];
+            $this->classname = strval($data['classname']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var float
+     * [Campo no documentado]
+     *
+     * @var float|null
      */
-    public $score;
+    public $score = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var float
+     * [Campo no documentado]
+     *
+     * @var float|null
      */
-    public $percentile;
+    public $percentile = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $classname;
+    public $classname = null;
 }

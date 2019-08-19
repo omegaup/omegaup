@@ -62,8 +62,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 p.problem_id = ? AND i.identity_id = ?;
         ';
 
-        global $conn;
-        $result = $conn->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
+        $result = MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
         return [
             'solved' => (bool) $result['solved'],
             'nominated' => (bool) $result['nominated'],
@@ -113,10 +112,9 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qnr.qualitynomination_id = ?
         ORDER BY
             i.username;';
-        global $conn;
 
         $votes = [];
-        foreach ($conn->GetAll($sql, [$qualitynomination_id]) as $vote) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$qualitynomination_id]) as $vote) {
             if (is_string($vote['time'])) {
                 $vote['time'] = (int)$vote['time'];
             }
@@ -240,9 +238,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             $params[] = $assignee;
         }
         if (!empty($types)) {
-            global $conn;
-            $escapeFunc = function ($type) use ($conn) {
-                return $conn->escape($type);
+            $escapeFunc = function ($type) {
+                return MySQLConnection::getInstance()->escape($type);
             };
             $conditions[] =
                 ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
@@ -259,9 +256,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $params[] = (int)($page * $pageSize);
         $params[] = (int)(($page + 1) * $pageSize);
 
-        global $conn;
         $nominations = [];
-        foreach ($conn->GetAll($sql, $params) as $nomination) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
             $nominations[] = self::processNomination($nomination);
         }
 
@@ -314,8 +310,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         WHERE
             qn.qualitynomination_id = ?;';
 
-        global $conn;
-        return self::processNomination($conn->GetRow($sql, [$qualitynomination_id]));
+        return self::processNomination(MySQLConnection::getInstance()->GetRow($sql, [$qualitynomination_id]));
     }
 
     /**
@@ -325,8 +320,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
 
-        global $conn;
-        return $conn->GetAll($sql);
+        return MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -360,8 +354,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . 'FROM `QualityNominations` '
             . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
-        global $conn;
-        return $conn->GetAll($sql);
+        return MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -418,8 +411,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
 
         $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
             . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
-        global $conn;
-        foreach ($conn->GetAll($sql) as $nomination) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $nomination) {
             $problemId = $nomination['problem_id'];
             $contents = self::getAllSuggestionsPerProblem($problemId);
             $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
@@ -499,8 +491,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 AND
                     status = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
 
         $qualityNominations = [];
         foreach ($rs as $row) {

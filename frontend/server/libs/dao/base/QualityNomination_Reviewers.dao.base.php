@@ -24,14 +24,12 @@ abstract class QualityNominationReviewersDAOBase {
      * Este metodo cargará un objeto {@link QualityNominationReviewers} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link QualityNominationReviewers Un objeto del tipo {@link QualityNominationReviewers}. NULL si no hay tal registro.
+     * @return ?QualityNominationReviewers Un objeto del tipo {@link QualityNominationReviewers}. NULL si no hay tal registro.
      */
-    final public static function getByPK(int $qualitynomination_id, int $user_id) : ?QualityNominationReviewers {
+    final public static function getByPK(?int $qualitynomination_id, ?int $user_id) : ?QualityNominationReviewers {
         $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` FROM QualityNomination_Reviewers WHERE (qualitynomination_id = ? AND user_id = ?) LIMIT 1;';
         $params = [$qualitynomination_id, $user_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -47,20 +45,19 @@ abstract class QualityNominationReviewersDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param QualityNominationReviewers [$QualityNomination_Reviewers] El objeto de tipo QualityNominationReviewers a eliminar
+     * @param QualityNominationReviewers $QualityNomination_Reviewers El objeto de tipo QualityNominationReviewers a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(QualityNominationReviewers $QualityNomination_Reviewers) : void {
         $sql = 'DELETE FROM `QualityNomination_Reviewers` WHERE qualitynomination_id = ? AND user_id = ?;';
         $params = [$QualityNomination_Reviewers->qualitynomination_id, $QualityNomination_Reviewers->user_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -75,29 +72,30 @@ abstract class QualityNominationReviewersDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link QualityNominationReviewers}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return QualityNominationReviewers[] Un arreglo que contiene objetos del tipo {@link QualityNominationReviewers}.
+     *
+     * @psalm-return array<int, QualityNominationReviewers>
      */
     final public static function getAll(
         ?int $pagina = null,
-        ?int $filasPorPagina = null,
+        int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` from QualityNomination_Reviewers';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new QualityNominationReviewers($row);
         }
         return $allData;
@@ -109,19 +107,18 @@ abstract class QualityNominationReviewersDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto QualityNominationReviewers suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param QualityNominationReviewers [$QualityNomination_Reviewers] El objeto de tipo QualityNominationReviewers a crear.
+     * @param QualityNominationReviewers $QualityNomination_Reviewers El objeto de tipo QualityNominationReviewers a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function create(QualityNominationReviewers $QualityNomination_Reviewers) : int {
         $sql = 'INSERT INTO QualityNomination_Reviewers (`qualitynomination_id`, `user_id`) VALUES (?, ?);';
         $params = [
-            (int)$QualityNomination_Reviewers->qualitynomination_id,
-            (int)$QualityNomination_Reviewers->user_id,
+            is_null($QualityNomination_Reviewers->qualitynomination_id) ? null : (int)$QualityNomination_Reviewers->qualitynomination_id,
+            is_null($QualityNomination_Reviewers->user_id) ? null : (int)$QualityNomination_Reviewers->user_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

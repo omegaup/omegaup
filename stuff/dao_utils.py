@@ -30,7 +30,7 @@ class Column:
         self.comment = tokens.get('comment', None)
         if 'tinyint' in self.type:
             self.php_primitive_type = 'bool'
-        elif 'timestamp' in self.type:
+        elif 'timestamp' in self.type or 'datetime' in self.type:
             self.php_primitive_type = 'int'
         elif 'int' in self.type:
             self.php_primitive_type = 'int'
@@ -39,7 +39,8 @@ class Column:
         else:
             self.php_primitive_type = 'string'
         self.php_type = (
-            ('' if self.not_null else '?') + self.php_primitive_type)
+            ('' if self.default or self.auto_increment else '?') +
+            self.php_primitive_type)
 
     def __repr__(self):
         return 'Column<name={}, type={}>'.format(self.name, self.type)

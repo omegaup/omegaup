@@ -39,33 +39,41 @@ class {{ table.class_name }} extends VO {
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {
 {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            /**
+             * @var string|int|float $data['{{ column.name }}']
+             * @var int $this->{{ column.name }}
+             */
             $this->{{ column.name }} = DAO::fromMySQLTimestamp($data['{{ column.name }}']);
 {%- elif column.php_primitive_type == 'bool' %}
             $this->{{ column.name }} = boolval($data['{{ column.name }}']);
 {%- elif column.php_primitive_type in ('int', 'float') %}
             $this->{{ column.name }} = ({{ column.php_primitive_type }})$data['{{ column.name }}'];
 {%- else %}
-            $this->{{ column.name }} = $data['{{ column.name }}'];
+            $this->{{ column.name }} = strval($data['{{ column.name }}']);
 {%- endif %}
+    {%- if column.default == 'CURRENT_TIMESTAMP' %}
+        } else {
+            $this->{{ column.name }} = Time::get();
+    {%- endif %}
         }
 {%- endfor %}
     }
 {%- for column in table.columns %}
 
     /**
-      * {{ column.comment or ' [Campo no documentado]' }}
+     * {{ column.comment or '[Campo no documentado]' }}
 {%- if column.primary_key %}
-      * Llave Primaria
+     * Llave Primaria
 {%- endif %}
 {%- if column.auto_increment %}
-      * Auto Incremento
+     * Auto Incremento
 {%- endif %}
-      * @access public
-      * @var {{ column.php_type }}
+     *
+     * @var {{ column.php_primitive_type }}{% if not column.default %}|null{% endif %}
      */
 {%- if column.default %}
 {%- if column.default == 'CURRENT_TIMESTAMP' %}
-    public ${{ column.name }} = null;  // CURRENT_TIMESTAMP
+    public ${{ column.name }};  // CURRENT_TIMESTAMP
 {%- elif 'timestamp' in column.type %}
     public ${{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
 {%- elif column.php_primitive_type == 'bool' %}
@@ -77,8 +85,10 @@ class {{ table.class_name }} extends VO {
 {%- else %}
     public ${{ column.name }} = '{{ column.default }}';
 {%- endif %}
+{%- elif column.auto_increment %}
+    public ${{ column.name }} = 0;
 {%- else %}
-    public ${{ column.name }};
+    public ${{ column.name }} = null;
 {%- endif %}
 {%- endfor %}
 }

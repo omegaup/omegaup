@@ -52,25 +52,25 @@ class Problemsets extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['access_mode'])) {
-            $this->access_mode = $data['access_mode'];
+            $this->access_mode = strval($data['access_mode']);
         }
         if (isset($data['languages'])) {
-            $this->languages = $data['languages'];
+            $this->languages = strval($data['languages']);
         }
         if (isset($data['needs_basic_information'])) {
             $this->needs_basic_information = boolval($data['needs_basic_information']);
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = $data['requests_user_information'];
+            $this->requests_user_information = strval($data['requests_user_information']);
         }
         if (isset($data['scoreboard_url'])) {
-            $this->scoreboard_url = $data['scoreboard_url'];
+            $this->scoreboard_url = strval($data['scoreboard_url']);
         }
         if (isset($data['scoreboard_url_admin'])) {
-            $this->scoreboard_url_admin = $data['scoreboard_url_admin'];
+            $this->scoreboard_url_admin = strval($data['scoreboard_url_admin']);
         }
         if (isset($data['type'])) {
-            $this->type = $data['type'];
+            $this->type = strval($data['type']);
         }
         if (isset($data['contest_id'])) {
             $this->contest_id = (int)$data['contest_id'];
@@ -84,88 +84,88 @@ class Problemsets extends VO {
     }
 
     /**
-      * El identificador único para cada conjunto de problemas
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int
+     * El identificador único para cada conjunto de problemas
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = 0;
 
     /**
-      * La lista de control de acceso compartida con su container
-      * @access public
-      * @var int
+     * La lista de control de acceso compartida con su container
+     *
+     * @var int|null
      */
-    public $acl_id;
+    public $acl_id = null;
 
     /**
-      * La modalidad de acceso a este conjunto de problemas
-      * @access public
-      * @var string
+     * La modalidad de acceso a este conjunto de problemas
+     *
+     * @var string
      */
     public $access_mode = 'public';
 
     /**
-      * Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas
-      * @access public
-      * @var ?string
+     * Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas
+     *
+     * @var string|null
      */
-    public $languages;
+    public $languages = null;
 
     /**
-      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil
-      * @access public
-      * @var bool
+     * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil
+     *
+     * @var bool
      */
     public $needs_basic_information = false;
 
     /**
-      * Se solicita información de los participantes para contactarlos posteriormente.
-      * @access public
-      * @var string
+     * Se solicita información de los participantes para contactarlos posteriormente.
+     *
+     * @var string
      */
     public $requests_user_information = 'no';
 
     /**
-      * Token para la url del scoreboard en problemsets
-      * @access public
-      * @var string
+     * Token para la url del scoreboard en problemsets
+     *
+     * @var string|null
      */
-    public $scoreboard_url;
+    public $scoreboard_url = null;
 
     /**
-      * Token para la url del scoreboard de admin en problemsets
-      * @access public
-      * @var string
+     * Token para la url del scoreboard de admin en problemsets
+     *
+     * @var string|null
      */
-    public $scoreboard_url_admin;
+    public $scoreboard_url_admin = null;
 
     /**
-      * Almacena el tipo de problemset que se ha creado
-      * @access public
-      * @var string
+     * Almacena el tipo de problemset que se ha creado
+     *
+     * @var string
      */
     public $type = 'Contest';
 
     /**
-      * Id del concurso
-      * @access public
-      * @var ?int
+     * Id del concurso
+     *
+     * @var int|null
      */
-    public $contest_id;
+    public $contest_id = null;
 
     /**
-      * Id del curso
-      * @access public
-      * @var ?int
+     * Id del curso
+     *
+     * @var int|null
      */
-    public $assignment_id;
+    public $assignment_id = null;
 
     /**
-      * Id de la entrevista
-      * @access public
-      * @var ?int
+     * Id de la entrevista
+     *
+     * @var int|null
      */
-    public $interview_id;
+    public $interview_id = null;
 }

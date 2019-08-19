@@ -177,8 +177,6 @@ class RunCreateTest extends OmegaupTestCase {
 
     /**
      * Cannot submit run when contest ended
-     *
-     * @expectedException NotAllowedToSubmitException
      */
     public function testRunWhenContestExpired() {
         $startTime = Time::get() - 60 * 60;
@@ -190,8 +188,13 @@ class RunCreateTest extends OmegaupTestCase {
         // Now is one second after contest finishes
         Time::setTimeForTesting($startTime + (2 * 60 * 60) + 1);
 
-        // Call API
-        RunController::apiCreate($r);
+        try {
+            // Call API
+            RunController::apiCreate($r);
+            $this->fail('api should have not created run, because contest has expired.');
+        } catch (NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotInsideContest', $e->getMessage());
+        }
     }
 
     /**

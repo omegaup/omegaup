@@ -39,21 +39,21 @@ class UsersExperiments extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['experiment'])) {
-            $this->experiment = $data['experiment'];
+            $this->experiment = strval($data['experiment']);
         }
     }
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public $user_id;
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var string
+     * [Campo no documentado]
+     *
+     * @var string|null
      */
-    public $experiment;
+    public $experiment = null;
 }

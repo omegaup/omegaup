@@ -53,8 +53,7 @@ class ClarificationsDAO extends ClarificationsDAOBase {
             $val[] = (int)$rowcount;
         }
 
-        global $conn;
-        return $conn->GetAll($sql, $val);
+        return MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     final public static function GetProblemClarifications($problem_id, $admin, $identity_id, $offset, $rowcount) {
@@ -86,7 +85,6 @@ class ClarificationsDAO extends ClarificationsDAOBase {
             $val[] = (int)$rowcount;
         }
 
-        global $conn;
-        return $conn->GetAll($sql, $val);
+        return MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 }

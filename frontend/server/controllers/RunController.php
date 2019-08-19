@@ -150,15 +150,23 @@ class RunController extends Controller {
             throw new InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
+        $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
+            $r->identity->identity_id,
+            $problemset_id
+        );
+
         // No one should submit after the deadline. Not even admins.
-        if (ProblemsetsDAO::isLateSubmission($r['container'])) {
+        if (ProblemsetsDAO::isLateSubmission(
+            $r['container'],
+            $problemsetIdentity
+        )) {
             throw new NotAllowedToSubmitException('runNotInsideContest');
         }
 
         // Contest admins can skip following checks
         if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
             // Before submit something, user had to open the problem/problemset.
-            if (!ProblemsetIdentitiesDAO::getByPK($r->identity->identity_id, $problemset_id) &&
+            if (is_null($problemsetIdentity) &&
                 !Authorization::canSubmitToProblemset(
                     $r->identity,
                     $r['problemset']
@@ -168,7 +176,7 @@ class RunController extends Controller {
             }
 
             // Validate that the run is timely inside contest
-            if (!ProblemsetsDAO::insideSubmissionWindow($r['container'], $r->identity->identity_id)) {
+            if (!ProblemsetsDAO::isSubmissionWindowOpen($r['container'])) {
                 throw new NotAllowedToSubmitException('runNotInsideContest');
             }
 
@@ -286,6 +294,7 @@ class RunController extends Controller {
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
+            'time' => Time::get(),
             'memory' => 0,
             'score' => 0,
             'contest_score' => $problemsetId != null ? 0 : null,

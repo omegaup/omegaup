@@ -46,10 +46,10 @@ class ProblemsetProblems extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['commit'])) {
-            $this->commit = $data['commit'];
+            $this->commit = strval($data['commit']);
         }
         if (isset($data['version'])) {
-            $this->version = $data['version'];
+            $this->version = strval($data['version']);
         }
         if (isset($data['points'])) {
             $this->points = (float)$data['points'];
@@ -60,46 +60,46 @@ class ProblemsetProblems extends VO {
     }
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problemset_id;
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public $problem_id;
+    public $problem_id = null;
 
     /**
-      * El hash SHA1 del commit en la rama master del problema.
-      * @access public
-      * @var string
+     * El hash SHA1 del commit en la rama master del problema.
+     *
+     * @var string
      */
     public $commit = 'published';
 
     /**
-      * El hash SHA1 del árbol de la rama private.
-      * @access public
-      * @var string
+     * El hash SHA1 del árbol de la rama private.
+     *
+     * @var string|null
      */
-    public $version;
+    public $version = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var float
+     * [Campo no documentado]
+     *
+     * @var float
      */
     public $points = 1.00;
 
     /**
-      * Define el orden de aparición de los problemas en una lista de problemas
-      * @access public
-      * @var int
+     * Define el orden de aparición de los problemas en una lista de problemas
+     *
+     * @var int
      */
     public $order = 1;
 }

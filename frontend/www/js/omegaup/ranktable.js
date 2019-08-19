@@ -22,6 +22,7 @@ OmegaUp.on('ready', function() {
             rank: user.rank,
             country: user.country_id,
             username: user.username,
+            classname: user.classname,
             name: user.name,
             score: user.score,
             problemsSolvedUser: problemsSolvedUser,

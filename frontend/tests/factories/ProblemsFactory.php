@@ -19,7 +19,7 @@ class ProblemParams implements ArrayAccess {
             $this->params = clone $params;
         }
 
-        ProblemParams::validateParameter('zipName', $this->params, false, OMEGAUP_RESOURCES_ROOT . 'testproblem.zip');
+        ProblemParams::validateParameter('zipName', $this->params, false, OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
         ProblemParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
         ProblemParams::validateParameter('visibility', $this->params, false, ProblemController::VISIBILITY_PUBLIC);
         ProblemParams::validateParameter('author', $this->params, false, UserFactory::createUser());

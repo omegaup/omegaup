@@ -16,7 +16,7 @@ class IdentityFactory {
     public static function getCsvData($file, $group_alias, $password = '') {
         $row = 0;
         $identities = [];
-        $path_file = OMEGAUP_RESOURCES_ROOT . $file;
+        $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
         if (($handle = fopen($path_file, 'r')) == false) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
