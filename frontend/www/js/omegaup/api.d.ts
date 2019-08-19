@@ -22,6 +22,24 @@ declare namespace omegaup {
     verdict: string;
   }
 
+  export interface Commit {
+    author: CommitUser;
+    commit: string;
+    commiter: CommitUser;
+    message: string;
+    parents: string[];
+    tree: {
+      [file: string]: string;
+    }
+    version: string;
+  }
+
+  interface CommitUser {
+    email: string;
+    name: string;
+    time: string;
+  }
+
   export interface Contest {
     alias: string;
     title: string;
