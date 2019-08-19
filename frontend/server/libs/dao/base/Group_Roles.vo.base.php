@@ -15,6 +15,12 @@
  * @access public
  */
 class GroupRoles extends VO {
+    const FIELD_NAMES = [
+        'group_id' => true,
+        'role_id' => true,
+        'acl_id' => true,
+    ];
+
     /**
      * Constructor de GroupRoles
      *
@@ -22,9 +28,13 @@ class GroupRoles extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_id'])) {
             $this->group_id = (int)$data['group_id'];
@@ -38,37 +48,26 @@ class GroupRoles extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $group_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $group_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
+     */
+    public $role_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $role_id;
-
-    /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 }

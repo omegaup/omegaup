@@ -15,6 +15,22 @@
  * @access public
  */
 class Assignments extends VO {
+    const FIELD_NAMES = [
+        'assignment_id' => true,
+        'course_id' => true,
+        'problemset_id' => true,
+        'acl_id' => true,
+        'name' => true,
+        'description' => true,
+        'alias' => true,
+        'publish_time_delay' => true,
+        'assignment_type' => true,
+        'start_time' => true,
+        'finish_time' => true,
+        'max_points' => true,
+        'order' => true,
+    ];
+
     /**
      * Constructor de Assignments
      *
@@ -22,9 +38,13 @@ class Assignments extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['assignment_id'])) {
             $this->assignment_id = (int)$data['assignment_id'];
@@ -39,25 +59,33 @@ class Assignments extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['publish_time_delay'])) {
             $this->publish_time_delay = (int)$data['publish_time_delay'];
         }
         if (isset($data['assignment_type'])) {
-            $this->assignment_type = $data['assignment_type'];
+            $this->assignment_type = strval($data['assignment_type']);
         }
         if (isset($data['start_time'])) {
-            $this->start_time = $data['start_time'];
+            /**
+             * @var string|int|float $data['start_time']
+             * @var int $this->start_time
+             */
+            $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
-            $this->finish_time = $data['finish_time'];
+            /**
+             * @var string|int|float $data['finish_time']
+             * @var int $this->finish_time
+             */
+            $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['max_points'])) {
             $this->max_points = (float)$data['max_points'];
@@ -68,106 +96,95 @@ class Assignments extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['start_time', 'finish_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $assignment_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $assignment_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $course_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $course_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * La lista de control de acceso compartida con el curso
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 
     /**
-      * La lista de control de acceso compartida con el curso
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $name = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(100)
-      */
-    public $name;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $description = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinytext
-      */
-    public $description;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $alias = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(32)
-      */
-    public $alias;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $publish_time_delay = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $publish_time_delay;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $assignment_type = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('homework','test')
-      */
-    public $assignment_type;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $start_time;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $finish_time;
+     * La cantidad total de puntos que se pueden obtener.
+     *
+     * @var float
+     */
+    public $max_points = 0.00;
 
     /**
-      * La cantidad total de puntos que se pueden obtener.
-      * @access public
-      * @var double
-      */
-    public $max_points;
-
-    /**
-      * Define el orden de aparición de los problemas/tareas
-      * @access public
-      * @var int(11)
-      */
-    public $order;
+     * Define el orden de aparición de los problemas/tareas
+     *
+     * @var int
+     */
+    public $order = 1;
 }

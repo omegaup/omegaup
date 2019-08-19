@@ -15,6 +15,18 @@
  * @access public
  */
 class Clarifications extends VO {
+    const FIELD_NAMES = [
+        'clarification_id' => true,
+        'author_id' => true,
+        'receiver_id' => true,
+        'message' => true,
+        'answer' => true,
+        'time' => true,
+        'problem_id' => true,
+        'problemset_id' => true,
+        'public' => true,
+    ];
+
     /**
      * Constructor de Clarifications
      *
@@ -22,9 +34,13 @@ class Clarifications extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['clarification_id'])) {
             $this->clarification_id = (int)$data['clarification_id'];
@@ -36,13 +52,19 @@ class Clarifications extends VO {
             $this->receiver_id = (int)$data['receiver_id'];
         }
         if (isset($data['message'])) {
-            $this->message = $data['message'];
+            $this->message = strval($data['message']);
         }
         if (isset($data['answer'])) {
-            $this->answer = $data['answer'];
+            $this->answer = strval($data['answer']);
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['problem_id'])) {
             $this->problem_id = (int)$data['problem_id'];
@@ -51,83 +73,72 @@ class Clarifications extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['public'])) {
-            $this->public = $data['public'] == '1';
+            $this->public = boolval($data['public']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $clarification_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $clarification_id;
+     * Autor de la clarificación.
+     *
+     * @var int|null
+     */
+    public $author_id = null;
 
     /**
-      * Autor de la clarificación.
-      * @access public
-      * @var int(11)
-      */
-    public $author_id;
+     * Usuario que recibirá el mensaje
+     *
+     * @var int|null
+     */
+    public $receiver_id = null;
 
     /**
-      * Usuario que recibirá el mensaje
-      * @access public
-      * @var int(11)
-      */
-    public $receiver_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $message = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var text
-      */
-    public $message;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $answer = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var text
-      */
-    public $answer;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $time;
+     * Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.
+     *
+     * @var int|null
+     */
+    public $problem_id = null;
 
     /**
-      * Lo ideal es que la clarificacion le llegue al problemsetter que escribio el problema o al contest owner si no esta ligado a un problema.
-      * @access public
-      * @var int(11)
-      */
-    public $problem_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
-
-    /**
-      * Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $public;
+     * Sólo las clarificaciones que el problemsetter marque como publicables aparecerán en la lista que todos pueden ver.
+     *
+     * @var bool
+     */
+    public $public = false;
 }

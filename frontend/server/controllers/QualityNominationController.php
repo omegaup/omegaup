@@ -62,7 +62,6 @@ class QualityNominationController extends Controller {
      *
      * @return array
      * @throws DuplicatedEntryInDatabaseException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiCreate(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -194,10 +193,10 @@ class QualityNominationController extends Controller {
             'contents' => json_encode($contents), // re-encoding it for normalization.
             'status' => 'open',
         ]);
-        QualityNominationsDAO::save($nomination);
+        QualityNominationsDAO::create($nomination);
 
         if ($nomination->nomination == 'promotion') {
-            $qualityReviewerGroup = GroupsDAO::FindByAlias(
+            $qualityReviewerGroup = GroupsDAO::findByAlias(
                 Authorization::QUALITY_REVIEWER_GROUP_ALIAS
             );
             foreach (GroupsDAO::sampleMembers(
@@ -292,8 +291,8 @@ class QualityNominationController extends Controller {
         try {
             $response = [];
             ProblemController::apiUpdate($r);
-            QualityNominationsDAO::save($qualitynomination);
-            QualityNominationLogDAO::save($qualitynominationlog);
+            QualityNominationsDAO::update($qualitynomination);
+            QualityNominationLogDAO::create($qualitynominationlog);
             DAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
               $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
@@ -301,9 +300,8 @@ class QualityNominationController extends Controller {
             }
         } catch (Exception $e) {
             DAO::transRollback();
-            self::$log->error('Failed to resolve demotion request');
-            self::$log->error($e);
-            throw new InvalidDatabaseOperationException($e);
+            self::$log->error('Failed to resolve demotion request', $e);
+            throw $e;
         }
 
         return ['status' => 'ok'];
@@ -320,18 +318,12 @@ class QualityNominationController extends Controller {
 
     /**
      * Send a mail with demotion notification to the original creator
-     *
-     * @throws InvalidDatabaseOperationException
      */
     private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination, $rationale) {
         $request = [];
-        try {
-            $adminuser = ProblemsDAO::getAdminUser($r['problem']);
-            $email = $adminuser['email'];
-            $username = $adminuser['name'];
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $adminuser = ProblemsDAO::getAdminUser($r['problem']);
+        $email = $adminuser['email'];
+        $username = $adminuser['name'];
 
         $email_params = [
             'reason' => htmlspecialchars($rationale),
@@ -372,22 +364,15 @@ class QualityNominationController extends Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
         $types = (isset($r['types']) ? $r['types'] : ['promotion', 'demotion']);
 
-        $nominations = null;
-        try {
-            $nominations = QualityNominationsDAO::getNominations(
+        return [
+            'status' => 'ok',
+            'nominations' => QualityNominationsDAO::getNominations(
                 $nominator,
                 $assignee,
                 $page,
                 $pageSize,
                 $types
-            );
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return [
-            'status' => 'ok',
-            'nominations' => $nominations,
+            ),
         ];
     }
 
@@ -401,7 +386,7 @@ class QualityNominationController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateMemberOfReviewerGroup(Request $r) {
-        if (!Authorization::isQualityReviewer($r->identity->identity_id)) {
+        if (!Authorization::isQualityReviewer($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
         }
     }
@@ -422,7 +407,6 @@ class QualityNominationController extends Controller {
      * @param Request $r
      * @return array
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiList(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -442,7 +426,6 @@ class QualityNominationController extends Controller {
      * @param Request $r
      * @return array
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiMyAssignedList(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -463,7 +446,6 @@ class QualityNominationController extends Controller {
      * @param Request $r
      * @return array
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiMyList(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -471,7 +453,7 @@ class QualityNominationController extends Controller {
         }
 
         // Validate request
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         return self::getListImpl($r, $r->user->user_id, null /* assignee */);
     }
@@ -483,7 +465,6 @@ class QualityNominationController extends Controller {
      * @param Request $r
      * @return array
      * @throws ForbiddenAccessException
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiDetails(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -502,7 +483,7 @@ class QualityNominationController extends Controller {
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
         $currentUserIsNominator = ($r->user->username == $response['nominator']['username']);
-        $currentUserReviewer = Authorization::isQualityReviewer($r->identity->identity_id);
+        $currentUserReviewer = Authorization::isQualityReviewer($r->identity);
         if (!$currentUserIsNominator && !$currentUserReviewer) {
             throw new ForbiddenAccessException('userNotAllowed');
         }

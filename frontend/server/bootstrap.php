@@ -119,6 +119,7 @@ require_once('libs/ApiUtils.php');
 require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Cache.php');
+require_once('libs/Database.php');
 require_once('libs/Experiments.php');
 require_once('libs/Grader.php');
 require_once('libs/Pager.php');
@@ -191,35 +192,6 @@ Logger::configure([
     ],
 ]);
 $log = Logger::getLogger('bootstrap');
-
-require_once('libs/third_party/adodb/adodb.inc.php');
-require_once('libs/third_party/adodb/adodb-exceptions.inc.php');
-
-global $conn;
-$conn = null;
-
-try {
-    $conn = ADONewConnection(OMEGAUP_DB_DRIVER);
-    $conn->debug = OMEGAUP_DB_DEBUG;
-    array_push($conn->optionFlags, [MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true]);
-    $conn->SetFetchMode(ADODB_FETCH_ASSOC);
-    $conn->PConnect(OMEGAUP_DB_HOST, OMEGAUP_DB_USER, OMEGAUP_DB_PASS, OMEGAUP_DB_NAME);
-} catch (Exception $databaseConectionException) {
-    $log->error($databaseConectionException);
-
-    /**
-     * Dispatch missing parameters
-     * */
-    header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-
-    die(json_encode([
-        'status' => 'error',
-        'error' => 'Conection to the database has failed.',
-        'errorcode' => 1,
-    ]));
-}
-$conn->SetCharSet('utf8');
-$conn->EXECUTE('SET NAMES \'utf8\';');
 
 $session = SessionController::apiCurrentSession(new Request($_REQUEST))['session'];
 $experiments = new Experiments(

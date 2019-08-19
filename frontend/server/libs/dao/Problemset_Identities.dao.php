@@ -18,38 +18,50 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     }
 
     public static function checkAndSaveFirstTimeAccess(
-        $identity_id,
-        $problemset_id,
-        $grant_access = false,
-        $share_user_information = false
+        Identities $identity,
+        Object $container,
+        bool $grantAccess = false,
+        bool $shareUserInformation = false
     ) : ProblemsetIdentities {
-        $problemset_identity = self::getByPK($identity_id, $problemset_id);
-        if (is_null($problemset_identity)) {
-            if (!$grant_access) {
+        $currentTime = Time::get();
+        $problemsetIdentity  = self::getByPK(
+            $identity->identity_id,
+            $container->problemset_id
+        );
+        if (is_null($problemsetIdentity)) {
+            if (!$grantAccess) {
                 // User was not authorized to do this.
                 throw new ForbiddenAccessException();
             }
-            $problemset_identity = new ProblemsetIdentities();
-            $problemset_identity->identity_id = $identity_id;
-            $problemset_identity->problemset_id = $problemset_id;
-            $problemset_identity->access_time = date('Y-m-d H:i:s');
-            $problemset_identity->score = 0;
-            $problemset_identity->time = 0;
-            $problemset_identity->is_invited = 0;
-            $problemset_identity->share_user_information = $share_user_information;
-            ProblemsetIdentitiesDAO::save($problemset_identity);
-        } elseif (is_null($problemset_identity->access_time)) {
-            // If its set to default time, update it
-            $problemset_identity->access_time = date('Y-m-d H:i:s');
-            $problemset_identity->share_user_information = $share_user_information;
-            ProblemsetIdentitiesDAO::save($problemset_identity);
+            $problemsetIdentity = new ProblemsetIdentities([
+                'identity_id' => $identity->identity_id,
+                'problemset_id' => $container->problemset_id,
+                'score' => 0,
+                'time' => 0,
+                'is_invited' => 0,
+            ]);
         }
-        return $problemset_identity;
+        if (is_null($problemsetIdentity->access_time)) {
+            // If its set to default time, update it
+            $problemsetIdentity->access_time = $currentTime;
+            $finishTime = $container->finish_time;
+            if (!empty($container->window_length)) {
+                $finishTime = min(
+                    $currentTime + $container->window_length * 60,
+                    $finishTime
+                );
+            }
+            $problemsetIdentity->end_time = $finishTime;
+            $problemsetIdentity->share_user_information = $shareUserInformation;
+            ProblemsetIdentitiesDAO::replace($problemsetIdentity);
+        }
+        return $problemsetIdentity;
     }
 
     public static function getWithExtraInformation($problemset_id) {
         $sql = 'SELECT
-                    pi.access_time,
+                    UNIX_TIMESTAMP(pi.access_time) as access_time,
+                    UNIX_TIMESTAMP(pi.end_time) as end_time,
                     i.username,
                     i.country_id,
                     IF(a.owner_id=i.identity_id, 1, NULL) as is_owner
@@ -70,8 +82,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 WHERE
                     p.problemset_id = ?;';
 
-        global $conn;
-        return $conn->GetAll($sql, [$problemset_id]);
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
     }
 
     final public static function getIdentitiesByProblemset($problemset_id) {
@@ -79,7 +90,9 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             SELECT
                 i.user_id,
                 i.username,
+                pi.identity_id,
                 pi.access_time,
+                pi.end_time,
                 pi.is_invited,
                 e.email,
                 i.country_id
@@ -96,8 +109,50 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             WHERE
                 pi.problemset_id = ?;';
 
-        global $conn;
-        return $conn->GetAll($sql, [$problemset_id]);
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+    }
+
+    /**
+     * When end time is recalculated, it never can be greater than
+     * contest finish time
+     *
+     */
+    public static function recalculateEndTimeForProblemsetIdentities(
+        Contests $contest
+    ) : int {
+        $sql = 'UPDATE
+                    `Problemset_Identities`
+                SET
+                    `end_time` = LEAST(
+                        FROM_UNIXTIME(?),
+                        DATE_ADD(`access_time`, INTERVAL ? MINUTE)
+                     )
+                WHERE
+                    Problemset_Identities.`problemset_id` = ?
+                    AND `access_time` IS NOT NULL;';
+
+        MySQLConnection::getInstance()->Execute($sql, [
+            $contest->finish_time,
+            $contest->window_length,
+            $contest->problemset_id
+        ]);
+
+        return MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    public static function recalculateEndTimeAsFinishTime(
+        Contests $contest
+    ) : int {
+        $sql = 'UPDATE
+                    `Problemset_Identities`
+                SET
+                    `end_time` = FROM_UNIXTIME(?)
+                WHERE
+                    `problemset_id` = ?;';
+
+        MySQLConnection::getInstance()->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
+
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {
@@ -114,8 +169,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemset_identity->problemset_id,
         ];
 
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 }

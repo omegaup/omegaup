@@ -9,9 +9,9 @@ class Validators {
     /**
      * Check if email is valid
      *
-     * @param string $email
+     * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
-     * @param boolean $required If $required is TRUE and the parameter is not present, check fails.
+     * @param bool $required If $required is TRUE and the parameter is not present, check fails.
      * @throws InvalidArgumentException
      */
     public static function validateEmail(
@@ -30,9 +30,9 @@ class Validators {
     /**
      * Check if string is string and not empty
      *
-     * @param string $parameter
+     * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
-     * @param boolean $required If $required is TRUE and the parameter is not present, check fails.
+     * @param bool $required If $required is TRUE and the parameter is not present, check fails.
      * @throws InvalidArgumentException
      */
     public static function validateStringNonEmpty(
@@ -67,6 +67,9 @@ class Validators {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
+        if (!is_string($parameter)) {
+            throw new InvalidParameterException('parameterInvalid', $parameterName);
+        }
 
         if (!is_null($minLength) && strlen($parameter) < $minLength) {
             throw new InvalidParameterException(
@@ -86,9 +89,9 @@ class Validators {
 
     /**
      *
-     * @param string $parameter
+     * @param mixed $parameter
      * @param string $parameterName
-     * @param boolean $required
+     * @param bool $required
      */
     public static function validateValidAlias(
         $parameter,
@@ -101,11 +104,37 @@ class Validators {
 
         if (!is_string($parameter) ||
             empty($parameter) ||
-            strlen($parameter) > 32 ||
-            preg_match('/^[a-zA-Z0-9-_]+$/', $parameter) !== 1
+            strlen($parameter) > 32
         ) {
             throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
+        if (self::isRestrictedAlias($parameter)) {
+            throw new DuplicatedEntryInDatabaseException('aliasInUse');
+        }
+        if (!self::isValidAlias($parameter)) {
+            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+        }
+    }
+
+    /**
+     * Returns whether the alias is valid and is not a restricted alias.
+     *
+     * @param string $alias
+     * @return boolean
+     */
+    public static function isValidAlias(string $alias) : bool {
+        return preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1 && !self::isRestrictedAlias($alias);
+    }
+
+    /**
+     * Returns whether the alias is restricted.
+     *
+     * @param string $alias the alias.
+     * @return boolean whether the alias is restricted.
+     */
+    public static function isRestrictedAlias(string $alias) : bool {
+        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup'];
+        return in_array(strtolower($alias), $restrictedAliases);
     }
 
     /**
@@ -113,7 +142,7 @@ class Validators {
      *
      * @param string $parameter
      * @param string $parameterName
-     * @param boolean $required
+     * @param bool $required
      * @throws InvalidParameterException
      */
     public static function validateValidUsername(
@@ -136,7 +165,7 @@ class Validators {
      *
      * @param string $parameter
      * @param string $parameterName
-     * @param boolean $required
+     * @param bool $required
      * @throws InvalidParameterException
      */
     public static function validateValidUsernameIdentity(
@@ -156,9 +185,9 @@ class Validators {
 
     /**
      *
-     * @param date $parameter
+     * @param mixed $parameter
      * @param string $parameterName
-     * @param boolean $required
+     * @param bool $required
      * @throws InvalidParameterException
      */
     public static function validateDate(
@@ -172,7 +201,7 @@ class Validators {
 
         // Validate that we are working with a date
         // @TODO This strtotime() allows nice strings like "next Thursday".
-        if (strtotime($parameter) === false) {
+        if (!is_string($parameter) || strtotime($parameter) === false) {
             throw new InvalidParameterException('parameterInvalid', $parameterName);
         }
     }
@@ -181,8 +210,8 @@ class Validators {
      *
      * @param mixed     $parameter
      * @param string    $parameterName
-     * @param int|float $lowerBound
-     * @param int|float $upperBound
+     * @param int|float|null $lowerBound
+     * @param int|float|null $upperBound
      * @param boolean   $required
      * @throws InvalidParameterException
      */
@@ -242,7 +271,7 @@ class Validators {
      * @param mixed $parameter
      * @param string $parameterName
      * @param array $enum
-     * @param type $required
+     * @param bool $required
      * @throws InvalidParameterException
      */
     public static function validateInEnum(
@@ -269,7 +298,7 @@ class Validators {
      * @param mixed $parameter
      * @param string $parameterName
      * @param array $enum
-     * @param type $required
+     * @param bool $required
      * @throws InvalidParameterException
      */
     public static function validateValidSubset(
@@ -280,6 +309,9 @@ class Validators {
     ) : void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
+        }
+        if (!is_string($parameter)) {
+            throw new InvalidParameterException('parameterInvalid', $parameterName);
         }
 
         $badElements = [];
@@ -300,9 +332,9 @@ class Validators {
 
     /**
      *
-     * @param type $parameter
-     * @param type $parameterName
-     * @param boolean $required
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @param bool $required
      * @throws InvalidParameterException
      */
     private static function isPresent(
@@ -317,5 +349,22 @@ class Validators {
             throw new InvalidParameterException('parameterEmpty', $parameterName);
         }
         return false;
+    }
+
+    /**
+     * Checks if badge exists in the allExistingBadges array,
+     * if not, it throws an exception.
+     *
+     * @param string $badgeAlias
+     * @param array $allExistingBadges
+     * @throws NotFoundException
+     */
+    public static function validateBadgeExists(
+        string $badgeAlias,
+        array $allExistingBadges
+    ) : void {
+        if (!in_array($badgeAlias, $allExistingBadges)) {
+            throw new NotFoundException('badgeNotExist');
+        }
     }
 }

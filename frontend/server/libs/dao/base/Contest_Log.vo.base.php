@@ -15,6 +15,15 @@
  * @access public
  */
 class ContestLog extends VO {
+    const FIELD_NAMES = [
+        'public_contest_id' => true,
+        'contest_id' => true,
+        'user_id' => true,
+        'from_admission_mode' => true,
+        'to_admission_mode' => true,
+        'time' => true,
+    ];
+
     /**
      * Constructor de ContestLog
      *
@@ -22,9 +31,13 @@ class ContestLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['public_contest_id'])) {
             $this->public_contest_id = (int)$data['public_contest_id'];
@@ -36,68 +49,63 @@ class ContestLog extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['from_admission_mode'])) {
-            $this->from_admission_mode = $data['from_admission_mode'];
+            $this->from_admission_mode = strval($data['from_admission_mode']);
         }
         if (isset($data['to_admission_mode'])) {
-            $this->to_admission_mode = $data['to_admission_mode'];
+            $this->to_admission_mode = strval($data['to_admission_mode']);
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $public_contest_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $public_contest_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $contest_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $contest_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $from_admission_mode = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('private','registration','public')
-      */
-    public $from_admission_mode;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $to_admission_mode = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('private','registration','public')
-      */
-    public $to_admission_mode;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $time;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $time;  // CURRENT_TIMESTAMP
 }

@@ -15,6 +15,12 @@
  * @access public
  */
 class Emails extends VO {
+    const FIELD_NAMES = [
+        'email_id' => true,
+        'email' => true,
+        'user_id' => true,
+    ];
+
     /**
      * Constructor de Emails
      *
@@ -22,15 +28,19 @@ class Emails extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['email_id'])) {
             $this->email_id = (int)$data['email_id'];
         }
         if (isset($data['email'])) {
-            $this->email = $data['email'];
+            $this->email = strval($data['email']);
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -38,36 +48,25 @@ class Emails extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $email_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $email_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $email = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(100)
-      */
-    public $email;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 }

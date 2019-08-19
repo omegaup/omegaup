@@ -114,7 +114,7 @@ OmegaUp.on('ready', function() {
                                admission_mode: ev.admissionMode
                              })
                       .then(function(response) {
-                        UI.contestUpdated(response);
+                        UI.contestUpdated(response, contestAlias);
                         refresh(ev, API.Contest.adminDetails, 'contest');
                       })
                       .fail(UI.apiError);
@@ -148,6 +148,17 @@ OmegaUp.on('ready', function() {
                         }
                         UI.success(T.userRemoveSuccess);
                         refresh(ev, API.Contest.users, 'users');
+                      })
+                      .fail(UI.apiError);
+                },
+                'save-end-time': function(selected) {
+                  API.Contest.updateEndTimeForIdentity({
+                               contest_alias: contestAlias,
+                               username: selected.username,
+                               end_time: (selected.end_time.getTime()) / 1000,
+                             })
+                      .then(function(response) {
+                        UI.success(T.userEndTimeUpdatedSuccessfully);
                       })
                       .fail(UI.apiError);
                 },

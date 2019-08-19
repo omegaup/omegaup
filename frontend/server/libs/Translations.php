@@ -8,25 +8,24 @@ class Translations {
     /**
      * The static Translations instance.
      *
-     * @var Translations
+     * @var null|Translations
      */
     private static $_instance = null;
 
     /**
      * The translation strings.
      *
-     * @var string[string]
+     * @var array<string, string>
      */
     private $_translations = [];
 
     /**
      * Creates a new instance of Translations.
-     *
-     * @return self
      */
     private function __construct() {
-        $lang = UserController::getPreferredLanguage(new Request());
+        $lang = IdentityController::getPreferredLanguage(new Request());
         $filename = OMEGAUP_ROOT . "/templates/{$lang}.lang";
+        /** @var array<int, string> $match */
         foreach (new RegexIterator(
             new SplFileObject($filename),
             '/([a-zA-Z0-9_]+) = "(.*)"$/',
@@ -46,7 +45,7 @@ class Translations {
      * @return Translations the singleton instance.
      */
     public static function getInstance() : Translations {
-        if (self::$_instance == null) {
+        if (is_null(self::$_instance)) {
             self::$_instance = new Translations();
         }
         return self::$_instance;
@@ -57,7 +56,7 @@ class Translations {
      *
      * @param string $key the translation string to look up.
      *
-     * @return string the translated string.
+     * @return null|string the translated string.
      */
     public function get(string $key) : ?string {
         if (!array_key_exists($key, $this->_translations)) {

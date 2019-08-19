@@ -18,8 +18,7 @@ class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
                 WHERE
                     difficulty = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$difficulty]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$difficulty]);
 
         $problemsOfTheWeek = [];
         foreach ($rs as $row) {

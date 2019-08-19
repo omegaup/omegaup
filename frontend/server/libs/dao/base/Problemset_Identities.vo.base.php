@@ -15,6 +15,18 @@
  * @access public
  */
 class ProblemsetIdentities extends VO {
+    const FIELD_NAMES = [
+        'identity_id' => true,
+        'problemset_id' => true,
+        'access_time' => true,
+        'end_time' => true,
+        'score' => true,
+        'time' => true,
+        'share_user_information' => true,
+        'privacystatement_consent_id' => true,
+        'is_invited' => true,
+    ];
+
     /**
      * Constructor de ProblemsetIdentities
      *
@@ -22,9 +34,13 @@ class ProblemsetIdentities extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
             $this->identity_id = (int)$data['identity_id'];
@@ -33,7 +49,18 @@ class ProblemsetIdentities extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['access_time'])) {
-            $this->access_time = $data['access_time'];
+            /**
+             * @var string|int|float $data['access_time']
+             * @var int $this->access_time
+             */
+            $this->access_time = DAO::fromMySQLTimestamp($data['access_time']);
+        }
+        if (isset($data['end_time'])) {
+            /**
+             * @var string|int|float $data['end_time']
+             * @var int $this->end_time
+             */
+            $this->end_time = DAO::fromMySQLTimestamp($data['end_time']);
         }
         if (isset($data['score'])) {
             $this->score = (int)$data['score'];
@@ -42,82 +69,78 @@ class ProblemsetIdentities extends VO {
             $this->time = (int)$data['time'];
         }
         if (isset($data['share_user_information'])) {
-            $this->share_user_information = $data['share_user_information'] == '1';
+            $this->share_user_information = boolval($data['share_user_information']);
         }
         if (isset($data['privacystatement_consent_id'])) {
             $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
         }
         if (isset($data['is_invited'])) {
-            $this->is_invited = $data['is_invited'] == '1';
+            $this->is_invited = boolval($data['is_invited']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $identity_id = null;
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
+     */
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * Hora a la que entró el usuario al concurso
+     *
+     * @var int|null
+     */
+    public $access_time = null;
 
     /**
-      * Hora a la que entró el usuario al concurso
-      * @access public
-      * @var datetime
-      */
-    public $access_time;
+     * Hora en la que finaliza un concurso para el usuario cuando se habilita la opción de inicios diferentes
+     *
+     * @var int|null
+     */
+    public $end_time = null;
 
     /**
-      * Indica el puntaje que obtuvo el usuario en el concurso
-      * @access public
-      * @var int(11)
-      */
-    public $score;
+     * Indica el puntaje que obtuvo el usuario en el concurso
+     *
+     * @var int
+     */
+    public $score = 1;
 
     /**
-      * Indica el tiempo que acumulo en usuario en el concurso
-      * @access public
-      * @var int(11)
-      */
-    public $time;
+     * Indica el tiempo que acumulo en usuario en el concurso
+     *
+     * @var int
+     */
+    public $time = 1;
 
     /**
-      * Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $share_user_information;
+     * Almacena la respuesta del participante de un concurso si está de acuerdo en divulgar su información.
+     *
+     * @var bool|null
+     */
+    public $share_user_information = null;
 
     /**
-      * Id del documento con el consentimiento de privacidad
-      * @access public
-      * @var int(11)
-      */
-    public $privacystatement_consent_id;
+     * Id del documento con el consentimiento de privacidad
+     *
+     * @var int|null
+     */
+    public $privacystatement_consent_id = null;
 
     /**
-      * Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos
-      * @access public
-      * @var tinyint(1)
-      */
-    public $is_invited;
+     * Indica si la identidad ingresará al concurso por invitación o lo encontró en el listado de concursos públicos
+     *
+     * @var bool
+     */
+    public $is_invited = false;
 }

@@ -10,18 +10,14 @@ class UserSupportTest extends OmegaupTestCase {
      * Basic test for users with support role
      */
     public function testUserHasSupportRole() {
-        $support = UserFactory::createSupportUser();
-        $support_identity = IdentitiesDAO::getByPK($support->main_identity_id);
-        $mentor = UserFactory::createMentorIdentity();
-        $mentor_identity = IdentitiesDAO::getByPK($mentor->main_identity_id);
+        [, $supportIdentity] = UserFactory::createSupportUser();
+        [, $mentorIdentity] = UserFactory::createMentorIdentity();
 
-        $is_support_member = Authorization::isSupportTeamMember($support_identity->identity_id);
         // Asserting that user belongs to the support group
-        $this->assertEquals(1, $is_support_member);
+        $this->assertTrue(Authorization::isSupportTeamMember($supportIdentity));
 
-        $is_support_member = Authorization::isSupportTeamMember($mentor_identity->identity_id);
         // Asserting that user doesn't belong to the support group
-        $this->assertNotEquals(1, $is_support_member);
+        $this->assertFalse(Authorization::isSupportTeamMember($mentorIdentity));
     }
 
     /**
@@ -29,7 +25,7 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testVerifyUser() {
         // Support team member will verify $user
-        $support = UserFactory::createSupportUser();
+        [$supportUser,] = UserFactory::createSupportUser();
 
         // Creates a user
         $email = Utils::CreateRandomString().'@mail.com';
@@ -39,7 +35,7 @@ class UserSupportTest extends OmegaupTestCase {
         ]));
 
         // Call api using support team member
-        $supportLogin = self::login($support);
+        $supportLogin = self::login($supportUser);
 
         $response = UserController::apiExtraInformation(new Request([
             'auth_token' => $supportLogin->auth_token,
@@ -69,14 +65,14 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesValidToken() {
         // Support team member will verify $user
-        $support = UserFactory::createSupportUser();
+        [$supportUser,] = UserFactory::createSupportUser();
 
         // Creates a user
         $email = Utils::CreateRandomString().'@mail.com';
         $user = UserFactory::createUser(new UserParams(['email' => $email]));
 
         // Call api using support team member
-        $supportLogin = self::login($support);
+        $supportLogin = self::login($supportUser);
 
         // Support tries to generate token without a request
         $response = UserController::apiExtraInformation(new Request([
@@ -119,21 +115,21 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesExpiredToken() {
         // Support team member will verify $user
-        $support = UserFactory::createSupportUser();
+        [$supportUser, ] = UserFactory::createSupportUser();
 
         // Creates a user
         $email = Utils::CreateRandomString().'@mail.com';
         $user = UserFactory::createUser(new UserParams(['email' => $email]));
 
         // Call api using support team member
-        $supportLogin = self::login($support);
+        $supportLogin = self::login($supportUser);
 
         // time travel
         $reset_sent_at =
-            ApiUtils::GetStringTime(Utils::GetPhpUnixTimestamp() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24));
+            ApiUtils::GetStringTime(Time::get() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24));
         $user = UsersDAO::FindByEmail($email);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::save($user);
+        UsersDAO::update($user);
 
         // Support can not genearate token because it has expired
         $response = UserController::apiExtraInformation(new Request([

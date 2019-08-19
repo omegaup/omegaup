@@ -7,7 +7,8 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::isSystemAdmin($r->identity->identity_id) && !UsersDAO::IsUserInterviewer($r->user->user_id)) {
+        if (!Authorization::isSystemAdmin($r->identity) &&
+            !UsersDAO::IsUserInterviewer($r->user->user_id)) {
             throw new ForbiddenAccessException();
         }
 
@@ -39,7 +40,7 @@ class InterviewController extends Controller {
         try {
             DAO::transBegin();
 
-            ACLsDAO::save($acl);
+            ACLsDAO::create($acl);
             $interview->acl_id = $acl->acl_id;
 
             $problemset = new Problemsets([
@@ -48,13 +49,13 @@ class InterviewController extends Controller {
                 'scoreboard_url' => SecurityTools::randomString(30),
                 'scoreboard_url_admin' => SecurityTools::randomString(30),
             ]);
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::create($problemset);
             $interview->problemset_id = $problemset->problemset_id;
-            InterviewsDAO::save($interview);
+            InterviewsDAO::create($interview);
 
             // Update interview_id in problemset object
             $problemset->interview_id = $interview->interview_id;
-            ProblemsetsDAO::save($problemset);
+            ProblemsetsDAO::update($problemset);
 
             DAO::transEnd();
         } catch (Exception $e) {
@@ -63,9 +64,8 @@ class InterviewController extends Controller {
 
             if (DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
-            } else {
-                throw new InvalidDatabaseOperationException($e);
             }
+            throw $e;
         }
 
         self::$log->info('Created new interview ' . $r['alias']);
@@ -101,13 +101,7 @@ class InterviewController extends Controller {
         Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
         // Does the interview exist ?
-        try {
-            $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
-
+        $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($r['interview'])) {
             throw new NotFoundException('interviewNotFound');
         }
@@ -165,30 +159,22 @@ class InterviewController extends Controller {
 
         // Only director is allowed to add people to interview
         if (is_null($r->identity)
-            || !Authorization::isInterviewAdmin($r->identity->identity_id, $r['interview'])
+            || !Authorization::isInterviewAdmin($r->identity, $r['interview'])
         ) {
             throw new ForbiddenAccessException();
         }
 
         // add the user to the interview
-        try {
-            ProblemsetIdentitiesDAO::save(new ProblemsetIdentities([
-                'problemset_id' => $r['interview']->problemset_id,
-                'identity_id' => $r['user']->main_identity_id,
-                'access_time' => null,
-                'score' => '0',
-                'time' => '0',
-            ]));
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            self::$log->error('Failed to create new ProblemsetIdentity: ' . $e->getMessage());
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        try {
-            $email = EmailsDAO::getByPK($r['user']->main_email_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        ProblemsetIdentitiesDAO::create(new ProblemsetIdentities([
+            'problemset_id' => $r['interview']->problemset_id,
+            'identity_id' => $r['user']->main_identity_id,
+            'access_time' => null,
+            'score' => '0',
+            'time' => '0',
+        ]));
+        $email = EmailsDAO::getByPK($r['user']->main_email_id);
+        if (is_null($email)) {
+            throw new NotFoundException('userOrMailNotFound');
         }
 
         include_once 'libs/Email.php';
@@ -211,16 +197,11 @@ class InterviewController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isInterviewAdmin($r->identity->identity_id, $interview)) {
+        if (!Authorization::isInterviewAdmin($r->identity, $interview)) {
             throw new ForbiddenAccessException();
         }
 
-        try {
-            $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
-        } catch (Exception $e) {
-            // Operation failed in the data layer
-            throw new InvalidDatabaseOperationException($e);
-        }
+        $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
 
         $users = [];
 
@@ -251,18 +232,16 @@ class InterviewController extends Controller {
 
         $interviews = null;
 
-        try {
-            $interviews = InterviewsDAO::getMyInterviews($r->user->user_id);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        $response['results'] = $interviews;
-
-        return $response;
+        return [
+            'status' => 'ok',
+            'result' => InterviewsDAO::getMyInterviews($r->user->user_id),
+        ];
     }
 
     public static function showIntro(Request $r) {
-        return ContestController::showContestIntro($r)['shouldShowIntro'];
+        $contest = ContestController::validateContest($r['contest_alias'] ?? '');
+        // TODO: Arreglar esto para que Problemsets se encargue de obtener
+        //       la info correcta
+        return ContestController::shouldShowIntro($r, $contest);
     }
 }

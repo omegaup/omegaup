@@ -169,16 +169,28 @@ class DuplicatedEntryInArrayException extends ApiException {
 }
 
 /**
- * DuplicatedEntryInDatabaseException
- *
+ * DatabaseOperationException
  */
-class InvalidDatabaseOperationException extends ApiException {
+class DatabaseOperationException extends ApiException {
+    private $_message = null;
+    private $_errno = 0;
+
     /**
-     *
-     * @param Exception $previous
+     * @param string $message The error message.
+     * @param bool $isDuplicate Whether this was raised from there being a duplicate entry.
      */
-    public function __construct(Exception $previous = null) {
-        parent::__construct('generalError', 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
+    public function __construct(string $message, int $errno) {
+        parent::__construct('generalError', 'HTTP/1.1 400 Bad Request', 400);
+        $this->_message = $message;
+        $this->_errno = $errno;
+    }
+
+    public function __toString() : string {
+        return "{$this->_message}: " . parent::__toString();
+    }
+
+    public function isDuplicate() : bool {
+        return $this->_errno == 1062;
     }
 }
 

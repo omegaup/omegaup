@@ -15,6 +15,15 @@
  * @access public
  */
 class ProblemsetProblems extends VO {
+    const FIELD_NAMES = [
+        'problemset_id' => true,
+        'problem_id' => true,
+        'commit' => true,
+        'version' => true,
+        'points' => true,
+        'order' => true,
+    ];
+
     /**
      * Constructor de ProblemsetProblems
      *
@@ -22,9 +31,13 @@ class ProblemsetProblems extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = (int)$data['problemset_id'];
@@ -33,10 +46,10 @@ class ProblemsetProblems extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['commit'])) {
-            $this->commit = $data['commit'];
+            $this->commit = strval($data['commit']);
         }
         if (isset($data['version'])) {
-            $this->version = $data['version'];
+            $this->version = strval($data['version']);
         }
         if (isset($data['points'])) {
             $this->points = (float)$data['points'];
@@ -47,57 +60,46 @@ class ProblemsetProblems extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
+     */
+    public $problem_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $problem_id;
+     * El hash SHA1 del commit en la rama master del problema.
+     *
+     * @var string
+     */
+    public $commit = 'published';
 
     /**
-      * El hash SHA1 del commit en la rama master del problema.
-      * @access public
-      * @var char(40)
-      */
-    public $commit;
+     * El hash SHA1 del árbol de la rama private.
+     *
+     * @var string|null
+     */
+    public $version = null;
 
     /**
-      * El hash SHA1 del árbol de la rama private.
-      * @access public
-      * @var char(40)
-      */
-    public $version;
+     * [Campo no documentado]
+     *
+     * @var float
+     */
+    public $points = 1.00;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $points;
-
-    /**
-      * Define el orden de aparición de los problemas en una lista de problemas
-      * @access public
-      * @var int(11)
-      */
-    public $order;
+     * Define el orden de aparición de los problemas en una lista de problemas
+     *
+     * @var int
+     */
+    public $order = 1;
 }

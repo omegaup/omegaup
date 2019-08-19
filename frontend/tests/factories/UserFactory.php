@@ -110,7 +110,7 @@ class UserFactory {
             $user = self::verifyUser($user);
         } else {
             $user->verified = 0;
-            UsersDAO::save($user);
+            UsersDAO::update($user);
         }
 
         // Password came hashed from DB. Set password in plaintext
@@ -190,13 +190,13 @@ class UserFactory {
      * @param string $email
      * @return Identity
      */
-    public static function createMentorIdentity($params = null) {
+    public static function createMentorIdentity($params = null) : array {
         $user = self::createUser($params);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         self::addMentorRole($identity);
 
-        return $user;
+        return [$user, $identity];
     }
 
     /**
@@ -207,13 +207,13 @@ class UserFactory {
      * @param string $email
      * @return User
      */
-    public static function createSupportUser($params = null) {
+    public static function createSupportUser($params = null) : array {
         $user = self::createUser($params);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         self::addSupportRole($identity);
 
-        return $user;
+        return [$user, $identity];
     }
 
     /**
@@ -224,7 +224,7 @@ class UserFactory {
      * @param string $email
      * @return User
      */
-    public static function createGroupIdentityCreator($params = null) {
+    public static function createGroupIdentityCreator($params = null) : Users {
         $user = self::createUser($params);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
@@ -257,7 +257,7 @@ class UserFactory {
             Authorization::MENTOR_GROUP_ALIAS
         );
 
-        GroupsIdentitiesDao::save(new GroupsIdentities([
+        GroupsIdentitiesDao::create(new GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $mentor_group->group_id,
         ]));
@@ -273,7 +273,7 @@ class UserFactory {
             Authorization::SUPPORT_GROUP_ALIAS
         );
 
-        GroupsIdentitiesDao::save(new GroupsIdentities([
+        GroupsIdentitiesDao::create(new GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $support_group->group_id,
         ]));
@@ -289,7 +289,7 @@ class UserFactory {
             Authorization::IDENTITY_CREATOR_GROUP_ALIAS
         );
 
-        GroupsIdentitiesDao::save(new GroupsIdentities([
+        GroupsIdentitiesDao::create(new GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $groupIdentityCreator->group_id,
         ]));
@@ -301,7 +301,7 @@ class UserFactory {
      * @return Boolean
      */
     public static function createPrivacyStatement($type = 'privacy_policy') {
-        return PrivacyStatementsDAO::save(new PrivacyStatements([
+        return PrivacyStatementsDAO::create(new PrivacyStatements([
             'git_object_id' => Utils::CreateRandomString(),
             'type' => $type,
         ]));

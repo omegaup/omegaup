@@ -15,6 +15,27 @@
  * @access public
  */
 class Users extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'username' => true,
+        'facebook_user_id' => true,
+        'password' => true,
+        'git_token' => true,
+        'main_email_id' => true,
+        'main_identity_id' => true,
+        'scholar_degree' => true,
+        'graduation_date' => true,
+        'birth_date' => true,
+        'verified' => true,
+        'verification_id' => true,
+        'reset_digest' => true,
+        'reset_sent_at' => true,
+        'hide_problem_tags' => true,
+        'in_mailing_list' => true,
+        'is_private' => true,
+        'preferred_language' => true,
+    ];
+
     /**
      * Constructor de Users
      *
@@ -22,21 +43,28 @@ class Users extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['username'])) {
-            $this->username = $data['username'];
+            $this->username = strval($data['username']);
         }
         if (isset($data['facebook_user_id'])) {
-            $this->facebook_user_id = $data['facebook_user_id'];
+            $this->facebook_user_id = strval($data['facebook_user_id']);
         }
         if (isset($data['password'])) {
-            $this->password = $data['password'];
+            $this->password = strval($data['password']);
+        }
+        if (isset($data['git_token'])) {
+            $this->git_token = strval($data['git_token']);
         }
         if (isset($data['main_email_id'])) {
             $this->main_email_id = (int)$data['main_email_id'];
@@ -44,230 +72,170 @@ class Users extends VO {
         if (isset($data['main_identity_id'])) {
             $this->main_identity_id = (int)$data['main_identity_id'];
         }
-        if (isset($data['name'])) {
-            $this->name = $data['name'];
-        }
-        if (isset($data['country_id'])) {
-            $this->country_id = $data['country_id'];
-        }
-        if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
-        }
-        if (isset($data['school_id'])) {
-            $this->school_id = (int)$data['school_id'];
-        }
         if (isset($data['scholar_degree'])) {
-            $this->scholar_degree = $data['scholar_degree'];
-        }
-        if (isset($data['language_id'])) {
-            $this->language_id = (int)$data['language_id'];
+            $this->scholar_degree = strval($data['scholar_degree']);
         }
         if (isset($data['graduation_date'])) {
-            $this->graduation_date = $data['graduation_date'];
+            $this->graduation_date = strval($data['graduation_date']);
         }
         if (isset($data['birth_date'])) {
-            $this->birth_date = $data['birth_date'];
-        }
-        if (isset($data['gender'])) {
-            $this->gender = $data['gender'];
+            $this->birth_date = strval($data['birth_date']);
         }
         if (isset($data['verified'])) {
-            $this->verified = $data['verified'] == '1';
+            $this->verified = boolval($data['verified']);
         }
         if (isset($data['verification_id'])) {
-            $this->verification_id = $data['verification_id'];
+            $this->verification_id = strval($data['verification_id']);
         }
         if (isset($data['reset_digest'])) {
-            $this->reset_digest = $data['reset_digest'];
+            $this->reset_digest = strval($data['reset_digest']);
         }
         if (isset($data['reset_sent_at'])) {
-            $this->reset_sent_at = $data['reset_sent_at'];
+            /**
+             * @var string|int|float $data['reset_sent_at']
+             * @var int $this->reset_sent_at
+             */
+            $this->reset_sent_at = DAO::fromMySQLTimestamp($data['reset_sent_at']);
         }
         if (isset($data['hide_problem_tags'])) {
-            $this->hide_problem_tags = $data['hide_problem_tags'] == '1';
+            $this->hide_problem_tags = boolval($data['hide_problem_tags']);
         }
         if (isset($data['in_mailing_list'])) {
-            $this->in_mailing_list = $data['in_mailing_list'] == '1';
+            $this->in_mailing_list = boolval($data['in_mailing_list']);
         }
         if (isset($data['is_private'])) {
-            $this->is_private = $data['is_private'] == '1';
+            $this->is_private = boolval($data['is_private']);
         }
         if (isset($data['preferred_language'])) {
-            $this->preferred_language = $data['preferred_language'];
+            $this->preferred_language = strval($data['preferred_language']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $user_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $username = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(50)
-      */
-    public $username;
+     * Facebook ID for this user.
+     *
+     * @var string|null
+     */
+    public $facebook_user_id = null;
 
     /**
-      * Facebook ID for this user.
-      * @access public
-      * @var varchar(20)
-      */
-    public $facebook_user_id;
+     * Contraseña del usuario, usando Argon2i o Blowfish
+     *
+     * @var string|null
+     */
+    public $password = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(100)
-      */
-    public $password;
+     * Token de acceso para git, usando Argon2i
+     *
+     * @var string|null
+     */
+    public $git_token = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $main_email_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $main_email_id = null;
 
     /**
-      * Identidad principal del usuario
-      * @access public
-      * @var int(11)
-      */
-    public $main_identity_id;
+     * Identidad principal del usuario
+     *
+     * @var int|null
+     */
+    public $main_identity_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(256)
-      */
-    public $name;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $scholar_degree = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $country_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $graduation_date = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $state_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $birth_date = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $school_id;
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $verified = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate')
-      */
-    public $scholar_degree;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $verification_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $language_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $reset_digest = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var date
-      */
-    public $graduation_date;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $reset_sent_at = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var date
-      */
-    public $birth_date;
+     * Determina si el usuario quiere ocultar las etiquetas de los problemas
+     *
+     * @var bool|null
+     */
+    public $hide_problem_tags = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('female','male','other','decline')
-      */
-    public $gender;
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $in_mailing_list = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $verified;
+     * Determina si el usuario eligió no compartir su información de manera pública
+     *
+     * @var bool
+     */
+    public $is_private = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(50)
-      */
-    public $verification_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(45)
-      */
-    public $reset_digest;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var datetime
-      */
-    public $reset_sent_at;
-
-    /**
-      * Determina si el usuario quiere ocultar las etiquetas de los problemas
-      * @access public
-      * @var tinyint(1)
-      */
-    public $hide_problem_tags;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $in_mailing_list;
-
-    /**
-      * Determina si el usuario eligió no compartir su información de manera pública
-      * @access public
-      * @var tinyint(1)
-      */
-    public $is_private;
-
-    /**
-      * El lenguaje de programación de preferencia de este usuario
-      * @access public
-      * @var enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
-      */
-    public $preferred_language;
+     * El lenguaje de programación de preferencia de este usuario
+     *
+     * @var string|null
+     */
+    public $preferred_language = null;
 }

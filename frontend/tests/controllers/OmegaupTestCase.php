@@ -46,6 +46,11 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         UserController::$sendEmailOnVerify = false;
         SessionController::$setCookieOnRegisterSession = false;
 
+        // Mock time
+        $currentTime = time();
+        Time::setTimeForTesting($currentTime);
+        MySQLConnection::getInstance()->Execute("SET TIMESTAMP = {$currentTime};");
+
         //Clean $_REQUEST before each test
         unset($_REQUEST);
     }
@@ -60,7 +65,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
 
     public static function logout() {
         $session = new SessionController();
-        if ($session->CurrentSessionAvailable()) {
+        if ($session->currentSessionAvailable()) {
             $session->InvalidateCache();
         }
         if (isset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
@@ -113,13 +118,13 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Logs in a identity an returns the auth_token
+     * Logs in an identity and returns the auth_token
      *
-     * @param $identity the identity to be logged in
+     * @param $identity to be logged in
      *
      * @return string auth_token
      */
-    public static function login($identity) {
+    public static function login($identity) : ScopedLoginToken {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
@@ -164,11 +169,11 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         // Assert data was correctly saved
         $this->assertEquals($r['description'], $contest->description);
 
-        $this->assertGreaterThanOrEqual($r['start_time'] - 1, Utils::GetPhpUnixTimestamp($contest->start_time));
-        $this->assertGreaterThanOrEqual($r['start_time'], Utils::GetPhpUnixTimestamp($contest->start_time) + 1);
+        $this->assertGreaterThanOrEqual($r['start_time'] - 1, $contest->start_time);
+        $this->assertGreaterThanOrEqual($r['start_time'], $contest->start_time + 1);
 
-        $this->assertGreaterThanOrEqual($r['finish_time'] - 1, Utils::GetPhpUnixTimestamp($contest->finish_time));
-        $this->assertGreaterThanOrEqual($r['finish_time'], Utils::GetPhpUnixTimestamp($contest->finish_time) + 1);
+        $this->assertGreaterThanOrEqual($r['finish_time'] - 1, $contest->finish_time);
+        $this->assertGreaterThanOrEqual($r['finish_time'], $contest->finish_time + 1);
 
         $this->assertEquals($r['window_length'], $contest->window_length);
         $this->assertEquals($r['admission_mode'], $contest->admission_mode);
@@ -432,7 +437,6 @@ class NoOpGrader extends Grader {
     private $_runs = [];
 
     public function grade(Runs $run, string $source) {
-        global $conn;
         $sql = '
             SELECT
                 s.guid
@@ -441,7 +445,7 @@ class NoOpGrader extends Grader {
             WHERE
                 s.submission_id = ?;
         ';
-        $guid = $conn->GetOne($sql, [$run->submission_id]);
+        $guid = MySQLConnection::getInstance()->GetOne($sql, [$run->submission_id]);
         $this->_submissions[$guid] = $source;
         array_push($this->_runs, $run);
     }

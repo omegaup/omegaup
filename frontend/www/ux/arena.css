@@ -36,7 +36,8 @@ legend {
 #problem,
 #ranking,
 #clarifications,
-#runs {
+#runs,
+#solution {
 	display: none;
 }
 
@@ -376,7 +377,7 @@ body#only-problem #problems .main {
 	background: #eee;
 	width: 850px;
 	height: 38em;
-	margin: 2em auto 0 auto;
+	margin: 4em auto 0 auto;
 	border: 2px solid #ccc;
 	padding: 1em;
 	position: relative;
@@ -704,4 +705,15 @@ td.forcebreaks-arena {
 
 .introjs-helperLayer {
   background-color: rgba(255,255,255,0.1);
+}
+
+#status {
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	z-index: 99999999;
+	max-width: 900px;
+	margin-right: auto;
+	margin-left: auto;
+	top: 0px;
+	width: 100%;
 }

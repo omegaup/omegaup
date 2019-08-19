@@ -16,7 +16,7 @@ class IdentityFactory {
     public static function getCsvData($file, $group_alias, $password = '') {
         $row = 0;
         $identities = [];
-        $path_file = OMEGAUP_RESOURCES_ROOT . $file;
+        $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
         if (($handle = fopen($path_file, 'r')) == false) {
             throw new InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -34,5 +34,40 @@ class IdentityFactory {
         }
         fclose($handle);
         return $identities;
+    }
+
+    public static function createIdentitiesFromAGroup(
+        Groups $group,
+        ScopedLoginToken $adminLogin,
+        string $password
+    ) : array {
+        // Call api using identity creator group member
+        IdentityController::apiBulkCreate(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'identities' => IdentityFactory::getCsvData(
+                'identities.csv',
+                $group->alias,
+                $password
+            ),
+            'group_alias' => $group->alias,
+        ]));
+
+        // Getting the identities members list
+        $response = GroupController::apiMembers(new Request([
+            'auth_token' => $adminLogin->auth_token,
+            'group_alias' => $group->alias,
+        ]));
+
+        [$unassociatedIdentity, $associatedIdentity] = $response['identities'];
+        $unassociatedIdentity = IdentitiesDAO::FindByUsername(
+            $unassociatedIdentity['username']
+        );
+        $associatedIdentity = IdentitiesDAO::FindByUsername(
+            $associatedIdentity['username']
+        );
+
+        $unassociatedIdentity->password = $password;
+        $associatedIdentity->password = $password;
+        return [$unassociatedIdentity, $associatedIdentity];
     }
 }

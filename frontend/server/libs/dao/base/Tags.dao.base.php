@@ -19,43 +19,20 @@
  */
 abstract class TagsDAOBase {
     /**
-     * Guardar registros.
-     *
-     * Este metodo guarda el estado actual del objeto {@link Tags}
-     * pasado en la base de datos. La llave primaria indicará qué instancia va
-     * a ser actualizada en base de datos. Si la llave primara o combinación de
-     * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
-     *
-     * @static
-     * @throws Exception si la operacion fallo.
-     * @param Tags [$Tags] El objeto de tipo Tags
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     */
-    final public static function save(Tags $Tags) {
-        if (is_null(self::getByPK($Tags->tag_id))) {
-            return TagsDAOBase::create($Tags);
-        }
-        return TagsDAOBase::update($Tags);
-    }
-
-    /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param Tags [$Tags] El objeto de tipo Tags a actualizar.
+     * @param Tags $Tags El objeto de tipo Tags a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
-    final public static function update(Tags $Tags) {
+    final public static function update(Tags $Tags) : int {
         $sql = 'UPDATE `Tags` SET `name` = ? WHERE `tag_id` = ?;';
         $params = [
             $Tags->name,
-            is_null($Tags->tag_id) ? null : (int)$Tags->tag_id,
+            (int)$Tags->tag_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -64,17 +41,12 @@ abstract class TagsDAOBase {
      * Este metodo cargará un objeto {@link Tags} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Tags Un objeto del tipo {@link Tags}. NULL si no hay tal registro.
+     * @return ?Tags Un objeto del tipo {@link Tags}. NULL si no hay tal registro.
      */
-    final public static function getByPK($tag_id) {
-        if (is_null($tag_id)) {
-            return null;
-        }
+    final public static function getByPK(int $tag_id) : ?Tags {
         $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` FROM Tags WHERE (tag_id = ?) LIMIT 1;';
         $params = [$tag_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -87,23 +59,22 @@ abstract class TagsDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto Tags suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Tags [$Tags] El objeto de tipo Tags a eliminar
+     * @param Tags $Tags El objeto de tipo Tags a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Tags $Tags) {
+    final public static function delete(Tags $Tags) : void {
         $sql = 'DELETE FROM `Tags` WHERE tag_id = ?;';
         $params = [$Tags->tag_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -118,24 +89,30 @@ abstract class TagsDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Tags}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return Tags[] Un arreglo que contiene objetos del tipo {@link Tags}.
+     *
+     * @psalm-return array<int, Tags>
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        int $filasPorPagina = 100,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` from Tags';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new Tags($row);
         }
         return $allData;
@@ -147,23 +124,22 @@ abstract class TagsDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Tags suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Tags [$Tags] El objeto de tipo Tags a crear.
+     * @param Tags $Tags El objeto de tipo Tags a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Tags $Tags) {
+    final public static function create(Tags $Tags) : int {
         $sql = 'INSERT INTO Tags (`name`) VALUES (?);';
         $params = [
             $Tags->name,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
-        $Tags->tag_id = $conn->Insert_ID();
+        $Tags->tag_id = MySQLConnection::getInstance()->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

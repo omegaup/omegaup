@@ -20,10 +20,11 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('basic_information', $this->params, false, 'false');
         ContestParams::validateParameter('requests_user_information', $this->params, false, 'no');
         ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
+        ContestParams::validateParameter('window_length', $this->params, false);
         ContestParams::validateParameter('languages', $this->params, false);
-        ContestParams::validateParameter('start_time', $this->params, false, (Utils::GetPhpUnixTimestamp() - 60 * 60));
-        ContestParams::validateParameter('finish_time', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
-        ContestParams::validateParameter('last_updated', $this->params, false, (Utils::GetPhpUnixTimestamp() + 60 * 60));
+        ContestParams::validateParameter('start_time', $this->params, false, (Time::get() - 60 * 60));
+        ContestParams::validateParameter('finish_time', $this->params, false, (Time::get() + 60 * 60));
+        ContestParams::validateParameter('last_updated', $this->params, false, (Time::get() + 60 * 60));
         ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
     }
 
@@ -45,20 +46,6 @@ class ContestParams implements ArrayAccess {
 
     public function offsetUnset($offset) {
         unset($this->params[$offset]);
-    }
-
-    public static function fromContest(Contests $contest) {
-        return new ContestParams([
-            'title' => $contest->title,
-            'admission_mode' => $contest->admission_mode,
-            'basic_information' => $contest->basic_information,
-            'contestDirector' => $contest->contestDirector,
-            'languages' => $contest->languages,
-            'start_time' => $contest->start_time,
-            'finish_time' => $contest->finish_time,
-            'last_updated' => $contest->last_updated,
-            'penalty_calc_policy' => $contest->penalty_calc_policy,
-        ]);
     }
 
     /**
@@ -110,7 +97,7 @@ class ContestsFactory {
             'start_time' => $params['start_time'],
             'finish_time' => $params['finish_time'],
             'last_updated' => $params['last_updated'],
-            'window_length' => null,
+            'window_length' => $params['window_length'],
             'admission_mode' => $params['admission_mode'],
             'alias' => substr($params['title'], 0, 20),
             'points_decay_factor' => '0.02',
@@ -122,16 +109,15 @@ class ContestsFactory {
             'penalty_type' => 'contest_start',
             'languages' => $params['languages'],
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
-            'basic_information' => $params['basic_information'], // This is just a default value.
+            'basic_information' => $params['basic_information'],
+            'requests_user_information' => $params['requests_user_information'],
+            'languages' => $params['languages'],
         ]);
         if ($params['penalty_calc_policy'] == null) {
             $r['penalty_calc_policy'] = 'sum';
         } else {
             $r['penalty_calc_policy'] = $params['penalty_calc_policy'];
         }
-        $r['languages'] = $params['languages'];
-        $r['basic_information'] = $params['basic_information']; // This is just a default value.
-        $r['requests_user_information'] = $params['requests_user_information']; // This is just a default value.
 
         return [
             'request' => $r,
@@ -139,10 +125,29 @@ class ContestsFactory {
         ];
     }
 
+    /**
+     * Insert problems in a contest
+     *
+     * @param type $contestData
+     * @param type $numOfProblems
+     * @return array array of problemData
+     */
+    public static function insertProblemsInContest($contestData, $numOfProblems = 3) {
+        // Create problems
+        $problems = [];
+        for ($i = 0; $i < $numOfProblems; $i++) {
+            $problems[$i] = ProblemsFactory::createProblem();
+            ContestsFactory::addProblemToContest($problems[$i], $contestData);
+        }
+
+        return $problems;
+    }
+
     public static function createContest($params = null) {
         if (!($params instanceof ContestParams)) {
             $params = new ContestParams($params);
         }
+
         $privateParams = new ContestParams($params);
         // Create a valid contest Request object
         $privateParams['admission_mode'] = 'private';
@@ -246,11 +251,33 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
-    public static function addUser($contestData, $user) {
+    public static function addUser(
+        array $contestData,
+        Users $user
+    ) : void {
         // Prepare our request
         $r = new Request();
         $r['contest_alias'] = $contestData['request']['alias'];
         $r['usernameOrEmail'] = $user->username;
+
+        // Log in the contest director
+        $login = OmegaupTestCase::login($contestData['director']);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call api
+        ContestController::apiAddUser($r);
+
+        unset($_REQUEST);
+    }
+
+    public static function addIdentity(
+        array $contestData,
+        Identities $identitiy
+    ) : void {
+        // Prepare our request
+        $r = new Request();
+        $r['contest_alias'] = $contestData['request']['alias'];
+        $r['usernameOrEmail'] = $identitiy->username;
 
         // Log in the contest director
         $login = OmegaupTestCase::login($contestData['director']);
@@ -293,22 +320,19 @@ class ContestsFactory {
         ContestController::apiAddGroupAdmin($r);
     }
 
-    public static function makeContestWindowLength($contestData, $windowLength = 20) {
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->window_length = $windowLength;
-        ContestsDAO::save($contest);
-    }
-
-    public static function forcePublic($contestData, $last_updated = null) {
+    public static function forcePublic(
+        array $contestData,
+        ?int $lastUpdated = null
+    ) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->admission_mode = 'public';
-        $contest->last_updated = gmdate('Y-m-d H:i:s', $last_updated);
-        ContestsDAO::save($contest);
+        $contest->last_updated = $lastUpdated;
+        ContestsDAO::update($contest);
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
         $contest->scoreboard = $percentage;
-        ContestsDAO::save($contest);
+        ContestsDAO::update($contest);
     }
 }

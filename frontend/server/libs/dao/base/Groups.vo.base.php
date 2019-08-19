@@ -15,6 +15,15 @@
  * @access public
  */
 class Groups extends VO {
+    const FIELD_NAMES = [
+        'group_id' => true,
+        'acl_id' => true,
+        'create_time' => true,
+        'alias' => true,
+        'name' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de Groups
      *
@@ -22,9 +31,13 @@ class Groups extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_id'])) {
             $this->group_id = (int)$data['group_id'];
@@ -33,71 +46,66 @@ class Groups extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['create_time'])) {
-            $this->create_time = $data['create_time'];
+            /**
+             * @var string|int|float $data['create_time']
+             * @var int $this->create_time
+             */
+            $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
+        } else {
+            $this->create_time = Time::get();
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['create_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $group_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $group_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $create_time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $create_time;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $alias = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(50)
-      */
-    public $alias;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $name = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(50)
-      */
-    public $name;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(256)
-      */
-    public $description;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $description = null;
 }

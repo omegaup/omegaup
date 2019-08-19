@@ -36,33 +36,23 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     }
 
     /**
-     *  Check if a submission is before the deadline.
+     *  Check whether a submission is before the deadline.
      *  No one, including admins, can submit after the deadline.
      */
-    public static function isLateSubmission($container) {
-        return isset($container->finish_time) &&
-               (Time::get() > strtotime($container->finish_time));
+    public static function isLateSubmission(
+        Object $container,
+        ?ProblemsetIdentities $problemsetIdentity
+    ) : bool {
+        if (is_null($problemsetIdentity)) {
+            return isset($container->finish_time) &&
+                   (Time::get() > $container->finish_time);
+        }
+        return Time::get() > $problemsetIdentity->end_time;
     }
 
-    public static function insideSubmissionWindow($container, $identity_id) {
-        if (isset($container->finish_time)) {
-            if (Time::get() > strtotime($container->finish_time) ||
-                Time::get() < strtotime($container->start_time)) {
-                return false;
-            }
-        }
-
-        if (!isset($container->window_length)) {
-            return true;
-        }
-
-        $problemset_identity = ProblemsetIdentitiesDAO::getByPK(
-            $identity_id,
-            $container->problemset_id
-        );
-        $first_access_time = $problemset_identity->access_time;
-
-        return Time::get() <= strtotime($first_access_time) + $container->window_length * 60;
+    public static function isSubmissionWindowOpen(Object $container) : bool {
+        return isset($container->start_time) &&
+                Time::get() >= $container->start_time;
     }
 
     public static function getWithTypeByPK($problemset_id) {
@@ -96,12 +86,43 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                     1;';
         $params = [$problemset_id];
 
-        global $conn;
-        $problemset = $conn->GetRow($sql, $params);
+        $problemset = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($problemset)) {
             return null;
         }
 
         return $problemset;
+    }
+
+    /**
+     * Checks whether users have made submissions with any of their associated
+     * identities and are currently logged in with one of them.
+     * In this case a flag is turned on and a message will be displayed in arena
+     *
+     * @param Users $user
+     */
+    public static function shouldShowFirstAssociatedIdentityRunWarning(
+        Users $user
+    ) : bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            INNER JOIN
+                Users u
+            ON
+                u.user_id = i.user_id
+            WHERE
+                u.user_id = ?
+                AND u.main_identity_id != i.identity_id
+            LIMIT
+                1;';
+
+        return MySQLConnection::getInstance()->GetOne($sql, [$user->user_id]) == '0';
     }
 }

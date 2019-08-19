@@ -15,6 +15,12 @@
  * @access public
  */
 class States extends VO {
+    const FIELD_NAMES = [
+        'country_id' => true,
+        'state_id' => true,
+        'name' => true,
+    ];
+
     /**
      * Constructor de States
      *
@@ -22,52 +28,45 @@ class States extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['country_id'])) {
-            $this->country_id = $data['country_id'];
+            $this->country_id = strval($data['country_id']);
         }
         if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
+            $this->state_id = strval($data['state_id']);
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var string|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $country_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var char(3)
-      */
-    public $country_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var string|null
+     */
+    public $state_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var char(3)
-      */
-    public $state_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(50)
-      */
-    public $name;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $name = null;
 }

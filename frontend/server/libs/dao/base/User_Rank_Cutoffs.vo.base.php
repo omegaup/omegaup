@@ -15,6 +15,12 @@
  * @access public
  */
 class UserRankCutoffs extends VO {
+    const FIELD_NAMES = [
+        'score' => true,
+        'percentile' => true,
+        'classname' => true,
+    ];
+
     /**
      * Constructor de UserRankCutoffs
      *
@@ -22,9 +28,13 @@ class UserRankCutoffs extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['score'])) {
             $this->score = (float)$data['score'];
@@ -33,39 +43,28 @@ class UserRankCutoffs extends VO {
             $this->percentile = (float)$data['percentile'];
         }
         if (isset($data['classname'])) {
-            $this->classname = $data['classname'];
+            $this->classname = strval($data['classname']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     *
+     * @var float|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $score = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $score;
+     * [Campo no documentado]
+     *
+     * @var float|null
+     */
+    public $percentile = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $percentile;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(50)
-      */
-    public $classname;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $classname = null;
 }

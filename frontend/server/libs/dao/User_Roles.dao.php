@@ -34,8 +34,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             $acl_id,
         ];
 
-        global $conn;
-        $admins = $conn->GetAll($sql, $params);
+        $admins = MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $sql = '
             SELECT
@@ -47,7 +46,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             WHERE
                 a.acl_id = ?;';
         $params = [$acl_id];
-        $owner = $conn->GetOne($sql, $params);
+        $owner = MySQLConnection::getInstance()->GetOne($sql, $params);
 
         $found = false;
         for ($i = 0; $i < count($admins); $i++) {
@@ -87,8 +86,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             Authorization::SYSTEM_ACL,
             $acl_id,
         ];
-        global $conn;
-        return $conn->GetOne($sql, $params) > 0;
+        return MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
     }
 
     public static function getContestAdmins(Contests $contest) {
@@ -117,10 +115,9 @@ class UserRolesDAO extends UserRolesDAOBase {
             $user_id,
             Authorization::SYSTEM_ACL,
         ];
-        global $conn;
 
         $roles = [];
-        foreach ($conn->GetAll($sql, $params) as $role) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
             $roles[] = $role['name'];
         }
         return $roles;
@@ -139,10 +136,9 @@ class UserRolesDAO extends UserRolesDAOBase {
         $params = [
             $identity_id
         ];
-        global $conn;
 
         $groups = [];
-        foreach ($conn->GetAll($sql, $params) as $group) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $group) {
             $groups[] = $group['name'];
         }
 

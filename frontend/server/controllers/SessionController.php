@@ -53,7 +53,7 @@ class SessionController extends Controller {
         return true;
     }
 
-    public static function CurrentSessionAvailable() {
+    public static function currentSessionAvailable() {
         return self::apiCurrentSession()['session']['valid'];
     }
 
@@ -63,10 +63,11 @@ class SessionController extends Controller {
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
      * */
-    public static function apiCurrentSession(Request $r = null) {
+    public static function apiCurrentSession(?Request $r = null) : array {
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
-            !is_null(self::$current_session)) {
+            !is_null(self::$current_session)
+        ) {
             return [
                 'status' => 'ok',
                 'session' => self::$current_session,
@@ -80,18 +81,18 @@ class SessionController extends Controller {
             $r['auth_token'] = SessionController::getAuthToken($r);
         }
         $authToken = $r['auth_token'];
-        if ($authToken != null &&
-            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
-            OMEGAUP_SESSION_CACHE_ENABLED === true) {
-            Cache::getFromCacheOrSet(
+        if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+            OMEGAUP_SESSION_CACHE_ENABLED === true &&
+            !is_null($authToken)
+         ) {
+            self::$current_session = Cache::getFromCacheOrSet(
                 Cache::SESSION_PREFIX,
                 $authToken,
-                $r,
-                ['SessionController', 'getCurrentSession'],
-                $session,
+                function () use ($r) {
+                    return SessionController::getCurrentSession($r);
+                },
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
-            self::$current_session = $session;
         } else {
             self::$current_session = SessionController::getCurrentSession($r);
         }
@@ -135,17 +136,7 @@ class SessionController extends Controller {
             ];
         }
 
-        $currentUser = AuthTokensDAO::getUserByToken($authToken);
         $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
-
-        // Get email via their id
-        if (!is_null($currentUser)) {
-            $email = EmailsDAO::getByPK($currentUser->main_email_id);
-            if (is_null($currentIdentity)) {
-                $currentIdentity = IdentitiesDAO::getByPK($currentUser->main_identity_id);
-            }
-        }
-
         if (is_null($currentIdentity)) {
             // Means user has auth token, but does not exist in DB
             return [
@@ -158,6 +149,14 @@ class SessionController extends Controller {
             ];
         }
 
+        if (is_null($currentIdentity->user_id)) {
+            $currentUser = null;
+            $email = null;
+        } else {
+            $currentUser = UsersDAO::getByPK($currentIdentity->user_id);
+            $email = !is_null($currentUser->main_email_id) ? EmailsDAO::getByPK($currentUser->main_email_id) : null;
+        }
+
         return [
             'valid' => true,
             'email' => !empty($email) ? $email->email : '',
@@ -165,7 +164,7 @@ class SessionController extends Controller {
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::isSystemAdmin($currentIdentity->identity_id),
+            'is_admin' => Authorization::isSystemAdmin($currentIdentity),
         ];
     }
 
@@ -174,6 +173,9 @@ class SessionController extends Controller {
      */
     public function InvalidateCache() {
         $currentSession = self::apiCurrentSession()['session'];
+        if (is_null($currentSession['auth_token'])) {
+            return;
+        }
         Cache::deleteFromCache(Cache::SESSION_PREFIX, $currentSession['auth_token']);
     }
 
@@ -195,12 +197,14 @@ class SessionController extends Controller {
         try {
             AuthTokensDAO::delete($authToken);
         } catch (Exception $e) {
+            // Best effort
+            self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
         }
 
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private function RegisterSession(Identities $identity, $b_ReturnAuthTokenAsString = false) {
+    private function registerSession(Identities $identity) : string {
         // Log the login.
         IdentityLoginLogDAO::create(new IdentityLoginLog([
             'identity_id' => $identity->identity_id,
@@ -220,29 +224,20 @@ class SessionController extends Controller {
         // Create the new token
         $entropy = bin2hex(random_bytes(SessionController::AUTH_TOKEN_ENTROPY_SIZE));
         $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
-        $s_AuthT = "{$entropy}-{$identity->identity_id}-{$hash}";
+        $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
-        $authToken = new AuthTokens();
-        $authToken->user_id = $identity->user_id;
-        $authToken->identity_id = $identity->identity_id;
-        $authToken->token = $s_AuthT;
-
-        try {
-            AuthTokensDAO::save($authToken);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        AuthTokensDAO::replace(new AuthTokens([
+            'user_id' => $identity->user_id,
+            'identity_id' => $identity->identity_id,
+            'token' => $token,
+        ]));
 
         if (self::$setCookieOnRegisterSession) {
-            $sm = $this->getSessionManagerInstance();
-            $sm->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $s_AuthT, 0, '/');
+            $this->getSessionManagerInstance()->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $token, 0, '/');
         }
 
-        Cache::deleteFromCache(Cache::SESSION_PREFIX, $s_AuthT);
-
-        if ($b_ReturnAuthTokenAsString) {
-            return $s_AuthT;
-        }
+        Cache::deleteFromCache(Cache::SESSION_PREFIX, $token);
+        return $token;
     }
 
     private static function getUniqueUsernameFromEmail($s_Email) {
@@ -384,6 +379,8 @@ class SessionController extends Controller {
     public function NativeLogin(Request $r) {
         $identity = null;
 
+        Validators::validateStringNonEmpty($r['password'], 'password');
+
         if (null != $r['returnAuthToken']) {
             $returnAuthToken = $r['returnAuthToken'];
         } else {
@@ -392,20 +389,35 @@ class SessionController extends Controller {
 
         try {
             $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
-            $r['user_id'] = $identity->user_id;
-            $r['identity_id'] = $identity->identity_id;
-            $r['user'] = $identity;
         } catch (ApiException $e) {
             self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
             return false;
         }
 
-        if (!UserController::testPassword($identity, $r['password'])) {
-            self::$log->warn("Identity {$r['usernameOrEmail']} has introduced invalid credentials.");
+        if (!IdentityController::testPassword($identity, $r['password'])) {
+            self::$log->warn("Identity {$identity->username} has introduced invalid credentials.");
             return false;
         }
+        if (SecurityTools::isOldHash($identity->password)) {
+            // Update the password using the new Argon2i algorithm.
+            self::$log->warn("Identity {$identity->username}'s password hash is being upgraded.");
+            try {
+                DAO::transBegin();
+                $identity->password = SecurityTools::hashString($r['password']);
+                IdentitiesDAO::update($identity);
+                if (!is_null($identity->user_id)) {
+                    $user = UsersDAO::getByPK($identity->user_id);
+                    $user->password = $identity->password;
+                    UsersDAO::update($user);
+                }
+                DAO::transEnd();
+            } catch (Exception $e) {
+                DAO::transRollback();
+                throw $e;
+            }
+        }
 
-        self::$log->info("Identity {$r['usernameOrEmail']} has logged in natively.");
+        self::$log->info("Identity {$identity->username} has logged in natively.");
 
         if (!is_null($identity->user_id)) {
             $user = UsersDAO::getByPK($identity->user_id);
@@ -413,7 +425,7 @@ class SessionController extends Controller {
         }
 
         try {
-            return $this->RegisterSession($identity, $returnAuthToken);
+            return $this->registerSession($identity, $returnAuthToken);
         } catch (Exception $e) {
             self::$log->error($e);
             return false;
@@ -491,10 +503,10 @@ class SessionController extends Controller {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }
-            $identity = IdentitiesDAO::FindByUsername($res['username']);
+            $identity = IdentitiesDAO::findByUsername($res['username']);
         }
 
-        $this->RegisterSession($identity);
+        $this->registerSession($identity);
         return ['status' => 'ok'];
     }
 }

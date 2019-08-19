@@ -15,6 +15,15 @@
  * @access public
  */
 class ProblemsetIdentityRequestHistory extends VO {
+    const FIELD_NAMES = [
+        'history_id' => true,
+        'identity_id' => true,
+        'problemset_id' => true,
+        'time' => true,
+        'accepted' => true,
+        'admin_id' => true,
+    ];
+
     /**
      * Constructor de ProblemsetIdentityRequestHistory
      *
@@ -22,9 +31,13 @@ class ProblemsetIdentityRequestHistory extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['history_id'])) {
             $this->history_id = (int)$data['history_id'];
@@ -36,10 +49,16 @@ class ProblemsetIdentityRequestHistory extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'] == '1';
+            $this->accepted = boolval($data['accepted']);
         }
         if (isset($data['admin_id'])) {
             $this->admin_id = (int)$data['admin_id'];
@@ -47,57 +66,46 @@ class ProblemsetIdentityRequestHistory extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $history_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $history_id;
+     * Identidad del usuario
+     *
+     * @var int|null
+     */
+    public $identity_id = null;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $time;
+     * [Campo no documentado]
+     *
+     * @var bool|null
+     */
+    public $accepted = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(4)
-      */
-    public $accepted;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $admin_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $admin_id = null;
 }

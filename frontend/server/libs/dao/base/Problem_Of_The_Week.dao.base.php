@@ -19,45 +19,22 @@
  */
 abstract class ProblemOfTheWeekDAOBase {
     /**
-     * Guardar registros.
-     *
-     * Este metodo guarda el estado actual del objeto {@link ProblemOfTheWeek}
-     * pasado en la base de datos. La llave primaria indicará qué instancia va
-     * a ser actualizada en base de datos. Si la llave primara o combinación de
-     * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
-     *
-     * @static
-     * @throws Exception si la operacion fallo.
-     * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     */
-    final public static function save(ProblemOfTheWeek $Problem_Of_The_Week) {
-        if (is_null(self::getByPK($Problem_Of_The_Week->problem_of_the_week_id))) {
-            return ProblemOfTheWeekDAOBase::create($Problem_Of_The_Week);
-        }
-        return ProblemOfTheWeekDAOBase::update($Problem_Of_The_Week);
-    }
-
-    /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek a actualizar.
+     * @param ProblemOfTheWeek $Problem_Of_The_Week El objeto de tipo ProblemOfTheWeek a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
-    final public static function update(ProblemOfTheWeek $Problem_Of_The_Week) {
+    final public static function update(ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'UPDATE `Problem_Of_The_Week` SET `problem_id` = ?, `time` = ?, `difficulty` = ? WHERE `problem_of_the_week_id` = ?;';
         $params = [
             is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
-            is_null($Problem_Of_The_Week->problem_of_the_week_id) ? null : (int)$Problem_Of_The_Week->problem_of_the_week_id,
+            (int)$Problem_Of_The_Week->problem_of_the_week_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -66,17 +43,12 @@ abstract class ProblemOfTheWeekDAOBase {
      * Este metodo cargará un objeto {@link ProblemOfTheWeek} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link ProblemOfTheWeek Un objeto del tipo {@link ProblemOfTheWeek}. NULL si no hay tal registro.
+     * @return ?ProblemOfTheWeek Un objeto del tipo {@link ProblemOfTheWeek}. NULL si no hay tal registro.
      */
-    final public static function getByPK($problem_of_the_week_id) {
-        if (is_null($problem_of_the_week_id)) {
-            return null;
-        }
+    final public static function getByPK(int $problem_of_the_week_id) : ?ProblemOfTheWeek {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` FROM Problem_Of_The_Week WHERE (problem_of_the_week_id = ?) LIMIT 1;';
         $params = [$problem_of_the_week_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -89,23 +61,22 @@ abstract class ProblemOfTheWeekDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto ProblemOfTheWeek suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek a eliminar
+     * @param ProblemOfTheWeek $Problem_Of_The_Week El objeto de tipo ProblemOfTheWeek a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(ProblemOfTheWeek $Problem_Of_The_Week) {
+    final public static function delete(ProblemOfTheWeek $Problem_Of_The_Week) : void {
         $sql = 'DELETE FROM `Problem_Of_The_Week` WHERE problem_of_the_week_id = ?;';
         $params = [$Problem_Of_The_Week->problem_of_the_week_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -120,24 +91,30 @@ abstract class ProblemOfTheWeekDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link ProblemOfTheWeek}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return ProblemOfTheWeek[] Un arreglo que contiene objetos del tipo {@link ProblemOfTheWeek}.
+     *
+     * @psalm-return array<int, ProblemOfTheWeek>
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        int $filasPorPagina = 100,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` from Problem_Of_The_Week';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemOfTheWeek($row);
         }
         return $allData;
@@ -149,28 +126,24 @@ abstract class ProblemOfTheWeekDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto ProblemOfTheWeek suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param ProblemOfTheWeek [$Problem_Of_The_Week] El objeto de tipo ProblemOfTheWeek a crear.
+     * @param ProblemOfTheWeek $Problem_Of_The_Week El objeto de tipo ProblemOfTheWeek a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(ProblemOfTheWeek $Problem_Of_The_Week) {
-        if (is_null($Problem_Of_The_Week->time)) {
-            $Problem_Of_The_Week->time = '2000-01-01';
-        }
+    final public static function create(ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
         $params = [
             is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
-        $Problem_Of_The_Week->problem_of_the_week_id = $conn->Insert_ID();
+        $Problem_Of_The_Week->problem_of_the_week_id = MySQLConnection::getInstance()->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

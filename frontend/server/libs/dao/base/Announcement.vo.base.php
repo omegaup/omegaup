@@ -15,6 +15,13 @@
  * @access public
  */
 class Announcement extends VO {
+    const FIELD_NAMES = [
+        'announcement_id' => true,
+        'user_id' => true,
+        'time' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de Announcement
      *
@@ -22,9 +29,13 @@ class Announcement extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['announcement_id'])) {
             $this->announcement_id = (int)$data['announcement_id'];
@@ -33,51 +44,46 @@ class Announcement extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * Identificador del aviso
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $announcement_id = 0;
 
     /**
-      * Identificador del aviso
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $announcement_id;
+     * UserID del autor de este aviso
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      * UserID del autor de este aviso
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * Fecha de creacion de este aviso
+     *
+     * @var int
+     */
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      * Fecha de creacion de este aviso
-      * @access public
-      * @var timestamp
-      */
-    public $time;
-
-    /**
-      * Mensaje de texto del aviso
-      * @access public
-      * @var text
-      */
-    public $description;
+     * Mensaje de texto del aviso
+     *
+     * @var string|null
+     */
+    public $description = null;
 }

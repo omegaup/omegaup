@@ -77,6 +77,97 @@ def test_user_ranking_course(driver):
                                      num_elements=1, scoreboard='Admin')
 
 
+def test_create_identities_for_course(driver):
+    '''Adding some identities into a course and associating one of them to
+    specific user
+    '''
+
+    run_id = driver.generate_id()
+    course_alias = 'ut_rank_course_%s' % run_id
+    school_name = 'ut_rank_school_%s' % run_id
+    assignment_alias = 'ut_rank_hw_%s' % run_id
+    problem = 'sumas'
+    username = 'ut_user_%s' % driver.generate_id()
+    password = 'p@ssw0rd'
+    driver.register_user(username, password)
+
+    # Admin creates a course with one assignment and one problem, and then
+    # creates some identities associated with the course group
+    with driver.login_admin():
+        create_course(driver, course_alias, school_name)
+        add_assignment(driver, assignment_alias)
+        add_problem_to_assignment(driver, assignment_alias, problem)
+        # The function require the group alias. We are assuming that it is the
+        # same as the course alias, since that is the default
+        unassociated, associated = util.add_identities_group(driver,
+                                                             course_alias)[:2]
+
+    # Unassociated identity joins the course which it was created for and
+    # creates a new run
+    with driver.login(unassociated.username, unassociated.password):
+        enter_course(driver, course_alias, assignment_alias)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 ('//a[contains(@href, "#problems/%s")]' %
+                  problem)))).click()
+
+        util.create_run(driver, problem, 'Main.cpp11')
+        driver.update_score_in_course(problem, assignment_alias)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 'button.details'))).click()
+
+        assert (('show-run:') in
+                driver.browser.current_url), driver.browser.current_url
+
+    # Registred user associates a new identity
+    with driver.login(username, password):
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.ID, 'nav-user'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH,
+                     ('//li[@id = "nav-user"]'
+                      '//a[@href = "/profile/"]')))).click()
+
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, ('//a[@href = "/profile/edit/"]')))).click()
+
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[contains(concat(" ", normalize-space(@class), " "), '
+                 '" username-input ")]'))).send_keys(associated.username)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[contains(concat(" ", normalize-space(@class), " "), '
+                 '" password-input ")]'
+                 ))).send_keys(associated.password)
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//form[contains(concat(" ", normalize-space(@class), " "), '
+                 '" add-identity-form ")]/div/button'))).click()
+
+        associated_identities = driver.browser.find_element_by_xpath(
+            '//tr/td[text() = "%s"]' % (associated.username))
+        assert associated_identities is not None, 'No identity matches'
+
+    # The new associated identity joins the course
+    with driver.login(associated.username, associated.password):
+        enter_course(driver, course_alias, assignment_alias)
+
+
 def enter_course_assignments_page(driver, course_alias):
     '''Steps to enter into scoreboard page'''
 

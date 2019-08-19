@@ -15,6 +15,15 @@
  * @access public
  */
 class QualityNominationComments extends VO {
+    const FIELD_NAMES = [
+        'qualitynomination_comment_id' => true,
+        'qualitynomination_id' => true,
+        'user_id' => true,
+        'time' => true,
+        'vote' => true,
+        'contents' => true,
+    ];
+
     /**
      * Constructor de QualityNominationComments
      *
@@ -22,9 +31,13 @@ class QualityNominationComments extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['qualitynomination_comment_id'])) {
             $this->qualitynomination_comment_id = (int)$data['qualitynomination_comment_id'];
@@ -36,68 +49,63 @@ class QualityNominationComments extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['vote'])) {
             $this->vote = (int)$data['vote'];
         }
         if (isset($data['contents'])) {
-            $this->contents = $data['contents'];
+            $this->contents = strval($data['contents']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $qualitynomination_comment_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $qualitynomination_comment_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $qualitynomination_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $qualitynomination_id;
+     * El usuario que emitió el comentario
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      * El usuario que emitió el comentario
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * Fecha de creacion de este comentario
+     *
+     * @var int
+     */
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      * Fecha de creacion de este comentario
-      * @access public
-      * @var timestamp
-      */
-    public $time;
+     * El voto emitido en este comentario. En el rango de [-2, +2]
+     *
+     * @var int|null
+     */
+    public $vote = null;
 
     /**
-      * El voto emitido en este comentario. En el rango de [-2, +2]
-      * @access public
-      * @var int(1)
-      */
-    public $vote;
-
-    /**
-      * El contenido de el comentario
-      * @access public
-      * @var text
-      */
-    public $contents;
+     * El contenido de el comentario
+     *
+     * @var string|null
+     */
+    public $contents = null;
 }

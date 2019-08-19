@@ -179,10 +179,10 @@ class LoginTest extends OmegaupTestCase {
         $plainPassword = $user->password;
         // Set old password
         $user->password = md5($plainPassword);
-        UsersDAO::save($user);
+        UsersDAO::update($user);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
         $identity->password = $user->password;
-        IdentitiesDAO::save($identity);
+        IdentitiesDAO::update($identity);
 
         // Let's put back plain password
         $user->password = $plainPassword;
@@ -204,11 +204,11 @@ class LoginTest extends OmegaupTestCase {
         $login = self::login($user);
 
         // Expire token manually
-        $auth_token_dao = AuthTokensDAO::getByPK($login->auth_token);
-        $auth_token_dao->create_time = date('Y-m-d H:i:s', strtotime($auth_token_dao->create_time . ' - 9 hour'));
-        AuthTokensDAO::save($auth_token_dao);
+        $authToken = AuthTokensDAO::getByPK($login->auth_token);
+        $authToken->create_time -= 9 * 3600;  // 9 hours
+        AuthTokensDAO::update($authToken);
 
-        $auth_token_2 = self::login($user);
+        $login2 = self::login($user);
 
         $existingTokens = AuthTokensDAO::getByPK($login->auth_token);
         $this->assertNull($existingTokens);
@@ -216,8 +216,6 @@ class LoginTest extends OmegaupTestCase {
 
     /**
      * Logins with empty passwords in DB are disabled
-     *
-     * @expectedException LoginDisabledException
      */
     public function testLoginDisabled() {
         // User to be verified
@@ -225,11 +223,17 @@ class LoginTest extends OmegaupTestCase {
 
         // Force empty password
         $user->password = '';
-        UsersDAO::save($user);
+        UsersDAO::update($user);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
         $identity->password = $user->password;
-        IdentitiesDAO::save($identity);
+        IdentitiesDAO::update($identity);
 
-        self::login($user);
+        try {
+            $user->password = 'foo';
+            self::login($user);
+            $this->fail('User should have not been able to log in');
+        } catch (LoginDisabledException $e) {
+            $this->assertEquals('loginDisabled', $e->getMessage());
+        }
     }
 }

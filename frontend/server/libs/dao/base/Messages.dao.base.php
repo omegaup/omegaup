@@ -19,47 +19,24 @@
  */
 abstract class MessagesDAOBase {
     /**
-     * Guardar registros.
-     *
-     * Este metodo guarda el estado actual del objeto {@link Messages}
-     * pasado en la base de datos. La llave primaria indicará qué instancia va
-     * a ser actualizada en base de datos. Si la llave primara o combinación de
-     * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
-     *
-     * @static
-     * @throws Exception si la operacion fallo.
-     * @param Messages [$Messages] El objeto de tipo Messages
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     */
-    final public static function save(Messages $Messages) {
-        if (is_null(self::getByPK($Messages->message_id))) {
-            return MessagesDAOBase::create($Messages);
-        }
-        return MessagesDAOBase::update($Messages);
-    }
-
-    /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param Messages [$Messages] El objeto de tipo Messages a actualizar.
+     * @param Messages $Messages El objeto de tipo Messages a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
-    final public static function update(Messages $Messages) {
+    final public static function update(Messages $Messages) : int {
         $sql = 'UPDATE `Messages` SET `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE `message_id` = ?;';
         $params = [
-            is_null($Messages->read) ? null : (int)$Messages->read,
+            (int)$Messages->read,
             is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
             is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
-            $Messages->date,
-            is_null($Messages->message_id) ? null : (int)$Messages->message_id,
+            DAO::toMySQLTimestamp($Messages->date),
+            (int)$Messages->message_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -68,17 +45,12 @@ abstract class MessagesDAOBase {
      * Este metodo cargará un objeto {@link Messages} de la base
      * de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link Messages Un objeto del tipo {@link Messages}. NULL si no hay tal registro.
+     * @return ?Messages Un objeto del tipo {@link Messages}. NULL si no hay tal registro.
      */
-    final public static function getByPK($message_id) {
-        if (is_null($message_id)) {
-            return null;
-        }
+    final public static function getByPK(int $message_id) : ?Messages {
         $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` FROM Messages WHERE (message_id = ?) LIMIT 1;';
         $params = [$message_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -91,23 +63,22 @@ abstract class MessagesDAOBase {
      * Este metodo eliminará el registro identificado por la llave primaria en
      * el objeto Messages suministrado. Una vez que se ha
      * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
+     * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param Messages [$Messages] El objeto de tipo Messages a eliminar
+     * @param Messages $Messages El objeto de tipo Messages a eliminar
+     *
+     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Messages $Messages) {
+    final public static function delete(Messages $Messages) : void {
         $sql = 'DELETE FROM `Messages` WHERE message_id = ?;';
         $params = [$Messages->message_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -122,24 +93,30 @@ abstract class MessagesDAOBase {
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link Messages}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return Messages[] Un arreglo que contiene objetos del tipo {@link Messages}.
+     *
+     * @psalm-return array<int, Messages>
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
+    final public static function getAll(
+        ?int $pagina = null,
+        int $filasPorPagina = 100,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ) : array {
         $sql = 'SELECT `Messages`.`message_id`, `Messages`.`read`, `Messages`.`sender_id`, `Messages`.`recipient_id`, `Messages`.`message`, `Messages`.`date` from Messages';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new Messages($row);
         }
         return $allData;
@@ -151,33 +128,26 @@ abstract class MessagesDAOBase {
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
      * contenidos del objeto Messages suministrado.
      *
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param Messages [$Messages] El objeto de tipo Messages a crear.
+     * @param Messages $Messages El objeto de tipo Messages a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Messages $Messages) {
-        if (is_null($Messages->read)) {
-            $Messages->read = false;
-        }
-        if (is_null($Messages->date)) {
-            $Messages->date = gmdate('Y-m-d H:i:s', Time::get());
-        }
+    final public static function create(Messages $Messages) : int {
         $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Messages->read) ? null : (int)$Messages->read,
+            (int)$Messages->read,
             is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
             is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
-            $Messages->date,
+            DAO::toMySQLTimestamp($Messages->date),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
-        $Messages->message_id = $conn->Insert_ID();
+        $Messages->message_id = MySQLConnection::getInstance()->Insert_ID();
 
-        return $ar;
+        return $affectedRows;
     }
 }

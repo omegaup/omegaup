@@ -15,6 +15,16 @@
  * @access public
  */
 class QualityNominations extends VO {
+    const FIELD_NAMES = [
+        'qualitynomination_id' => true,
+        'user_id' => true,
+        'problem_id' => true,
+        'nomination' => true,
+        'contents' => true,
+        'time' => true,
+        'status' => true,
+    ];
+
     /**
      * Constructor de QualityNominations
      *
@@ -22,9 +32,13 @@ class QualityNominations extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['qualitynomination_id'])) {
             $this->qualitynomination_id = (int)$data['qualitynomination_id'];
@@ -36,78 +50,73 @@ class QualityNominations extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['nomination'])) {
-            $this->nomination = $data['nomination'];
+            $this->nomination = strval($data['nomination']);
         }
         if (isset($data['contents'])) {
-            $this->contents = $data['contents'];
+            $this->contents = strval($data['contents']);
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
         if (isset($data['status'])) {
-            $this->status = $data['status'];
+            $this->status = strval($data['status']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $qualitynomination_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $qualitynomination_id;
+     * El usuario que nominó el problema
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      * El usuario que nominó el problema
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * El problema que fue nominado
+     *
+     * @var int|null
+     */
+    public $problem_id = null;
 
     /**
-      * El problema que fue nominado
-      * @access public
-      * @var int(11)
-      */
-    public $problem_id;
+     * El tipo de nominación
+     *
+     * @var string
+     */
+    public $nomination = 'suggestion';
 
     /**
-      * El tipo de nominación
-      * @access public
-      * @var enum('suggestion','promotion','demotion','dismissal')
-      */
-    public $nomination;
+     * Un blob json con el contenido de la nominación
+     *
+     * @var string|null
+     */
+    public $contents = null;
 
     /**
-      * Un blob json con el contenido de la nominación
-      * @access public
-      * @var text
-      */
-    public $contents;
+     * Fecha de creacion de esta nominación
+     *
+     * @var int
+     */
+    public $time;  // CURRENT_TIMESTAMP
 
     /**
-      * Fecha de creacion de esta nominación
-      * @access public
-      * @var timestamp
-      */
-    public $time;
-
-    /**
-      * El estado de la nominación
-      * @access public
-      * @var enum('open','approved','denied')
-      */
-    public $status;
+     * El estado de la nominación
+     *
+     * @var string
+     */
+    public $status = 'open';
 }

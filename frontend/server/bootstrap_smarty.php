@@ -25,8 +25,8 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign('OMEGAUP_GA_TRACK', 0);
     }
 
-    $userRequest = new Request($_REQUEST);
-    $session = SessionController::apiCurrentSession($userRequest)['session'];
+    $identityRequest = new Request($_REQUEST);
+    $session = SessionController::apiCurrentSession($identityRequest)['session'];
     if ($session['valid']) {
         $smarty->assign('LOGGED_IN', '1');
         UITools::$IsLoggedIn = true;
@@ -35,7 +35,10 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign('CURRENT_USER_EMAIL', $session['email']);
         $smarty->assign('CURRENT_USER_IS_EMAIL_VERIFIED', empty($session['user']) || $session['user']->verified);
         $smarty->assign('CURRENT_USER_IS_ADMIN', $session['is_admin']);
-        $smarty->assign('CURRENT_USER_IS_REVIEWER', Authorization::isQualityReviewer($session['identity']->identity_id));
+        $smarty->assign(
+            'CURRENT_USER_IS_REVIEWER',
+            Authorization::isQualityReviewer($session['identity'])
+        );
         $smarty->assign('CURRENT_USER_AUTH_TOKEN', $session['auth_token']);
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=92">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=16">');
@@ -45,19 +48,19 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign(
             'currentUserInfo',
             [
-                'username' => $session['username'],
+                'username' => $session['identity']->username,
             ]
         );
 
         UITools::$IsAdmin = $session['is_admin'];
-        $userRequest['username'] = $session['username'];
+        $identityRequest['username'] = $session['identity']->username;
     } else {
-        $userRequest['username'] = null;
+        $identityRequest['username'] = null;
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="/media/avatar_92.png">');
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="/media/avatar_16.png">');
     }
 
-    $lang = UserController::getPreferredLanguage($userRequest);
+    $lang = IdentityController::getPreferredLanguage($identityRequest);
 
     if (defined('OMEGAUP_ENVIRONMENT') && OMEGAUP_ENVIRONMENT === 'development') {
         $smarty->force_compile = true;

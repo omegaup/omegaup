@@ -18,25 +18,21 @@ require_once('base/Tags.vo.base.php');
   *
   */
 class TagsDAO extends TagsDAOBase {
-    final public static function getByName($name) {
-        $sql = 'SELECT * FROM Tags WHERE (name = ? ) LIMIT 1;';
-        $params = [$name];
+    final public static function getByName(string $name) : ?Tags {
+        $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
 
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (empty($rs)) {
+        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        if (empty($row)) {
             return null;
         }
-
-        return new Tags($rs);
+        return new Tags($row);
     }
 
-    public static function FindByName($name) {
-        global $conn;
-        $sql = "SELECT name FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
+    public static function findByName(string $name) : array {
+        $sql = "SELECT * FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
-        $rs = $conn->GetAll($sql, $args);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $row) {
             array_push($result, new Tags($row));

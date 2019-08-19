@@ -27,8 +27,60 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         ';
         $val = [$problemset_id];
 
-        global $conn;
-        return $conn->GetAll($sql, $val);
+        return MySQLConnection::getInstance()->GetAll($sql, $val);
+    }
+
+    final public static function getProblemsAssignmentByCourseAlias(
+        Courses $course
+    ) : array {
+        // Build SQL statement
+        $sql = '
+            SELECT
+                a.name, a.alias AS assignment_alias,a.description,
+                UNIX_TIMESTAMP(a.start_time) AS start_time,
+                UNIX_TIMESTAMP(a.finish_time) AS finish_time,
+                a.assignment_type, p.alias AS problem_alias,
+                a.publish_time_delay, p.problem_id
+            FROM
+                Problems p
+            INNER JOIN
+                Problemset_Problems pp ON pp.problem_id = p.problem_id
+            INNER JOIN
+                Assignments a ON pp.problemset_id = a.problemset_id
+            INNER JOIN
+                Courses c ON a.course_id = c.course_id
+            WHERE
+                c.alias = ?
+            ORDER BY
+                a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
+        ';
+        $val = [$course->alias];
+
+        $problemsAssignments = MySQLConnection::getInstance()->GetAll($sql, $val);
+
+        $result = [];
+
+        foreach ($problemsAssignments as $assignment) {
+            $assignmentAlias = $assignment['assignment_alias'];
+            if (!isset($result[$assignmentAlias])) {
+                $result[$assignmentAlias] = [
+                    'name' => $assignment['name'],
+                    'description' => $assignment['description'],
+                    'start_time' => $assignment['start_time'],
+                    'finish_time' => $assignment['finish_time'],
+                    'assignment_alias' => $assignment['assignment_alias'],
+                    'assignment_type' => $assignment['assignment_type'],
+                    'publish_time_delay' => $assignment['publish_time_delay'],
+                    'problems' => [],
+                ];
+            }
+            array_push($result[$assignmentAlias]['problems'], [
+                'problem_alias' => $assignment['problem_alias'],
+                'problem_id' => $assignment['problem_id'],
+            ]);
+        }
+
+        return $result;
     }
 
     /*
@@ -40,8 +92,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                'FROM Problemset_Problems pp ' .
                'WHERE pp.problemset_id = ?';
         $val = [$problemset->problemset_id];
-        global $conn;
-        return $conn->GetOne($sql, $val);
+        return MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /*
@@ -68,8 +119,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
         $val = [$problemsetId];
-        global $conn;
-        return $conn->GetAll($sql, $val);
+        return MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /*
@@ -86,8 +136,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 ORDER BY
                     `order`, `problem_id` ASC;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$problemset_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
 
         $problemsetProblems = [];
         foreach ($rs as $row) {
@@ -113,9 +162,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 pp.problemset_id = ?
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset->problemset_id];
-        global $conn;
         $result = [];
-        foreach ($conn->GetAll($sql, $val) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
             $result[] = new Problems($row);
         }
         return $result;
@@ -137,10 +185,9 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             WHERE
                 Problemset_Problems.problemset_id = ?;
         ';
-        global $conn;
         $params = [$newProblemsetId, $oldProblemsetId];
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -158,9 +205,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             $problemsetId,
             $problemId,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getProblemsByProblemset($problemset_id) {
@@ -187,8 +233,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$problemset_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -209,8 +254,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 WHERE
                     problemset_id = ?;';
 
-        global $conn;
-        return $conn->GetOne($sql, [$problemset_id]);
+        return MySQLConnection::getInstance()->GetOne($sql, [$problemset_id]);
     }
 
     /**
@@ -226,7 +270,6 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         Users $user,
         string $updatePublished
     ) : void {
-        global $conn;
         $now = Time::get();
 
         if ($updatePublished == ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
@@ -252,7 +295,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
-            $conn->Execute($sql, [
+            MySQLConnection::getInstance()->Execute($sql, [
                 $problem->commit,
                 $problem->current_version,
                 $now,
@@ -282,7 +325,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
-            $conn->Execute($sql, [
+            MySQLConnection::getInstance()->Execute($sql, [
                 $problem->commit,
                 $problem->current_version,
                 $now,
@@ -309,7 +352,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     UNIX_TIMESTAMP(c.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
-            $rs = $conn->GetAll($sql, [
+            $rs = MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
             ]);
@@ -334,7 +377,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     UNIX_TIMESTAMP(a.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
-            $rs = $conn->GetAll($sql, [
+            $rs = MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
             ]);
@@ -342,9 +385,13 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 array_push($problemsets, new Problemsets($row));
             }
 
-            $problemsets = array_filter($problemsets, function (Problemsets $p) use ($user) {
-                return Authorization::isAdmin($user->main_identity_id, $p);
-            });
+            $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+            $problemsets = array_filter(
+                $problemsets,
+                function (Problemsets $problemset) use ($identity) {
+                    return Authorization::isAdmin($identity, $problemset);
+                }
+            );
 
             if (!empty($problemsets)) {
                 $problemsetIds = array_map(function (Problemsets $p) {
@@ -361,7 +408,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                         pp.problem_id = ? AND
                         pp.problemset_id IN ($problemsetPlaceholders);
                 ";
-                $conn->Execute($sql, array_merge([
+                MySQLConnection::getInstance()->Execute($sql, array_merge([
                     $problem->commit,
                     $problem->current_version,
                     $problem->problem_id,
@@ -388,14 +435,12 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 pp.version = ? AND
                 pp.problem_id = ?;
         ';
-        $conn->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 
     public static function updateProblemsetProblemSubmissions(
         ProblemsetProblems $problemsetProblem
     ) : void {
-        global $conn;
-
         $sql = '
             INSERT IGNORE INTO
                 Runs (
@@ -411,7 +456,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             ORDER BY
                 s.submission_id;
         ';
-        $conn->Execute($sql, [
+        MySQLConnection::getInstance()->Execute($sql, [
             $problemsetProblem->version,
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
@@ -436,7 +481,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 pp.problemset_id = ? AND
                 pp.problem_id = ?;
         ';
-        $conn->Execute($sql, [
+        MySQLConnection::getInstance()->Execute($sql, [
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
         ]);

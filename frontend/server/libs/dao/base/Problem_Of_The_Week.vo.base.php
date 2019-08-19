@@ -15,6 +15,13 @@
  * @access public
  */
 class ProblemOfTheWeek extends VO {
+    const FIELD_NAMES = [
+        'problem_of_the_week_id' => true,
+        'problem_id' => true,
+        'time' => true,
+        'difficulty' => true,
+    ];
+
     /**
      * Constructor de ProblemOfTheWeek
      *
@@ -22,9 +29,13 @@ class ProblemOfTheWeek extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_of_the_week_id'])) {
             $this->problem_of_the_week_id = (int)$data['problem_of_the_week_id'];
@@ -33,51 +44,40 @@ class ProblemOfTheWeek extends VO {
             $this->problem_id = (int)$data['problem_id'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = strval($data['time']);
         }
         if (isset($data['difficulty'])) {
-            $this->difficulty = $data['difficulty'];
+            $this->difficulty = strval($data['difficulty']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $problem_of_the_week_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $problem_of_the_week_id;
+     * El id del problema escogido como problema de la semana.
+     *
+     * @var int|null
+     */
+    public $problem_id = null;
 
     /**
-      * El id del problema escogido como problema de la semana.
-      * @access public
-      * @var int(11)
-      */
-    public $problem_id;
+     * El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.
+     *
+     * @var string
+     */
+    public $time = '2000-01-01';
 
     /**
-      * El inicio de la semana de la cual este problema fue elegido como el mejor de la semana.
-      * @access public
-      * @var date
-      */
-    public $time;
-
-    /**
-      * En algún momento tendremos un problema fácil y uno difícil.
-      * @access public
-      * @var enum('easy','hard')
-      */
-    public $difficulty;
+     * En algún momento tendremos un problema fácil y uno difícil.
+     *
+     * @var string|null
+     */
+    public $difficulty = null;
 }

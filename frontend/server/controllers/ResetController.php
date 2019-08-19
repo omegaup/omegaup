@@ -21,7 +21,7 @@ class ResetController extends Controller {
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::save($user);
+        UsersDAO::update($user);
 
         if (IS_TEST) {
             return ['status' => 'ok', 'token' => $token];
@@ -40,7 +40,7 @@ class ResetController extends Controller {
             self::$log->error('Failed to send reset password email ' . $e->getMessage());
             $user->reset_digest = null;
             $user->reset_sent_at = null;
-            UsersDAO::save($user);
+            UsersDAO::update($user);
         }
 
         return [
@@ -60,7 +60,7 @@ class ResetController extends Controller {
     public static function apiGenerateToken(Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!Authorization::isSupportTeamMember($r->identity)) {
             throw new ForbiddenAccessException();
         }
 
@@ -84,7 +84,7 @@ class ResetController extends Controller {
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::save($user);
+        UsersDAO::update($user);
 
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
@@ -116,13 +116,13 @@ class ResetController extends Controller {
         $identity->password = $user->password;
         try {
             DAO::transBegin();
-            UsersDAO::save($user);
-            IdentitiesDAO::save($identity);
+            UsersDAO::update($user);
+            IdentitiesDAO::update($identity);
             DAO::transEnd();
         } catch (Exception $e) {
             DAO::transRollback();
-            self::$log->error('Failed to reset password: ' . $e->getMessage());
-            throw new InvalidDatabaseOperationException($e);
+            self::$log->error('Failed to reset password', $e);
+            throw $e;
         }
 
         return [
@@ -142,11 +142,11 @@ class ResetController extends Controller {
         }
 
         // Support doesn't need wait to resest passwords
-        if (!is_null($r->identity) && Authorization::isSupportTeamMember($r->identity->identity_id)) {
+        if (!is_null($r->identity) && Authorization::isSupportTeamMember($r->identity)) {
             return;
         }
 
-        $seconds = Time::get() - strtotime($user->reset_sent_at);
+        $seconds = Time::get() - $user->reset_sent_at;
         if ($seconds < PASSWORD_RESET_MIN_WAIT) {
             throw new InvalidParameterException('passwordResetMinWait');
         }
@@ -174,7 +174,7 @@ class ResetController extends Controller {
 
         SecurityTools::testStrongPassword($password);
 
-        $seconds = Time::get() - strtotime($user->reset_sent_at);
+        $seconds = Time::get() - $user->reset_sent_at;
         if ($seconds > PASSWORD_RESET_TIMEOUT) {
             throw new InvalidParameterException('passwordResetResetExpired');
         }

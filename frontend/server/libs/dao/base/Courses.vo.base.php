@@ -15,6 +15,22 @@
  * @access public
  */
 class Courses extends VO {
+    const FIELD_NAMES = [
+        'course_id' => true,
+        'name' => true,
+        'description' => true,
+        'alias' => true,
+        'group_id' => true,
+        'acl_id' => true,
+        'start_time' => true,
+        'finish_time' => true,
+        'public' => true,
+        'school_id' => true,
+        'needs_basic_information' => true,
+        'requests_user_information' => true,
+        'show_scoreboard' => true,
+    ];
+
     /**
      * Constructor de Courses
      *
@@ -22,21 +38,25 @@ class Courses extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['course_id'])) {
             $this->course_id = (int)$data['course_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['group_id'])) {
             $this->group_id = (int)$data['group_id'];
@@ -45,129 +65,126 @@ class Courses extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['start_time'])) {
-            $this->start_time = $data['start_time'];
+            /**
+             * @var string|int|float $data['start_time']
+             * @var int $this->start_time
+             */
+            $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
-            $this->finish_time = $data['finish_time'];
+            /**
+             * @var string|int|float $data['finish_time']
+             * @var int $this->finish_time
+             */
+            $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['public'])) {
-            $this->public = $data['public'] == '1';
+            $this->public = boolval($data['public']);
         }
         if (isset($data['school_id'])) {
             $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['needs_basic_information'])) {
-            $this->needs_basic_information = $data['needs_basic_information'] == '1';
+            $this->needs_basic_information = boolval($data['needs_basic_information']);
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = $data['requests_user_information'];
+            $this->requests_user_information = strval($data['requests_user_information']);
         }
         if (isset($data['show_scoreboard'])) {
-            $this->show_scoreboard = $data['show_scoreboard'] == '1';
+            $this->show_scoreboard = boolval($data['show_scoreboard']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['start_time', 'finish_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $course_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $course_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $name = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(100)
-      */
-    public $name;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $description = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinytext
-      */
-    public $description;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $alias = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(32)
-      */
-    public $alias;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $group_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $group_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * Hora de inicio de este curso
+     *
+     * @var int
+     */
+    public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      * Hora de inicio de este curso
-      * @access public
-      * @var timestamp
-      */
-    public $start_time;
+     * Hora de finalizacion de este curso
+     *
+     * @var int
+     */
+    public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      * Hora de finalizacion de este curso
-      * @access public
-      * @var timestamp
-      */
-    public $finish_time;
+     * True implica que cualquier usuario puede entrar al curso
+     *
+     * @var bool
+     */
+    public $public = false;
 
     /**
-      * True implica que cualquier usuario puede entrar al curso
-      * @access public
-      * @var tinyint(1)
-      */
-    public $public;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $school_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $school_id;
+     * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil
+     *
+     * @var bool
+     */
+    public $needs_basic_information = false;
 
     /**
-      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un curso sólo si ya llenó su información de perfil
-      * @access public
-      * @var tinyint(1)
-      */
-    public $needs_basic_information;
+     * Se solicita información de los participantes para contactarlos posteriormente.
+     *
+     * @var string
+     */
+    public $requests_user_information = 'no';
 
     /**
-      * Se solicita información de los participantes para contactarlos posteriormente.
-      * @access public
-      * @var enum('no','optional','required')
-      */
-    public $requests_user_information;
-
-    /**
-      * Los estudiantes pueden visualizar el scoreboard de un curso.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $show_scoreboard;
+     * Los estudiantes pueden visualizar el scoreboard de un curso.
+     *
+     * @var bool
+     */
+    public $show_scoreboard = false;
 }

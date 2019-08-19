@@ -14,10 +14,9 @@ require_once('base/Users.vo.base.php');
   */
 class UsersDAO extends UsersDAOBase {
     public static function FindByEmail($email) {
-        global  $conn;
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -25,9 +24,8 @@ class UsersDAO extends UsersDAOBase {
     }
 
     public static function FindByUsername($username) {
-        global  $conn;
         $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
-        $rs = $conn->GetRow($sql, [$username]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$username]);
         if (empty($rs)) {
             return null;
         }
@@ -43,36 +41,7 @@ class UsersDAO extends UsersDAOBase {
             WHERE
                 ur.user_id = ? AND ur.role_id = 4;';
         $params = [$user_id];
-        global $conn;
-        return $conn->GetOne($sql, $params) > 0;
-    }
-
-    public static function FindByUsernameOrName($usernameOrName) {
-        global  $conn;
-        $sql = "
-            SELECT
-                u.*
-            FROM
-                Users u
-            WHERE
-                u.username = ? OR u.name = ?
-            UNION DISTINCT
-            SELECT DISTINCT
-                u.*
-            FROM
-                Users u
-            WHERE
-                u.username LIKE CONCAT('%', ?, '%') OR
-                u.username LIKE CONCAT('%', ?, '%')
-            LIMIT 10";
-        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
-
-        $rs = $conn->GetAll($sql, $args);
-        $result = [];
-        foreach ($rs as $user_data) {
-            array_push($result, new Users($user_data));
-        }
-        return $result;
+        return MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
     }
 
     public static function FindResetInfoByEmail($email) {
@@ -101,9 +70,8 @@ class UsersDAO extends UsersDAOBase {
             $Users->username,
             $Users->user_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getExtendedProfileDataByPk($user_id) {
@@ -112,29 +80,33 @@ class UsersDAO extends UsersDAOBase {
         }
         $sql = 'SELECT
                     COALESCE(c.`name`, "xx") AS country,
+                    c.`country_id` AS country_id,
                     s.`name` AS state,
+                    s.`state_id` AS state_id,
                     sc.`name` AS school,
+                    sc.`school_id` AS school_id,
                     e.`email`,
                     l.`name` AS locale
                 FROM
                     Users u
                 INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                INNER JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
-                    Countries c ON u.country_id = c.country_id
+                    Countries c ON i.country_id = c.country_id
                 LEFT JOIN
-                    States s ON u.state_id = s.state_id AND s.country_id = c.country_id
+                    States s ON i.state_id = s.state_id AND s.country_id = c.country_id
                 LEFT JOIN
-                    Schools sc ON u.school_id = sc.school_id
+                    Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
-                    Languages l ON u.language_id = l.language_id
+                    Languages l ON i.language_id = l.language_id
                 WHERE
                     u.`user_id` = ?
                 LIMIT
                     1;';
         $params = [$user_id];
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -159,8 +131,7 @@ class UsersDAO extends UsersDAOBase {
                     1;';
         $params = [$identity_id];
 
-        global $conn;
-        return $conn->GetOne($sql, $params);
+        return MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     public static function getRankingClassName($user_id) {
@@ -182,8 +153,7 @@ class UsersDAO extends UsersDAOBase {
                 LIMIT
                     1;';
         $params = [$user_id];
-        global $conn;
-        return $conn->GetOne($sql, $params) ?? 'user-rank-unranked';
+        return MySQLConnection::getInstance()->GetOne($sql, $params) ?? 'user-rank-unranked';
     }
 
     final public static function getByVerification($verification_id) {
@@ -194,8 +164,7 @@ class UsersDAO extends UsersDAOBase {
                 WHERE
                     verification_id = ?';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$verification_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$verification_id]);
 
         $users = [];
         foreach ($rs as $row) {
@@ -214,13 +183,20 @@ class UsersDAO extends UsersDAOBase {
                 AND
                     in_mailing_list = ?';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$verified, $in_mailing_list]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$verified, $in_mailing_list]);
 
         $users = [];
         foreach ($rs as $row) {
             array_push($users, new Users($row));
         }
         return $users;
+    }
+
+    public static function getUsersCount() {
+        $sql = 'SELECT
+                    COUNT(*) AS total
+                FROM
+                    Users;';
+        return MySQLConnection::getInstance()->GetRow($sql)['total'];
     }
 }

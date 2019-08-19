@@ -15,6 +15,12 @@
  * @access public
  */
 class IdentityLoginLog extends VO {
+    const FIELD_NAMES = [
+        'identity_id' => true,
+        'ip' => true,
+        'time' => true,
+    ];
+
     /**
      * Constructor de IdentityLoginLog
      *
@@ -22,9 +28,13 @@ class IdentityLoginLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
             $this->identity_id = (int)$data['identity_id'];
@@ -33,39 +43,34 @@ class IdentityLoginLog extends VO {
             $this->ip = (int)$data['ip'];
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            /**
+             * @var string|int|float $data['time']
+             * @var int $this->time
+             */
+            $this->time = DAO::fromMySQLTimestamp($data['time']);
+        } else {
+            $this->time = Time::get();
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * Identidad del usuario
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $identity_id = null;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $ip = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(10)
-      */
-    public $ip;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $time;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $time;  // CURRENT_TIMESTAMP
 }

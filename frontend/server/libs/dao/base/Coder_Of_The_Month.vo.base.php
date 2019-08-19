@@ -15,6 +15,16 @@
  * @access public
  */
 class CoderOfTheMonth extends VO {
+    const FIELD_NAMES = [
+        'coder_of_the_month_id' => true,
+        'user_id' => true,
+        'description' => true,
+        'time' => true,
+        'interview_url' => true,
+        'rank' => true,
+        'selected_by' => true,
+    ];
+
     /**
      * Constructor de CoderOfTheMonth
      *
@@ -22,9 +32,13 @@ class CoderOfTheMonth extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['coder_of_the_month_id'])) {
             $this->coder_of_the_month_id = (int)$data['coder_of_the_month_id'];
@@ -33,13 +47,13 @@ class CoderOfTheMonth extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['time'])) {
-            $this->time = $data['time'];
+            $this->time = strval($data['time']);
         }
         if (isset($data['interview_url'])) {
-            $this->interview_url = $data['interview_url'];
+            $this->interview_url = strval($data['interview_url']);
         }
         if (isset($data['rank'])) {
             $this->rank = (int)$data['rank'];
@@ -50,64 +64,53 @@ class CoderOfTheMonth extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $coder_of_the_month_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $coder_of_the_month_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $description = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinytext
-      */
-    public $description;
+     * Fecha no es UNIQUE por si hay más de 1 coder de mes.
+     *
+     * @var string
+     */
+    public $time = '2000-01-01';
 
     /**
-      * Fecha no es UNIQUE por si hay más de 1 coder de mes.
-      * @access public
-      * @var date
-      */
-    public $time;
+     * Para linekar a un post del blog con entrevistas.
+     *
+     * @var string|null
+     */
+    public $interview_url = null;
 
     /**
-      * Para linekar a un post del blog con entrevistas.
-      * @access public
-      * @var varchar(256)
-      */
-    public $interview_url;
+     * El lugar en el que el usuario estuvo durante ese mes
+     *
+     * @var int|null
+     */
+    public $rank = null;
 
     /**
-      * El lugar en el que el usuario estuvo durante ese mes
-      * @access public
-      * @var int(11)
-      */
-    public $rank;
-
-    /**
-      * Id de la identidad que seleccionó al coder.
-      * @access public
-      * @var int(11)
-      */
-    public $selected_by;
+     * Id de la identidad que seleccionó al coder.
+     *
+     * @var int|null
+     */
+    public $selected_by = null;
 }

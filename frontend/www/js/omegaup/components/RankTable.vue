@@ -37,6 +37,12 @@
           </option>
         </select>
       </template>
+      <template v-else-if="!isLogged &amp;&amp; !isIndex">
+        <span class="label label-info">{{ T.mustLoginToFilterUsers }}</span>
+      </template>
+      <template v-else-if="!isIndex">
+        <span class="label label-info">{{ T.mustUpdateBasicInfoToFilterUsers }}</span>
+      </template>
     </div>
     <table class="table">
       <thead>
@@ -52,9 +58,12 @@
         <tr v-for="rank in ranking">
           <td>{{ rank.rank }}</td>
           <td><omegaup-countryflag v-bind:country="rank.country"></omegaup-countryflag></td>
-          <td class="forcebreaks forcebreaks-top-5"><strong><a v-bind:href=
-          "`/profile/${rank.username}`">{{ rank.username }}</a></strong><span v-if=
-          "rank.name == null || length == 5">&nbsp;</span> <span v-else=""><br>
+          <td class="forcebreaks forcebreaks-top-5"><omegaup-user-username v-bind:classname=
+          "rank.classname"
+                                 v-bind:linkify="true"
+                                 v-bind:username="rank.username"></omegaup-user-username><span v-if=
+                                 "rank.name == null || length == 5">&nbsp;</span> <span v-else=
+                                 ""><br>
           {{ rank.name }}</span></td>
           <td class="numericColumn">{{ rank.score }}</td>
           <td class="numericColumn"
@@ -86,9 +95,11 @@ import { T, OmegaUp } from '../omegaup.js';
 import UI from '../ui.js';
 import Autocomplete from './Autocomplete.vue';
 import CountryFlag from './CountryFlag.vue';
+import user_Username from './user/Username.vue';
 
 interface Rank {
   country: string;
+  classname?: string;
   username: string;
   name?: string;
   score: number;
@@ -99,12 +110,14 @@ interface Rank {
   components: {
     'omegaup-autocomplete': Autocomplete,
     'omegaup-countryflag': CountryFlag,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class RankTable extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
   @Prop() isIndex!: boolean;
+  @Prop() isLogged!: boolean;
   @Prop() availableFilters!: { [key: string]: string };
   @Prop() filter!: string;
   @Prop() ranking!: Rank[];

@@ -13,9 +13,8 @@ require_once('base/Notifications.vo.base.php');
   */
 class NotificationsDAO extends NotificationsDAOBase {
     public static function getUnreadNotifications(Users $user) {
-        global $conn;
         $sql = 'SELECT
-                    n.contents, n.timestamp
+                    n.notification_id, n.contents, UNIX_TIMESTAMP(n.timestamp) as timestamp
                 FROM
                     Notifications n
                 WHERE
@@ -23,6 +22,6 @@ class NotificationsDAO extends NotificationsDAOBase {
                 ORDER BY
                     n.timestamp ASC;';
         $args = [$user->user_id];
-        return $conn->GetAll($sql, $args);
+        return MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 }

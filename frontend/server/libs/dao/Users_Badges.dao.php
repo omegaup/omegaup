@@ -12,8 +12,7 @@ require_once('base/Users_Badges.vo.base.php');
   *
   */
 class UsersBadgesDAO extends UsersBadgesDAOBase {
-    public static function getUserOwnedBadges(Users $user) {
-        global $conn;
+    public static function getUserOwnedBadges(Users $user): array {
         $sql = 'SELECT
                     ub.badge_alias, ub.assignation_time
                 FROM
@@ -23,6 +22,40 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                 ORDER BY
                     ub.assignation_time ASC;';
         $args = [$user->user_id];
-        return $conn->GetAll($sql, $args);
+        return MySQLConnection::getInstance()->GetAll($sql, $args);
+    }
+
+    public static function getUserBadgeAssignationTime(Users $user, string $badge): ?int {
+        $sql = 'SELECT
+                    UNIX_TIMESTAMP(ub.assignation_time)
+                FROM
+                    Users_Badges ub
+                WHERE
+                    ub.user_id = ? AND ub.badge_alias = ?;';
+        $args = [$user->user_id, $badge];
+        return MySQLConnection::getInstance()->getOne($sql, $args);
+    }
+
+    public static function getBadgeOwnersCount(string $badge) {
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    Users_Badges
+                WHERE
+                    badge_alias = ?;';
+        $args = [$badge];
+        return MySQLConnection::getInstance()->getOne($sql, $args);
+    }
+
+    public static function getBadgeFirstAssignationTime(string $badge) {
+        $sql = 'SELECT
+                    UNIX_TIMESTAMP(MIN(ub.assignation_time))
+                FROM
+                    Users_Badges ub
+                WHERE
+                    ub.badge_alias = ?
+                LIMIT 1;';
+        $args = [$badge];
+        return MySQLConnection::getInstance()->getOne($sql, $args);
     }
 }

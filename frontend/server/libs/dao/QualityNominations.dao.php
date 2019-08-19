@@ -19,7 +19,10 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
      */
     const CONFIDENCE = 5;
 
-    public static function getNominationStatusForProblem(Problems $problem, Identities $identity) {
+    public static function getNominationStatusForProblem(
+        Problems $problem,
+        Identities $identity
+    ) : array {
         $sql = '
             SELECT
                 COUNT(r.run_id) > 0 as solved,
@@ -59,8 +62,12 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 p.problem_id = ? AND i.identity_id = ?;
         ';
 
-        global $conn;
-        return $conn->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
+        $result = MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
+        return [
+            'solved' => (bool) $result['solved'],
+            'nominated' => (bool) $result['nominated'],
+            'dismissed' => (bool) $result['dismissed'],
+        ];
     }
 
     /**
@@ -105,10 +112,9 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             qnr.qualitynomination_id = ?
         ORDER BY
             i.username;';
-        global $conn;
 
         $votes = [];
-        foreach ($conn->GetAll($sql, [$qualitynomination_id]) as $vote) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$qualitynomination_id]) as $vote) {
             if (is_string($vote['time'])) {
                 $vote['time'] = (int)$vote['time'];
             }
@@ -187,11 +193,11 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
             nominator.username as nominator_username,
-            nominator.name as nominator_name,
+            nominatorIdentity.name as nominator_name,
             p.alias,
             p.title,
             author.username as author_username,
-            author.name as author_name
+            authorIdentity.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -203,13 +209,21 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             nominator.user_id = qn.user_id
         INNER JOIN
+            Identities nominatorIdentity
+        ON
+            nominatorIdentity.identity_id = nominator.main_identity_id
+        INNER JOIN
             ACLs acl
         ON
             acl.acl_id = p.acl_id
         INNER JOIN
             Users author
         ON
-            author.user_id = acl.owner_id';
+            author.user_id = acl.owner_id
+        INNER JOIN
+            Identities authorIdentity
+        ON
+            authorIdentity.identity_id = author.main_identity_id';
         $params = [];
         $conditions = [];
 
@@ -224,9 +238,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             $params[] = $assignee;
         }
         if (!empty($types)) {
-            global $conn;
-            $escapeFunc = function ($type) use ($conn) {
-                return $conn->escape($type);
+            $escapeFunc = function ($type) {
+                return MySQLConnection::getInstance()->escape($type);
             };
             $conditions[] =
                 ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
@@ -243,9 +256,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $params[] = (int)($page * $pageSize);
         $params[] = (int)(($page + 1) * $pageSize);
 
-        global $conn;
         $nominations = [];
-        foreach ($conn->GetAll($sql, $params) as $nomination) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
             $nominations[] = self::processNomination($nomination);
         }
 
@@ -264,11 +276,11 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
             nominator.username as nominator_username,
-            nominator.name as nominator_name,
+            nominatorIdentity.name as nominator_name,
             p.alias,
             p.title,
             author.username as author_username,
-            author.name as author_name
+            authorIdentity.name as author_name
         FROM
             QualityNominations qn
         INNER JOIN
@@ -280,6 +292,10 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         ON
             nominator.user_id = qn.user_id
         INNER JOIN
+            Identities nominatorIdentity
+        ON
+            nominatorIdentity.identity_id = nominator.main_identity_id
+        INNER JOIN
             ACLs acl
         ON
             acl.acl_id = p.acl_id
@@ -287,11 +303,14 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             Users author
         ON
             author.user_id = acl.owner_id
+        INNER JOIN
+            Identities authorIdentity
+        ON
+            authorIdentity.identity_id = author.main_identity_id
         WHERE
             qn.qualitynomination_id = ?;';
 
-        global $conn;
-        return self::processNomination($conn->GetRow($sql, [$qualitynomination_id]));
+        return self::processNomination(MySQLConnection::getInstance()->GetRow($sql, [$qualitynomination_id]));
     }
 
     /**
@@ -301,8 +320,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
 
-        global $conn;
-        return $conn->GetAll($sql);
+        return MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -336,8 +354,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . 'FROM `QualityNominations` '
             . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
-        global $conn;
-        return $conn->GetAll($sql);
+        return MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -394,8 +411,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
 
         $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
             . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
-        global $conn;
-        foreach ($conn->GetAll($sql) as $nomination) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $nomination) {
             $problemId = $nomination['problem_id'];
             $contents = self::getAllSuggestionsPerProblem($problemId);
             $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
@@ -413,7 +429,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             );
 
             if ($problem->quality != null || $problem->difficulty != null) {
-                ProblemsDAO::save($problem);
+                ProblemsDAO::update($problem);
             }
             // TODO(heduenas): Get threshold parameter from DB for each problem independently.
             $tags = self::mostVotedTags($problemAggregates['tags'], 0.25);
@@ -475,8 +491,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 AND
                     status = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
 
         $qualityNominations = [];
         foreach ($rs as $row) {

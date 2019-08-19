@@ -15,6 +15,13 @@
  * @access public
  */
 class PrivacyStatementConsentLog extends VO {
+    const FIELD_NAMES = [
+        'privacystatement_consent_id' => true,
+        'identity_id' => true,
+        'privacystatement_id' => true,
+        'timestamp' => true,
+    ];
+
     /**
      * Constructor de PrivacyStatementConsentLog
      *
@@ -22,9 +29,13 @@ class PrivacyStatementConsentLog extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['privacystatement_consent_id'])) {
             $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
@@ -36,48 +47,43 @@ class PrivacyStatementConsentLog extends VO {
             $this->privacystatement_id = (int)$data['privacystatement_id'];
         }
         if (isset($data['timestamp'])) {
-            $this->timestamp = $data['timestamp'];
+            /**
+             * @var string|int|float $data['timestamp']
+             * @var int $this->timestamp
+             */
+            $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
+        } else {
+            $this->timestamp = Time::get();
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * Id del consentimiento de privacidad almacenado en el log
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['timestamp']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $privacystatement_consent_id = 0;
 
     /**
-      * Id del consentimiento de privacidad almacenado en el log
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $privacystatement_consent_id;
+     * Identidad del usuario
+     *
+     * @var int|null
+     */
+    public $identity_id = null;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
+     * Id del documento de privacidad
+     *
+     * @var int|null
+     */
+    public $privacystatement_id = null;
 
     /**
-      * Id del documento de privacidad
-      * @access public
-      * @var int(11)
-      */
-    public $privacystatement_id;
-
-    /**
-      * Fecha y hora en la que el usuario acepta las nuevas políticas
-      * @access public
-      * @var timestamp
-      */
-    public $timestamp;
+     * Fecha y hora en la que el usuario acepta las nuevas políticas
+     *
+     * @var int
+     */
+    public $timestamp;  // CURRENT_TIMESTAMP
 }

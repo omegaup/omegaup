@@ -11,7 +11,7 @@ include('base/Assignments.vo.base.php');
   *
   */
 class AssignmentsDAO extends AssignmentsDAOBase {
-    public static function GetProblemset($courseId, $assignmentAlias = null) {
+    public static function getProblemset($courseId, $assignmentAlias = null) {
         $sql = 'SELECT
                     p.*
                 FROM
@@ -22,15 +22,14 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                     a.problemset_id = p.problemset_id
                 WHERE
                     a.course_id = ?';
-        global $conn;
         $params = [$courseId];
         if (is_null($assignmentAlias)) {
-            return $conn->GetAll($sql, $params);
+            return MySQLConnection::getInstance()->GetAll($sql, $params);
         }
         $sql .= ' AND a.alias = ?';
         $params[] = $assignmentAlias;
 
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -39,13 +38,11 @@ class AssignmentsDAO extends AssignmentsDAOBase {
     }
 
     public static function getAssignmentCountsForCourse($course_id) {
-        global $conn;
-
         $sql = 'SELECT a.assignment_type, COUNT(*) AS count
                 FROM Assignments a
                 WHERE a.course_id = ?
                 GROUP BY a.assignment_type;';
-        $rs = $conn->GetAll($sql, [$course_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
         $counts = [];
         foreach ($rs as $row) {
             $counts[$row['assignment_type']] = intval($row['count']);
@@ -58,24 +55,14 @@ class AssignmentsDAO extends AssignmentsDAOBase {
             return null;
         }
 
-        try {
-            $assignment = self::getByProblemset($problemset_id);
-            if (!is_null($assignment)) {
-                return $assignment;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return null;
+        return self::getByProblemset($problemset_id);
     }
 
     final public static function getByProblemset($problemset_id) {
         $sql = 'SELECT * FROM Assignments WHERE (problemset_id = ?) LIMIT 1;';
         $params = [$problemset_id];
 
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -94,8 +81,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                     alias = ?
                 LIMIT 1;';
 
-        global $conn;
-        $row = $conn->GetRow($sql, [$course_id, $assignment_alias]);
+        $row = MySQLConnection::getInstance()->GetRow($sql, [$course_id, $assignment_alias]);
         if (empty($row)) {
             return null;
         }
@@ -117,8 +103,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 WHERE
                     a.assignment_id = ? LIMIT 1;';
 
-        global $conn;
-        $rs = $conn->GetRow($sql, [$assignmentId]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$assignmentId]);
         if (empty($rs)) {
             return null;
         }
@@ -138,9 +123,8 @@ class AssignmentsDAO extends AssignmentsDAOBase {
             $assignment_id,
         ];
 
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -169,8 +153,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 ORDER BY
                     `order` ASC, `start_time` ASC';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$courseId]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$courseId]);
         $ar = [];
         foreach ($rs as $row) {
             $ar[] = $row;

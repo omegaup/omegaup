@@ -15,6 +15,11 @@
  * @access public
  */
 class UsersExperiments extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'experiment' => true,
+    ];
+
     /**
      * Constructor de UsersExperiments
      *
@@ -22,40 +27,33 @@ class UsersExperiments extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['experiment'])) {
-            $this->experiment = $data['experiment'];
+            $this->experiment = strval($data['experiment']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(256)
-      */
-    public $experiment;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $experiment = null;
 }

@@ -15,6 +15,30 @@
  * @access public
  */
 class Problems extends VO {
+    const FIELD_NAMES = [
+        'problem_id' => true,
+        'acl_id' => true,
+        'visibility' => true,
+        'title' => true,
+        'alias' => true,
+        'commit' => true,
+        'current_version' => true,
+        'languages' => true,
+        'input_limit' => true,
+        'visits' => true,
+        'submissions' => true,
+        'accepted' => true,
+        'difficulty' => true,
+        'creation_date' => true,
+        'source' => true,
+        'order' => true,
+        'deprecated' => true,
+        'email_clarifications' => true,
+        'quality' => true,
+        'quality_histogram' => true,
+        'difficulty_histogram' => true,
+    ];
+
     /**
      * Constructor de Problems
      *
@@ -22,9 +46,13 @@ class Problems extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_id'])) {
             $this->problem_id = (int)$data['problem_id'];
@@ -36,19 +64,19 @@ class Problems extends VO {
             $this->visibility = (int)$data['visibility'];
         }
         if (isset($data['title'])) {
-            $this->title = $data['title'];
+            $this->title = strval($data['title']);
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['commit'])) {
-            $this->commit = $data['commit'];
+            $this->commit = strval($data['commit']);
         }
         if (isset($data['current_version'])) {
-            $this->current_version = $data['current_version'];
+            $this->current_version = strval($data['current_version']);
         }
         if (isset($data['languages'])) {
-            $this->languages = $data['languages'];
+            $this->languages = strval($data['languages']);
         }
         if (isset($data['input_limit'])) {
             $this->input_limit = (int)$data['input_limit'];
@@ -66,188 +94,183 @@ class Problems extends VO {
             $this->difficulty = (float)$data['difficulty'];
         }
         if (isset($data['creation_date'])) {
-            $this->creation_date = $data['creation_date'];
+            /**
+             * @var string|int|float $data['creation_date']
+             * @var int $this->creation_date
+             */
+            $this->creation_date = DAO::fromMySQLTimestamp($data['creation_date']);
+        } else {
+            $this->creation_date = Time::get();
         }
         if (isset($data['source'])) {
-            $this->source = $data['source'];
+            $this->source = strval($data['source']);
         }
         if (isset($data['order'])) {
-            $this->order = $data['order'];
+            $this->order = strval($data['order']);
         }
         if (isset($data['deprecated'])) {
-            $this->deprecated = $data['deprecated'] == '1';
+            $this->deprecated = boolval($data['deprecated']);
         }
         if (isset($data['email_clarifications'])) {
-            $this->email_clarifications = $data['email_clarifications'] == '1';
+            $this->email_clarifications = boolval($data['email_clarifications']);
         }
         if (isset($data['quality'])) {
             $this->quality = (float)$data['quality'];
         }
         if (isset($data['quality_histogram'])) {
-            $this->quality_histogram = $data['quality_histogram'];
+            $this->quality_histogram = strval($data['quality_histogram']);
         }
         if (isset($data['difficulty_histogram'])) {
-            $this->difficulty_histogram = $data['difficulty_histogram'];
+            $this->difficulty_histogram = strval($data['difficulty_histogram']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['creation_date']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $problem_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $problem_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * -1 banned, 0 private, 1 public, 2 recommended
+     *
+     * @var int
+     */
+    public $visibility = 1;
 
     /**
-      * -1 banned, 0 private, 1 public, 2 recommended
-      * @access public
-      * @var int(1)
-      */
-    public $visibility;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $title = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(256)
-      */
-    public $title;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $alias = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(32)
-      */
-    public $alias;
+     * El hash SHA1 del commit en la rama master del problema.
+     *
+     * @var string
+     */
+    public $commit = 'published';
 
     /**
-      * El hash SHA1 del commit en la rama master del problema.
-      * @access public
-      * @var char(40)
-      */
-    public $commit;
+     * El hash SHA1 del árbol de la rama private.
+     *
+     * @var string|null
+     */
+    public $current_version = null;
 
     /**
-      * El hash SHA1 del árbol de la rama private.
-      * @access public
-      * @var char(40)
-      */
-    public $current_version;
+     * [Campo no documentado]
+     *
+     * @var string
+     */
+    public $languages = 'c,cpp,java,py,rb,pl,cs,pas,hs,cpp11,lua';
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
-      */
-    public $languages;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $input_limit = 10240;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $input_limit;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $visits = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $visits;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $submissions = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $submissions;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $accepted = 0;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $accepted;
+     * [Campo no documentado]
+     *
+     * @var float|null
+     */
+    public $difficulty = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $difficulty;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $creation_date;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $creation_date;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $source = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(256)
-      */
-    public $source;
+     * [Campo no documentado]
+     *
+     * @var string
+     */
+    public $order = 'normal';
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('normal','inverse')
-      */
-    public $order;
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $deprecated = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $deprecated;
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $email_clarifications = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $email_clarifications;
+     * [Campo no documentado]
+     *
+     * @var float|null
+     */
+    public $quality = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var double
-      */
-    public $quality;
+     * Valores del histograma de calidad del problema.
+     *
+     * @var string|null
+     */
+    public $quality_histogram = null;
 
     /**
-      * Valores del histograma de calidad del problema.
-      * @access public
-      * @var text
-      */
-    public $quality_histogram;
-
-    /**
-      * Valores del histograma de dificultad del problema.
-      * @access public
-      * @var text
-      */
-    public $difficulty_histogram;
+     * Valores del histograma de dificultad del problema.
+     *
+     * @var string|null
+     */
+    public $difficulty_histogram = null;
 }

@@ -14,14 +14,13 @@ class CoursesFactory {
         }
         $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
         if ($public != false) {
-            $curatorGroup = GroupsDAO::FindByAlias(
+            $curatorGroup = GroupsDAO::findByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
-            GroupsIdentitiesDAO::save(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
                 'identity_id' => $identity->identity_id,
-                'role_id' => Authorization::ADMIN_ROLE,
             ]));
         }
 
@@ -32,8 +31,8 @@ class CoursesFactory {
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp()),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'start_time' => (Time::get()),
+            'finish_time' => (Time::get() + 120),
             'public' => $public,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
@@ -74,8 +73,8 @@ class CoursesFactory {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => Utils::GetPhpUnixTimestamp() + $startTimeDelay,
-            'finish_time' => Utils::GetPhpUnixTimestamp() + 120,
+            'start_time' => Time::get() + $startTimeDelay,
+            'finish_time' => Time::get() + 120,
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework',
             'course' => $course,
@@ -113,8 +112,8 @@ class CoursesFactory {
                     'name' => Utils::CreateRandomString(),
                     'alias' => Utils::CreateRandomString(),
                     'description' => Utils::CreateRandomString(),
-                    'start_time' => (Utils::GetPhpUnixTimestamp()),
-                    'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+                    'start_time' => (Time::get()),
+                    'finish_time' => (Time::get() + 120),
                     'course_alias' => $courseAlias,
                     'assignment_type' => $assignmentType
                 ]);

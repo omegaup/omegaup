@@ -6,16 +6,15 @@ class CourseCreateTest extends OmegaupTestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $curatorGroup = GroupsDAO::FindByAlias(
+        $curatorGroup = GroupsDAO::findByAlias(
             Authorization::COURSE_CURATOR_GROUP_ALIAS
         );
 
         self::$curator = UserFactory::createUser();
         $identity = IdentitiesDAO::getByPK(self::$curator->main_identity_id);
-        GroupsIdentitiesDAO::save(new GroupsIdentities([
+        GroupsIdentitiesDAO::create(new GroupsIdentities([
             'group_id' => $curatorGroup->group_id,
             'identity_id' => $identity->identity_id,
-            'role_id' => Authorization::ADMIN_ROLE,
         ]));
     }
 
@@ -31,8 +30,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120)
         ]);
 
         $response = CourseController::apiCreate($r);
@@ -58,8 +57,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => $sameName,
             'alias' => $sameAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120)
         ]);
 
         $response = CourseController::apiCreate($r);
@@ -76,8 +75,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => $sameName,
             'alias' => $sameAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120)
         ]);
 
         CourseController::apiCreate($r);
@@ -95,8 +94,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120)
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120)
         ]);
 
         // Call api
@@ -111,8 +110,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
         ]));
@@ -185,8 +184,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
         ]));
@@ -201,8 +200,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120),
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework'
         ]));
@@ -222,8 +221,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 120),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 60),
+            'start_time' => (Time::get() + 120),
+            'finish_time' => (Time::get() + 60),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework'
         ]));
@@ -242,8 +241,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120),
             'public' => 1,
         ]);
 
@@ -261,8 +260,8 @@ class CourseCreateTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Utils::GetPhpUnixTimestamp() + 60),
-            'finish_time' => (Utils::GetPhpUnixTimestamp() + 120),
+            'start_time' => (Time::get() + 60),
+            'finish_time' => (Time::get() + 120),
             'school_id' => $school->school_id,
             'public' => 1,
         ]);
@@ -299,9 +298,17 @@ class CourseCreateTest extends OmegaupTestCase {
         $course = CoursesDAO::getByPK($courseData['request']['course']->course_id);
         $studentLogin = OmegaupTestCase::login($student);
         // Scoreboard have to be visible to associated user
-        $this->assertTrue(CourseController::shouldShowScoreboard($identityStudent->identity_id, $course, $group));
+        $this->assertTrue(CourseController::shouldShowScoreboard(
+            $identityStudent,
+            $course,
+            $group
+        ));
         // But, Scoreboard shouldn't  be visible to unassociated user
-        $this->assertFalse(CourseController::shouldShowScoreboard($identityUser->identity_id, $course, $group));
+        $this->assertFalse(CourseController::shouldShowScoreboard(
+            $identityUser,
+            $course,
+            $group
+        ));
 
         // Turning off show_scoreboard flag
         CourseController::apiUpdate(new Request([
@@ -316,7 +323,15 @@ class CourseCreateTest extends OmegaupTestCase {
         $course = CoursesDAO::getByPK($courseData['request']['course']->course_id);
 
         // Scoreboard shouldn't be visible to associated or unassociated user
-        $this->assertFalse(CourseController::shouldShowScoreboard($identityStudent->identity_id, $course, $group));
-        $this->assertFalse(CourseController::shouldShowScoreboard($identityUser->identity_id, $course, $group));
+        $this->assertFalse(CourseController::shouldShowScoreboard(
+            $identityStudent,
+            $course,
+            $group
+        ));
+        $this->assertFalse(CourseController::shouldShowScoreboard(
+            $identityUser,
+            $course,
+            $group
+        ));
     }
 }

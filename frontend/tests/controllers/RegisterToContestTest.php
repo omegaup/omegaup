@@ -19,7 +19,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
-            'start_time' => Utils::GetPhpUnixTimestamp() + 60 * 60,
+            'start_time' => Time::get() + 60 * 60,
         ]);
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
@@ -40,21 +40,21 @@ class RegisterToContestTest extends OmegaupTestCase {
             // Expected contestNotStarted exception. Continue.
         }
 
-        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
-        $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
+        $showIntro = ContestController::shouldShowIntro($request2, $contestData['contest']);
+        $this->assertEquals($showIntro, ContestController::SHOW_INTRO);
 
         // Contest is going on right now
         $adminLogin = self::login($contestAdmin);
         $request = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
-            'start_time' => Utils::GetPhpUnixTimestamp() - 1,
+            'start_time' => Time::get() - 1,
         ]);
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
 
-        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
-        $this->assertEquals($show_intro, ContestController::SHOW_INTRO);
+        $showIntro = ContestController::shouldShowIntro($request2, $contestData['contest']);
+        $this->assertEquals($showIntro, ContestController::SHOW_INTRO);
 
         $contestantLogin = self::login($contestant);
         $request2 = new Request([
@@ -66,8 +66,8 @@ class RegisterToContestTest extends OmegaupTestCase {
         $response = ContestController::apiOpen($request2);
 
         // Now that i have joined the contest, i should not see the intro
-        $show_intro = ContestController::showContestIntro($request2)['shouldShowIntro'];
-        $this->assertEquals($show_intro, !ContestController::SHOW_INTRO);
+        $showIntro = ContestController::shouldShowIntro($request2, $contestData['contest']);
+        $this->assertEquals($showIntro, !ContestController::SHOW_INTRO);
     }
 
     /**
@@ -86,9 +86,9 @@ class RegisterToContestTest extends OmegaupTestCase {
             'auth_token' => $contestantLogin->auth_token,
         ]);
 
-        $show_intro = ContestController::showContestIntro($request)['shouldShowIntro'];
+        $showIntro = ContestController::shouldShowIntro($request, $contestData['contest']);
 
-        $this->assertEquals(1, $show_intro);
+        $this->assertEquals(1, $showIntro);
     }
 
     //pruebas (público, privado) x (usuario mortal, admin, invitado)

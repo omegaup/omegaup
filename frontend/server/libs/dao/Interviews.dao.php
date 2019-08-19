@@ -14,8 +14,7 @@ class InterviewsDAO extends InterviewsDAOBase {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
         $params = [$alias];
 
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -41,8 +40,7 @@ class InterviewsDAO extends InterviewsDAOBase {
 
         $params = [$user_id, $user_id, Authorization::ADMIN_ROLE];
 
-        global $conn;
-        $rs = $conn->GetAll($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $result = [];
 
@@ -58,23 +56,13 @@ class InterviewsDAO extends InterviewsDAOBase {
             return null;
         }
 
-        try {
-            $interview = self::getByProblemset($problemset_id);
-            if (!is_null($interview)) {
-                return $interviews;
-            }
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
-
-        return null;
+        return self::getByProblemset($problemset_id);
     }
 
     public static function getByProblemset($problemset_id) {
         $sql = 'SELECT i.* from Interviews i where i.problemset_id = ?;';
 
-        global $conn;
-        $interviews = $conn->GetRow($sql, [$problemset_id]);
+        $interviews = MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
         if (empty($interviews)) {
             return null;
         }

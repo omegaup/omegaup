@@ -15,6 +15,11 @@
  * @access public
  */
 class Tags extends VO {
+    const FIELD_NAMES = [
+        'tag_id' => true,
+        'name' => true,
+    ];
+
     /**
      * Constructor de Tags
      *
@@ -22,42 +27,35 @@ class Tags extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['tag_id'])) {
             $this->tag_id = (int)$data['tag_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $tag_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $tag_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(32)
-      */
-    public $name;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $name = null;
 }

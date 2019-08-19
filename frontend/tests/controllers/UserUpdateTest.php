@@ -29,14 +29,15 @@ class UserUpdateTest extends OmegaupTestCase {
         UserController::apiUpdate($r);
 
         // Check user from db
-        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($r['name'], $user_db->name);
-        $this->assertEquals($r['country_id'], $user_db->country_id);
-        $this->assertEquals($r['state_id'], $user_db->state_id);
-        $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
-        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
-        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($locale->language_id, $user_db->language_id);
+        $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
+        $this->assertEquals($r['name'], $identityDb->name);
+        $this->assertEquals($r['country_id'], $identityDb->country_id);
+        $this->assertEquals($r['state_id'], $identityDb->state_id);
+        $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
+        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
+        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
+        $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Edit all fields again with diff values
         $locale = LanguagesDAO::getByName('pseudo');
@@ -55,20 +56,23 @@ class UserUpdateTest extends OmegaupTestCase {
         UserController::apiUpdate($r);
 
         // Check user from db
-        $user_db = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $this->assertEquals($r['name'], $user_db->name);
-        $this->assertEquals($r['country_id'], $user_db->country_id);
-        $this->assertEquals($r['state_id'], $user_db->state_id);
-        $this->assertEquals($r['scholar_degree'], $user_db->scholar_degree);
-        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $user_db->birth_date);
-        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $user_db->graduation_date);
-        $this->assertEquals($locale->language_id, $user_db->language_id);
+        $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
+        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
+        $this->assertEquals($r['name'], $identityDb->name);
+        $this->assertEquals($r['country_id'], $identityDb->country_id);
+        $this->assertEquals($r['state_id'], $identityDb->state_id);
+        $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
+        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
+        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
+        $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
         $r = new Request([
             'username' => $user->username
         ]);
-        $this->assertEquals($locale->name, UserController::getPreferredLanguage($r));
+        $this->assertEquals($locale->name, IdentityController::getPreferredLanguage(
+            $r
+        ));
     }
 
     /**
@@ -276,5 +280,49 @@ class UserUpdateTest extends OmegaupTestCase {
         } catch (InvalidParameterException $e) {
             // OK!
         }
+    }
+
+    /**
+     * Tests that the user can generate a git token.
+     */
+    public function testGenerateGitToken() {
+        $user = UserFactory::createUser();
+        $this->assertNull($user->git_token);
+        $login = self::login($user);
+        $response = UserController::apiGenerateGitToken(new Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertNotEquals($response['token'], '');
+
+        $dbUser = UsersDAO::FindByUsername($user->username);
+        $this->assertNotNull($dbUser->git_token);
+        $this->assertTrue(SecurityTools::compareHashedStrings($response['token'], $dbUser->git_token));
+    }
+
+    /**
+     * Tests that users that have old hashes can migrate transparently to
+     * Argon2id.
+     */
+    public function testOldHashTransparentMigration() {
+        // Create the user and manually set its password to the well-known
+        // 'omegaup' hash.
+        $user = UserFactory::createUser();
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity->password = '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a';
+        IdentitiesDAO::update($identity);
+        $user->password = $identity->password;
+        UsersDAO::update($user);
+        $this->assertTrue(SecurityTools::isOldHash($identity->password));
+
+        // After logging in, the password should have been updated.
+        $identity->password = 'omegaup';
+        self::login($identity);
+        $identity = IdentitiesDAO::getByPK($identity->identity_id);
+        $this->assertFalse(SecurityTools::isOldHash($identity->password));
+
+        // After logging in once, the user should be able to log in again with
+        // the exact same password.
+        $identity->password = 'omegaup';
+        self::login($identity);
     }
 }

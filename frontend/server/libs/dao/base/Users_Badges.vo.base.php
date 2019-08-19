@@ -15,6 +15,13 @@
  * @access public
  */
 class UsersBadges extends VO {
+    const FIELD_NAMES = [
+        'user_badge_id' => true,
+        'user_id' => true,
+        'badge_alias' => true,
+        'assignation_time' => true,
+    ];
+
     /**
      * Constructor de UsersBadges
      *
@@ -22,9 +29,13 @@ class UsersBadges extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_badge_id'])) {
             $this->user_badge_id = (int)$data['user_badge_id'];
@@ -33,51 +44,46 @@ class UsersBadges extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['badge_alias'])) {
-            $this->badge_alias = $data['badge_alias'];
+            $this->badge_alias = strval($data['badge_alias']);
         }
         if (isset($data['assignation_time'])) {
-            $this->assignation_time = $data['assignation_time'];
+            /**
+             * @var string|int|float $data['assignation_time']
+             * @var int $this->assignation_time
+             */
+            $this->assignation_time = DAO::fromMySQLTimestamp($data['assignation_time']);
+        } else {
+            $this->assignation_time = Time::get();
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['assignation_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $user_badge_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $user_badge_id;
+     * Identificador de usuario
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      * Identificador de usuario
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * Identificador de badge
+     *
+     * @var string|null
+     */
+    public $badge_alias = null;
 
     /**
-      * Identificador de badge
-      * @access public
-      * @var varchar(32)
-      */
-    public $badge_alias;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $assignation_time;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $assignation_time;  // CURRENT_TIMESTAMP
 }

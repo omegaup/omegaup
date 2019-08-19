@@ -15,6 +15,12 @@
  * @access public
  */
 class Roles extends VO {
+    const FIELD_NAMES = [
+        'role_id' => true,
+        'name' => true,
+        'description' => true,
+    ];
+
     /**
      * Constructor de Roles
      *
@@ -22,52 +28,45 @@ class Roles extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['role_id'])) {
             $this->role_id = (int)$data['role_id'];
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $role_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $role_id;
+     * El nombre corto del rol.
+     *
+     * @var string|null
+     */
+    public $name = null;
 
     /**
-      * El nombre corto del rol.
-      * @access public
-      * @var varchar(50)
-      */
-    public $name;
-
-    /**
-      * La descripción humana del rol.
-      * @access public
-      * @var varchar(100)
-      */
-    public $description;
+     * La descripción humana del rol.
+     *
+     * @var string|null
+     */
+    public $description = null;
 }

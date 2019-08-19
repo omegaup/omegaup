@@ -243,6 +243,45 @@ class ApiCaller {
             header('Content-Type: application/json');
         }
     }
+
+    /**
+     * Handles an exception by displaying an error to the end user and
+     * terminates the request.
+     *
+     * @param Exception $e the thrown exception.
+     */
+    public static function handleException(Exception $e) : void {
+        $apiException = null;
+        if ($e instanceof ApiException) {
+            $apiException = $e;
+        } else {
+            $apiException = new InternalServerErrorException($e);
+        }
+
+        if ($apiException->getCode() == 401) {
+            ApiCaller::$log->info("{$apiException}");
+            header('Location: /login/?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+            die();
+        }
+        if ($apiException->getCode() == 403) {
+            ApiCaller::$log->info("{$apiException}");
+            // Even though this is forbidden, we pretend the resource did not
+            // exist.
+            header('HTTP/1.1 404 Not Found');
+            die(file_get_contents(__DIR__ . '/../404.html'));
+        }
+        if ($apiException->getcode() == 404) {
+            ApiCaller::$log->info("{$apiException}");
+            header('HTTP/1.1 404 Not Found');
+            die(file_get_contents(__DIR__ . '/../404.html'));
+        }
+        ApiCaller::$log->error("{$apiException}");
+        if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
+            newrelic_notice_error($apiException);
+        }
+        header('HTTP/1.1 500 Internal Server Error');
+        die(file_get_contents(__DIR__ . '/../500.html'));
+    }
 }
 
 ApiCaller::$log = Logger::getLogger('ApiCaller');

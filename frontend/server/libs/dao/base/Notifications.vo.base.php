@@ -15,6 +15,14 @@
  * @access public
  */
 class Notifications extends VO {
+    const FIELD_NAMES = [
+        'notification_id' => true,
+        'user_id' => true,
+        'timestamp' => true,
+        'read' => true,
+        'contents' => true,
+    ];
+
     /**
      * Constructor de Notifications
      *
@@ -22,9 +30,13 @@ class Notifications extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['notification_id'])) {
             $this->notification_id = (int)$data['notification_id'];
@@ -33,61 +45,56 @@ class Notifications extends VO {
             $this->user_id = (int)$data['user_id'];
         }
         if (isset($data['timestamp'])) {
-            $this->timestamp = $data['timestamp'];
+            /**
+             * @var string|int|float $data['timestamp']
+             * @var int $this->timestamp
+             */
+            $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
+        } else {
+            $this->timestamp = Time::get();
         }
         if (isset($data['read'])) {
-            $this->read = $data['read'] == '1';
+            $this->read = boolval($data['read']);
         }
         if (isset($data['contents'])) {
-            $this->contents = $data['contents'];
+            $this->contents = strval($data['contents']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['timestamp']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $notification_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $notification_id;
+     * Identificador de usuario
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      * Identificador de usuario
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $timestamp;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $timestamp;
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $read = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $read;
-
-    /**
-      * JSON con el contenido de la notificación
-      * @access public
-      * @var text
-      */
-    public $contents;
+     * JSON con el contenido de la notificación
+     *
+     * @var string|null
+     */
+    public $contents = null;
 }

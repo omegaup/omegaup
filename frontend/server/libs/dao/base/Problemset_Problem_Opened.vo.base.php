@@ -15,6 +15,13 @@
  * @access public
  */
 class ProblemsetProblemOpened extends VO {
+    const FIELD_NAMES = [
+        'problemset_id' => true,
+        'problem_id' => true,
+        'identity_id' => true,
+        'open_time' => true,
+    ];
+
     /**
      * Constructor de ProblemsetProblemOpened
      *
@@ -22,9 +29,13 @@ class ProblemsetProblemOpened extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = (int)$data['problemset_id'];
@@ -36,49 +47,44 @@ class ProblemsetProblemOpened extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['open_time'])) {
-            $this->open_time = $data['open_time'];
+            /**
+             * @var string|int|float $data['open_time']
+             * @var int $this->open_time
+             */
+            $this->open_time = DAO::fromMySQLTimestamp($data['open_time']);
+        } else {
+            $this->open_time = Time::get();
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['open_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
+     */
+    public $problem_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $problem_id;
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
+     */
+    public $identity_id = null;
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $open_time;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $open_time;  // CURRENT_TIMESTAMP
 }

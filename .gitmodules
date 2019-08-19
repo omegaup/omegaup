@@ -1,6 +1,3 @@
-[submodule "frontend/server/libs/adodb"]
-	path = frontend/server/libs/third_party/adodb
-	url = https://github.com/ADOdb/ADOdb.git
 [submodule "frontend/server/libs/third_party/facebook-php-graph-sdk"]
 	path = frontend/server/libs/third_party/facebook-php-graph-sdk
 	url = https://github.com/facebook/php-graph-sdk.git

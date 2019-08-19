@@ -23,7 +23,6 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      * Gets the users that solved the most problems during the provided
      * time period.
      *
-     * @global type $conn
      * @param string (date) $startTime
      * @param string (date) $endTime
      * @return null|Users
@@ -93,8 +92,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $val = [$startTime, $endTime, $endTime];
 
-        global $conn;
-        $results = $conn->getAll($sql, $val);
+        $results = MySQLConnection::getInstance()->getAll($sql, $val);
         if (empty($results)) {
             return null;
         }
@@ -110,11 +108,13 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     final public static function getCodersOfTheMonth() {
         $sql = '
           SELECT
-            cm.time, u.username, COALESCE(u.country_id, "xx") AS country_id, e.email
+            cm.time, u.username, COALESCE(i.country_id, "xx") AS country_id, e.email
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
             Users u ON u.user_id = cm.user_id
+          INNER JOIN
+            Identities i ON i.identity_id = u.main_identity_id
           LEFT JOIN
             Emails e ON e.user_id = u.user_id
           WHERE
@@ -123,8 +123,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
         ';
 
-        global $conn;
-        $rs = $conn->GetAll($sql);
+        $rs = MySQLConnection::getInstance()->GetAll($sql);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = $row;
@@ -142,11 +141,17 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
         $date = date('Y-m-01', strtotime($firstDay));
         $sql = '
           SELECT
-            cm.time, u.username, COALESCE(u.country_id, "xx") AS country_id, e.email, u.user_id
+            cm.time,
+            i.username,
+            COALESCE(i.country_id, "xx") AS country_id,
+            e.email,
+            u.user_id
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
             Users u ON u.user_id = cm.user_id
+          INNER JOIN
+            Identities i ON u.user_id = i.user_id
           LEFT JOIN
             Emails e ON e.user_id = u.user_id
           WHERE
@@ -155,8 +160,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
           LIMIT 100
         ';
-        global $conn;
-        return $conn->getAll($sql, [$date]);
+        return MySQLConnection::getInstance()->getAll($sql, [$date]);
     }
 
     /**
@@ -180,8 +184,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 1
         ';
 
-        global $conn;
-        $rs = $conn->GetRow($sql, []);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, []);
         if (empty($rs)) {
             return false;
         }
@@ -198,8 +201,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                     `time` = ?
                 AND
                     `selected_by` ' . $clause . ';';
-        global $conn;
-        $rs = $conn->GetAll($sql, [$time]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -216,8 +218,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$time]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {

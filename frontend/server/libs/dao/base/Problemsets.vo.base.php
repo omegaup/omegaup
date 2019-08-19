@@ -15,6 +15,21 @@
  * @access public
  */
 class Problemsets extends VO {
+    const FIELD_NAMES = [
+        'problemset_id' => true,
+        'acl_id' => true,
+        'access_mode' => true,
+        'languages' => true,
+        'needs_basic_information' => true,
+        'requests_user_information' => true,
+        'scoreboard_url' => true,
+        'scoreboard_url_admin' => true,
+        'type' => true,
+        'contest_id' => true,
+        'assignment_id' => true,
+        'interview_id' => true,
+    ];
+
     /**
      * Constructor de Problemsets
      *
@@ -22,9 +37,13 @@ class Problemsets extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problemset_id'])) {
             $this->problemset_id = (int)$data['problemset_id'];
@@ -33,25 +52,25 @@ class Problemsets extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['access_mode'])) {
-            $this->access_mode = $data['access_mode'];
+            $this->access_mode = strval($data['access_mode']);
         }
         if (isset($data['languages'])) {
-            $this->languages = $data['languages'];
+            $this->languages = strval($data['languages']);
         }
         if (isset($data['needs_basic_information'])) {
-            $this->needs_basic_information = $data['needs_basic_information'] == '1';
+            $this->needs_basic_information = boolval($data['needs_basic_information']);
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = $data['requests_user_information'];
+            $this->requests_user_information = strval($data['requests_user_information']);
         }
         if (isset($data['scoreboard_url'])) {
-            $this->scoreboard_url = $data['scoreboard_url'];
+            $this->scoreboard_url = strval($data['scoreboard_url']);
         }
         if (isset($data['scoreboard_url_admin'])) {
-            $this->scoreboard_url_admin = $data['scoreboard_url_admin'];
+            $this->scoreboard_url_admin = strval($data['scoreboard_url_admin']);
         }
         if (isset($data['type'])) {
-            $this->type = $data['type'];
+            $this->type = strval($data['type']);
         }
         if (isset($data['contest_id'])) {
             $this->contest_id = (int)$data['contest_id'];
@@ -65,99 +84,88 @@ class Problemsets extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * El identificador único para cada conjunto de problemas
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $problemset_id = 0;
 
     /**
-      * El identificador único para cada conjunto de problemas
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * La lista de control de acceso compartida con su container
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 
     /**
-      * La lista de control de acceso compartida con su container
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * La modalidad de acceso a este conjunto de problemas
+     *
+     * @var string
+     */
+    public $access_mode = 'public';
 
     /**
-      * La modalidad de acceso a este conjunto de problemas
-      * @access public
-      * @var enum('private','public','registration')
-      */
-    public $access_mode;
+     * Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas
+     *
+     * @var string|null
+     */
+    public $languages = null;
 
     /**
-      * Un filtro (opcional) de qué lenguajes se pueden usar para resolver los problemas
-      * @access public
-      * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
-      */
-    public $languages;
+     * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil
+     *
+     * @var bool
+     */
+    public $needs_basic_information = false;
 
     /**
-      * Un campo opcional para indicar si es obligatorio que el usuario pueda ingresar a un concurso sólo si ya llenó su información de perfil
-      * @access public
-      * @var tinyint(1)
-      */
-    public $needs_basic_information;
+     * Se solicita información de los participantes para contactarlos posteriormente.
+     *
+     * @var string
+     */
+    public $requests_user_information = 'no';
 
     /**
-      * Se solicita información de los participantes para contactarlos posteriormente.
-      * @access public
-      * @var enum('no','optional','required')
-      */
-    public $requests_user_information;
+     * Token para la url del scoreboard en problemsets
+     *
+     * @var string|null
+     */
+    public $scoreboard_url = null;
 
     /**
-      * Token para la url del scoreboard en problemsets
-      * @access public
-      * @var varchar(30)
-      */
-    public $scoreboard_url;
+     * Token para la url del scoreboard de admin en problemsets
+     *
+     * @var string|null
+     */
+    public $scoreboard_url_admin = null;
 
     /**
-      * Token para la url del scoreboard de admin en problemsets
-      * @access public
-      * @var varchar(30)
-      */
-    public $scoreboard_url_admin;
+     * Almacena el tipo de problemset que se ha creado
+     *
+     * @var string
+     */
+    public $type = 'Contest';
 
     /**
-      * Almacena el tipo de problemset que se ha creado
-      * @access public
-      * @var enum('contest','assignment','interview')
-      */
-    public $type;
+     * Id del concurso
+     *
+     * @var int|null
+     */
+    public $contest_id = null;
 
     /**
-      * Id del concurso
-      * @access public
-      * @var int(11)
-      */
-    public $contest_id;
+     * Id del curso
+     *
+     * @var int|null
+     */
+    public $assignment_id = null;
 
     /**
-      * Id del curso
-      * @access public
-      * @var int(11)
-      */
-    public $assignment_id;
-
-    /**
-      * Id de la entrevista
-      * @access public
-      * @var int(11)
-      */
-    public $interview_id;
+     * Id de la entrevista
+     *
+     * @var int|null
+     */
+    public $interview_id = null;
 }

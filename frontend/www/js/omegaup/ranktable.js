@@ -3,7 +3,8 @@ import Vue from 'vue';
 import {OmegaUp} from './omegaup.js';
 
 OmegaUp.on('ready', function() {
-  const payload = JSON.parse(document.getElementById('payload').innerText);
+  const payload =
+      JSON.parse(document.getElementById('rank-table-payload').innerText);
 
   omegaup.API.User.rankByProblemsSolved({
                     offset: payload.page,
@@ -14,13 +15,14 @@ OmegaUp.on('ready', function() {
         const ranking = [];
         for (const user of result.rank) {
           let problemsSolvedUser = undefined;
-          if (payload.is_index !== true) {
+          if (payload.isIndex !== true) {
             problemsSolvedUser = user.problems_solved;
           }
           ranking.add({
             rank: user.rank,
             country: user.country_id,
             username: user.username,
+            classname: user.classname,
             name: user.name,
             score: user.score,
             problemsSolvedUser: problemsSolvedUser,
@@ -35,6 +37,7 @@ OmegaUp.on('ready', function() {
                 page: this.page,
                 length: this.length,
                 isIndex: this.isIndex,
+                isLogged: this.isLogged,
                 availableFilters: this.availableFilters,
                 filter: this.filter,
                 ranking: this.ranking,
@@ -45,7 +48,8 @@ OmegaUp.on('ready', function() {
           data: {
             page: payload.page,
             length: payload.length,
-            isIndex: payload.is_index,
+            isIndex: payload.isIndex,
+            isLogged: payload.isLogged,
             availableFilters: payload.availableFilters,
             filter: payload.filter,
             ranking: ranking,

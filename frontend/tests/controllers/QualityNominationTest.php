@@ -344,8 +344,14 @@ class QualityNominationTest extends OmegaupTestCase {
         ]);
         $response = QualityNominationController::apiResolve($request);
 
-        $this->assertContains($problemData['problem']->title, $emailSender::$listEmails[0]['subject']);
-        $this->assertContains($problemData['author']->name, $emailSender::$listEmails[0]['body']);
+        $this->assertContains(
+            $problemData['problem']->title,
+            $emailSender::$listEmails[0]['subject']
+        );
+        $this->assertContains(
+            $problemData['authorIdentity']->name,
+            $emailSender::$listEmails[0]['body']
+        );
         $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
         $this->assertContains('something else', $emailSender::$listEmails[0]['body']);
         $this->assertEquals(1, count($emailSender::$listEmails));
@@ -1174,8 +1180,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // Set date for all quality nominations as 1 week ago, so that they are eligible for
         // current problem of the week.
         $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
-        global $conn;
-        $conn->Execute('UPDATE `QualityNominations` SET `time` = ?', [$dateOneWeekAgo]);
+        MySQLConnection::getInstance()->Execute('UPDATE `QualityNominations` SET `time` = ?', [$dateOneWeekAgo]);
 
         return $problemData;
     }

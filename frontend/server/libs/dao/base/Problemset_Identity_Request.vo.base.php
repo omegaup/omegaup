@@ -15,6 +15,15 @@
  * @access public
  */
 class ProblemsetIdentityRequest extends VO {
+    const FIELD_NAMES = [
+        'identity_id' => true,
+        'problemset_id' => true,
+        'request_time' => true,
+        'last_update' => true,
+        'accepted' => true,
+        'extra_note' => true,
+    ];
+
     /**
      * Constructor de ProblemsetIdentityRequest
      *
@@ -22,9 +31,13 @@ class ProblemsetIdentityRequest extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
             $this->identity_id = (int)$data['identity_id'];
@@ -33,71 +46,70 @@ class ProblemsetIdentityRequest extends VO {
             $this->problemset_id = (int)$data['problemset_id'];
         }
         if (isset($data['request_time'])) {
-            $this->request_time = $data['request_time'];
+            /**
+             * @var string|int|float $data['request_time']
+             * @var int $this->request_time
+             */
+            $this->request_time = DAO::fromMySQLTimestamp($data['request_time']);
+        } else {
+            $this->request_time = Time::get();
         }
         if (isset($data['last_update'])) {
-            $this->last_update = $data['last_update'];
+            /**
+             * @var string|int|float $data['last_update']
+             * @var int $this->last_update
+             */
+            $this->last_update = DAO::fromMySQLTimestamp($data['last_update']);
         }
         if (isset($data['accepted'])) {
-            $this->accepted = $data['accepted'] == '1';
+            $this->accepted = boolval($data['accepted']);
         }
         if (isset($data['extra_note'])) {
-            $this->extra_note = $data['extra_note'];
+            $this->extra_note = strval($data['extra_note']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * Identidad del usuario
+     * Llave Primaria
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['request_time', 'last_update']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $identity_id = null;
 
     /**
-      * Identidad del usuario
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var int|null
+     */
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $request_time;  // CURRENT_TIMESTAMP
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $request_time;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $last_update = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $last_update;
+     * [Campo no documentado]
+     *
+     * @var bool|null
+     */
+    public $accepted = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $accepted;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var mediumtext
-      */
-    public $extra_note;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $extra_note = null;
 }

@@ -15,6 +15,13 @@
  * @access public
  */
 class AuthTokens extends VO {
+    const FIELD_NAMES = [
+        'user_id' => true,
+        'identity_id' => true,
+        'token' => true,
+        'create_time' => true,
+    ];
+
     /**
      * Constructor de AuthTokens
      *
@@ -22,9 +29,13 @@ class AuthTokens extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -33,50 +44,45 @@ class AuthTokens extends VO {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['token'])) {
-            $this->token = $data['token'];
+            $this->token = strval($data['token']);
         }
         if (isset($data['create_time'])) {
-            $this->create_time = $data['create_time'];
+            /**
+             * @var string|int|float $data['create_time']
+             * @var int $this->create_time
+             */
+            $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
+        } else {
+            $this->create_time = Time::get();
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['create_time']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * Identidad del usuario
+     *
+     * @var int|null
+     */
+    public $identity_id = null;
 
     /**
-      * Identidad del usuario
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
+     * [Campo no documentado]
+     * Llave Primaria
+     *
+     * @var string|null
+     */
+    public $token = null;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * @access public
-      * @var varchar(128)
-      */
-    public $token;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $create_time;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $create_time;  // CURRENT_TIMESTAMP
 }

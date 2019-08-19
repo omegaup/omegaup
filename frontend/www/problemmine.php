@@ -2,19 +2,23 @@
 
 require_once('../server/bootstrap_smarty.php');
 
-$private_problems_alert = 0;
-$is_admin = false;
-
-if ($session['valid']) {
-    if (!isset($_SESSION['private_problems_alert']) &&
-        ProblemsDAO::getPrivateCount($session['user']) > 0) {
-        $_SESSION['private_problems_alert'] = 1;
-        $private_problems_alert = 1;
-    }
-    $is_admin = Authorization::isSystemAdmin($session['identity']->identity_id);
+try {
+    $smartyProperties = ProblemController::getProblemsMineInfoForSmarty(
+        new Request($_REQUEST)
+    );
+} catch (Exception $e) {
+    ApiCaller::handleException($e);
 }
 
-$smarty->assign('PRIVATE_PROBLEMS_ALERT', $private_problems_alert);
-$smarty->assign('IS_SYSADMIN', $is_admin);
+foreach ($smartyProperties as $key => $value) {
+    $smarty->assign($key, $value);
+}
+
+$privateProblemsAlert = (!isset($_SESSION['private_problems_alert']) &&
+    ProblemsDAO::getPrivateCount($session['user']) > 0);
+if ($privateProblemsAlert) {
+    $_SESSION['private_problems_alert'] = true;
+}
+$smarty->assign('privateProblemsAlert', $privateProblemsAlert);
 
 $smarty->display('../templates/problem.mine.tpl');

@@ -15,6 +15,33 @@
  * @access public
  */
 class Contests extends VO {
+    const FIELD_NAMES = [
+        'contest_id' => true,
+        'problemset_id' => true,
+        'acl_id' => true,
+        'title' => true,
+        'description' => true,
+        'start_time' => true,
+        'finish_time' => true,
+        'last_updated' => true,
+        'window_length' => true,
+        'rerun_id' => true,
+        'admission_mode' => true,
+        'alias' => true,
+        'scoreboard' => true,
+        'points_decay_factor' => true,
+        'partial_score' => true,
+        'submissions_gap' => true,
+        'feedback' => true,
+        'penalty' => true,
+        'penalty_type' => true,
+        'penalty_calc_policy' => true,
+        'show_scoreboard_after' => true,
+        'urgent' => true,
+        'languages' => true,
+        'recommended' => true,
+    ];
+
     /**
      * Constructor de Contests
      *
@@ -22,9 +49,13 @@ class Contests extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['contest_id'])) {
             $this->contest_id = (int)$data['contest_id'];
@@ -36,19 +67,33 @@ class Contests extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['title'])) {
-            $this->title = $data['title'];
+            $this->title = strval($data['title']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['start_time'])) {
-            $this->start_time = $data['start_time'];
+            /**
+             * @var string|int|float $data['start_time']
+             * @var int $this->start_time
+             */
+            $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
-            $this->finish_time = $data['finish_time'];
+            /**
+             * @var string|int|float $data['finish_time']
+             * @var int $this->finish_time
+             */
+            $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['last_updated'])) {
-            $this->last_updated = $data['last_updated'];
+            /**
+             * @var string|int|float $data['last_updated']
+             * @var int $this->last_updated
+             */
+            $this->last_updated = DAO::fromMySQLTimestamp($data['last_updated']);
+        } else {
+            $this->last_updated = Time::get();
         }
         if (isset($data['window_length'])) {
             $this->window_length = (int)$data['window_length'];
@@ -57,10 +102,10 @@ class Contests extends VO {
             $this->rerun_id = (int)$data['rerun_id'];
         }
         if (isset($data['admission_mode'])) {
-            $this->admission_mode = $data['admission_mode'];
+            $this->admission_mode = strval($data['admission_mode']);
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['scoreboard'])) {
             $this->scoreboard = (int)$data['scoreboard'];
@@ -69,215 +114,204 @@ class Contests extends VO {
             $this->points_decay_factor = (float)$data['points_decay_factor'];
         }
         if (isset($data['partial_score'])) {
-            $this->partial_score = $data['partial_score'] == '1';
+            $this->partial_score = boolval($data['partial_score']);
         }
         if (isset($data['submissions_gap'])) {
             $this->submissions_gap = (int)$data['submissions_gap'];
         }
         if (isset($data['feedback'])) {
-            $this->feedback = $data['feedback'];
+            $this->feedback = strval($data['feedback']);
         }
         if (isset($data['penalty'])) {
             $this->penalty = (int)$data['penalty'];
         }
         if (isset($data['penalty_type'])) {
-            $this->penalty_type = $data['penalty_type'];
+            $this->penalty_type = strval($data['penalty_type']);
         }
         if (isset($data['penalty_calc_policy'])) {
-            $this->penalty_calc_policy = $data['penalty_calc_policy'];
+            $this->penalty_calc_policy = strval($data['penalty_calc_policy']);
         }
         if (isset($data['show_scoreboard_after'])) {
-            $this->show_scoreboard_after = $data['show_scoreboard_after'] == '1';
+            $this->show_scoreboard_after = boolval($data['show_scoreboard_after']);
         }
         if (isset($data['urgent'])) {
-            $this->urgent = $data['urgent'] == '1';
+            $this->urgent = boolval($data['urgent']);
         }
         if (isset($data['languages'])) {
-            $this->languages = $data['languages'];
+            $this->languages = strval($data['languages']);
         }
         if (isset($data['recommended'])) {
-            $this->recommended = $data['recommended'] == '1';
+            $this->recommended = boolval($data['recommended']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * El identificador unico para cada concurso
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['start_time', 'finish_time', 'last_updated']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $contest_id = 0;
 
     /**
-      * El identificador unico para cada concurso
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $contest_id;
+     * La lista de problemas de este concurso
+     *
+     * @var int|null
+     */
+    public $problemset_id = null;
 
     /**
-      * La lista de problemas de este concurso
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * El titulo que aparecera en cada concurso
+     *
+     * @var string|null
+     */
+    public $title = null;
 
     /**
-      * El titulo que aparecera en cada concurso
-      * @access public
-      * @var varchar(256)
-      */
-    public $title;
+     * Una breve descripcion de cada concurso.
+     *
+     * @var string|null
+     */
+    public $description = null;
 
     /**
-      * Una breve descripcion de cada concurso.
-      * @access public
-      * @var tinytext
-      */
-    public $description;
+     * Hora de inicio de este concurso
+     *
+     * @var int
+     */
+    public $start_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      * Hora de inicio de este concurso
-      * @access public
-      * @var timestamp
-      */
-    public $start_time;
+     * Hora de finalizacion de este concurso
+     *
+     * @var int
+     */
+    public $finish_time = 946706400; // 2000-01-01 06:00:00
 
     /**
-      * Hora de finalizacion de este concurso
-      * @access public
-      * @var timestamp
-      */
-    public $finish_time;
+     * Indica la hora en que se actualizó de privado a público un concurso o viceversa
+     *
+     * @var int
+     */
+    public $last_updated;  // CURRENT_TIMESTAMP
 
     /**
-      * Indica la hora en que se actualizó de privado a público un concurso o viceversa
-      * @access public
-      * @var timestamp
-      */
-    public $last_updated;
+     * Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso
+     *
+     * @var int|null
+     */
+    public $window_length = null;
 
     /**
-      * Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso
-      * @access public
-      * @var int(11)
-      */
-    public $window_length;
+     * Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.
+     *
+     * @var int|null
+     */
+    public $rerun_id = null;
 
     /**
-      * Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.
-      * @access public
-      * @var int(11)
-      */
-    public $rerun_id;
+     * Modalidad en la que se registra un concurso.
+     *
+     * @var string
+     */
+    public $admission_mode = 'private';
 
     /**
-      * Modalidad en la que se registra un concurso.
-      * @access public
-      * @var enum('private','registration','public')
-      */
-    public $admission_mode;
+     * Almacenará el token necesario para acceder al concurso
+     *
+     * @var string|null
+     */
+    public $alias = null;
 
     /**
-      * Almacenará el token necesario para acceder al concurso
-      * @access public
-      * @var varchar(32)
-      */
-    public $alias;
+     * Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible
+     *
+     * @var int
+     */
+    public $scoreboard = 1;
 
     /**
-      * Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible
-      * @access public
-      * @var int(11)
-      */
-    public $scoreboard;
+     * El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7
+     *
+     * @var float
+     */
+    public $points_decay_factor = 0.00;
 
     /**
-      * El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7
-      * @access public
-      * @var double
-      */
-    public $points_decay_factor;
+     * Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos
+     *
+     * @var bool
+     */
+    public $partial_score = true;
 
     /**
-      * Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos
-      * @access public
-      * @var tinyint(1)
-      */
-    public $partial_score;
+     * Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro
+     *
+     * @var int
+     */
+    public $submissions_gap = 60;
 
     /**
-      * Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro
-      * @access public
-      * @var int(11)
-      */
-    public $submissions_gap;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $feedback = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var enum('no','yes','partial')
-      */
-    public $feedback;
+     * Entero indicando el número de minutos con que se penaliza por recibir un no-accepted
+     *
+     * @var int
+     */
+    public $penalty = 1;
 
     /**
-      * Entero indicando el número de minutos con que se penaliza por recibir un no-accepted
-      * @access public
-      * @var int(11)
-      */
-    public $penalty;
+     * Indica la política de cálculo de penalty: minutos desde que inició el concurso, minutos desde que se abrió el problema, o tiempo de ejecución (en milisegundos).
+     *
+     * @var string|null
+     */
+    public $penalty_type = null;
 
     /**
-      * Indica la política de cálculo de penalty: minutos desde que inició el concurso, minutos desde que se abrió el problema, o tiempo de ejecución (en milisegundos).
-      * @access public
-      * @var enum('contest_start','problem_open','runtime','none')
-      */
-    public $penalty_type;
+     * Indica como afecta el penalty al score.
+     *
+     * @var string|null
+     */
+    public $penalty_calc_policy = null;
 
     /**
-      * Indica como afecta el penalty al score.
-      * @access public
-      * @var enum('sum','max')
-      */
-    public $penalty_calc_policy;
+     * Mostrar el scoreboard automáticamente después del concurso
+     *
+     * @var bool
+     */
+    public $show_scoreboard_after = true;
 
     /**
-      * Mostrar el scoreboard automáticamente después del concurso
-      * @access public
-      * @var tinyint(1)
-      */
-    public $show_scoreboard_after;
+     * Indica si el concurso es de alta prioridad y requiere mejor QoS.
+     *
+     * @var bool
+     */
+    public $urgent = false;
 
     /**
-      * Indica si el concurso es de alta prioridad y requiere mejor QoS.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $urgent;
+     * Un filtro (opcional) de qué lenguajes se pueden usar en un concurso
+     *
+     * @var string|null
+     */
+    public $languages = null;
 
     /**
-      * Un filtro (opcional) de qué lenguajes se pueden usar en un concurso
-      * @access public
-      * @var set('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua')
-      */
-    public $languages;
-
-    /**
-      * Mostrar el concurso en la lista de recomendados.
-      * @access public
-      * @var tinyint(1)
-      */
-    public $recommended;
+     * Mostrar el concurso en la lista de recomendados.
+     *
+     * @var bool
+     */
+    public $recommended = false;
 }

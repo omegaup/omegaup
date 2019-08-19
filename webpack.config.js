@@ -26,6 +26,8 @@ let config = [
       admin_user: './frontend/www/js/omegaup/admin/user.js',
       admin_roles: './frontend/www/js/omegaup/admin/roles.js',
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
+      badge_details: './frontend/www/js/omegaup/badge/details.js',
+      badge_list: './frontend/www/js/omegaup/badge/list.js',
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.js',
       coder_of_the_month_notice:
           './frontend/www/js/omegaup/coderofthemonth/notice.js',
@@ -48,10 +50,12 @@ let config = [
       course_submissions_list:
           './frontend/www/js/omegaup/course/submissions_list.js',
       group_list: './frontend/www/js/omegaup/group/list.js',
+      notification_list: './frontend/www/js/omegaup/notification/list.js',
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
       problem_list: './frontend/www/js/omegaup/problem/list.js',
       problem_stats: './frontend/www/js/omegaup/problem/stats.js',
+      problem_solution: './frontend/www/js/omegaup/problem/solution.js',
       rank_table: './frontend/www/js/omegaup/ranktable.js',
       schools_intro: './frontend/www/js/omegaup/schools/intro.js',
       schools_rank: './frontend/www/js/omegaup/schools/rank.js',

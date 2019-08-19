@@ -36,46 +36,16 @@ class Utils {
         return $problem_id;
     }
 
-    public static function GetPhpUnixTimestamp($time = null) {
-        if (is_null($time)) {
-            return Time::get();
-        } else {
-            return strtotime($time);
-        }
-    }
-
     public static function GetDbDatetime() {
         // Go to the DB
-        global $conn;
 
-        $sql = 'SELECT NOW() n';
-        $rs = $conn->GetRow($sql);
-
-        if (empty($rs)) {
-            return null;
-        }
-
-        return $rs['n'];
+        return MySQLConnection::getInstance()->GetOne('SELECT NOW();');
     }
 
     public static function GetTimeFromUnixTimestamp($time) {
         // Go to the DB to take the unix timestamp
-        global $conn;
 
-        $sql = 'SELECT FROM_UNIXTIME(?) t';
-        $params = [$time];
-        $rs = $conn->GetRow($sql, $params);
-
-        if (empty($rs)) {
-            return null;
-        }
-
-        return $rs['t'];
-    }
-
-    public static function getNextTime() {
-        self::$counttime++;
-        return Utils::GetTimeFromUnixTimestamp(self::$inittime + self::$counttime);
+        return MySQLConnection::getInstance()->GetOne('SELECT FROM_UNIXTIME(?);', [$time]);
     }
 
     public static function CleanLog() {
@@ -89,26 +59,22 @@ class Utils {
     }
 
     public static function deleteAllSuggestions() {
-        global $conn;
-        $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
+        MySQLConnection::getInstance()->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
     }
 
     public static function deleteAllRanks() {
-        global $conn;
-        $conn->Execute('DELETE FROM `User_Rank`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `User_Rank`;');
     }
 
     public static function deleteAllPreviousRuns() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Submission_Log`;');
-        $conn->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
-        $conn->Execute('DELETE FROM `Runs`;');
-        $conn->Execute('DELETE FROM `Submissions`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Submission_Log`;');
+        MySQLConnection::getInstance()->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Runs`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Submissions`;');
     }
 
     public static function deleteAllProblemsOfTheWeek() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Problem_Of_The_Week`;');
     }
 
     /**
@@ -143,12 +109,12 @@ class Utils {
 
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
-            SubmissionsDAO::save($submission);
+            SubmissionsDAO::update($submission);
             $run->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
         }
 
-        RunsDAO::save($run);
+        RunsDAO::update($run);
 
         Grader::getInstance()->setGraderResourceForTesting(
             $run,
@@ -183,7 +149,7 @@ class Utils {
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));
-        ACLsDAO::save(new ACLs([
+        ACLsDAO::create(new ACLs([
             'acl_id' => Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,
         ]));
@@ -218,8 +184,6 @@ class Utils {
     }
 
     public static function CleanupDB() {
-        global $conn;
-
         // Tables to truncate
         $tables = [
             'ACLs',
@@ -241,6 +205,7 @@ class Utils {
             'Notifications',
             'PrivacyStatement_Consent_Log',
             'Problems',
+            'Problems_Forfeited',
             'Problems_Languages',
             'Problems_Tags',
             'Problemset_Access_Log',
@@ -267,31 +232,36 @@ class Utils {
 
         try {
             // Disable foreign checks
-            $conn->Execute('SET foreign_key_checks = 0;');
+            MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 0;');
 
             foreach ($tables as $t) {
-                $conn->Execute("TRUNCATE TABLE `$t`;");
+                MySQLConnection::getInstance()->Execute("TRUNCATE TABLE `$t`;");
             }
 
             // Tables with special entries.
-            $conn->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
+            MySQLConnection::getInstance()->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
 
             // The format of the question changed from this id
-            $conn->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
+            MySQLConnection::getInstance()->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
 
             // Make sure the user_id and identity_id never matches in tests.
-            $conn->Execute('ALTER TABLE Identities auto_increment = 100000;');
+            MySQLConnection::getInstance()->Execute('ALTER TABLE Identities auto_increment = 100000;');
             self::setUpDefaultDataConfig();
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());
         } finally {
             // Enabling them again
-            $conn->Execute('SET foreign_key_checks = 1;');
+            MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 1;');
         }
+        self::commit();
     }
 
     public static function RunUpdateUserRank() {
+        // Ensure all suggestions are written to the database before invoking
+        // the external script.
+        self::commit();
+
         shell_exec('python3 ' . escapeshellarg(OMEGAUP_ROOT) . '/../stuff/cron/update_user_rank.py' .
         ' --quiet ' .
         ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
@@ -301,8 +271,11 @@ class Utils {
     }
 
     public static function Commit() {
-        global $conn;
-        $conn->Execute('COMMIT');
+        try {
+            MySQLConnection::getInstance()->StartTrans();
+        } finally {
+            MySQLConnection::getInstance()->CompleteTrans();
+        }
     }
 
     public static function RunAggregateFeedback() {

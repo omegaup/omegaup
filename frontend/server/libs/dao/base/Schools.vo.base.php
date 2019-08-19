@@ -15,6 +15,13 @@
  * @access public
  */
 class Schools extends VO {
+    const FIELD_NAMES = [
+        'school_id' => true,
+        'country_id' => true,
+        'state_id' => true,
+        'name' => true,
+    ];
+
     /**
      * Constructor de Schools
      *
@@ -22,62 +29,55 @@ class Schools extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['school_id'])) {
             $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['country_id'])) {
-            $this->country_id = $data['country_id'];
+            $this->country_id = strval($data['country_id']);
         }
         if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
+            $this->state_id = strval($data['state_id']);
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $school_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $school_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $country_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $country_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $state_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $state_id;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(128)
-      */
-    public $name;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $name = null;
 }

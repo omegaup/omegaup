@@ -1,5 +1,4 @@
 <?php
-
 require_once('../server/bootstrap_smarty.php');
 
 if (OMEGAUP_LOCKDOWN) {
@@ -12,11 +11,15 @@ try {
     $coderOfTheMonthResponse = UserController::apiCoderOfTheMonth(new Request());
     $smarty->assign('coderOfTheMonthData', $coderOfTheMonthResponse['userinfo']);
 
-    $schoolRankPayload = SchoolController::apiRank(new Request(['rowcount' => 100]));
-    // Show top 5 schools rank
-    $smarty->assign('schoolRankPayload', ['rowCount' => 5, 'rank' => $schoolRankPayload['rank']]);
+    $smartyProperties = SchoolController::getSchoolsRankForSmarty(
+        /*$rowCount=*/ 5,
+        /*$isIndex=*/true
+    );
 } catch (Exception $e) {
-    // Oh, well...
+     ApiCaller::handleException($e);
+}
+foreach ($smartyProperties as $key => $value) {
+    $smarty->assign($key, $value);
 }
 
 $smarty->display('../templates/index.tpl');

@@ -1,7 +1,5 @@
 {include file='head.tpl' htmlTitle="{#omegaupTitleIndex#}"}
 
-<script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
-
 {if isset($coderOfTheMonthData)}
 <script type="text/json" id="coder-of-the-month-payload">{$coderOfTheMonthData|json_encode}</script>
 {else}
@@ -37,7 +35,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				{include file='rank.table.tpl' length=5 is_index=true}
+				{include file='rank.table.tpl' rankTablePayload=$rankTablePayload}
 			</div>
 
 			{if isset($schoolRankPayload)}

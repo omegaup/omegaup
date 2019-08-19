@@ -15,6 +15,19 @@
  * @access public
  */
 class Identities extends VO {
+    const FIELD_NAMES = [
+        'identity_id' => true,
+        'username' => true,
+        'password' => true,
+        'name' => true,
+        'user_id' => true,
+        'language_id' => true,
+        'country_id' => true,
+        'state_id' => true,
+        'school_id' => true,
+        'gender' => true,
+    ];
+
     /**
      * Constructor de Identities
      *
@@ -22,21 +35,25 @@ class Identities extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
             $this->identity_id = (int)$data['identity_id'];
         }
         if (isset($data['username'])) {
-            $this->username = $data['username'];
+            $this->username = strval($data['username']);
         }
         if (isset($data['password'])) {
-            $this->password = $data['password'];
+            $this->password = strval($data['password']);
         }
         if (isset($data['name'])) {
-            $this->name = $data['name'];
+            $this->name = strval($data['name']);
         }
         if (isset($data['user_id'])) {
             $this->user_id = (int)$data['user_id'];
@@ -45,99 +62,88 @@ class Identities extends VO {
             $this->language_id = (int)$data['language_id'];
         }
         if (isset($data['country_id'])) {
-            $this->country_id = $data['country_id'];
+            $this->country_id = strval($data['country_id']);
         }
         if (isset($data['state_id'])) {
-            $this->state_id = $data['state_id'];
+            $this->state_id = strval($data['state_id']);
         }
         if (isset($data['school_id'])) {
             $this->school_id = (int)$data['school_id'];
         }
         if (isset($data['gender'])) {
-            $this->gender = $data['gender'];
+            $this->gender = strval($data['gender']);
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $identity_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $identity_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $username = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(50)
-      */
-    public $username;
+     * Contraseña del usuario, usando Argon2i o Blowfish
+     *
+     * @var string|null
+     */
+    public $password = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(100)
-      */
-    public $password;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $name = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var varchar(256)
-      */
-    public $name;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $user_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $user_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $language_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $language_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $country_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $country_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $state_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var char(3)
-      */
-    public $state_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $school_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $school_id;
-
-    /**
-      * Género de la identidad
-      * @access public
-      * @var enum('female','male','other','decline')
-      */
-    public $gender;
+     * Género de la identidad
+     *
+     * @var string|null
+     */
+    public $gender = null;
 }

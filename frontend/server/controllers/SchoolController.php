@@ -23,10 +23,9 @@ class SchoolController extends Controller {
             throw new InvalidParameterException('parameterEmpty', 'query');
         }
 
-        try {
-            $schools = SchoolsDAO::findByName($r[$param]);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        $schools = SchoolsDAO::findByName($r[$param]);
+        if (is_null($schools)) {
+            throw new NotFoundException('schoolNotFound');
         }
 
         $response = [];
@@ -43,7 +42,6 @@ class SchoolController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
      */
     public static function apiCreate(Request $r) {
         self::authenticateRequest($r);
@@ -74,17 +72,49 @@ class SchoolController extends Controller {
         ]);
 
         $school_id = 0;
-        try {
-            $existing = SchoolsDAO::findByName($name);
-            if (!empty($existing)) {
-                return $existing[0]->school_id;
-            }
-            // Save in db
-            SchoolsDAO::save($school);
-            return $school->school_id;
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
+        $existing = SchoolsDAO::findByName($name);
+        if (!empty($existing)) {
+            return $existing[0]->school_id;
         }
+        // Save in db
+        SchoolsDAO::create($school);
+        return $school->school_id;
+    }
+
+    /**
+     * Ensures that all the numeric parameters have valid values.
+     *
+     * @param Request $r
+     * @return array
+     */
+    private static function validateRankDetails(Request $r) : array {
+        $r->ensureInt('offset', null, null, false);
+        $r->ensureInt('rowcount', 5, 100, false);
+        $r->ensureInt('start_time', null, null, false);
+        $r->ensureInt('finish_time', null, null, false);
+
+        try {
+            self::authenticateRequest($r);
+        } catch (UnauthorizedException $e) {
+            if (!is_null($r['start_time'])) {
+                throw new InvalidParameterException('paramterInvalid', 'start_time');
+            }
+            if (!is_null($r['finish_time'])) {
+                throw new InvalidParameterException('paramterInvalid', 'finish_time');
+            }
+            // Both endpoints were not specified, so the API can be used
+            // unauthenticated since it'll be cached.
+        }
+
+        return [
+            'offset' => $r['offset'] ?: 0,
+            'rowcount' => $r['rowcount'] ?: 100,
+            'start_time' => $r['start_time'] ?:
+                            strtotime('first day of this month', Time::get()),
+            'finish_time' => $r['finish_time'] ?:
+                             strtotime('first day of next month', Time::get()),
+            'can_use_cache' => is_null($r['start_time']) && is_null($r['finish_time'])
+        ];
     }
 
     /**
@@ -92,80 +122,101 @@ class SchoolController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidDatabaseOperationException
-     * @throws InvalidParameterException
      */
     public static function apiRank(Request $r) {
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', 100, 100, false);
-        $r->ensureInt('start_time', null, null, false);
-        $r->ensureInt('finish_time', null, null, false);
+        [
+            'offset' => $offset,
+            'rowcount' => $rowCount,
+            'start_time' => $startTime,
+            'finish_time' => $finishTime,
+            'can_use_cache' => $canUseCache,
+        ] = self::validateRankDetails($r);
+        return [
+            'status' => 'ok',
+            'rank' => self::getSchoolsRank(
+                $offset,
+                $rowCount,
+                $startTime,
+                $finishTime,
+                $canUseCache
+            ),
+        ];
+    }
 
-        try {
-            self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
-            if (!is_null($r['start_time']) || !is_null($r['finish_time'])) {
-                throw new InvalidParameterException('paramterInvalid', 'start_time');
-            }
-        }
-
-        // Defaults for offset and rowcount
-        if (null == $r['offset']) {
-            $r['offset'] = 0;
-        }
-        if (null == $r['rowcount']) {
-            $r['rowcount'] = 100;
-        }
-
-        $canUseCache = is_null($r['start_time']) && is_null($r['finish_time']);
-
-        if (is_null($r['start_time'])) {
-            $r['start_time'] = date('Y-m-01', Time::get());
-        } else {
-            $r['start_time'] = gmdate('Y-m-d', $r['start_time']);
-        }
-
-        if (is_null($r['finish_time'])) {
-            $r['finish_time'] = date('Y-m-d', strtotime('first day of next month'));
-        } else {
-            $r['finish_time'] = gmdate('Y-m-d', $r['finish_time']);
-        }
-
-        $fetch = function (Request $r) {
-            try {
-                return SchoolsDAO::getRankByUsersAndProblemsWithAC(
-                    $r['start_time'],
-                    $r['finish_time'],
-                    $r['offset'],
-                    $r['rowcount']
-                );
-            } catch (Exception $e) {
-                throw new InvalidDatabaseOperationException($e);
-            }
+    /**
+     * Returns rank of best schools in last month
+     *
+     * @param int $offset
+     * @param int $rowCount
+     * @param int $startTime
+     * @param int $finishTime
+     * @param bool $canUseCache
+     * @return array
+     */
+    private static function getSchoolsRank(
+        int $offset,
+        int $rowCount,
+        int $startTime,
+        int $finishTime,
+        bool $canUseCache
+    ) : array {
+        $fetch = function () use ($offset, $rowCount, $startTime, $finishTime) {
+            return SchoolsDAO::getRankByUsersAndProblemsWithAC(
+                $startTime,
+                $finishTime,
+                $offset,
+                $rowCount
+            );
         };
 
-        $result = [];
         if ($canUseCache) {
-            $cache_key = $r['offset'] .'-'. $r['rowcount'];
-            Cache::getFromCacheOrSet(
+            return Cache::getFromCacheOrSet(
                 Cache::SCHOOL_RANK,
-                $cache_key,
-                $r,
+                "{$offset}-{$rowCount}",
                 $fetch,
-                $result,
                 60 * 60 * 24 // 1 day
             );
-        } else {
-            $result = $fetch($r);
         }
+        return $fetch();
+    }
 
-        return ['status' => 'ok', 'rank' => $result];
+    /**
+     * Gets the rank of best schools in last month with smarty format
+     *
+     * @param int $rowCount
+     * @param bool $isIndex
+     * @return array
+     */
+    public static function getSchoolsRankForSmarty(
+        int $rowCount,
+        bool $isIndex
+    ) : array {
+        $schoolsRank = [
+            'schoolRankPayload' => [
+                'rowCount' => $rowCount,
+                'rank' => self::getSchoolsRank(
+                    /*$offset=*/0,
+                    $rowCount,
+                    /*$startTime=*/strtotime('first day of this month', Time::get()),
+                    /*$finishTime=*/strtotime('first day of next month', Time::get()),
+                    /*$canUseCache=*/true
+                ),
+            ]
+        ];
+        if (!$isIndex) {
+            return $schoolsRank;
+        }
+        $schoolsRank['rankTablePayload'] = [
+            'length' => $rowCount,
+            'isIndex' => $isIndex,
+            'availableFilters' => [],
+        ];
+        return $schoolsRank;
     }
 
     /**
      * @param $countryId
      * @param $stateId
-     * @throws InvalidDatabaseOperationException
      * @throws InvalidParameterException
      */
     public static function getStateIdFromCountryAndState($countryId, $stateId) {
@@ -173,10 +224,6 @@ class SchoolController extends Controller {
             // Both state and country must be specified together.
             return null;
         }
-        try {
-            return StatesDAO::getByPK($countryId, $stateId);
-        } catch (Exception $e) {
-            throw new InvalidDatabaseOperationException($e);
-        }
+        return StatesDAO::getByPK($countryId, $stateId);
     }
 }

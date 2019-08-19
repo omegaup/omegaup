@@ -21,13 +21,10 @@ class SchoolsDAO extends SchoolsDAOBase {
     /**
      * Finds schools that cotains 'name'
      *
-     * @global type $conn
      * @param string $name
      * @return array Schools
      */
     public static function findByName($name) {
-        global  $conn;
-
         $sql = '
             SELECT
                 s.*
@@ -39,7 +36,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$name];
 
         $result = [];
-        foreach ($conn->GetAll($sql, $args) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
             $result[] = new Schools($row);
         }
         return $result;
@@ -48,15 +45,18 @@ class SchoolsDAO extends SchoolsDAOBase {
     /**
      * Returns rank of schools by # of distinct users with at least one AC and # of distinct problems solved.
      *
-     * @param  string (DateTime) $startDate
-     * @param  string (DateTime) $finishDate
-     * @param  int   $offset
-     * @param  int   $rowcount
+     * @param  int $startTime
+     * @param  int $finishTime
+     * @param  int $offset
+     * @param  int $rowcount
      * @return array
      */
-    public static function getRankByUsersAndProblemsWithAC($startDate, $finishDate, $offset, $rowcount) {
-        global  $conn;
-
+    public static function getRankByUsersAndProblemsWithAC(
+        int $startDate,
+        int $finishDate,
+        int $offset,
+        int $rowcount
+    ) : array {
         $sql = '
             SELECT
               s.name,
@@ -75,7 +75,7 @@ class SchoolsDAO extends SchoolsDAOBase {
               Problems p ON p.problem_id = su.problem_id
             WHERE
               r.verdict = "AC" AND p.visibility >= 1 AND
-              su.time BETWEEN CAST(? AS DATETIME) AND CAST(? AS DATETIME)
+              su.time BETWEEN CAST(FROM_UNIXTIME(?) AS DATETIME) AND CAST(FROM_UNIXTIME(?) AS DATETIME)
             GROUP BY
               s.school_id
             ORDER BY
@@ -86,7 +86,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
         $result = [];
-        foreach ($conn->GetAll($sql, $args) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
             $result[] = [
                 'name' => $row['name'],
                 'country_id' => $row['country_id'],

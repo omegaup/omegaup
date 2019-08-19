@@ -17,30 +17,30 @@ abstract class CacheAdapter {
         return CacheAdapter::$sInstance;
     }
 
-    abstract public function entry($key, $default_var, $ttl = 0);
-    abstract public function add($key, $var, $ttl = 0);
-    abstract public function cas($key, $old, $new);
+    abstract public function entry(string $key, $defaultVar, int $ttl = 0);
+    abstract public function add(string $key, $var, int $ttl = 0) : bool;
+    abstract public function cas(string $key, int $old, int $new) : bool;
     abstract public function clear();
-    abstract public function delete($key);
-    abstract public function fetch($key);
-    abstract public function store($key, $var, $ttl = 0);
+    abstract public function delete(string $key) : bool;
+    abstract public function fetch(string $key);
+    abstract public function store(string $key, $var, int $ttl = 0) : bool;
 }
 
 /**
  * Implementation of CacheAdapter that uses the real APC functions.
  */
 class APCCacheAdapter extends CacheAdapter {
-    public function entry($key, $default_var, $ttl = 0) {
-        return apcu_entry($key, function ($key) use ($default_var) {
-            return $default_var;
+    public function entry(string $key, $defaultVar, int $ttl = 0) {
+        return apcu_entry($key, function ($key) use ($defaultVar) {
+            return $defaultVar;
         }, $ttl);
     }
 
-    public function add($key, $var, $ttl = 0) {
+    public function add(string $key, $var, int $ttl = 0) : bool {
         return apcu_add($key, $var, $ttl);
     }
 
-    public function cas($key, $old, $new) {
+    public function cas(string $key, int $old, int $new) : bool {
         return apcu_cas($key, $old, $new);
     }
 
@@ -48,15 +48,15 @@ class APCCacheAdapter extends CacheAdapter {
         apcu_clear_cache();
     }
 
-    public function delete($key) {
+    public function delete(string $key) : bool {
         return apcu_delete($key);
     }
 
-    public function fetch($key) {
+    public function fetch(string $key) {
         return apcu_fetch($key, $success);
     }
 
-    public function store($key, $var, $ttl = 0) {
+    public function store(string $key, $var, int $ttl = 0) : bool {
         return apcu_store($key, $var, $ttl);
     }
 }
@@ -68,14 +68,14 @@ class APCCacheAdapter extends CacheAdapter {
 class InProcessCacheAdapter extends CacheAdapter {
     private $cache = [];
 
-    public function entry($key, $default_var, $ttl = 0) {
+    public function entry(string $key, $defaultVar, int $ttl = 0) {
         if (!array_key_exists($key, $this->cache)) {
-            $this->cache[$key] = $default_var;
+            $this->cache[$key] = $defaultVar;
         }
         return $this->cache[$key];
     }
 
-    public function add($key, $var, $ttl = 0) {
+    public function add(string $key, $var, int $ttl = 0) : bool {
         if (array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -83,7 +83,7 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
-    public function cas($key, $old, $new) {
+    public function cas(string $key, int $old, int $new) : bool {
         if (!array_key_exists($key, $this->cache) || $this->cache[$key] !== $old) {
             return false;
         }
@@ -95,7 +95,7 @@ class InProcessCacheAdapter extends CacheAdapter {
         $this->cache = [];
     }
 
-    public function delete($key) {
+    public function delete(string $key) : bool {
         if (!array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -103,14 +103,14 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
-    public function fetch($key) {
+    public function fetch(string $key) {
         if (!array_key_exists($key, $this->cache)) {
             return false;
         }
         return $this->cache[$key];
     }
 
-    public function store($key, $var, $ttl = 0) {
+    public function store(string $key, $var, int $ttl = 0) : bool {
         $this->cache[$key] = $var;
         return true;
     }
@@ -130,6 +130,7 @@ class Cache {
     const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
     const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_SOLUTION = 'solution-';
+    const PROBLEM_SOLUTION_EXISTS = 'solution-exists-';
     const PROBLEM_STATS = 'problem-stats-';
     const RUN_ADMIN_DETAILS = 'run-admin-details-';
     const RUN_COUNTS = 'run-counts-';
@@ -143,16 +144,14 @@ class Cache {
     private $log;
     protected $key;
 
-    public static $cacheResults = true;
-
     /**
      * Inicializa el cache para el key dado
      * @param string $key el id del cache
      */
-    public function __construct($prefix, $id = '') {
+    public function __construct(string $prefix, string $id = '') {
         $this->log = Logger::getLogger('cache');
 
-        if (!self::cacheEnabled()) {
+        if (!self::isEnabled()) {
             $this->log->debug('Cache disabled');
             return;
         }
@@ -171,8 +170,8 @@ class Cache {
      * @param int $timeout (seconds)
      * @return boolean
      */
-    public function set($value, $timeout = APC_USER_CACHE_TIMEOUT) {
-        if (!self::cacheEnabled()) {
+    public function set($value, int $timeout = APC_USER_CACHE_TIMEOUT) : bool {
+        if (!self::isEnabled()) {
             return false;
         }
         if (CacheAdapter::getInstance()->store($this->key, $value, $timeout) !== true) {
@@ -190,8 +189,8 @@ class Cache {
      *
      * @return boolean
      */
-    public function delete() {
-        if (!self::cacheEnabled()) {
+    public function delete() : bool {
+        if (!self::isEnabled()) {
             return false;
         }
         if (CacheAdapter::getInstance()->delete($this->key) !== true) {
@@ -209,7 +208,7 @@ class Cache {
      * @return mixed
      */
     public function get() {
-        if (!self::cacheEnabled()) {
+        if (!self::isEnabled()) {
             return null;
         }
         if (($result = CacheAdapter::getInstance()->fetch($this->key)) === false) {
@@ -221,48 +220,43 @@ class Cache {
     }
 
     /**
-     *
-     * If value exists from cache, get it from cache.
-     * Otherwise, executes the $setFunc to generate a value that will be
-     * stored in the cache and it will return it.
-     *
-     * Returns true if cache was used, false if it had to be set
+     * If the specified $id exists in cache, gets its associated value from the
+     * cache.  Otherwise, executes $setFunc() to generate the associated
+     * value, stores it, and returns it.
      *
      * @param string $prefix
      * @param string $id
-     * @param Request $r
      * @param callable $setFunc
      * @param int $timeout (seconds)
-     * @return boolean
+     * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
+     * @return mixed the value returned from the cache or $setFunc().
      */
-    public static function getFromCacheOrSet($prefix, $id, $arg, $setFunc, &$returnValue, $timeout = 0) {
-        if (is_null($id)) {
-            // Unconditionally skipping cache.
-            $returnValue = call_user_func($setFunc, $r);
-            return false;
-        }
+    public static function getFromCacheOrSet(
+        string $prefix,
+        string $id,
+        callable $setFunc,
+        int $timeout = 0,
+        ?bool &$cacheUsed = null
+    ) {
         $cache = new Cache($prefix, $id);
         $returnValue = $cache->get();
 
         // If there wasn't a value in the cache for the key ($prefix, $id)
         if (!is_null($returnValue)) {
-            // Cache was used
-            return true;
+            if (!is_null($cacheUsed)) {
+                $cacheUsed = true;
+            }
+            return $returnValue;
         }
 
         // Get the value from the function provided
-        $returnValue = call_user_func($setFunc, $arg);
+        $returnValue = call_user_func($setFunc);
+        $cache->set($returnValue, $timeout);
 
-        // If the $setFunc() didn't disable the cache
-        if (self::$cacheResults === true) {
-            $cache->set($returnValue, $timeout);
-        } else {
-            // Reset value
-            self::$cacheResults = true;
+        if (!is_null($cacheUsed)) {
+            $cacheUsed = false;
         }
-
-        // Cache was not used
-        return false;
+        return $returnValue;
     }
 
     /**
@@ -271,7 +265,7 @@ class Cache {
      * @param string $prefix
      * @param string $id
      */
-    public static function deleteFromCache($prefix, $id = '') {
+    public static function deleteFromCache($prefix, $id = '') : void {
         $cache = new Cache($prefix, $id);
         $cache->delete();
     }
@@ -281,7 +275,7 @@ class Cache {
      *
      * @param string $prefix
      */
-    private static function getVersion($prefix) {
+    private static function getVersion(string $prefix) : int {
         $key = "v{$prefix}";
         return (int) CacheAdapter::getInstance()->entry($key, 0);
     }
@@ -294,8 +288,8 @@ class Cache {
      *
      * @param string $prefix
      */
-    public static function invalidateAllKeys($prefix) {
-        if (!self::cacheEnabled()) {
+    public static function invalidateAllKeys(string $prefix) : void {
+        if (!self::isEnabled()) {
             return;
         }
         $key = "v{$prefix}";
@@ -307,9 +301,9 @@ class Cache {
         } while (!CacheAdapter::getInstance()->cas($key, $version, $version + 1));
     }
 
-    private static function cacheEnabled() {
+    private static function isEnabled() : bool {
         return defined('APC_USER_CACHE_ENABLED') &&
-               APC_USER_CACHE_ENABLED === true;
+            APC_USER_CACHE_ENABLED === true;
     }
 
     /**
@@ -317,7 +311,7 @@ class Cache {
      *
      * Only use this for testing purposes.
      */
-    public static function clearCacheForTesting() {
+    public static function clearCacheForTesting() : void {
         CacheAdapter::getInstance()->clear();
     }
 }

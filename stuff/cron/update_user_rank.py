@@ -33,8 +33,25 @@ def update_user_rank(cur):
                     Runs r
                 ON
                     r.run_id = s.current_run_id
+                INNER JOIN
+                    Identities i
+                ON
+                    i.identity_id = s.identity_id
+                INNER JOIN
+                    Users u
+                ON
+                    u.user_id = i.user_id
                 WHERE
-                    s.problem_id = p.problem_id AND r.verdict = 'AC'
+                    s.problem_id = p.problem_id AND r.verdict = 'AC' AND
+                    NOT EXISTS (
+                        SELECT
+                            pf.problem_id, pf.user_id
+                        FROM
+                            Problems_Forfeited pf
+                        WHERE
+                            pf.problem_id = p.problem_id AND
+                            pf.user_id = u.user_id
+                    )
             );
     ''')
     logging.info('Updating user rank...')
@@ -70,7 +87,15 @@ def update_user_rank(cur):
         INNER JOIN
             Users u ON u.user_id = i.user_id
         WHERE
-            u.is_private = 0
+            u.is_private = 0 AND
+            NOT EXISTS (
+                SELECT
+                    pf.problem_id, pf.user_id
+                FROM
+                    Problems_Forfeited pf
+                WHERE
+                    pf.problem_id = ps.problem_id AND pf.user_id = u.user_id
+            )
         GROUP BY
             identity_id
         ORDER BY

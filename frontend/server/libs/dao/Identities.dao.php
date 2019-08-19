@@ -11,7 +11,6 @@ include_once('base/Identities.vo.base.php');
   */
 class IdentitiesDAO extends IdentitiesDAOBase {
     public static function FindByEmail($email) {
-        global  $conn;
         $sql = 'SELECT
                   i.*
                 FROM
@@ -25,15 +24,14 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $email ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
         return new Identities($rs);
     }
 
-    public static function FindByUsername($username) {
-        global  $conn;
+    public static function findByUsername(string $username) : ?Identities {
         $sql = 'SELECT
                    i.*
                 FROM
@@ -43,25 +41,54 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $username ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
         return new Identities($rs);
     }
 
-    public static function FindByUserId($user_id) {
-        global  $conn;
+    public static function findByUsernameOrName(string $usernameOrName) : array {
+        $sql = "
+            SELECT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                i.username = ? OR i.name = ?
+            UNION DISTINCT
+            SELECT DISTINCT
+                i.*
+            FROM
+                Identities i
+            WHERE
+                i.username LIKE CONCAT('%', ?, '%') OR
+                i.username LIKE CONCAT('%', ?, '%')
+            LIMIT 100";
+        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
+
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
+        $result = [];
+        foreach ($rs as $identityData) {
+            array_push($result, new Identities($identityData));
+        }
+        return $result;
+    }
+
+    public static function findByUserId(int $userId) : ?Identities {
         $sql = 'SELECT
                   i.*
                 FROM
                   `Identities` i
+                INNER JOIN
+                  `Users` u
+                ON
+                  i.identity_id = u.main_identity_id
                 WHERE
                   i.user_id = ?
                 LIMIT
                   0, 1';
-        $params = [ $user_id ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$userId]);
         if (empty($rs)) {
             return null;
         }
@@ -69,7 +96,6 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     }
 
     public static function getExtraInformation($email) {
-        global  $conn;
         $sql = 'SELECT
                   UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
                   u.verified,
@@ -99,7 +125,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $email ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -113,7 +139,6 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     }
 
     public static function isVerified($identity_id) {
-        global  $conn;
         $sql = 'SELECT
                   u.verified
                 FROM
@@ -129,7 +154,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $identity_id ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -159,14 +184,13 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LEFT JOIN
                     Schools sc ON i.school_id = sc.school_id
                 LEFT JOIN
-                    Languages l ON u.language_id = l.language_id
+                    Languages l ON i.language_id = l.language_id
                 WHERE
                     i.`identity_id` = ?
                 LIMIT
                     1;';
         $params = [$identity_id];
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -174,7 +198,6 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     }
 
     public static function isUserAssociatedWithIdentityOfGroup(int $userId, int $identityId) {
-        global  $conn;
         $sql = '
             SELECT
                 COUNT(*) = 1 AS associated
@@ -195,13 +218,12 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             LIMIT 1;';
         $args = [$userId, $identityId];
 
-        $rs = $conn->GetRow($sql, $args);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $args);
 
         return $rs['associated'] == '1';
     }
 
     public static function getUnassociatedIdentity($username) {
-        global  $conn;
         $sql = '
             SELECT
                 i.*
@@ -213,7 +235,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             LIMIT 1;';
         $args = [$username];
 
-        $rs = $conn->GetRow($sql, $args);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $args);
         if (empty($rs)) {
             return null;
         }
@@ -221,7 +243,6 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     }
 
     public static function getAssociatedIdentities($userId) {
-        global  $conn;
         $sql = '
             SELECT
                 i.username,
@@ -237,7 +258,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 i.user_id = ?
                 ';
 
-        $rs = $conn->GetAll($sql, [$userId]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$userId]);
         $result = [];
         foreach ($rs as $identity) {
             array_push($result, [
@@ -249,7 +270,6 @@ class IdentitiesDAO extends IdentitiesDAOBase {
     }
 
     public static function associateIdentityWithUser($userId, $identity_id) {
-        global $conn;
         $sql = '
             UPDATE
                 Identities
@@ -258,8 +278,8 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             WHERE
                 identity_id = ?
         ';
-        $conn->Execute($sql, [$userId, $identity_id]);
+        MySQLConnection::getInstance()->Execute($sql, [$userId, $identity_id]);
 
-        return $conn->Affected_Rows();
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 }

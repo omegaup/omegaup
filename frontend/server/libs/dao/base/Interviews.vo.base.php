@@ -15,6 +15,16 @@
  * @access public
  */
 class Interviews extends VO {
+    const FIELD_NAMES = [
+        'interview_id' => true,
+        'problemset_id' => true,
+        'acl_id' => true,
+        'alias' => true,
+        'title' => true,
+        'description' => true,
+        'window_length' => true,
+    ];
+
     /**
      * Constructor de Interviews
      *
@@ -22,9 +32,13 @@ class Interviews extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['interview_id'])) {
             $this->interview_id = (int)$data['interview_id'];
@@ -36,13 +50,13 @@ class Interviews extends VO {
             $this->acl_id = (int)$data['acl_id'];
         }
         if (isset($data['alias'])) {
-            $this->alias = $data['alias'];
+            $this->alias = strval($data['alias']);
         }
         if (isset($data['title'])) {
-            $this->title = $data['title'];
+            $this->title = strval($data['title']);
         }
         if (isset($data['description'])) {
-            $this->description = $data['description'];
+            $this->description = strval($data['description']);
         }
         if (isset($data['window_length'])) {
             $this->window_length = (int)$data['window_length'];
@@ -50,64 +64,53 @@ class Interviews extends VO {
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime([]);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $interview_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $interview_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $problemset_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $problemset_id;
+     * La lista de control de acceso del problema
+     *
+     * @var int|null
+     */
+    public $acl_id = null;
 
     /**
-      * La lista de control de acceso del problema
-      * @access public
-      * @var int(11)
-      */
-    public $acl_id;
+     * El alias de la entrevista
+     *
+     * @var string|null
+     */
+    public $alias = null;
 
     /**
-      * El alias de la entrevista
-      * @access public
-      * @var varchar(32)
-      */
-    public $alias;
+     * El titulo de la entrevista.
+     *
+     * @var string|null
+     */
+    public $title = null;
 
     /**
-      * El titulo de la entrevista.
-      * @access public
-      * @var varchar(256)
-      */
-    public $title;
+     * Una breve descripcion de la entrevista.
+     *
+     * @var string|null
+     */
+    public $description = null;
 
     /**
-      * Una breve descripcion de la entrevista.
-      * @access public
-      * @var tinytext
-      */
-    public $description;
-
-    /**
-      * Indica el tiempo que tiene el usuario para envíar soluciones.
-      * @access public
-      * @var int(11)
-      */
-    public $window_length;
+     * Indica el tiempo que tiene el usuario para envíar soluciones.
+     *
+     * @var int|null
+     */
+    public $window_length = null;
 }

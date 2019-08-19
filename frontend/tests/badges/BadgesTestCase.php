@@ -16,12 +16,12 @@ class BadgesTestCase extends OmegaupTestCase {
 
     public function setUp() {
         parent::setUp();
+        Time::setTimeForTesting(null);
         Utils::CleanupDb();
     }
 
     public static function getSortedResults(string $query) {
-        global $conn;
-        $rs = $conn->GetAll($query);
+        $rs = MySQLConnection::getInstance()->GetAll($query);
         $results = [];
         foreach ($rs as $user) {
             $results[] = $user['user_id'];

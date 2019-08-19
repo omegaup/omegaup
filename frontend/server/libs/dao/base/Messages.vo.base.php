@@ -15,6 +15,15 @@
  * @access public
  */
 class Messages extends VO {
+    const FIELD_NAMES = [
+        'message_id' => true,
+        'read' => true,
+        'sender_id' => true,
+        'recipient_id' => true,
+        'message' => true,
+        'date' => true,
+    ];
+
     /**
      * Constructor de Messages
      *
@@ -22,15 +31,19 @@ class Messages extends VO {
      * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
      * cuyos campos son iguales a las variables que constituyen a este objeto.
      */
-    function __construct($data = null) {
-        if (is_null($data)) {
+    function __construct(?array $data = null) {
+        if (empty($data)) {
             return;
+        }
+        $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
+        if (!empty($unknownColumns)) {
+            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['message_id'])) {
             $this->message_id = (int)$data['message_id'];
         }
         if (isset($data['read'])) {
-            $this->read = $data['read'] == '1';
+            $this->read = boolval($data['read']);
         }
         if (isset($data['sender_id'])) {
             $this->sender_id = (int)$data['sender_id'];
@@ -39,65 +52,60 @@ class Messages extends VO {
             $this->recipient_id = (int)$data['recipient_id'];
         }
         if (isset($data['message'])) {
-            $this->message = $data['message'];
+            $this->message = strval($data['message']);
         }
         if (isset($data['date'])) {
-            $this->date = $data['date'];
+            /**
+             * @var string|int|float $data['date']
+             * @var int $this->date
+             */
+            $this->date = DAO::fromMySQLTimestamp($data['date']);
+        } else {
+            $this->date = Time::get();
         }
     }
 
     /**
-     * Converts date fields to timestamps
+     * [Campo no documentado]
+     * Llave Primaria
+     * Auto Incremento
+     *
+     * @var int|null
      */
-    public function toUnixTime(array $fields = []) {
-        if (empty($fields)) {
-            parent::toUnixTime(['date']);
-            return;
-        }
-        parent::toUnixTime($fields);
-    }
+    public $message_id = 0;
 
     /**
-      *  [Campo no documentado]
-      * Llave Primaria
-      * Auto Incremento
-      * @access public
-      * @var int(11)
-      */
-    public $message_id;
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $read = false;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinyint(1)
-      */
-    public $read;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $sender_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $sender_id;
+     * [Campo no documentado]
+     *
+     * @var int|null
+     */
+    public $recipient_id = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var int(11)
-      */
-    public $recipient_id;
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $message = null;
 
     /**
-      *  [Campo no documentado]
-      * @access public
-      * @var tinytext
-      */
-    public $message;
-
-    /**
-      *  [Campo no documentado]
-      * @access public
-      * @var timestamp
-      */
-    public $date;
+     * [Campo no documentado]
+     *
+     * @var int
+     */
+    public $date;  // CURRENT_TIMESTAMP
 }
