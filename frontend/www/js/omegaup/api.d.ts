@@ -22,6 +22,19 @@ declare namespace omegaup {
     score?: number;
   }
 
+  export interface Commit {
+    author: Signature;
+    commit: string;
+    commiter: Signature;
+    message: string;
+    parents: string[];
+    tree: {
+      [file: string]: string;
+    }
+    version: string;
+  }
+
+
   export interface Contest {
     alias: string;
     title: string;
@@ -106,31 +119,6 @@ declare namespace omegaup {
     visibility?: number;
   }
 
-  export interface QueryParameters {
-    some_tags: boolean;
-    min_difficulty: number;
-    max_difficulty: number;
-    order_by: string;
-    mode: string;
-    only_karel?: boolean;
-    tag?: string[];
-  }
-
-  export interface RankInfo {
-    rank: number;
-    name?: string;
-    problems_solved: number;
-  }
-
-  interface RunDetails {
-    admin: boolean;
-    details: omegaup.Details;
-    guid: string;
-    judged_by: string;
-    language: string;
-    logs: string;
-  }
-
   export interface Profile {
     username: string;
     name: string;
@@ -139,6 +127,16 @@ declare namespace omegaup {
     gravatar_92: string;
     rankinfo: RankInfo;
     classname: string;
+  }
+
+  export interface QueryParameters {
+    some_tags: boolean;
+    min_difficulty: number;
+    max_difficulty: number;
+    order_by: string;
+    mode: string;
+    only_karel?: boolean;
+    tag?: string[];
   }
 
   export interface RankInfo {
@@ -158,11 +156,26 @@ declare namespace omegaup {
     username: string;
   }
 
+  interface RunDetails {
+    admin: boolean;
+    details: omegaup.Details;
+    guid: string;
+    judged_by: string;
+    language: string;
+    logs: string;
+  }
+
   export interface SchoolsRank {
     country_id: string;
     distinct_problems: number;
     distinct_users: number;
     name: string;
+  }
+
+  interface Signature {
+    email: string;
+    name: string;
+    time: string;
   }
 
   export interface Solutions {
