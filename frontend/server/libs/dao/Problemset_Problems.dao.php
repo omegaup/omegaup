@@ -15,7 +15,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         $sql = '
             SELECT
                 p.problem_id, p.title, p.alias, p.languages, pp.points,
-                pp.order, pp.version
+                pp.commit, pp.order, pp.version
             FROM
                 Problems p
             INNER JOIN
@@ -177,9 +177,9 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     public static function copyProblemset($newProblemsetId, $oldProblemsetId) {
         $sql = '
             INSERT INTO
-                Problemset_Problems (problemset_id, problem_id, version, points, `order`)
+                Problemset_Problems (problemset_id, problem_id, commit, version, points, `order`)
             SELECT
-                ?, problem_id, version, points, `order`
+                ?, problem_id, commit, version, points, `order`
             FROM
                 Problemset_Problems
             WHERE
