@@ -23,9 +23,9 @@ declare namespace omegaup {
   }
 
   export interface Commit {
-    author: CommitUser;
+    author: Signature;
     commit: string;
-    commiter: CommitUser;
+    commiter: Signature;
     message: string;
     parents: string[];
     tree: {
@@ -34,7 +34,7 @@ declare namespace omegaup {
     version: string;
   }
 
-  interface CommitUser {
+  interface Signature {
     email: string;
     name: string;
     time: string;

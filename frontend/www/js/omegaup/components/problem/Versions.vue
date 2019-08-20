@@ -194,7 +194,7 @@ export default class ProblemVersions extends Vue {
     return diff;
   }
 
-  get diffSubmissions(): (string | RunsDiff)[][] {
+  get diffSubmissions(): [RunsDiff, string][] {
     if (!this.selectedRevision) {
       return [];
     }
@@ -202,7 +202,7 @@ export default class ProblemVersions extends Vue {
     if (!this.runsDiff.hasOwnProperty(version)) {
       return [];
     }
-    const result = [];
+    const result: [RunsDiff, string][] = [];
     for (const row of this.runsDiff[version]) {
       let className = '';
       if (row.new_score > row.old_score) {
