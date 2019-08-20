@@ -45,20 +45,19 @@ export default class AdminRoles extends Vue {
   groups: omegaup.Group[] = this.initialGroups;
 
   @Emit()
-  onChangeRole(ev: Event, role: string): omegaup.Role {
+  onChangeRole(ev: Event, role: string): omegaup.Selectable<string> {
     return {
-      title: role,
-      value: (<HTMLInputElement>ev.target).checked,
+      value: role,
+      selected: (<HTMLInputElement>ev.target).checked,
     };
   }
 
   @Emit()
-  onChangeGroup(ev: Event, group: string): omegaup.Group {
-    const selectedGroup: omegaup.Group = {
-      title: group,
-      value: (<HTMLInputElement>ev.target).checked,
+  onChangeGroup(ev: Event, group: string): omegaup.Selectable<string> {
+    return {
+      value: group,
+      selected: (<HTMLInputElement>ev.target).checked,
     };
-    return selectedGroup;
   }
 }
 

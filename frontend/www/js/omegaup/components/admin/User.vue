@@ -80,19 +80,19 @@ export default class User extends Vue {
   onChangeExperiment(
     ev: Event,
     experiment: omegaup.Experiment,
-  ): omegaup.Experiment {
-    let selectedExperiment = experiment;
-    selectedExperiment.config = (<HTMLInputElement>ev.target).checked;
-    return selectedExperiment;
+  ): omegaup.Selectable<omegaup.Experiment> {
+    return {
+      value: experiment,
+      selected: (<HTMLInputElement>ev.target).checked,
+    };
   }
 
   @Emit('change-role')
-  onChangeRole(ev: Event, role: string): omegaup.Role {
-    const selectedRole: omegaup.Group = {
-      title: role,
-      value: (<HTMLInputElement>ev.target).checked,
+  onChangeRole(ev: Event, role: string): omegaup.Selectable<string> {
+    return {
+      value: role,
+      selected: (<HTMLInputElement>ev.target).checked,
     };
-    return selectedRole;
   }
 
   onVerifyUser() {

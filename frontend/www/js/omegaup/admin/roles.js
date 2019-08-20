@@ -15,34 +15,34 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'on-change-role': function(selectedRole) {
-            if (selectedRole.value) {
+            if (selectedRole.selected) {
               omegaup.API.User.addRole({
                                 username: payload.username,
-                                role: selectedRole.title,
+                                role: selectedRole.value,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                                 username: payload.username,
-                                role: selectedRole.title,
+                                role: selectedRole.value,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             }
           },
           'on-change-group': function(selectedGroup) {
-            if (selectedGroup.value) {
+            if (selectedGroup.selected) {
               omegaup.API.User.addGroup({
                                 username: payload.username,
-                                group: selectedGroup.title,
+                                group: selectedGroup.value,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeGroup({
                                 username: payload.username,
-                                group: selectedGroup.title,
+                                group: selectedGroup.value,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);

@@ -20,34 +20,34 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'change-experiment': function(experiment) {
-            if (experiment.config) {
+            if (experiment.selected) {
               omegaup.API.User.addExperiment({
                                 username: payload.username,
-                                experiment: experiment.name,
+                                experiment: experiment.value.name,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeExperiment({
                                 username: payload.username,
-                                experiment: experiment.name,
+                                experiment: experiment.value.name,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             }
           },
           'change-role': function(role) {
-            if (role.value) {
+            if (role.selected) {
               omegaup.API.User.addRole({
                                 username: payload.username,
-                                role: role.title,
+                                role: role.value,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                                 username: payload.username,
-                                role: role.title,
+                                role: role.value,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
