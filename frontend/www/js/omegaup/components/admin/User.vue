@@ -39,7 +39,7 @@
         <tbody>
           <tr v-for="experiment in systemExperiments">
             <td><input type="checkbox"
-                   v-bind:checked="experiment.config"
+                   v-bind:checked="experiment.config || hasExperiment(experiment.name)"
                    v-bind:disabled="experiment.config"
                    v-on:change.prevent="onChangeExperiment($event, experiment)"></td>
             <td>{{ experiment.name }}</td>
@@ -61,15 +61,19 @@ export default class User extends Vue {
   @Prop() emails!: string[];
   @Prop() username!: string;
   @Prop() verified!: boolean;
-  @Prop() experiments!: omegaup.Experiment[];
+  @Prop() experiments!: string[];
   @Prop() systemExperiments!: omegaup.Experiment[];
   @Prop() roles!: string[];
   @Prop() roleNames!: string[];
 
   T = T;
 
-  hasRole(role: omegaup.Role): boolean {
-    return this.roles.indexOf(role.title) !== -1;
+  hasExperiment(experiment: string): boolean {
+    return this.experiments.indexOf(experiment) !== -1;
+  }
+
+  hasRole(role: string): boolean {
+    return this.roles.indexOf(role) !== -1;
   }
 
   @Emit('change-experiment')
@@ -77,8 +81,8 @@ export default class User extends Vue {
     ev: Event,
     experiment: omegaup.Experiment,
   ): omegaup.Experiment {
-    let selectedExperiment: omegaup.Experiment = experiment;
-    selectedExperiment['config'] = (<HTMLInputElement>ev.target).checked;
+    let selectedExperiment = experiment;
+    selectedExperiment.config = (<HTMLInputElement>ev.target).checked;
     return selectedExperiment;
   }
 

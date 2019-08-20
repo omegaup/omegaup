@@ -27,7 +27,7 @@ try_define('OMEGAUP_MAINTENANCE', null);
 # ####################################
 try_define('OMEGAUP_TEST_ROOT', OMEGAUP_ROOT . '/tests/controllers/');
 try_define('OMEGAUP_TEST_RESOURCES_ROOT', OMEGAUP_ROOT . '/tests/resources/');
-try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
+try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
 # ####################################
 # DATABASE CONFIG

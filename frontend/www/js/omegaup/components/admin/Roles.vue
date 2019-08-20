@@ -46,11 +46,10 @@ export default class AdminRoles extends Vue {
 
   @Emit()
   onChangeRole(ev: Event, role: string): omegaup.Role {
-    const selectedRole: omegaup.Role = {
+    return {
       title: role,
       value: (<HTMLInputElement>ev.target).checked,
     };
-    return selectedRole;
   }
 
   @Emit()

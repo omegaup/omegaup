@@ -106,17 +106,17 @@ export default class AdminSupport extends Vue {
 
   @Emit('search-email')
   onSearchEmail(): string {
-    return <string>this.email;
+    return this.email;
   }
 
   @Emit('verify-user')
   onVerifyUser(): string {
-    return <string>this.email;
+    return this.email;
   }
 
   @Emit('generate-token')
   onGenerateToken(): string {
-    return <string>this.email;
+    return this.email;
   }
 
   onCopyToken(): void {
