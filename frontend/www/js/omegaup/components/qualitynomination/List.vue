@@ -54,42 +54,41 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 
-export default {
-  props: {
-    nominations: Array,
-    currentUser: String,
-    myView: Boolean,
-  },
-  data: function() {
-    return {
-      showAll: true,
-      T: T,
-    };
-  },
-  computed: {
-    visibleNominations: function() {
-      var self = this;
-      if (this.showAll) {
-        return this.nominations;
-      } else {
-        return this.nominations.filter(function(nomination) {
-          return nomination.status == 'open';
-        });
-      }
-    },
-  },
-  methods: {
-    problemUrl: function(problemAlias) {
-      return '/arena/problem/' + problemAlias + '/';
-    },
-    userUrl: function(username) { return '/profile/' + username + '/';},
-    nominationDetailsUrl: function(nominationId) {
-      return '/nomination/' + nominationId + '/';
+@Component
+export default class QualityNominationList extends Vue {
+  @Prop() nominations!: omegaup.Nomination[];
+  @Prop() currentUser!: string;
+  @Prop() myView!: boolean;
+
+  showAll = true;
+  T = T;
+
+  get visibleNominations(): omegaup.Nomination[] {
+    if (this.showAll) {
+      return this.nominations;
     }
+    return this.nominations.filter((nomination: omegaup.Nomination) => {
+      return nomination.status === 'open';
+    });
   }
-};
+
+  problemUrl(problemAlias: string): string {
+    return '/arena/problem/' + problemAlias + '/';
+  }
+
+  userUrl(username: string): string {
+    return '/profile/' + username + '/';
+  }
+
+  nominationDetailsUrl(nominationId: number): string {
+    return '/nomination/' + nominationId + '/';
+  }
+}
+
 </script>
