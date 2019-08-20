@@ -39,7 +39,7 @@
         <tbody>
           <tr v-for="experiment in systemExperiments">
             <td><input type="checkbox"
-                   v-bind:checked="experiment.config || hasExperiment(experiment)"
+                   v-bind:checked="experiment.config"
                    v-bind:disabled="experiment.config"
                    v-on:change.prevent="onChangeExperiment($event, experiment)"></td>
             <td>{{ experiment.name }}</td>
@@ -51,37 +51,49 @@
   </div>
 </template>
 
-<script>
-import DatePicker from '../DatePicker.vue';
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {
-    emails: Array,
-    experiments: Array,
-    systemExperiments: Array,
-    roleNames: Array,
-    roles: Array,
-    username: String,
-    verified: Boolean,
-  },
-  data: function() {
-    return {
-      T: T,
+@Component({})
+export default class User extends Vue {
+  @Prop() emails!: string[];
+  @Prop() username!: string;
+  @Prop() verified!: boolean;
+  @Prop() experiments!: omegaup.Experiment[];
+  @Prop() systemExperiments!: omegaup.Experiment[];
+  @Prop() roles!: string[];
+  @Prop() roleNames!: string[];
+
+  T = T;
+
+  hasRole(role: omegaup.Role): boolean {
+    return this.roles.indexOf(role.title) !== -1;
+  }
+
+  @Emit('change-experiment')
+  onChangeExperiment(
+    ev: Event,
+    experiment: omegaup.Experiment,
+  ): omegaup.Experiment {
+    let selectedExperiment: omegaup.Experiment = experiment;
+    selectedExperiment['config'] = (<HTMLInputElement>ev.target).checked;
+    return selectedExperiment;
+  }
+
+  @Emit('change-role')
+  onChangeRole(ev: Event, role: string): omegaup.Role {
+    const selectedRole: omegaup.Group = {
+      title: role,
+      value: (<HTMLInputElement>ev.target).checked,
     };
-  },
-  methods: {
-    hasExperiment: function(name) {
-      return this.experiments.indexOf(name) !== -1;
-    },
-    hasRole: function(name) { return this.roles.indexOf(name) !== -1;},
-    onChangeExperiment: function(ev, experiment) {
-      this.$emit('change-experiment', experiment, ev.target.checked);
-    },
-    onChangeRole: function(ev, role) {
-      this.$emit('change-role', role, ev.target.checked);
-    },
-    onVerifyUser: function() { this.$emit('verify-user');},
-  },
-};
+    return selectedRole;
+  }
+
+  onVerifyUser() {
+    this.$emit('verify-user');
+  }
+}
+
 </script>

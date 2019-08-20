@@ -48,6 +48,17 @@ declare namespace omegaup {
     group: omegaup.DetailsGroup[];
   }
 
+  export interface Experiment {
+    config: boolean;
+    hash: string;
+    name: string;
+  }
+
+  export interface Group {
+    title: string;
+    value: boolean;
+  }
+
   export interface Identity {
     name: string;
     username: string;
@@ -124,6 +135,11 @@ declare namespace omegaup {
     ip: string;
     time: string;
     username: string;
+  }
+
+  export interface Role {
+    title: string;
+    value: boolean;
   }
 
   export interface SchoolsRank {

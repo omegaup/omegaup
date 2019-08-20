@@ -30,24 +30,37 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {
-    initialRoles: Array,
-    initialGroups: Array,
-  },
-  data: function() {
-    return {T: T, roles: this.initialRoles, groups: this.initialGroups};
-  },
-  methods: {
-    onChangeRole: function(ev, role) {
-      this.$emit('change-role', role, ev.target.checked);
-    },
-    onChangeGroup: function(ev, group) {
-      this.$emit('change-group', group, ev.target.checked);
-    },
-  },
-};
+@Component({})
+export default class AdminRoles extends Vue {
+  @Prop() initialRoles!: omegaup.Role[];
+  @Prop() initialGroups!: omegaup.Group[];
+
+  T = T;
+  roles: omegaup.Role[] = this.initialRoles;
+  groups: omegaup.Group[] = this.initialGroups;
+
+  @Emit()
+  onChangeRole(ev: Event, role: string): omegaup.Role {
+    const selectedRole: omegaup.Role = {
+      title: role,
+      value: (<HTMLInputElement>ev.target).checked,
+    };
+    return selectedRole;
+  }
+
+  @Emit()
+  onChangeGroup(ev: Event, group: string): omegaup.Group {
+    const selectedGroup: omegaup.Group = {
+      title: group,
+      value: (<HTMLInputElement>ev.target).checked,
+    };
+    return selectedGroup;
+  }
+}
+
 </script>

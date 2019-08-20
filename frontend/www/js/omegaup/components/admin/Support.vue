@@ -87,29 +87,50 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 import UI from '../../ui.js';
 
-export default {
-  props: {
-    username: String,
-    verified: Boolean,
-    link: String,
-    lastLogin: Date,
-  },
-  data: function() { return {T: T, UI: UI, email: null};},
-  methods: {
-    onSearchEmail: function() { this.$emit('search-email', this.email);},
-    onVerifyUser: function() { this.$emit('verify-user', this.email);},
-    onGenerateToken: function() { this.$emit('generate-token', this.email);},
-    onCopyToken: function() {
-      let copyText = this.$el.querySelector("input[name=link]");
-      copyText.trigger('select');
-      document.execCommand('copy');
-      this.$emit('copy-token');
-    },
-    onReset: function() { this.$emit('reset');}
+@Component({})
+export default class AdminSupport extends Vue {
+  @Prop() username!: string;
+  @Prop() verified!: boolean;
+  @Prop() link!: string;
+  @Prop() lastLogin!: Date;
+
+  T = T;
+  UI = UI;
+  email: string = '';
+
+  @Emit('search-email')
+  onSearchEmail(): string {
+    return <string>this.email;
   }
-};
+
+  @Emit('verify-user')
+  onVerifyUser(): string {
+    return <string>this.email;
+  }
+
+  @Emit('generate-token')
+  onGenerateToken(): string {
+    return <string>this.email;
+  }
+
+  onCopyToken(): void {
+    let copyText: HTMLInputElement = <HTMLInputElement>(
+      this.$el.querySelector('input[name=link]')
+    );
+    copyText.select();
+    document.execCommand('copy');
+    this.$emit('copy-token');
+  }
+
+  onReset(): void {
+    this.$emit('reset');
+  }
+}
+
 </script>
