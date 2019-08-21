@@ -74,7 +74,6 @@ declare namespace omegaup {
 
   export interface Group {
     alias: string;
-    isMember: Selectable<Group>;
   }
 
   export interface Identity {
@@ -174,7 +173,6 @@ declare namespace omegaup {
 
   export interface Role {
     title: string;
-    isMember: Selectable<Role>;
   }
 
   interface RunDetails {

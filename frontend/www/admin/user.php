@@ -34,7 +34,7 @@ $payload = [
     }, $userExperiments),
     'systemExperiments' => $systemExperiments,
     'roleNames' => array_map(function ($role) {
-        return $role->name;
+        return ['title' => $role->name];
     }, $roles),
     'systemRoles' => $systemRoles,
     'username' => $user->username,

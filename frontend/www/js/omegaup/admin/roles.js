@@ -18,14 +18,14 @@ OmegaUp.on('ready', function() {
             if (selectedRole.selected) {
               omegaup.API.User.addRole({
                                 username: payload.username,
-                                role: selectedRole.value,
+                                role: selectedRole.value.title,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                                 username: payload.username,
-                                role: selectedRole.value,
+                                role: selectedRole.value.title,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
@@ -35,14 +35,14 @@ OmegaUp.on('ready', function() {
             if (selectedGroup.selected) {
               omegaup.API.User.addGroup({
                                 username: payload.username,
-                                group: selectedGroup.value,
+                                group: selectedGroup.value.alias,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeGroup({
                                 username: payload.username,
-                                group: selectedGroup.value,
+                                group: selectedGroup.value.alias,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);

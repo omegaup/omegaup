@@ -40,14 +40,14 @@ OmegaUp.on('ready', function() {
             if (role.selected) {
               omegaup.API.User.addRole({
                                 username: payload.username,
-                                role: role.value,
+                                role: role.value.title,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                                 username: payload.username,
-                                role: role.value,
+                                role: role.value.title,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);

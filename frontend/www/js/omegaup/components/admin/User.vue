@@ -27,10 +27,10 @@
         <tbody>
           <tr v-for="role in roleNames">
             <td><input type="checkbox"
-                   v-bind:checked="hasRole(role)"
+                   v-bind:checked="hasRole(role.title)"
                    v-bind:disabled="role == 'Admin'"
                    v-on:change.prevent="onChangeRole($event, role)"></td>
-            <td>{{ role }}</td>
+            <td>{{ role.title }}</td>
           </tr>
         </tbody>
       </table>
@@ -64,7 +64,7 @@ export default class User extends Vue {
   @Prop() experiments!: string[];
   @Prop() systemExperiments!: omegaup.Experiment[];
   @Prop() roles!: string[];
-  @Prop() roleNames!: string[];
+  @Prop() roleNames!: omegaup.Role[];
 
   T = T;
 
@@ -88,7 +88,10 @@ export default class User extends Vue {
   }
 
   @Emit('change-role')
-  onChangeRole(ev: Event, role: string): omegaup.Selectable<string> {
+  onChangeRole(
+    ev: Event,
+    role: omegaup.Role,
+  ): omegaup.Selectable<omegaup.Role> {
     return {
       value: role,
       selected: (<HTMLInputElement>ev.target).checked,

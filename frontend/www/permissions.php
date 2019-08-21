@@ -23,7 +23,7 @@ foreach ($roles as $key => $role) {
     $userSystemRoles[$key]['value'] = in_array($role->name, $systemRoles);
 }
 foreach ($groups as $key => $group) {
-    $userSystemGroups[$key]['title'] = $group->name;
+    $userSystemGroups[$key]['alias'] = $group->name;
     $userSystemGroups[$key]['value'] = in_array($group->name, $systemGroups);
 }
 $payload = [

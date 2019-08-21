@@ -10,7 +10,7 @@
           <tr v-for="role in roles">
             <td><input type="checkbox"
                    v-model="role.value"
-                   v-on:change.prevent="onChangeRole($event, role.title)"></td>
+                   v-on:change.prevent="onChangeRole($event, role)"></td>
             <td>{{ role.title }}</td>
           </tr>
         </tbody>
@@ -21,8 +21,8 @@
           <tr v-for="group in groups">
             <td><input type="checkbox"
                    v-model="group.value"
-                   v-on:change.prevent="onChangeGroup($event, group.title)"></td>
-            <td>{{ group.title }}</td>
+                   v-on:change.prevent="onChangeGroup($event, group)"></td>
+            <td>{{ group.alias }}</td>
           </tr>
         </tbody>
       </table>
@@ -45,7 +45,10 @@ export default class AdminRoles extends Vue {
   groups: omegaup.Group[] = this.initialGroups;
 
   @Emit()
-  onChangeRole(ev: Event, role: string): omegaup.Selectable<string> {
+  onChangeRole(
+    ev: Event,
+    role: omegaup.Role,
+  ): omegaup.Selectable<omegaup.Role> {
     return {
       value: role,
       selected: (<HTMLInputElement>ev.target).checked,
@@ -53,7 +56,10 @@ export default class AdminRoles extends Vue {
   }
 
   @Emit()
-  onChangeGroup(ev: Event, group: string): omegaup.Selectable<string> {
+  onChangeGroup(
+    ev: Event,
+    group: omegaup.Group,
+  ): omegaup.Selectable<omegaup.Group> {
     return {
       value: group,
       selected: (<HTMLInputElement>ev.target).checked,
