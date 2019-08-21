@@ -49,6 +49,17 @@ declare namespace omegaup {
     place: number;
   }
 
+  export interface CourseAdmin {
+    username: string;
+    role: string;
+  }
+
+  export interface CourseGroupAdmin {
+    role: string;
+    name: string;
+    alias: string;
+  }
+
   interface CourseProgress {
     [assignment: string]: number;
   }
