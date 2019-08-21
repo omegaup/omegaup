@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
-
 class Broadcaster {
     // Logging.
     private $log = null;
@@ -61,11 +59,11 @@ class Broadcaster {
                 'user_name' => $r['user']->username
             ];
             $subject = ApiUtils::FormatString(
-                Translations::getInstance()->get('clarificationEmailSubject'),
+                \OmegaUp\Translations::getInstance()->get('clarificationEmailSubject'),
                 $email_params
             );
             $body = ApiUtils::FormatString(
-                Translations::getInstance()->get('clarificationEmailBody'),
+                \OmegaUp\Translations::getInstance()->get('clarificationEmailBody'),
                 $email_params
             );
 

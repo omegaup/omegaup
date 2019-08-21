@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
-
 /**
  * Description:
  *     Session controller handles sessions.
@@ -354,7 +352,7 @@ class SessionController extends Controller {
             self::$log->error('Facebook email empty');
             return [
                 'status' => 'error',
-                'error' => Translations::getInstance()->get(
+                'error' => \OmegaUp\Translations::getInstance()->get(
                     'loginFacebookEmptyEmailError'
                 ),
             ];

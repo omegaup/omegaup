@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
-
 /**
  *   ApiException
  *
@@ -90,7 +88,7 @@ abstract class ApiException extends Exception {
             self::$log->error('null error message');
             return '{untranslated:(null)}';
         }
-        $localizedText = Translations::getInstance()->get($this->message);
+        $localizedText = \OmegaUp\Translations::getInstance()->get($this->message);
         if (is_null($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
@@ -121,7 +119,7 @@ class InvalidParameterException extends ApiException {
     }
 
     public function getErrorMessage() : string {
-        $localizedText = Translations::getInstance()->get($this->message);
+        $localizedText = \OmegaUp\Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
@@ -356,7 +354,7 @@ class ProblemDeploymentFailedException extends ApiException {
     }
 
     public function getErrorMessage() : string {
-        $localizedText = Translations::getInstance()->get($this->message);
+        $localizedText = \OmegaUp\Translations::getInstance()->get($this->message);
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
