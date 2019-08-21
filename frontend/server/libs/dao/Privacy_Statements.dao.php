@@ -21,8 +21,7 @@ class PrivacyStatementsDAO extends PrivacyStatementsDAOBase {
                 ORDER BY
                   privacystatement_id DESC
                 LIMIT 1';
-        global $conn;
-        return $conn->GetRow($sql, [$statement_type]);
+        return MySQLConnection::getInstance()->GetRow($sql, [$statement_type]);
     }
 
     public static function getId($git_object_id, $statement_type) {
@@ -36,7 +35,6 @@ class PrivacyStatementsDAO extends PrivacyStatementsDAOBase {
                 ORDER BY
                   privacystatement_id DESC
                 LIMIT 1';
-        global $conn;
-        return $conn->GetOne($sql, [$git_object_id, $statement_type]);
+        return MySQLConnection::getInstance()->GetOne($sql, [$git_object_id, $statement_type]);
     }
 }

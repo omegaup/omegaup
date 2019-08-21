@@ -203,14 +203,14 @@ export default {
       const self = this;
       // Build query parameters
       let queryParameters = {
-        'some_tags': 'true',
+        'some_tags': true,
         'min_difficulty': self.difficultyRange[0],
         'max_difficulty': self.difficultyRange[1],
         'order_by': self.selectedPriority,
         'mode': 'desc'
       };
       if (self.karel) {
-        queryParameters['only_karel'] = 'true';
+        queryParameters['only_karel'] = true;
       }
       if (self.selectedTags.length > 0) {
         queryParameters.tag = self.selectedTags;

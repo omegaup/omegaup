@@ -82,8 +82,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 WHERE
                     p.problemset_id = ?;';
 
-        global $conn;
-        return $conn->GetAll($sql, [$problemset_id]);
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
     }
 
     final public static function getIdentitiesByProblemset($problemset_id) {
@@ -110,8 +109,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             WHERE
                 pi.problemset_id = ?;';
 
-        global $conn;
-        return $conn->GetAll($sql, [$problemset_id]);
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
     }
 
     /**
@@ -133,14 +131,13 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     Problemset_Identities.`problemset_id` = ?
                     AND `access_time` IS NOT NULL;';
 
-        global $conn;
-        $conn->Execute($sql, [
+        MySQLConnection::getInstance()->Execute($sql, [
             $contest->finish_time,
             $contest->window_length,
             $contest->problemset_id
         ]);
 
-        return $conn->Affected_Rows();
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function recalculateEndTimeAsFinishTime(
@@ -153,10 +150,9 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 WHERE
                     `problemset_id` = ?;';
 
-        global $conn;
-        $conn->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
+        MySQLConnection::getInstance()->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
 
-        return $conn->Affected_Rows();
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {
@@ -173,8 +169,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemset_identity->problemset_id,
         ];
 
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 }

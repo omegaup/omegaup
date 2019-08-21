@@ -27,6 +27,14 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         ]));
         $this->assertEquals(1, sizeof($getAssignmentResponse['problems']));
         $this->assertEquals($problem['problem']->alias, $getAssignmentResponse['problems'][0]['alias']);
+        $this->assertEquals(
+            $problem['problem']->commit,
+            $getAssignmentResponse['problems'][0]['commit']
+        );
+        $this->assertEquals(
+            $problem['problem']->current_version,
+            $getAssignmentResponse['problems'][0]['version']
+        );
     }
 
     public function testDeleteProblemFromAssignment() {

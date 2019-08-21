@@ -14,7 +14,6 @@ require_once('base/Problems_Forfeited.vo.base.php');
  */
 class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
     public static function getProblemsForfeitedCount(Users $user): int {
-        global $conn;
         $sql = 'SELECT
                     COUNT(*)
                 FROM
@@ -22,14 +21,13 @@ class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
                 WHERE
                     user_id = ?;';
         $args = [$user->user_id];
-        return $conn->getOne($sql, $args);
+        return MySQLConnection::getInstance()->getOne($sql, $args);
     }
 
     public static function isProblemForfeited(
         Problems $problem,
         Identities $identity
     ) : bool {
-        global $conn;
         $sql = 'SELECT
                     COUNT(*)
                 FROM
@@ -37,6 +35,6 @@ class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
                 WHERE
                     problem_id = ? AND user_id = ?;';
         $args = [$problem->problem_id, $identity->user_id];
-        return $conn->GetOne($sql, $args) > 0;
+        return MySQLConnection::getInstance()->GetOne($sql, $args) > 0;
     }
 }

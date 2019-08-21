@@ -18,7 +18,6 @@ require_once('base/Auth_Tokens.vo.base.php');
  */
 class AuthTokensDAO extends AuthTokensDAOBase {
     public static function getUserByToken($auth_token) {
-        global $conn;
         $sql = 'SELECT
                     u.*
                 FROM
@@ -29,7 +28,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     at.user_id = u.user_id
                 WHERE
                     at.token = ?;';
-        $rs = $conn->GetRow($sql, [$auth_token]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
         if (empty($rs)) {
             return null;
         }
@@ -37,7 +36,6 @@ class AuthTokensDAO extends AuthTokensDAOBase {
     }
 
     public static function getIdentityByToken($auth_token) {
-        global $conn;
         $sql = 'SELECT
                     i.*
                 FROM
@@ -48,7 +46,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     at.identity_id = i.identity_id
                 WHERE
                     at.token = ?;';
-        $rs = $conn->GetRow($sql, [$auth_token]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
 
         if (empty($rs)) {
             return null;
@@ -57,25 +55,23 @@ class AuthTokensDAO extends AuthTokensDAOBase {
     }
 
     public static function expireAuthTokens($identity_id) {
-        global $conn;
         $sql = 'DELETE FROM
                     `Auth_Tokens`
                 WHERE
                     identity_id = ?;';
-        $conn->Execute($sql, [$identity_id]);
+        MySQLConnection::getInstance()->Execute($sql, [$identity_id]);
 
-        return $conn->Affected_Rows();
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getByIdentityId($identityId) {
-        global $conn;
         $sql = 'SELECT
                     at.*
                 FROM
                     `Auth_Tokens` at
                 WHERE
                     at.identity_id = ?;';
-        $rs = $conn->GetAll($sql, [$identityId]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
 
         $authTokens = [];
         foreach ($rs as $row) {

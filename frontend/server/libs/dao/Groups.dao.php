@@ -19,10 +19,9 @@ require_once('base/Groups.vo.base.php');
   */
 class GroupsDAO extends GroupsDAOBase {
     public static function findByAlias($alias) {
-        global  $conn;
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -30,11 +29,10 @@ class GroupsDAO extends GroupsDAOBase {
     }
 
     public static function SearchByName($name) {
-        global  $conn;
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 
-        $rs = $conn->GetAll($sql, $args);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
         $ar = [];
         foreach ($rs as $row) {
             array_push($ar, new Groups($row));
@@ -43,10 +41,9 @@ class GroupsDAO extends GroupsDAOBase {
     }
 
     public static function getByName($name) {
-        global  $conn;
         $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
 
-        $rs = $conn->GetRow($sql, [$name]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {
             return null;
         }
@@ -84,8 +81,7 @@ class GroupsDAO extends GroupsDAOBase {
             $identity_id,
         ];
 
-        global $conn;
-        $rs = $conn->GetAll($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $groups = [];
         foreach ($rs as $row) {
@@ -111,10 +107,9 @@ class GroupsDAO extends GroupsDAOBase {
                 RAND()
             LIMIT
                 0, ?;';
-        global $conn;
 
         $identities = [];
-        foreach ($conn->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
             $identities[] = new Identities($row);
         }
         return $identities;

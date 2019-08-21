@@ -20,8 +20,7 @@ require_once('base/Groups_Scoreboards.vo.base.php');
 class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase {
     public static function getByGroup($group_id) {
         $sql = 'SELECT * FROM Groups_Scoreboards WHERE group_id = ?;';
-        global $conn;
-        $rs = $conn->GetAll($sql, [$group_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$group_id]);
 
         $groupsScoreboards = [];
         foreach ($rs as $row) {
@@ -32,8 +31,7 @@ class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase {
 
     public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Groups_Scoreboards WHERE alias = ? LIMIT 1;';
-        global $conn;
-        $rs = $conn->GetRow($sql, [$alias]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($rs)) {
             return null;
         }

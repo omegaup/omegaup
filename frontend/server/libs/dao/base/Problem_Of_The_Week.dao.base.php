@@ -33,9 +33,8 @@ abstract class ProblemOfTheWeekDAOBase {
             $Problem_Of_The_Week->difficulty,
             (int)$Problem_Of_The_Week->problem_of_the_week_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -49,8 +48,7 @@ abstract class ProblemOfTheWeekDAOBase {
     final public static function getByPK(int $problem_of_the_week_id) : ?ProblemOfTheWeek {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` FROM Problem_Of_The_Week WHERE (problem_of_the_week_id = ?) LIMIT 1;';
         $params = [$problem_of_the_week_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -76,10 +74,9 @@ abstract class ProblemOfTheWeekDAOBase {
     final public static function delete(ProblemOfTheWeek $Problem_Of_The_Week) : void {
         $sql = 'DELETE FROM `Problem_Of_The_Week` WHERE problem_of_the_week_id = ?;';
         $params = [$Problem_Of_The_Week->problem_of_the_week_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -110,15 +107,14 @@ abstract class ProblemOfTheWeekDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` from Problem_Of_The_Week';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemOfTheWeek($row);
         }
         return $allData;
@@ -141,13 +137,12 @@ abstract class ProblemOfTheWeekDAOBase {
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Problem_Of_The_Week->problem_of_the_week_id = $conn->Insert_ID();
+        $Problem_Of_The_Week->problem_of_the_week_id = MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }
