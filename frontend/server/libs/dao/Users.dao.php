@@ -14,10 +14,9 @@ require_once('base/Users.vo.base.php');
   */
 class UsersDAO extends UsersDAOBase {
     public static function FindByEmail($email) {
-        global  $conn;
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -25,9 +24,8 @@ class UsersDAO extends UsersDAOBase {
     }
 
     public static function FindByUsername($username) {
-        global  $conn;
         $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
-        $rs = $conn->GetRow($sql, [$username]);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, [$username]);
         if (empty($rs)) {
             return null;
         }
@@ -43,8 +41,7 @@ class UsersDAO extends UsersDAOBase {
             WHERE
                 ur.user_id = ? AND ur.role_id = 4;';
         $params = [$user_id];
-        global $conn;
-        return $conn->GetOne($sql, $params) > 0;
+        return MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
     }
 
     public static function FindResetInfoByEmail($email) {
@@ -73,9 +70,8 @@ class UsersDAO extends UsersDAOBase {
             $Users->username,
             $Users->user_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getExtendedProfileDataByPk($user_id) {
@@ -110,8 +106,7 @@ class UsersDAO extends UsersDAOBase {
                 LIMIT
                     1;';
         $params = [$user_id];
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
+        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -136,8 +131,7 @@ class UsersDAO extends UsersDAOBase {
                     1;';
         $params = [$identity_id];
 
-        global $conn;
-        return $conn->GetOne($sql, $params);
+        return MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     public static function getRankingClassName($user_id) {
@@ -159,8 +153,7 @@ class UsersDAO extends UsersDAOBase {
                 LIMIT
                     1;';
         $params = [$user_id];
-        global $conn;
-        return $conn->GetOne($sql, $params) ?? 'user-rank-unranked';
+        return MySQLConnection::getInstance()->GetOne($sql, $params) ?? 'user-rank-unranked';
     }
 
     final public static function getByVerification($verification_id) {
@@ -171,8 +164,7 @@ class UsersDAO extends UsersDAOBase {
                 WHERE
                     verification_id = ?';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$verification_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$verification_id]);
 
         $users = [];
         foreach ($rs as $row) {
@@ -191,8 +183,7 @@ class UsersDAO extends UsersDAOBase {
                 AND
                     in_mailing_list = ?';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$verified, $in_mailing_list]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$verified, $in_mailing_list]);
 
         $users = [];
         foreach ($rs as $row) {
@@ -206,7 +197,6 @@ class UsersDAO extends UsersDAOBase {
                     COUNT(*) AS total
                 FROM
                     Users;';
-        global $conn;
-        return $conn->GetRow($sql)['total'];
+        return MySQLConnection::getInstance()->GetRow($sql)['total'];
     }
 }

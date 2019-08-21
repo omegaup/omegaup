@@ -38,21 +38,13 @@ abstract class RunCountsDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
             $Run_Counts->date,
             intval($Run_Counts->total),
             intval($Run_Counts->ac_count),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -69,9 +61,8 @@ abstract class RunCountsDAOBase {
             (int)$Run_Counts->ac_count,
             $Run_Counts->date,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -85,8 +76,7 @@ abstract class RunCountsDAOBase {
     final public static function getByPK(?string $date) : ?RunCounts {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` FROM Run_Counts WHERE (date = ?) LIMIT 1;';
         $params = [$date];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -112,10 +102,9 @@ abstract class RunCountsDAOBase {
     final public static function delete(RunCounts $Run_Counts) : void {
         $sql = 'DELETE FROM `Run_Counts` WHERE date = ?;';
         $params = [$Run_Counts->date];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -146,15 +135,14 @@ abstract class RunCountsDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` from Run_Counts';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new RunCounts($row);
         }
         return $allData;
@@ -177,9 +165,8 @@ abstract class RunCountsDAOBase {
             (int)$Run_Counts->total,
             (int)$Run_Counts->ac_count,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

@@ -21,10 +21,9 @@ class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
     final public static function deleteProblemLanguages(ProblemsLanguages $problems_languages) {
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ?;';
         $params = [$problems_languages->problem_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getByProblemId($problemId) {
@@ -35,8 +34,7 @@ class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
                 WHERE
                     problem_id = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$problemId]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problemId]);
 
         $problemsLanguages = [];
         foreach ($rs as $row) {

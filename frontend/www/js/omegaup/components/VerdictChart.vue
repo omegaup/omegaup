@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Highcharts } from '@/third_party/js/highstock.js';
 import { oGraph } from '../../omegaup-graph.js';
 import { T } from '../omegaup.js';
 import UI from '../ui.js';
@@ -14,7 +15,7 @@ export default class VerdictChart extends Vue {
   @Prop() stats!: omegaup.Stats;
   @Prop() title!: string;
 
-  runCountsChart: omegaup.Stats = null;
+  runCountsChart: omegaup.Stats = Highcharts.Chart;
 
   mounted() {
     this.runCountsChart = oGraph.verdictCounts(

@@ -20,8 +20,7 @@ class UsersExperimentsDAO extends UsersExperimentsDAOBase {
             $user_id,
             $experiment,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
+        MySQLConnection::getInstance()->Execute($sql, $params);
     }
 
     final public static function getByUserId($user_id) {
@@ -32,8 +31,7 @@ class UsersExperimentsDAO extends UsersExperimentsDAOBase {
                 WHERE
                     user_id = ?;';
 
-        global $conn;
-        $rs = $conn->GetAll($sql, [$user_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$user_id]);
 
         $users_experiments = [];
         foreach ($rs as $row) {

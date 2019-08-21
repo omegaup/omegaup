@@ -38,22 +38,14 @@ abstract class ProblemsetProblemOpenedDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Problemset_Problem_Opened->problemset_id) ? intval($Problemset_Problem_Opened->problemset_id) : null,
-            !is_null($Problemset_Problem_Opened->problem_id) ? intval($Problemset_Problem_Opened->problem_id) : null,
-            !is_null($Problemset_Problem_Opened->identity_id) ? intval($Problemset_Problem_Opened->identity_id) : null,
+            $Problemset_Problem_Opened->problemset_id,
+            $Problemset_Problem_Opened->problem_id,
+            $Problemset_Problem_Opened->identity_id,
             DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -71,9 +63,8 @@ abstract class ProblemsetProblemOpenedDAOBase {
             is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
             is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -87,8 +78,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
     final public static function getByPK(?int $problemset_id, ?int $problem_id, ?int $identity_id) : ?ProblemsetProblemOpened {
         $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM Problemset_Problem_Opened WHERE (problemset_id = ? AND problem_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$problemset_id, $problem_id, $identity_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -114,10 +104,9 @@ abstract class ProblemsetProblemOpenedDAOBase {
     final public static function delete(ProblemsetProblemOpened $Problemset_Problem_Opened) : void {
         $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND identity_id = ?;';
         $params = [$Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -148,15 +137,14 @@ abstract class ProblemsetProblemOpenedDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` from Problemset_Problem_Opened';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemsetProblemOpened($row);
         }
         return $allData;
@@ -180,9 +168,8 @@ abstract class ProblemsetProblemOpenedDAOBase {
             is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
             DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

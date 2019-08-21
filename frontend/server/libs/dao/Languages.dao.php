@@ -28,8 +28,7 @@ class LanguagesDAO extends LanguagesDAOBase {
                 LIMIT
                     0, 1;';
 
-        global $conn;
-        $row = $conn->GetRow($sql, [$name]);
+        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }

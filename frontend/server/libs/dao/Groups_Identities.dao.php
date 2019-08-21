@@ -11,7 +11,6 @@ include_once('base/Groups_Identities.vo.base.php');
   */
 class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
     public static function GetMemberIdentities(Groups $group) {
-        global  $conn;
         $sql = '
             SELECT
                 i.username,
@@ -53,7 +52,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
             WHERE
                 gi.group_id = ?;';
 
-        $rs = $conn->GetAll($sql, [$group->group_id]);
+        $rs = MySQLConnection::getInstance()->GetAll($sql, [$group->group_id]);
         $identities = [];
         foreach ($rs as $row) {
             $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
@@ -70,7 +69,6 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
     }
 
     public static function GetMemberCountById($group_id) {
-        global  $conn;
         $sql = '
             SELECT
                 COUNT(*) AS count
@@ -79,7 +77,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
             WHERE
                 gi.group_id = ?;';
         $params = [$group_id];
-        return $conn->GetOne($sql, $params);
+        return MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     final public static function getByGroupId($groupId) {
@@ -91,9 +89,8 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
             WHERE
                 group_id = ?;';
 
-        global $conn;
         $groupsIdentities = [];
-        foreach ($conn->GetAll($sql, [$groupId]) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$groupId]) as $row) {
             array_push($groupsIdentities, new GroupsIdentities($row));
         }
         return $groupsIdentities;
@@ -112,9 +109,8 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
             WHERE
                 gi.group_id = ?;';
 
-        global $conn;
         $identities = [];
-        foreach ($conn->GetAll($sql, [$group_id]) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql, [$group_id]) as $row) {
             array_push($identities, $row['username']);
         }
         return $identities;

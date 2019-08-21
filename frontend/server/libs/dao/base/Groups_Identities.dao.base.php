@@ -38,23 +38,15 @@ abstract class GroupsIdentitiesDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Groups_Identities->group_id) ? intval($Groups_Identities->group_id) : null,
-            !is_null($Groups_Identities->identity_id) ? intval($Groups_Identities->identity_id) : null,
+            $Groups_Identities->group_id,
+            $Groups_Identities->identity_id,
             !is_null($Groups_Identities->share_user_information) ? intval($Groups_Identities->share_user_information) : null,
             !is_null($Groups_Identities->privacystatement_consent_id) ? intval($Groups_Identities->privacystatement_consent_id) : null,
             $Groups_Identities->accept_teacher,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -73,9 +65,8 @@ abstract class GroupsIdentitiesDAOBase {
             is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
             is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -89,8 +80,7 @@ abstract class GroupsIdentitiesDAOBase {
     final public static function getByPK(?int $group_id, ?int $identity_id) : ?GroupsIdentities {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$group_id, $identity_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -116,10 +106,9 @@ abstract class GroupsIdentitiesDAOBase {
     final public static function delete(GroupsIdentities $Groups_Identities) : void {
         $sql = 'DELETE FROM `Groups_Identities` WHERE group_id = ? AND identity_id = ?;';
         $params = [$Groups_Identities->group_id, $Groups_Identities->identity_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -150,15 +139,14 @@ abstract class GroupsIdentitiesDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` from Groups_Identities';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new GroupsIdentities($row);
         }
         return $allData;
@@ -183,9 +171,8 @@ abstract class GroupsIdentitiesDAOBase {
             is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
             $Groups_Identities->accept_teacher,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

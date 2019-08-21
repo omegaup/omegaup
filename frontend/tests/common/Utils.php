@@ -38,16 +38,14 @@ class Utils {
 
     public static function GetDbDatetime() {
         // Go to the DB
-        global $conn;
 
-        return $conn->GetOne('SELECT NOW();');
+        return MySQLConnection::getInstance()->GetOne('SELECT NOW();');
     }
 
     public static function GetTimeFromUnixTimestamp($time) {
         // Go to the DB to take the unix timestamp
-        global $conn;
 
-        return $conn->GetOne('SELECT FROM_UNIXTIME(?);', [$time]);
+        return MySQLConnection::getInstance()->GetOne('SELECT FROM_UNIXTIME(?);', [$time]);
     }
 
     public static function CleanLog() {
@@ -61,26 +59,22 @@ class Utils {
     }
 
     public static function deleteAllSuggestions() {
-        global $conn;
-        $conn->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
+        MySQLConnection::getInstance()->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
     }
 
     public static function deleteAllRanks() {
-        global $conn;
-        $conn->Execute('DELETE FROM `User_Rank`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `User_Rank`;');
     }
 
     public static function deleteAllPreviousRuns() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Submission_Log`;');
-        $conn->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
-        $conn->Execute('DELETE FROM `Runs`;');
-        $conn->Execute('DELETE FROM `Submissions`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Submission_Log`;');
+        MySQLConnection::getInstance()->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Runs`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Submissions`;');
     }
 
     public static function deleteAllProblemsOfTheWeek() {
-        global $conn;
-        $conn->Execute('DELETE FROM `Problem_Of_The_Week`;');
+        MySQLConnection::getInstance()->Execute('DELETE FROM `Problem_Of_The_Week`;');
     }
 
     /**
@@ -190,8 +184,6 @@ class Utils {
     }
 
     public static function CleanupDB() {
-        global $conn;
-
         // Tables to truncate
         $tables = [
             'ACLs',
@@ -240,27 +232,27 @@ class Utils {
 
         try {
             // Disable foreign checks
-            $conn->Execute('SET foreign_key_checks = 0;');
+            MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 0;');
 
             foreach ($tables as $t) {
-                $conn->Execute("TRUNCATE TABLE `$t`;");
+                MySQLConnection::getInstance()->Execute("TRUNCATE TABLE `$t`;");
             }
 
             // Tables with special entries.
-            $conn->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
+            MySQLConnection::getInstance()->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
 
             // The format of the question changed from this id
-            $conn->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
+            MySQLConnection::getInstance()->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
 
             // Make sure the user_id and identity_id never matches in tests.
-            $conn->Execute('ALTER TABLE Identities auto_increment = 100000;');
+            MySQLConnection::getInstance()->Execute('ALTER TABLE Identities auto_increment = 100000;');
             self::setUpDefaultDataConfig();
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());
         } finally {
             // Enabling them again
-            $conn->Execute('SET foreign_key_checks = 1;');
+            MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 1;');
         }
         self::commit();
     }
@@ -279,11 +271,10 @@ class Utils {
     }
 
     public static function Commit() {
-        global $conn;
         try {
-            $conn->StartTrans();
+            MySQLConnection::getInstance()->StartTrans();
         } finally {
-            $conn->CompleteTrans();
+            MySQLConnection::getInstance()->CompleteTrans();
         }
     }
 

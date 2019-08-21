@@ -38,24 +38,16 @@ abstract class ProblemsetIdentityRequestDAOBase {
             throw new NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
-        /**
-         * For some reason, psalm is not able to correctly assess the types in
-         * the ternary expressions below.
-         *
-         * @psalm-suppress DocblockTypeContradiction
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         $params = [
-            !is_null($Problemset_Identity_Request->identity_id) ? intval($Problemset_Identity_Request->identity_id) : null,
-            !is_null($Problemset_Identity_Request->problemset_id) ? intval($Problemset_Identity_Request->problemset_id) : null,
+            $Problemset_Identity_Request->identity_id,
+            $Problemset_Identity_Request->problemset_id,
             DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
             DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             !is_null($Problemset_Identity_Request->accepted) ? intval($Problemset_Identity_Request->accepted) : null,
             $Problemset_Identity_Request->extra_note,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -75,9 +67,8 @@ abstract class ProblemsetIdentityRequestDAOBase {
             is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
             is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        return MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -91,8 +82,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
     final public static function getByPK(?int $identity_id, ?int $problemset_id) : ?ProblemsetIdentityRequest {
         $sql = 'SELECT `Problemset_Identity_Request`.`identity_id`, `Problemset_Identity_Request`.`problemset_id`, `Problemset_Identity_Request`.`request_time`, `Problemset_Identity_Request`.`last_update`, `Problemset_Identity_Request`.`accepted`, `Problemset_Identity_Request`.`extra_note` FROM Problemset_Identity_Request WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
-        global $conn;
-        $row = $conn->GetRow($sql, $params);
+        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -118,10 +108,9 @@ abstract class ProblemsetIdentityRequestDAOBase {
     final public static function delete(ProblemsetIdentityRequest $Problemset_Identity_Request) : void {
         $sql = 'DELETE FROM `Problemset_Identity_Request` WHERE identity_id = ? AND problemset_id = ?;';
         $params = [$Problemset_Identity_Request->identity_id, $Problemset_Identity_Request->problemset_id];
-        global $conn;
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -152,15 +141,14 @@ abstract class ProblemsetIdentityRequestDAOBase {
         string $tipoDeOrden = 'ASC'
     ) : array {
         $sql = 'SELECT `Problemset_Identity_Request`.`identity_id`, `Problemset_Identity_Request`.`problemset_id`, `Problemset_Identity_Request`.`request_time`, `Problemset_Identity_Request`.`last_update`, `Problemset_Identity_Request`.`accepted`, `Problemset_Identity_Request`.`extra_note` from Problemset_Identity_Request';
-        global $conn;
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . $conn->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach ($conn->GetAll($sql) as $row) {
+        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemsetIdentityRequest($row);
         }
         return $allData;
@@ -186,9 +174,8 @@ abstract class ProblemsetIdentityRequestDAOBase {
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $affectedRows = $conn->Affected_Rows();
+        MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
