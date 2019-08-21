@@ -1,109 +1,10 @@
 <?php
 
 /**
- *   ApiException
- *
- *   Exception that works with arrays instead of plain strings
- *
- *
- */
-abstract class ApiException extends Exception {
-    public static $log;
-
-    protected $header;
-    private $customMessage;
-
-    /**
-     * Builds an api exception
-     *
-     * @param string $message
-     * @param string $header
-     * @param string $code
-     * @param Exception $previous
-     */
-    public function __construct($message, $header, $code, Exception $previous = null) {
-        parent::__construct($message, $code, $previous);
-
-        $this->header = $header;
-        $this->customMessage = [];
-    }
-
-    /**
-     * Returns header
-     *
-     * @return string
-     */
-    final public function getHeader() : string {
-        return $this->header;
-    }
-
-    /**
-     * Adds a custom field to the asArray representation of this exception
-     *
-     * @param string $key
-     * @param type $value
-     */
-    final public function addCustomMessageToArray($key, $value) : void {
-        $this->customMessage[$key] = $value;
-    }
-
-    /**
-     *
-     * @return array
-     */
-    final public function asArray() : array {
-        return array_merge(
-            [
-                'status' => 'error',
-                'error' => $this->getErrorMessage(),
-                'errorcode' => $this->code,
-                'header' => $this->header,
-                'cause' => !is_null($this->getPrevious()) ? $this->getPrevious()->getMessage() : null,
-                'trace' => $this->getTraceAsString(),
-            ],
-            $this->customMessage
-        );
-    }
-
-    /**
-     * Returns exception info intended for public error msgs in http responses
-     *
-     * @return array
-     */
-    final public function asResponseArray() : array {
-        return array_merge(
-            [
-                'status' => 'error',
-                'error' => $this->getErrorMessage(),
-                'errorname' => $this->message,
-                'errorcode' => $this->code,
-                'header' => $this->header,
-            ],
-            $this->customMessage
-        );
-    }
-
-    public function getErrorMessage() : string {
-        if (is_null($this->message)) {
-            self::$log->error('null error message');
-            return '{untranslated:(null)}';
-        }
-        $localizedText = \OmegaUp\Translations::getInstance()->get($this->message);
-        if (is_null($localizedText)) {
-            self::$log->error("Untranslated error message: {$this->message}");
-            return "{untranslated:{$this->message}}";
-        }
-        return $localizedText;
-    }
-}
-
-ApiException::$log = Logger::getLogger('ApiException');
-
-/**
  * InvalidArgumentException
  *
  */
-class InvalidParameterException extends ApiException {
+class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
     private $parameter;
     private $additional_parameters;
 
@@ -140,7 +41,7 @@ class InvalidParameterException extends ApiException {
  * DuplicatedEntryInDatabaseException
  *
  */
-class DuplicatedEntryInDatabaseException extends ApiException {
+class DuplicatedEntryInDatabaseException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -155,7 +56,7 @@ class DuplicatedEntryInDatabaseException extends ApiException {
  * DuplicatedEntryInArrayException
  *
  */
-class DuplicatedEntryInArrayException extends ApiException {
+class DuplicatedEntryInArrayException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -169,7 +70,7 @@ class DuplicatedEntryInArrayException extends ApiException {
 /**
  * DatabaseOperationException
  */
-class DatabaseOperationException extends ApiException {
+class DatabaseOperationException extends \OmegaUp\Exceptions\ApiException {
     private $_message = null;
     private $_errno = 0;
 
@@ -196,7 +97,7 @@ class DatabaseOperationException extends ApiException {
  * NotFoundException
  *
  */
-class NotFoundException extends ApiException {
+class NotFoundException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -211,7 +112,7 @@ class NotFoundException extends ApiException {
  * ForbiddenAccessException
  *
  */
-class ForbiddenAccessException extends ApiException {
+class ForbiddenAccessException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -226,7 +127,7 @@ class ForbiddenAccessException extends ApiException {
  * UnauthorizedException
  *
  */
-class UnauthorizedException extends ApiException {
+class UnauthorizedException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -241,7 +142,7 @@ class UnauthorizedException extends ApiException {
  * PreconditionFailed
  *
  */
-class PreconditionFailedException extends ApiException {
+class PreconditionFailedException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -256,7 +157,7 @@ class PreconditionFailedException extends ApiException {
  * Filesystem operation failed
  *
  */
-class InvalidFilesystemOperationException extends ApiException {
+class InvalidFilesystemOperationException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -271,7 +172,7 @@ class InvalidFilesystemOperationException extends ApiException {
  * Default for unexpected errors
  *
  */
-class CaptchaVerificationFailedException extends ApiException {
+class CaptchaVerificationFailedException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param Exception $previous
@@ -285,7 +186,7 @@ class CaptchaVerificationFailedException extends ApiException {
  * Default for unexpected errors
  *
  */
-class InternalServerErrorException extends ApiException {
+class InternalServerErrorException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param Exception $previous
@@ -299,7 +200,7 @@ class InternalServerErrorException extends ApiException {
  * Login failed exception
  *
  */
-class InvalidCredentialsException extends ApiException {
+class InvalidCredentialsException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -310,13 +211,13 @@ class InvalidCredentialsException extends ApiException {
     }
 }
 
-class NotAllowedToSubmitException extends ApiException {
+class NotAllowedToSubmitException extends \OmegaUp\Exceptions\ApiException {
     public function __construct($message = 'unableToSubmit', Exception $previous = null) {
         parent::__construct($message, 'HTTP/1.1 403 FORBIDDEN', 403, $previous);
     }
 }
 
-class EmailNotVerifiedException extends ApiException {
+class EmailNotVerifiedException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -327,7 +228,7 @@ class EmailNotVerifiedException extends ApiException {
     }
 }
 
-class EmailVerificationSendException extends ApiException {
+class EmailVerificationSendException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -342,7 +243,7 @@ class EmailVerificationSendException extends ApiException {
  * ProblemDeploymentFailedException
  *
  */
-class ProblemDeploymentFailedException extends ApiException {
+class ProblemDeploymentFailedException extends \OmegaUp\Exceptions\ApiException {
     /**
      *
      * @param string $message
@@ -369,20 +270,20 @@ class ProblemDeploymentFailedException extends ApiException {
 /**
  * LoginDisabledException
  */
-class LoginDisabledException extends ApiException {
-    public function __construct($message, ApiException $previous = null) {
+class LoginDisabledException extends \OmegaUp\Exceptions\ApiException {
+    public function __construct($message, \OmegaUp\Exceptions\ApiException $previous = null) {
         parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }
 
-class UnimplementedException extends ApiException {
-    public function __construct(ApiException $previous = null) {
+class UnimplementedException extends \OmegaUp\Exceptions\ApiException {
+    public function __construct(\OmegaUp\Exceptions\ApiException $previous = null) {
         parent::__construct('wordsUnimplemented', 'HTTP/1.1 405 Method Not Allowed', 405, $previous);
     }
 }
 
-class CSRFException extends ApiException {
-    public function __construct($message = 'csrfException', ApiException $previous = null) {
+class CSRFException extends \OmegaUp\Exceptions\ApiException {
+    public function __construct($message = 'csrfException', \OmegaUp\Exceptions\ApiException $previous = null) {
         parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400, $previous);
     }
 }

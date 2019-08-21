@@ -175,7 +175,7 @@ class ProblemController extends Controller {
     /**
      * Create a new problem
      *
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
@@ -242,7 +242,7 @@ class ProblemController extends Controller {
             }
             ProblemController::setRestrictedTags($problem);
             DAO::transEnd();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
             DAO::transRollback();
 
@@ -629,7 +629,7 @@ class ProblemController extends Controller {
      * Rejudge problem
      *
      * @param Request $r
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiRejudge(Request $r) {
         self::authenticateRequest($r);
@@ -672,7 +672,7 @@ class ProblemController extends Controller {
      * Update problem contents
      *
      * @param Request $r
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
@@ -764,7 +764,7 @@ class ProblemController extends Controller {
             ProblemController::setRestrictedTags($problem);
 
             DAO::transEnd();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             // Operation failed in the data layer, rollback transaction
             DAO::transRollback();
 
@@ -831,7 +831,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array The updated file languages
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      */
     private static function updateLooseFile(
         Request $r,
@@ -875,7 +875,7 @@ class ProblemController extends Controller {
                 ProblemsDAO::update($problem);
             }
             $updatedFileLanguages = $problemDeployer->getUpdatedLanguages();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             throw $e;
         }
 
@@ -887,7 +887,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiUpdateStatement(Request $r) {
         self::authenticateRequest($r);
@@ -905,7 +905,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function apiUpdateSolution(Request $r) {
         self::authenticateRequest($r);
@@ -976,7 +976,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @return Array
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -1235,7 +1235,7 @@ class ProblemController extends Controller {
      * Validate problem Details API
      *
      * @param Request $r
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -1261,7 +1261,7 @@ class ProblemController extends Controller {
      * @param $problemsetId
      * @param $contestAlias
      * @return Array
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotFoundException
      */
     private static function validateProblemset(Problems $problem, $problemsetId, $contestAlias = null) {
@@ -1830,7 +1830,7 @@ class ProblemController extends Controller {
      * Validate problem Details API
      *
      * @param Request $r
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotFoundException
      * @throws ForbiddenAccessException
      */
@@ -2363,7 +2363,7 @@ class ProblemController extends Controller {
                 ]));
             }
             DAO::transEnd();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
             DAO::transRollback();
             throw $e;

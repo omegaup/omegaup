@@ -426,7 +426,7 @@ class UserController extends Controller {
      *
      * @param Request $r
      * @return type
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotFoundException
      */
     public static function apiVerifyEmail(Request $r) {
@@ -520,7 +520,7 @@ class UserController extends Controller {
      *
      * @param ?string $userOrEmail
      * @return Users
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws InvalidParameterException
      */
     public static function resolveUser(?string $userOrEmail) : Users {

@@ -8,7 +8,7 @@ $r['show_solvers'] = true;
 try {
     $result = ProblemController::apiDetails($r);
     $problem = ProblemsDAO::GetByAlias($result['alias']);
-} catch (ApiException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
 }

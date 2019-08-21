@@ -387,7 +387,7 @@ class SessionController extends Controller {
 
         try {
             $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
             return false;
         }
@@ -460,7 +460,7 @@ class SessionController extends Controller {
                 $profile['emailAddress'],
                 $profile['firstName'] . ' ' . $profile['lastName']
             );
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error("Unable to login via LinkedIn: $e");
             return $e->asResponseArray();
         }
@@ -497,7 +497,7 @@ class SessionController extends Controller {
 
             try {
                 $res = UserController::apiCreate($r);
-            } catch (ApiException $e) {
+            } catch (\OmegaUp\Exceptions\ApiException $e) {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }

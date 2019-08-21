@@ -20,7 +20,7 @@ class ApiCaller {
     public static function call(Request $request) {
         try {
             $response = $request->execute();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error($e);
             $response = $e->asResponseArray();
         } catch (Exception $e) {
@@ -74,7 +74,7 @@ class ApiCaller {
                     new Exception('API did not return an array.')
                 );
             }
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             $apiException = $e;
         } catch (Exception $e) {
             $apiException = new InternalServerErrorException($e);
@@ -252,7 +252,7 @@ class ApiCaller {
      */
     public static function handleException(Exception $e) : void {
         $apiException = null;
-        if ($e instanceof ApiException) {
+        if ($e instanceof \OmegaUp\Exceptions\ApiException) {
             $apiException = $e;
         } else {
             $apiException = new InternalServerErrorException($e);
