@@ -672,7 +672,10 @@ class ContestController extends Controller {
                 $acl = ACLsDAO::getByPK($contest->acl_id);
                 $result['director'] = UsersDAO::getByPK($acl->owner_id)->username;
 
-                $problemsInContest = ProblemsetProblemsDAO::getProblemsByProblemset($contest->problemset_id);
+                $problemsInContest = ProblemsetProblemsDAO::getProblemsByProblemset(
+                    $contest->problemset_id,
+                    /*shouldGetProblemsetProblemOrder=*/ false
+                );
 
                 // Add info of each problem to the contest
                 $problemsResponseArray = [];
@@ -869,8 +872,9 @@ class ContestController extends Controller {
             // Create the contest
             self::createContest($problemset, $contest, $r->user->user_id);
 
-            $problemsetProblems = ProblemsetProblemsDAO::getProblemsetProblems(
-                $originalContest->problemset_id
+            $problemsetProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+                $originalContest->problemset_id,
+                /*shouldGetProblemsetProblemOrder=*/ true
             );
             foreach ($problemsetProblems as $problemsetProblem) {
                 $problem = new Problems([
@@ -1289,7 +1293,10 @@ class ContestController extends Controller {
         );
 
         $problemset = ProblemsetsDAO::getByPK($contest->problemset_id);
-        $problems = ProblemsetProblemsDAO::getProblemsetProblems($problemset->problemset_id);
+        $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
+            $problemset->problemset_id,
+            /*shouldGetProblemsetProblemOrder=*/ true
+        );
 
         return ['status' => 'ok', 'problems' => $problems];
     }

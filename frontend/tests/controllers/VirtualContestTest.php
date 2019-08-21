@@ -54,8 +54,14 @@ class VirtualContestTest extends OmegaupTestCase {
         $this->assertEquals($originalContest->languages, $virtualContest->languages);
 
         // Assert virtual contest problenset problems
-        $originalProblems = ProblemsetProblemsDAO::getProblems($originalContest->problemset_id);
-        $virtualProblems = ProblemsetProblemsDAO::getProblems($virtualContest->problemset_id);
+        $originalProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+            $originalContest->problemset_id,
+            /*shouldGetProblemsetProblemOrder=*/ true
+        );
+        $virtualProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+            $virtualContest->problemset_id,
+            /*shouldGetProblemsetProblemOrder=*/ true
+        );
         // Number of problems must be equal
         $this->assertEquals(count($originalProblems), count($virtualProblems));
 
