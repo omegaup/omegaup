@@ -79,15 +79,15 @@ export default class QualityNominationList extends Vue {
   }
 
   problemUrl(problemAlias: string): string {
-    return '/arena/problem/' + problemAlias + '/';
+    return `/arena/problem/${problemAlias}/`;
   }
 
   userUrl(username: string): string {
-    return '/profile/' + username + '/';
+    return `/profile/${username}/`;
   }
 
   nominationDetailsUrl(nominationId: number): string {
-    return '/nomination/' + nominationId + '/';
+    return `/nomination/${nominationId}/`;
   }
 }
 

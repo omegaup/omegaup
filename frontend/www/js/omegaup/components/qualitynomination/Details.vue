@@ -110,11 +110,11 @@ export default class QualityNominationDetails extends Vue {
   rationale = this.initialRationale;
 
   userUrl(alias: string): string {
-    return '/profile/' + alias + '/';
+    return `/profile/${alias}/`;
   }
 
   problemUrl(alias: string): string {
-    return '/arena/problem/' + alias + '/';
+    return `/arena/problem/${alias}/`;
   }
 
   markResolution(banProblem: boolean): void {

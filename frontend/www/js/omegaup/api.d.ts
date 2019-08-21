@@ -61,9 +61,7 @@ declare namespace omegaup {
     group: omegaup.DetailsGroup[];
   }
 
-  export interface Identity {
-    name: string;
-    username: string;
+  export interface Identity extends User {
     school: string;
     school_id: number;
     country_id: string;
@@ -113,9 +111,7 @@ declare namespace omegaup {
     badge?: string;
   }
 
-  export interface Profile {
-    username: string;
-    name: string;
+  export interface Profile extends User {
     email: string;
     country_id: string;
     gravatar_92: string;
@@ -138,16 +134,6 @@ declare namespace omegaup {
     tags?: Tag[];
     title: string;
     visibility?: number;
-  }
-
-  export interface Profile {
-    username: string;
-    name: string;
-    email: string;
-    country_id: string;
-    gravatar_92: string;
-    rankinfo: RankInfo;
-    classname: string;
   }
 
   export interface QueryParameters {
