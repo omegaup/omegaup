@@ -440,7 +440,6 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-course-addstudents', {
         props: {
-          T: T,
           students: this.students,
           courseAlias: courseAlias,
         },

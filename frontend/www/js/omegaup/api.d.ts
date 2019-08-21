@@ -49,6 +49,16 @@ declare namespace omegaup {
     place: number;
   }
 
+  interface CourseProgress {
+    [assignment: string]: number;
+  }
+
+  export interface CourseStudent {
+    name?: string;
+    username: string;
+    progress: CourseProgress[];
+  }
+
   interface DetailsGroup {
     cases: omegaup.Case[];
     contest_score: number;
