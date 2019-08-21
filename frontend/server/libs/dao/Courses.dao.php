@@ -16,7 +16,7 @@ class CoursesDAO extends CoursesDAOBase {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        $resultRows = MySQLConnection::getInstance()->GetAll($sql, [$name]);
+        $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$name]);
         $finalResult = [];
 
         foreach ($resultRows as $row) {
@@ -54,7 +54,7 @@ class CoursesDAO extends CoursesDAOBase {
             ORDER BY
                 start_time;";
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$alias]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
         foreach ($rs as $row) {
@@ -79,7 +79,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$identity_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$identity_id]);
         $courses = [];
         foreach ($rs as $row) {
             array_push($courses, new Courses($row));
@@ -121,7 +121,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) pr
                 ON pr.identity_id = i.identity_id';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$group_id, $course_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_id, $course_id]);
         $progress = [];
         foreach ($rs as $row) {
             $username = $row['username'];
@@ -177,7 +177,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ON a.assignment_id = pr.assignment_id
                 where a.course_id = ?';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$course_id, $identity_id, $course_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id, $identity_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {
@@ -237,7 +237,7 @@ class CoursesDAO extends CoursesDAOBase {
             (int)$pageSize,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
@@ -274,7 +274,7 @@ class CoursesDAO extends CoursesDAOBase {
             (int)$pageSize,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
@@ -287,7 +287,7 @@ class CoursesDAO extends CoursesDAOBase {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
         $params = [$alias];
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -299,7 +299,7 @@ class CoursesDAO extends CoursesDAOBase {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
         $params = [$assignmentAlias, $course->course_id];
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -322,9 +322,9 @@ class CoursesDAO extends CoursesDAOBase {
 
         $params = [$assignment_alias, $course->course_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getSharingInformation($identity_id, Courses $course, Groups $group) {
@@ -349,7 +349,7 @@ class CoursesDAO extends CoursesDAOBase {
             $identity_id,
             $group->group_id,
         ];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }

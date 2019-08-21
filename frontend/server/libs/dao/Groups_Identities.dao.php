@@ -52,7 +52,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
             WHERE
                 gi.group_id = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$group->group_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id]);
         $identities = [];
         foreach ($rs as $row) {
             $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
@@ -77,7 +77,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
             WHERE
                 gi.group_id = ?;';
         $params = [$group_id];
-        return MySQLConnection::getInstance()->GetOne($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     final public static function getByGroupId($groupId) {
@@ -90,7 +90,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
                 group_id = ?;';
 
         $groupsIdentities = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$groupId]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$groupId]) as $row) {
             array_push($groupsIdentities, new GroupsIdentities($row));
         }
         return $groupsIdentities;
@@ -110,7 +110,7 @@ class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
                 gi.group_id = ?;';
 
         $identities = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$group_id]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_id]) as $row) {
             array_push($identities, $row['username']);
         }
         return $identities;

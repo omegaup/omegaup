@@ -26,7 +26,7 @@ class EmailsDAO extends EmailsDAOBase {
                 WHERE
                     user_id = ?';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$user_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$user_id]);
 
         $emails = [];
         foreach ($rs as $row) {

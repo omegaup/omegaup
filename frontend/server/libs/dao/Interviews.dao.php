@@ -14,7 +14,7 @@ class InterviewsDAO extends InterviewsDAOBase {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
         $params = [$alias];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -40,7 +40,7 @@ class InterviewsDAO extends InterviewsDAOBase {
 
         $params = [$user_id, $user_id, Authorization::ADMIN_ROLE];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $result = [];
 
@@ -62,7 +62,7 @@ class InterviewsDAO extends InterviewsDAOBase {
     public static function getByProblemset($problemset_id) {
         $sql = 'SELECT i.* from Interviews i where i.problemset_id = ?;';
 
-        $interviews = MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
+        $interviews = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
         if (empty($interviews)) {
             return null;
         }

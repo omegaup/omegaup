@@ -26,7 +26,7 @@ class RolesDAO extends RolesDAOBase {
                 WHERE
                     name = ?';
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }

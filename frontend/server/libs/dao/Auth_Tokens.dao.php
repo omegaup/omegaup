@@ -1,4 +1,5 @@
 <?php
+
 require_once('base/Auth_Tokens.dao.base.php');
 require_once('base/Auth_Tokens.vo.base.php');
 /** Page-level DocBlock .
@@ -28,7 +29,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     at.user_id = u.user_id
                 WHERE
                     at.token = ?;';
-        $rs = MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
         if (empty($rs)) {
             return null;
         }
@@ -46,7 +47,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     at.identity_id = i.identity_id
                 WHERE
                     at.token = ?;';
-        $rs = MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$auth_token]);
 
         if (empty($rs)) {
             return null;
@@ -59,9 +60,9 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     `Auth_Tokens`
                 WHERE
                     identity_id = ?;';
-        MySQLConnection::getInstance()->Execute($sql, [$identity_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$identity_id]);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getByIdentityId($identityId) {
@@ -71,7 +72,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
                     `Auth_Tokens` at
                 WHERE
                     at.identity_id = ?;';
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
 
         $authTokens = [];
         foreach ($rs as $row) {

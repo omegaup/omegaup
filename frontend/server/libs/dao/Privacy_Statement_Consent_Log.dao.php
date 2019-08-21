@@ -19,7 +19,7 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
                   pscl.identity_id = ?
                   AND pscl.privacystatement_id = ?
                ';
-        return MySQLConnection::getInstance()->GetOne($sql, [$identity_id, $privacystatement_id]) > 0;
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$identity_id, $privacystatement_id]) > 0;
     }
 
     /**
@@ -37,8 +37,8 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
                   )
                 VALUES
                   (?, ?)';
-        MySQLConnection::getInstance()->Execute($sql, [$identityId, $privacyStatementId]);
-        return MySQLConnection::getInstance()->Insert_ID();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$identityId, $privacyStatementId]);
+        return \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
     }
 
     /**
@@ -59,6 +59,6 @@ class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
                 ORDER BY
                   privacystatement_id DESC
                 LIMIT 1';
-        return MySQLConnection::getInstance()->GetOne($sql, [$identityId, $privacyStatementId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$identityId, $privacyStatementId]);
     }
 }

@@ -146,7 +146,7 @@ class ContestsDAO extends ContestsDAOBase {
     final public static function getByAlias(string $alias) : ?Contests {
         $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, [$alias]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($rs)) {
             return null;
         }
@@ -157,7 +157,7 @@ class ContestsDAO extends ContestsDAOBase {
     final public static function getByTitle($title) {
         $sql = 'SELECT * FROM Contests WHERE title = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$title]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);
 
         $contests = [];
         foreach ($rs as $row) {
@@ -181,7 +181,7 @@ class ContestsDAO extends ContestsDAOBase {
                 WHERE c.alias = ? LIMIT 1;';
         $params = [$alias];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -190,7 +190,7 @@ class ContestsDAO extends ContestsDAOBase {
 
     final public static function getByProblemset($problemset_id) {
         $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
-        $row = MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
         if (empty($row)) {
             return null;
         }
@@ -211,7 +211,7 @@ class ContestsDAO extends ContestsDAOBase {
             admission_mode = \'private\' and a.owner_id = ?;';
         $params = [$user->user_id];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
 
         if (!array_key_exists('total', $rs)) {
             return 0;
@@ -256,7 +256,7 @@ class ContestsDAO extends ContestsDAOBase {
                 contest_id DESC;';
         $params = [$identity_id];
 
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -314,7 +314,7 @@ class ContestsDAO extends ContestsDAOBase {
             $pageSize,
         ];
 
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -343,14 +343,14 @@ class ContestsDAO extends ContestsDAOBase {
                 Problemsets ps ON ps.problemset_id = c.problemset_id';
 
         if (!is_null($order)) {
-            $sql .= ' ORDER BY `c`.`' . MySQLConnection::getInstance()->escape($order) . '` ' .
+            $sql .= ' ORDER BY `c`.`' . \OmegaUp\MySQLConnection::getInstance()->escape($order) . '` ' .
                     ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
             $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . (int)$pageSize;
         }
 
-        return MySQLConnection::getInstance()->GetAll($sql);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -384,7 +384,7 @@ class ContestsDAO extends ContestsDAOBase {
             (int)$pageSize,
         ];
 
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -435,7 +435,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = (int)$offset;
         $params[] = (int)$pageSize;
 
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -478,7 +478,7 @@ class ContestsDAO extends ContestsDAOBase {
         $params[] = (int)$offset;
         $params[] = (int)$pageSize;
 
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
@@ -656,7 +656,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = (int)$offset;
         $params[] = (int)$renglones_por_pagina;
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function getAllPublicContests(
@@ -699,7 +699,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = (int)$offset;
         $params[] = (int)$renglones_por_pagina;
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function getAllContests(
@@ -738,7 +738,7 @@ class ContestsDAO extends ContestsDAOBase {
         }
         $params[] = (int)$offset;
         $params[] = (int)$renglones_por_pagina;
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     public static function getContestForProblemset($problemset_id) {
@@ -763,7 +763,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         $params = [$problemset_id];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             throw new NotFoundException('problemsetNotFound');
         }
@@ -844,7 +844,7 @@ class ContestsDAO extends ContestsDAOBase {
                 c.contest_id = ?;
         ';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$contestId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$contestId]);
     }
 
     public static function requestsUserInformation($contestId) {
@@ -858,7 +858,7 @@ class ContestsDAO extends ContestsDAOBase {
             LIMIT 1;
         ';
 
-        $requestsUsersInfo = MySQLConnection::getInstance()->GetOne($sql, [$contestId]);
+        $requestsUsersInfo = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$contestId]);
 
         return $requestsUsersInfo == 'yes' || $requestsUsersInfo == 'optional';
     }

@@ -82,7 +82,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 WHERE
                     p.problemset_id = ?;';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
     }
 
     final public static function getIdentitiesByProblemset($problemset_id) {
@@ -109,7 +109,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             WHERE
                 pi.problemset_id = ?;';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
     }
 
     /**
@@ -131,13 +131,13 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     Problemset_Identities.`problemset_id` = ?
                     AND `access_time` IS NOT NULL;';
 
-        MySQLConnection::getInstance()->Execute($sql, [
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
             $contest->finish_time,
             $contest->window_length,
             $contest->problemset_id
         ]);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function recalculateEndTimeAsFinishTime(
@@ -150,9 +150,9 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 WHERE
                     `problemset_id` = ?;';
 
-        MySQLConnection::getInstance()->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {
@@ -169,7 +169,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemset_identity->problemset_id,
         ];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }

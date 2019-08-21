@@ -36,7 +36,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$name];
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
             $result[] = new Schools($row);
         }
         return $result;
@@ -86,7 +86,7 @@ class SchoolsDAO extends SchoolsDAOBase {
         $args = [$startDate, $finishDate, $offset, $rowcount];
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args) as $row) {
             $result[] = [
                 'name' => $row['name'],
                 'country_id' => $row['country_id'],

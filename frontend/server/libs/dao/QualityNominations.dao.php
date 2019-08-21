@@ -62,7 +62,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 p.problem_id = ? AND i.identity_id = ?;
         ';
 
-        $result = MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
         return [
             'solved' => (bool) $result['solved'],
             'nominated' => (bool) $result['nominated'],
@@ -114,7 +114,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
             i.username;';
 
         $votes = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$qualitynomination_id]) as $vote) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$qualitynomination_id]) as $vote) {
             if (is_string($vote['time'])) {
                 $vote['time'] = (int)$vote['time'];
             }
@@ -239,7 +239,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         }
         if (!empty($types)) {
             $escapeFunc = function ($type) {
-                return MySQLConnection::getInstance()->escape($type);
+                return \OmegaUp\MySQLConnection::getInstance()->escape($type);
             };
             $conditions[] =
                 ' qn.nomination in ("' . implode('", "', array_map($escapeFunc, $types)) . '")';
@@ -257,7 +257,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $params[] = (int)(($page + 1) * $pageSize);
 
         $nominations = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
             $nominations[] = self::processNomination($nomination);
         }
 
@@ -310,7 +310,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         WHERE
             qn.qualitynomination_id = ?;';
 
-        return self::processNomination(MySQLConnection::getInstance()->GetRow($sql, [$qualitynomination_id]));
+        return self::processNomination(\OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$qualitynomination_id]));
     }
 
     /**
@@ -320,7 +320,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . "FROM `QualityNominations` WHERE (`nomination` = 'suggestion');";
 
-        return MySQLConnection::getInstance()->GetAll($sql);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -354,7 +354,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         $sql = 'SELECT `QualityNominations`.`contents` '
             . 'FROM `QualityNominations` '
             . "WHERE (`nomination` = 'suggestion') AND `QualityNominations`.`problem_id` = " . $problemId . ';';
-        return MySQLConnection::getInstance()->GetAll($sql);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
@@ -411,7 +411,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
 
         $sql = 'SELECT DISTINCT `QualityNominations`.`problem_id` '
             . "FROM `QualityNominations` WHERE nomination = 'suggestion';";
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $nomination) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $nomination) {
             $problemId = $nomination['problem_id'];
             $contents = self::getAllSuggestionsPerProblem($problemId);
             $problemAggregates = self::calculateProblemSuggestionAggregates($contents);
@@ -491,7 +491,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
                 AND
                     status = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId, $problemId, $nomination, $contents, $status]);
 
         $qualityNominations = [];
         foreach ($rs as $row) {

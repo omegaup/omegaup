@@ -86,7 +86,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                     1;';
         $params = [$problemset_id];
 
-        $problemset = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $problemset = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($problemset)) {
             return null;
         }
@@ -123,6 +123,6 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             LIMIT
                 1;';
 
-        return MySQLConnection::getInstance()->GetOne($sql, [$user->user_id]) == '0';
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$user->user_id]) == '0';
     }
 }

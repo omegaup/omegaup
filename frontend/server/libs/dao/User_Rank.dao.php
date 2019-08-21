@@ -51,10 +51,10 @@ class UserRankDAO extends UserRankDAOBase {
             $sql_from .= ' WHERE `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sql_from .= ' WHERE `ur`.`' . MySQLConnection::getInstance()->escape($filteredBy) . '_id` = ?';
+            $sql_from .= ' WHERE `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape($filteredBy) . '_id` = ?';
         }
         if (!is_null($order)) {
-            $sql_from .= ' ORDER BY `ur`.`' . MySQLConnection::getInstance()->escape($order) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
+            $sql_from .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape($order) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         $sql_limit = '';
         $params_limit = [];
@@ -64,12 +64,12 @@ class UserRankDAO extends UserRankDAOBase {
             $sql_limit = ' LIMIT ?, ?';
         }
         // Get total rows
-        $total_rows = MySQLConnection::getInstance()->GetOne($sql_count . $sql_from, $params);
+        $total_rows = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql_count . $sql_from, $params);
 
         $params = array_merge($params, $params_limit);
 
         // Get rows
-        $allData = MySQLConnection::getInstance()->GetAll($sql . $sql_from . $sql_limit, $params);
+        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql . $sql_from . $sql_limit, $params);
         return [
             'rows' => $allData,
             'total' => $total_rows

@@ -18,7 +18,7 @@ class IdentityLoginLogDAO extends IdentityLoginLogDAOBase {
                 WHERE
                     identity_id = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
 
         $identityLoginLogs = [];
         foreach ($rs as $row) {

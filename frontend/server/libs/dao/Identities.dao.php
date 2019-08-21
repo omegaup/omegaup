@@ -24,7 +24,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $email ];
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -41,7 +41,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $username ];
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -67,7 +67,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $identityData) {
             array_push($result, new Identities($identityData));
@@ -88,7 +88,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                   i.user_id = ?
                 LIMIT
                   0, 1';
-        $rs = MySQLConnection::getInstance()->GetRow($sql, [$userId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$userId]);
         if (empty($rs)) {
             return null;
         }
@@ -125,7 +125,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $email ];
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -154,7 +154,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                   0, 1';
         $params = [ $identity_id ];
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -190,7 +190,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 LIMIT
                     1;';
         $params = [$identity_id];
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -218,7 +218,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             LIMIT 1;';
         $args = [$userId, $identityId];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $args);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
 
         return $rs['associated'] == '1';
     }
@@ -235,7 +235,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             LIMIT 1;';
         $args = [$username];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $args);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
         if (empty($rs)) {
             return null;
         }
@@ -258,7 +258,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
                 i.user_id = ?
                 ';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$userId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
         $result = [];
         foreach ($rs as $identity) {
             array_push($result, [
@@ -278,8 +278,8 @@ class IdentitiesDAO extends IdentitiesDAOBase {
             WHERE
                 identity_id = ?
         ';
-        MySQLConnection::getInstance()->Execute($sql, [$userId, $identity_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$userId, $identity_id]);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }

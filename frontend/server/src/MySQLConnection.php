@@ -1,4 +1,9 @@
 <?php
+
+namespace OmegaUp;
+
+use \DatabaseOperationException;
+
 /**
  * A minimalistic database access layer that has an interface mostly compatible
  * with ADOdb.
@@ -6,7 +11,7 @@
 class MySQLConnection {
     /**
      * The MySQLi connection.
-     * @var mysqli
+     * @var \mysqli
      */
     private $_connection;
 
@@ -157,8 +162,8 @@ class MySQLConnection {
     /**
      * Executes a MySQL query.
      */
-    private function Query(string $sql, array $params, int $resultmode) : ?mysqli_result {
-        /** @var mysqli_result|bool */
+    private function Query(string $sql, array $params, int $resultmode) : ?\mysqli_result {
+        /** @var \mysqli_result|bool */
         $result = $this->_connection->query($this->BindQueryParams($sql, $params), $resultmode);
         if ($result === false) {
             throw new DatabaseOperationException(
@@ -168,7 +173,7 @@ class MySQLConnection {
         } elseif ($result === true) {
             return null;
         }
-        /** @var mysqli_result */
+        /** @var \mysqli_result */
         return $result;
     }
 

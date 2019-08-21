@@ -311,7 +311,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             }
         }
 
-        $total = MySQLConnection::getInstance()->GetOne("SELECT COUNT(*) $sql", $args);
+        $total = \OmegaUp\MySQLConnection::getInstance()->GetOne("SELECT COUNT(*) $sql", $args);
 
         // Reset the offset to 0 if out of bounds.
         if ($offset < 0 || $offset > $total) {
@@ -328,7 +328,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql .= ' LIMIT ?, ? ';
         $args[] = (int)$offset;
         $args[] = (int)$rowcount;
-        $result = MySQLConnection::getInstance()->GetAll("{$select} {$sql};", $args);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll("{$select} {$sql};", $args);
         if (is_null($result)) {
             return [];
         }
@@ -360,7 +360,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
         $params = [$alias];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
                 return null;
         }
@@ -369,14 +369,14 @@ class ProblemsDAO extends ProblemsDAOBase {
     }
 
     final public static function searchByAlias($alias) {
-        $quoted = MySQLConnection::getInstance()->Quote($alias);
+        $quoted = \OmegaUp\MySQLConnection::getInstance()->Quote($alias);
 
         if (strpos($quoted, "'") !== false) {
             $quoted = substr($quoted, 1, strlen($quoted) - 2);
         }
 
         $sql = "SELECT * FROM Problems WHERE (alias LIKE '%$quoted%' OR title LIKE '%$quoted%') LIMIT 0,10;";
-        $rs = MySQLConnection::getInstance()->GetAll($sql);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
 
         $result = [];
 
@@ -402,7 +402,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         }
         $sql .= ';';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problem->problem_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problem->problem_id]);
         $result = [];
 
         foreach ($rs as $r) {
@@ -414,7 +414,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
     final public static function getPracticeDeadline($id) {
         $sql = 'SELECT COALESCE(UNIX_TIMESTAMP(MAX(finish_time)), 0) FROM Contests c INNER JOIN Problemset_Problems pp USING(problemset_id) WHERE pp.problem_id = ?';
-        return MySQLConnection::getInstance()->GetOne($sql, [$id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$id]);
     }
 
     public static function getProblemsSolvedCount(Identities $identity): int {
@@ -433,7 +433,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $args = [$identity->identity_id];
 
-        return MySQLConnection::getInstance()->getOne($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 
     final public static function getProblemsSolved($identityId) {
@@ -454,7 +454,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $val = [$identityId];
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
             array_push($result, new Problems($row));
         }
         return $result;
@@ -489,7 +489,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $params = [$identityId];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $r) {
@@ -546,7 +546,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 i.username ASC,
                 rp.problem_id DESC;";
 
-        return MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
     }
 
     final public static function getUnsolvedProblemsByUsersOfCourse($course_alias) {
@@ -603,7 +603,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 i.username ASC,
                 rp.problem_id DESC;";
 
-        return MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
     }
 
     final public static function isProblemSolved(
@@ -623,7 +623,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 s.problem_id = ? AND s.identity_id = ? AND r.verdict = "AC";
         ';
 
-        return MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
 
     public static function getPrivateCount(Users $user) : int {
@@ -639,7 +639,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             p.visibility <= 0 and a.owner_id = ?;';
         $params = [$user->user_id];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     public static function getExplicitAdminEmails(Problems $problem) {
@@ -669,7 +669,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         ';
 
         $params = [$problem->problem_id];
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $result = [];
         foreach ($rs as $r) {
@@ -704,7 +704,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                1;
         ';
         $params = [$problem->acl_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (!array_key_exists('name', $row)) {
                 return null;
         }
@@ -763,7 +763,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             (int)$pageSize,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -802,7 +802,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             (int)$pageSize,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -817,12 +817,12 @@ class ProblemsDAO extends ProblemsDAOBase {
     final public static function getAllProblems($page, $cols_per_page, $order, $order_type) {
         $sql = 'SELECT * from Problems where `visibility` > ? ';
         if (!is_null($order)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
             $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
         }
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_DELETED]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_DELETED]);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = new Problems($row);
@@ -856,7 +856,7 @@ class ProblemsDAO extends ProblemsDAOBase {
             );';
         $params = [$group_id, $problem_id];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $identities = [];
         foreach ($rs as $row) {
@@ -880,8 +880,8 @@ class ProblemsDAO extends ProblemsDAOBase {
             ProblemController::VISIBILITY_DELETED,
             $problem_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function hasBeenUsedInCoursesOrContests(Problems $problem) {
@@ -894,7 +894,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 s.problemset_id IS NOT NULL
                 AND s.problem_id = ?;
         ';
-        return MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id]);
     }
 
     final public static function getByContest($contest_id) {
@@ -913,7 +913,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 WHERE
                     c.contest_id = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$contest_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$contest_id]);
 
         $problems = [];
         foreach ($rs as $row) {
@@ -930,7 +930,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 WHERE
                     title = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$title]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);
 
         $problems = [];
         foreach ($rs as $row) {

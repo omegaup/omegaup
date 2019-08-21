@@ -21,7 +21,7 @@ class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
                 WHERE
                     user_id = ?;';
         $args = [$user->user_id];
-        return MySQLConnection::getInstance()->getOne($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 
     public static function isProblemForfeited(
@@ -35,6 +35,6 @@ class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
                 WHERE
                     problem_id = ? AND user_id = ?;';
         $args = [$problem->problem_id, $identity->user_id];
-        return MySQLConnection::getInstance()->GetOne($sql, $args) > 0;
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $args) > 0;
     }
 }

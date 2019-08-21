@@ -18,7 +18,7 @@ class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
                 WHERE
                     difficulty = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$difficulty]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$difficulty]);
 
         $problemsOfTheWeek = [];
         foreach ($rs as $row) {

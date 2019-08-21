@@ -15,7 +15,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -32,7 +32,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
             WHERE
                 s.guid = ?;
         ';
-        MySQLConnection::getInstance()->Execute($sql, [$guid]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$guid]);
     }
 
     /**
@@ -51,7 +51,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemId];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -74,7 +74,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemId, $problemsetId];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -93,7 +93,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemsetId];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -132,6 +132,6 @@ class SubmissionsDAO extends SubmissionsDAOBase {
             $val = [$identityId, $problemId, $problemsetId];
         }
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 }

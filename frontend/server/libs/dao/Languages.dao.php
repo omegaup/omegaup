@@ -28,7 +28,7 @@ class LanguagesDAO extends LanguagesDAOBase {
                 LIMIT
                     0, 1;';
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }
