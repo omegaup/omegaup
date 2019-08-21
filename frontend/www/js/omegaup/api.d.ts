@@ -1,4 +1,17 @@
 declare namespace omegaup {
+  export interface Assignment {
+    alias: string;
+    assignment_type: string,
+    description: string;
+    finish_time: Date;
+    has_runs: boolean;
+    name: string;
+    order: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    start_time: Date;
+  }
+
   export interface Badge {
     badge_alias: string;
     assignation_time?: Date;

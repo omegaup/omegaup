@@ -160,7 +160,7 @@ OmegaUp.on('ready', function() {
     el: '#assignments div.list',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentlist', {
-        props: {T: T, assignments: this.assignments, courseAlias: courseAlias},
+        props: {assignments: this.assignments, courseAlias: courseAlias},
         on: {
           'edit': function(assignment) {
             assignmentDetails.show = true;
@@ -225,12 +225,8 @@ OmegaUp.on('ready', function() {
     el: '#assignments div.form',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentdetails', {
-        props: {
-          T: T,
-          show: this.show,
-          update: this.update,
-          assignment: this.assignment
-        },
+        props:
+            {show: this.show, update: this.update, assignment: this.assignment},
         on: {
           submit: function(ev) {
             if (ev.update) {

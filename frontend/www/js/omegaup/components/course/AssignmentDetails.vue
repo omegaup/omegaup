@@ -84,55 +84,58 @@
   </div>
 </template>
 
-<script>
-import DateTimePicker from '../DateTimePicker.vue';
-
-export default {
-  props: {
-    T: Object,
-    update: Boolean,
-    assignment: Object,
-    show: {
-      type: Boolean,
-      'default': false,
-    },
-  },
-  data: function() {
-    return {
-      alias: this.assignment.alias,
-      assignmentType: this.assignment.assignment_type || 'homework',
-      description: this.assignment.description,
-      finishTime: this.assignment.finish_time || new Date(),
-      name: this.assignment.name,
-      startTime: this.assignment.start_time || new Date(),
-    };
-  },
-  watch: {
-    assignment: function(val) { this.reset();},
-  },
-  methods: {
-    reset: function() {
-      this.alias = this.assignment.alias;
-      this.assignmentType = this.assignment.assignment_type || 'homework';
-      this.description = this.assignment.description;
-      this.finishTime = this.assignment.finish_time || new Date();
-      this.name = this.assignment.name;
-      this.startTime = this.assignment.start_time || new Date();
-    },
-    onSubmit: function() { this.$emit('submit', this);},
-    onCancel: function() {
-      this.reset();
-      this.$emit('cancel');
-    },
-  },
-  components: {
-    'omegaup-datetimepicker': DateTimePicker,
-  },
-};
-</script>
-
 <style>
 .omegaup-course-assignmentdetails .form-group>label {
   width: 100%;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
+import DateTimePicker from '../DateTimePicker.vue';
+
+@Component({
+  components: {
+    'omegaup-datetimepicker': DateTimePicker,
+  },
+})
+export default class CourseAssignmentDetails extends Vue {
+  @Prop() update!: boolean;
+  @Prop() assignment!: omegaup.Assignment;
+  @Prop({ default: false }) show!: boolean;
+
+  T = T;
+  alias = this.assignment.alias || '';
+  assignmentType = this.assignment.assignment_type || 'homework';
+  description = this.assignment.description || '';
+  name = this.assignment.name || '';
+  startTime = this.assignment.start_time || new Date();
+  finishTime = this.assignment.finish_time || new Date();
+
+  @Watch('assignment')
+  onAssignmentChange() {
+    this.reset();
+  }
+
+  reset(): void {
+    this.alias = this.assignment.alias;
+    this.assignmentType = this.assignment.assignment_type || 'homework';
+    this.description = this.assignment.description;
+    this.finishTime = this.assignment.finish_time || new Date();
+    this.name = this.assignment.name;
+    this.startTime = this.assignment.start_time || new Date();
+  }
+
+  onCancel(): void {
+    this.reset();
+    this.$emit('cancel');
+  }
+
+  onSubmit(): void {
+    this.$emit('submit', this);
+  }
+}
+
+</script>
