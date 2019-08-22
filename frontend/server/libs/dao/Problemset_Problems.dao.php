@@ -10,26 +10,6 @@ include('base/Problemset_Problems.vo.base.php');
   *
   */
 class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
-    final public static function getProblems($problemset_id) {
-        // Build SQL statement
-        $sql = '
-            SELECT
-                p.problem_id, p.title, p.alias, p.languages, pp.points,
-                pp.commit, pp.order, pp.version
-            FROM
-                Problems p
-            INNER JOIN
-                Problemset_Problems pp ON pp.problem_id = p.problem_id
-            WHERE
-                pp.problemset_id = ?
-            ORDER BY
-                pp.`order`, `pp`.`problem_id` ASC;
-        ';
-        $val = [$problemset_id];
-
-        return MySQLConnection::getInstance()->GetAll($sql, $val);
-    }
-
     final public static function getProblemsAssignmentByCourseAlias(
         Courses $course
     ) : array {
@@ -98,14 +78,22 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     /*
      * Get problemset problems including problemset alias, points, and order
      */
-    final public static function getProblemsetProblems(int $problemsetId) {
+    final public static function getProblemsByProblemset(
+        int $problemsetId
+    ) : array {
         // Build SQL statement
         $sql = 'SELECT
+                    p.title,
                     p.problem_id,
                     p.alias,
                     p.visibility,
-                    pp.points,
+                    p.visits,
+                    p.submissions,
+                    p.accepted,
+                    p.difficulty,
                     pp.order,
+                    p.languages,
+                    pp.points,
                     pp.commit,
                     pp.version
                 FROM
@@ -118,8 +106,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     pp.problemset_id = ?
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
-        $val = [$problemsetId];
-        return MySQLConnection::getInstance()->GetAll($sql, $val);
+
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
 
     /*
@@ -207,39 +195,6 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         ];
         MySQLConnection::getInstance()->Execute($sql, $params);
         return MySQLConnection::getInstance()->Affected_Rows();
-    }
-
-    final public static function getProblemsByProblemset($problemset_id) {
-        $sql = 'SELECT
-                    p.title,
-                    p.alias,
-                    p.visits,
-                    p.submissions,
-                    p.accepted,
-                    p.difficulty,
-                    p.order,
-                    p.languages,
-                    pp.points,
-                    pp.commit,
-                    pp.version
-                FROM
-                    Problems p
-                INNER JOIN
-                    Problemset_Problems pp
-                ON
-                    p.problem_id = pp.problem_id
-                WHERE
-                    pp.problemset_id = ?
-                ORDER BY
-                    pp.order, pp.problem_id ASC;';
-
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
-
-        $problems = [];
-        foreach ($rs as $row) {
-            array_push($problems, $row);
-        }
-        return $problems;
     }
 
     /*
