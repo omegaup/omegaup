@@ -1020,8 +1020,7 @@ class CourseController extends Controller {
         }
 
         $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
-            $r['assignment']->problemset_id,
-            /*shouldGetProblemsetProblemOrder=*/ true
+            $r['assignment']->problemset_id
         );
         $letter = 0;
         foreach ($problems as &$problem) {
@@ -1741,8 +1740,7 @@ class CourseController extends Controller {
         );
 
         $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
-            $tokenAuthenticationResult['assignment']->problemset_id,
-            /*shouldGetProblemsetProblemOrder=*/ true
+            $tokenAuthenticationResult['assignment']->problemset_id
         );
         $letter = 0;
         foreach ($problems as &$problem) {

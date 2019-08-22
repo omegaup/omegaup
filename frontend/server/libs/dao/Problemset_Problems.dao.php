@@ -79,8 +79,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      * Get problemset problems including problemset alias, points, and order
      */
     final public static function getProblemsByProblemset(
-        int $problemsetId,
-        bool $shouldGetProblemsetProblemOrder
+        int $problemsetId
     ) : array {
         // Build SQL statement
         $sql = 'SELECT
@@ -92,8 +91,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     p.submissions,
                     p.accepted,
                     p.difficulty,
-                    p.order AS problem_order,
-                    pp.order AS problemset_problem_order,
+                    pp.order,
                     p.languages,
                     pp.points,
                     pp.commit,
@@ -109,26 +107,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
-
-        $problems = [];
-        foreach ($rs as $row) {
-            if ($shouldGetProblemsetProblemOrder) {
-                $row['order'] = $row['problemset_problem_order'];
-                unset($row['visits']);
-                unset($row['submissions']);
-                unset($row['accepted']);
-                unset($row['difficulty']);
-            } else {
-                $row['order'] = $row['problem_order'];
-                unset($row['problem_id']);
-                unset($row['visibility']);
-            }
-            unset($row['problem_order']);
-            unset($row['problemset_problem_order']);
-            array_push($problems, $row);
-        }
-        return $problems;
+        return MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
 
     /*
