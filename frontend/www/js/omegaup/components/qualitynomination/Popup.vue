@@ -289,9 +289,7 @@ export default class QualityNominationPopup extends Vue {
     this.currentView = 'thanks';
     this.localNominated = true;
 
-    setTimeout(() => {
-      this.onHide(false);
-    }, 1000);
+    setTimeout(() => this.onHide(false), 1000);
   }
 
   @Watch('dismissed')
