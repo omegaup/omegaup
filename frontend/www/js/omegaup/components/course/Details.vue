@@ -131,74 +131,6 @@
   </div>
 </template>
 
-<script>
-import UI from '../../ui.js';
-import DatePicker from '../DatePicker.vue';
-
-export default {
-  props: {
-    T: Object,
-    update: Boolean,
-    course: Object,
-  },
-  data: function() {
-    return {
-      alias: this.course.alias,
-      description: this.course.description,
-      finishTime: this.course.finish_time || new Date(),
-      showScoreboard: !!this.course.show_scoreboard,
-      startTime: this.course.start_time || new Date(),
-      name: this.course.name,
-      school_id: this.course.school_id,
-      school_name: this.course.school_name,
-      basic_information_required: !!this.course.basic_information_required,
-      requests_user_information: this.course.requests_user_information || 'no'
-    };
-  },
-  mounted: function() {
-    let self = this;
-    UI.schoolTypeahead($('input.typeahead', self.$el), function(event, item) {
-      self.school_name = item.value;
-      self.school_id = item.id;
-    });
-  },
-  watch: {
-    course: function(val) { this.reset();},
-  },
-  methods: {
-    reset: function() {
-      this.alias = this.course.alias;
-      this.description = this.course.description;
-      this.finishTime = this.course.finish_time || new Date();
-      this.showScoreboard = !!this.course.show_scoreboard;
-      this.startTime = this.course.start_time || new Date();
-      this.name = this.course.name;
-      this.school_id = this.course.school_id;
-      this.school_name = this.course.school_name;
-      this.basic_information_required =
-          !!this.course.basic_information_required;
-      this.requests_user_information =
-          this.course.requests_user_information || 'no';
-    },
-    onSubmit: function() { this.$emit('submit', this);},
-    onCancel: function() {
-      this.reset();
-      this.$emit('cancel');
-    },
-    onChange: function() {
-      if (this.course.school_id == this.school_id) {
-        this.school_id = null;
-      } else {
-        this.course.school_id = this.school_id;
-      }
-    }
-  },
-  components: {
-    'omegaup-datepicker': DatePicker,
-  },
-};
-</script>
-
 <style>
 .omegaup-course-details .form-group>label {
   width: 100%;
@@ -207,3 +139,82 @@ export default {
   font-weight: bold;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import DatePicker from '../DatePicker.vue';
+
+@Component({
+  components: {
+    'omegaup-datepicker': DatePicker,
+  },
+})
+export default class CourseDetails extends Vue {
+  @Prop() update!: boolean;
+  @Prop() course!: omegaup.Course;
+
+  UI = UI;
+  T = T;
+  alias = this.course.alias || '';
+  description = this.course.description || '';
+  finishTime = this.course.finish_time || new Date();
+  showScoreboard = !!this.course.show_scoreboard;
+  startTime = this.course.start_time || new Date();
+  name = this.course.name || '';
+  school_id = this.course.school_id || -1;
+  school_name = this.course.school_name || '';
+  basic_information_required = !!this.course.basic_information_required;
+  requests_user_information = this.course.requests_user_information || 'no';
+
+  mounted(): void {
+    let self = this;
+    this.UI.schoolTypeahead($('input.typeahead', self.$el), function(
+      event: Event,
+      item: any,
+    ) {
+      self.school_name = item.value;
+      self.school_id = item.id;
+    });
+  }
+
+  @Watch('course')
+  onCourseChange() {
+    this.reset();
+  }
+
+  reset(): void {
+    this.alias = this.course.alias || '';
+    this.description = this.course.description || '';
+    this.finishTime = this.course.finish_time || new Date();
+    this.showScoreboard = !!this.course.show_scoreboard;
+    this.startTime = this.course.start_time || new Date();
+    this.name = this.course.name || '';
+    this.school_id = this.course.school_id || -1;
+    this.school_name = this.course.school_name || '';
+    this.basic_information_required = !!this.course.basic_information_required;
+    this.requests_user_information =
+      this.course.requests_user_information || 'no';
+  }
+
+  onSubmit(): void {
+    this.$emit('submit', this);
+  }
+
+  @Emit('cancel')
+  onCancel(): void {
+    this.reset();
+  }
+
+  onChange(): void {
+    if (this.course.school_id === this.school_id) {
+      this.school_id = -1;
+    } else {
+      this.course.school_id = this.school_id;
+    }
+  }
+}
+
+</script>

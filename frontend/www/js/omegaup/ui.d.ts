@@ -9,6 +9,7 @@ declare namespace omegaup {
     markdownConverter: (options?: MarkdownConverterOptions) => Converter;
     navigateTo: (url: string) => void;
     userTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
+    schoolTypeahead: (elem: any, cb: (event: HTMLEvent, val: any) => void) => void;
   };
 
   interface MarkdownConverterOptions {

@@ -297,11 +297,11 @@ OmegaUp.on('ready', function() {
     el: '#edit div',
     render: function(createElement) {
       return createElement('omegaup-course-details', {
-        props: {T: T, update: true, course: this.course},
+        props: {update: true, course: this.course},
         on: {
           submit: function(ev) {
             var schoolIdDeferred = $.Deferred();
-            if (ev.school_id) {
+            if (ev.school_id !== -1) {
               schoolIdDeferred.resolve(ev.school_id);
             } else if (ev.school_name) {
               API.School.create({name: ev.school_name})
