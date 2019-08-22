@@ -46,25 +46,26 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
 import DateTime from '../DateTimePicker.vue';
 
-export default {
-  data: function() {
-    return {
-      T: T,
-      title: '',
-      alias: '',
-      description: '',
-      startTime: new Date(),
-    };
-  },
-  methods: {
-    onSubmit: function() { this.$parent.$emit('clone-contest', this);},
-  },
+@Component({
   components: {
     'omegaup-datetime': DateTime,
   },
-};
+})
+export default class Clone extends Vue {
+  T = T;
+  title = '';
+  alias = '';
+  description = '';
+  startTime = new Date();
+
+  onSubmit() { this.$parent.$emit('clone-contest', this);}
+}
+
 </script>

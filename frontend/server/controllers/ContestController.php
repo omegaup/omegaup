@@ -840,6 +840,12 @@ class ContestController extends Controller {
             $r->identity
         );
 
+        // Validates form
+        Validators::validateValidAlias($r['alias'], 'alias', true);
+        Validators::validateStringNonEmpty($r['title'], 'title', true);
+        Validators::validateStringNonEmpty($r['description'], 'description', true);
+        $r->ensureInt('start_time', null, null, true);
+
         $length = $originalContest->finish_time - $originalContest->start_time;
 
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
