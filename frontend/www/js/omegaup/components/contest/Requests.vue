@@ -20,7 +20,7 @@
           <td>{{ request.username }}</td>
           <td>{{ request.country }}</td>
           <td>{{ request.request_time }}</td>
-          <td v-if="request.accepted == null">{{ T.wordsPending }}</td>
+          <td v-if="request.last_update == null">{{ T.wordsPending }}</td>
           <td v-else-if="request.accepted == 'true' || request.accepted == '1'">{{ T.wordAccepted
           }}</td>
           <td v-else="">{{ T.wordsDenied }}</td>
@@ -40,23 +40,24 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-export default {
-  props: {data: Array},
-  data: function() {
-    return {
-      T: T,
-      requests: this.data,
-    };
-  },
-  methods: {
-    onAcceptRequest: function(username) {
-      this.$parent.$emit('accept-request', this, username);
-    },
-    onDenyRequest: function(username) {
-      this.$parent.$emit('deny-request', this, username);
-    },
-  },
-};
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
+
+@Component({})
+export default class Requests extends Vue {
+  @Prop() data!: omegaup.IdentityContestRequest[];
+
+  T = T;
+  requests = this.data;
+
+  onAcceptRequest(username: string): void {
+    this.$parent.$emit('accept-request', this, username);
+  }
+  onDenyRequest(username: string): void {
+    this.$parent.$emit('deny-request', this, username);
+  }
+}
+
 </script>
