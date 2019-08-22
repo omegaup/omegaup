@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-md-6">
           <form class="form"
-                v-on:submit.prevent="$emit('add-admin', adminUsername);">
+                v-on:submit.prevent="$emit('add-admin', adminUsername)">
             <div class="form-group">
               <label>{{ T.wordsAdmin }}</label> <span aria-hidden="true"
                    class="glyphicon glyphicon-info-sign"
@@ -48,7 +48,7 @@
                 <td><button class="close"
                         type="button"
                         v-if="admin.role != 'site-admin' &amp;&amp; admin.role != 'owner'"
-                        v-on:click="$emit('removeAdmin', admin);">×</button></td>
+                        v-on:click="$emit('removeAdmin', admin)">×</button></td>
               </tr>
             </tbody>
           </table>
@@ -93,7 +93,7 @@
                 </td>
                 <td><button class="close"
                         type="button"
-                        v-on:click="$emit('removeGroupAdmin', group);">×</button></td>
+                        v-on:click="$emit('removeGroupAdmin', group)">×</button></td>
               </tr>
             </tbody>
           </table>

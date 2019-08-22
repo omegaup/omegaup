@@ -91,7 +91,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 import omegaup from '../../api.js';
 import DateTimePicker from '../DateTimePicker.vue';
@@ -128,9 +128,9 @@ export default class CourseAssignmentDetails extends Vue {
     this.startTime = this.assignment.start_time || new Date();
   }
 
+  @Emit('cancel')
   onCancel(): void {
     this.reset();
-    this.$emit('cancel');
   }
 
   onSubmit(): void {
