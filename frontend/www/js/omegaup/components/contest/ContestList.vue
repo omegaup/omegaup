@@ -128,27 +128,31 @@ export default class List extends Vue {
   T = T;
   UI = UI;
 
-  makeWorldClockLink(date: Date) : string {
+  makeWorldClockLink(date: Date): string {
     if (!date) {
       return '#';
     }
-    return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' +
-           date.toISOString();
+    return (
+      'https://timeanddate.com/worldclock/fixedtime.html?iso=' +
+      date.toISOString()
+    );
   }
 
   @Emit('bulk-update')
-  onBulkUpdate(admissionMode: string) : string {
+  onBulkUpdate(admissionMode: string): string {
     return admissionMode;
   }
 
   @Emit('toggle-show-admin')
-  onShowAdmin() : boolean {
-    const input = this.$el.querySelector('.show-admin-contests') as HTMLInputElement;
+  onShowAdmin(): boolean {
+    const input = this.$el.querySelector(
+      '.show-admin-contests',
+    ) as HTMLInputElement;
     return input.checked;
   }
 
   @Emit('download-csv-users')
-  onDownloadCsv(contestAlias: string) : string {
+  onDownloadCsv(contestAlias: string): string {
     return contestAlias;
   }
 }

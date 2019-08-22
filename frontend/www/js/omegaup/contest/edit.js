@@ -110,15 +110,15 @@ OmegaUp.on('ready', function() {
                 },
                 'runs-diff': (ev, versions, selectedCommit) => {
                   API.Contest.runsDiff({
-                    problem_alias: ev.alias,
-                    contest_alias: ev.contestAlias,
-                    version: selectedCommit.version,
-                  })
-                  .then(function(response) {
-                    versions.$set(versions.runsDiff, selectedCommit.version,
-                      response.diff);
-                  })
-                  .fail(UI.apiError);
+                               problem_alias: ev.alias,
+                               contest_alias: ev.contestAlias,
+                               version: selectedCommit.version,
+                             })
+                      .then(function(response) {
+                        versions.$set(versions.runsDiff, selectedCommit.version,
+                                      response.diff);
+                      })
+                      .fail(UI.apiError);
                 },
                 'get-versions': (problemAlias, problemComponent) => {
                   API.Problem.versions({problem_alias: problemAlias})
@@ -137,7 +137,8 @@ OmegaUp.on('ready', function() {
                         }
                         for (const revision of result.log) {
                           if (publishedCommitHash == revision.commit) {
-                            problemComponent.selectedRevision = problemComponent.publishedRevision = revision;
+                            problemComponent.selectedRevision =
+                                problemComponent.publishedRevision = revision;
                             break;
                           }
                         }

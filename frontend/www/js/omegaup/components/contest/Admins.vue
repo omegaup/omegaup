@@ -67,9 +67,11 @@ export default class Admins extends Vue {
   admins = this.data;
   selected = {};
 
-  onSubmit() : void { this.$parent.$emit('add-admin', this);}
+  onSubmit(): void {
+    this.$parent.$emit('add-admin', this);
+  }
 
-  onRemove(admin: omegaup.UserRole) : void {
+  onRemove(admin: omegaup.UserRole): void {
     this.selected = admin;
     this.$parent.$emit('remove-admin', this);
   }

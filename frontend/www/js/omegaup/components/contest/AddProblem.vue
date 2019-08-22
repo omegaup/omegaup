@@ -77,16 +77,20 @@ import problem_Versions from '../problem/Versions.vue';
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() data!: omegaup.Problem[];
-  @Prop({default: () => { return {
-      author: null,
-      commit: '',
-      commiter: null,
-      message: '',
-      parents: [],
-      tree: {},
-      version: '',
-    }}
-  }) emptyCommit!: omegaup.Commit;
+  @Prop({
+    default: () => {
+      return {
+        author: null,
+        commit: '',
+        commiter: null,
+        message: '',
+        parents: [],
+        tree: {},
+        version: '',
+      };
+    },
+  })
+  emptyCommit!: omegaup.Commit;
 
   T = T;
   UI = UI;
@@ -99,7 +103,9 @@ export default class AddProblem extends Vue {
   publishedRevision = this.emptyCommit;
   selectedRevision = this.emptyCommit;
 
-  onSubmit(): void { this.$parent.$emit('add-problem', this);}
+  onSubmit(): void {
+    this.$parent.$emit('add-problem', this);
+  }
 
   onEdit(problem: omegaup.Problem): void {
     this.alias = problem.alias;
