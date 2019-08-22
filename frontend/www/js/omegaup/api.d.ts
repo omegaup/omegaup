@@ -100,9 +100,7 @@ declare namespace omegaup {
     group: omegaup.DetailsGroup[];
   }
 
-  export interface Identity {
-    name: string;
-    username: string;
+  export interface Identity extends User {
     school: string;
     school_id: number;
     country_id: string;
@@ -130,6 +128,27 @@ declare namespace omegaup {
     memory: number;
   }
 
+  export interface NominationVote {
+    time: number;
+    vote: number;
+    user: User;
+  }
+
+  export interface Nomination {
+    author: User;
+    author_name: string;
+    author_username: string;
+    nomination: string;
+    nominator: User;
+    nominator_name: string;
+    nominator_username: string;
+    problem: Problem;
+    quality_nomination_id: number;
+    status: string;
+    time: string;
+    votes: NominationVote[];
+  }
+
   export interface Notification {
     notification_id: number;
     contents: NotificationContents;
@@ -139,6 +158,14 @@ declare namespace omegaup {
   export interface NotificationContents {
     type: string;
     badge?: string;
+  }
+
+  export interface Profile extends User {
+    email: string;
+    country_id: string;
+    gravatar_92: string;
+    rankinfo: RankInfo;
+    classname: string;
   }
 
   export interface Problem {
@@ -159,16 +186,6 @@ declare namespace omegaup {
     title: string;
     version?: string;
     visibility?: number;
-  }
-
-  export interface Profile {
-    username: string;
-    name: string;
-    email: string;
-    country_id: string;
-    gravatar_92: string;
-    rankinfo: RankInfo;
-    classname: string;
   }
 
   export interface QueryParameters {
@@ -250,6 +267,11 @@ declare namespace omegaup {
 
   export interface UserRole {
     role: string;
+    username: string;
+  }
+
+  export interface User {
+    name: string;
     username: string;
   }
 
