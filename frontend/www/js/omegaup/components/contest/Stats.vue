@@ -13,30 +13,29 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
 import verdict_chart from '../VerdictChart.vue';
 import distribution_chart from '../DistributionChart.vue';
 
-export default {
-  props: {
-    stats: Object,
-    contestAlias: String,
-  },
-  computed: {
-    totalRuns: function() {
-      return omegaup.UI.formatString(omegaup.T.totalRuns,
-                                     {numRuns: this.stats.total_runs});
-    }
-  },
+@Component({
   components: {
     'omegaup-verdict-chart': verdict_chart,
     'omegaup-distribution-chart': distribution_chart,
   },
-  data: function() {
-    return {
-      T: T,
-    };
-  },
-};
+})
+export default class Stats extends Vue {
+  @Prop() stats!: omegaup.Stats;
+  @Prop() contestAlias!: string;
+
+  T = T;
+
+  get totalRuns(): string {
+    return UI.formatString(T.totalRuns, { numRuns: this.stats.total_runs });
+  }
+}
+
 </script>
