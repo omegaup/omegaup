@@ -4,18 +4,15 @@
       <div class="row">
         <div class="col-md-6">
           <form class="form"
-                v-on:submit.prevent="onAddAdmin">
+                v-on:submit.prevent="$emit('add-admin', adminUsername)">
             <div class="form-group">
               <label>{{ T.wordsAdmin }}</label> <span aria-hidden="true"
                    class="glyphicon glyphicon-info-sign"
                    data-placement="top"
                    data-toggle="tooltip"
-                   v-bind:title="T.courseEditAddAdminsTooltip"></span> <input autocomplete="off"
-                   class="form-control typeahead"
-                   name="useradmin"
-                   size="20"
-                   type="text"
-                   v-model="useradmin">
+                   v-bind:title="T.courseEditAddAdminsTooltip"></span>
+                   <omegaup-autocomplete v-bind:init="el =&gt; UI.userTypeahead(el)"
+                   v-model="adminUsername"></omegaup-autocomplete>
             </div>
             <div class="form-group pull-right">
               <label><input name="toggle-site-admins"
@@ -24,7 +21,7 @@
                      "btn btn-primary"
                    type="submit">{{ T.wordsAddAdmin }}</button> <button class="btn btn-secondary"
                    type="reset"
-                   v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
+                   v-on:click.prevent="$emit('cancel')">{{ T.wordsCancel }}</button>
             </div>
           </form>
           <div v-if="admins.length == 0">
@@ -51,26 +48,22 @@
                 <td><button class="close"
                         type="button"
                         v-if="admin.role != 'site-admin' &amp;&amp; admin.role != 'owner'"
-                        v-on:click="onRemoveAdmin(admin)">×</button></td>
+                        v-on:click="$emit('removeAdmin', admin)">×</button></td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="col-md-6">
           <form class="form"
-                v-on:submit.prevent="onAddGroupAdmin">
+                v-on:submit.prevent="$emit('add-group-admin', adminGroup)">
             <div class="form-group">
               <label>{{ T.wordsGroupAdmin }}</label> <span aria-hidden="true"
                    class="glyphicon glyphicon-info-sign"
                    data-placement="top"
                    data-toggle="tooltip"
-                   v-bind:title="T.courseEditAddGroupAdminsTooltip"></span> <input autocomplete=
-                   "off"
-                   class="form-control typeahead"
-                   name="groupadmin"
-                   size="20"
-                   type="text"
-                   v-model="groupadmin">
+                   v-bind:title="T.courseEditAddGroupAdminsTooltip"></span>
+                   <omegaup-autocomplete v-bind:init="el =&gt; UI.userTypeahead(el)"
+                   v-model="adminGroup"></omegaup-autocomplete>
             </div>
             <div class="form-group pull-right">
               <button class="btn btn-primary"
@@ -96,11 +89,11 @@
             <tbody>
               <tr v-for="group in groupadmins">
                 <td>
-                  <a v-bind:href="adminGroupEdit(group)">{{ group.name || group.username }}</a>
+                  <a v-bind:href="adminGroupEdit(group)">{{ group.name }}</a>
                 </td>
                 <td><button class="close"
                         type="button"
-                        v-on:click="onRemoveGroupAdmin(group)">×</button></td>
+                        v-on:click="$emit('removeGroupAdmin', group)">×</button></td>
               </tr>
             </tbody>
           </table>
@@ -110,58 +103,35 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
-import {T} from '../../omegaup.js';
+import Autocomplete from '../Autocomplete.vue';
 
-export default {
-  props: {
-    admins: Array,
-    groupadmins: Array,
+@Component({
+  components: {
+    'omegaup-autocomplete': Autocomplete,
   },
-  data: function() {
-    return {T: T, useradmin: '', groupadmin: '', showSiteAdmins: false};
-  },
-  mounted: function() {
-    let self = this;
-    UI.userTypeahead(
-        $('input.typeahead[name="useradmin"]', self.$el),
-        function(event, item) { self.adminUsername = item.value; });
-    UI.groupTypeahead($('input.typeahead[name="groupadmin"]', self.$el),
-                      function(event, item) { self.adminGroup = item.value; });
-  },
-  methods: {
-    onAddAdmin: function() {
-      let hintElem = $('input.typeahead.tt-hint', this.$el);
-      let hint = hintElem.val();
-      if (hint) {
-        // There is a hint currently visible in the UI, the user likely
-        // expects that hint to be used when trying to add someone, instead
-        // of what they've actually typed so far.
-        this.adminUsername = hint;
-      }
-      this.$emit('add-admin', this.adminUsername);
-    },
-    onAddGroupAdmin: function() {
-      let hintElem = $('input.typeahead.tt-hint', this.$el);
-      let hint = hintElem.val();
-      if (hint) {
-        // There is a hint currently visible in the UI, the user likely
-        // expects that hint to be used when trying to add someone, instead
-        // of what they've actually typed so far.
-        this.adminGroup = hint;
-      }
-      this.$emit('add-group-admin', this.adminGroup);
-    },
-    onCancel: function() { this.$emit('cancel');},
-    onRemoveAdmin: function(admin) { this.$emit('removeAdmin', admin);},
-    onRemoveGroupAdmin: function(group) {
-      this.$emit('removeGroupAdmin', group);
-    },
-    adminProfile: function(admin) { return '/profile/' + admin.username + '/';},
-    adminGroupEdit: function(admingroup) {
-      return '/group/' + admingroup.alias + '/edit/';
-    },
-  },
-};
+})
+export default class CourseAdministrators extends Vue {
+  @Prop() admins!: omegaup.CourseAdmin[];
+  @Prop() groupadmins!: omegaup.CourseGroupAdmin[];
+
+  T = T;
+  UI = UI;
+  showSiteAdmins = false;
+  adminUsername = '';
+  adminGroup = '';
+
+  adminProfile(admin: omegaup.CourseAdmin): string {
+    return `/profile/${admin.username}/`;
+  }
+
+  adminGroupEdit(admingroup: omegaup.CourseGroupAdmin): string {
+    return `/group/${admingroup.alias}/edit/`;
+  }
+}
+
 </script>
