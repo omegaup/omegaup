@@ -43,35 +43,36 @@
   </div>
 </template>
 
-<script>
-import {T, UI} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
 import Autocomplete from '../Autocomplete.vue';
 import user_Username from '../user/Username.vue';
 
-export default {
-  props: {
-    data: Array,
-  },
-  data: function() {
-    return {
-      T: T,
-      UI: UI,
-      user: '',
-      showSiteAdmin: false,
-      admins: this.data,
-      selected: {},
-    };
-  },
-  methods: {
-    onSubmit: function() { this.$parent.$emit('add-admin', this);},
-    onRemove: function(admin) {
-      this.selected = admin;
-      this.$parent.$emit('remove-admin', this);
-    },
-  },
+@Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
     'omegaup-user-username': user_Username,
   },
+})
+export default class Admins extends Vue {
+  @Prop() data!: omegaup.UserRole[];
+
+  T = T;
+  UI = UI;
+  user = '';
+  showSiteAdmin = false;
+  admins = this.data;
+  selected = {};
+
+  onSubmit() : void { this.$parent.$emit('add-admin', this);}
+
+  onRemove(admin: omegaup.UserRole) : void {
+    this.selected = admin;
+    this.$parent.$emit('remove-admin', this);
+  }
 }
+
 </script>
