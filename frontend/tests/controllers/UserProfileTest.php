@@ -216,9 +216,9 @@ class UserProfileTest extends OmegaupTestCase {
         //Submission gap between runs must be 60 seconds
         $runs = [];
         $runs[0] = RunsFactory::createRun($problemOne, $contest, $user);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runs[1] = RunsFactory::createRun($problemTwo, $contest, $user);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runs[2] = RunsFactory::createRun($problemOne, $contest, $user);
 
         RunsFactory::gradeRun($runs[0]);

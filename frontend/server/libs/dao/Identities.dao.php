@@ -131,7 +131,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         }
         return [
           // Asks whether request was made on the last day
-          'within_last_day' => Time::get() - ((int)$rs['reset_sent_at']) < 60 * 60 * 24,
+          'within_last_day' => \OmegaUp\Time::get() - ((int)$rs['reset_sent_at']) < 60 * 60 * 24,
           'verified' => $rs['verified'] == 1,
           'username' => $rs['username'],
           'last_login' => is_null($rs['last_login']) ? null : ((int)$rs['last_login']),

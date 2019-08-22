@@ -1479,7 +1479,7 @@ class ProblemController extends Controller {
                 ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
                     'problem_id' => $problem->problem_id,
-                    'open_time' => Time::get(),
+                    'open_time' => \OmegaUp\Time::get(),
                     'identity_id' => $r->identity->identity_id
                 ]));
             }

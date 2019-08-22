@@ -23,7 +23,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         bool $grantAccess = false,
         bool $shareUserInformation = false
     ) : ProblemsetIdentities {
-        $currentTime = Time::get();
+        $currentTime = \OmegaUp\Time::get();
         $problemsetIdentity  = self::getByPK(
             $identity->identity_id,
             $container->problemset_id

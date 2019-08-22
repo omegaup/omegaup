@@ -48,7 +48,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
 
         // Mock time
         $currentTime = time();
-        Time::setTimeForTesting($currentTime);
+        \OmegaUp\Time::setTimeForTesting($currentTime);
         \OmegaUp\MySQLConnection::getInstance()->Execute("SET TIMESTAMP = {$currentTime};");
 
         //Clean $_REQUEST before each test

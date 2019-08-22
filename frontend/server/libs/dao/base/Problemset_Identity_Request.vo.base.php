@@ -52,7 +52,7 @@ class ProblemsetIdentityRequest extends VO {
              */
             $this->request_time = DAO::fromMySQLTimestamp($data['request_time']);
         } else {
-            $this->request_time = Time::get();
+            $this->request_time = \OmegaUp\Time::get();
         }
         if (isset($data['last_update'])) {
             /**

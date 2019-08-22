@@ -45,14 +45,14 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
     ) : bool {
         if (is_null($problemsetIdentity)) {
             return isset($container->finish_time) &&
-                   (Time::get() > $container->finish_time);
+                   (\OmegaUp\Time::get() > $container->finish_time);
         }
-        return Time::get() > $problemsetIdentity->end_time;
+        return \OmegaUp\Time::get() > $problemsetIdentity->end_time;
     }
 
     public static function isSubmissionWindowOpen(Object $container) : bool {
         return isset($container->start_time) &&
-                Time::get() >= $container->start_time;
+                \OmegaUp\Time::get() >= $container->start_time;
     }
 
     public static function getWithTypeByPK($problemset_id) {

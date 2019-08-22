@@ -18,7 +18,7 @@ class VirtualContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Let assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         // Create a new contestant
         $contestant = UserFactory::createUser();
@@ -80,7 +80,7 @@ class VirtualContestTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]);
 
-        Time::setTimeForTesting(Time::get() - 100);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() - 100);
 
         try {
             $response = ContestController::apiCreateVirtual($r);
@@ -101,7 +101,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Lets assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
         $r = new Request([
@@ -139,7 +139,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Lets assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
         $r = new Request([
@@ -170,7 +170,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Lets assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
         $r = new Request([

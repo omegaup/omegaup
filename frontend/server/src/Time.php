@@ -1,5 +1,7 @@
 <?php
 
+namespace OmegaUp;
+
 /**
  *
  * @author juan.pablo
@@ -18,7 +20,7 @@ class Time {
     /**
      * @param int|null $time
      */
-    public static function setTimeForTesting($time) : void {
+    public static function setTimeForTesting(?int $time) : void {
         self::$time = $time;
     }
 }

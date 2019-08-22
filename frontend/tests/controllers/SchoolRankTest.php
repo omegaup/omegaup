@@ -43,10 +43,10 @@ class SchoolRankTest extends OmegaupTestCase {
      *
      */
     public function testSchoolRankPositive() {
-        $currentTime = Time::get();
-        $pastMonthTime = strtotime('first day of last month', Time::get());
+        $currentTime = \OmegaUp\Time::get();
+        $pastMonthTime = strtotime('first day of last month', \OmegaUp\Time::get());
 
-        Time::setTimeForTesting($pastMonthTime);
+        \OmegaUp\Time::setTimeForTesting($pastMonthTime);
 
         // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
         // 1 in school #2 but PA, 1 with no school for the past month
@@ -57,7 +57,7 @@ class SchoolRankTest extends OmegaupTestCase {
 
         $this->createRunsWithSchool($schoolsData);
 
-        Time::setTimeForTesting($currentTime);
+        \OmegaUp\Time::setTimeForTesting($currentTime);
 
         // Prepare setup, 5 users, 2 in school #1, 1 in school #2,
         // 1 in school #2 but PA, 1 with no school for the current time

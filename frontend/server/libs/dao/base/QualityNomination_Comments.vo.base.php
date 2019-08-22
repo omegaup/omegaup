@@ -55,7 +55,7 @@ class QualityNominationComments extends VO {
              */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
         } else {
-            $this->time = Time::get();
+            $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['vote'])) {
             $this->vote = (int)$data['vote'];

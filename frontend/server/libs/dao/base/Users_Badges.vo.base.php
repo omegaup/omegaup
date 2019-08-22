@@ -53,7 +53,7 @@ class UsersBadges extends VO {
              */
             $this->assignation_time = DAO::fromMySQLTimestamp($data['assignation_time']);
         } else {
-            $this->assignation_time = Time::get();
+            $this->assignation_time = \OmegaUp\Time::get();
         }
     }
 

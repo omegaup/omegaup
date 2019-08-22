@@ -225,7 +225,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         Users $user,
         string $updatePublished
     ) : void {
-        $now = Time::get();
+        $now = \OmegaUp\Time::get();
 
         if ($updatePublished == ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
             $sql = '

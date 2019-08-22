@@ -547,7 +547,7 @@ class ContestController extends Controller {
         ProblemsetIdentityRequestDAO::create(new ProblemsetIdentityRequest([
             'identity_id' => $r->identity->identity_id,
             'problemset_id' => $contest->problemset_id,
-            'request_time' => Time::get(),
+            'request_time' => \OmegaUp\Time::get(),
         ]));
 
         return ['status' => 'ok'];
@@ -913,7 +913,7 @@ class ContestController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        if ($originalContest->finish_time > Time::get()) {
+        if ($originalContest->finish_time > \OmegaUp\Time::get()) {
             throw new ForbiddenAccessException('originalContestHasNotEnded');
         }
 
@@ -922,7 +922,7 @@ class ContestController extends Controller {
         $contestLength = $originalContest->finish_time - $originalContest->start_time;
 
         $r->ensureInt('start_time', null, null, false);
-        $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : Time::get();
+        $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : \OmegaUp\Time::get();
 
         // Initialize contest
         $contest = new Contests([
@@ -2053,7 +2053,7 @@ class ContestController extends Controller {
 
         $request->accepted = $resolution;
         $request->extra_note = $r['note'];
-        $request->last_update = Time::get();
+        $request->last_update = \OmegaUp\Time::get();
 
         ProblemsetIdentityRequestDAO::update($request);
 
@@ -2287,7 +2287,7 @@ class ContestController extends Controller {
         Identities $identity
     ) : void {
         if ($originalContest->admission_mode !== $contest->admission_mode) {
-            $timestamp = Time::get();
+            $timestamp = \OmegaUp\Time::get();
             ContestLogDAO::create(new ContestLog([
                 'contest_id' => $contest->contest_id,
                 'user_id' => $identity->user_id,

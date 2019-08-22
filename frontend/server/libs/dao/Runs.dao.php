@@ -593,7 +593,7 @@ class RunsDAO extends RunsDAOBase {
             );
         }
 
-        return Time::get() >= ($lastRunTime + $submissionGap);
+        return \OmegaUp\Time::get() >= ($lastRunTime + $submissionGap);
     }
 
     /**
@@ -608,7 +608,7 @@ class RunsDAO extends RunsDAOBase {
                 (int)$contest->submissions_gap
             );
         }
-        return (Time::get() + $submission_gap);
+        return (\OmegaUp\Time::get() + $submission_gap);
     }
 
     final public static function searchWithRunIdGreaterThan(

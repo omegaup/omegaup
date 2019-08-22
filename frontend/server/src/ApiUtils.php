@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \Time;
-
 class ApiUtils {
     /**
      * Gets a random string
@@ -14,7 +12,7 @@ class ApiUtils {
 
     public static function getStringTime(?int $time = null) : string {
         if (is_null($time)) {
-            return date('Y-m-d H:i:s', Time::get());
+            return date('Y-m-d H:i:s', \OmegaUp\Time::get());
         }
         return date('Y-m-d H:i:s', $time);
     }

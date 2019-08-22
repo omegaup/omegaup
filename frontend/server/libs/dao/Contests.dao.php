@@ -221,11 +221,11 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     public static function hasStarted(Contests $contest) {
-        return Time::get() >= $contest->start_time;
+        return \OmegaUp\Time::get() >= $contest->start_time;
     }
 
     public static function hasFinished(Contests $contest) {
-        return Time::get() >= $contest->finish_time;
+        return \OmegaUp\Time::get() >= $contest->finish_time;
     }
 
     public static function getContestsParticipated($identity_id) {

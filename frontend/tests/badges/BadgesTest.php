@@ -58,7 +58,7 @@ class BadgesTest extends BadgesTestCase {
             switch ($action['type']) {
                 case 'changeTime':
                     $time = strtotime($action['time']);
-                    Time::setTimeForTesting($time);
+                    \OmegaUp\Time::setTimeForTesting($time);
                     break;
 
                 case 'apicalls':
@@ -88,7 +88,7 @@ class BadgesTest extends BadgesTestCase {
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = self::getSortedExpectedResults($expectedResults);
         $this->assertEquals($results, $expected);
-        Time::setTimeForTesting(null);
+        \OmegaUp\Time::setTimeForTesting(null);
     }
 
     public function phpUnitTest($badge): void {
@@ -256,7 +256,7 @@ class BadgesTest extends BadgesTestCase {
         $user = UserFactory::createUser();
         ProblemsFactory::createProblemWithAuthor($user);
 
-        $previousTime = Time::get();
+        $previousTime = \OmegaUp\Time::get();
         Utils::RunAssignBadges();
 
         $login = self::login($user);
@@ -270,7 +270,7 @@ class BadgesTest extends BadgesTestCase {
             $problemSetterResult['assignation_time'],
             $this->logicalAnd(
                 $this->greaterThanOrEqual($previousTime),
-                $this->lessThanOrEqual(Time::get())
+                $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
         );
 
@@ -290,7 +290,7 @@ class BadgesTest extends BadgesTestCase {
         // For some reason, this method creates a new user also.
         ProblemsFactory::createProblemWithAuthor($user);
 
-        $previousTime = Time::get();
+        $previousTime = \OmegaUp\Time::get();
         Utils::RunAssignBadges();
 
         // In total they must exist 4 users: admintest, test,
@@ -304,7 +304,7 @@ class BadgesTest extends BadgesTestCase {
             $details['first_assignation'],
             $this->logicalAnd(
                 $this->greaterThanOrEqual($previousTime),
-                $this->lessThanOrEqual(Time::get())
+                $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
         );
         $this->assertEquals(25, $details['owners_percentage']);

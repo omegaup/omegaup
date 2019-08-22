@@ -100,7 +100,7 @@ class Problems extends VO {
              */
             $this->creation_date = DAO::fromMySQLTimestamp($data['creation_date']);
         } else {
-            $this->creation_date = Time::get();
+            $this->creation_date = \OmegaUp\Time::get();
         }
         if (isset($data['source'])) {
             $this->source = strval($data['source']);

@@ -53,7 +53,7 @@ class {{ table.class_name }} extends VO {
 {%- endif %}
     {%- if column.default == 'CURRENT_TIMESTAMP' %}
         } else {
-            $this->{{ column.name }} = Time::get();
+            $this->{{ column.name }} = \OmegaUp\Time::get();
     {%- endif %}
         }
 {%- endfor %}
