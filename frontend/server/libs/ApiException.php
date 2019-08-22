@@ -25,7 +25,7 @@ class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";
         }
-        $localizedText = ApiUtils::FormatString(
+        $localizedText = \OmegaUp\ApiUtils::FormatString(
             $localizedText,
             $this->additional_parameters
         );

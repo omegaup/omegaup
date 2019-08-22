@@ -116,7 +116,6 @@ spl_autoload_register(function ($classname) {
 });
 
 require_once('libs/ApiException.php');
-require_once('libs/ApiUtils.php');
 require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Cache.php');

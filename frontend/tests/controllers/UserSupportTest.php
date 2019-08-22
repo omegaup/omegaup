@@ -125,8 +125,9 @@ class UserSupportTest extends OmegaupTestCase {
         $supportLogin = self::login($supportUser);
 
         // time travel
-        $reset_sent_at =
-            ApiUtils::GetStringTime(Time::get() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24));
+        $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
+            Time::get() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24)
+        );
         $user = UsersDAO::FindByEmail($email);
         $user->reset_sent_at = $reset_sent_at;
         UsersDAO::update($user);
