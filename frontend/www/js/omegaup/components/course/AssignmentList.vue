@@ -30,12 +30,12 @@
             </td>
             <td class="button-column">
               <a v-bind:title="T.courseAssignmentEdit"
-                  v-on:click="onEdit(assignment)"><span aria-hidden="true"
+                  v-on:click="$emit('edit', assignment)"><span aria-hidden="true"
                     class="glyphicon glyphicon-edit"></span></a>
             </td>
             <td class="button-column">
               <a v-bind:title="T.courseAssignmentDelete"
-                  v-on:click="onDelete(assignment)"><span aria-hidden="true"
+                  v-on:click="$emit('delete', assignment)"><span aria-hidden="true"
                     class="glyphicon glyphicon-remove"></span></a>
             </td>
           </tr>
@@ -61,12 +61,12 @@
             </td>
             <td class="button-column">
               <a v-bind:title="T.courseAssignmentEdit"
-                  v-on:click="onEdit(assignment)"><span aria-hidden="true"
+                  v-on:click="$emit('edit', assignment)"><span aria-hidden="true"
                     class="glyphicon glyphicon-edit"></span></a>
             </td>
             <td class="button-column">
               <a v-bind:title="T.courseAssignmentDelete"
-                  v-on:click="onDelete(assignment)"><span aria-hidden="true"
+                  v-on:click="$emit('delete', assignment)"><span aria-hidden="true"
                     class="glyphicon glyphicon-remove"></span></a>
             </td>
           </tr>
@@ -80,7 +80,7 @@
             <div class="pull-right">
               <button class="btn btn-primary"
                    type="submit"
-                   v-on:click.prevent="onNew">{{ T.courseAssignmentNew }}</button>
+                   v-on:click.prevent="$emit('new')">{{ T.courseAssignmentNew }}</button>
             </div>
           </div>
         </div>
@@ -89,42 +89,51 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    T: Object,
-    assignments: Array,
-    courseAlias: String,
-  },
-  data: function() { return {};},
-  computed: {
-    homeworks: function() {
-      return this.assignments.filter(
-          (assignment) => { return assignment.assignment_type == 'homework'; });
-    },
-    tests: function() {
-      return this.assignments.filter(
-          (assignment) => { return assignment.assignment_type == 'test'; });
-    }
-  },
-  methods: {
-    assignmentUrl: function(assignment) {
-      return '/course/' + this.courseAlias + '/assignment/' + assignment.alias +
-             '/';
-    },
-    onDelete: function(assignment) { this.$emit('delete', assignment);},
-    onEdit: function(assignment) { this.$emit('edit', assignment);},
-    onNew: function() { this.$emit('new');},
-    sortHomeworks: function(event) {
-      this.homeworks.splice(event.newIndex, 0,
-                            this.homeworks.splice(event.oldIndex, 1)[0]);
-      this.$emit('sort-homeworks', this.courseAlias, this.homeworks);
-    },
-    sortTests: function(event) {
-      this.tests.splice(event.newIndex, 0,
-                        this.tests.splice(event.oldIndex, 1)[0]);
-      this.$emit('sort-tests', this.courseAlias, this.tests);
-    },
-  },
-};
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
+
+@Component
+export default class CourseAssignmentList extends Vue {
+  @Prop() assignments!: omegaup.Assignment[];
+  @Prop() courseAlias!: string;
+
+  T = T;
+
+  get homeworks(): omegaup.Assignment[] {
+    return this.assignments.filter((assignment: omegaup.Assignment) => {
+      return assignment.assignment_type == 'homework';
+    });
+  }
+
+  get tests(): omegaup.Assignment[] {
+    return this.assignments.filter((assignment: omegaup.Assignment) => {
+      return assignment.assignment_type == 'test';
+    });
+  }
+
+  assignmentUrl(assignment: omegaup.Assignment): string {
+    return `/course/${this.courseAlias}/assignment/${assignment.alias}/`;
+  }
+
+  sortHomeworks(event: any): void {
+    this.homeworks.splice(
+      event.newIndex,
+      0,
+      this.homeworks.splice(event.oldIndex, 1)[0],
+    );
+    this.$emit('sort-homeworks', this.courseAlias, this.homeworks);
+  }
+
+  sortTests(event: any): void {
+    this.tests.splice(
+      event.newIndex,
+      0,
+      this.tests.splice(event.oldIndex, 1)[0],
+    );
+    this.$emit('sort-tests', this.courseAlias, this.tests);
+  }
+}
+
 </script>

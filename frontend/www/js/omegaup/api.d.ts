@@ -97,6 +97,27 @@ declare namespace omegaup {
     student_count: boolean;
   }
 
+  export interface CourseAdmin {
+    username: string;
+    role: string;
+  }
+
+  export interface CourseGroupAdmin {
+    role: string;
+    name: string;
+    alias: string;
+  }
+
+  interface CourseProgress {
+    [assignment: string]: number;
+  }
+
+  export interface CourseStudent {
+    name?: string;
+    username: string;
+    progress: CourseProgress[];
+  }
+
   interface DetailsGroup {
     cases: omegaup.Case[];
     contest_score: number;
