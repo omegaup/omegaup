@@ -41,6 +41,11 @@ declare namespace omegaup {
     window_length?: number;
     start_time?: Date;
     finish_time?: Date;
+    admission_mode?: string;
+  }
+
+  interface ContestAdmin {
+    username: string;
   }
 
   interface ContestResult {
@@ -73,6 +78,16 @@ declare namespace omegaup {
   export interface IdentityContest {
     username: string;
     end_time: Date;
+  }
+
+  export interface IdentityContestRequest {
+    username: string;
+    country: string;
+    request_time: Date;
+    last_update: Date;
+    accepted: boolean;
+    admin?: ContestAdmin;
+
   }
 
   interface Meta {
@@ -143,6 +158,14 @@ declare namespace omegaup {
     rank: number;
     name?: string;
     problems_solved: number;
+  }
+
+  export interface Scoreboard {
+    contests: omegaup.Contest[];
+    name: string;
+    place: number;
+    totalPenalty: number;
+    totalPoints: number;
   }
 
   export interface Report {
