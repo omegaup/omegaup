@@ -141,23 +141,15 @@ declare namespace omegaup {
     badge?: string;
   }
 
-  export interface Profile {
-    username: string;
-    name: string;
-    email: string;
-    country_id: string;
-    gravatar_92: string;
-    rankinfo: RankInfo;
-    classname: string;
-  }
-
   export interface Problem {
     accepted?: number;
     alias: string;
+    commit?: string;
     difficulty?: number;
+    order: number;
     penalty?: number;
     percent?: number;
-    points?: number;
+    points: number;
     quality?: number;
     ratio?: number;
     run_details?: omegaup.RunDetails;
@@ -165,6 +157,7 @@ declare namespace omegaup {
     submissions?: number;
     tags?: Tag[];
     title: string;
+    version?: string;
     visibility?: number;
   }
 
