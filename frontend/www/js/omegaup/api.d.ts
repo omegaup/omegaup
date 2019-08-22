@@ -14,6 +14,17 @@ declare namespace omegaup {
     start_time: Date | number;
   }
 
+  export interface AssignmentProblem {
+    alias: string;
+    commit: string;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    title: string;
+    version: string;
+  }
+
   export interface Badge {
     badge_alias: string;
     assignation_time?: Date;
