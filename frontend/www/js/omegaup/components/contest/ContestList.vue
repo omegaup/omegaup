@@ -113,34 +113,44 @@
   </div>
 </template>
 
-<script>
-import {T, UI} from '../../omegaup.js';
-export default {
-  props: {contests: Array, isAdmin: Boolean, title: String},
-  data: function() {
-    return {
-      T: T,
-      UI: UI,
-    };
-  },
-  methods: {
-    makeWorldClockLink: function(date) {
-      if (!date) {
-        return '#';
-      }
-      return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' +
-             date.toISOString();
-    },
-    onBulkUpdate: function(admissionMode) {
-      this.$emit('bulk-update', admissionMode);
-    },
-    onShowAdmin: function() {
-      this.$emit('toggle-show-admin',
-                 this.$el.querySelector('.show-admin-contests').checked);
-    },
-    onDownloadCsv: function(contestAlias) {
-      this.$emit('download-csv-users', contestAlias);
-    },
-  },
-};
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
+
+@Component({})
+export default class List extends Vue {
+  @Prop() contests!: omegaup.Contest[];
+  @Prop() isAdmin!: boolean;
+  @Prop() title!: string;
+
+  T = T;
+  UI = UI;
+
+  makeWorldClockLink(date: Date) : string {
+    if (!date) {
+      return '#';
+    }
+    return 'https://timeanddate.com/worldclock/fixedtime.html?iso=' +
+           date.toISOString();
+  }
+
+  @Emit('bulk-update')
+  onBulkUpdate(admissionMode: string) : string {
+    return admissionMode;
+  }
+
+  @Emit('toggle-show-admin')
+  onShowAdmin() : boolean {
+    const input = this.$el.querySelector('.show-admin-contests') as HTMLInputElement;
+    return input.checked;
+  }
+
+  @Emit('download-csv-users')
+  onDownloadCsv(contestAlias: string) : string {
+    return contestAlias;
+  }
+}
+
 </script>
