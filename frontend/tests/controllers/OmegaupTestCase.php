@@ -44,7 +44,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public function setUp() {
         parent::setUp();
         UserController::$sendEmailOnVerify = false;
-        SessionController::$setCookieOnRegisterSession = false;
+        SessionController::setCookieOnRegisterSessionForTesting(false);
 
         // Mock time
         $currentTime = time();
@@ -78,15 +78,14 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Override session_start, phpunit doesn't like it, but we still validate that it is called once
+     * Override session_start, validating that it is called once.
      */
-    public function mockSessionManager() {
+    public function mockSessionManager() : void {
         $sessionManagerMock =
-            $this->getMockBuilder('SessionManager')->getMock();
+            $this->getMockBuilder('\\OmegaUp\\SessionManager')->getMock();
         $sessionManagerMock->expects($this->once())
-                ->method('sessionStart')
-                ->will($this->returnValue(''));
-        SessionController::$_sessionManager = $sessionManagerMock;
+                ->method('sessionStart');
+        SessionController::setSessionManagerForTesting($sessionManagerMock);
     }
 
     /**
@@ -128,8 +127,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
-        $oldCookieSetting = SessionController::$setCookieOnRegisterSession;
-        SessionController::$setCookieOnRegisterSession = false;
+        $oldCookieSetting = SessionController::setCookieOnRegisterSessionForTesting(false);
 
         // Inflate request with identity data
         $r = new Request([
@@ -147,7 +145,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         unset($_REQUEST);
 
         // Set cookie setting as it was before the login
-        SessionController::$setCookieOnRegisterSession = $oldCookieSetting;
+        SessionController::setCookieOnRegisterSessionForTesting($oldCookieSetting);
 
         return new ScopedLoginToken($response['auth_token']);
     }

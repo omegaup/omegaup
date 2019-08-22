@@ -10,15 +10,17 @@
  */
 class SessionController extends Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
-
-    private static $current_session = null;
+    /** @var null|array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool} */
+    private static $_currentSession = null;
     private static $_facebook;
-    public static $_sessionManager;
-    public static $setCookieOnRegisterSession = true;
+    /** @var null|\OmegaUp\SessionManager */
+    private static $_sessionManager = null;
+    /** @var bool */
+    private static $_setCookieOnRegisterSession = true;
 
-    public static function getSessionManagerInstance() {
+    public static function getSessionManagerInstance() : \OmegaUp\SessionManager {
         if (is_null(self::$_sessionManager)) {
-            self::$_sessionManager = new SessionManager();
+            self::$_sessionManager = new \OmegaUp\SessionManager();
         }
         return self::$_sessionManager;
     }
@@ -51,7 +53,7 @@ class SessionController extends Controller {
         return true;
     }
 
-    public static function currentSessionAvailable() {
+    public static function currentSessionAvailable() : bool {
         return self::apiCurrentSession()['session']['valid'];
     }
 
@@ -60,15 +62,18 @@ class SessionController extends Controller {
      * server roundtrip (about ~100msec on each pageload), it also returns the
      * current time to be able to calculate the time delta between the
      * contestant's machine and the server.
-     * */
+     *
+     * @return array
+     * @psalm-return array{status: string, session: null|array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     */
     public static function apiCurrentSession(?Request $r = null) : array {
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
-            !is_null(self::$current_session)
+            !is_null(self::$_currentSession)
         ) {
             return [
                 'status' => 'ok',
-                'session' => self::$current_session,
+                'session' => self::$_currentSession,
                 'time' => \OmegaUp\Time::get(),
             ];
         }
@@ -76,14 +81,17 @@ class SessionController extends Controller {
             $r = new Request();
         }
         if (is_null($r['auth_token'])) {
-            $r['auth_token'] = SessionController::getAuthToken($r);
+            $authToken = SessionController::getAuthToken($r);
+            $r['auth_token'] = $authToken;
+        } else {
+            $authToken = strval($r['auth_token']);
         }
-        $authToken = $r['auth_token'];
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null($authToken)
-         ) {
-            self::$current_session = Cache::getFromCacheOrSet(
+        ) {
+            /** @var array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool} */
+            self::$_currentSession = Cache::getFromCacheOrSet(
                 Cache::SESSION_PREFIX,
                 $authToken,
                 function () use ($r) {
@@ -92,11 +100,11 @@ class SessionController extends Controller {
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
         } else {
-            self::$current_session = SessionController::getCurrentSession($r);
+            self::$_currentSession = SessionController::getCurrentSession($r);
         }
         return [
             'status' => 'ok',
-            'session' => self::$current_session,
+            'session' => self::$_currentSession,
             'time' => \OmegaUp\Time::get(),
         ];
     }
@@ -105,25 +113,27 @@ class SessionController extends Controller {
         $SessionM = self::getSessionManagerInstance();
         $SessionM->sessionStart();
         $authToken = null;
-        if (!is_null($r) && !is_null($r['auth_token'])) {
-            $authToken = $r['auth_token'];
+        if (!is_null($r['auth_token'])) {
+            $authToken = strval($r['auth_token']);
         } else {
             $authToken = $SessionM->getCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME);
         }
         if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
             return $authToken;
-        } elseif (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
-                && self::isAuthTokenValid($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
-            return $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME];
-        } else {
-            return null;
         }
+        if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
+                && self::isAuthTokenValid($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
+            return strval($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+        }
+        return null;
     }
 
-    public static function getCurrentSession(Request $r) {
-        $authToken = $r['auth_token'];
-
-        if (is_null($authToken)) {
+    /**
+     * @return array
+     * @psalm-return array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool}
+     */
+    public static function getCurrentSession(Request $r) : array {
+        if (empty($r['auth_token'])) {
             return [
                 'valid' => false,
                 'email' => null,
@@ -133,6 +143,7 @@ class SessionController extends Controller {
                 'is_admin' => false,
             ];
         }
+        $authToken = strval($r['auth_token']);
 
         $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
         if (is_null($currentIdentity)) {
@@ -163,7 +174,6 @@ class SessionController extends Controller {
         return [
             'valid' => true,
             'email' => !empty($email) ? $email->email : '',
-            'username' => $currentIdentity->username,
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
@@ -186,7 +196,7 @@ class SessionController extends Controller {
      * Invalidates the current request's session cache.
      */
     public function InvalidateLocalCache() {
-        self::$current_session = null;
+        self::$_currentSession = null;
     }
 
     public function UnRegisterSession() {
@@ -235,7 +245,7 @@ class SessionController extends Controller {
             'token' => $token,
         ]));
 
-        if (self::$setCookieOnRegisterSession) {
+        if (self::$_setCookieOnRegisterSession) {
             $this->getSessionManagerInstance()->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $token, 0, '/');
         }
 
@@ -511,5 +521,17 @@ class SessionController extends Controller {
 
         $this->registerSession($identity);
         return ['status' => 'ok'];
+    }
+
+    public static function setSessionManagerForTesting(
+        \OmegaUp\SessionManager $sessionManager
+    ) : void {
+        self::$_sessionManager = $sessionManager;
+    }
+
+    public static function setCookieOnRegisterSessionForTesting(bool $newValue) : bool {
+        $oldValue = self::$_setCookieOnRegisterSession;
+        self::$_setCookieOnRegisterSession = $newValue;
+        return $oldValue;
     }
 }
