@@ -1,14 +1,16 @@
 <?php
 
 include('base/Problemset_Access_Log.dao.base.php');
-include('base/Problemset_Access_Log.vo.base.php');
-/** ProblemsetAccessLog Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetAccessLog }.
-  * @access public
-  *
-  */
+
+/**
+ * ProblemsetAccessLog Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\ProblemsetAccessLog}.
+ *
+ * @access public
+ */
 class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
     public static function GetAccessForProblemset($problemset_id) {
         $sql = 'SELECT
@@ -80,7 +82,7 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
 
         $problemsetAccessLog = [];
         foreach ($rs as $row) {
-            array_push($problemsetAccessLog, new ProblemsetAccessLog($row));
+            array_push($problemsetAccessLog, new \OmegaUp\DAO\VO\ProblemsetAccessLog($row));
         }
         return $problemsetAccessLog;
     }

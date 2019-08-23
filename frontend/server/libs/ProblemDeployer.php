@@ -47,7 +47,7 @@ class ProblemDeployer {
 
     public function commit(
         string $message,
-        Users $user,
+        \OmegaUp\DAO\VO\Users $user,
         int $operation,
         array $problemSettings
     ) : void {
@@ -403,7 +403,7 @@ class ProblemDeployer {
     public function updatePublished(
         string $oldOid,
         string $newOid,
-        Users $user
+        \OmegaUp\DAO\VO\Users $user
     ) {
         $curl = curl_init();
 

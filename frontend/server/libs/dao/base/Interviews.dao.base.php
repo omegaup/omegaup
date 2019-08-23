@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Interviews}.
+ * {@link \OmegaUp\DAO\VO\Interviews}.
  * @access public
  * @abstract
- *
  */
 abstract class InterviewsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param Interviews $Interviews El objeto de tipo Interviews a actualizar.
+     * @param \OmegaUp\DAO\VO\Interviews $Interviews El objeto de tipo Interviews a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(Interviews $Interviews) : int {
+    final public static function update(\OmegaUp\DAO\VO\Interviews $Interviews) : int {
         $sql = 'UPDATE `Interviews` SET `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE `interview_id` = ?;';
         $params = [
             is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
@@ -41,40 +39,45 @@ abstract class InterviewsDAOBase {
     }
 
     /**
-     * Obtener {@link Interviews} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\Interviews} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Interviews} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Interviews}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?Interviews Un objeto del tipo {@link Interviews}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\Interviews Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\Interviews} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $interview_id) : ?Interviews {
+    final public static function getByPK(int $interview_id) : ?\OmegaUp\DAO\VO\Interviews {
         $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` FROM Interviews WHERE (interview_id = ?) LIMIT 1;';
         $params = [$interview_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new Interviews($row);
+        return new \OmegaUp\DAO\VO\Interviews($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Interviews suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\Interviews} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param Interviews $Interviews El objeto de tipo Interviews a eliminar
+     * @param \OmegaUp\DAO\VO\Interviews $Interviews El
+     * objeto de tipo \OmegaUp\DAO\VO\Interviews a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Interviews $Interviews) : void {
+    final public static function delete(\OmegaUp\DAO\VO\Interviews $Interviews) : void {
         $sql = 'DELETE FROM `Interviews` WHERE interview_id = ?;';
         $params = [$Interviews->interview_id];
 
@@ -88,7 +91,8 @@ abstract class InterviewsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Interviews}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\Interviews}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -99,9 +103,10 @@ abstract class InterviewsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return Interviews[] Un arreglo que contiene objetos del tipo {@link Interviews}.
+     * @return \OmegaUp\DAO\VO\Interviews[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\Interviews}.
      *
-     * @psalm-return array<int, Interviews>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\Interviews>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -118,7 +123,7 @@ abstract class InterviewsDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new Interviews($row);
+            $allData[] = new \OmegaUp\DAO\VO\Interviews($row);
         }
         return $allData;
     }
@@ -127,13 +132,15 @@ abstract class InterviewsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Interviews suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\Interviews}
+     * suministrado.
      *
-     * @param Interviews $Interviews El objeto de tipo Interviews a crear.
+     * @param \OmegaUp\DAO\VO\Interviews $Interviews El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Interviews} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Interviews $Interviews) : int {
+    final public static function create(\OmegaUp\DAO\VO\Interviews $Interviews) : int {
         $sql = 'INSERT INTO Interviews (`problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,

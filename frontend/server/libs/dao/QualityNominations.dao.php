@@ -1,14 +1,16 @@
 <?php
 
 include_once('base/QualityNominations.dao.base.php');
-include_once('base/QualityNominations.vo.base.php');
-/** QualityNominations Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link QualityNominations }.
-  * @access public
-  *
-  */
+
+/**
+ * QualityNominations Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\QualityNominations}.
+ *
+ * @access public
+ */
 class QualityNominationsDAO extends QualityNominationsDAOBase {
     /**
      * If a problem has more than this number of problems, none will be assigned.
@@ -20,8 +22,8 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
     const CONFIDENCE = 5;
 
     public static function getNominationStatusForProblem(
-        Problems $problem,
-        Identities $identity
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity
     ) : array {
         $sql = '
             SELECT
@@ -495,7 +497,7 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
 
         $qualityNominations = [];
         foreach ($rs as $row) {
-            array_push($qualityNominations, new QualityNominations($row));
+            array_push($qualityNominations, new \OmegaUp\DAO\VO\QualityNominations($row));
         }
         return $qualityNominations;
     }

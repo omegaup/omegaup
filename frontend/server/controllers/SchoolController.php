@@ -65,7 +65,7 @@ class SchoolController extends Controller {
      */
     public static function createSchool($name, $state) {
         // Create school object
-        $school = new Schools([
+        $school = new \OmegaUp\DAO\VO\Schools([
             'name' => $name,
             'country_id' => $state != null ? $state->country_id : null,
             'state_id' => $state != null ? $state->state_id : null,

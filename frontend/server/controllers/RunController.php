@@ -279,7 +279,7 @@ class RunController extends Controller {
         }
 
         // Populate new run+submission object
-        $submission = new Submissions([
+        $submission = new \OmegaUp\DAO\VO\Submissions([
             'identity_id' => $r->identity->identity_id,
             'problem_id' => $r['problem']->problem_id,
             'problemset_id' => $problemsetId,
@@ -289,7 +289,7 @@ class RunController extends Controller {
             'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
-        $run = new Runs([
+        $run = new \OmegaUp\DAO\VO\Runs([
             'version' => $r['problem']->current_version,
             'status' => 'new',
             'runtime' => 0,
@@ -333,7 +333,7 @@ class RunController extends Controller {
             throw $e;
         }
 
-        SubmissionLogDAO::create(new SubmissionLog([
+        SubmissionLogDAO::create(new \OmegaUp\DAO\VO\SubmissionLog([
             'user_id' => $r->identity->user_id,
             'identity_id' => $r->identity->identity_id,
             'submission_id' => $submission->submission_id,
@@ -511,9 +511,9 @@ class RunController extends Controller {
     /**
      * Invalidates relevant caches on run rejudge
      *
-     * @param Runs $run
+     * @param \OmegaUp\DAO\VO\Runs $run
      */
-    public static function invalidateCacheOnRejudge(Runs $run) : void {
+    public static function invalidateCacheOnRejudge(\OmegaUp\DAO\VO\Runs $run) : void {
         try {
             // Expire details of the run
             Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
@@ -606,8 +606,8 @@ class RunController extends Controller {
     }
 
     private static function populateRunDetails(
-        Submissions $submission,
-        Runs $run,
+        \OmegaUp\DAO\VO\Submissions $submission,
+        \OmegaUp\DAO\VO\Runs $run,
         bool $showDetails,
         &$response
     ) {
@@ -658,7 +658,7 @@ class RunController extends Controller {
 
     public static function downloadSubmission(
         string $guid,
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         bool $passthru
     ) {
         $submission = SubmissionsDAO::getByGuid($guid);
@@ -688,7 +688,7 @@ class RunController extends Controller {
     }
 
     private static function getGraderResource(
-        Runs $run,
+        \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         bool $passthru = false
     ) {

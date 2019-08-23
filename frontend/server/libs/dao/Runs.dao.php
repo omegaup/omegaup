@@ -1,22 +1,17 @@
 <?php
 
 require_once('base/Runs.dao.base.php');
-require_once('base/Runs.vo.base.php');
-/** Page-level DocBlock .
- *
- * @author alanboy
- * @package docs
- *
- */
 
-/** Runs Data Access Object (DAO).
+/**
+ * Runs Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link Runs }.
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Runs}.
+ *
  * @author alanboy
  * @access public
  * @package docs
- *
  */
 class RunsDAO extends RunsDAOBase {
     /**
@@ -399,7 +394,7 @@ class RunsDAO extends RunsDAOBase {
     }
 
     final public static function getProblemsetRuns(
-        Problemsets $problemset,
+        \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $onlyAC = false
     ) : array {
         $sql = '
@@ -541,7 +536,7 @@ class RunsDAO extends RunsDAOBase {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         $runs = [];
         foreach ($rs as $row) {
-            array_push($runs, new Runs($row));
+            array_push($runs, new \OmegaUp\DAO\VO\Runs($row));
         }
         return $runs;
     }
@@ -575,7 +570,7 @@ class RunsDAO extends RunsDAOBase {
 
     final public static function isRunInsideSubmissionGap(
         ?int $problemsetId,
-        ?Contests $contest,
+        ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
         int $identityId
     ) : bool {
@@ -632,7 +627,7 @@ class RunsDAO extends RunsDAOBase {
 
         $result = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemId, $submissionId]) as $row) {
-            array_push($result, new Runs($row));
+            array_push($result, new \OmegaUp\DAO\VO\Runs($row));
         }
         return $result;
     }
@@ -674,7 +669,7 @@ class RunsDAO extends RunsDAOBase {
      * + If penalty_type is anything else then:
      *   - penalty = submit_delay
      */
-    public static function recalculatePenaltyForContest(Contests $contest) {
+    public static function recalculatePenaltyForContest(\OmegaUp\DAO\VO\Contests $contest) {
         $penalty_type = $contest->penalty_type;
         if ($penalty_type == 'none') {
             $sql = '
@@ -742,10 +737,10 @@ class RunsDAO extends RunsDAOBase {
      * Creates any necessary runs for submissions against a problem, given a
      * problem version.
      *
-     * @param Problems $problem the problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      */
     final public static function createRunsForVersion(
-        Problems $problem
+        \OmegaUp\DAO\VO\Problems $problem
     ) : void {
         $sql = '
             INSERT IGNORE INTO
@@ -768,9 +763,9 @@ class RunsDAO extends RunsDAOBase {
      * Update the version of the non-problemset runs of a problem to the
      * current version.
      *
-     * @param Problems $problem the problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      */
-    final public static function updateVersionToCurrent(Problems $problem) : void {
+    final public static function updateVersionToCurrent(\OmegaUp\DAO\VO\Problems $problem) : void {
         $sql = '
             UPDATE
                 Submissions s
@@ -791,9 +786,9 @@ class RunsDAO extends RunsDAOBase {
     /**
      * Gets the runs that were inserted due to a version change.
      *
-     * @param Problems $problem the problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      */
-    final public static function getNewRunsForVersion(Problems $problem) : array {
+    final public static function getNewRunsForVersion(\OmegaUp\DAO\VO\Problems $problem) : array {
         $sql = '
             SELECT
                 r.run_id
@@ -812,7 +807,7 @@ class RunsDAO extends RunsDAOBase {
 
         $result = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $row) {
-            $result[] = new Runs($row);
+            $result[] = new \OmegaUp\DAO\VO\Runs($row);
         }
         return $result;
     }
@@ -821,13 +816,13 @@ class RunsDAO extends RunsDAOBase {
      * Gets a report of the runs that could have score changes due to a version
      * change.
      *
-     * @param Problems $problem      the problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem      the problem.
      * @param ?int     $problemsetId the optional problemset.
      * @param string   $oldVersion   the old version.
      * @param string   $newVersion   the new version.
      */
     final public static function getRunsDiffsForVersion(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         ?int $problemsetId,
         string $oldVersion,
         string $newVersion

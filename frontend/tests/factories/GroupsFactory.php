@@ -8,7 +8,7 @@ class GroupsFactory {
      * @param type $name
      * @param type $description
      */
-    public static function createGroup(Users $owner = null, $name = null, $description = null, $alias = null, ScopedLoginToken $login = null) {
+    public static function createGroup(\OmegaUp\DAO\VO\Users $owner = null, $name = null, $description = null, $alias = null, ScopedLoginToken $login = null) {
         if (is_null($owner)) {
             $owner = UserFactory::createUser();
         }
@@ -50,9 +50,9 @@ class GroupsFactory {
      * Add user to group helper
      *
      * @param array $groupData
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Users $user
      */
-    public static function addUserToGroup(array $groupData, Users $user, ScopedLoginToken $login = null) {
+    public static function addUserToGroup(array $groupData, \OmegaUp\DAO\VO\Users $user, ScopedLoginToken $login = null) {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($groupData['owner']);
         }

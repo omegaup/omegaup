@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -8,10 +7,11 @@
   *                                                                                 *
   * ******************************************************************************* */
 
+namespace OmegaUp\DAO\VO;
+
 /**
- * Value Object file for table {{ table.name }}.
+ * Value Object class for table `{{ table.name }}`.
  *
- * VO does not have any behaviour.
  * @access public
  */
 class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
@@ -21,20 +21,13 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
 {%- endfor %}
     ];
 
-    /**
-     * Constructor de {{ table.class_name }}
-     *
-     * Para construir un objeto de tipo {{ table.class_name }} debera llamarse a el constructor
-     * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
-     * cuyos campos son iguales a las variables que constituyen a este objeto.
-     */
     function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {

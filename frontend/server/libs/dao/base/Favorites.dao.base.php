@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,47 +11,51 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Favorites}.
+ * {@link \OmegaUp\DAO\VO\Favorites}.
  * @access public
  * @abstract
- *
  */
 abstract class FavoritesDAOBase {
     /**
-     * Obtener {@link Favorites} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\Favorites} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Favorites} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Favorites}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?Favorites Un objeto del tipo {@link Favorites}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\Favorites Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\Favorites} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(?int $user_id, ?int $problem_id) : ?Favorites {
+    final public static function getByPK(?int $user_id, ?int $problem_id) : ?\OmegaUp\DAO\VO\Favorites {
         $sql = 'SELECT `Favorites`.`user_id`, `Favorites`.`problem_id` FROM Favorites WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
         $params = [$user_id, $problem_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new Favorites($row);
+        return new \OmegaUp\DAO\VO\Favorites($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Favorites suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\Favorites} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param Favorites $Favorites El objeto de tipo Favorites a eliminar
+     * @param \OmegaUp\DAO\VO\Favorites $Favorites El
+     * objeto de tipo \OmegaUp\DAO\VO\Favorites a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Favorites $Favorites) : void {
+    final public static function delete(\OmegaUp\DAO\VO\Favorites $Favorites) : void {
         $sql = 'DELETE FROM `Favorites` WHERE user_id = ? AND problem_id = ?;';
         $params = [$Favorites->user_id, $Favorites->problem_id];
 
@@ -66,7 +69,8 @@ abstract class FavoritesDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Favorites}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\Favorites}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -77,9 +81,10 @@ abstract class FavoritesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return Favorites[] Un arreglo que contiene objetos del tipo {@link Favorites}.
+     * @return \OmegaUp\DAO\VO\Favorites[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\Favorites}.
      *
-     * @psalm-return array<int, Favorites>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\Favorites>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -96,7 +101,7 @@ abstract class FavoritesDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new Favorites($row);
+            $allData[] = new \OmegaUp\DAO\VO\Favorites($row);
         }
         return $allData;
     }
@@ -105,13 +110,15 @@ abstract class FavoritesDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Favorites suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\Favorites}
+     * suministrado.
      *
-     * @param Favorites $Favorites El objeto de tipo Favorites a crear.
+     * @param \OmegaUp\DAO\VO\Favorites $Favorites El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Favorites} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Favorites $Favorites) : int {
+    final public static function create(\OmegaUp\DAO\VO\Favorites $Favorites) : int {
         $sql = 'INSERT INTO Favorites (`user_id`, `problem_id`) VALUES (?, ?);';
         $params = [
             is_null($Favorites->user_id) ? null : (int)$Favorites->user_id,

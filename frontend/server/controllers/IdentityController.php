@@ -10,10 +10,10 @@ class IdentityController extends Controller {
      * Given a username or a email, returns the identity object
      *
      * @param ?string $userOrEmail
-     * @return Identities
+     * @return \OmegaUp\DAO\VO\Identities
      * @throws \OmegaUp\Exceptions\ApiException
      */
-    public static function resolveIdentity(?string $userOrEmail) : Identities {
+    public static function resolveIdentity(?string $userOrEmail) : \OmegaUp\DAO\VO\Identities {
         Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
         $identity = IdentitiesDAO::findByUsername($userOrEmail);
         if (!is_null($identity)) {
@@ -29,13 +29,13 @@ class IdentityController extends Controller {
     /**
      * Tests a if a password is valid for a given identity.
      *
-     * @param Identities $identity    The identity.
+     * @param \OmegaUp\DAO\VO\Identities $identity    The identity.
      * @param string     $password    The password.
      * @return bool                   Whether the password is valid.
      * @throws LoginDisabledException When the identity is not allowed to login
      *                                using a password.
      */
-    public static function testPassword(Identities $identity, string $password) : bool {
+    public static function testPassword(\OmegaUp\DAO\VO\Identities $identity, string $password) : bool {
         if (is_null($identity->password)) {
             // The user had logged in through a third-party account.
             throw new LoginDisabledException('loginThroughThirdParty');
@@ -169,7 +169,7 @@ class IdentityController extends Controller {
         $state = SchoolController::getStateIdFromCountryAndState($countryId, $stateId);
         $schoolId = SchoolController::createSchool(trim($school), $state);
 
-        return new Identities([
+        return new \OmegaUp\DAO\VO\Identities([
             'username' => $username,
             'name' => $name ?? $originalIdentity->name,
             'country_id' => !is_null($state) ? $state->country_id : $originalIdentity->country_id,
@@ -184,15 +184,15 @@ class IdentityController extends Controller {
     /**
      * Save object Identities in DB, and add user into group.
      * This function is called inside a transaction.
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @param $groupId
      */
-    private static function saveIdentityGroup(Identities $identity, $groupId) {
+    private static function saveIdentityGroup(\OmegaUp\DAO\VO\Identities $identity, $groupId) {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
             IdentitiesDAO::create($identity);
-            GroupsIdentitiesDAO::create(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $groupId,
                 'identity_id' => $identity->identity_id,
             ]));
@@ -333,7 +333,7 @@ class IdentityController extends Controller {
         SecurityTools::testStrongPassword($password);
         $hashedPassword = SecurityTools::hashString($password);
 
-        return new Identities([
+        return new \OmegaUp\DAO\VO\Identities([
             'username' => $username,
             'name' => $name,
             'password' => $hashedPassword,
@@ -355,8 +355,8 @@ class IdentityController extends Controller {
      */
     public static function getProfile(
         Request $r,
-        ?Identities $identity,
-        ?Users $user,
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user,
         bool $omitRank
     ) : array {
         if (is_null($identity)) {
@@ -404,10 +404,10 @@ class IdentityController extends Controller {
     /**
      * Returns the profile of the identity given
      *
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @return array
      */
-    private static function getProfileImpl(Identities $identity) {
+    private static function getProfileImpl(\OmegaUp\DAO\VO\Identities $identity) {
         $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
 
         return [

@@ -64,7 +64,7 @@ class ClarificationController extends Controller {
         self::validateCreate($r);
 
         $receiverId = $r['identity'] ? $r['identity']->identity_id : null;
-        $r['clarification'] = new Clarifications([
+        $r['clarification'] = new \OmegaUp\DAO\VO\Clarifications([
             'author_id' => $r->identity->identity_id,
             'receiver_id' => $receiverId,
             'problemset_id' => $r['contest']->problemset_id,
@@ -195,7 +195,7 @@ class ClarificationController extends Controller {
         return $response;
     }
 
-    private static function clarificationUpdated(Request $r, Clarifications $clarification) {
+    private static function clarificationUpdated(Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
         try {
             if (is_null($r['problem'])) {
                 $r['problem'] = ProblemsDAO::GetByPK($clarification->problem_id);

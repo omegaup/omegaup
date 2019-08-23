@@ -32,7 +32,7 @@ class ContestRequestsTest extends OmegaupTestCase {
     }
 
     private function registerUserForContest(
-        Users $contestant,
+        \OmegaUp\DAO\VO\Users $contestant,
         Request $contest
     ) : void {
         $contestantLogin = self::login($contestant);
@@ -67,7 +67,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         int $numberOfContestants,
         array $contestants,
         array $result,
-        Users $mainAdmin,
+        \OmegaUp\DAO\VO\Users $mainAdmin,
         array $arbitratedUsers,
         array $acceptedUsers
     ) {

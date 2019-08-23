@@ -2,7 +2,7 @@
 
 class CoursesFactory {
     public static function createCourse(
-        Users $admin = null,
+        \OmegaUp\DAO\VO\Users $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
@@ -18,7 +18,7 @@ class CoursesFactory {
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
-            GroupsIdentitiesDAO::create(new GroupsIdentities([
+            GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
                 'identity_id' => $identity->identity_id,
             ]));
@@ -48,7 +48,7 @@ class CoursesFactory {
     }
 
     public static function createCourseWithOneAssignment(
-        Users $admin = null,
+        \OmegaUp\DAO\VO\Users $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
@@ -133,7 +133,7 @@ class CoursesFactory {
     /**
      * Add a Student to a course
      * @param Array $courseData [from self::createCourse]
-     * @param Users $student
+     * @param \OmegaUp\DAO\VO\Users $student
      */
     public static function addStudentToCourse($courseData, $student = null, ?ScopedLoginToken $login = null) {
         if (is_null($student)) {

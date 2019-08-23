@@ -187,7 +187,7 @@ def generate_dao(script: Text) -> Sequence[DaoFile]:
     vo_template = env.get_template('vo.php')
     dao_template = env.get_template('dao.php')
     for table in tables:
-        yield DaoFile('{}.vo.base.php'.format(table.name),
+        yield DaoFile('{}.php'.format(table.class_name),
                       vo_template.render(table=table))
         yield DaoFile('{}.dao.base.php'.format(table.name),
                       dao_template.render(table=table))

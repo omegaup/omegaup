@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link QualityNominations}.
+ * {@link \OmegaUp\DAO\VO\QualityNominations}.
  * @access public
  * @abstract
- *
  */
 abstract class QualityNominationsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param QualityNominations $QualityNominations El objeto de tipo QualityNominations a actualizar.
+     * @param \OmegaUp\DAO\VO\QualityNominations $QualityNominations El objeto de tipo QualityNominations a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(QualityNominations $QualityNominations) : int {
+    final public static function update(\OmegaUp\DAO\VO\QualityNominations $QualityNominations) : int {
         $sql = 'UPDATE `QualityNominations` SET `user_id` = ?, `problem_id` = ?, `nomination` = ?, `contents` = ?, `time` = ?, `status` = ? WHERE `qualitynomination_id` = ?;';
         $params = [
             is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
@@ -41,40 +39,45 @@ abstract class QualityNominationsDAOBase {
     }
 
     /**
-     * Obtener {@link QualityNominations} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\QualityNominations} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link QualityNominations} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\QualityNominations}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?QualityNominations Un objeto del tipo {@link QualityNominations}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\QualityNominations Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\QualityNominations} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $qualitynomination_id) : ?QualityNominations {
+    final public static function getByPK(int $qualitynomination_id) : ?\OmegaUp\DAO\VO\QualityNominations {
         $sql = 'SELECT `QualityNominations`.`qualitynomination_id`, `QualityNominations`.`user_id`, `QualityNominations`.`problem_id`, `QualityNominations`.`nomination`, `QualityNominations`.`contents`, `QualityNominations`.`time`, `QualityNominations`.`status` FROM QualityNominations WHERE (qualitynomination_id = ?) LIMIT 1;';
         $params = [$qualitynomination_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new QualityNominations($row);
+        return new \OmegaUp\DAO\VO\QualityNominations($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto QualityNominations suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\QualityNominations} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param QualityNominations $QualityNominations El objeto de tipo QualityNominations a eliminar
+     * @param \OmegaUp\DAO\VO\QualityNominations $QualityNominations El
+     * objeto de tipo \OmegaUp\DAO\VO\QualityNominations a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(QualityNominations $QualityNominations) : void {
+    final public static function delete(\OmegaUp\DAO\VO\QualityNominations $QualityNominations) : void {
         $sql = 'DELETE FROM `QualityNominations` WHERE qualitynomination_id = ?;';
         $params = [$QualityNominations->qualitynomination_id];
 
@@ -88,7 +91,8 @@ abstract class QualityNominationsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link QualityNominations}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\QualityNominations}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -99,9 +103,10 @@ abstract class QualityNominationsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return QualityNominations[] Un arreglo que contiene objetos del tipo {@link QualityNominations}.
+     * @return \OmegaUp\DAO\VO\QualityNominations[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\QualityNominations}.
      *
-     * @psalm-return array<int, QualityNominations>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\QualityNominations>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -118,7 +123,7 @@ abstract class QualityNominationsDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new QualityNominations($row);
+            $allData[] = new \OmegaUp\DAO\VO\QualityNominations($row);
         }
         return $allData;
     }
@@ -127,13 +132,15 @@ abstract class QualityNominationsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto QualityNominations suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\QualityNominations}
+     * suministrado.
      *
-     * @param QualityNominations $QualityNominations El objeto de tipo QualityNominations a crear.
+     * @param \OmegaUp\DAO\VO\QualityNominations $QualityNominations El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\QualityNominations} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(QualityNominations $QualityNominations) : int {
+    final public static function create(\OmegaUp\DAO\VO\QualityNominations $QualityNominations) : int {
         $sql = 'INSERT INTO QualityNominations (`user_id`, `problem_id`, `nomination`, `contents`, `time`, `status`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,

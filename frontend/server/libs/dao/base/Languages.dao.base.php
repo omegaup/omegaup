@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Languages}.
+ * {@link \OmegaUp\DAO\VO\Languages}.
  * @access public
  * @abstract
- *
  */
 abstract class LanguagesDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param Languages $Languages El objeto de tipo Languages a actualizar.
+     * @param \OmegaUp\DAO\VO\Languages $Languages El objeto de tipo Languages a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(Languages $Languages) : int {
+    final public static function update(\OmegaUp\DAO\VO\Languages $Languages) : int {
         $sql = 'UPDATE `Languages` SET `name` = ?, `country_id` = ? WHERE `language_id` = ?;';
         $params = [
             $Languages->name,
@@ -37,40 +35,45 @@ abstract class LanguagesDAOBase {
     }
 
     /**
-     * Obtener {@link Languages} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\Languages} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Languages} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Languages}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?Languages Un objeto del tipo {@link Languages}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\Languages Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\Languages} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $language_id) : ?Languages {
+    final public static function getByPK(int $language_id) : ?\OmegaUp\DAO\VO\Languages {
         $sql = 'SELECT `Languages`.`language_id`, `Languages`.`name`, `Languages`.`country_id` FROM Languages WHERE (language_id = ?) LIMIT 1;';
         $params = [$language_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new Languages($row);
+        return new \OmegaUp\DAO\VO\Languages($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Languages suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\Languages} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param Languages $Languages El objeto de tipo Languages a eliminar
+     * @param \OmegaUp\DAO\VO\Languages $Languages El
+     * objeto de tipo \OmegaUp\DAO\VO\Languages a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Languages $Languages) : void {
+    final public static function delete(\OmegaUp\DAO\VO\Languages $Languages) : void {
         $sql = 'DELETE FROM `Languages` WHERE language_id = ?;';
         $params = [$Languages->language_id];
 
@@ -84,7 +87,8 @@ abstract class LanguagesDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Languages}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\Languages}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -95,9 +99,10 @@ abstract class LanguagesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return Languages[] Un arreglo que contiene objetos del tipo {@link Languages}.
+     * @return \OmegaUp\DAO\VO\Languages[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\Languages}.
      *
-     * @psalm-return array<int, Languages>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\Languages>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -114,7 +119,7 @@ abstract class LanguagesDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new Languages($row);
+            $allData[] = new \OmegaUp\DAO\VO\Languages($row);
         }
         return $allData;
     }
@@ -123,13 +128,15 @@ abstract class LanguagesDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Languages suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\Languages}
+     * suministrado.
      *
-     * @param Languages $Languages El objeto de tipo Languages a crear.
+     * @param \OmegaUp\DAO\VO\Languages $Languages El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Languages} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Languages $Languages) : int {
+    final public static function create(\OmegaUp\DAO\VO\Languages $Languages) : int {
         $sql = 'INSERT INTO Languages (`name`, `country_id`) VALUES (?, ?);';
         $params = [
             $Languages->name,

@@ -60,8 +60,8 @@ class Authorization {
     const IDENTITY_CREATOR_GROUP_ALIAS = 'omegaup:group-identity-creator';
 
     public static function canViewSubmission(
-        Identities $identity,
-        Submissions $submission
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Submissions $submission
     ) : bool {
         return (
             $submission->identity_id === $identity->identity_id  ||
@@ -70,8 +70,8 @@ class Authorization {
     }
 
     public static function canEditSubmission(
-        Identities $identity,
-        Submissions $submission
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Submissions $submission
     ) : bool {
         $problem = ProblemsDAO::getByPK($submission->problem_id);
         if (is_null($problem)) {
@@ -96,8 +96,8 @@ class Authorization {
     }
 
     public static function canViewClarification(
-        Identities $identity,
-        Clarifications $clarification
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Clarifications $clarification
     ) : bool {
         // TODO Temporary until isAdmin function is fixed
         $identity_id = $identity->identity_id;
@@ -114,8 +114,8 @@ class Authorization {
     }
 
     public static function canEditClarification(
-        Identities $identity,
-        Clarifications $clarification
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Clarifications $clarification
     ) : bool {
         $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         if (is_null($problemset)) {
@@ -136,8 +136,8 @@ class Authorization {
      * reviewers can do so.
      */
     public static function canEditProblem(
-        Identities $identity,
-        Problems $problem
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
     ) : bool {
         return self::isProblemAdmin($identity, $problem) ||
             self::isQualityReviewer($identity) ||
@@ -153,8 +153,8 @@ class Authorization {
      * admins and identities that have solved the problem can do so.
      */
     public static function canViewProblemSolution(
-        Identities $identity,
-        Problems $problem
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
     ) : bool {
         if (is_null($identity->identity_id)) {
             return false;
@@ -164,18 +164,18 @@ class Authorization {
             ProblemsForfeitedDAO::isProblemForfeited($problem, $identity);
     }
 
-    public static function canViewEmail(Identities $identity) : bool {
+    public static function canViewEmail(\OmegaUp\DAO\VO\Identities $identity) : bool {
         return self::isMentor($identity);
     }
 
-    public static function canCreateGroupIdentities(Identities $identity) : bool {
+    public static function canCreateGroupIdentities(\OmegaUp\DAO\VO\Identities $identity) : bool {
         return self::isGroupIdentityCreator($identity);
     }
 
     public static function canViewCourse(
-        Identities $identity,
-        Courses $course,
-        Groups $group
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course,
+        \OmegaUp\DAO\VO\Groups $group
     ) : bool {
         if (!Authorization::isCourseAdmin($identity, $course) &&
             !Authorization::isGroupMember($identity, $group)
@@ -187,7 +187,7 @@ class Authorization {
     }
 
     public static function isAdmin(
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         Object $entity
     ) : bool {
         if (is_null($entity) || is_null($identity->user_id)) {
@@ -202,8 +202,8 @@ class Authorization {
     }
 
     public static function isContestAdmin(
-        Identities $identity,
-        Contests $contest
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
     ) : bool {
         if (is_null($identity->user_id)) {
             return false;
@@ -212,8 +212,8 @@ class Authorization {
     }
 
     public static function isInterviewAdmin(
-        Identities $identity,
-        Interviews $interview
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Interviews $interview
     ) : bool {
         if (is_null($identity->user_id)) {
             return false;
@@ -222,8 +222,8 @@ class Authorization {
     }
 
     public static function isProblemAdmin(
-        Identities $identity,
-        Problems $problem
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
     ) : bool {
         if (is_null($identity->user_id)) {
             return false;
@@ -232,7 +232,7 @@ class Authorization {
     }
 
     public static function hasRole(
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         int $acl_id,
         int $role_id
     ) : bool {
@@ -240,7 +240,7 @@ class Authorization {
             UserRolesDAO::hasRole($identity->identity_id, $acl_id, $role_id);
     }
 
-    public static function isSystemAdmin(Identities $identity) : bool {
+    public static function isSystemAdmin(\OmegaUp\DAO\VO\Identities $identity) : bool {
         if (self::$is_system_admin == null) {
             self::$is_system_admin = Authorization::hasRole(
                 $identity,
@@ -251,7 +251,7 @@ class Authorization {
         return self::$is_system_admin;
     }
 
-    public static function isQualityReviewer(Identities $identity) : bool {
+    public static function isQualityReviewer(\OmegaUp\DAO\VO\Identities $identity) : bool {
         if (self::$quality_reviewer_group == null) {
             self::$quality_reviewer_group = GroupsDAO::findByAlias(
                 Authorization::QUALITY_REVIEWER_GROUP_ALIAS
@@ -263,7 +263,7 @@ class Authorization {
         );
     }
 
-    public static function isMentor(Identities $identity) : bool {
+    public static function isMentor(\OmegaUp\DAO\VO\Identities $identity) : bool {
         if (self::$mentor_group == null) {
             self::$mentor_group = GroupsDAO::findByAlias(
                 Authorization::MENTOR_GROUP_ALIAS
@@ -289,7 +289,7 @@ class Authorization {
         return in_array($today, $availableDateToChooseCoder);
     }
 
-    public static function isGroupIdentityCreator(Identities $identity) : bool {
+    public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity) : bool {
         if (self::$groupIdentityCreator == null) {
             self::$groupIdentityCreator = GroupsDAO::findByAlias(
                 Authorization::IDENTITY_CREATOR_GROUP_ALIAS
@@ -301,7 +301,7 @@ class Authorization {
         );
     }
 
-    public static function isSupportTeamMember(Identities $identity) : bool {
+    public static function isSupportTeamMember(\OmegaUp\DAO\VO\Identities $identity) : bool {
         if (self::$support_group == null) {
             self::$support_group = GroupsDAO::findByAlias(
                 Authorization::SUPPORT_GROUP_ALIAS
@@ -313,14 +313,14 @@ class Authorization {
         );
     }
 
-    public static function isGroupAdmin(Identities $identity, Groups $group) : bool {
+    public static function isGroupAdmin(\OmegaUp\DAO\VO\Identities $identity, \OmegaUp\DAO\VO\Groups $group) : bool {
         if (is_null($identity->user_id)) {
             return false;
         }
         return self::isAdmin($identity, $group);
     }
 
-    private static function isOwner(Identities $identity, int $aclId) : bool {
+    private static function isOwner(\OmegaUp\DAO\VO\Identities $identity, int $aclId) : bool {
         $acl = ACLsDAO::getByPK($aclId);
         return $acl->owner_id == $identity->user_id;
     }
@@ -329,8 +329,8 @@ class Authorization {
      * An admin is either the group owner or a member of the admin group.
      */
     public static function isCourseAdmin(
-        Identities $identity,
-        Courses $course
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Courses $course
     ) : bool {
         if (is_null($identity->user_id)) {
             return false;
@@ -339,8 +339,8 @@ class Authorization {
     }
 
     private static function isGroupMember(
-        Identities $identity,
-        Groups $group
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Groups $group
     ) : bool {
         if (Authorization::isSystemAdmin($identity)) {
             return true;
@@ -352,7 +352,7 @@ class Authorization {
         return !empty($groupUsers);
     }
 
-    public static function isCourseCurator(Identities $identity) : bool {
+    public static function isCourseCurator(\OmegaUp\DAO\VO\Identities $identity) : bool {
         if (self::$course_curator_group == null) {
             self::$course_curator_group = GroupsDAO::findByAlias(
                 Authorization::COURSE_CURATOR_GROUP_ALIAS
@@ -373,8 +373,8 @@ class Authorization {
     }
 
     public static function canSubmitToProblemset(
-        Identities $identity,
-        ?Problemsets $problemset
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Problemsets $problemset
     ) : bool {
         if (is_null($problemset)) {
             return false;
@@ -386,7 +386,7 @@ class Authorization {
                );
     }
 
-    public static function canCreatePublicCourse(Identities $identity) : bool {
+    public static function canCreatePublicCourse(\OmegaUp\DAO\VO\Identities $identity) : bool {
         return self::isCourseCurator($identity);
     }
 }

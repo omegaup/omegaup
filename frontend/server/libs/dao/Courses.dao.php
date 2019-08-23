@@ -1,14 +1,15 @@
 <?php
 
 include('base/Courses.dao.base.php');
-include('base/Courses.vo.base.php');
-/** Courses Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Courses }.
-  * @access public
-  *
-  */
+
+/**
+ * Courses Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Courses}.
+ * @access public
+ */
 class CoursesDAO extends CoursesDAOBase {
     public static function findByName($name) {
         $sql = "SELECT DISTINCT c.*
@@ -20,7 +21,7 @@ class CoursesDAO extends CoursesDAOBase {
         $finalResult = [];
 
         foreach ($resultRows as $row) {
-            array_push($finalResult, new Courses($row));
+            array_push($finalResult, new \OmegaUp\DAO\VO\Courses($row));
         }
 
         return $finalResult;
@@ -84,7 +85,7 @@ class CoursesDAO extends CoursesDAOBase {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$identity_id]);
         $courses = [];
         foreach ($rs as $row) {
-            array_push($courses, new Courses($row));
+            array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
     }
@@ -243,7 +244,7 @@ class CoursesDAO extends CoursesDAOBase {
 
         $courses = [];
         foreach ($rs as $row) {
-            array_push($courses, new Courses($row));
+            array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
     }
@@ -280,7 +281,7 @@ class CoursesDAO extends CoursesDAOBase {
 
         $courses = [];
         foreach ($rs as $row) {
-            array_push($courses, new Courses($row));
+            array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
     }
@@ -294,10 +295,10 @@ class CoursesDAO extends CoursesDAOBase {
             return null;
         }
 
-        return new Courses($row);
+        return new \OmegaUp\DAO\VO\Courses($row);
     }
 
-    final public static function getAssignmentByAlias(Courses $course, string $assignmentAlias) {
+    final public static function getAssignmentByAlias(\OmegaUp\DAO\VO\Courses $course, string $assignmentAlias) {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
         $params = [$assignmentAlias, $course->course_id];
 
@@ -306,10 +307,10 @@ class CoursesDAO extends CoursesDAOBase {
             return null;
         }
 
-        return new Assignments($row);
+        return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
-    final public static function updateAssignmentMaxPoints(Courses $course, string $assignment_alias) {
+    final public static function updateAssignmentMaxPoints(\OmegaUp\DAO\VO\Courses $course, string $assignment_alias) {
         $sql = 'UPDATE Assignments a
                 JOIN (
                     SELECT assignment_id, sum(psp.points) as max_points
@@ -329,7 +330,7 @@ class CoursesDAO extends CoursesDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    final public static function getSharingInformation($identity_id, Courses $course, Groups $group) {
+    final public static function getSharingInformation($identity_id, \OmegaUp\DAO\VO\Courses $course, \OmegaUp\DAO\VO\Groups $group) {
         if ($course->group_id != $group->group_id) {
             return true;
         }

@@ -115,7 +115,7 @@ class RunsFactory {
      *
      * @param type $problemData
      * @param type $contestData
-     * @param Users $contestant
+     * @param \OmegaUp\DAO\VO\Users $contestant
      * @return array
      */
     public static function createRun($problemData, $contestData, $contestant) {

@@ -91,10 +91,10 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Given an Identity, checks that login let state as supposed
      *
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @param type $auth_token
      */
-    public function assertLogin(Identities $identity, $auth_token = null) {
+    public function assertLogin(\OmegaUp\DAO\VO\Identities $identity, $auth_token = null) {
         // Check auth token
         $auth_tokens_bd = AuthTokensDAO::getByIdentityId($identity->identity_id);
 
@@ -434,7 +434,7 @@ class NoOpGrader extends Grader {
     private $_submissions = [];
     private $_runs = [];
 
-    public function grade(Runs $run, string $source) {
+    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) {
         $sql = '
             SELECT
                 s.guid
@@ -483,7 +483,7 @@ class NoOpGrader extends Grader {
     }
 
     public function getGraderResource(
-        Runs $run,
+        \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         bool $passthru = false,
         bool $missingOk = false
@@ -503,7 +503,7 @@ class NoOpGrader extends Grader {
     }
 
     public function setGraderResourceForTesting(
-        Runs $run,
+        \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         string $contents
     ) {

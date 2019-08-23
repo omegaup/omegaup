@@ -16,7 +16,7 @@ class GroupScoreboardController extends Controller {
      */
     private static function validateGroupScoreboard(
         string $groupAlias,
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         string $scoreboardAlias
     ) {
         GroupController::validateGroup($groupAlias, $identity);
@@ -40,7 +40,7 @@ class GroupScoreboardController extends Controller {
      */
     private static function validateGroupScoreboardAndContest(
         string $groupAlias,
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         string $scoreboardAlias,
         string $contestAlias
     ) {
@@ -83,7 +83,7 @@ class GroupScoreboardController extends Controller {
         $r->ensureBool('only_ac');
         $r->ensureFloat('weight');
 
-        GroupsScoreboardsProblemsetsDAO::create(new GroupsScoreboardsProblemsets([
+        GroupsScoreboardsProblemsetsDAO::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
             'problemset_id' => $contestScoreboard['contest']->problemset_id,
             'only_ac' => $r['only_ac'],

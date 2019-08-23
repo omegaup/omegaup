@@ -1,14 +1,16 @@
 <?php
 
 include('base/Users_Experiments.dao.base.php');
-include('base/Users_Experiments.vo.base.php');
-/** UsersExperiments Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link UsersExperiments }.
-  * @access public
-  *
-  */
+
+/**
+ * UsersExperiments Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\UsersExperiments}.
+ *
+ * @access public
+ */
 class UsersExperimentsDAO extends UsersExperimentsDAOBase {
     public static function delete($user_id, $experiment) {
         $sql = '
@@ -35,7 +37,7 @@ class UsersExperimentsDAO extends UsersExperimentsDAOBase {
 
         $users_experiments = [];
         foreach ($rs as $row) {
-            array_push($users_experiments, new UsersExperiments($row));
+            array_push($users_experiments, new \OmegaUp\DAO\VO\UsersExperiments($row));
         }
         return $users_experiments;
     }

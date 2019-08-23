@@ -64,9 +64,9 @@ class Experiments {
 
     /**
      * Creates an instance of Experiments.
-     * @param array $request Typically $_REQUEST, except in tests.
-     * @param User $user The currently logged in user.
-     * @param array $defines Typically get_defined_constants(true)['user'],
+     * @param array<string, string> $request Typically $_REQUEST, except in tests.
+     * @param \OmegaUp\DAO\VO\Users $user The currently logged in user.
+     * @param array<string, mixed> $defines Typically get_defined_constants(true)['user'],
      *                       except in tests.
      * @param array $knownExperiments Typically
      *                                Experiments::$kKnownExperiments, except
@@ -74,7 +74,7 @@ class Experiments {
      */
     public function __construct(
         array $request,
-        Users $user = null,
+        \OmegaUp\DAO\VO\Users $user = null,
         array $defines = null,
         array $knownExperiments = null
     ) {
@@ -119,13 +119,12 @@ class Experiments {
 
     /**
      * Loads experiments for a particular user.
-     * @param Users $user The user.
-     * @param array $knownExperiments Typically
-     *                                Experiments::$kKnownExperiments, except
-     *                                in tests.
+     * @param \OmegaUp\DAO\VO\Users $user The user.
+     * @param string[] $knownExperiments Typically
+     * Experiments::KNOWN_EXPERIMENTS, except in tests.
      */
     private function loadExperimentsForUser(
-        Users $user,
+        \OmegaUp\DAO\VO\Users $user,
         array $knownExperiments
     ) {
         foreach (UsersExperimentsDAO::getByUserId($user->user_id) as $ue) {

@@ -11,12 +11,12 @@ class GroupController extends Controller {
      * Utility function to create a new group.
      */
     public static function createGroup($alias, $name, $description, $owner_id) {
-        $group = new Groups([
+        $group = new \OmegaUp\DAO\VO\Groups([
             'alias' => $alias,
             'name' => $name,
             'description' => $description,
         ]);
-        $groupAcl = new ACLs([
+        $groupAcl = new \OmegaUp\DAO\VO\ACLs([
             'owner_id' => $owner_id,
         ]);
 
@@ -68,13 +68,13 @@ class GroupController extends Controller {
      * Validate group param
      *
      * @param string $groupAlias
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     public static function validateGroup(
         string $groupAlias,
-        Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity
     ) {
         Validators::validateStringNonEmpty($groupAlias, 'group_alias');
         $group = GroupsDAO::findByAlias($groupAlias);
@@ -92,11 +92,11 @@ class GroupController extends Controller {
      * Validate common params for these APIs
      *
      * @param string $groupAlias
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      */
     private static function validateGroupAndOwner(
         string $groupAlias,
-        Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity
     ) {
         return self::validateGroup($groupAlias, $identity);
     }
@@ -111,7 +111,7 @@ class GroupController extends Controller {
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
-        GroupsIdentitiesDAO::create(new GroupsIdentities([
+        GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $group->group_id,
             'identity_id' => $resolvedIdentity->identity_id
         ]));
@@ -250,7 +250,7 @@ class GroupController extends Controller {
         Validators::validateStringNonEmpty($r['name'], 'name', true);
         Validators::validateStringNonEmpty($r['description'], 'description', false);
 
-        GroupsScoreboardsDAO::create(new GroupsScoreboards([
+        GroupsScoreboardsDAO::create(new \OmegaUp\DAO\VO\GroupsScoreboards([
             'group_id' => $group->group_id,
             'name' => $r['name'],
             'description' =>$r['description'],

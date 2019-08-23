@@ -20,7 +20,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         }
 
         $problemForfeited = ProblemsFactory::createProblem();
-        ProblemsForfeitedDAO::create(new ProblemsForfeited([
+        ProblemsForfeitedDAO::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
             'user_id' => $user->user_id,
             'problem_id' => $problemForfeited['problem']->problem_id,
         ]));

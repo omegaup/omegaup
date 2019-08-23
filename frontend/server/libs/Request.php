@@ -19,11 +19,13 @@ class Request extends ArrayObject {
 
     /**
      * The object of the user currently logged in.
+     * @var null|\OmegaUp\DAO\VO\Users
      */
     public $user = null;
 
     /**
      * The object of the identity currently logged in.
+     * @var null|\OmegaUp\DAO\VO\Identities
      */
     public $identity = null;
 

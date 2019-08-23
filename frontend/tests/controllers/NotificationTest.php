@@ -9,12 +9,12 @@
 class NotificationTest extends OmegaupTestCase {
     public function testListUnreadNotifications() {
         $user = UserFactory::createUser();
-        NotificationsDAO::create(new Notifications([
+        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'read' => true,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testRead'])
         ]));
-        NotificationsDAO::create(new Notifications([
+        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
         ]));
@@ -32,15 +32,15 @@ class NotificationTest extends OmegaupTestCase {
 
     public function testReadNotifications() {
         $user = UserFactory::createUser();
-        NotificationsDAO::create(new Notifications([
+        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
         ]));
-        NotificationsDAO::create(new Notifications([
+        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread2'])
         ]));
-        NotificationsDAO::create(new Notifications([
+        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread3'])
         ]));
@@ -102,7 +102,7 @@ class NotificationTest extends OmegaupTestCase {
 
     public function testReadNotificationsForbbidenAccessException() {
         $user = UserFactory::createUser();
-        $notification = new Notifications([
+        $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
         ]);

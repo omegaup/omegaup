@@ -168,7 +168,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
     }
 
     private function assertContestRestrictionsForIdentity(
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         array $contestData,
         string $identityStatus
     ) : void {
@@ -219,7 +219,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
     }
 
     private function assertCourseRestrictionsForIdentity(
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         array $courseData,
         string $identityStatus
     ) : void {
@@ -255,7 +255,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
     }
 
     private function assertProblemRestrictionsForIdentity(
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         string $identityStatus
     ) : void {
         // Login with the identity recently created
@@ -280,7 +280,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
     }
 
     private function assertGroupRestrictionsForIdentity(
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         string $identityStatus
     ) : void {
         // Login with the identity recently created

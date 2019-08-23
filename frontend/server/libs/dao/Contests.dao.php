@@ -1,13 +1,6 @@
 <?php
 
 require_once('base/Contests.dao.base.php');
-require_once('base/Contests.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
 
 /**
  * Base class for the ActiveStatus and RecommendedStatus enums below.
@@ -117,14 +110,16 @@ class PublicStatus extends StatusBase {
     const YES = 1;
 }
 
-/** Contests Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Contests }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
+/**
+ * Contests Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Contests}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
   */
 class ContestsDAO extends ContestsDAOBase {
     private static $getContestsColumns = '
@@ -143,7 +138,7 @@ class ContestsDAO extends ContestsDAOBase {
                                 rerun_id
                                 ';
 
-    final public static function getByAlias(string $alias) : ?Contests {
+    final public static function getByAlias(string $alias) : ?\OmegaUp\DAO\VO\Contests {
         $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
@@ -151,7 +146,7 @@ class ContestsDAO extends ContestsDAOBase {
             return null;
         }
 
-        return new Contests($rs);
+        return new \OmegaUp\DAO\VO\Contests($rs);
     }
 
     final public static function getByTitle($title) {
@@ -161,7 +156,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         $contests = [];
         foreach ($rs as $row) {
-            array_push($contests, new Contests($row));
+            array_push($contests, new \OmegaUp\DAO\VO\Contests($row));
         }
         return $contests;
     }
@@ -195,10 +190,10 @@ class ContestsDAO extends ContestsDAOBase {
             return null;
         }
 
-        return new Contests($row);
+        return new \OmegaUp\DAO\VO\Contests($row);
     }
 
-    public static function getPrivateContestsCount(Users $user) {
+    public static function getPrivateContestsCount(\OmegaUp\DAO\VO\Users $user) {
         $sql = 'SELECT
            COUNT(c.contest_id) as total
         FROM
@@ -220,11 +215,11 @@ class ContestsDAO extends ContestsDAOBase {
         return $rs['total'];
     }
 
-    public static function hasStarted(Contests $contest) {
+    public static function hasStarted(\OmegaUp\DAO\VO\Contests $contest) {
         return \OmegaUp\Time::get() >= $contest->start_time;
     }
 
-    public static function hasFinished(Contests $contest) {
+    public static function hasFinished(\OmegaUp\DAO\VO\Contests $contest) {
         return \OmegaUp\Time::get() >= $contest->finish_time;
     }
 
@@ -776,11 +771,11 @@ class ContestsDAO extends ContestsDAOBase {
     /**
      * Generate alias of virtual contest / ghost mode
      *
-     * @param Contests $contest
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Contests $contest
+     * @param \OmegaUp\DAO\VO\Users $user
      * @return string of unique virtual contest alias
      */
-    public static function generateAlias(Contests $contest) {
+    public static function generateAlias(\OmegaUp\DAO\VO\Contests $contest) {
         // Virtual contest alias format (alias-virtual-random)
         $alias = $contest->alias;
 
@@ -792,7 +787,7 @@ class ContestsDAO extends ContestsDAOBase {
      * @param Contest $contest
      * @return boolean
      */
-    public static function isVirtual(Contests $contest) {
+    public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest) {
         return $contest->rerun_id != 0;
     }
 

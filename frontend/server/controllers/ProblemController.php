@@ -185,7 +185,7 @@ class ProblemController extends Controller {
         self::validateCreateOrUpdate($r);
 
         // Populate a new Problem object
-        $problem = new Problems([
+        $problem = new \OmegaUp\DAO\VO\Problems([
             'visibility' => $r['visibility'], /* private by default */
             'title' => $r['title'],
             'visits' => 0,
@@ -204,7 +204,7 @@ class ProblemController extends Controller {
         self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $r['languages'] !== '';
 
-        $acl = new ACLs();
+        $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $r->user->user_id;
 
         // Insert new problem
@@ -398,7 +398,7 @@ class ProblemController extends Controller {
     private static function addTag(
         string $tagName,
         bool $isPublic,
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         bool $allowRestricted = false
     ) : void {
         // Normalize name.
@@ -410,13 +410,13 @@ class ProblemController extends Controller {
 
         $tag = TagsDAO::getByName($tagName);
         if (is_null($tag)) {
-            $tag = new Tags([
+            $tag = new \OmegaUp\DAO\VO\Tags([
                 'name' => $tagName,
             ]);
             TagsDAO::create($tag);
         }
 
-        ProblemsTagsDAO::create(new ProblemsTags([
+        ProblemsTagsDAO::create(new \OmegaUp\DAO\VO\ProblemsTags([
             'problem_id' => $problem->problem_id,
             'tag_id' => $tag->tag_id,
             'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
@@ -528,7 +528,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('tagRestricted', 'name');
         }
 
-        ProblemsTagsDAO::delete(new ProblemsTags([
+        ProblemsTagsDAO::delete(new \OmegaUp\DAO\VO\ProblemsTags([
             'problem_id' => $problem->problem_id,
             'tag_id' => $tag->tag_id,
         ]));
@@ -805,7 +805,7 @@ class ProblemController extends Controller {
         return $response;
     }
 
-    private static function setRestrictedTags(Problems $problem) {
+    private static function setRestrictedTags(\OmegaUp\DAO\VO\Problems $problem) {
         ProblemsTagsDAO::clearRestrictedTags($problem);
         $languages = explode(',', $problem->languages);
         if (in_array('cat', $languages)) {
@@ -835,7 +835,7 @@ class ProblemController extends Controller {
      */
     private static function updateLooseFile(
         Request $r,
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         string $directory,
         string $contents
     ): array {
@@ -922,13 +922,13 @@ class ProblemController extends Controller {
      * Invalidates the various caches of the problem, as well as updating the
      * languages.
      *
-     * @param Problems $problem the problem
+     * @param \OmegaUp\DAO\VO\Problems $problem the problem
      * @param array $updatedLanguages the array of updated statement file languages.
      *
      * @return void
      */
     private static function invalidateCache(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         array $updatedLanguages
     ): void {
         self::updateLanguages($problem);
@@ -949,13 +949,13 @@ class ProblemController extends Controller {
     /**
      * Invalidates the problem solution cache
      *
-     * @param Problems $problem the problem
+     * @param \OmegaUp\DAO\VO\Problems $problem the problem
      * @param array $updatedLanguages the array of updated loose file languages.
      *
      * @return void
      */
     private static function invalidateSolutionCache(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         array $updatedLanguages
     ): void {
         // Invalidate problem solution cache
@@ -1111,7 +1111,7 @@ class ProblemController extends Controller {
     /**
      * Gets the problem statement from the gitserver.
      *
-     * @param Problems $problem  The problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem  The problem.
      * @param string   $commit   The git commit at which to get the statement.
      * @param string   $language The language of the problem. Will default to
      *                           Spanish if not found.
@@ -1120,7 +1120,7 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         string $commit,
         string $language
     ) : array {
@@ -1142,7 +1142,7 @@ class ProblemController extends Controller {
     /**
      * Gets the problem solution from the gitserver.
      *
-     * @param Problems $problem  The problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem  The problem.
      * @param string   $commit   The git commit at which to get the solution.
      * @param string   $language The language of the solution. Will default to
      *                           Spanish if not found.
@@ -1151,7 +1151,7 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemSolution(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         string $commit,
         string $language
     ) : array {
@@ -1174,11 +1174,11 @@ class ProblemController extends Controller {
      * Gets the distributable problem settings for the problem, using the cache
      * if needed.
      *
-     * @param Problems $problem the problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      * @return array the problem settings.
      */
     private static function getProblemSettingsDistrib(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         string $commit
     ) : array {
         return Cache::getFromCacheOrSet(
@@ -1257,14 +1257,14 @@ class ProblemController extends Controller {
     /**
      * Validate problemset Details API
      *
-     * @param Problems $problem
+     * @param \OmegaUp\DAO\VO\Problems $problem
      * @param $problemsetId
      * @param $contestAlias
      * @return Array
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateProblemset(Problems $problem, $problemsetId, $contestAlias = null) {
+    private static function validateProblemset(\OmegaUp\DAO\VO\Problems $problem, $problemsetId, $contestAlias = null) {
         $problemNotFound = null;
         $response = [];
         if (!empty($contestAlias)) {
@@ -1332,7 +1332,7 @@ class ProblemController extends Controller {
      * inside a contest
      *
      * @param Request $r
-     * @return Problems
+     * @return \OmegaUp\DAO\VO\Problems
      * @throws UnauthorizedException
      */
     private static function getValidProblemAndProblemset(Request $r) : array {
@@ -1351,14 +1351,14 @@ class ProblemController extends Controller {
     /**
      * Get the extra problem details with all the validations
      * @param Request $r
-     * @param Problems $problem
+     * @param \OmegaUp\DAO\VO\Problems $problem
      * @param bool $showSolvers
      * @return array
      */
     private static function getProblemDetails(
         Request $r,
-        Problems $problem,
-        ?Problemsets $problemset,
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?\OmegaUp\DAO\VO\Problemsets $problemset,
         bool $showSolvers
     ) : array {
         $response = [];
@@ -1476,7 +1476,7 @@ class ProblemController extends Controller {
                 $problem->problem_id,
                 $r->identity->identity_id
             )) {
-                ProblemsetProblemOpenedDAO::create(new ProblemsetProblemOpened([
+                ProblemsetProblemOpenedDAO::create(new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
                     'problem_id' => $problem->problem_id,
                     'open_time' => \OmegaUp\Time::get(),
@@ -1566,7 +1566,7 @@ class ProblemController extends Controller {
             if ($seenSolutions >= $allowedSolutions) {
                 throw new ForbiddenAccessException('allowedSolutionsLimitReached');
             }
-            ProblemsForfeitedDAO::create(new ProblemsForfeited([
+            ProblemsForfeitedDAO::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
                 'user_id' => $r->user->user_id,
                 'problem_id' => $problem->problem_id
             ]));
@@ -1785,7 +1785,7 @@ class ProblemController extends Controller {
     /**
      * Resolve a commit from the problem's master branch.
      *
-     * @param Problems $problem the problem.
+     * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      * @param ?string  $commit  the optional explicit commit hash.
      *
      * @return the SHA1 of a commit in the problem's master branch, plus
@@ -1793,7 +1793,7 @@ class ProblemController extends Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function resolveCommit(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         ?string $commit
     ) : array {
         $masterCommit = null;
@@ -2303,19 +2303,19 @@ class ProblemController extends Controller {
      *
      * Authentication is expected to be performed earlier.
      *
-     * @param Problems $problem
+     * @param \OmegaUp\DAO\VO\Problems $problem
      * @param $problemsetId
      * @param $contestAlias
      * @param $currentLoggedIdentityId
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @return float
      */
     private static function bestScore(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         $problemsetId,
         $contestAlias,
         int $currentLoggedIdentityId,
-        ?Identities $identity = null
+        ?\OmegaUp\DAO\VO\Identities $identity = null
     ) : float {
         $currentIdentityId = (is_null($identity) ? $currentLoggedIdentityId : $identity->identity_id);
 
@@ -2343,13 +2343,13 @@ class ProblemController extends Controller {
      * @param Request $r
      * @return Array
      */
-    private static function updateLanguages(Problems $problem) {
+    private static function updateLanguages(\OmegaUp\DAO\VO\Problems $problem) {
         $problemArtifacts = new ProblemArtifacts($problem->alias);
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Removing existing data
-            $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
+            $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new \OmegaUp\DAO\VO\ProblemsLanguages([
                 'problem_id' => $problem->problem_id,
             ]));
 
@@ -2357,7 +2357,7 @@ class ProblemController extends Controller {
                 if (!$problemArtifacts->exists("statements/{$lang->name}.markdown")) {
                     continue;
                 }
-                ProblemsLanguagesDAO::create(new ProblemsLanguages([
+                ProblemsLanguagesDAO::create(new \OmegaUp\DAO\VO\ProblemsLanguages([
                     'problem_id' => $problem->problem_id,
                     'language_id' => $lang->language_id,
                 ]));
@@ -2541,12 +2541,12 @@ class ProblemController extends Controller {
     /**
      * Returns true if the problem's solution exists, otherwise returns false.
      *
-     * @param Problems $problem The problem object.
+     * @param \OmegaUp\DAO\VO\Problems $problem The problem object.
      * @return bool The problem solution status.
      * @throws InvalidFilesystemOperationException
      */
     private static function getProblemSolutionExistenceImpl(
-        Problems $problem
+        \OmegaUp\DAO\VO\Problems $problem
     ): bool {
         $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
         $existingFiles = $problemArtifacts->lsTree('solutions');
@@ -2565,7 +2565,7 @@ class ProblemController extends Controller {
     }
 
     private static function getProblemSolutionExistence(
-        Problems $problem
+        \OmegaUp\DAO\VO\Problems $problem
     ): bool {
         return Cache::getFromCacheOrSet(
             Cache::PROBLEM_SOLUTION_EXISTS,
@@ -2582,13 +2582,13 @@ class ProblemController extends Controller {
     /**
      * Returns the status for a problem solution.
      *
-     * @param Problems $problem
+     * @param \OmegaUp\DAO\VO\Problems $problem
      * @param Identity $user
      * @return string The status for the problem solution.
      */
     public static function getProblemSolutionStatus(
-        Problems $problem,
-        Identities $identity
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity
     ) : string {
         $exists = self::getProblemSolutionExistence($problem);
         if (!$exists) {
