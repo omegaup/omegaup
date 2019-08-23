@@ -9,6 +9,8 @@ declare namespace omegaup {
     markdownConverter: (options?: MarkdownConverterOptions) => Converter;
     navigateTo: (url: string) => void;
     userTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
+    groupTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
+    isVirtual: (contest: omegaup.Contest) => boolean,
   };
 
   interface MarkdownConverterOptions {
