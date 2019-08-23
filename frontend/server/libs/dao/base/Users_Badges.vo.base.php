@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class UsersBadges extends VO {
+class UsersBadges extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_badge_id' => true,
         'user_id' => true,
@@ -51,7 +51,7 @@ class UsersBadges extends VO {
              * @var string|int|float $data['assignation_time']
              * @var int $this->assignation_time
              */
-            $this->assignation_time = DAO::fromMySQLTimestamp($data['assignation_time']);
+            $this->assignation_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['assignation_time']);
         } else {
             $this->assignation_time = \OmegaUp\Time::get();
         }

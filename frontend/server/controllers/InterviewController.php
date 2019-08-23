@@ -36,7 +36,7 @@ class InterviewController extends Controller {
         ]);
 
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             ACLsDAO::create($acl);
             $interview->acl_id = $acl->acl_id;
@@ -55,12 +55,12 @@ class InterviewController extends Controller {
             $problemset->interview_id = $interview->interview_id;
             ProblemsetsDAO::update($problemset);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
 
-            if (DAO::isDuplicateEntryException($e)) {
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;

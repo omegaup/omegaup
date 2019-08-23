@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Courses extends VO {
+class Courses extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'course_id' => true,
         'name' => true,
@@ -69,14 +69,14 @@ class Courses extends VO {
              * @var string|int|float $data['start_time']
              * @var int $this->start_time
              */
-            $this->start_time = DAO::fromMySQLTimestamp($data['start_time']);
+            $this->start_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['start_time']);
         }
         if (isset($data['finish_time'])) {
             /**
              * @var string|int|float $data['finish_time']
              * @var int $this->finish_time
              */
-            $this->finish_time = DAO::fromMySQLTimestamp($data['finish_time']);
+            $this->finish_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['public'])) {
             $this->public = boolval($data['public']);

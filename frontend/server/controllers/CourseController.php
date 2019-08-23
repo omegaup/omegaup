@@ -39,8 +39,8 @@ class CourseController extends Controller {
      */
     private static function validateCreateAssignment(Request $r, Courses $course) : void {
         $isRequired = true;
-        $courseStartTime = DAO::fromMySQLTimestamp($course->start_time);
-        $courseFinishTime = DAO::fromMySQLTimestamp($course->finish_time);
+        $courseStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->start_time);
+        $courseFinishTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->finish_time);
 
         Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
         Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
@@ -226,7 +226,7 @@ class CourseController extends Controller {
 
         $offset = round($r['start_time']) - $originalCourse->start_time;
 
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
 
         try {
             // Create the course (and group)
@@ -272,9 +272,9 @@ class CourseController extends Controller {
                     );
                 }
             }
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -326,7 +326,7 @@ class CourseController extends Controller {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
 
         $group = GroupController::createGroup(
             $course->alias,
@@ -350,10 +350,10 @@ class CourseController extends Controller {
 
             CoursesDAO::create($course);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
-            if (DAO::isDuplicateEntryException($e)) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
             }
             throw $e;
@@ -373,7 +373,7 @@ class CourseController extends Controller {
         Courses $course,
         Assignments $assignment
     ) : Problemsets {
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
         try {
             // Create the backing problemset
             $problemset = new Problemsets([
@@ -392,10 +392,10 @@ class CourseController extends Controller {
             $problemset->assignment_id = $assignment->assignment_id;
             ProblemsetsDAO::update($problemset);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
-            if (DAO::isDuplicateEntryException($e)) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;
@@ -1117,7 +1117,7 @@ class CourseController extends Controller {
             'accept_teacher' => $r['accept_teacher'],
         ]);
 
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
 
         try {
             // Only users adding themselves are saved in consent log
@@ -1147,9 +1147,9 @@ class CourseController extends Controller {
             }
             GroupsIdentitiesDAO::replace($groupIdentity);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -1553,8 +1553,8 @@ class CourseController extends Controller {
                 'description' => $course->description,
                 'alias' => $course->alias,
                 'school_id' => $course->school_id,
-                'start_time' => DAO::fromMySQLTimestamp($course->start_time),
-                'finish_time' => DAO::fromMySQLTimestamp($course->finish_time),
+                'start_time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->start_time),
+                'finish_time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->finish_time),
                 'is_admin' => $isAdmin,
                 'public' => $course->public,
                 'basic_information_required' => boolval($course->needs_basic_information),

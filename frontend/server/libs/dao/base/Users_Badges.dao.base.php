@@ -30,7 +30,7 @@ abstract class UsersBadgesDAOBase {
         $params = [
             is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
-            DAO::toMySQLTimestamp($Users_Badges->assignation_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Users_Badges->assignation_time),
             (int)$Users_Badges->user_badge_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -135,7 +135,7 @@ abstract class UsersBadgesDAOBase {
         $params = [
             is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
             $Users_Badges->badge_alias,
-            DAO::toMySQLTimestamp($Users_Badges->assignation_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Users_Badges->assignation_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

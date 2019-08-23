@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Tags extends VO {
+class Tags extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'tag_id' => true,
         'name' => true,

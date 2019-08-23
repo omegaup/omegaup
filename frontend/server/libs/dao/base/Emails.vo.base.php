@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Emails extends VO {
+class Emails extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'email_id' => true,
         'email' => true,

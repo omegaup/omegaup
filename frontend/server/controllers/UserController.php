@@ -87,7 +87,7 @@ class UserController extends Controller {
             try {
                 UsersDAO::savePassword($user);
             } catch (Exception $e) {
-                if (DAO::isDuplicateEntryException($e)) {
+                if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                     throw new DuplicatedEntryInDatabaseException('usernameInUse', $e);
                 }
                 throw $e;
@@ -179,7 +179,7 @@ class UserController extends Controller {
 
         // Save objects into DB
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             UsersDAO::create($user);
 
@@ -202,9 +202,9 @@ class UserController extends Controller {
                 self::sendVerificationEmail($user);
             }
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -406,15 +406,15 @@ class UserController extends Controller {
         $identity->password = $hashedPassword;
 
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             UsersDAO::update($user);
 
             IdentitiesDAO::update($identity);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -1064,9 +1064,9 @@ class UserController extends Controller {
         $response['userinfo'] = [
             'username' => $user->username,
             'name' => $identity->name,
-            'birth_date' => is_null($user->birth_date) ? null : DAO::fromMySQLTimestamp($user->birth_date),
+            'birth_date' => is_null($user->birth_date) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp($user->birth_date),
             'gender' => $identity->gender,
-            'graduation_date' => is_null($user->graduation_date) ? null : DAO::fromMySQLTimestamp($user->graduation_date),
+            'graduation_date' => is_null($user->graduation_date) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp($user->graduation_date),
             'scholar_degree' => $user->scholar_degree,
             'preferred_language' => $user->preferred_language,
             'is_private' => $user->is_private,
@@ -1393,7 +1393,7 @@ class UserController extends Controller {
             $contests[$contest['alias']]['data'] = $contest;
             foreach ($contest as $key => $item) {
                 if ($key == 'start_time' || $key == 'finish_time' || $key == 'last_updated') {
-                    $contests[$contest['alias']][$key] = DAO::fromMySQLTimestamp($item);
+                    $contests[$contest['alias']][$key] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($item);
                 }
             }
         }
@@ -1547,7 +1547,7 @@ class UserController extends Controller {
         $r->identity->password = $hashedPassword;
 
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             // Update username and password for user object
             UsersDAO::update($r->user);
@@ -1555,9 +1555,9 @@ class UserController extends Controller {
             // Update username and password for identity object
             IdentitiesDAO::update($r->identity);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -1699,7 +1699,7 @@ class UserController extends Controller {
         self::updateValueProperties($r, $r->identity, $identityValueProperties);
 
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             // Update user object
             UsersDAO::update($r->user);
@@ -1707,9 +1707,9 @@ class UserController extends Controller {
             // Update identity object
             IdentitiesDAO::update($r->identity);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
 
             throw $e;
         }
@@ -1839,7 +1839,7 @@ class UserController extends Controller {
         Validators::validateEmail($r['email'], 'email');
 
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             // Update email
             $email = EmailsDAO::getByPK($r->user->main_email_id);
@@ -1862,10 +1862,10 @@ class UserController extends Controller {
                 }
             }
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
-            if (DAO::isDuplicateEntryException($e)) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('mailInUse', $e);
             }
             throw $e;
@@ -2292,7 +2292,7 @@ class UserController extends Controller {
                 $privacystatement_id
             );
         } catch (Exception $e) {
-            if (DAO::isDuplicateEntryException($e)) {
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy', $e);
             }
             throw $e;

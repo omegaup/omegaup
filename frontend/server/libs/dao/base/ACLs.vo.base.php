@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class ACLs extends VO {
+class ACLs extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'acl_id' => true,
         'owner_id' => true,

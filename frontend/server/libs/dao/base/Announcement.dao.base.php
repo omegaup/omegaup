@@ -29,7 +29,7 @@ abstract class AnnouncementDAOBase {
         $sql = 'UPDATE `Announcement` SET `user_id` = ?, `time` = ?, `description` = ? WHERE `announcement_id` = ?;';
         $params = [
             is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
-            DAO::toMySQLTimestamp($Announcement->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
             (int)$Announcement->announcement_id,
         ];
@@ -134,7 +134,7 @@ abstract class AnnouncementDAOBase {
         $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [
             is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
-            DAO::toMySQLTimestamp($Announcement->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetIdentityRequest extends VO {
+class ProblemsetIdentityRequest extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'identity_id' => true,
         'problemset_id' => true,
@@ -50,7 +50,7 @@ class ProblemsetIdentityRequest extends VO {
              * @var string|int|float $data['request_time']
              * @var int $this->request_time
              */
-            $this->request_time = DAO::fromMySQLTimestamp($data['request_time']);
+            $this->request_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['request_time']);
         } else {
             $this->request_time = \OmegaUp\Time::get();
         }
@@ -59,7 +59,7 @@ class ProblemsetIdentityRequest extends VO {
              * @var string|int|float $data['last_update']
              * @var int $this->last_update
              */
-            $this->last_update = DAO::fromMySQLTimestamp($data['last_update']);
+            $this->last_update = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['last_update']);
         }
         if (isset($data['accepted'])) {
             $this->accepted = boolval($data['accepted']);

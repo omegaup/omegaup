@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class AuthTokens extends VO {
+class AuthTokens extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_id' => true,
         'identity_id' => true,
@@ -51,7 +51,7 @@ class AuthTokens extends VO {
              * @var string|int|float $data['create_time']
              * @var int $this->create_time
              */
-            $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
+            $this->create_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['create_time']);
         } else {
             $this->create_time = \OmegaUp\Time::get();
         }

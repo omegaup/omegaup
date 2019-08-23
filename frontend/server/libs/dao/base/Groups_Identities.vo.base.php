@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class GroupsIdentities extends VO {
+class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'group_id' => true,
         'identity_id' => true,

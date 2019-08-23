@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class States extends VO {
+class States extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'country_id' => true,
         'state_id' => true,

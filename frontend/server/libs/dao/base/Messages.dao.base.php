@@ -32,7 +32,7 @@ abstract class MessagesDAOBase {
             is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
             is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
-            DAO::toMySQLTimestamp($Messages->date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Messages->date),
             (int)$Messages->message_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -139,7 +139,7 @@ abstract class MessagesDAOBase {
             is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
             is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
             $Messages->message,
-            DAO::toMySQLTimestamp($Messages->date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Messages->date),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class RolesPermissions extends VO {
+class RolesPermissions extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'role_id' => true,
         'permission_id' => true,

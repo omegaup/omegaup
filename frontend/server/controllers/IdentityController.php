@@ -65,7 +65,7 @@ class IdentityController extends Controller {
 
         // Save objects into DB
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             // Prepare DAOs
             $identity = self::createIdentity(
@@ -82,9 +82,9 @@ class IdentityController extends Controller {
             // Save in DB
             self::saveIdentityGroup($identity, $group->group_id);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -109,7 +109,7 @@ class IdentityController extends Controller {
 
         // Save objects into DB
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             foreach ($r['identities'] as $identity) {
                 // Prepare DAOs
@@ -127,9 +127,9 @@ class IdentityController extends Controller {
                 self::saveIdentityGroup($identity, $group->group_id);
             }
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -189,7 +189,7 @@ class IdentityController extends Controller {
      */
     private static function saveIdentityGroup(Identities $identity, $groupId) {
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             IdentitiesDAO::create($identity);
             GroupsIdentitiesDAO::create(new GroupsIdentities([
@@ -197,10 +197,10 @@ class IdentityController extends Controller {
                 'identity_id' => $identity->identity_id,
             ]));
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
-            if (DAO::isDuplicateEntryException($e)) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;

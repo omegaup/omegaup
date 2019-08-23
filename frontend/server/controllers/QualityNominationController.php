@@ -286,19 +286,19 @@ class QualityNominationController extends Controller {
         ]);
         $qualitynomination->status = $r['status'];
 
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
         try {
             $response = [];
             ProblemController::apiUpdate($r);
             QualityNominationsDAO::update($qualitynomination);
             QualityNominationLogDAO::create($qualitynominationlog);
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
               $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
                 $response = self::sendDemotionEmail($r, $qualitynomination, $qualitynominationlog->rationale);
             }
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to resolve demotion request', $e);
             throw $e;
         }

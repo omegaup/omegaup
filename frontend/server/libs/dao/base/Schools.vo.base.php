@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Schools extends VO {
+class Schools extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'school_id' => true,
         'country_id' => true,

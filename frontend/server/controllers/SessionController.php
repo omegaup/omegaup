@@ -415,7 +415,7 @@ class SessionController extends Controller {
             // Update the password using the new Argon2i algorithm.
             self::$log->warn("Identity {$identity->username}'s password hash is being upgraded.");
             try {
-                DAO::transBegin();
+                \OmegaUp\DAO\DAO::transBegin();
                 $identity->password = SecurityTools::hashString($r['password']);
                 IdentitiesDAO::update($identity);
                 if (!is_null($identity->user_id)) {
@@ -423,9 +423,9 @@ class SessionController extends Controller {
                     $user->password = $identity->password;
                     UsersDAO::update($user);
                 }
-                DAO::transEnd();
+                \OmegaUp\DAO\DAO::transEnd();
             } catch (Exception $e) {
-                DAO::transRollback();
+                \OmegaUp\DAO\DAO::transRollback();
                 throw $e;
             }
         }

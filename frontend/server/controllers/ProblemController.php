@@ -209,7 +209,7 @@ class ProblemController extends Controller {
 
         // Insert new problem
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             // Commit at the very end
             $problemDeployer = new ProblemDeployer(
@@ -241,19 +241,19 @@ class ProblemController extends Controller {
                 }
             }
             ProblemController::setRestrictedTags($problem);
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
 
             throw $e;
         } catch (Exception $e) {
             self::$log->error("Failed to upload problem {$problem->alias}", $e);
 
             // Operation failed unexpectedly, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
 
-            if (DAO::isDuplicateEntryException($e)) {
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('problemTitleExists', $e);
             }
             throw $e;
@@ -639,7 +639,7 @@ class ProblemController extends Controller {
         // Call Grader
         $runs = [];
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
             $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
 
             foreach ($runs as $run) {
@@ -653,9 +653,9 @@ class ProblemController extends Controller {
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
             }
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
         Grader::getInstance()->rejudge($runs, false);
@@ -712,7 +712,7 @@ class ProblemController extends Controller {
 
         try {
             //Begin transaction
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             $operation = ProblemDeployer::UPDATE_SETTINGS;
             if (isset($_FILES['problem_contents'])
@@ -763,15 +763,15 @@ class ProblemController extends Controller {
 
             ProblemController::setRestrictedTags($problem);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             // Operation failed in the data layer, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
 
             throw $e;
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to update problem');
             self::$log->error($e);
 
@@ -1426,7 +1426,7 @@ class ProblemController extends Controller {
                 'name' => is_null($problemsetter->name) ?
                           $problemsetter->username :
                           $problemsetter->name,
-                'creation_date' => DAO::fromMySQLTimestamp($response['creation_date']),
+                'creation_date' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($response['creation_date']),
             ];
         } else {
             unset($response['source']);
@@ -1693,7 +1693,7 @@ class ProblemController extends Controller {
         $problemDeployer = new ProblemDeployer($problem->alias);
         try {
             // Begin transaction
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
             $problemDeployer->updatePublished(
                 ((new ProblemArtifacts($problem->alias, 'published'))->commit())['commit'],
                 $problem->commit,
@@ -1712,10 +1712,10 @@ class ProblemController extends Controller {
 
             ProblemsDAO::update($problem);
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to update problem: ', $e);
 
             throw $e;
@@ -2346,7 +2346,7 @@ class ProblemController extends Controller {
     private static function updateLanguages(Problems $problem) {
         $problemArtifacts = new ProblemArtifacts($problem->alias);
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             // Removing existing data
             $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new ProblemsLanguages([
@@ -2362,10 +2362,10 @@ class ProblemController extends Controller {
                     'language_id' => $lang->language_id,
                 ]));
             }
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
     }

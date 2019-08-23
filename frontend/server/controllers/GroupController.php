@@ -20,7 +20,7 @@ class GroupController extends Controller {
             'owner_id' => $owner_id,
         ]);
 
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
 
         try {
             ACLsDAO::create($groupAcl);
@@ -30,10 +30,10 @@ class GroupController extends Controller {
 
             self::$log->info("Group {$alias} created.");
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
-            if (DAO::isDuplicateEntryException($e)) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;

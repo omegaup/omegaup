@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Submissions extends VO {
+class Submissions extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'submission_id' => true,
         'current_run_id' => true,
@@ -69,7 +69,7 @@ class Submissions extends VO {
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = DAO::fromMySQLTimestamp($data['time']);
+            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
         } else {
             $this->time = \OmegaUp\Time::get();
         }

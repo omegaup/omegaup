@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class RunCounts extends VO {
+class RunCounts extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'date' => true,
         'total' => true,

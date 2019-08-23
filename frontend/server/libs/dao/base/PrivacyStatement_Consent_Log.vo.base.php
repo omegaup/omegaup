@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class PrivacyStatementConsentLog extends VO {
+class PrivacyStatementConsentLog extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'privacystatement_consent_id' => true,
         'identity_id' => true,
@@ -51,7 +51,7 @@ class PrivacyStatementConsentLog extends VO {
              * @var string|int|float $data['timestamp']
              * @var int $this->timestamp
              */
-            $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
+            $this->timestamp = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['timestamp']);
         } else {
             $this->timestamp = \OmegaUp\Time::get();
         }
