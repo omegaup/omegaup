@@ -297,7 +297,7 @@ OmegaUp.on('ready', function() {
         on: {
           submit: function(ev) {
             var schoolIdDeferred = $.Deferred();
-            if (ev.school_id !== -1) {
+            if (ev.school_id !== undefined) {
               schoolIdDeferred.resolve(ev.school_id);
             } else if (ev.school_name) {
               API.School.create({name: ev.school_name})

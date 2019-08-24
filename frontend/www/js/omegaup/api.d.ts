@@ -90,7 +90,7 @@ declare namespace omegaup {
     name: string;
     public: boolean;
     requests_user_information: string;
-    school_id: number;
+    school_id?: number;
     school_name: string;
     show_scoreboard: boolean;
     start_time: Date;
