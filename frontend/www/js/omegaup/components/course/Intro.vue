@@ -10,19 +10,19 @@
          v-if="needsBasicInformation"></p>
       <template v-if="requestsUserInformation != 'no'">
         <p v-html="consentHtml"></p><label><input type="radio"
-               v-bind:value="1"
+               v-bind:value="true"
                v-model="shareUserInformation"> {{ T.wordsYes }}</label> <label><input type="radio"
-               v-bind:value="0"
+               v-bind:value="false"
                v-model="shareUserInformation"> {{ T.wordsNo }}</label>
       </template>
       <template v-if="shouldShowAcceptTeacher">
         <p v-html="acceptTeacherConsentHtml"></p><label><input name="accept-teacher"
                type="radio"
-               v-bind:value="1"
+               v-bind:value="true"
                v-model="acceptTeacher"> {{ T.wordsYes }}</label> <label><input name=
                "reject-teacher"
                type="radio"
-               v-bind:value="0"
+               v-bind:value="false"
                v-model="acceptTeacher"> {{ T.wordsNo }}</label>
       </template>
       <div class="text-center">
@@ -62,9 +62,9 @@ export default class CourseIntro extends Vue {
   @Prop() statements!: Statement;
 
   T = T;
-  shareUserInformation = 0;
+  shareUserInformation = false;
   markdownConverter = UI.markdownConverter();
-  acceptTeacher = 0;
+  acceptTeacher = false;
 
   get consentHtml(): string {
     const markdown = this.statements.privacy.markdown || '';
@@ -80,7 +80,7 @@ export default class CourseIntro extends Vue {
     return (
       this.needsBasicInformation ||
       (this.requestsUserInformation === 'required' &&
-        this.shareUserInformation !== 1)
+        this.shareUserInformation !== true)
     );
   }
 

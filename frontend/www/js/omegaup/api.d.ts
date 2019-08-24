@@ -3,7 +3,7 @@ declare namespace omegaup {
     alias: string;
     assignment_type: string,
     description: string;
-    finish_time: Date | number;
+    finish_time: Date;
     has_runs?: boolean;
     max_points?: number;
     name: string;
@@ -11,7 +11,7 @@ declare namespace omegaup {
     publish_time_delay?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
-    start_time: Date | number;
+    start_time: Date;
   }
 
   export interface AssignmentProblem {
