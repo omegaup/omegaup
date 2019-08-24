@@ -164,10 +164,16 @@ export default class CourseDetails extends Vue {
   showScoreboard = !!this.course.show_scoreboard;
   startTime = this.course.start_time || new Date();
   name = this.course.name || '';
-  school_id?: number = this.course.school_id;
   school_name = this.course.school_name || '';
+  school_id = this.course.school_id;
   basic_information_required = !!this.course.basic_information_required;
   requests_user_information = this.course.requests_user_information || 'no';
+
+  data(): { [name: string]: any } {
+    return {
+      school_id: this.course.school_id,
+    };
+  }
 
   mounted(): void {
     let self = this;
@@ -192,7 +198,7 @@ export default class CourseDetails extends Vue {
     this.showScoreboard = !!this.course.show_scoreboard;
     this.startTime = this.course.start_time || new Date();
     this.name = this.course.name || '';
-    this.school_id = this.course.school_id;
+    this.school_id = this.course.school_id || undefined;
     this.school_name = this.course.school_name || '';
     this.basic_information_required = !!this.course.basic_information_required;
     this.requests_user_information =
