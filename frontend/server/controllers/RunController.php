@@ -54,7 +54,7 @@ class RunController extends Controller {
         }
         // check that problem is not publicly or privately banned.
         if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
-            throw new NotFoundException('problemNotfound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotfound');
         }
 
         $allowedLanguages = array_intersect(
@@ -378,7 +378,7 @@ class RunController extends Controller {
      * Validate request of details
      *
      * @param Request $r
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateDetailsRequest(Request $r) {
@@ -387,12 +387,12 @@ class RunController extends Controller {
         // If user is not judge, must be the run's owner.
         $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
         if (is_null($r['submission'])) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
         if (is_null($r['run'])) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
     }
 
@@ -550,7 +550,7 @@ class RunController extends Controller {
 
         $r['problem'] = ProblemsDAO::getByPK($r['submission']->problem_id);
         if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
@@ -663,17 +663,17 @@ class RunController extends Controller {
     ) {
         $submission = SubmissionsDAO::getByGuid($guid);
         if (is_null($submission)) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $run = RunsDAO::getByPK($submission->current_run_id);
         if (is_null($run)) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $problem = ProblemsDAO::getByPK($submission->problem_id);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::isProblemAdmin($identity, $problem)) {
@@ -785,7 +785,7 @@ class RunController extends Controller {
      *
      * @param Request $r
      * @throws ForbiddenAccessException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateList(Request $r) {
         // Defaults for offset and rowcount
@@ -811,7 +811,7 @@ class RunController extends Controller {
 
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
-                throw new NotFoundException('problemNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
             }
         }
 
@@ -826,7 +826,7 @@ class RunController extends Controller {
         if (!is_null($r['username'])) {
             try {
                 $r['identity'] = IdentityController::resolveIdentity($r['username']);
-            } catch (NotFoundException $e) {
+            } catch (\OmegaUp\Exceptions\NotFoundException $e) {
                 // If not found, simply ignore it
                 $r['username'] = null;
                 $r['identity'] = null;

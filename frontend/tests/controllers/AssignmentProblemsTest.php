@@ -249,7 +249,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to remove an invalid problem.
      *
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testDeleteNonExistingProblem() {
         $user = UserFactory::createUser();

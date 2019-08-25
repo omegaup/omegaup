@@ -357,14 +357,14 @@ class Validators {
      *
      * @param string $badgeAlias
      * @param array $allExistingBadges
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function validateBadgeExists(
         string $badgeAlias,
         array $allExistingBadges
     ) : void {
         if (!in_array($badgeAlias, $allExistingBadges)) {
-            throw new NotFoundException('badgeNotExist');
+            throw new \OmegaUp\Exceptions\NotFoundException('badgeNotExist');
         }
     }
 }

@@ -121,7 +121,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testViewProblemStatementInvalidType() {
         $this->internalViewProblemStatement('not_html_or_markdown', '');

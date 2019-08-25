@@ -273,14 +273,14 @@ class ContestController extends Controller {
      *
      * @param string $contestAlias
      * @return [Contests, Problemsets]
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateBasicDetails(?string $contestAlias) : array {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         // If the contest is private, verify that our user is invited
         $contestProblemset = ContestsDAO::getByAliasWithExtraInformation($contestAlias);
         if (is_null($contestProblemset)) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
         return [
             new Contests(
@@ -297,13 +297,13 @@ class ContestController extends Controller {
      *
      * @param string $contestAlias
      * @return Contests $contest
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function validateContest(string $contestAlias) : Contests {
         Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         $contest = ContestsDAO::getByAlias($contestAlias);
         if (is_null($contest)) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
         return $contest;
     }
@@ -489,7 +489,7 @@ class ContestController extends Controller {
         // If the contest is private, verify that our user is invited
         $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
         if (is_null($r['contest'])) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         // Initialize response to be the contest information
@@ -910,7 +910,7 @@ class ContestController extends Controller {
 
         $originalContest = ContestsDAO::getByAlias($r['alias']);
         if (is_null($originalContest)) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         if ($originalContest->finish_time > Time::get()) {
@@ -1239,7 +1239,7 @@ class ContestController extends Controller {
      * @param string $contestAlias
      * @param Identities $identity
      * @return Contests
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateContestAdmin(
@@ -1249,7 +1249,7 @@ class ContestController extends Controller {
     ) : Contests {
         $contest = ContestsDAO::getByAlias($contestAlias);
         if (is_null($contest)) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         if (!Authorization::isContestAdmin($identity, $contest)) {
@@ -1511,7 +1511,7 @@ class ContestController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $problemsetProblem = ProblemsetProblemsDAO::getByPK(
@@ -1519,7 +1519,7 @@ class ContestController extends Controller {
             (int)$problem->problem_id
         );
         if (is_null($problemsetProblem)) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
 
         return [
@@ -1662,7 +1662,7 @@ class ContestController extends Controller {
 
         // Check if admin to delete is actually an admin
         if (!Authorization::isContestAdmin($identity, $contest)) {
-            throw new NotFoundException();
+            throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
         ACLController::removeUser($contest->acl_id, $identity->user_id);
@@ -1740,7 +1740,7 @@ class ContestController extends Controller {
 
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         if (is_null($contest)) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         $r->ensureInt('offset', null, null, false /* optional */);
@@ -1790,7 +1790,7 @@ class ContestController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiScoreboardEvents(Request $r) {
         // Get the current user
@@ -1816,7 +1816,7 @@ class ContestController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiScoreboard(Request $r) {
         [$contest, $problemset] = self::validateBasicDetails($r['contest_alias']);
@@ -1875,7 +1875,7 @@ class ContestController extends Controller {
         foreach ($contest_aliases as $contest_alias) {
             $contest = ContestsDAO::getByAlias($contest_alias);
             if (is_null($contest)) {
-                throw new NotFoundException('contestNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
 
             array_push($contests, $contest);
@@ -2243,7 +2243,7 @@ class ContestController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiUpdateEndTimeForIdentity(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -2261,7 +2261,7 @@ class ContestController extends Controller {
 
         $identity = IdentityController::resolveIdentity($r['username']);
         if (is_null($identity)) {
-            throw new NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
 
         $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
@@ -2321,7 +2321,7 @@ class ContestController extends Controller {
      *
      * @param Request $r
      * @return Array
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateRuns(Request $r) : Array {
@@ -2349,7 +2349,7 @@ class ContestController extends Controller {
 
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($problem)) {
-                throw new NotFoundException('problemNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
             }
         }
 
@@ -2743,7 +2743,7 @@ class ContestController extends Controller {
         // Validate & get contest_alias
         $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
         if (is_null($r['contest'])) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         // Validate value param

@@ -35,7 +35,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      */
     final public static function replace(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
         if (empty($Groups_Scoreboards_Problemsets->group_scoreboard_id) || empty($Groups_Scoreboards_Problemsets->problemset_id)) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
         $params = [
@@ -94,12 +94,12 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
      * será arrojada.
      *
      * @param GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets El objeto de tipo GroupsScoreboardsProblemsets a eliminar
      *
-     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : void {
         $sql = 'DELETE FROM `Groups_Scoreboards_Problemsets` WHERE group_scoreboard_id = ? AND problemset_id = ?;';
@@ -107,7 +107,7 @@ abstract class GroupsScoreboardsProblemsetsDAOBase {
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
     }
 

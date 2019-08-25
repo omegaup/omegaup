@@ -152,7 +152,12 @@ class SessionController extends Controller {
             $email = null;
         } else {
             $currentUser = UsersDAO::getByPK($currentIdentity->user_id);
-            $email = !is_null($currentUser->main_email_id) ? EmailsDAO::getByPK($currentUser->main_email_id) : null;
+            if (is_null($currentUser)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
+            $email = !is_null($currentUser->main_email_id) ?
+                EmailsDAO::getByPK($currentUser->main_email_id) :
+                null;
         }
 
         return [

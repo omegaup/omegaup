@@ -551,7 +551,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 ]),
             ]));
             $this->fail('Invalid "original" should have been caught');
-        } catch (NotFoundException $e) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             // Expected.
         }
 
@@ -811,7 +811,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemDismissed = QualityNominationsDAO::getByUserAndProblem(
             $r->user->user_id,

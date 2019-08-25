@@ -23,7 +23,7 @@ class IdentityController extends Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        throw new NotFoundException('userOrMailNotFound');
+        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
     }
 
     /**
@@ -449,7 +449,7 @@ class IdentityController extends Controller {
                     return IdentityController::convertToSupportedLanguage($result->name);
                 }
             }
-        } catch (NotFoundException $ex) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $ex) {
             self::$log->debug($ex);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $ex) {
             self::$log->debug($ex);

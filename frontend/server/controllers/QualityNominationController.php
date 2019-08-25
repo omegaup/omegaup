@@ -79,7 +79,7 @@ class QualityNominationController extends Controller {
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if ($r['nomination'] != 'demotion') {
@@ -167,11 +167,11 @@ class QualityNominationController extends Controller {
                 if (is_null($original)) {
                     $contents['original'] = self::extractAliasFromArgument($contents['original']);
                     if (is_null($contents['original'])) {
-                        throw new NotFoundException('problemNotFound');
+                        throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
                     $original = ProblemsDAO::getByAlias($contents['original']);
                     if (is_null($original)) {
-                        throw new NotFoundException('problemNotFound');
+                        throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
                 }
             }
@@ -236,7 +236,7 @@ class QualityNominationController extends Controller {
 
         $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
         if (is_null($qualitynomination)) {
-            throw new NotFoundException('qualitynominationNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('qualitynominationNotFound');
         }
         if ($qualitynomination->nomination != 'demotion') {
             throw new \OmegaUp\Exceptions\InvalidParameterException('onlyDemotionsSupported');
@@ -247,7 +247,7 @@ class QualityNominationController extends Controller {
 
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $newProblemVisibility = $r['problem']->visibility;
@@ -476,7 +476,7 @@ class QualityNominationController extends Controller {
         $r->ensureInt('qualitynomination_id');
         $response = QualityNominationsDAO::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
-            throw new NotFoundException('qualityNominationNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('qualityNominationNotFound');
         }
 
         // The nominator can see the nomination, as well as all the members of
@@ -490,7 +490,7 @@ class QualityNominationController extends Controller {
         // Get information from the original problem.
         $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Adding in the response object a flag to know whether the user is a reviewer

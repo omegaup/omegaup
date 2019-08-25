@@ -17,7 +17,7 @@ class AuthorizationController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $isAdmin = Authorization::isProblemAdmin($resolvedIdentity, $problem);

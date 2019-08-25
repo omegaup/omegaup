@@ -274,7 +274,7 @@ class UserController extends Controller {
     private static function sendVerificationEmail(Users $user) {
         $email = EmailsDAO::getByPK($user->main_email_id);
         if (is_null($email)) {
-            throw new NotFoundException('userOrMailNotfound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotfound');
         }
 
         if (!self::$sendEmailOnVerify) {
@@ -373,7 +373,7 @@ class UserController extends Controller {
 
             $user = UsersDAO::FindByUsername($r['username']);
             if (is_null($user)) {
-                throw new NotFoundException('userNotExist');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
@@ -427,7 +427,7 @@ class UserController extends Controller {
      * @param Request $r
      * @return type
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiVerifyEmail(Request $r) {
         $user = null;
@@ -456,7 +456,7 @@ class UserController extends Controller {
         }
 
         if (is_null($user)) {
-            throw new NotFoundException('verificationIdInvalid');
+            throw new \OmegaUp\Exceptions\NotFoundException('verificationIdInvalid');
         }
 
         $user->verified = 1;
@@ -533,7 +533,7 @@ class UserController extends Controller {
         if (!is_null($user)) {
             return $user;
         }
-        throw new NotFoundException('userOrMailNotFound');
+        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
     }
 
     /**
@@ -1259,7 +1259,7 @@ class UserController extends Controller {
      * @return Array
      * @throws ForbiddenAccessException
      * @throws DuplicatedEntryInDatabaseException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiSelectCoderOfTheMonth(Request $r) {
         self::authenticateRequest($r);
@@ -1287,7 +1287,7 @@ class UserController extends Controller {
         $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect);
 
         if (empty($users)) {
-            throw new NotFoundException('noCoders');
+            throw new \OmegaUp\Exceptions\NotFoundException('noCoders');
         }
 
         foreach ($users as $index => $user) {
@@ -1331,7 +1331,7 @@ class UserController extends Controller {
 
         $contest = ContestsDAO::getByAlias($r['interview']);
         if (is_null($contest)) {
-            throw new NotFoundException('interviewNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('interviewNotFound');
         }
 
         // Only admins can view interview details
@@ -1739,7 +1739,7 @@ class UserController extends Controller {
             Validators::validateStringNonEmpty($r['username'], 'username');
             $identity = IdentitiesDAO::findByUsername($r['username']);
             if (is_null($identity)) {
-                throw new NotFoundException('userNotExist');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
         Validators::validateInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
@@ -1982,7 +1982,7 @@ class UserController extends Controller {
                     }
                     $problem = ProblemsDAO::getByAlias($tokens[2]);
                     if (is_null($problem)) {
-                        throw new NotFoundException('problemNotFound');
+                        throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
                     if (!is_null($identity) && Authorization::isProblemAdmin(
                         $identity,
@@ -2005,7 +2005,7 @@ class UserController extends Controller {
         Validators::validateValidUsername($r['username'], 'username');
         $r['user'] = UsersDAO::FindByUsername($r['username']);
         if (is_null($r['user'])) {
-            throw new NotFoundException('userNotExist');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
     }
 
@@ -2282,7 +2282,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
         if (is_null($privacystatement_id)) {
-            throw new NotFoundException('privacyStatementNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
         }
         $identity = self::resolveTargetIdentity($r);
 
