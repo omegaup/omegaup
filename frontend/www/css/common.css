@@ -1,20 +1,40 @@
-body { padding-top: 51px; /* Espacio para el navbar */ }
-#header { border-bottom-width: 0; }
-#header .caret { border-top-color: white; border-bottom-color: white; }
-#header .active > a { background-color: #5F87D4; }
-#header #user-dropdown img { width: 51px; height: 51px; margin-right: 10px; }
-#header .navbar-header img { height: 20px; }
-#header .navbar-header .navbar-brand { background-color: white; background-image: linear-gradient(to bottom,white 0,#ddd 100%); }
-/* Elimina el padding del elemento dropdown del nombre
-del usuario para la redimesion de la imagen de perfil. */
+body {
+  padding-top: 51px; /* Espacio para el navbar */
+}
+#header {
+  border-bottom-width: 0;
+}
+#header .caret {
+  border-top-color: white;
+  border-bottom-color: white;
+}
+#header .active > a {
+  background-color: #5f87d4;
+}
+#header #user-dropdown img {
+  width: 51px;
+  height: 51px;
+  margin-right: 10px;
+}
+#header .navbar-header img {
+  height: 20px;
+}
+#header .navbar-header .navbar-brand {
+  background-color: white;
+  background-image: linear-gradient(to bottom, white 0, #ddd 100%);
+}
+/*
+ * Elimina el padding del elemento dropdown del nombre del usuario para la
+ * redimesion de la imagen de perfil.
+ */
 #user-dropdown {
-	padding: 0 12px 0 0;
+  padding: 0 12px 0 0;
 }
 #user-dropdown span {
-	vertical-align: middle;
+  vertical-align: middle;
 }
 #user-dropdown span.username {
-	display: inline-block;
+  display: inline-block;
   max-width: 100px;
   white-space: nowrap;
   overflow: hidden;
@@ -23,95 +43,121 @@ del usuario para la redimesion de la imagen de perfil. */
 
 #header .navbar-text,
 #header .navbar-nav > li > a {
-	color: #fff;
+  color: #fff;
 }
 
 #header .navbar-nav > li > a:hover,
 #header .nav > li > a:hover,
 #header .nav > li > a:focus,
-.nav .open>a,
-.nav .open>a:hover,
-.nav .open>a:focus {
-	background-color: #577DC7;
+.nav .open > a,
+.nav .open > a:hover,
+.nav .open > a:focus {
+  background-color: #577dc7;
 }
 
-/* Cambio de background al pasar el mouse sobre las pestañas o al
-darle focus. */
+/*
+ * Cambio de background al pasar el mouse sobre las pestañas o al darle focus.
+ */
 .nav-tabs.nav-justified > li > a:hover,
 .nav-tabs.nav-justified > li > a:focus {
-        background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .dropdown:hover .dropdown-menu {
-	display: block;
+  display: block;
 }
 #header .navbar-nav .dropdown:hover ul.dropdown-menu > li > a {
-	color: #333;
+  color: #333;
 }
 
 #header {
-	background-color: #678DD7;
-	border-color:transparent;
-	margin: 0;
+  background-color: #678dd7;
+  border-color: transparent;
+  margin: 0;
 }
 
 #header .navbar-inner {
-	max-width: 900px;
-	margin-left: auto;
-	margin-right: auto;
-	padding-left: 0;
-	padding-right: 0;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0;
+  padding-right: 0;
 }
 
-#header #grader-status > a { background-color: white; color: black; }
-#header #grader-status .caret { border-top-color: black; border-bottom-color: black; }
-#header #grader-status > a.grader-error { color: rgb(185, 74, 72); background-image: linear-gradient(rgb(242, 222, 222) 0px, rgb(231, 195, 195) 100%); background-color: rgb(242, 222, 222); }
-#header #grader-status > a.grader-ok { color: rgb(70, 136, 71); background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%); background-color: rgb(223, 240, 216); }
-#header #grader-status > a.grader-warning { color: #c09853; background-image: linear-gradient(to bottom,#fcf8e3 0,#f8efc0 100%); border-color: #f5e79e; }
+#header #grader-status > a {
+  background-color: white;
+  color: black;
+}
+#header #grader-status .caret {
+  border-top-color: black;
+  border-bottom-color: black;
+}
+#header #grader-status > a.grader-error {
+  color: rgb(185, 74, 72);
+  background-image: linear-gradient(
+    rgb(242, 222, 222) 0px,
+    rgb(231, 195, 195) 100%
+  );
+  background-color: rgb(242, 222, 222);
+}
+#header #grader-status > a.grader-ok {
+  color: rgb(70, 136, 71);
+  background-image: linear-gradient(
+    rgb(223, 240, 216) 0px,
+    rgb(200, 229, 188) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+#header #grader-status > a.grader-warning {
+  color: #c09853;
+  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
+  border-color: #f5e79e;
+}
 
 @media (max-width: 991px) {
-	#header .navbar-inner {
-		width: 100% !important;
-	}
-	.container {
-		max-width: 100% !important;
-	}
+  #header .navbar-inner {
+    width: 100% !important;
+  }
+  .container {
+    max-width: 100% !important;
+  }
 }
 
 .forcebreaks {
-        text-overflow: ellipsis !important;
-        word-wrap: break-word;
-        overflow: hidden;
-        display: table-cell;
+  text-overflow: ellipsis !important;
+  word-wrap: break-word;
+  overflow: hidden;
+  display: table-cell;
 }
 
-/* Evita el desborde de la tabla top 5 coders trabajando
-en conjunto con la clase ".forcebreaks" de common.css
-de tal manera que se establece overflow: hidden con un ancho máximo
-de 166px de contenido para mostrar.  */
+/*
+ * Evita el desborde de la tabla top 5 coders trabajando en conjunto con la
+ * clase ".forcebreaks" de common.css de tal manera que se establece overflow:
+ * hidden con un ancho máximo de 166px de contenido para mostrar.
+ */
 .forcebreaks-top-5 {
-        word-wrap: initial !important;
-        max-width: 155px;
+  word-wrap: initial !important;
+  max-width: 155px;
 }
 
 /* Clase para quitar el padding de algn contenedor o div tag */
 .no-padding {
-        padding: 0;
+  padding: 0;
 }
 /* Clase para quitar el margin de algn contenedor o div tag */
 .no-margin {
-        margin: 0;
+  margin: 0;
 }
 /* Estilos de uso general */
 .center {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .vertical-padding {
-        padding-top: 15px;
-        padding-bottom: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 /*
@@ -120,8 +166,8 @@ de 166px de contenido para mostrar.  */
  * cuadra de nuevo.
  */
 :target::before {
-	content: "";
-	display: block;
-	height: 51px;
-	margin: -51px 0 0;
+  content: '';
+  display: block;
+  height: 51px;
+  margin: -51px 0 0;
 }
