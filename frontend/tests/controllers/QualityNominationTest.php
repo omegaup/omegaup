@@ -535,7 +535,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 ]),
             ]));
             $this->fail('Missing "original" should have been caught');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Expected.
         }
 

@@ -35,7 +35,7 @@ class CourseController extends Controller {
      *
      * @param Courses $course
      * @param Assignments $assignment
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateCreateAssignment(Request $r, Courses $course) : void {
         $isRequired = true;
@@ -59,7 +59,7 @@ class CourseController extends Controller {
         );
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
 
         Validators::validateInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $isRequired);
@@ -79,7 +79,7 @@ class CourseController extends Controller {
      * Validates create Courses
      *
      * @param Request $r
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateCreate(
@@ -88,7 +88,7 @@ class CourseController extends Controller {
         self::validateBasicCreateOrUpdate($r);
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
     }
 
@@ -98,7 +98,7 @@ class CourseController extends Controller {
      * @param Request $r
      * @param string $courseAlias
      * @return Courses
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateUpdate(
@@ -119,7 +119,7 @@ class CourseController extends Controller {
         }
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
 
         return $originalCourse;
@@ -129,7 +129,7 @@ class CourseController extends Controller {
      * Validates basic information of a course
      * @param Request $r
      * @param bool $isUpdate
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateBasicCreateOrUpdate(Request $r, bool $isUpdate = false) : void {
@@ -161,7 +161,7 @@ class CourseController extends Controller {
         } else {
             $school = SchoolsDAO::getByPK($r['school_id']);
             if (is_null($school)) {
-                throw new InvalidParameterException('schoolNotFound');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('schoolNotFound');
             }
         }
 
@@ -212,7 +212,7 @@ class CourseController extends Controller {
      * Clone a course
      *
      * @return array
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiClone(Request $r) {
@@ -284,7 +284,7 @@ class CourseController extends Controller {
     /**
      * Create new course API
      *
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
@@ -523,7 +523,7 @@ class CourseController extends Controller {
         }
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
 
         // Prevent date changes if a course already has runs
@@ -535,7 +535,7 @@ class CourseController extends Controller {
             );
 
             if ($runCount > 0) {
-                throw new InvalidParameterException('courseUpdateAlreadyHasRuns');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('courseUpdateAlreadyHasRuns');
             }
         }
 
@@ -773,7 +773,7 @@ class CourseController extends Controller {
     /**
      * List course assignments
      *
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListAssignments(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -871,7 +871,7 @@ class CourseController extends Controller {
      * Returns courses for which the current user is an admin and
      * for in which the user is a student.
      *
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListCourses(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -1316,7 +1316,7 @@ class CourseController extends Controller {
         $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
         $course = CoursesDAO::getByAlias($r['course_alias']);
@@ -1351,7 +1351,7 @@ class CourseController extends Controller {
         $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
         $course = CoursesDAO::getByAlias($r['course_alias']);

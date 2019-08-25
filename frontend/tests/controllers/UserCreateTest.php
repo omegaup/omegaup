@@ -120,7 +120,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Creating a user without password
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoPassword() {
         UserController::$permissionKey = uniqid();
@@ -139,7 +139,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Creating a user without email
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoEmail() {
         UserController::$permissionKey = uniqid();
@@ -158,7 +158,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Create a user without username...
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoUser() {
         UserController::$permissionKey = uniqid();
@@ -203,7 +203,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Tests usernames with invalid chars. Exception is expected
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUsernameWithInvalidChars() {
         UserController::$permissionKey = uniqid();
@@ -237,7 +237,7 @@ class CreateUserTest extends OmegaupTestCase {
             ]));
 
             $this->fail('Expected because of the invalid group name');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK
             $this->assertEquals('parameterInvalidAlias', $e->getMessage());
         }

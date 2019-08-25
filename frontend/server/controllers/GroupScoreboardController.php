@@ -24,7 +24,7 @@ class GroupScoreboardController extends Controller {
         Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
         $scoreboard = GroupsScoreboardsDAO::getByAlias($scoreboardAlias);
         if (is_null($scoreboard)) {
-            throw new InvalidParameterException('parameterNotFound', 'Scoreboard');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Scoreboard');
         }
         return $scoreboard;
     }
@@ -36,7 +36,7 @@ class GroupScoreboardController extends Controller {
      * @param $identityId
      * @param $scoreboardAlias
      * @param $contestAlias
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateGroupScoreboardAndContest(
         string $groupAlias,
@@ -53,7 +53,7 @@ class GroupScoreboardController extends Controller {
         Validators::validateValidAlias($contestAlias, 'contest_alias');
         $contest = ContestsDAO::getByAlias($contestAlias);
         if (is_null($contest)) {
-            throw new InvalidParameterException('parameterNotFound', 'Contest');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Contest');
         }
 
         if (!ContestController::isPublic($contest->admission_mode) &&
@@ -118,7 +118,7 @@ class GroupScoreboardController extends Controller {
             $contestScoreboard['contest']->problemset_id
         );
         if (empty($gscs)) {
-            throw new InvalidParameterException('parameterNotFound', 'Contest');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Contest');
         }
 
         GroupsScoreboardsProblemsetsDAO::delete($gscs);

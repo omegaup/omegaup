@@ -227,7 +227,7 @@ class CreateProblemTest extends OmegaupTestCase {
             try {
                 // Call the API
                 $response = ProblemController::apiCreate($r);
-            } catch (InvalidParameterException $e) {
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // We're OK, clean up our mess and continue
                 unset($_REQUEST);
                 continue;
@@ -257,7 +257,7 @@ class CreateProblemTest extends OmegaupTestCase {
             try {
                 // Call the API
                 $response = ProblemController::apiCreate($r);
-            } catch (InvalidParameterException $e) {
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // We're OK, clean up our mess and continue
                 unset($_REQUEST);
                 continue;
@@ -543,7 +543,7 @@ class CreateProblemTest extends OmegaupTestCase {
             // Call the API
             $response = ProblemController::apiCreate($r);
             $this->fail('Exception was expected. Wrong attribute');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'parameterEmpty');
         }
     }

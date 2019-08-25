@@ -69,7 +69,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     /**
      * Removes an inexistent problem from a private contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveInvalidProblemFromPrivateContest() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -94,7 +94,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     /**
      * Removes a problem from an inexistent contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveProblemFromInvalidContest() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -215,7 +215,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     /**
      * Removes a single problem from a public contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveProblemsFromPublicContestWithASingleProblem() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -233,7 +233,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     /**
      * Removes all problems from a public contest.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveAllProblemsFromPublicContestWithTwoProblems() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));

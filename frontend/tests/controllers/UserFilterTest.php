@@ -5,7 +5,7 @@
  */
 class UserFilterTest extends OmegaupTestCase {
     /**
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testInvalidFilter() {
         UserController::apiValidateFilter(new Request([

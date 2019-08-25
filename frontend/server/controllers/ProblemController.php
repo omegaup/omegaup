@@ -90,7 +90,7 @@ class ProblemController extends Controller {
                     && array_key_exists('visibility', $r)
                     && $r['problem']->visibility != $r['visibility']
                     && !Authorization::isQualityReviewer($r->identity)) {
-                throw new InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
             }
 
             if ($r['problem']->deprecated) {
@@ -99,7 +99,7 @@ class ProblemController extends Controller {
 
             if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
-                    throw new InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
                 } else {
                     Validators::validateInEnum(
                         $r['visibility'],
@@ -135,7 +135,7 @@ class ProblemController extends Controller {
             if (!empty($r['selected_tags'])) {
                 foreach ($r['selected_tags'] as $tag) {
                     if (empty($tag->tagname)) {
-                        throw new InvalidParameterException('parameterEmpty', 'tagname');
+                        throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'tagname');
                     }
                 }
             }
@@ -348,7 +348,7 @@ class ProblemController extends Controller {
         $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -405,7 +405,7 @@ class ProblemController extends Controller {
         $tagName = TagController::normalize($tagName);
 
         if (!$allowRestricted && in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
-            throw new InvalidParameterException('tagRestricted', 'name');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('tagRestricted', 'name');
         }
 
         $tag = TagsDAO::getByName($tagName);
@@ -477,7 +477,7 @@ class ProblemController extends Controller {
         $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -525,7 +525,7 @@ class ProblemController extends Controller {
         }
 
         if (in_array($tag->name, self::RESTRICTED_TAG_NAMES)) {
-            throw new InvalidParameterException('tagRestricted', 'name');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('tagRestricted', 'name');
         }
 
         ProblemsTagsDAO::delete(new ProblemsTags([

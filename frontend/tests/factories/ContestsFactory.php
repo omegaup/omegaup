@@ -55,12 +55,12 @@ class ContestParams implements ArrayAccess {
      * @param boolean $required
      * @param $default
      * @return boolean
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateParameter($parameter, &$array, $required = true, $default = null) {
         if (!isset($array[$parameter])) {
             if ($required) {
-                throw new InvalidParameterException('ParameterEmpty', $parameter);
+                throw new \OmegaUp\Exceptions\InvalidParameterException('ParameterEmpty', $parameter);
             }
             $array[$parameter] = $default;
         }

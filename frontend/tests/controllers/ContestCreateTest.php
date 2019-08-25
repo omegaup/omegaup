@@ -70,7 +70,7 @@ class CreateContestTest extends OmegaupTestCase {
             try {
                 // Call the API
                 $response = ContestController::apiCreate($r);
-            } catch (InvalidParameterException $e) {
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // This exception is expected
                 unset($_REQUEST);
                 continue;
@@ -108,7 +108,7 @@ class CreateContestTest extends OmegaupTestCase {
     /**
      * Tests very long contests
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
@@ -132,7 +132,7 @@ class CreateContestTest extends OmegaupTestCase {
     /**
      * Public contest without problems is not valid.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreatePublicContest() {
         // Create a valid contest Request object
@@ -156,7 +156,7 @@ class CreateContestTest extends OmegaupTestCase {
      * Public contest with problems NOW is NOT valid. You need
      * to create the contest first and then you can add problems
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreatePublicContestWithProblems() {
         $problem = ProblemsFactory::createProblem();

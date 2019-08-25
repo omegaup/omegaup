@@ -69,7 +69,7 @@ class GroupController extends Controller {
      *
      * @param string $groupAlias
      * @param Identities $identity
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     public static function validateGroup(
@@ -135,7 +135,7 @@ class GroupController extends Controller {
             $resolvedIdentity->identity_id
         );
         if (is_null($groupIdentities)) {
-            throw new InvalidParameterException('parameterNotFound', 'User');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'User');
         }
 
         GroupsIdentitiesDAO::delete($groupIdentities);
@@ -177,10 +177,10 @@ class GroupController extends Controller {
         self::authenticateRequest($r);
 
         if (is_null($r['query'])) {
-            throw new InvalidParameterException('parameterEmpty', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
         }
         if (strlen($r['query']) < 2) {
-            throw new InvalidParameterException('parameterInvalid', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'query');
         }
 
         $groups = GroupsDAO::SearchByName($r['query']);

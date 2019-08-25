@@ -115,7 +115,7 @@ class GroupsTest extends OmegaupTestCase {
     /**
      * Remove user from group test
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRemoveUserFromGroupUserNotInGroup() {
         $groupData = GroupsFactory::createGroup();

@@ -40,7 +40,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
     /**
      * Reset my password
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testResetMyPasswordBadOldPassword() {
         // Create an user in omegaup

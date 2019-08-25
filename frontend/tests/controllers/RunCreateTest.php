@@ -318,7 +318,7 @@ class RunCreateTest extends OmegaupTestCase {
      * Test that grabbing a problem from a contest A and using it as
      * parameter of contest B does not work
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testInvalidContestProblemCombination() {
         // Set the context for the first contest
@@ -359,7 +359,7 @@ class RunCreateTest extends OmegaupTestCase {
             try {
                 // Call API
                 $response = RunController::apiCreate($r);
-            } catch (InvalidParameterException $e) {
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // The API should throw this exception, in this case
                 // we continue
                 continue;
@@ -520,7 +520,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Languages must be validated against the problem's allowed languages.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRunInvalidProblemLanguage() {
         // Create public problem without C as an option.
@@ -548,7 +548,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Languages must be validated against the problem's allowed languages.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRunInvalidContestLanguage() {
         $problemData = ProblemsFactory::createProblem();
@@ -675,7 +675,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Can't set both params at the same time
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testRunWithProblemsetIdAndContestAlias() {
         $r = $this->setValidRequest();

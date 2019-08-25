@@ -18,7 +18,7 @@ class IdentityFactory {
         $identities = [];
         $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
         if (($handle = fopen($path_file, 'r')) == false) {
-            throw new InvalidParameterException('parameterInvalid', 'identities');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'identities');
         }
         $headers = fgetcsv($handle, 1000, ',');
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
