@@ -1,4 +1,4 @@
--- Normalaze problemset_id in assignments
+-- Normalize problemset_id in assignments
 UPDATE
     `Problemsets`
 INNER JOIN
