@@ -1114,7 +1114,7 @@ class CourseController extends Controller {
             'group_id' => $course->group_id,
             'identity_id' => $resolvedIdentity->identity_id,
             'share_user_information' => $r['share_user_information'],
-            'accept_teacher' => $r['accept_teacher'],
+            'accept_teacher' => $r['accept_teacher'] ? 'yes' : 'no',
         ]);
 
         DAO::transBegin();
