@@ -377,7 +377,7 @@ class CourseController extends Controller {
         try {
             // Create the backing problemset
             $problemset = new Problemsets([
-                'acl_id' => $course->acl_id,
+                'acl_id' => $assignment->acl_id,
                 'type' => 'Assignment',
                 'scoreboard_url' => SecurityTools::randomString(30),
                 'scoreboard_url_admin' => SecurityTools::randomString(30),
