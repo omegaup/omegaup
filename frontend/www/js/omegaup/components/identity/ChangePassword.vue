@@ -63,11 +63,11 @@ export default class IdentityEdit extends Vue {
   newPassword = '';
   newPasswordRepeat = '';
 
-  emitChangePasswordToParent() : void {
+  emitChangePasswordToParent(): void {
     this.$emit('emitChangePassword', this.newPassword, this.newPasswordRepeat);
   }
 
-  emitCancelToParent() : void {
+  emitCancelToParent(): void {
     this.$emit('emitCancel');
   }
 }

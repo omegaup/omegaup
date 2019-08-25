@@ -77,8 +77,9 @@
          v-bind:username="username"
          v-if="showEditForm"></omegaup-identity-edit>
          <omegaup-identity-change-password v-bind:username="username"
-         v-if="showChangePasswordForm" v-on:emitChangePassword="onChildChangePasswordMember"
-         v-on:emitCancel="onChildCancel"></omegaup-identity-change-password>
+         v-if="showChangePasswordForm"
+         v-on:emitcancel="onChildCancel"
+         v-on:emitchangepassword="onChildChangePasswordMember"></omegaup-identity-change-password>
   </div>
 </template>
 
@@ -150,9 +151,7 @@ export default {
       inputElem.typeahead('close');
       inputElem.val('');
     },
-    onChildCancel: function() {
-      this.$emit('cancel', this);
-    }
+    onChildCancel: function() { this.$emit('cancel', this);}
   },
   components: {
     'omegaup-user-username': user_Username,
