@@ -57,6 +57,7 @@ function escapeCsv(cell) {
 }
 
 function escapeXml(str) {
+  if (str === null) return '';
   return str.replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
