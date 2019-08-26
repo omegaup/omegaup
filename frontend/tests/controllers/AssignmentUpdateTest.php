@@ -43,7 +43,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * When updating an assignment you need to supply both assignment
      * alias and course alias
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testMissingDataOnAssignmentUpdate() {
         $user = UserFactory::createUser();
@@ -79,7 +79,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
             ]));
 
             $this->fail('Assignment should not have been updated because finish time is earlier than start time');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'courseInvalidStartTime');
         }
     }
@@ -119,7 +119,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testAssignmentsOutOfDate() {
         // Create 1 course with 1 assignment

@@ -93,7 +93,7 @@ class Contests extends VO {
              */
             $this->last_updated = DAO::fromMySQLTimestamp($data['last_updated']);
         } else {
-            $this->last_updated = Time::get();
+            $this->last_updated = \OmegaUp\Time::get();
         }
         if (isset($data['window_length'])) {
             $this->window_length = (int)$data['window_length'];

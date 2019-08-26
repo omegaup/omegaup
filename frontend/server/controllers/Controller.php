@@ -75,7 +75,7 @@ class Controller {
      *
      * @param Request $r
      * @return Users
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     protected static function resolveTargetUser(Request $r) {
         // By default use current user
@@ -86,7 +86,7 @@ class Controller {
 
             $user = UsersDAO::FindByUsername($r['username']);
             if (is_null($user)) {
-                throw new NotFoundException('userNotExist');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
 
@@ -102,7 +102,7 @@ class Controller {
      *
      * @param Request $r
      * @return Identity
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     protected static function resolveTargetIdentity(Request $r) {
         // By default use current identity
@@ -115,7 +115,7 @@ class Controller {
 
         $identity = IdentitiesDAO::findByUsername($r['username']);
         if (is_null($identity)) {
-            throw new NotFoundException('userNotExist');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         return $identity;

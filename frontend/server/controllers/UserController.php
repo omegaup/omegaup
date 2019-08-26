@@ -132,7 +132,7 @@ class UserController extends Controller {
         } elseif (OMEGAUP_VALIDATE_CAPTCHA) {
             // Validate captcha
             if (!isset($r['recaptcha'])) {
-                throw new InvalidParameterException('parameterNotFound', 'recaptcha');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'recaptcha');
             }
 
             $url = 'https://www.google.com/recaptcha/api/siteverify';
@@ -274,7 +274,7 @@ class UserController extends Controller {
     private static function sendVerificationEmail(Users $user) {
         $email = EmailsDAO::getByPK($user->main_email_id);
         if (is_null($email)) {
-            throw new NotFoundException('userOrMailNotfound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotfound');
         }
 
         if (!self::$sendEmailOnVerify) {
@@ -373,7 +373,7 @@ class UserController extends Controller {
 
             $user = UsersDAO::FindByUsername($r['username']);
             if (is_null($user)) {
-                throw new NotFoundException('userNotExist');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
@@ -394,7 +394,7 @@ class UserController extends Controller {
                 );
 
                 if ($old_password_valid === false) {
-                    throw new InvalidParameterException('parameterInvalid', 'old_password');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'old_password');
                 }
             }
 
@@ -427,7 +427,7 @@ class UserController extends Controller {
      * @param Request $r
      * @return type
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiVerifyEmail(Request $r) {
         $user = null;
@@ -456,7 +456,7 @@ class UserController extends Controller {
         }
 
         if (is_null($user)) {
-            throw new NotFoundException('verificationIdInvalid');
+            throw new \OmegaUp\Exceptions\NotFoundException('verificationIdInvalid');
         }
 
         $user->verified = 1;
@@ -481,7 +481,7 @@ class UserController extends Controller {
     /**
      * Registers to the mailing list all users that have not been added before. Admin only
      *
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     public static function apiMailingListBackfill(Request $r) {
@@ -521,7 +521,7 @@ class UserController extends Controller {
      * @param ?string $userOrEmail
      * @return Users
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function resolveUser(?string $userOrEmail) : Users {
         Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
@@ -533,7 +533,7 @@ class UserController extends Controller {
         if (!is_null($user)) {
             return $user;
         }
-        throw new NotFoundException('userOrMailNotFound');
+        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
     }
 
     /**
@@ -1012,7 +1012,7 @@ class UserController extends Controller {
                 'Virtual-ESCOM2018' => 50,
             ];
         } else {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
                 'contest_type',
                 [
@@ -1132,7 +1132,7 @@ class UserController extends Controller {
      * @param Request $r
      * @return response array
      * @throws ForbiddenAccessException
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiStatusVerified(Request $r) {
         self::authenticateRequest($r);
@@ -1144,7 +1144,7 @@ class UserController extends Controller {
         $response = IdentitiesDAO::getStatusVerified($r['email']);
 
         if (is_null($response)) {
-            throw new InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
 
         return [
@@ -1161,7 +1161,7 @@ class UserController extends Controller {
      * @param Request $r
      * @return response array
      * @throws ForbiddenAccessException
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiExtraInformation(Request $r) {
         self::authenticateRequest($r);
@@ -1173,7 +1173,7 @@ class UserController extends Controller {
         $response = IdentitiesDAO::getExtraInformation($r['email']);
 
         if (is_null($response)) {
-            throw new InvalidParameterException('invalidUser');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
 
         $response['status'] = 'ok';
@@ -1189,7 +1189,7 @@ class UserController extends Controller {
      * @return array
      */
     public static function apiCoderOfTheMonth(Request $r) {
-        $currentTimestamp = Time::get();
+        $currentTimestamp = \OmegaUp\Time::get();
         if (!empty($r['date'])) {
             Validators::validateDate($r['date'], 'date', false);
             $firstDay = date('Y-m-01', strtotime($r['date']));
@@ -1259,11 +1259,11 @@ class UserController extends Controller {
      * @return Array
      * @throws ForbiddenAccessException
      * @throws DuplicatedEntryInDatabaseException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiSelectCoderOfTheMonth(Request $r) {
         self::authenticateRequest($r);
-        $currentTimestamp = Time::get();
+        $currentTimestamp = \OmegaUp\Time::get();
 
         if (!Authorization::isMentor($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
@@ -1287,7 +1287,7 @@ class UserController extends Controller {
         $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect);
 
         if (empty($users)) {
-            throw new NotFoundException('noCoders');
+            throw new \OmegaUp\Exceptions\NotFoundException('noCoders');
         }
 
         foreach ($users as $index => $user) {
@@ -1331,7 +1331,7 @@ class UserController extends Controller {
 
         $contest = ContestsDAO::getByAlias($r['interview']);
         if (is_null($contest)) {
-            throw new NotFoundException('interviewNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('interviewNotFound');
         }
 
         // Only admins can view interview details
@@ -1474,7 +1474,7 @@ class UserController extends Controller {
         } elseif (!is_null($r['query'])) {
             $param = 'query';
         } else {
-            throw new InvalidParameterException('parameterEmpty', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
         }
 
         $identities = IdentitiesDAO::findByUsernameOrName($r[$param]);
@@ -1523,7 +1523,7 @@ class UserController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiUpdateBasicInfo(Request $r) {
         self::authenticateRequest($r);
@@ -1533,7 +1533,7 @@ class UserController extends Controller {
             $testu = UsersDAO::FindByUsername($r['username']);
 
             if (!is_null($testu)) {
-                throw new InvalidParameterException('parameterUsernameInUse', 'username');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterUsernameInUse', 'username');
             }
 
             Validators::validateValidUsername($r['username'], 'username');
@@ -1574,7 +1574,7 @@ class UserController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiUpdate(Request $r) {
         self::authenticateRequest($r);
@@ -1600,7 +1600,7 @@ class UserController extends Controller {
 
             $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
             if (is_null($state)) {
-                throw new InvalidParameterException('parameterInvalid', 'state_id');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'state_id');
             }
             $r->identity->state_id = $state->state_id;
             $r->identity->country_id = $state->country_id;
@@ -1610,7 +1610,7 @@ class UserController extends Controller {
             if (is_numeric($r['school_id'])) {
                 $r['school'] = SchoolsDAO::getByPK($r['school_id']);
                 if (is_null($r['school'])) {
-                    throw new InvalidParameterException('parameterInvalid', 'school');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'school');
                 }
                 $r->identity->school_id = $r['school']->school_id;
             } elseif (empty($r['school_name'])) {
@@ -1645,8 +1645,8 @@ class UserController extends Controller {
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
 
-            if ($r['birth_date'] >= strtotime('-5 year', Time::get())) {
-                throw new InvalidParameterException('birthdayInTheFuture', 'birth_date');
+            if ($r['birth_date'] >= strtotime('-5 year', \OmegaUp\Time::get())) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('birthdayInTheFuture', 'birth_date');
             }
         }
 
@@ -1654,7 +1654,7 @@ class UserController extends Controller {
             // find language in Language
             $language = LanguagesDAO::getByName($r['locale']);
             if (is_null($language)) {
-                throw new InvalidParameterException('invalidLanguage', 'locale');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('invalidLanguage', 'locale');
             }
             $r->identity->language_id = $language->language_id;
         }
@@ -1739,7 +1739,7 @@ class UserController extends Controller {
             Validators::validateStringNonEmpty($r['username'], 'username');
             $identity = IdentitiesDAO::findByUsername($r['username']);
             if (is_null($identity)) {
-                throw new NotFoundException('userNotExist');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
         Validators::validateInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
@@ -1885,7 +1885,7 @@ class UserController extends Controller {
         $newUsername = substr($email, 0, strpos($email, '@'));
         $newUsername = str_replace('-', '_', $newUsername);
         $newUsername = str_replace('.', '_', $newUsername);
-        return $newUsername . Time::get();
+        return $newUsername . \OmegaUp\Time::get();
     }
 
     /**
@@ -1926,12 +1926,12 @@ class UserController extends Controller {
         foreach ($filters as $filter) {
             $tokens = explode('/', $filter);
             if (count($tokens) < 2 || $tokens[0] != '') {
-                throw new InvalidParameterException('parameterInvalid', 'filter');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
             }
             switch ($tokens[1]) {
                 case 'all-events':
                     if (count($tokens) != 2) {
-                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                        throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
                     if (!$session['is_admin']) {
                         throw new ForbiddenAccessException('userNotAllowed');
@@ -1939,7 +1939,7 @@ class UserController extends Controller {
                     break;
                 case 'user':
                     if (count($tokens) != 3) {
-                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                        throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
                     if ($tokens[2] != $identity->username && !$session['is_admin']) {
                         throw new ForbiddenAccessException('userNotAllowed');
@@ -1947,7 +1947,7 @@ class UserController extends Controller {
                     break;
                 case 'contest':
                     if (count($tokens) < 3) {
-                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                        throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
                     $r2 = new Request([
                         'contest_alias' => $tokens[2],
@@ -1965,7 +1965,7 @@ class UserController extends Controller {
                     break;
                 case 'problemset':
                     if (count($tokens) < 3) {
-                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                        throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
                     $r2 = ProblemsetController::wrapRequest(new Request([
                         'problemset_id' => $tokens[2],
@@ -1978,11 +1978,11 @@ class UserController extends Controller {
                     break;
                 case 'problem':
                     if (count($tokens) != 3) {
-                        throw new InvalidParameterException('parameterInvalid', 'filter');
+                        throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
                     $problem = ProblemsDAO::getByAlias($tokens[2]);
                     if (is_null($problem)) {
-                        throw new NotFoundException('problemNotFound');
+                        throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
                     if (!is_null($identity) && Authorization::isProblemAdmin(
                         $identity,
@@ -2005,7 +2005,7 @@ class UserController extends Controller {
         Validators::validateValidUsername($r['username'], 'username');
         $r['user'] = UsersDAO::FindByUsername($r['username']);
         if (is_null($r['user'])) {
-            throw new NotFoundException('userNotExist');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
     }
 
@@ -2020,7 +2020,7 @@ class UserController extends Controller {
         Validators::validateStringNonEmpty($r['role'], 'role');
         $r['role'] = RolesDAO::getByName($r['role']);
         if (is_null($r['role'])) {
-            throw new InvalidParameterException('parameterNotFound', 'role');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'role');
         }
 
         if ($r['role']->role_id == Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
@@ -2039,7 +2039,7 @@ class UserController extends Controller {
         Validators::validateStringNonEmpty($r['group'], 'group');
         $r['group'] = GroupsDAO::getByName($r['group']);
         if (is_null($r['group'])) {
-            throw new InvalidParameterException('parameterNotFound', 'group');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'group');
         }
     }
 
@@ -2147,7 +2147,7 @@ class UserController extends Controller {
 
         Validators::validateStringNonEmpty($r['experiment'], 'experiment');
         if (!in_array($r['experiment'], $experiments->getAllKnownExperiments())) {
-            throw new InvalidParameterException('parameterNotFound', 'experiment');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'experiment');
         }
     }
 
@@ -2282,7 +2282,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
         if (is_null($privacystatement_id)) {
-            throw new NotFoundException('privacyStatementNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
         }
         $identity = self::resolveTargetIdentity($r);
 
@@ -2306,7 +2306,7 @@ class UserController extends Controller {
      * Associates an identity to the logged user given the username
      *
      * @param Request $r
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiAssociateIdentity(Request $r) {
@@ -2320,7 +2320,7 @@ class UserController extends Controller {
         $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
 
         if (empty($identity)) {
-            throw new InvalidParameterException('parameterInvalid', 'username');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'username');
         }
 
         if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r->user->user_id, (int)$identity->identity_id)) {
@@ -2333,7 +2333,7 @@ class UserController extends Controller {
         );
 
         if ($passwordCheck === false) {
-            throw new InvalidParameterException('parameterInvalid', 'password');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'password');
         }
 
         IdentitiesDAO::associateIdentityWithUser($r->user->user_id, $identity->identity_id);
@@ -2447,7 +2447,7 @@ class UserController extends Controller {
         Request $r,
         ?Identities $identity
     ) : array {
-        $currentTimeStamp = Time::get();
+        $currentTimeStamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimeStamp);
         $firstDayOfNextMonth = new DateTime($currentDate);
         $firstDayOfNextMonth->modify('first day of next month');

@@ -53,7 +53,7 @@ class ProblemsetProblemOpened extends VO {
              */
             $this->open_time = DAO::fromMySQLTimestamp($data['open_time']);
         } else {
-            $this->open_time = Time::get();
+            $this->open_time = \OmegaUp\Time::get();
         }
     }
 

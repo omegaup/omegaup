@@ -45,12 +45,12 @@ abstract class GroupRolesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
      * será arrojada.
      *
      * @param GroupRoles $Group_Roles El objeto de tipo GroupRoles a eliminar
      *
-     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(GroupRoles $Group_Roles) : void {
         $sql = 'DELETE FROM `Group_Roles` WHERE group_id = ? AND role_id = ? AND acl_id = ?;';
@@ -58,7 +58,7 @@ abstract class GroupRolesDAOBase {
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
     }
 

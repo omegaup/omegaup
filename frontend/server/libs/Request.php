@@ -77,10 +77,13 @@ class Request extends ArrayObject {
      * Executes the user-provided function and returns its result.
      */
     public function execute() {
+        if (is_null($this->method)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
+        }
         $response = call_user_func($this->method, $this);
 
         if ($response === false) {
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         return $response;
@@ -112,7 +115,7 @@ class Request extends ArrayObject {
                 if (!$required) {
                     return;
                 }
-                throw new InvalidParameterException('parameterEmpty', $key);
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
             }
             $this[$key] = $val == '1' || $val == 'true';
         }
@@ -131,7 +134,7 @@ class Request extends ArrayObject {
             if (!$required) {
                 return;
             }
-            throw new InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
         }
         $val = self::offsetGet($key);
         Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
@@ -151,7 +154,7 @@ class Request extends ArrayObject {
             if (!$required) {
                 return;
             }
-            throw new InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
         }
         $val = self::offsetGet($key);
         Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);

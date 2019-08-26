@@ -35,7 +35,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
      */
     final public static function replace(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
         if (empty($Problemset_Identity_Request->identity_id) || empty($Problemset_Identity_Request->problemset_id)) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problemset_Identity_Request (`identity_id`, `problemset_id`, `request_time`, `last_update`, `accepted`, `extra_note`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
@@ -98,12 +98,12 @@ abstract class ProblemsetIdentityRequestDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
      * será arrojada.
      *
      * @param ProblemsetIdentityRequest $Problemset_Identity_Request El objeto de tipo ProblemsetIdentityRequest a eliminar
      *
-     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(ProblemsetIdentityRequest $Problemset_Identity_Request) : void {
         $sql = 'DELETE FROM `Problemset_Identity_Request` WHERE identity_id = ? AND problemset_id = ?;';
@@ -111,7 +111,7 @@ abstract class ProblemsetIdentityRequestDAOBase {
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
     }
 

@@ -69,7 +69,7 @@ class SessionController extends Controller {
             return [
                 'status' => 'ok',
                 'session' => self::$current_session,
-                'time' => Time::get(),
+                'time' => \OmegaUp\Time::get(),
             ];
         }
         if (is_null($r)) {
@@ -97,7 +97,7 @@ class SessionController extends Controller {
         return [
             'status' => 'ok',
             'session' => self::$current_session,
-            'time' => Time::get(),
+            'time' => \OmegaUp\Time::get(),
         ];
     }
 
@@ -152,7 +152,12 @@ class SessionController extends Controller {
             $email = null;
         } else {
             $currentUser = UsersDAO::getByPK($currentIdentity->user_id);
-            $email = !is_null($currentUser->main_email_id) ? EmailsDAO::getByPK($currentUser->main_email_id) : null;
+            if (is_null($currentUser)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
+            $email = !is_null($currentUser->main_email_id) ?
+                EmailsDAO::getByPK($currentUser->main_email_id) :
+                null;
         }
 
         return [
@@ -244,7 +249,7 @@ class SessionController extends Controller {
 
         try {
             Validators::validateValidUsername($username, 'username');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // How can we know whats wrong with the username?
             // Things that could go wrong:
             //      generated email is too short
@@ -273,7 +278,7 @@ class SessionController extends Controller {
 
     public static function apiGoogleLogin(Request $r = null) {
         if (is_null($r['storeToken'])) {
-            throw new InvalidParameterException('parameterNotFound', 'storeToken');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'storeToken');
         }
 
         require_once 'libs/third_party/google-api-php-client/src/Google/autoload.php';

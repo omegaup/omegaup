@@ -80,7 +80,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Identity should not be created because group alias is not correct');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
     }
@@ -108,7 +108,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Identity should not be created because group alias must be included in username');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
     }
@@ -136,7 +136,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Identity should not be created because of the wrong username (Use of [:] is not allowed)');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
         $wrongIdentityName = 'wrongUsername';
@@ -153,7 +153,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Identity should not be created because of the wrong username (Username needs include group_alias)');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
     }

@@ -85,7 +85,7 @@ class NotificationTest extends OmegaupTestCase {
                 'notifications' => [],
             ]));
             $this->fail('Should have thrown NotFoundException');
-        } catch (NotFoundException $e) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'notificationIdsNotProvided');
         }
         try {
@@ -95,7 +95,7 @@ class NotificationTest extends OmegaupTestCase {
                 'notifications' => ['10'],
             ]));
             $this->fail('Should have thrown NotFoundException');
-        } catch (NotFoundException $e) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'notificationDoesntExist');
         }
     }

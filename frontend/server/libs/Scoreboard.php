@@ -92,12 +92,12 @@ class ScoreboardParams implements ArrayAccess {
      * @param  boolean $required
      * @param    $default
      * @return boolean
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateParameter($parameter, array& $array, $required = true, $default = null) {
         if (!isset($array[$parameter])) {
             if ($required) {
-                throw new InvalidParameterException('parameterEmpty', $parameter);
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $parameter);
             }
 
             $array[$parameter] = $default;
@@ -212,7 +212,7 @@ class Scoreboard {
         );
 
         if (!is_null($cache)) {
-            $timeout = max(0, $this->params['finish_time'] - Time::get());
+            $timeout = max(0, $this->params['finish_time'] - \OmegaUp\Time::get());
             $cache->set($result, $timeout);
         }
 
@@ -279,7 +279,7 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout = max(0, $this->params['finish_time'] - Time::get());
+        $timeout = max(0, $this->params['finish_time'] - \OmegaUp\Time::get());
         if ($canUseContestantCache) {
             $contestantEventsCache->set($result, $timeout);
         } elseif ($canUseAdminCache) {
@@ -345,7 +345,7 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
-        $timeout = max(0, $params['finish_time'] - Time::get());
+        $timeout = max(0, $params['finish_time'] - \OmegaUp\Time::get());
         $contestantScoreboardCache = new Cache(Cache::CONTESTANT_SCOREBOARD_PREFIX, $params['problemset_id']);
         $contestantScoreboard = Scoreboard::getScoreboardFromRuns(
             $contestRuns,
@@ -445,7 +445,7 @@ class Scoreboard {
     private static function getScoreboardTimeLimitUnixTimestamp(
         ScoreboardParams $params
     ) {
-        if ($params['admin'] || ((Time::get() >= $params['finish_time']) && $params['show_scoreboard_after'])) {
+        if ($params['admin'] || ((\OmegaUp\Time::get() >= $params['finish_time']) && $params['show_scoreboard_after'])) {
             // Show full scoreboard to admin users
             // or if the contest finished and the creator wants to show it at the end
             return null;
@@ -614,7 +614,7 @@ class Scoreboard {
             'start_time' => $contestStartTime,
             'finish_time' => $contestFinishTime,
             'title' => $contestTitle,
-            'time' => Time::get() * 1000
+            'time' => \OmegaUp\Time::get() * 1000
         ];
     }
 

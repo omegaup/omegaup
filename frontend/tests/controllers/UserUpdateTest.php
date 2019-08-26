@@ -77,7 +77,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * Value for the recruitment optin flag should be non-negative
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNegativeStateUpdate() {
         $user = UserFactory::createUser();
@@ -129,7 +129,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
      /**
      * Request parameter name cannot be too long
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNameUpdateTooLong() {
         $user = UserFactory::createUser();
@@ -147,7 +147,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * Request parameter name cannot be empty
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testEmptyNameUpdate() {
         $user = UserFactory::createUser();
@@ -163,7 +163,7 @@ class UserUpdateTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testFutureBirthday() {
         // Create the user to edit
@@ -197,7 +197,7 @@ class UserUpdateTest extends OmegaupTestCase {
         try {
             UserController::apiUpdate($r);
             $this->fail('All countries now have state information, so it must be provided.');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK!
         }
     }
@@ -220,7 +220,7 @@ class UserUpdateTest extends OmegaupTestCase {
         try {
             UserController::apiUpdate($r);
             $this->fail('Please select a valid gender option');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK!
         }
     }
@@ -277,7 +277,7 @@ class UserUpdateTest extends OmegaupTestCase {
         try {
             UserController::apiUpdate($r);
             $this->fail('Please select a valid gender option');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK!
         }
     }

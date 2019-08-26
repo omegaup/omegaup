@@ -22,9 +22,9 @@ class ContestParams implements ArrayAccess {
         ContestParams::validateParameter('contestDirector', $this->params, false, UserFactory::createUser());
         ContestParams::validateParameter('window_length', $this->params, false);
         ContestParams::validateParameter('languages', $this->params, false);
-        ContestParams::validateParameter('start_time', $this->params, false, (Time::get() - 60 * 60));
-        ContestParams::validateParameter('finish_time', $this->params, false, (Time::get() + 60 * 60));
-        ContestParams::validateParameter('last_updated', $this->params, false, (Time::get() + 60 * 60));
+        ContestParams::validateParameter('start_time', $this->params, false, (\OmegaUp\Time::get() - 60 * 60));
+        ContestParams::validateParameter('finish_time', $this->params, false, (\OmegaUp\Time::get() + 60 * 60));
+        ContestParams::validateParameter('last_updated', $this->params, false, (\OmegaUp\Time::get() + 60 * 60));
         ContestParams::validateParameter('penalty_calc_policy', $this->params, false);
     }
 
@@ -55,12 +55,12 @@ class ContestParams implements ArrayAccess {
      * @param boolean $required
      * @param $default
      * @return boolean
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateParameter($parameter, &$array, $required = true, $default = null) {
         if (!isset($array[$parameter])) {
             if ($required) {
-                throw new InvalidParameterException('ParameterEmpty', $parameter);
+                throw new \OmegaUp\Exceptions\InvalidParameterException('ParameterEmpty', $parameter);
             }
             $array[$parameter] = $default;
         }

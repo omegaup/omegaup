@@ -50,7 +50,7 @@ class Announcement extends VO {
              */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
         } else {
-            $this->time = Time::get();
+            $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['description'])) {
             $this->description = strval($data['description']);

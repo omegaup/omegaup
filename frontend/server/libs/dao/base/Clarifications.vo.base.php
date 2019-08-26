@@ -64,7 +64,7 @@ class Clarifications extends VO {
              */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
         } else {
-            $this->time = Time::get();
+            $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['problem_id'])) {
             $this->problem_id = (int)$data['problem_id'];

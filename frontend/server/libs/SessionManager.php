@@ -6,9 +6,9 @@ class SessionManager {
             $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
             foreach ($cookies as $cookie) {
                 $parts = explode('=', $cookie);
-                $old_name = trim($parts[0]);
-                setcookie($old_name, '', Time::get() - 1000);
-                setcookie($old_name, '', Time::get() - 1000, '/');
+                $oldName = trim($parts[0]);
+                setcookie($oldName, '', \OmegaUp\Time::get() - 1000);
+                setcookie($oldName, '', \OmegaUp\Time::get() - 1000, '/');
             }
         }
 

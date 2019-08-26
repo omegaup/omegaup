@@ -19,12 +19,12 @@ class CourseController extends Controller {
      * @param Courses $course
      * @param string $assignmentAlias
      * @return Assignments
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCourseAssignmentAlias(Courses $course, string $assignmentAlias) : Assignments {
         $assignment = CoursesDAO::getAssignmentByAlias($course, $assignmentAlias);
         if (is_null($assignment)) {
-            throw new NotFoundException('assignmentNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
         return $assignment;
@@ -35,7 +35,7 @@ class CourseController extends Controller {
      *
      * @param Courses $course
      * @param Assignments $assignment
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateCreateAssignment(Request $r, Courses $course) : void {
         $isRequired = true;
@@ -59,7 +59,7 @@ class CourseController extends Controller {
         );
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
 
         Validators::validateInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $isRequired);
@@ -79,7 +79,7 @@ class CourseController extends Controller {
      * Validates create Courses
      *
      * @param Request $r
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateCreate(
@@ -88,7 +88,7 @@ class CourseController extends Controller {
         self::validateBasicCreateOrUpdate($r);
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
     }
 
@@ -98,7 +98,7 @@ class CourseController extends Controller {
      * @param Request $r
      * @param string $courseAlias
      * @return Courses
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateUpdate(
@@ -119,7 +119,7 @@ class CourseController extends Controller {
         }
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
 
         return $originalCourse;
@@ -129,7 +129,7 @@ class CourseController extends Controller {
      * Validates basic information of a course
      * @param Request $r
      * @param bool $isUpdate
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateBasicCreateOrUpdate(Request $r, bool $isUpdate = false) : void {
@@ -161,7 +161,7 @@ class CourseController extends Controller {
         } else {
             $school = SchoolsDAO::getByPK($r['school_id']);
             if (is_null($school)) {
-                throw new InvalidParameterException('schoolNotFound');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('schoolNotFound');
             }
         }
 
@@ -178,13 +178,13 @@ class CourseController extends Controller {
      * course. Throws if not found.
      * @param string $courseAlias
      * @return Courses
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCourseExists(string $courseAlias) : Courses {
         Validators::validateStringNonEmpty($courseAlias, 'course_alias', true /*is_required*/);
         $course = CoursesDAO::getByAlias($courseAlias);
         if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         return $course;
     }
@@ -194,7 +194,7 @@ class CourseController extends Controller {
      * @param Courses $course
      * @param Groups $group
      * @return Groups
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function resolveGroup(Courses $course, ?Groups $group) : Groups {
         if (!is_null($group)) {
@@ -203,7 +203,7 @@ class CourseController extends Controller {
 
         $group = GroupsDAO::getByPK($course->group_id);
         if (is_null($group)) {
-            throw new NotFoundException();
+            throw new \OmegaUp\Exceptions\NotFoundException();
         }
         return $group;
     }
@@ -212,7 +212,7 @@ class CourseController extends Controller {
      * Clone a course
      *
      * @return array
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiClone(Request $r) {
@@ -284,7 +284,7 @@ class CourseController extends Controller {
     /**
      * Create new course API
      *
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(Request $r) {
@@ -426,7 +426,7 @@ class CourseController extends Controller {
         // Get this problem
         $problem = ProblemsDAO::getByAlias($problemAlias);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         [$masterCommit, $currentVersion] = ProblemController::resolveCommit(
@@ -523,7 +523,7 @@ class CourseController extends Controller {
         }
 
         if ($r['start_time'] > $r['finish_time']) {
-            throw new InvalidParameterException('courseInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
 
         // Prevent date changes if a course already has runs
@@ -535,7 +535,7 @@ class CourseController extends Controller {
             );
 
             if ($runCount > 0) {
-                throw new InvalidParameterException('courseUpdateAlreadyHasRuns');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('courseUpdateAlreadyHasRuns');
             }
         }
 
@@ -577,7 +577,7 @@ class CourseController extends Controller {
             $r['assignment_alias']
         );
         if (is_null($problemset)) {
-            throw new NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
 
         $points = 100;
@@ -626,7 +626,7 @@ class CourseController extends Controller {
             $r['assignment_alias']
         );
         if (is_null($problemSet)) {
-            throw new NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
 
         // Update problems order
@@ -634,7 +634,7 @@ class CourseController extends Controller {
         foreach ($problems as $problem) {
             $currentProblem = ProblemsDAO::getByAlias($problem['alias']);
             if (is_null($problem)) {
-                throw new NotFoundException('problemNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
             }
 
             $order = 1;
@@ -674,7 +674,7 @@ class CourseController extends Controller {
             $currentAssignment = AssignmentsDAO::getByAliasAndCourse($assignment['alias'], $course->course_id);
 
             if (empty($currentAssignment)) {
-                throw new NotFoundException('assignmentNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
             }
 
             AssignmentsDAO::updateAssignmentsOrder(
@@ -701,7 +701,7 @@ class CourseController extends Controller {
         // Get this problem
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $identities = ProblemsDAO::getIdentitiesInGroupWhoAttemptedProblem(
@@ -736,13 +736,13 @@ class CourseController extends Controller {
             $r['assignment_alias']
         );
         if (is_null($problemSet)) {
-            throw new NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
 
         // Get this problem
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Delete the entry from the database.
@@ -751,7 +751,7 @@ class CourseController extends Controller {
             $problem->problem_id
         );
         if (is_null($problemsetProblem)) {
-            throw new NotFoundException('problemNotPartOfAssignment');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotPartOfAssignment');
         }
         if (SubmissionsDAO::countTotalRunsOfProblemInProblemset(
             (int)$problem->problem_id,
@@ -773,7 +773,7 @@ class CourseController extends Controller {
     /**
      * List course assignments
      *
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListAssignments(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -801,7 +801,7 @@ class CourseController extends Controller {
             'status' => 'ok',
             'assignments' => [],
         ];
-        $time = Time::get();
+        $time = \OmegaUp\Time::get();
         foreach ($assignments as $assignment) {
             $assignment['has_runs'] = SubmissionsDAO::countTotalSubmissionsOfProblemset(
                 (int)$assignment['problemset_id']
@@ -844,7 +844,7 @@ class CourseController extends Controller {
             $r['assignment_alias']
         );
         if (is_null($problemSet)) {
-            throw new NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
 
         throw new UnimplementedException();
@@ -871,7 +871,7 @@ class CourseController extends Controller {
      * Returns courses for which the current user is an admin and
      * for in which the user is a student.
      *
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListCourses(Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -1006,7 +1006,7 @@ class CourseController extends Controller {
             $course->group_id,
             $resolvedIdentity->identity_id
         ))) {
-            throw new NotFoundException(
+            throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseStudentNotInCourse'
             );
         }
@@ -1016,7 +1016,7 @@ class CourseController extends Controller {
             $course->course_id
         );
         if (is_null($r['assignment'])) {
-            throw new NotFoundException('assignmentNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
         $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
@@ -1180,7 +1180,7 @@ class CourseController extends Controller {
             $course->group_id,
             $resolvedIdentity->identity_id
         ))) {
-            throw new NotFoundException('courseStudentNotInCourse');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseStudentNotInCourse');
         }
 
         GroupsIdentitiesDAO::delete(new GroupsIdentities([
@@ -1205,7 +1205,7 @@ class CourseController extends Controller {
 
         $course = CoursesDAO::getByAlias($r['course_alias']);
         if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
         if (!Authorization::isCourseAdmin($r->identity, $course)) {
@@ -1241,7 +1241,7 @@ class CourseController extends Controller {
 
         $course = CoursesDAO::getByAlias($r['course_alias']);
         if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
         // Only director is allowed to make modifications
@@ -1277,7 +1277,7 @@ class CourseController extends Controller {
 
         $course = CoursesDAO::getByAlias($r['course_alias']);
         if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -1287,7 +1287,7 @@ class CourseController extends Controller {
 
         // Check if admin to delete is actually an admin
         if (!Authorization::isCourseAdmin($resolvedIdentity, $course)) {
-            throw new NotFoundException();
+            throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
         ACLController::removeUser($course->acl_id, $resolvedUser->user_id);
@@ -1316,12 +1316,12 @@ class CourseController extends Controller {
         $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
         $course = CoursesDAO::getByAlias($r['course_alias']);
         if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
         // Only admins are allowed to modify course
@@ -1351,12 +1351,12 @@ class CourseController extends Controller {
         $group = GroupsDAO::findByAlias($r['group']);
 
         if ($group == null) {
-            throw new InvalidParameterException('invalidParameters');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
         $course = CoursesDAO::getByAlias($r['course_alias']);
         if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -1372,7 +1372,7 @@ class CourseController extends Controller {
     /**
      * Show course intro only on public courses when user is not yet registered
      * @param  Request $r
-     * @throws NotFoundException Course not found or trying to directly access a private course.
+     * @throws \OmegaUp\Exceptions\NotFoundException Course not found or trying to directly access a private course.
      * @throws ForbiddenAccessException
      * @return array
      */
@@ -1565,7 +1565,7 @@ class CourseController extends Controller {
             if ($isAdmin) {
                 $group = GroupsDAO::getByPK($course->group_id);
                 if (is_null($group)) {
-                    throw new NotFoundException('courseGroupNotFound');
+                    throw new \OmegaUp\Exceptions\NotFoundException('courseGroupNotFound');
                 }
                 $result['student_count'] = GroupsIdentitiesDAO::GetMemberCountById(
                     $group->group_id
@@ -1633,7 +1633,7 @@ class CourseController extends Controller {
      * @param  string $token
      * @param  Request $r
      * @return array
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function authenticateAndValidateToken(
@@ -1668,7 +1668,7 @@ class CourseController extends Controller {
 
         $assignmentProblemset = AssignmentsDAO::getByIdWithScoreboardUrls($assignment->assignment_id);
         if (is_null($assignmentProblemset)) {
-            throw new NotFoundException('assignmentNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
         if ($token === $assignmentProblemset['scoreboard_url_admin']) {
@@ -1702,11 +1702,11 @@ class CourseController extends Controller {
         Validators::validateStringNonEmpty($assignmentAlias, 'assignment', true /* is_required */);
         $course = CoursesDAO::getByAlias($courseAlias);
         if (is_null($course)) {
-            throw new NotFoundException('courseNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
         if (is_null($assignment)) {
-            throw new NotFoundException('assignmentNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
         // Admins are almighty, no need to check anything else.
@@ -1714,7 +1714,7 @@ class CourseController extends Controller {
             return [$course, $assignment];
         }
 
-        if ($assignment->start_time > Time::get() ||
+        if ($assignment->start_time > \OmegaUp\Time::get() ||
             !GroupRolesDAO::isContestant($identity->identity_id, $assignment->acl_id)
         ) {
             throw new ForbiddenAccessException();
@@ -1820,7 +1820,7 @@ class CourseController extends Controller {
      * Validates runs API
      *
      * @param Request $r
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateRuns(Request $r) : void {
@@ -1840,7 +1840,7 @@ class CourseController extends Controller {
             $course->course_id
         );
         if (is_null($r['assignment'])) {
-            throw new NotFoundException('assignmentNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
         if (!Authorization::isCourseAdmin($r->identity, $course)) {
@@ -1859,7 +1859,7 @@ class CourseController extends Controller {
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
 
             if (is_null($r['problem'])) {
-                throw new NotFoundException('problemNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
             }
         }
 
@@ -1991,7 +1991,7 @@ class CourseController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiAssignmentScoreboardEvents(Request $r) {
         $tokenAuthenticationResult = self::authenticateAndValidateToken(

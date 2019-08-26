@@ -23,7 +23,7 @@ class IdentityController extends Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        throw new NotFoundException('userOrMailNotFound');
+        throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
     }
 
     /**
@@ -99,7 +99,7 @@ class IdentityController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws DuplicatedEntryInDatabaseException
      */
     public static function apiBulkCreate(Request $r) {
@@ -140,7 +140,7 @@ class IdentityController extends Controller {
 
     /**
      * @param Request $r
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateGroupOwnership(Request $r) {
         self::authenticateRequest($r);
@@ -149,7 +149,7 @@ class IdentityController extends Controller {
         }
         $group = GroupController::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
-            throw new InvalidParameterException('parameterInvalid', 'identities');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'identities');
         }
         return $group;
     }
@@ -274,7 +274,7 @@ class IdentityController extends Controller {
 
     /**
      * @param Request $r
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateUpdateRequest(Request $r) {
         self::authenticateRequest($r);
@@ -283,7 +283,7 @@ class IdentityController extends Controller {
         }
         GroupController::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
-            throw new InvalidParameterException('parameterInvalid', 'identities');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'identities');
         }
     }
 
@@ -291,11 +291,11 @@ class IdentityController extends Controller {
         // Check group is present
         $identityUsername = explode(':', $username);
         if (count($identityUsername) != 2) {
-            throw new InvalidParameterException('parameterInvalid', 'username');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'username');
         }
         $identityGroupAlias = $identityUsername[0];
         if ($identityGroupAlias != $groupAlias) {
-            throw new InvalidParameterException('parameterInvalid', 'group_alias');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'group_alias');
         }
         // Validate request
         Validators::validateValidUsernameIdentity($username, 'username');
@@ -360,7 +360,7 @@ class IdentityController extends Controller {
         bool $omitRank
     ) : array {
         if (is_null($identity)) {
-            throw new InvalidParameterException('parameterNotFound', 'Identity');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Identity');
         }
 
         $response = Cache::getFromCacheOrSet(
@@ -449,9 +449,9 @@ class IdentityController extends Controller {
                     return IdentityController::convertToSupportedLanguage($result->name);
                 }
             }
-        } catch (NotFoundException $ex) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $ex) {
             self::$log->debug($ex);
-        } catch (InvalidParameterException $ex) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $ex) {
             self::$log->debug($ex);
         }
 

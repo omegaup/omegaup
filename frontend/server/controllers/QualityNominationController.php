@@ -75,11 +75,11 @@ class QualityNominationController extends Controller {
         Validators::validateStringNonEmpty($r['contents'], 'contents');
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)) {
-            throw new InvalidParameterException('parameterInvalid', 'contents');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if ($r['nomination'] != 'demotion') {
@@ -93,13 +93,13 @@ class QualityNominationController extends Controller {
             $atLeastOneFieldIsPresent = false;
             if (isset($contents['difficulty'])) {
                 if (!is_int($contents['difficulty']) || $contents['difficulty'] < 0 || $contents['difficulty'] > 4) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $atLeastOneFieldIsPresent = true;
             }
             if (isset($contents['tags'])) {
                 if (!is_array($contents['tags'])) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
                 if (!empty($contents['tags'])) {
                     $atLeastOneFieldIsPresent = true;
@@ -107,18 +107,18 @@ class QualityNominationController extends Controller {
             }
             if (isset($contents['quality'])) {
                 if (!is_int($contents['quality']) || $contents['quality'] < 0 || $contents['quality'] > 4) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $atLeastOneFieldIsPresent = true;
             }
             if (!$atLeastOneFieldIsPresent) {
-                throw new InvalidParameterException('parameterInvalid', 'contents');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
             if (isset($contents['tags']) && is_array($contents['tags'])) {
                 foreach ($contents['tags'] as &$tag) {
                     if (!is_string($tag)) {
-                        throw new InvalidParameterException('parameterInvalid', 'contents');
+                        throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                     }
                     $tag = TagController::normalize($tag);
                 }
@@ -131,12 +131,12 @@ class QualityNominationController extends Controller {
                 || (!isset($contents['source']) || !is_string($contents['source']) || empty($contents['source']))
                 || (!isset($contents['tags']) || !is_array($contents['tags']))
             ) {
-                throw new InvalidParameterException('parameterInvalid', 'contents');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
             foreach ($contents['tags'] as &$tag) {
                 if (!is_string($tag)) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $tag = TagController::normalize($tag);
             }
@@ -148,30 +148,30 @@ class QualityNominationController extends Controller {
                 if (!is_array($statement) || empty($language)
                     || (!isset($statement['markdown']) || !is_string($statement['markdown']) || empty($statement['markdown']))
                 ) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
             }
         } elseif ($r['nomination'] == 'demotion') {
             if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases'])) {
-                throw new InvalidParameterException('parameterInvalid', 'contents');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             if ($contents['reason'] == 'other' && !isset($contents['rationale'])) {
-                throw new InvalidParameterException('parameterInvalid', 'contents');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
             if ($contents['reason'] == 'duplicate') {
                 if (!isset($contents['original']) || !is_string($contents['original']) || empty($contents['original'])) {
-                    throw new InvalidParameterException('parameterInvalid', 'contents');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
                 $original = ProblemsDAO::getByAlias($contents['original']);
                 if (is_null($original)) {
                     $contents['original'] = self::extractAliasFromArgument($contents['original']);
                     if (is_null($contents['original'])) {
-                        throw new NotFoundException('problemNotFound');
+                        throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
                     $original = ProblemsDAO::getByAlias($contents['original']);
                     if (is_null($original)) {
-                        throw new NotFoundException('problemNotFound');
+                        throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
                 }
             }
@@ -180,7 +180,7 @@ class QualityNominationController extends Controller {
                 || isset($contents['tags']) || isset($contents['statements']) || isset($statement['markdown'])
                 || isset($contents['reason'])
             ) {
-                throw new InvalidParameterException('parameterInvalid', 'contents');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
         }
 
@@ -236,10 +236,10 @@ class QualityNominationController extends Controller {
 
         $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
         if (is_null($qualitynomination)) {
-            throw new NotFoundException('qualitynominationNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('qualitynominationNotFound');
         }
         if ($qualitynomination->nomination != 'demotion') {
-            throw new InvalidParameterException('onlyDemotionsSupported');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('onlyDemotionsSupported');
         }
         if ($r['status'] == $qualitynomination->status) {
             return ['status' => 'ok'];
@@ -247,7 +247,7 @@ class QualityNominationController extends Controller {
 
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $newProblemVisibility = $r['problem']->visibility;
@@ -476,7 +476,7 @@ class QualityNominationController extends Controller {
         $r->ensureInt('qualitynomination_id');
         $response = QualityNominationsDAO::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
-            throw new NotFoundException('qualityNominationNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('qualityNominationNotFound');
         }
 
         // The nominator can see the nomination, as well as all the members of
@@ -490,7 +490,7 @@ class QualityNominationController extends Controller {
         // Get information from the original problem.
         $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Adding in the response object a flag to know whether the user is a reviewer

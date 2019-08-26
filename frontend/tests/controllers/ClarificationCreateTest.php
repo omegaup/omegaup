@@ -72,7 +72,7 @@ class CreateClarificationTest extends OmegaupTestCase {
     /**
     * Creates a clarification with message too long
     *
-    * @expectedException InvalidParameterException
+    * @expectedException \OmegaUp\Exceptions\InvalidParameterException
     */
     public function testCreateClarificationMessageTooLong() {
         $problemData = null;

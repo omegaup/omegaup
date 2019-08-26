@@ -1,7 +1,7 @@
 <?php
 class ResetCreateTest extends OmegaupTestCase {
     /**
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testShouldRequireEmailParameter() {
         $r = new Request();
@@ -9,7 +9,7 @@ class ResetCreateTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testShouldRefuseNotRegisteredEmailAddresses() {
         $email = Utils::CreateRandomString() . '@mail.com';
@@ -23,7 +23,7 @@ class ResetCreateTest extends OmegaupTestCase {
             $user_data = UserFactory::generateUser(false);
             $r = new Request($user_data);
             ResetController::apiCreate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
         $this->assertEquals('unverifiedUser', $message);
@@ -36,14 +36,14 @@ class ResetCreateTest extends OmegaupTestCase {
 
         try {
             ResetController::apiCreate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
         $this->assertEquals('passwordResetMinWait', $message);
 
         // time travel
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
-            Time::get() - PASSWORD_RESET_MIN_WAIT - 1
+            \OmegaUp\Time::get() - PASSWORD_RESET_MIN_WAIT - 1
         );
         $user = UsersDAO::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;

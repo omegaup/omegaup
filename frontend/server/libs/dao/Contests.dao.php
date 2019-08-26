@@ -221,11 +221,11 @@ class ContestsDAO extends ContestsDAOBase {
     }
 
     public static function hasStarted(Contests $contest) {
-        return Time::get() >= $contest->start_time;
+        return \OmegaUp\Time::get() >= $contest->start_time;
     }
 
     public static function hasFinished(Contests $contest) {
-        return Time::get() >= $contest->finish_time;
+        return \OmegaUp\Time::get() >= $contest->finish_time;
     }
 
     public static function getContestsParticipated($identity_id) {
@@ -765,7 +765,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
-            throw new NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
         return [
             'needsBasicInformation' => $rs['needs_basic_information'] == '1',

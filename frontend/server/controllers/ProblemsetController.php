@@ -110,7 +110,7 @@ class ProblemsetController extends Controller {
                 ])
             );
         }
-        throw new NotFoundException('problemsetNotFound');
+        throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
     }
 
     /**
@@ -147,7 +147,7 @@ class ProblemsetController extends Controller {
      *
      * @param Request $r
      * @return array
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiScoreboardEvents(Request $r) {
         $r = self::wrapRequest($r);
@@ -179,14 +179,14 @@ class ProblemsetController extends Controller {
      * $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem)
      * $r['tokens'][2] = Id of entity ($tokens[2])
      * $r['tokens'][3] = Token given by the filter
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function wrapRequest(Request $r) {
         $r->ensureInt('problemset_id');
 
         $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
         if (is_null($r['problemset'])) {
-            throw new NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
         if ($r['problemset']['type'] == 'Contest') {
             $request = new Request([

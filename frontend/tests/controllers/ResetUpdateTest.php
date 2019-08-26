@@ -4,7 +4,7 @@ class ResetUpdateTest extends OmegaupTestCase {
         try {
             $r = new Request();
             ResetController::apiUpdate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             // Verify that the cause of the exception was the expected.
             $message = $expected->getMessage();
         }
@@ -18,7 +18,7 @@ class ResetUpdateTest extends OmegaupTestCase {
             $user_data['reset_token'] = 'abcde';
             $r = new Request($user_data);
             ResetController::apiUpdate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
         $this->assertEquals('invalidResetToken', $message);
@@ -33,7 +33,7 @@ class ResetUpdateTest extends OmegaupTestCase {
             $user_data['password_confirmation'] = 'abcde';
             $r = new Request($user_data);
             ResetController::apiUpdate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
         $this->assertEquals('passwordMismatch', $message);
@@ -50,7 +50,7 @@ class ResetUpdateTest extends OmegaupTestCase {
         $r = new Request($user_data);
         try {
             ResetController::apiUpdate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
         $this->assertEquals('parameterStringTooShort', $message);
@@ -60,7 +60,7 @@ class ResetUpdateTest extends OmegaupTestCase {
         $r = new Request($user_data);
         try {
             ResetController::apiUpdate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
         $this->assertEquals('parameterStringTooLong', $message);
@@ -75,7 +75,7 @@ class ResetUpdateTest extends OmegaupTestCase {
 
         // Time travel
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
-            Time::get() - PASSWORD_RESET_TIMEOUT - 1
+            \OmegaUp\Time::get() - PASSWORD_RESET_TIMEOUT - 1
         );
         $user = UsersDAO::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;
@@ -84,7 +84,7 @@ class ResetUpdateTest extends OmegaupTestCase {
         try {
             $r = new Request($user_data);
             $response = ResetController::apiUpdate($r);
-        } catch (InvalidParameterException $expected) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
         $this->assertEquals('passwordResetResetExpired', $message);

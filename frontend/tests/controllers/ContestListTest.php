@@ -462,20 +462,20 @@ class ContestListTest extends OmegaupTestCase {
         // Create three PUBLIC contests
         $contests[0] = ContestsFactory::createContest(
             new ContestParams([
-                'last_updated' => Time::get()
+                'last_updated' => \OmegaUp\Time::get()
             ])
         );
 
         $contests[1] = ContestsFactory::createContest(
             new ContestParams([
-                'last_updated' => Time::get() + 1
+                'last_updated' => \OmegaUp\Time::get() + 1
             ])
         );
         ContestsFactory::addProblemToContest($problemData, $contests[1]);
 
         $contests[2] = ContestsFactory::createContest(
             new ContestParams([
-                'last_updated' => Time::get() + 2
+                'last_updated' => \OmegaUp\Time::get() + 2
             ])
         );
         $originalOrderContest = [
@@ -505,7 +505,7 @@ class ContestListTest extends OmegaupTestCase {
 
         $login = self::login($contests[1]['director']);
 
-        Time::setTimeForTesting(Time::get() + 5);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 5);
         // set contests[1] to private
         $response = ContestController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,
@@ -513,7 +513,7 @@ class ContestListTest extends OmegaupTestCase {
             'admission_mode' => 'private',
         ]));
 
-        Time::setTimeForTesting(Time::get() + 10);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 10);
         // set contests[1] to public
         $response = ContestController::apiUpdate(new Request([
             'auth_token' => $login->auth_token,

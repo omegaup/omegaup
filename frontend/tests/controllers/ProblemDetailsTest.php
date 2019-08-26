@@ -82,7 +82,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertNotNull($problemOpened);
 
         // Verify open time
-        $this->assertEquals(Time::get(), $problemOpened->open_time);
+        $this->assertEquals(\OmegaUp\Time::get(), $problemOpened->open_time);
     }
 
     /**
@@ -121,7 +121,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testViewProblemStatementInvalidType() {
         $this->internalViewProblemStatement('not_html_or_markdown', '');

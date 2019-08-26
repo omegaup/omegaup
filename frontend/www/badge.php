@@ -10,7 +10,7 @@ if (empty($_REQUEST['badge_alias'])) {
 try {
     Validators::validateBadgeExists($_REQUEST['badge_alias'], BadgeController::getAllBadges());
     $smarty->assign('badge_alias', $_REQUEST['badge_alias']);
-} catch (NotFoundException $e) {
+} catch (\OmegaUp\Exceptions\NotFoundException $e) {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 $smarty->display('../templates/badge.details.tpl');

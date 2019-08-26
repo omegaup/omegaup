@@ -34,7 +34,7 @@ class RunController extends Controller {
      * @param Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotAllowedToSubmitException
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateCreateRequest(Request $r) {
@@ -54,7 +54,7 @@ class RunController extends Controller {
         }
         // check that problem is not publicly or privately banned.
         if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
-            throw new NotFoundException('problemNotfound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotfound');
         }
 
         $allowedLanguages = array_intersect(
@@ -70,7 +70,7 @@ class RunController extends Controller {
 
         // Can't set both problemset_id and contest_alias at the same time.
         if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'incompatibleArgs',
                 'problemset_id and contest_alias'
             );
@@ -88,7 +88,7 @@ class RunController extends Controller {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
 
             if ($r['contest'] == null) {
-                throw new InvalidParameterException('parameterNotFound', 'contest_alias');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'contest_alias');
             }
 
             $problemset_id = $r['contest']->problemset_id;
@@ -106,7 +106,7 @@ class RunController extends Controller {
             // in this scenario.
             if (ProblemsDAO::isVisible($r['problem']) ||
                   Authorization::isProblemAdmin($r->identity, $r['problem']) ||
-                  Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
+                  \OmegaUp\Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                 if (!RunsDAO::isRunInsideSubmissionGap(
                     null,
                     null,
@@ -126,7 +126,7 @@ class RunController extends Controller {
 
         $r['problemset'] = ProblemsetsDAO::getByPK($problemset_id);
         if ($r['problemset'] == null) {
-            throw new InvalidParameterException('parameterNotFound', 'problemset_id');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problemset_id');
         }
 
         // Validate the language.
@@ -147,7 +147,7 @@ class RunController extends Controller {
             $problemset_id,
             $r['problem']->problem_id
         )) {
-            throw new InvalidParameterException('parameterNotFound', 'problem_alias');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
         $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(
@@ -266,7 +266,7 @@ class RunController extends Controller {
 
             if (!is_null($start)) {
                 //asuming submit_delay is in minutes
-                $submitDelay = (int) ((Time::get() - $start) / 60);
+                $submitDelay = (int) ((\OmegaUp\Time::get() - $start) / 60);
             } else {
                 $submitDelay = 0;
             }
@@ -285,7 +285,7 @@ class RunController extends Controller {
             'problemset_id' => $problemsetId,
             'guid' => md5(uniqid(rand(), true)),
             'language' => $r['language'],
-            'time' => Time::get(),
+            'time' => \OmegaUp\Time::get(),
             'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
@@ -294,7 +294,7 @@ class RunController extends Controller {
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
-            'time' => Time::get(),
+            'time' => \OmegaUp\Time::get(),
             'memory' => 0,
             'score' => 0,
             'contest_score' => $problemsetId != null ? 0 : null,
@@ -378,7 +378,7 @@ class RunController extends Controller {
      * Validate request of details
      *
      * @param Request $r
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateDetailsRequest(Request $r) {
@@ -387,12 +387,12 @@ class RunController extends Controller {
         // If user is not judge, must be the run's owner.
         $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
         if (is_null($r['submission'])) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $r['run'] = RunsDAO::getByPK($r['submission']->current_run_id);
         if (is_null($r['run'])) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
     }
 
@@ -550,7 +550,7 @@ class RunController extends Controller {
 
         $r['problem'] = ProblemsDAO::getByPK($r['submission']->problem_id);
         if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
@@ -663,17 +663,17 @@ class RunController extends Controller {
     ) {
         $submission = SubmissionsDAO::getByGuid($guid);
         if (is_null($submission)) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $run = RunsDAO::getByPK($submission->current_run_id);
         if (is_null($run)) {
-            throw new NotFoundException('runNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $problem = ProblemsDAO::getByPK($submission->problem_id);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::isProblemAdmin($identity, $problem)) {
@@ -785,7 +785,7 @@ class RunController extends Controller {
      *
      * @param Request $r
      * @throws ForbiddenAccessException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateList(Request $r) {
         // Defaults for offset and rowcount
@@ -811,7 +811,7 @@ class RunController extends Controller {
 
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
-                throw new NotFoundException('problemNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
             }
         }
 
@@ -826,7 +826,7 @@ class RunController extends Controller {
         if (!is_null($r['username'])) {
             try {
                 $r['identity'] = IdentityController::resolveIdentity($r['username']);
-            } catch (NotFoundException $e) {
+            } catch (\OmegaUp\Exceptions\NotFoundException $e) {
                 // If not found, simply ignore it
                 $r['username'] = null;
                 $r['identity'] = null;

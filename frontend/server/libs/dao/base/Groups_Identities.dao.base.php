@@ -35,7 +35,7 @@ abstract class GroupsIdentitiesDAOBase {
      */
     final public static function replace(GroupsIdentities $Groups_Identities) : int {
         if (empty($Groups_Identities->group_id) || empty($Groups_Identities->identity_id)) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
         $params = [
@@ -96,12 +96,12 @@ abstract class GroupsIdentitiesDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
      * será arrojada.
      *
      * @param GroupsIdentities $Groups_Identities El objeto de tipo GroupsIdentities a eliminar
      *
-     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(GroupsIdentities $Groups_Identities) : void {
         $sql = 'DELETE FROM `Groups_Identities` WHERE group_id = ? AND identity_id = ?;';
@@ -109,7 +109,7 @@ abstract class GroupsIdentitiesDAOBase {
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
     }
 

@@ -161,7 +161,7 @@ class ApiCaller {
      * function to call in order to build a Request object.
      *
      * @return Request
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function createRequest() {
         $apiAsUrl = $_SERVER['REQUEST_URI'];
@@ -175,7 +175,7 @@ class ApiCaller {
 
         if ($args === false || count($args) < 2) {
             self::$log->error('Api called with URI with less args than expected: '.count($args));
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         $controllerName = ucfirst($args[2]);
@@ -188,7 +188,7 @@ class ApiCaller {
 
         if (!class_exists($controllerName)) {
             self::$log->error('Controller name was not found: '. $controllerName);
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         // Create request
@@ -200,7 +200,7 @@ class ApiCaller {
         // Check the method
         if (!method_exists($controllerName, $methodName)) {
             self::$log->error('Method name was not found: '. $controllerName.'::'.$methodName);
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         // Get the auth_token and user data from cookies
@@ -228,7 +228,7 @@ class ApiCaller {
     private static function setHttpHeaders(array $response) {
         // Scumbag IE y su cache agresivo.
         header('Expires: Tue, 03 Jul 2001 06:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', Time::get()) . ' GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', \OmegaUp\Time::get()) . ' GMT');
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');

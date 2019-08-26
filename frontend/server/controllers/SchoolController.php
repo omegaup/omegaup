@@ -20,12 +20,12 @@ class SchoolController extends Controller {
         } elseif (!is_null($r['query'])) {
             $param = 'query';
         } else {
-            throw new InvalidParameterException('parameterEmpty', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
         }
 
         $schools = SchoolsDAO::findByName($r[$param]);
         if (is_null($schools)) {
-            throw new NotFoundException('schoolNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
         $response = [];
@@ -61,7 +61,7 @@ class SchoolController extends Controller {
      * @param $name
      * @param $state
      * @return $school_id
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function createSchool($name, $state) {
         // Create school object
@@ -97,10 +97,10 @@ class SchoolController extends Controller {
             self::authenticateRequest($r);
         } catch (UnauthorizedException $e) {
             if (!is_null($r['start_time'])) {
-                throw new InvalidParameterException('paramterInvalid', 'start_time');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('paramterInvalid', 'start_time');
             }
             if (!is_null($r['finish_time'])) {
-                throw new InvalidParameterException('paramterInvalid', 'finish_time');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('paramterInvalid', 'finish_time');
             }
             // Both endpoints were not specified, so the API can be used
             // unauthenticated since it'll be cached.
@@ -110,9 +110,9 @@ class SchoolController extends Controller {
             'offset' => $r['offset'] ?: 0,
             'rowcount' => $r['rowcount'] ?: 100,
             'start_time' => $r['start_time'] ?:
-                            strtotime('first day of this month', Time::get()),
+                            strtotime('first day of this month', \OmegaUp\Time::get()),
             'finish_time' => $r['finish_time'] ?:
-                             strtotime('first day of next month', Time::get()),
+                             strtotime('first day of next month', \OmegaUp\Time::get()),
             'can_use_cache' => is_null($r['start_time']) && is_null($r['finish_time'])
         ];
     }
@@ -197,8 +197,8 @@ class SchoolController extends Controller {
                 'rank' => self::getSchoolsRank(
                     /*$offset=*/0,
                     $rowCount,
-                    /*$startTime=*/strtotime('first day of this month', Time::get()),
-                    /*$finishTime=*/strtotime('first day of next month', Time::get()),
+                    /*$startTime=*/strtotime('first day of this month', \OmegaUp\Time::get()),
+                    /*$finishTime=*/strtotime('first day of next month', \OmegaUp\Time::get()),
                     /*$canUseCache=*/true
                 ),
             ]
@@ -217,7 +217,7 @@ class SchoolController extends Controller {
     /**
      * @param $countryId
      * @param $stateId
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function getStateIdFromCountryAndState($countryId, $stateId) {
         if (is_null($countryId) || is_null($stateId)) {

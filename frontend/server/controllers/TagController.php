@@ -24,7 +24,7 @@ class TagController extends Controller {
         } elseif (!is_null($r['query'])) {
             $param = 'query';
         } else {
-            throw new InvalidParameterException('parameterEmpty', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
         }
 
         $tags = TagsDAO::FindByName($r[$param]);

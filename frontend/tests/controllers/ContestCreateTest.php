@@ -70,7 +70,7 @@ class CreateContestTest extends OmegaupTestCase {
             try {
                 // Call the API
                 $response = ContestController::apiCreate($r);
-            } catch (InvalidParameterException $e) {
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // This exception is expected
                 unset($_REQUEST);
                 continue;
@@ -108,7 +108,7 @@ class CreateContestTest extends OmegaupTestCase {
     /**
      * Tests very long contests
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
@@ -132,7 +132,7 @@ class CreateContestTest extends OmegaupTestCase {
     /**
      * Public contest without problems is not valid.
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreatePublicContest() {
         // Create a valid contest Request object
@@ -156,7 +156,7 @@ class CreateContestTest extends OmegaupTestCase {
      * Public contest with problems NOW is NOT valid. You need
      * to create the contest first and then you can add problems
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreatePublicContestWithProblems() {
         $problem = ProblemsFactory::createProblem();
@@ -219,7 +219,7 @@ class CreateContestTest extends OmegaupTestCase {
         // Get a problem
         $problem = ProblemsFactory::createProblem();
 
-        $originalTime = Time::get();
+        $originalTime = \OmegaUp\Time::get();
 
         // Create contest with 2 hours and a window length 30 of minutes
         $contest = ContestsFactory::createContest(
@@ -241,7 +241,7 @@ class CreateContestTest extends OmegaupTestCase {
 
         // User joins the contest 1 hour and 50 minutes after it starts
         $updatedTime = $originalTime + 110 * 60;
-        Time::setTimeForTesting($updatedTime);
+        \OmegaUp\Time::setTimeForTesting($updatedTime);
         ContestsFactory::openContest($contest, $contestant);
         ContestsFactory::openProblemInContest($contest, $problem, $contestant);
 
@@ -252,7 +252,7 @@ class CreateContestTest extends OmegaupTestCase {
         try {
             // User tries to create a run 5 minutes after contest has finished
             $updatedTime = $updatedTime + 15 * 60;
-            Time::setTimeForTesting($updatedTime);
+            \OmegaUp\Time::setTimeForTesting($updatedTime);
             $run = RunsFactory::createRun($problem, $contest, $contestant);
             RunsFactory::gradeRun($run, 1.0, 'AC', 10);
             $this->fail('Contestant should not create a run after contest finishes');
@@ -260,7 +260,7 @@ class CreateContestTest extends OmegaupTestCase {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         } finally {
-            Time::setTimeForTesting($originalTime);
+            \OmegaUp\Time::setTimeForTesting($originalTime);
         }
     }
 }

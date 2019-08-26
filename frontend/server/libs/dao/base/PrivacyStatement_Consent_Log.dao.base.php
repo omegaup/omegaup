@@ -64,12 +64,12 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
      * será arrojada.
      *
      * @param PrivacyStatementConsentLog $PrivacyStatement_Consent_Log El objeto de tipo PrivacyStatementConsentLog a eliminar
      *
-     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : void {
         $sql = 'DELETE FROM `PrivacyStatement_Consent_Log` WHERE privacystatement_consent_id = ?;';
@@ -77,7 +77,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
     }
 
