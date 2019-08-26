@@ -68,48 +68,7 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-import UI from '../../ui.js';
-
-export default {
-  props: {},
-
-  data: function() {
-    return {
-      T: T,
-      UI: UI,
-      rationale: '',
-      original: '',
-      currentView: 'question',
-      showReportDialog: false,
-      selectedReason: undefined
-    };
-  },
-
-  methods: {
-    onHide() { this.showReportDialog = false;},
-
-    onReportInappropriateProblem() {
-      this.showReportDialog = true;
-      this.currentView = 'question';
-      this.rationale = '';
-      this.original = '';
-      this.selectedReason = undefined;
-    },
-
-    onSubmit() {
-      this.$emit('submit', this);
-      this.currentView = 'thanks';
-      setTimeout(() => this.onHide(), 1000);
-    }
-  }
-};
-
-</script>
-
 <style>
-
 .qualitynomination-demotionpopup .popup {
 	position: fixed;
 	bottom: 10px;
@@ -158,3 +117,40 @@ export default {
 	position: absolute;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+
+@Component
+export default class QualityNominationDemotionPopup extends Vue {
+  T = T;
+  UI = UI;
+  rationale = '';
+  original = '';
+  currentView = 'question';
+  showReportDialog = false;
+  selectedReason = '';
+
+  onHide(): void {
+    this.showReportDialog = false;
+  }
+
+  onReportInappropriateProblem(): void {
+    this.showReportDialog = true;
+    this.currentView = 'question';
+    this.rationale = '';
+    this.original = '';
+    this.selectedReason = '';
+  }
+
+  onSubmit(): void {
+    this.$emit('submit', this);
+    this.currentView = 'thanks';
+    setTimeout(() => this.onHide(), 1000);
+  }
+}
+
+</script>

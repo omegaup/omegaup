@@ -1019,7 +1019,9 @@ class CourseController extends Controller {
             throw new NotFoundException('assignmentNotFound');
         }
 
-        $problems = ProblemsetProblemsDAO::getProblems($r['assignment']->problemset_id);
+        $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
+            $r['assignment']->problemset_id
+        );
         $letter = 0;
         foreach ($problems as &$problem) {
             $runsArray = RunsDAO::getForProblemDetails(
@@ -1737,7 +1739,7 @@ class CourseController extends Controller {
             $r
         );
 
-        $problems = ProblemsetProblemsDAO::getProblems(
+        $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
             $tokenAuthenticationResult['assignment']->problemset_id
         );
         $letter = 0;
