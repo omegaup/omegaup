@@ -74,7 +74,7 @@ class Controller {
      * Request must be authenticated before this function is called.
      *
      * @param Request $r
-     * @return Users
+     * @return \OmegaUp\DAO\VO\Users
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     protected static function resolveTargetUser(Request $r) {

@@ -1,14 +1,16 @@
 <?php
 
 include_once('base/Identities.dao.base.php');
-include_once('base/Identities.vo.base.php');
-/** Identities Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Identities }.
-  * @access public
-  *
-  */
+
+/**
+ * Identities Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Identities}.
+ *
+ * @access public
+ */
 class IdentitiesDAO extends IdentitiesDAOBase {
     public static function FindByEmail($email) {
         $sql = 'SELECT
@@ -28,10 +30,10 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Identities($rs);
+        return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function findByUsername(string $username) : ?Identities {
+    public static function findByUsername(string $username) : ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                    i.*
                 FROM
@@ -45,7 +47,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Identities($rs);
+        return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
     public static function findByUsernameOrName(string $usernameOrName) : array {
@@ -70,12 +72,12 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $identityData) {
-            array_push($result, new Identities($identityData));
+            array_push($result, new \OmegaUp\DAO\VO\Identities($identityData));
         }
         return $result;
     }
 
-    public static function findByUserId(int $userId) : ?Identities {
+    public static function findByUserId(int $userId) : ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                   i.*
                 FROM
@@ -92,7 +94,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Identities($rs);
+        return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
     public static function getExtraInformation($email) {
@@ -239,7 +241,7 @@ class IdentitiesDAO extends IdentitiesDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Identities($rs);
+        return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
     public static function getAssociatedIdentities($userId) {

@@ -144,7 +144,7 @@ class ProblemsFactory {
         ];
     }
 
-    public static function createProblemWithAuthor(Users $author, ScopedLoginToken $login = null) {
+    public static function createProblemWithAuthor(\OmegaUp\DAO\VO\Users $author, ScopedLoginToken $login = null) {
         return self::createProblem(new ProblemParams([
             'visibility' => ProblemController::VISIBILITY_PUBLIC,
             'author' => $author,
@@ -220,7 +220,7 @@ class ProblemsFactory {
         unset($_REQUEST);
     }
 
-    public static function addGroupAdmin($problemData, Groups $group) {
+    public static function addGroupAdmin($problemData, \OmegaUp\DAO\VO\Groups $group) {
         // Prepare our request
         $r = new Request([
             'problem_alias' => $problemData['request']['problem_alias'],

@@ -1,14 +1,16 @@
 <?php
 
 include('base/Group_Roles.dao.base.php');
-include('base/Group_Roles.vo.base.php');
-/** GroupRoles Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link GroupRoles }.
-  * @access public
-  *
-  */
+
+/**
+ * GroupRoles Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\GroupRoles}.
+ *
+ * @access public
+ */
 class GroupRolesDAO extends GroupRolesDAOBase {
     public static function getAdmins($acl_id) {
         $sql = '
@@ -77,15 +79,15 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
-    public static function getContestAdmins(Contests $contest) {
+    public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest) {
         return self::getAdmins($contest->acl_id);
     }
 
-    public static function getCourseAdmins(Courses $course) {
+    public static function getCourseAdmins(\OmegaUp\DAO\VO\Courses $course) {
         return self::getAdmins($course->acl_id);
     }
 
-    public static function getProblemAdmins(Problems $problem) {
+    public static function getProblemAdmins(\OmegaUp\DAO\VO\Problems $problem) {
         return self::getAdmins($problem->acl_id);
     }
 

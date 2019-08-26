@@ -1,21 +1,17 @@
 <?php
 
 require_once('base/Auth_Tokens.dao.base.php');
-require_once('base/Auth_Tokens.vo.base.php');
-/** Page-level DocBlock .
+
+/**
+ * AuthTokens Data Access Object (DAO).
  *
- * @author alanboy
- * @package docs
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\AuthTokens}.
  *
- */
-/** AuthTokens Data Access Object (DAO).
- *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link AuthTokens }.
  * @author alanboy
  * @access public
  * @package docs
- *
  */
 class AuthTokensDAO extends AuthTokensDAOBase {
     public static function getUserByToken($auth_token) {
@@ -33,10 +29,10 @@ class AuthTokensDAO extends AuthTokensDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Users($rs);
+        return new \OmegaUp\DAO\VO\Users($rs);
     }
 
-    public static function getIdentityByToken($auth_token) {
+    public static function getIdentityByToken($auth_token) : ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                     i.*
                 FROM
@@ -52,7 +48,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Identities($rs);
+        return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
     public static function expireAuthTokens($identity_id) {
@@ -76,7 +72,7 @@ class AuthTokensDAO extends AuthTokensDAOBase {
 
         $authTokens = [];
         foreach ($rs as $row) {
-            array_push($authTokens, new AuthTokens($row));
+            array_push($authTokens, new \OmegaUp\DAO\VO\AuthTokens($row));
         }
         return $authTokens;
     }

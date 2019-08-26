@@ -1,17 +1,16 @@
 <?php
 
 require_once('base/Users.dao.base.php');
-require_once('base/Users.vo.base.php');
 
-/** Users Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Users }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+/**
+ * Users Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
+ * almacenar de forma permanente y recuperar instancias de objetos {@link \OmegaUp\DAO\VO\Users}.
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class UsersDAO extends UsersDAOBase {
     public static function FindByEmail($email) {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
@@ -20,7 +19,7 @@ class UsersDAO extends UsersDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Users($rs);
+        return new \OmegaUp\DAO\VO\Users($rs);
     }
 
     public static function FindByUsername($username) {
@@ -29,7 +28,7 @@ class UsersDAO extends UsersDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Users($rs);
+        return new \OmegaUp\DAO\VO\Users($rs);
     }
 
     public static function IsUserInterviewer($user_id) {
@@ -56,7 +55,7 @@ class UsersDAO extends UsersDAOBase {
         }
     }
 
-    public static function savePassword(Users $Users) {
+    public static function savePassword(\OmegaUp\DAO\VO\Users $Users) {
         $sql = '
             UPDATE
                 `Users`
@@ -168,7 +167,7 @@ class UsersDAO extends UsersDAOBase {
 
         $users = [];
         foreach ($rs as $row) {
-            array_push($users, new Users($row));
+            array_push($users, new \OmegaUp\DAO\VO\Users($row));
         }
         return $users;
     }
@@ -187,7 +186,7 @@ class UsersDAO extends UsersDAOBase {
 
         $users = [];
         foreach ($rs as $row) {
-            array_push($users, new Users($row));
+            array_push($users, new \OmegaUp\DAO\VO\Users($row));
         }
         return $users;
     }

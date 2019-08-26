@@ -203,7 +203,7 @@ class SessionController extends Controller {
         $this->InvalidateCache();
 
         $currentSession = self::apiCurrentSession()['session'];
-        $authToken = new AuthTokens(['token' => $currentSession['auth_token']]);
+        $authToken = new \OmegaUp\DAO\VO\AuthTokens(['token' => $currentSession['auth_token']]);
 
         $this->InvalidateLocalCache();
 
@@ -217,9 +217,9 @@ class SessionController extends Controller {
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private function registerSession(Identities $identity) : string {
+    private function registerSession(\OmegaUp\DAO\VO\Identities $identity) : string {
         // Log the login.
-        IdentityLoginLogDAO::create(new IdentityLoginLog([
+        IdentityLoginLogDAO::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => $identity->identity_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));
@@ -239,7 +239,7 @@ class SessionController extends Controller {
         $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
-        AuthTokensDAO::replace(new AuthTokens([
+        AuthTokensDAO::replace(new \OmegaUp\DAO\VO\AuthTokens([
             'user_id' => $identity->user_id,
             'identity_id' => $identity->identity_id,
             'token' => $token,

@@ -980,9 +980,9 @@ class UpdateProblemTest extends OmegaupTestCase {
 
     private function updateProblemsetProblemWithRuns(
         string $updatePublished,
-        ?Users $problemAuthor = null,
-        ?Users $contestDirector = null,
-        ?Users $contestAdmin = null
+        ?\OmegaUp\DAO\VO\Users $problemAuthor = null,
+        ?\OmegaUp\DAO\VO\Users $contestDirector = null,
+        ?\OmegaUp\DAO\VO\Users $contestAdmin = null
     ) {
         $originalTime = \OmegaUp\Time::get();
         try {

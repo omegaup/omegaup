@@ -37,7 +37,7 @@ class IdentityFactory {
     }
 
     public static function createIdentitiesFromAGroup(
-        Groups $group,
+        \OmegaUp\DAO\VO\Groups $group,
         ScopedLoginToken $adminLogin,
         string $password
     ) : array {

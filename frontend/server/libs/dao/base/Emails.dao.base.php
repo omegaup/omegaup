@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Emails}.
+ * {@link \OmegaUp\DAO\VO\Emails}.
  * @access public
  * @abstract
- *
  */
 abstract class EmailsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param Emails $Emails El objeto de tipo Emails a actualizar.
+     * @param \OmegaUp\DAO\VO\Emails $Emails El objeto de tipo Emails a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(Emails $Emails) : int {
+    final public static function update(\OmegaUp\DAO\VO\Emails $Emails) : int {
         $sql = 'UPDATE `Emails` SET `email` = ?, `user_id` = ? WHERE `email_id` = ?;';
         $params = [
             $Emails->email,
@@ -37,40 +35,45 @@ abstract class EmailsDAOBase {
     }
 
     /**
-     * Obtener {@link Emails} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\Emails} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Emails} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Emails}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?Emails Un objeto del tipo {@link Emails}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\Emails Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\Emails} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $email_id) : ?Emails {
+    final public static function getByPK(int $email_id) : ?\OmegaUp\DAO\VO\Emails {
         $sql = 'SELECT `Emails`.`email_id`, `Emails`.`email`, `Emails`.`user_id` FROM Emails WHERE (email_id = ?) LIMIT 1;';
         $params = [$email_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new Emails($row);
+        return new \OmegaUp\DAO\VO\Emails($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Emails suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\Emails} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param Emails $Emails El objeto de tipo Emails a eliminar
+     * @param \OmegaUp\DAO\VO\Emails $Emails El
+     * objeto de tipo \OmegaUp\DAO\VO\Emails a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Emails $Emails) : void {
+    final public static function delete(\OmegaUp\DAO\VO\Emails $Emails) : void {
         $sql = 'DELETE FROM `Emails` WHERE email_id = ?;';
         $params = [$Emails->email_id];
 
@@ -84,7 +87,8 @@ abstract class EmailsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Emails}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\Emails}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -95,9 +99,10 @@ abstract class EmailsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return Emails[] Un arreglo que contiene objetos del tipo {@link Emails}.
+     * @return \OmegaUp\DAO\VO\Emails[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\Emails}.
      *
-     * @psalm-return array<int, Emails>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\Emails>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -114,7 +119,7 @@ abstract class EmailsDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new Emails($row);
+            $allData[] = new \OmegaUp\DAO\VO\Emails($row);
         }
         return $allData;
     }
@@ -123,13 +128,15 @@ abstract class EmailsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Emails suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\Emails}
+     * suministrado.
      *
-     * @param Emails $Emails El objeto de tipo Emails a crear.
+     * @param \OmegaUp\DAO\VO\Emails $Emails El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Emails} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Emails $Emails) : int {
+    final public static function create(\OmegaUp\DAO\VO\Emails $Emails) : int {
         $sql = 'INSERT INTO Emails (`email`, `user_id`) VALUES (?, ?);';
         $params = [
             $Emails->email,

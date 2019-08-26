@@ -5,8 +5,8 @@ require_once('libs/dao/Problemset_Problems.dao.php');
 
 class ProblemsetController extends Controller {
     public static function validateAddProblemToProblemset(
-        Problems $problem,
-        Identities $identity
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity
     ) {
         if ($problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
             $problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
@@ -21,10 +21,10 @@ class ProblemsetController extends Controller {
 
     public static function addProblem(
         $problemset_id,
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         string $commit,
         string $currentVersion,
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         int $points,
         int $order_in_contest = 1,
         bool $validateVisibility = true
@@ -36,7 +36,7 @@ class ProblemsetController extends Controller {
             );
         }
 
-        self::updateProblemsetProblem(new ProblemsetProblems([
+        self::updateProblemsetProblem(new \OmegaUp\DAO\VO\ProblemsetProblems([
             'problemset_id' => $problemset_id,
             'problem_id' => $problem->problem_id,
             'commit' => $commit,
@@ -51,7 +51,7 @@ class ProblemsetController extends Controller {
      * the contest_score for all the problemset and problem runs
      */
     private static function updateProblemsetProblem(
-        ProblemsetProblems $updatedProblemsetProblem
+        \OmegaUp\DAO\VO\ProblemsetProblems $updatedProblemsetProblem
     ) {
         $oldProblemsetProblem = ProblemsetProblemsDAOBase::getByPK(
             $updatedProblemsetProblem->problemset_id,

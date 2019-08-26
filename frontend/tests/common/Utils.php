@@ -149,11 +149,11 @@ class Utils {
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));
-        ACLsDAO::create(new ACLs([
+        ACLsDAO::create(new \OmegaUp\DAO\VO\ACLs([
             'acl_id' => Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,
         ]));
-        UserRolesDAO::create(new UserRoles([
+        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $admin->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,

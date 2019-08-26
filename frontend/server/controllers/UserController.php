@@ -79,7 +79,7 @@ class UserController extends Controller {
                 throw new DuplicatedEntryInDatabaseException('mailInUse');
             }
 
-            $user = new Users([
+            $user = new \OmegaUp\DAO\VO\Users([
                 'user_id' => $userByEmail->user_id,
                 'username' => $r['username'],
                 'password' => $hashedPassword
@@ -170,10 +170,10 @@ class UserController extends Controller {
             }
         }
 
-        $user = new Users($userData);
-        $identity = new Identities($identityData);
+        $user = new \OmegaUp\DAO\VO\Users($userData);
+        $identity = new \OmegaUp\DAO\VO\Identities($identityData);
 
-        $email = new Emails([
+        $email = new \OmegaUp\DAO\VO\Emails([
             'email' => $r['email'],
         ]);
 
@@ -219,7 +219,7 @@ class UserController extends Controller {
      *
      * @param Request $r
      */
-    private static function registerToSendy(Users $user) {
+    private static function registerToSendy(\OmegaUp\DAO\VO\Users $user) {
         if (!OMEGAUP_EMAIL_SENDY_ENABLE) {
             return false;
         }
@@ -271,7 +271,7 @@ class UserController extends Controller {
      * @param Request $r
      * @throws EmailVerificationSendException
      */
-    private static function sendVerificationEmail(Users $user) {
+    private static function sendVerificationEmail(\OmegaUp\DAO\VO\Users $user) {
         $email = EmailsDAO::getByPK($user->main_email_id);
         if (is_null($email)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotfound');
@@ -299,7 +299,7 @@ class UserController extends Controller {
      * @param Request $r
      * @throws EmailNotVerifiedException
      */
-    public static function checkEmailVerification(Users $user) {
+    public static function checkEmailVerification(\OmegaUp\DAO\VO\Users $user) {
         if ($user->verified != '0') {
             // Already verified, nothing to do.
             return;
@@ -519,11 +519,11 @@ class UserController extends Controller {
      * Given a username or a email, returns the user object
      *
      * @param ?string $userOrEmail
-     * @return Users
+     * @return \OmegaUp\DAO\VO\Users
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function resolveUser(?string $userOrEmail) : Users {
+    public static function resolveUser(?string $userOrEmail) : \OmegaUp\DAO\VO\Users {
         Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
         $user = UsersDAO::FindByUsername($userOrEmail);
         if (!is_null($user)) {
@@ -1051,12 +1051,12 @@ class UserController extends Controller {
     /**
      * Returns the profile of the user given
      *
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Users $user
      * @return array
      */
     public static function getProfileImpl(
-        Users $user,
-        Identities $identity
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity
     ) {
         $response = [];
         $response['userinfo'] = [];
@@ -1212,7 +1212,7 @@ class UserController extends Controller {
             }
 
             // Only first place coder is saved
-            CoderOfTheMonthDAO::create(new CoderOfTheMonth([
+            CoderOfTheMonthDAO::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $users[0]['user_id'],
                 'time' => $firstDay,
                 'rank' => 1,
@@ -1296,7 +1296,7 @@ class UserController extends Controller {
             }
 
             // Save it
-            CoderOfTheMonthDAO::create(new CoderOfTheMonth([
+            CoderOfTheMonthDAO::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $user['user_id'],
                 'time' => $dateToSelect,
                 'rank' => $index + 1,
@@ -1357,7 +1357,7 @@ class UserController extends Controller {
      * Get Contests which a certain user has participated in
      *
      * @param Request $r
-     * @return Contests array
+     * @return \OmegaUp\DAO\VO\Contests array
      */
     public static function apiContestStats(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1407,7 +1407,7 @@ class UserController extends Controller {
      * Get Problems solved by user
      *
      * @param Request $r
-     * @return Problems array
+     * @return \OmegaUp\DAO\VO\Problems array
      */
     public static function apiProblemsSolved(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1435,7 +1435,7 @@ class UserController extends Controller {
      * Get Problems unsolved by user
      *
      * @param Request $r
-     * @return Problems array
+     * @return \OmegaUp\DAO\VO\Problems array
      */
     public static function apiListUnsolvedProblems(Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1763,7 +1763,7 @@ class UserController extends Controller {
      */
     public static function getRankByProblemsSolved(
         Request $r,
-        ?Identities $identity
+        ?\OmegaUp\DAO\VO\Identities $identity
     ) : array {
         if (is_null($identity)) {
             $selectedFilter = self::getSelectedFilter($r);
@@ -2056,7 +2056,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveRole($r);
 
-        UserRolesDAO::create(new UserRoles([
+        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $r['user']->user_id,
             'role_id' => $r['role']->role_id,
             'acl_id' => Authorization::SYSTEM_ACL,
@@ -2080,7 +2080,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveRole($r);
 
-        UserRolesDAO::delete(new UserRoles([
+        UserRolesDAO::delete(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $r['user']->user_id,
             'role_id' => $r['role']->role_id,
             'acl_id' => Authorization::SYSTEM_ACL,
@@ -2103,7 +2103,7 @@ class UserController extends Controller {
 
         self::authenticateRequest($r);
         self::validateAddRemoveGroup($r);
-        GroupsIdentitiesDAO::create(new GroupsIdentities([
+        GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $r->identity->identity_id,
             'group_id' => $r['group']->group_id,
         ]));
@@ -2126,7 +2126,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveGroup($r);
 
-        GroupsIdentitiesDAO::delete(new GroupsIdentities([
+        GroupsIdentitiesDAO::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $r->identity->identity_id,
             'group_id' => $r['group']->group_id
         ]));
@@ -2164,7 +2164,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveExperiment($r);
 
-        UsersExperimentsDAO::create(new UsersExperiments([
+        UsersExperimentsDAO::create(new \OmegaUp\DAO\VO\UsersExperiments([
             'user_id' => $r['user']->user_id,
             'experiment' => $r['experiment'],
         ]));
@@ -2376,24 +2376,24 @@ class UserController extends Controller {
 
     /**
      * Returns true whether user is logged with the main identity
-     * @param Users $user
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Users $user
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @return bool
      */
-    public static function isMainIdentity(Users $user, Identities $identity) : bool {
+    public static function isMainIdentity(\OmegaUp\DAO\VO\Users $user, \OmegaUp\DAO\VO\Identities $identity) : bool {
         return $identity->identity_id == $user->main_identity_id;
     }
 
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param Request $r
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @param Smarty $smarty
      * @return array
      */
     public static function getRankDetailsForSmarty(
         Request $r,
-        ?Identities $identity,
+        ?\OmegaUp\DAO\VO\Identities $identity,
         Smarty $smarty
     ) : array {
         $r->ensureInt('page', null, null, false);
@@ -2440,12 +2440,12 @@ class UserController extends Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param Request $r
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @return array
      */
     public static function getCoderOfTheMonthDetailsForSmarty(
         Request $r,
-        ?Identities $identity
+        ?\OmegaUp\DAO\VO\Identities $identity
     ) : array {
         $currentTimeStamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimeStamp);

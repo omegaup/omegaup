@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link ACLs}.
+ * {@link \OmegaUp\DAO\VO\ACLs}.
  * @access public
  * @abstract
- *
  */
 abstract class ACLsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param ACLs $ACLs El objeto de tipo ACLs a actualizar.
+     * @param \OmegaUp\DAO\VO\ACLs $ACLs El objeto de tipo ACLs a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(ACLs $ACLs) : int {
+    final public static function update(\OmegaUp\DAO\VO\ACLs $ACLs) : int {
         $sql = 'UPDATE `ACLs` SET `owner_id` = ? WHERE `acl_id` = ?;';
         $params = [
             is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
@@ -36,40 +34,45 @@ abstract class ACLsDAOBase {
     }
 
     /**
-     * Obtener {@link ACLs} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\ACLs} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link ACLs} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ACLs}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?ACLs Un objeto del tipo {@link ACLs}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\ACLs Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\ACLs} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $acl_id) : ?ACLs {
+    final public static function getByPK(int $acl_id) : ?\OmegaUp\DAO\VO\ACLs {
         $sql = 'SELECT `ACLs`.`acl_id`, `ACLs`.`owner_id` FROM ACLs WHERE (acl_id = ?) LIMIT 1;';
         $params = [$acl_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new ACLs($row);
+        return new \OmegaUp\DAO\VO\ACLs($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto ACLs suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\ACLs} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param ACLs $ACLs El objeto de tipo ACLs a eliminar
+     * @param \OmegaUp\DAO\VO\ACLs $ACLs El
+     * objeto de tipo \OmegaUp\DAO\VO\ACLs a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(ACLs $ACLs) : void {
+    final public static function delete(\OmegaUp\DAO\VO\ACLs $ACLs) : void {
         $sql = 'DELETE FROM `ACLs` WHERE acl_id = ?;';
         $params = [$ACLs->acl_id];
 
@@ -83,7 +86,8 @@ abstract class ACLsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link ACLs}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\ACLs}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -94,9 +98,10 @@ abstract class ACLsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return ACLs[] Un arreglo que contiene objetos del tipo {@link ACLs}.
+     * @return \OmegaUp\DAO\VO\ACLs[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\ACLs}.
      *
-     * @psalm-return array<int, ACLs>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\ACLs>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -113,7 +118,7 @@ abstract class ACLsDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new ACLs($row);
+            $allData[] = new \OmegaUp\DAO\VO\ACLs($row);
         }
         return $allData;
     }
@@ -122,13 +127,15 @@ abstract class ACLsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ACLs suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\ACLs}
+     * suministrado.
      *
-     * @param ACLs $ACLs El objeto de tipo ACLs a crear.
+     * @param \OmegaUp\DAO\VO\ACLs $ACLs El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ACLs} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(ACLs $ACLs) : int {
+    final public static function create(\OmegaUp\DAO\VO\ACLs $ACLs) : int {
         $sql = 'INSERT INTO ACLs (`owner_id`) VALUES (?);';
         $params = [
             is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,

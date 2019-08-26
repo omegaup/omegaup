@@ -82,7 +82,7 @@ class ContestsFactory {
      *
      * @param string $title
      * @param string $public
-     * @param Users $contestDirector
+     * @param \OmegaUp\DAO\VO\Users $contestDirector
      * @return Request
      */
     public static function getRequest($params = null) {
@@ -253,7 +253,7 @@ class ContestsFactory {
 
     public static function addUser(
         array $contestData,
-        Users $user
+        \OmegaUp\DAO\VO\Users $user
     ) : void {
         // Prepare our request
         $r = new Request();
@@ -272,7 +272,7 @@ class ContestsFactory {
 
     public static function addIdentity(
         array $contestData,
-        Identities $identitiy
+        \OmegaUp\DAO\VO\Identities $identitiy
     ) : void {
         // Prepare our request
         $r = new Request();
@@ -305,7 +305,7 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
-    public static function addGroupAdmin($contestData, Groups $group) {
+    public static function addGroupAdmin($contestData, \OmegaUp\DAO\VO\Groups $group) {
         // Prepare our request
         $r = new Request([
             'contest_alias' => $contestData['request']['alias'],

@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,28 +11,28 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link RunCounts}.
+ * {@link \OmegaUp\DAO\VO\RunCounts}.
  * @access public
  * @abstract
- *
  */
 abstract class RunCountsDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link RunCounts}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\RunCounts}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @throws Exception si la operacion fallo.
+     * @throws Exception si la operacion falló.
      *
-     * @param RunCounts $Run_Counts El objeto de tipo RunCounts
+     * @param \OmegaUp\DAO\VO\RunCounts $Run_Counts El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\RunCounts}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(RunCounts $Run_Counts) : int {
+    final public static function replace(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : int {
         if (empty($Run_Counts->date)) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
@@ -50,11 +49,11 @@ abstract class RunCountsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param RunCounts $Run_Counts El objeto de tipo RunCounts a actualizar.
+     * @param \OmegaUp\DAO\VO\RunCounts $Run_Counts El objeto de tipo RunCounts a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(RunCounts $Run_Counts) : int {
+    final public static function update(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : int {
         $sql = 'UPDATE `Run_Counts` SET `total` = ?, `ac_count` = ? WHERE `date` = ?;';
         $params = [
             (int)$Run_Counts->total,
@@ -66,40 +65,45 @@ abstract class RunCountsDAOBase {
     }
 
     /**
-     * Obtener {@link RunCounts} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\RunCounts} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link RunCounts} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\RunCounts}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?RunCounts Un objeto del tipo {@link RunCounts}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\RunCounts Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\RunCounts} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(?string $date) : ?RunCounts {
+    final public static function getByPK(?string $date) : ?\OmegaUp\DAO\VO\RunCounts {
         $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` FROM Run_Counts WHERE (date = ?) LIMIT 1;';
         $params = [$date];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new RunCounts($row);
+        return new \OmegaUp\DAO\VO\RunCounts($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto RunCounts suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\RunCounts} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param RunCounts $Run_Counts El objeto de tipo RunCounts a eliminar
+     * @param \OmegaUp\DAO\VO\RunCounts $Run_Counts El
+     * objeto de tipo \OmegaUp\DAO\VO\RunCounts a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(RunCounts $Run_Counts) : void {
+    final public static function delete(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : void {
         $sql = 'DELETE FROM `Run_Counts` WHERE date = ?;';
         $params = [$Run_Counts->date];
 
@@ -113,7 +117,8 @@ abstract class RunCountsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link RunCounts}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\RunCounts}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -124,9 +129,10 @@ abstract class RunCountsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return RunCounts[] Un arreglo que contiene objetos del tipo {@link RunCounts}.
+     * @return \OmegaUp\DAO\VO\RunCounts[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\RunCounts}.
      *
-     * @psalm-return array<int, RunCounts>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\RunCounts>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -143,7 +149,7 @@ abstract class RunCountsDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new RunCounts($row);
+            $allData[] = new \OmegaUp\DAO\VO\RunCounts($row);
         }
         return $allData;
     }
@@ -152,13 +158,15 @@ abstract class RunCountsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto RunCounts suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\RunCounts}
+     * suministrado.
      *
-     * @param RunCounts $Run_Counts El objeto de tipo RunCounts a crear.
+     * @param \OmegaUp\DAO\VO\RunCounts $Run_Counts El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\RunCounts} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(RunCounts $Run_Counts) : int {
+    final public static function create(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : int {
         $sql = 'INSERT INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
         $params = [
             $Run_Counts->date,

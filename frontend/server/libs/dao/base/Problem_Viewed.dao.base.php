@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,28 +11,28 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link ProblemViewed}.
+ * {@link \OmegaUp\DAO\VO\ProblemViewed}.
  * @access public
  * @abstract
- *
  */
 abstract class ProblemViewedDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link ProblemViewed}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\ProblemViewed}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @throws Exception si la operacion fallo.
+     * @throws Exception si la operacion falló.
      *
-     * @param ProblemViewed $Problem_Viewed El objeto de tipo ProblemViewed
+     * @param \OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemViewed}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(ProblemViewed $Problem_Viewed) : int {
+    final public static function replace(\OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed) : int {
         if (empty($Problem_Viewed->problem_id) || empty($Problem_Viewed->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
@@ -50,11 +49,11 @@ abstract class ProblemViewedDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param ProblemViewed $Problem_Viewed El objeto de tipo ProblemViewed a actualizar.
+     * @param \OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed El objeto de tipo ProblemViewed a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(ProblemViewed $Problem_Viewed) : int {
+    final public static function update(\OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed) : int {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problem_Viewed->view_time),
@@ -66,40 +65,45 @@ abstract class ProblemViewedDAOBase {
     }
 
     /**
-     * Obtener {@link ProblemViewed} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\ProblemViewed} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link ProblemViewed} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemViewed}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?ProblemViewed Un objeto del tipo {@link ProblemViewed}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\ProblemViewed Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\ProblemViewed} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(?int $problem_id, ?int $identity_id) : ?ProblemViewed {
+    final public static function getByPK(?int $problem_id, ?int $identity_id) : ?\OmegaUp\DAO\VO\ProblemViewed {
         $sql = 'SELECT `Problem_Viewed`.`problem_id`, `Problem_Viewed`.`identity_id`, `Problem_Viewed`.`view_time` FROM Problem_Viewed WHERE (problem_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$problem_id, $identity_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new ProblemViewed($row);
+        return new \OmegaUp\DAO\VO\ProblemViewed($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto ProblemViewed suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\ProblemViewed} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param ProblemViewed $Problem_Viewed El objeto de tipo ProblemViewed a eliminar
+     * @param \OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed El
+     * objeto de tipo \OmegaUp\DAO\VO\ProblemViewed a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(ProblemViewed $Problem_Viewed) : void {
+    final public static function delete(\OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed) : void {
         $sql = 'DELETE FROM `Problem_Viewed` WHERE problem_id = ? AND identity_id = ?;';
         $params = [$Problem_Viewed->problem_id, $Problem_Viewed->identity_id];
 
@@ -113,7 +117,8 @@ abstract class ProblemViewedDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link ProblemViewed}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\ProblemViewed}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -124,9 +129,10 @@ abstract class ProblemViewedDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return ProblemViewed[] Un arreglo que contiene objetos del tipo {@link ProblemViewed}.
+     * @return \OmegaUp\DAO\VO\ProblemViewed[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\ProblemViewed}.
      *
-     * @psalm-return array<int, ProblemViewed>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\ProblemViewed>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -143,7 +149,7 @@ abstract class ProblemViewedDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new ProblemViewed($row);
+            $allData[] = new \OmegaUp\DAO\VO\ProblemViewed($row);
         }
         return $allData;
     }
@@ -152,13 +158,15 @@ abstract class ProblemViewedDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ProblemViewed suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\ProblemViewed}
+     * suministrado.
      *
-     * @param ProblemViewed $Problem_Viewed El objeto de tipo ProblemViewed a crear.
+     * @param \OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemViewed} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(ProblemViewed $Problem_Viewed) : int {
+    final public static function create(\OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed) : int {
         $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
             is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,

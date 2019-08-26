@@ -21,12 +21,12 @@ class Grader {
     /**
      * Call /run/new/ endpoint with run id as parameter.
      *
-     * @param Runs   $run    the run to be graded.
+     * @param \OmegaUp\DAO\VO\Runs   $run    the run to be graded.
      * @param string $source the source of the submission.
      *
      * @throws Exception
      */
-    public function grade(Runs $run, string $source) {
+    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) {
         if (OMEGAUP_GRADER_FAKE) {
             $submission = SubmissionsDAO::getByPK($run->submission_id);
             file_put_contents("/tmp/{$submission->guid}", $source);
@@ -55,7 +55,7 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/grade/',
             self::REQUEST_MODE_JSON,
             [
-                'run_ids' => array_map(function (Runs $r) {
+                'run_ids' => array_map(function (\OmegaUp\DAO\VO\Runs $r) {
                     return (int)$r->run_id;
                 }, $runs),
                 'rejudge' => true,
@@ -138,7 +138,7 @@ class Grader {
     }
 
     public function getGraderResource(
-        Runs $run,
+        \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         bool $passthru = false,
         bool $missingOk = false

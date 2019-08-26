@@ -185,7 +185,7 @@ class QualityNominationController extends Controller {
         }
 
         // Create object
-        $nomination = new QualityNominations([
+        $nomination = new \OmegaUp\DAO\VO\QualityNominations([
             'user_id' => $r->user->user_id,
             'problem_id' => $problem->problem_id,
             'nomination' => $r['nomination'],
@@ -202,7 +202,7 @@ class QualityNominationController extends Controller {
                 $qualityReviewerGroup,
                 self::REVIEWERS_PER_NOMINATION
             ) as $reviewer) {
-                QualityNominationReviewersDAO::create(new QualityNominationReviewers([
+                QualityNominationReviewersDAO::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
                     'qualitynomination_id' => $nomination->qualitynomination_id,
                     'user_id' => $reviewer->user_id,
                 ]));
@@ -277,7 +277,7 @@ class QualityNominationController extends Controller {
 
         $r['visibility'] = $newProblemVisibility;
 
-        $qualitynominationlog = new QualityNominationLog([
+        $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
             'user_id' => $r->user->user_id,
             'qualitynomination_id' => $qualitynomination->qualitynomination_id,
             'from_status' => $qualitynomination->status,
@@ -318,7 +318,7 @@ class QualityNominationController extends Controller {
     /**
      * Send a mail with demotion notification to the original creator
      */
-    private static function sendDemotionEmail(Request $r, QualityNominations $qualitynomination, $rationale) {
+    private static function sendDemotionEmail(Request $r, \OmegaUp\DAO\VO\QualityNominations $qualitynomination, $rationale) {
         $request = [];
         $adminuser = ProblemsDAO::getAdminUser($r['problem']);
         $email = $adminuser['email'];

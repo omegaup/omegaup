@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,28 +11,28 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link States}.
+ * {@link \OmegaUp\DAO\VO\States}.
  * @access public
  * @abstract
- *
  */
 abstract class StatesDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link States}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\States}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @throws Exception si la operacion fallo.
+     * @throws Exception si la operacion falló.
      *
-     * @param States $States El objeto de tipo States
+     * @param \OmegaUp\DAO\VO\States $States El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\States}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(States $States) : int {
+    final public static function replace(\OmegaUp\DAO\VO\States $States) : int {
         if (empty($States->country_id) || empty($States->state_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
@@ -50,11 +49,11 @@ abstract class StatesDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param States $States El objeto de tipo States a actualizar.
+     * @param \OmegaUp\DAO\VO\States $States El objeto de tipo States a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(States $States) : int {
+    final public static function update(\OmegaUp\DAO\VO\States $States) : int {
         $sql = 'UPDATE `States` SET `name` = ? WHERE `country_id` = ? AND `state_id` = ?;';
         $params = [
             $States->name,
@@ -66,40 +65,45 @@ abstract class StatesDAOBase {
     }
 
     /**
-     * Obtener {@link States} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\States} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link States} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\States}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?States Un objeto del tipo {@link States}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\States Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\States} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(?string $country_id, ?string $state_id) : ?States {
+    final public static function getByPK(?string $country_id, ?string $state_id) : ?\OmegaUp\DAO\VO\States {
         $sql = 'SELECT `States`.`country_id`, `States`.`state_id`, `States`.`name` FROM States WHERE (country_id = ? AND state_id = ?) LIMIT 1;';
         $params = [$country_id, $state_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new States($row);
+        return new \OmegaUp\DAO\VO\States($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto States suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\States} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param States $States El objeto de tipo States a eliminar
+     * @param \OmegaUp\DAO\VO\States $States El
+     * objeto de tipo \OmegaUp\DAO\VO\States a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(States $States) : void {
+    final public static function delete(\OmegaUp\DAO\VO\States $States) : void {
         $sql = 'DELETE FROM `States` WHERE country_id = ? AND state_id = ?;';
         $params = [$States->country_id, $States->state_id];
 
@@ -113,7 +117,8 @@ abstract class StatesDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link States}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\States}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -124,9 +129,10 @@ abstract class StatesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return States[] Un arreglo que contiene objetos del tipo {@link States}.
+     * @return \OmegaUp\DAO\VO\States[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\States}.
      *
-     * @psalm-return array<int, States>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\States>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -143,7 +149,7 @@ abstract class StatesDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new States($row);
+            $allData[] = new \OmegaUp\DAO\VO\States($row);
         }
         return $allData;
     }
@@ -152,13 +158,15 @@ abstract class StatesDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto States suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\States}
+     * suministrado.
      *
-     * @param States $States El objeto de tipo States a crear.
+     * @param \OmegaUp\DAO\VO\States $States El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\States} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(States $States) : int {
+    final public static function create(\OmegaUp\DAO\VO\States $States) : int {
         $sql = 'INSERT INTO States (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
         $params = [
             $States->country_id,

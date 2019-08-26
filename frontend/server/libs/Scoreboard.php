@@ -56,7 +56,7 @@ class ScoreboardParams implements ArrayAccess {
         unset($this->params[$offset]);
     }
 
-    public static function fromContest(Contests $contest) {
+    public static function fromContest(\OmegaUp\DAO\VO\Contests $contest) {
         return new ScoreboardParams([
             'alias' => $contest->alias,
             'title' => $contest->title,
@@ -72,7 +72,7 @@ class ScoreboardParams implements ArrayAccess {
         ]);
     }
 
-    public static function fromAssignment(Assignments $assignment, $groupId, $showAllRuns) {
+    public static function fromAssignment(\OmegaUp\DAO\VO\Assignments $assignment, $groupId, $showAllRuns) {
         return new ScoreboardParams([
             'alias' => $assignment->alias,
             'title' => $assignment->name,

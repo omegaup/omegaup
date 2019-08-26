@@ -25,10 +25,10 @@ class InterviewController extends Controller {
 
         self::validateCreateOrUpdate($r, false);
 
-        $acl = new ACLs([
+        $acl = new \OmegaUp\DAO\VO\ACLs([
             'owner_id' => $r->user->user_id,
         ]);
-        $interview = new Interviews([
+        $interview = new \OmegaUp\DAO\VO\Interviews([
             'alias' => $r['alias'],
             'title' => $r['title'],
             'description' => array_key_exists('description', $r) ? $r['description'] : $r['title'],
@@ -41,7 +41,7 @@ class InterviewController extends Controller {
             ACLsDAO::create($acl);
             $interview->acl_id = $acl->acl_id;
 
-            $problemset = new Problemsets([
+            $problemset = new \OmegaUp\DAO\VO\Problemsets([
                 'acl_id' => $acl->acl_id,
                 'type' => 'Interview',
                 'scoreboard_url' => SecurityTools::randomString(30),
@@ -163,7 +163,7 @@ class InterviewController extends Controller {
         }
 
         // add the user to the interview
-        ProblemsetIdentitiesDAO::create(new ProblemsetIdentities([
+        ProblemsetIdentitiesDAO::create(new \OmegaUp\DAO\VO\ProblemsetIdentities([
             'problemset_id' => $r['interview']->problemset_id,
             'identity_id' => $r['user']->main_identity_id,
             'access_time' => null,

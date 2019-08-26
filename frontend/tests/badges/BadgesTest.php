@@ -22,7 +22,7 @@ class BadgesTest extends BadgesTestCase {
     }
 
     private static function RunRequest(array $apicall): void {
-        $login = self::login(new Identities([
+        $login = self::login(new \OmegaUp\DAO\VO\Identities([
             'username' => $apicall['username'],
             'password' => $apicall['password'],
         ]));

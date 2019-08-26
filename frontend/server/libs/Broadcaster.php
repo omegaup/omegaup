@@ -8,7 +8,7 @@ class Broadcaster {
         $this->log = Logger::getLogger('broadcaster');
     }
 
-    public function broadcastClarification(Request $r, Clarifications $clarification) {
+    public function broadcastClarification(Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
         try {
             $message = json_encode([
                 'message' => '/clarification/update/',
