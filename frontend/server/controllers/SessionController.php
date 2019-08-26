@@ -91,8 +91,8 @@ class SessionController extends Controller {
             !is_null($authToken)
         ) {
             /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
-            self::$_currentSession = Cache::getFromCacheOrSet(
-                Cache::SESSION_PREFIX,
+            self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
                 function () use ($r) {
                     return SessionController::getCurrentSession($r);
@@ -189,7 +189,7 @@ class SessionController extends Controller {
         if (is_null($currentSession['auth_token'])) {
             return;
         }
-        Cache::deleteFromCache(Cache::SESSION_PREFIX, $currentSession['auth_token']);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::SESSION_PREFIX, $currentSession['auth_token']);
     }
 
     /**
@@ -249,7 +249,7 @@ class SessionController extends Controller {
             $this->getSessionManagerInstance()->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $token, 0, '/');
         }
 
-        Cache::deleteFromCache(Cache::SESSION_PREFIX, $token);
+        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::SESSION_PREFIX, $token);
         return $token;
     }
 

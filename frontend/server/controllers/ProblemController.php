@@ -786,9 +786,9 @@ class ProblemController extends Controller {
 
                 // Expire details of the runs
                 foreach ($runs as $run) {
-                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                    \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::RUN_ADMIN_DETAILS, $run->run_id);
                 }
-                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
+                \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::PROBLEM_STATS, $problem->alias);
             } catch (Exception $e) {
                 self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
             }
@@ -935,13 +935,13 @@ class ProblemController extends Controller {
 
         // Invalidate problem statement or solution cache
         foreach ($updatedLanguages as $lang) {
-            Cache::deleteFromCache(
-                Cache::PROBLEM_STATEMENT,
+            \OmegaUp\Cache::deleteFromCache(
+                \OmegaUp\Cache::PROBLEM_STATEMENT,
                 "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
             );
         }
-        Cache::deleteFromCache(
-            Cache::PROBLEM_SETTINGS_DISTRIB,
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}"
         );
     }
@@ -960,13 +960,13 @@ class ProblemController extends Controller {
     ): void {
         // Invalidate problem solution cache
         foreach ($updatedLanguages as $lang) {
-            Cache::deleteFromCache(
-                Cache::PROBLEM_SOLUTION,
+            \OmegaUp\Cache::deleteFromCache(
+                \OmegaUp\Cache::PROBLEM_SOLUTION,
                 "{$problem->alias}-{$problem->commit}-{$lang}-markdown"
             );
         }
-        Cache::deleteFromCache(
-            Cache::PROBLEM_SOLUTION_EXISTS,
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}"
         );
     }
@@ -1124,8 +1124,8 @@ class ProblemController extends Controller {
         string $commit,
         string $language
     ) : array {
-        return Cache::getFromCacheOrSet(
-            Cache::PROBLEM_STATEMENT,
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
             function () use ($problem, $commit, $language) {
                 return ProblemController::getProblemResourceImpl([
@@ -1155,8 +1155,8 @@ class ProblemController extends Controller {
         string $commit,
         string $language
     ) : array {
-        return Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SOLUTION,
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
             function () use ($problem, $commit, $language) {
                 return ProblemController::getProblemResourceImpl([
@@ -1181,8 +1181,8 @@ class ProblemController extends Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit
     ) : array {
-        return Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SETTINGS_DISTRIB,
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
             function () use ($problem) {
                 return ProblemController::getProblemSettingsDistribImpl([
@@ -1394,8 +1394,8 @@ class ProblemController extends Controller {
         // Add preferred language of the user.
         $request = new \OmegaUp\Request(['omit_rank' => true, 'auth_token' => $r['auth_token']]);
         if (!is_null($r->identity)) {
-            $userData = Cache::getFromCacheOrSet(
-                Cache::USER_PROFILE,
+            $userData = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::USER_PROFILE,
                 $r->identity->username,
                 function () use ($r) {
                     return UserController::apiProfile($r);
@@ -1729,9 +1729,9 @@ class ProblemController extends Controller {
 
                 // Expire details of the runs
                 foreach ($runs as $run) {
-                    Cache::deleteFromCache(Cache::RUN_ADMIN_DETAILS, $run->run_id);
+                    \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::RUN_ADMIN_DETAILS, $run->run_id);
                 }
-                Cache::deleteFromCache(Cache::PROBLEM_STATS, $problem->alias);
+                \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::PROBLEM_STATS, $problem->alias);
             } catch (Exception $e) {
                 self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
             }
@@ -1995,7 +1995,7 @@ class ProblemController extends Controller {
 
         // Array to count AC stats per case.
         // Let's try to get the last snapshot from cache.
-        $problemStatsCache = new Cache(Cache::PROBLEM_STATS, $r['problem']->alias);
+        $problemStatsCache = new \OmegaUp\Cache(\OmegaUp\Cache::PROBLEM_STATS, $r['problem']->alias);
         $casesStats = $problemStatsCache->get();
         if (is_null($casesStats)) {
             // Initialize the array at counts = 0
@@ -2567,8 +2567,8 @@ class ProblemController extends Controller {
     private static function getProblemSolutionExistence(
         \OmegaUp\DAO\VO\Problems $problem
     ): bool {
-        return Cache::getFromCacheOrSet(
-            Cache::PROBLEM_SOLUTION_EXISTS,
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
             function () use ($problem) {
                 return ProblemController::getProblemSolutionExistenceImpl(
