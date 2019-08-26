@@ -2,7 +2,6 @@
 
 require_once OMEGAUP_ROOT . '/www/api/ApiCaller.php';
 require_once 'libs/FileHandler.php';
-require_once 'libs/FileUploader.php';
 
 /**
  * Test to ensure that all the badges are in the correct format.
