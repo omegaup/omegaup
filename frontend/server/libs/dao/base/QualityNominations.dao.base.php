@@ -32,7 +32,7 @@ abstract class QualityNominationsDAOBase {
             is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
-            DAO::toMySQLTimestamp($QualityNominations->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNominations->time),
             $QualityNominations->status,
             (int)$QualityNominations->qualitynomination_id,
         ];
@@ -140,7 +140,7 @@ abstract class QualityNominationsDAOBase {
             is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
             $QualityNominations->nomination,
             $QualityNominations->contents,
-            DAO::toMySQLTimestamp($QualityNominations->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNominations->time),
             $QualityNominations->status,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

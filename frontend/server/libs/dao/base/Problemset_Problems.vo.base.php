@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetProblems extends VO {
+class ProblemsetProblems extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'problemset_id' => true,
         'problem_id' => true,

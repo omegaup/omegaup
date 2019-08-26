@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Clarifications extends VO {
+class Clarifications extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'clarification_id' => true,
         'author_id' => true,
@@ -62,7 +62,7 @@ class Clarifications extends VO {
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = DAO::fromMySQLTimestamp($data['time']);
+            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
         } else {
             $this->time = \OmegaUp\Time::get();
         }

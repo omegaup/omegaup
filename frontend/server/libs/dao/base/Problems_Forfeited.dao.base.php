@@ -41,7 +41,7 @@ abstract class ProblemsForfeitedDAOBase {
         $params = [
             $Problems_Forfeited->user_id,
             $Problems_Forfeited->problem_id,
-            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -57,7 +57,7 @@ abstract class ProblemsForfeitedDAOBase {
     final public static function update(ProblemsForfeited $Problems_Forfeited) : int {
         $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
-            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
             is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
             is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
         ];
@@ -163,7 +163,7 @@ abstract class ProblemsForfeitedDAOBase {
         $params = [
             is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
             is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
-            DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

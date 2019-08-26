@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class GroupsScoreboards extends VO {
+class GroupsScoreboards extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'group_scoreboard_id' => true,
         'group_id' => true,
@@ -50,7 +50,7 @@ class GroupsScoreboards extends VO {
              * @var string|int|float $data['create_time']
              * @var int $this->create_time
              */
-            $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
+            $this->create_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['create_time']);
         } else {
             $this->create_time = \OmegaUp\Time::get();
         }

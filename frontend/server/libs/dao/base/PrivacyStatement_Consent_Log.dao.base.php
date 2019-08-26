@@ -30,7 +30,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $params = [
             is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
             is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
-            DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
             (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -135,7 +135,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $params = [
             is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
             is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
-            DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

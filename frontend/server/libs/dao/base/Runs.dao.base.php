@@ -37,7 +37,7 @@ abstract class RunsDAOBase {
             (int)$Runs->memory,
             (float)$Runs->score,
             is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
-            DAO::toMySQLTimestamp($Runs->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Runs->time),
             $Runs->judged_by,
             (int)$Runs->run_id,
         ];
@@ -150,7 +150,7 @@ abstract class RunsDAOBase {
             (int)$Runs->memory,
             (float)$Runs->score,
             is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
-            DAO::toMySQLTimestamp($Runs->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Runs->time),
             $Runs->judged_by,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

@@ -73,7 +73,7 @@ abstract class ProblemsetAccessLogDAOBase {
             is_null($Problemset_Access_Log->problemset_id) ? null : (int)$Problemset_Access_Log->problemset_id,
             is_null($Problemset_Access_Log->identity_id) ? null : (int)$Problemset_Access_Log->identity_id,
             is_null($Problemset_Access_Log->ip) ? null : (int)$Problemset_Access_Log->ip,
-            DAO::toMySQLTimestamp($Problemset_Access_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Access_Log->time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

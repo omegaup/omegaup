@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Problems extends VO {
+class Problems extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'problem_id' => true,
         'acl_id' => true,
@@ -98,7 +98,7 @@ class Problems extends VO {
              * @var string|int|float $data['creation_date']
              * @var int $this->creation_date
              */
-            $this->creation_date = DAO::fromMySQLTimestamp($data['creation_date']);
+            $this->creation_date = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['creation_date']);
         } else {
             $this->creation_date = \OmegaUp\Time::get();
         }

@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Notifications extends VO {
+class Notifications extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'notification_id' => true,
         'user_id' => true,
@@ -49,7 +49,7 @@ class Notifications extends VO {
              * @var string|int|float $data['timestamp']
              * @var int $this->timestamp
              */
-            $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
+            $this->timestamp = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['timestamp']);
         } else {
             $this->timestamp = \OmegaUp\Time::get();
         }

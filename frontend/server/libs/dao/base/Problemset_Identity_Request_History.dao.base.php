@@ -30,7 +30,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $params = [
             is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
             is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
-            DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
             is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
             is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
             (int)$Problemset_Identity_Request_History->history_id,
@@ -137,7 +137,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $params = [
             is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
             is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
-            DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
             is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
             is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
         ];

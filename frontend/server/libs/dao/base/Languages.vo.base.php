@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Languages extends VO {
+class Languages extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'language_id' => true,
         'name' => true,

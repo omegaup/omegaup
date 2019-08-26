@@ -42,7 +42,7 @@ abstract class AuthTokensDAOBase {
             !is_null($Auth_Tokens->user_id) ? intval($Auth_Tokens->user_id) : null,
             !is_null($Auth_Tokens->identity_id) ? intval($Auth_Tokens->identity_id) : null,
             $Auth_Tokens->token,
-            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -60,7 +60,7 @@ abstract class AuthTokensDAOBase {
         $params = [
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
-            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
             $Auth_Tokens->token,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -166,7 +166,7 @@ abstract class AuthTokensDAOBase {
             is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
             is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
             $Auth_Tokens->token,
-            DAO::toMySQLTimestamp($Auth_Tokens->create_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

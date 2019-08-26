@@ -222,7 +222,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
-        } catch (DatabaseOperationException $e) {
+        } catch (\OmegaUp\Exceptions\DatabaseOperationException $e) {
             // OK.
         }
     }

@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class PrivacyStatements extends VO {
+class PrivacyStatements extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'privacystatement_id' => true,
         'git_object_id' => true,

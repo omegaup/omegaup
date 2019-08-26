@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Messages extends VO {
+class Messages extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'message_id' => true,
         'read' => true,
@@ -59,7 +59,7 @@ class Messages extends VO {
              * @var string|int|float $data['date']
              * @var int $this->date
              */
-            $this->date = DAO::fromMySQLTimestamp($data['date']);
+            $this->date = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['date']);
         } else {
             $this->date = \OmegaUp\Time::get();
         }

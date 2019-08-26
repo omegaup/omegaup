@@ -191,9 +191,9 @@ class ContestController extends Controller {
 
         $addedContests = [];
         foreach ($contests as $contest) {
-            $contest['start_time'] = DAO::fromMySQLTimestamp($contest['start_time']);
-            $contest['finish_time'] = DAO::fromMySQLTimestamp($contest['finish_time']);
-            $contest['last_updated'] = DAO::fromMySQLTimestamp($contest['last_updated']);
+            $contest['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest['start_time']);
+            $contest['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest['finish_time']);
+            $contest['last_updated'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest['last_updated']);
             $addedContests[] = $contest;
         }
 
@@ -530,8 +530,8 @@ class ContestController extends Controller {
             }
         }
 
-        $result['start_time'] = DAO::fromMySQLTimestamp($result['start_time']);
-        $result['finish_time'] = DAO::fromMySQLTimestamp($result['finish_time']);
+        $result['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['start_time']);
+        $result['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['finish_time']);
 
         $result['status'] = 'ok';
 
@@ -575,7 +575,7 @@ class ContestController extends Controller {
         }
 
         $r->ensureBool('share_user_information', false);
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
         try {
             ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                 $r->identity,
@@ -610,9 +610,9 @@ class ContestController extends Controller {
                 ]));
             }
 
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -658,8 +658,8 @@ class ContestController extends Controller {
                     'rerun_id',
                 ]);
 
-                $result['start_time'] = DAO::fromMySQLTimestamp($result['start_time']);
-                $result['finish_time'] = DAO::fromMySQLTimestamp($result['finish_time']);
+                $result['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['start_time']);
+                $result['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['finish_time']);
                 $result['show_scoreboard_after'] = (bool)$result['show_scoreboard_after'];
                 $result['original_contest_alias'] = null;
                 $result['original_problemset_id'] = null;
@@ -866,7 +866,7 @@ class ContestController extends Controller {
                                            // admission_mode
         ]);
 
-        DAO::transBegin();
+        \OmegaUp\DAO\DAO::transBegin();
         try {
             // Create the contest
             self::createContest($problemset, $contest, $r->user->user_id);
@@ -890,9 +890,9 @@ class ContestController extends Controller {
                     $problemsetProblem['order'] ?: 1
                 );
             }
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -982,7 +982,7 @@ class ContestController extends Controller {
         // Push changes
         try {
             // Begin a new transaction
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             ACLsDAO::create($acl);
             $problemset->acl_id = $acl->acl_id;
@@ -1012,11 +1012,11 @@ class ContestController extends Controller {
             ProblemsetsDAO::update($problemset);
 
             // End transaction transaction
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            DAO::transRollback();
-            if (DAO::isDuplicateEntryException($e)) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
             }
             throw $e;
@@ -1100,8 +1100,8 @@ class ContestController extends Controller {
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
-        $start_time = !is_null($r['start_time']) ? $r['start_time'] : DAO::fromMySQLTimestamp($contest->start_time);
-        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : DAO::fromMySQLTimestamp($contest->finish_time);
+        $start_time = !is_null($r['start_time']) ? $r['start_time'] : \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->start_time);
+        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->finish_time);
 
         // Validate start & finish time
         if ($start_time > $finish_time) {
@@ -1218,7 +1218,7 @@ class ContestController extends Controller {
         self::validateCommonCreateOrUpdate($r, $contest, false /* is required*/);
 
         // Prevent date changes if a contest already has runs
-        if (!is_null($r['start_time']) && $r['start_time'] != DAO::fromMySQLTimestamp($contest->start_time)) {
+        if (!is_null($r['start_time']) && $r['start_time'] != \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->start_time)) {
             $runCount = 0;
 
             $runCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
@@ -2196,7 +2196,7 @@ class ContestController extends Controller {
         // Push changes
         try {
             // Begin a new transaction
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
 
             // Save the contest object with data sent by user to the database
             self::updateContest($contest, $originalContest, $r->identity);
@@ -2210,10 +2210,10 @@ class ContestController extends Controller {
             }
 
             // End transaction
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
             // Operation failed in the data layer, rollback transaction
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
 
             throw $e;
         }

@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Users extends VO {
+class Users extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_id' => true,
         'username' => true,
@@ -95,7 +95,7 @@ class Users extends VO {
              * @var string|int|float $data['reset_sent_at']
              * @var int $this->reset_sent_at
              */
-            $this->reset_sent_at = DAO::fromMySQLTimestamp($data['reset_sent_at']);
+            $this->reset_sent_at = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['reset_sent_at']);
         }
         if (isset($data['hide_problem_tags'])) {
             $this->hide_problem_tags = boolval($data['hide_problem_tags']);

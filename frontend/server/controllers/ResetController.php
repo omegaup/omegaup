@@ -113,12 +113,12 @@ class ResetController extends Controller {
         }
         $identity->password = $user->password;
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
             UsersDAO::update($user);
             IdentitiesDAO::update($identity);
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to reset password', $e);
             throw $e;
         }
