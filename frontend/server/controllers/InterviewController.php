@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
-
 class InterviewController extends Controller {
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = !$is_update;
@@ -114,7 +112,7 @@ class InterviewController extends Controller {
             // this is fine, we'll create an account for this user
         }
 
-        $subject = Translations::getInstance()->get('interviewInvitationEmailSubject');
+        $subject = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailSubject');
 
         if (is_null($r['user'])) {
             // create a new user
@@ -128,19 +126,19 @@ class InterviewController extends Controller {
             UserController::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
-            $body = Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
+            $body = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
                            . '<br>'
                            . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '">'
                            . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '</a>'
                            . '<br>';
 
-            $body .= Translations::getInstance()->get('interviewEmailDraft')
+            $body .= \OmegaUp\Translations::getInstance()->get('interviewEmailDraft')
                             . '<br>'
-                            . Translations::getInstance()->get('profileUsername')
+                            . \OmegaUp\Translations::getInstance()->get('profileUsername')
                             . ' : '
                             . $newUserRequest['username']
                             . '<br>'
-                            . Translations::getInstance()->get('loginPassword')
+                            . \OmegaUp\Translations::getInstance()->get('loginPassword')
                             . ' : '
                             . $newUserRequest['password']
                             . '<br>';
@@ -148,7 +146,7 @@ class InterviewController extends Controller {
             $r['user'] = $newUserRequest['user'];
         } else {
             // Email to current OmegaUp user
-            $body = Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
+            $body = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
                            . ' <a href="https://omegaup.com/interview/' . $r['interview']->alias . '/arena">'
                            . ' https://omegaup.com/interview/' . $r['interview']->alias . '/arena</a>';
         }

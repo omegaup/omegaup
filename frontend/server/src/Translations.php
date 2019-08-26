@@ -1,5 +1,10 @@
 <?php
 
+namespace OmegaUp;
+
+use \IdentityController;
+use \Request;
+
 /**
  * Utility class to lazily load translation strings to be used in controllers
  * and other libraries.
@@ -8,7 +13,7 @@ class Translations {
     /**
      * The static Translations instance.
      *
-     * @var null|Translations
+     * @var null|\OmegaUp\Translations
      */
     private static $_instance = null;
 
@@ -26,10 +31,10 @@ class Translations {
         $lang = IdentityController::getPreferredLanguage(new Request());
         $filename = OMEGAUP_ROOT . "/templates/{$lang}.lang";
         /** @var array<int, string> $match */
-        foreach (new RegexIterator(
-            new SplFileObject($filename),
+        foreach (new \RegexIterator(
+            new \SplFileObject($filename),
             '/([a-zA-Z0-9_]+) = "(.*)"$/',
-            RegexIterator::GET_MATCH
+            \RegexIterator::GET_MATCH
         ) as $match) {
             $this->_translations[$match[1]] = str_replace(
                 ['\\"', '\\n'],
@@ -42,11 +47,11 @@ class Translations {
     /**
      * Returns the static singleton instance of Translations.
      *
-     * @return Translations the singleton instance.
+     * @return \OmegaUp\Translations the singleton instance.
      */
-    public static function getInstance() : Translations {
+    public static function getInstance() : \OmegaUp\Translations {
         if (is_null(self::$_instance)) {
-            self::$_instance = new Translations();
+            self::$_instance = new \OmegaUp\Translations();
         }
         return self::$_instance;
     }

@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
-
 class ResetController extends Controller {
     /**
      * Creates a reset operation, the first of two steps needed to reset a
@@ -27,10 +25,10 @@ class ResetController extends Controller {
             return ['status' => 'ok', 'token' => $token];
         }
 
-        $subject = Translations::getInstance()->get('wordsReset');
+        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset');
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-        $message = Translations::getInstance()->get('wordsResetMessage');
+        $message = \OmegaUp\Translations::getInstance()->get('wordsResetMessage');
         $body = str_replace('[link]', $link, $message);
 
         try {
@@ -45,7 +43,7 @@ class ResetController extends Controller {
 
         return [
             'status' => 'ok',
-            'message' => Translations::getInstance()->get('passwordResetRequestSuccess')
+            'message' => \OmegaUp\Translations::getInstance()->get('passwordResetRequestSuccess')
         ];
     }
 
@@ -127,7 +125,7 @@ class ResetController extends Controller {
 
         return [
             'status' => 'ok',
-            'message' =>  IS_TEST ? 'message' : Translations::getInstance()->get('passwordResetResetSuccess')
+            'message' =>  IS_TEST ? 'message' : \OmegaUp\Translations::getInstance()->get('passwordResetResetSuccess')
         ];
     }
 

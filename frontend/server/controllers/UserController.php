@@ -1,6 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
 require_once 'libs/UrlHelper.php';
 
 /**
@@ -283,9 +282,9 @@ class UserController extends Controller {
             return;
         }
 
-        $subject = Translations::getInstance()->get('verificationEmailSubject');
+        $subject = \OmegaUp\Translations::getInstance()->get('verificationEmailSubject');
         $body = sprintf(
-            Translations::getInstance()->get('verificationEmailBody'),
+            \OmegaUp\Translations::getInstance()->get('verificationEmailBody'),
             OMEGAUP_URL,
             $user->verification_id
         );

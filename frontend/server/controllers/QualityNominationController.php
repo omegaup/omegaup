@@ -1,6 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
 require_once 'libs/dao/QualityNomination_Log.dao.php';
 require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
 require_once 'libs/dao/QualityNominations.dao.php';
@@ -331,11 +330,11 @@ class QualityNominationController extends Controller {
             'user_name' => $username
         ];
         $mail_subject = ApiUtils::FormatString(
-            Translations::getInstance()->get('demotionProblemEmailSubject'),
+            \OmegaUp\Translations::getInstance()->get('demotionProblemEmailSubject'),
             $email_params
         );
         $mail_body = ApiUtils::FormatString(
-            Translations::getInstance()->get('demotionProblemEmailBody'),
+            \OmegaUp\Translations::getInstance()->get('demotionProblemEmailBody'),
             $email_params
         );
 
