@@ -75,7 +75,7 @@ class MySQLConnection {
             OMEGAUP_DB_PASS,
             OMEGAUP_DB_NAME
         )) {
-            throw new DatabaseOperationException(
+            throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 'Failed to connect to MySQL (' . mysqli_connect_errno() . '): '
                 . mysqli_connect_error(),
                 mysqli_connect_errno()
@@ -135,7 +135,7 @@ class MySQLConnection {
 
         $inputChunks = explode('?', $sql);
         if (count($params) != count($inputChunks) - 1) {
-            throw new DatabaseOperationException(
+            throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 'Mismatched number of parameters. Expected '
                         . (count($inputChunks) - 1) . ', got ' . count($params),
                 0
@@ -166,7 +166,7 @@ class MySQLConnection {
         /** @var \mysqli_result|bool */
         $result = $this->_connection->query($this->BindQueryParams($sql, $params), $resultmode);
         if ($result === false) {
-            throw new DatabaseOperationException(
+            throw new \OmegaUp\Exceptions\DatabaseOperationException(
                 "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}",
                 intval($this->_connection->errno)
             );
@@ -292,7 +292,7 @@ class MySQLConnection {
      */
     public function CompleteTrans() : void {
         if ($this->_transactionCount <= 0) {
-            throw new DatabaseOperationException('Called FailTrans() outside of a transaction', 0);
+            throw new \OmegaUp\Exceptions\DatabaseOperationException('Called FailTrans() outside of a transaction', 0);
         }
         if (--$this->_transactionCount > 0) {
             return;
@@ -311,7 +311,7 @@ class MySQLConnection {
      */
     public function FailTrans() : void {
         if ($this->_transactionCount <= 0) {
-            throw new DatabaseOperationException('Called FailTrans() outside of a transaction', 0);
+            throw new \OmegaUp\Exceptions\DatabaseOperationException('Called FailTrans() outside of a transaction', 0);
         }
         $this->_transactionOk = false;
     }

@@ -21,7 +21,7 @@ final class DAO {
     }
 
     final public static function isDuplicateEntryException(Exception $e) : bool {
-        if (!($e instanceof DatabaseOperationException)) {
+        if (!($e instanceof \OmegaUp\Exceptions\DatabaseOperationException)) {
             return false;
         }
         return $e->isDuplicate();
