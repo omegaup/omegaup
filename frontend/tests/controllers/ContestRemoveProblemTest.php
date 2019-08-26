@@ -12,7 +12,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
     private function assertProblemRemovedFromContest($problemData, $contestData) {
         $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
@@ -32,7 +32,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
     private function assertProblemExistsInContest($problemData, $contestData) {
         $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
@@ -80,7 +80,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($contestData['director']);
 
         // Create a new request
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -104,7 +104,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Log in as contest director
         $login = OmegaupTestCase::login($contestData['director']);
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => 'this contest doesnt exists',
@@ -129,7 +129,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         $login = OmegaupTestCase::login($contestant);
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -146,7 +146,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     private function makeContestPublic($contestData) {
         $login = OmegaupTestCase::login($contestData['director']);
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' =>  $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -305,7 +305,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // Prepare request
         $login = OmegaupTestCase::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $secondaryAdmin->username,
             'contest_alias' => $contestData['request']['alias'],

@@ -3,10 +3,10 @@ require_once('../server/bootstrap_smarty.php');
 
 try {
     $session = SessionController::apiCurrentSession(
-        new Request($_REQUEST)
+        new \OmegaUp\Request($_REQUEST)
     )['session'];
     $smartyProperties = UserController::getRankDetailsForSmarty(
-        new Request($_REQUEST),
+        new \OmegaUp\Request($_REQUEST),
         $session['identity'],
         $smarty
     );

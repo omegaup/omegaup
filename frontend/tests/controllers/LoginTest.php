@@ -19,7 +19,7 @@ class LoginTest extends OmegaupTestCase {
         $this->assertEquals(0, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
 
         // Inflate request with user data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
         ]);
@@ -44,7 +44,7 @@ class LoginTest extends OmegaupTestCase {
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         // Inflate request with user data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $email,
             'password' => $user->password
         ]);
@@ -65,7 +65,7 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         // Inflate request with user data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $user->username,
             'password' => 'badpasswordD:'
         ]);
@@ -81,7 +81,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByUserInvalidUsername() {
         // Inflate request with user data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => 'IDontExist',
             'password' => 'badpasswordD:'
         ]);
@@ -101,7 +101,7 @@ class LoginTest extends OmegaupTestCase {
         $user = UserFactory::createUser(new UserParams(['email' => $email]));
 
         // Inflate request with user data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $email,
             'password' => 'badpasswordD:'
         ]);
@@ -149,7 +149,7 @@ class LoginTest extends OmegaupTestCase {
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         // Inflate request with user data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
         ]);
@@ -188,7 +188,7 @@ class LoginTest extends OmegaupTestCase {
         $user->password = $plainPassword;
 
         // Inflate request with user data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
         ]);

@@ -9,10 +9,10 @@ class NotificationController extends Controller {
     /**
      * Returns a list of unread notifications for user
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiMyList(Request $r) {
+    public static function apiMyList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         return [
             'status' => 'ok',
@@ -25,10 +25,10 @@ class NotificationController extends Controller {
     /**
      * Updates notifications as read in database
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiReadNotifications(Request $r) {
+    public static function apiReadNotifications(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
         if (empty($r['notifications'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('notificationIdsNotProvided');

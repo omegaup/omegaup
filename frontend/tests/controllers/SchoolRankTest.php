@@ -71,7 +71,7 @@ class SchoolRankTest extends OmegaupTestCase {
         // Call API
         $rankViewer = UserFactory::createUser();
         $rankViewerLogin = self::login($rankViewer);
-        $response = SchoolController::apiRank(new Request([
+        $response = SchoolController::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
 
@@ -90,7 +90,7 @@ class SchoolRankTest extends OmegaupTestCase {
         );
         $this->assertEquals(1, $response['rank'][1]['distinct_users']);
 
-        $cachedResponse = SchoolController::apiRank(new Request([
+        $cachedResponse = SchoolController::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
         ]));
 
@@ -107,7 +107,7 @@ class SchoolRankTest extends OmegaupTestCase {
 
         $rankViewer = UserFactory::createUser();
         $rankViewerLogin = self::login($rankViewer);
-        $originalResponse = SchoolController::apiRank(new Request([
+        $originalResponse = SchoolController::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));
 
@@ -116,7 +116,7 @@ class SchoolRankTest extends OmegaupTestCase {
         $start_time = strtotime('-1 day');
         $end_time = strtotime('+1 day');
 
-        $response = SchoolController::apiRank(new Request([
+        $response = SchoolController::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
             'start_time' => $start_time,
             'finish_time' => $end_time
@@ -127,7 +127,7 @@ class SchoolRankTest extends OmegaupTestCase {
         $this->assertEquals(2, $response['rank'][0]['distinct_users']);
         $this->assertEquals(1, $response['rank'][2]['distinct_users']);
 
-        $cachedResponse = SchoolController::apiRank(new Request([
+        $cachedResponse = SchoolController::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,
         ]));
 

@@ -12,7 +12,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
     public static function assertProblemAddedToContest($problemData, $contestData, $r) {
         // Get problem and contest from DB
@@ -38,7 +38,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Build request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -68,7 +68,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
         // Build request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => 'this problem doesnt exists',
@@ -94,7 +94,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Create an empty request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => 'invalid problem',
             'problem_alias' => $problemData['request']['alias'],
@@ -123,7 +123,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Build request
         $userLogin = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['alias'],
@@ -148,7 +148,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
                 $login
             );
 
-            $r = new Request([
+            $r = new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -166,7 +166,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
             $login
         );
         try {
-            $response = ContestController::apiAddProblem(new Request([
+            $response = ContestController::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -196,7 +196,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         $directorLogin = self::login($contestData['director']);
         try {
-            ContestController::apiAddProblem(new Request([
+            ContestController::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -212,7 +212,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         $problem->visibility = ProblemController::VISIBILITY_PRIVATE;
         ProblemsDAO::update($problem);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],

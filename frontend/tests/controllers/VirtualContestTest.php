@@ -24,7 +24,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -75,7 +75,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -104,7 +104,7 @@ class VirtualContestTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -113,7 +113,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiAddProblem(new Request([
+            ContestController::apiAddProblem(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'problem_alias' => $problemData['problem']->alias,
                 'points' => 100,
@@ -142,7 +142,7 @@ class VirtualContestTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -151,7 +151,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiRemoveProblem(new Request([
+            ContestController::apiRemoveProblem(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'problem_alias' => $problemData['problem']->alias,
                 'auth_token' => $login->auth_token
@@ -173,7 +173,7 @@ class VirtualContestTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -182,7 +182,7 @@ class VirtualContestTest extends OmegaupTestCase {
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiUpdate(new Request([
+            ContestController::apiUpdate(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'title' => 'testtest',
                 'auth_token' => $login->auth_token

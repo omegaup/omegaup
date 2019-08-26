@@ -1,4 +1,9 @@
 <?php
+
+namespace OmegaUp;
+
+use \Validators;
+
 /**
  * Request
  *
@@ -7,16 +12,8 @@
  * as a backing for the values.
  *
  * Request also holds all global state.
- *
- * You can use the push function to create a child Request object that will have
- * copy-on-write semantics.
  */
-class Request extends ArrayObject {
-    /**
-     * The parent of this Request. This is set whenever the push function is called.
-     */
-    private $parent = null;
-
+class Request extends \ArrayObject {
     /**
      * The object of the user currently logged in.
      * @var null|\OmegaUp\DAO\VO\Users
@@ -31,57 +28,40 @@ class Request extends ArrayObject {
 
     /**
      * The method that will be called.
+     * @var null|callable
      */
     public $method = null;
 
     /**
      * A global per-request unique(-ish) ID.
+     * @var string
      */
-    public static $_requestId = null;
-
-    /**
-     * Whether $key exists. Used as isset($req[$key]);
-     *
-     * @param string $key The key.
-     */
-    public function offsetExists($key) : bool {
-        return parent::offsetExists($key) || ($this->parent != null && isset($this->parent[$key]));
-    }
+    public static $_requestId;
 
     /**
      * Gets the value associated with a key. Used as $req[$key];
      *
-     * @param string $key The key.
+     * @param mixed $key The key.
+     * @return mixed
      */
     public function offsetGet($key) {
-        if (isset($this[$key]) && parent::offsetGet($key) !== 'null') {
+        if (parent::offsetExists($key)) {
             return parent::offsetGet($key);
-        }
-        if ($this->parent != null) {
-            return $this->parent->offsetGet($key);
         }
         return null;
     }
 
     /**
-     * Creates a new Request with the same members as the current Request, with copy-on-write semantics.
-     *
-     * @param array $contents The (optional) array with the values.
-     */
-    public function push(?array $contents = null) : Request {
-        $req = new Request($contents);
-        $req->parent = $this;
-        $req->user = $this->user;
-        return $req;
-    }
-
-    /**
      * Executes the user-provided function and returns its result.
+     *
+     * @return mixed
      */
     public function execute() {
         if (is_null($this->method)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
+
+        /** @var mixed */
         $response = call_user_func($this->method, $this);
 
         if ($response === false) {
@@ -94,10 +74,10 @@ class Request extends ArrayObject {
     /**
      * Gets the request ID.
      *
-     * @return the global per-request unique(-ish) ID
+     * @return string the global per-request unique(-ish) ID
      */
     public static function requestId() : string {
-        return Request::$_requestId;
+        return \OmegaUp\Request::$_requestId;
     }
 
     /**
@@ -107,7 +87,8 @@ class Request extends ArrayObject {
         string $key,
         bool $required = true
     ) : void {
-        $val = self::offsetGet($key);
+        /** @var mixed */
+        $val = $this->offsetGet($key);
         if (is_int($val)) {
             $this[$key] = $val == 1;
         } elseif (is_bool($val)) {
@@ -138,7 +119,8 @@ class Request extends ArrayObject {
             }
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
         }
-        $val = self::offsetGet($key);
+        /** @var mixed */
+        $val = $this->offsetGet($key);
         Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
         $this[$key] = (int)$val;
     }
@@ -158,10 +140,11 @@ class Request extends ArrayObject {
             }
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
         }
-        $val = self::offsetGet($key);
+        /** @var mixed */
+        $val = $this->offsetGet($key);
         Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
         $this[$key] = (float)$val;
     }
 }
 
-Request::$_requestId = str_replace('.', '', uniqid('', true));
+\OmegaUp\Request::$_requestId = str_replace('.', '', uniqid('', true));

@@ -20,7 +20,7 @@ class ContestCloneTest extends OmegaupTestCase {
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = ContestController::apiClone(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'title' => Utils::CreateRandomString(),
@@ -33,12 +33,12 @@ class ContestCloneTest extends OmegaupTestCase {
         $this->assertEquals($contestAlias, $contestClonedData['alias']);
 
         // Call API
-        $clonedContestProblemsResponse = ContestController::apiProblems(new Request([
+        $clonedContestProblemsResponse = ContestController::apiProblems(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestAlias,
         ]));
 
-        $originalContestProblemsResponse = ContestController::apiProblems(new Request([
+        $originalContestProblemsResponse = ContestController::apiProblems(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -69,7 +69,7 @@ class ContestCloneTest extends OmegaupTestCase {
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = ContestController::apiClone(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'title' => Utils::CreateRandomString(),
@@ -97,13 +97,13 @@ class ContestCloneTest extends OmegaupTestCase {
 
         // Create new user
         $user = UserFactory::createUser();
-        $login = UserController::apiLogin(new Request([
+        $login = UserController::apiLogin(new \OmegaUp\Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
         ]));
 
         // Clone the contest
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = ContestController::apiClone(new \OmegaUp\Request([
             'auth_token' => $login['auth_token'],
             'contest_alias' => $contestData['request']['alias'],
             'title' => Utils::CreateRandomString(),

@@ -22,7 +22,7 @@ class ProblemRunsTest extends OmegaupTestCase {
         // Regular users cannot use "show_all".
         try {
             $login = self::login($contestants[0]);
-            ProblemController::apiRuns(new Request([
+            ProblemController::apiRuns(new \OmegaUp\Request([
                 'problem_alias' => $problemData['problem']->alias,
                 'auth_token' => $login->auth_token,
                 'show_all' => true,
@@ -35,7 +35,7 @@ class ProblemRunsTest extends OmegaupTestCase {
         // Each user can only see their own runs.
         for ($i = 0; $i < count($contestants); ++$i) {
             $login = self::login($contestants[$i]);
-            $response = ProblemController::apiRuns(new Request([
+            $response = ProblemController::apiRuns(new \OmegaUp\Request([
                 'problem_alias' => $problemData['problem']->alias,
                 'auth_token' => $login->auth_token,
             ]));
@@ -49,7 +49,7 @@ class ProblemRunsTest extends OmegaupTestCase {
         // Admins can also see each contestants' runs.
         $login = self::login($problemData['author']);
         for ($i = 0; $i < count($contestants); ++$i) {
-            $response = ProblemController::apiRuns(new Request([
+            $response = ProblemController::apiRuns(new \OmegaUp\Request([
                 'problem_alias' => $problemData['problem']->alias,
                 'auth_token' => $login->auth_token,
                 'show_all' => true,
@@ -63,7 +63,7 @@ class ProblemRunsTest extends OmegaupTestCase {
         }
 
         // Admins can see all contestants' runs.
-        $response = ProblemController::apiRuns(new Request([
+        $response = ProblemController::apiRuns(new \OmegaUp\Request([
             'problem_alias' => $problemData['problem']->alias,
             'auth_token' => $login->auth_token,
             'show_all' => true,

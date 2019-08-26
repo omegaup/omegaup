@@ -33,7 +33,7 @@ class RunRejudgeTest extends OmegaupTestCase {
 
         // Build request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData['response']['guid'],
         ]);

@@ -4,7 +4,7 @@
  * AuthorizationController
  */
 class AuthorizationController extends Controller {
-    public static function apiProblem(Request $r) {
+    public static function apiProblem(\OmegaUp\Request $r) {
         // This is not supposed to be called by end-users, but by the
         // gitserver. Regular sessions cannot be used since they
         // expire, so use a pre-shared secret to authenticate that

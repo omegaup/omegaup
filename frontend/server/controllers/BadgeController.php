@@ -23,20 +23,20 @@ class BadgeController extends Controller {
     /**
      * Returns a list of existing badges
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         return self::getAllBadges();
     }
 
     /**
      * Returns a list of badges owned by current user
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiMyList(Request $r) {
+    public static function apiMyList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         return [
             'status' => 'ok',
@@ -49,10 +49,10 @@ class BadgeController extends Controller {
     /**
      * Returns a list of badges owned by a certain user
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiUserList(Request $r) {
+    public static function apiUserList(\OmegaUp\Request $r) {
         $user = UsersDAO::FindByUsername($r['target_username']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -67,10 +67,10 @@ class BadgeController extends Controller {
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiMyBadgeAssignationTime(Request $r) {
+    public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
         Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
@@ -86,10 +86,10 @@ class BadgeController extends Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiBadgeDetails(Request $r) {
+    public static function apiBadgeDetails(\OmegaUp\Request $r) {
         Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
         Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
         $totalUsers = max(UsersDAO::getUsersCount(), 1);

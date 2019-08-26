@@ -576,7 +576,7 @@ class Scoreboard {
                 if ($withRunDetails === true) {
                     $runDetails = [];
 
-                    $runDetailsRequest = new Request([
+                    $runDetailsRequest = new \OmegaUp\Request([
                         'run_alias' => $run['guid'],
                         'auth_token' => $authToken,
                     ]);

@@ -130,7 +130,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         $oldCookieSetting = SessionController::setCookieOnRegisterSessionForTesting(false);
 
         // Inflate request with identity data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $identity->username,
             'password' => $identity->password,
         ]);
@@ -153,9 +153,9 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Assert that contest in the request actually exists in the DB
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public function assertContest(Request $r) {
+    public function assertContest(\OmegaUp\Request $r) {
         // Validate that data was written to DB by getting the contest by title
         $contests = ContestsDAO::getByTitle($r['title']);
         $contest = $contests[0];

@@ -16,7 +16,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // Contest will start in the future:
         $adminLogin = self::login($contestAdmin);
-        $request = new Request([
+        $request = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
             'start_time' => \OmegaUp\Time::get() + 60 * 60,
@@ -28,7 +28,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $contestantLogin = self::login($contestant);
-        $request2 = new Request([
+        $request2 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]);
@@ -45,7 +45,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // Contest is going on right now
         $adminLogin = self::login($contestAdmin);
-        $request = new Request([
+        $request = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
             'start_time' => \OmegaUp\Time::get() - 1,
@@ -57,7 +57,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $this->assertEquals($showIntro, ContestController::SHOW_INTRO);
 
         $contestantLogin = self::login($contestant);
-        $request2 = new Request([
+        $request2 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]);
@@ -81,7 +81,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // user can now submit to contest
         $contestantLogin = self::login($contestant);
-        $request = new Request([
+        $request = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]);
@@ -103,7 +103,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         // make it "registrable"
         self::log('Update contest to make it registrable');
         $adminLogin = self::login($contestAdmin);
-        $r1 = new Request([
+        $r1 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
@@ -113,7 +113,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         // some user asks for contest
         $contestant = UserFactory::createUser();
         $contestantLogin = self::login($contestant);
-        $r2 = new Request([
+        $r2 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]);
@@ -129,7 +129,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // admin lists registrations
         $adminLogin = self::login($contestAdmin);
-        $r3 = new Request([
+        $r3 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
         ]);
@@ -143,7 +143,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // ask for details again, this should fail again
         $contestantLogin = self::login($contestant);
-        $r2 = new Request([
+        $r2 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]);
@@ -161,7 +161,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // user can now submit to contest
         $contestantLogin = self::login($contestant);
-        $r2 = new Request([
+        $r2 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]);
@@ -182,7 +182,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // make it "registrable"
         $adminLogin = self::login($contestAdmin);
-        $r1 = new Request([
+        $r1 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
@@ -192,13 +192,13 @@ class RegisterToContestTest extends OmegaupTestCase {
         // some user asks for contest
         $contestant = UserFactory::createUser();
         $contestantLogin = self::login($contestant);
-        $r2 = new Request([
+        $r2 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]);
         ContestController::apiRegisterForContest($r2);
 
-        $r3 = new Request([
+        $r3 = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
             'username' => $contestant->username,
@@ -227,7 +227,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         ]));
 
         $adminLogin = self::login($contestAdmin);
-        ContestController::apiUpdate(new Request([
+        ContestController::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'basic_information' => 1,
             'auth_token' => $adminLogin->auth_token,
@@ -238,7 +238,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         $contestantLogin = self::login($contestant);
 
-        ContestController::apiOpen(new Request([
+        ContestController::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]));
@@ -259,7 +259,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // Updates contest, with basic information needed
         $adminLogin = self::login($contestAdmin);
-        ContestController::apiUpdate(new Request([
+        ContestController::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'basic_information' => 1,
             'auth_token' => $adminLogin->auth_token,
@@ -271,14 +271,14 @@ class RegisterToContestTest extends OmegaupTestCase {
         // Updates contestant, with basic information
         $contestantLogin = self::login($contestant);
         $states = StatesDAO::getByCountry('MX');
-        UserController::apiUpdate(new Request([
+        UserController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $contestantLogin->auth_token,
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
             'school_id' => $school['school']->school_id
         ]));
 
-        $contest = ContestController::apiOpen(new Request([
+        $contest = ContestController::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]));
@@ -312,7 +312,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         foreach ($uninvitedContestants as $contestant) {
             $contestantLogin = self::login($contestant);
 
-            ContestController::apiOpen(new Request([
+            ContestController::apiOpen(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $contestantLogin->auth_token,
             ]));

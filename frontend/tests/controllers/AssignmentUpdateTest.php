@@ -15,7 +15,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $updatedStartTime = $courseData['request']['start_time'] + 10;
         $updatedFinishTime = $courseData['request']['start_time'] + 20;
 
-        CourseController::apiUpdateAssignment(new Request([
+        CourseController::apiUpdateAssignment(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias,
@@ -26,7 +26,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         ]));
 
         // Read the assignment again
-        $response = CourseController::apiAssignmentDetails(new Request([
+        $response = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias
@@ -52,7 +52,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
 
         // Call the update API with no
-        $response = CourseController::apiUpdateAssignment(new Request([
+        $response = CourseController::apiUpdateAssignment(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $courseData['assignment_alias'],
             'course' => $courseData['course_alias'],
@@ -70,7 +70,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithOneAssignment($user, $login);
 
         try {
-            CourseController::apiUpdateAssignment(new Request([
+            CourseController::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
                 'course' => $courseData['course_alias'],
@@ -96,7 +96,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         );
 
         $student = UserFactory::createUser();
-        $response = CourseController::apiAddStudent(new Request([
+        $response = CourseController::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
@@ -104,7 +104,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
 
         $login = OmegaupTestCase::login($student);
         try {
-            CourseController::apiUpdateAssignment(new Request([
+            CourseController::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'assignment' => $courseData['assignment_alias'],
                 'course' => $courseData['course_alias'],
@@ -126,13 +126,13 @@ class AssignmentUpdateTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiListAssignments(new Request([
+        $response = CourseController::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
 
         // Updating start_time of assignment out of the date
-        CourseController::apiUpdateAssignment(new Request([
+        CourseController::apiUpdateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course' => $courseData['course_alias'],
             'name' => $response['assignments'][0]['name'],

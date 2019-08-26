@@ -41,7 +41,7 @@ class CourseRunsTest extends OmegaupTestCase {
         $login = self::login($courseData['admin']);
 
         // Call API
-        $response = CourseController::apiRuns(new Request([
+        $response = CourseController::apiRuns(new \OmegaUp\Request([
             'course_alias' => $courseData['request']['course_alias'],
             'assignment_alias' => $courseData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -61,7 +61,7 @@ class CourseRunsTest extends OmegaupTestCase {
             $adminIdentity,
             $problemData['problem']
         ));
-        $response = RunController::apiDetails(new Request([
+        $response = RunController::apiDetails(new \OmegaUp\Request([
             'problemset_id' => $courseData['assignment']->problemset_id,
             'run_alias' => $response['runs'][0]['guid'],
             'auth_token' => $login->auth_token,

@@ -410,7 +410,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertContains('![404](notfound.jpg)', $markdown_contents);
 
         // Check that the images are there.
-        $response = ProblemController::apiDetails(new Request([
+        $response = ProblemController::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $r['problem_alias'],
         ]));
@@ -501,7 +501,7 @@ class CreateProblemTest extends OmegaupTestCase {
         // Call the API
         ProblemController::apiCreate($r);
 
-        $tags = ProblemController::apiTags(new Request([
+        $tags = ProblemController::apiTags(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]))['tags'];

@@ -69,9 +69,9 @@ class GroupScoreboardController extends Controller {
     /**
      * Add contest to a group scoreboard
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiAddContest(Request $r) {
+    public static function apiAddContest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $contestScoreboard = self::validateGroupScoreboardAndContest(
             $r['group_alias'],
@@ -102,9 +102,9 @@ class GroupScoreboardController extends Controller {
     /**
      * Add contest to a group scoreboard
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiRemoveContest(Request $r) {
+    public static function apiRemoveContest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $contestScoreboard = self::validateGroupScoreboardAndContest(
             $r['group_alias'],
@@ -132,9 +132,9 @@ class GroupScoreboardController extends Controller {
      * Details of a scoreboard. Returns a list with all contests that belong to
      * the given scoreboard_alias
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $scoreboard = self::validateGroupScoreboard(
             $r['group_alias'],
@@ -199,9 +199,9 @@ class GroupScoreboardController extends Controller {
     /**
      * Details of a scoreboard
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $group = GroupController::validateGroup($r['group_alias'], $r->identity);
 

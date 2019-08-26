@@ -85,7 +85,7 @@ class UserFactory {
 
         // Populate a new Request to pass to the API
         UserController::$permissionKey = uniqid();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => $params['username'],
             'name' => $params['name'],
             'password' => $params['password'],
@@ -158,7 +158,7 @@ class UserFactory {
      * @return type
      */
     public static function verifyUser(\OmegaUp\DAO\VO\Users $user) {
-        UserController::apiVerifyEmail(new Request([
+        UserController::apiVerifyEmail(new \OmegaUp\Request([
             'id' => $user->verification_id
         ]));
 

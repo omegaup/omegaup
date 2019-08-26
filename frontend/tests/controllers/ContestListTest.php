@@ -42,7 +42,7 @@ class ContestListTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'page_size' => 50
         ]);
@@ -64,7 +64,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new PUBLIC contest
         $contestData = ContestsFactory::createContest();
 
-        $response = ContestController::apiList(new Request(['page_size' => 50]));
+        $response = ContestController::apiList(new \OmegaUp\Request(['page_size' => 50]));
 
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
@@ -88,7 +88,7 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addUser($contestData, $contestant);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiList($r);
@@ -115,7 +115,7 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addUser($contestData, $contestant);
 
         $login = self::login(UserFactory::createUser());
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiList($r);
@@ -136,7 +136,7 @@ class ContestListTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         $login = self::login(UserFactory::createAdminUser());
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'page_size' => 100
         ]);
@@ -165,7 +165,7 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $contestant);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiList($r);
@@ -191,7 +191,7 @@ class ContestListTest extends OmegaupTestCase {
         $admin2 = UserFactory::createUser();
 
         $login = self::login($admin1);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
 
@@ -250,7 +250,7 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addGroupAdmin($contestData, $group['group']);
 
         $login = self::login($author);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
 
@@ -273,7 +273,7 @@ class ContestListTest extends OmegaupTestCase {
      * Test that contests with recommended flag show first in list.
      */
     public function testRecommendedShowsOnTop() {
-        $r = new Request();
+        $r = new \OmegaUp\Request();
 
         // Create 2 contests, with the not-recommended.finish_time > recommended.finish_time
         $recommendedContestData = ContestsFactory::createContest();
@@ -288,7 +288,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Turn recommended ON
         $login = self::login(UserFactory::createAdminUser());
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $recommendedContestData['request']['alias'],
             'value' => 1,
@@ -298,7 +298,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Get list of contests
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiList($r);
@@ -339,7 +339,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Get list of contests
         $login = self::login($contestant);
-        $response = ContestController::apiList(new Request([
+        $response = ContestController::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -359,7 +359,7 @@ class ContestListTest extends OmegaupTestCase {
         if (true) {
             $login = self::login(UserFactory::createAdminUser());
             for ($i = 0; $i < 2; $i++) {
-                ContestController::apiSetRecommended(new Request([
+                ContestController::apiSetRecommended(new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'contest_alias' => $recommendedContest[$i]['request']['alias'],
                     'value' => 1,
@@ -369,7 +369,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Get list of contests
         $login = self::login($contestant);
-        $response = ContestController::apiList(new Request([
+        $response = ContestController::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -388,7 +388,7 @@ class ContestListTest extends OmegaupTestCase {
      * Basic test. Check that only the first contest is on the list
      */
     public function testShowOnlyCurrentContests() {
-        $r = new Request();
+        $r = new \OmegaUp\Request();
 
         // Create 2 contests, the second one will occur in to the future.
         $currentContestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -408,7 +408,7 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addUser($futureContestData, $contestant);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'active' => ActiveStatus::ACTIVE,
         ]);
@@ -444,7 +444,7 @@ class ContestListTest extends OmegaupTestCase {
         }
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiListParticipating($r);
@@ -488,7 +488,7 @@ class ContestListTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $loginContestant = self::login($contestant);
-        $response = ContestController::apiList(new Request([
+        $response = ContestController::apiList(new \OmegaUp\Request([
             'auth_token' => $loginContestant->auth_token,
             'page_size' => 50,
             'admission_mode' => 'public'
@@ -507,7 +507,7 @@ class ContestListTest extends OmegaupTestCase {
 
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 5);
         // set contests[1] to private
-        $response = ContestController::apiUpdate(new Request([
+        $response = ContestController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contests[1]['request']['alias'],
             'admission_mode' => 'private',
@@ -515,7 +515,7 @@ class ContestListTest extends OmegaupTestCase {
 
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 10);
         // set contests[1] to public
-        $response = ContestController::apiUpdate(new Request([
+        $response = ContestController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contests[1]['request']['alias'],
             'admission_mode' => 'public',
@@ -529,7 +529,7 @@ class ContestListTest extends OmegaupTestCase {
         ];
 
         $loginNewContestant = self::login($contestant);
-        $response = ContestController::apiList(new Request([
+        $response = ContestController::apiList(new \OmegaUp\Request([
             'auth_token' => $loginNewContestant->auth_token,
             'page_size' => 50,
             'admission_mode' => 'public'

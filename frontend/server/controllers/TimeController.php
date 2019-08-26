@@ -11,10 +11,10 @@ class TimeController extends Controller {
     /**
      * Entry point for /time API
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiGet(Request $r = null) {
+    public static function apiGet(\OmegaUp\Request $r = null) {
         $response = [];
         $response['time'] = \OmegaUp\Time::get();
         $response['status'] = 'ok';

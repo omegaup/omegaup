@@ -21,7 +21,7 @@ class NotificationTest extends OmegaupTestCase {
 
         // Get all unread notifications through API
         $login = self::login($user);
-        $results = NotificationController::apiMyList(new Request([
+        $results = NotificationController::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
         ]));
@@ -47,7 +47,7 @@ class NotificationTest extends OmegaupTestCase {
 
         // Get all unread notifications (3) for user
         $login = self::login($user);
-        $results = NotificationController::apiMyList(new Request([
+        $results = NotificationController::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
         ]));
@@ -60,14 +60,14 @@ class NotificationTest extends OmegaupTestCase {
         }
 
         // Mark notifications as read
-        $results = NotificationController::apiReadNotifications(new Request([
+        $results = NotificationController::apiReadNotifications(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
             'notifications' => $ids,
         ]));
 
         // Get all unread notifications (1) for user
-        $results = NotificationController::apiMyList(new Request([
+        $results = NotificationController::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
         ]));
@@ -79,7 +79,7 @@ class NotificationTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
         try {
-            NotificationController::apiReadNotifications(new Request([
+            NotificationController::apiReadNotifications(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $user,
                 'notifications' => [],
@@ -89,7 +89,7 @@ class NotificationTest extends OmegaupTestCase {
             $this->assertEquals($e->getMessage(), 'notificationIdsNotProvided');
         }
         try {
-            NotificationController::apiReadNotifications(new Request([
+            NotificationController::apiReadNotifications(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $user,
                 'notifications' => ['10'],
@@ -112,7 +112,7 @@ class NotificationTest extends OmegaupTestCase {
         $login = self::login($maliciousUser);
 
         try {
-            NotificationController::apiReadNotifications(new Request([
+            NotificationController::apiReadNotifications(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $maliciousUser,
                 'notifications' => [$notification->notification_id],

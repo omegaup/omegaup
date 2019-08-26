@@ -25,7 +25,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
             'problem_id' => $problemForfeited['problem']->problem_id,
         ]));
 
-        $results = ProblemForfeitedController::apiGetCounts(new Request([
+        $results = ProblemForfeitedController::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -48,7 +48,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $extraProblem = ProblemsFactory::createProblem();
 
         try {
-            ProblemController::apiSolution(new Request([
+            ProblemController::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $extraProblem['problem']->alias,
             ]));
@@ -57,7 +57,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
             $this->assertEquals($e->getMessage(), 'problemSolutionNotVisible');
         }
 
-        $response = ProblemController::apiSolution(new Request([
+        $response = ProblemController::apiSolution(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $extraProblem['problem']->alias,
             'forfeit_problem' => true,
@@ -76,7 +76,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $login = self::login($user);
         $problem = ProblemsFactory::createProblem()['problem'];
         try {
-            ProblemController::apiSolution(new Request([
+            ProblemController::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
                 'forfeit_problem' => true,

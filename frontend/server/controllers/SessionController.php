@@ -10,7 +10,7 @@
  */
 class SessionController extends Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
-    /** @var null|array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool} */
+    /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
     private static $_currentSession = null;
     private static $_facebook;
     /** @var null|\OmegaUp\SessionManager */
@@ -64,9 +64,9 @@ class SessionController extends Controller {
      * contestant's machine and the server.
      *
      * @return array
-     * @psalm-return array{status: string, session: null|array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     * @psalm-return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
      */
-    public static function apiCurrentSession(?Request $r = null) : array {
+    public static function apiCurrentSession(?\OmegaUp\Request $r = null) : array {
         if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null(self::$_currentSession)
@@ -78,7 +78,7 @@ class SessionController extends Controller {
             ];
         }
         if (is_null($r)) {
-            $r = new Request();
+            $r = new \OmegaUp\Request();
         }
         if (is_null($r['auth_token'])) {
             $authToken = SessionController::getAuthToken($r);
@@ -90,7 +90,7 @@ class SessionController extends Controller {
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null($authToken)
         ) {
-            /** @var array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool} */
+            /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
             self::$_currentSession = Cache::getFromCacheOrSet(
                 Cache::SESSION_PREFIX,
                 $authToken,
@@ -109,7 +109,7 @@ class SessionController extends Controller {
         ];
     }
 
-    private static function getAuthToken(Request $r = null) {
+    private static function getAuthToken(\OmegaUp\Request $r) : ?string {
         $SessionM = self::getSessionManagerInstance();
         $SessionM->sessionStart();
         $authToken = null;
@@ -130,9 +130,9 @@ class SessionController extends Controller {
 
     /**
      * @return array
-     * @psalm-return array{valid: bool, email: string|null, user: Users|null, identity: Identities|null, auth_token: string|null, is_admin: bool}
+     * @psalm-return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
      */
-    public static function getCurrentSession(Request $r) : array {
+    public static function getCurrentSession(\OmegaUp\Request $r) : array {
         if (empty($r['auth_token'])) {
             return [
                 'valid' => false,
@@ -286,7 +286,7 @@ class SessionController extends Controller {
         return $username . $suffix;
     }
 
-    public static function apiGoogleLogin(Request $r = null) {
+    public static function apiGoogleLogin(\OmegaUp\Request $r = null) {
         if (is_null($r['storeToken'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'storeToken');
         }
@@ -386,10 +386,10 @@ class SessionController extends Controller {
      * usernameOrEmail
      * password
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return boolean
      */
-    public function NativeLogin(Request $r) {
+    public function NativeLogin(\OmegaUp\Request $r) {
         $identity = null;
 
         Validators::validateStringNonEmpty($r['password'], 'password');
@@ -501,7 +501,7 @@ class SessionController extends Controller {
             // $username = str_replace(" ", "_", $fb_user_profile["name"] ),
             UserController::$permissionKey = uniqid();
 
-            $r = new Request([
+            $r = new \OmegaUp\Request([
                 'name' => (!is_null($name) ? $name : $username),
                 'username' => $username,
                 'email' => $email,

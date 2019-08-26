@@ -26,7 +26,7 @@ class CoursesFactory {
 
         $courseAlias = Utils::CreateRandomString();
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
@@ -68,7 +68,7 @@ class CoursesFactory {
         $assignmentAlias = Utils::CreateRandomString();
         $course = CoursesDAO::getByAlias($courseAlias);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -107,7 +107,7 @@ class CoursesFactory {
 
         foreach ($assignmentsPerType as $assignmentType => $count) {
             for ($i = 0; $i < $count; $i++) {
-                $r = new Request([
+                $r = new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'name' => Utils::CreateRandomString(),
                     'alias' => Utils::CreateRandomString(),
@@ -145,7 +145,7 @@ class CoursesFactory {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($courseData['admin']);
         }
-        GroupController::apiAddUser(new Request([
+        GroupController::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $student->username,
             'group_alias' => $group->alias
@@ -158,7 +158,7 @@ class CoursesFactory {
         $responses = [];
         foreach ($problems as $problem) {
             // Add a problem to the assignment
-            $responses[] = CourseController::apiAddProblem(new Request([
+            $responses[] = CourseController::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseAlias,
                 'assignment_alias' => $assignmentAlias,
@@ -196,7 +196,7 @@ class CoursesFactory {
                     $p++;
                     if ($s % 2 == $p % 2) {
                         // PA run
-                        $runResponsePA = RunController::apiCreate(new Request([
+                        $runResponsePA = RunController::apiCreate(new \OmegaUp\Request([
                             'auth_token' => $studentLogin->auth_token,
                             'problemset_id' => $assignment->problemset_id,
                             'problem_alias' => $problemData['request']['problem_alias'],
@@ -208,7 +208,7 @@ class CoursesFactory {
 
                         if (($s + $p) % 3 == 0) {
                             // 100 pts run
-                            $runResponseAC = RunController::apiCreate(new Request([
+                            $runResponseAC = RunController::apiCreate(new \OmegaUp\Request([
                                 'auth_token' => $studentLogin->auth_token,
                                 'problemset_id' => $assignment->problemset_id,
                                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -231,7 +231,7 @@ class CoursesFactory {
         $login = OmegaupTestCase::login($user);
 
         // Call api
-        CourseController::apiIntroDetails(new Request([
+        CourseController::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAssignmentData['request']['course_alias'],
         ]));
@@ -242,7 +242,7 @@ class CoursesFactory {
         $login = OmegaupTestCase::login($user);
 
         // Call api
-        CourseController::apiIntroDetails(new Request([
+        CourseController::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAssignmentData['request']['course_alias'],
             'assignment_alias' => $courseAssignmentData['request']['assignment_alias'],
@@ -254,7 +254,7 @@ class CoursesFactory {
         $login = OmegaupTestCase::login($user);
 
         // Call api
-        ProblemController::apiDetails(new Request([
+        ProblemController::apiDetails(new \OmegaUp\Request([
             'course_alias' => $courseAssignmentData['request']['course_alias'],
             'assignment_alias' => $courseAssignmentData['request']['assignment_alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
