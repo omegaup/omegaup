@@ -97,12 +97,18 @@ export default class CourseViewStudent extends Vue {
   T = T;
   UI = UI;
   selectedAssignment: Partial<omegaup.Assignment> = {};
-  selectedProblem: Partial<omegaup.CourseProblem> = {};
+  selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
   selectedStudent: Partial<omegaup.CourseStudent> = this.initialStudent || {};
+
+  data(): { [name: string]: any } {
+    return {
+      selectedProblem: undefined,
+    };
+  }
 
   mounted(): void {
     let self = this;
-    window.addEventListener('popstate', function(ev: any): void {
+    window.addEventListener('popstate', function(ev: PopStateEvent): void {
       self.selectedStudent =
         (ev.state && ev.state.student) || self.initialStudent;
     });
@@ -123,12 +129,12 @@ export default class CourseViewStudent extends Vue {
   }
 
   bestRunSource(problem: omegaup.CourseProblem): string {
-    let best = this.bestRun(problem);
+    const best = this.bestRun(problem);
     return (best && best.source) || '';
   }
 
   bestScore(problem: omegaup.CourseProblem): number {
-    let best = this.bestRun(problem);
+    const best = this.bestRun(problem);
     return (best && best.score) || 0.0;
   }
 
@@ -164,7 +170,7 @@ export default class CourseViewStudent extends Vue {
   @Watch('problems')
   onProblemsChange(newVal: omegaup.CourseProblem[]) {
     if (newVal.length === 0) {
-      this.selectedProblem = {};
+      this.selectedProblem = undefined;
       return;
     }
     this.selectedProblem = newVal[0];
