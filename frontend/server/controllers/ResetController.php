@@ -12,9 +12,9 @@ class ResetController extends Controller {
     public static function apiCreate(Request $r) {
         self::validateCreateRequest($r);
         $email = $r['email'];
-        $token = ApiUtils::GetRandomString();
+        $token = \OmegaUp\ApiUtils::getRandomString();
         $reset_digest = hash('sha1', $token);
-        $reset_sent_at = ApiUtils::GetStringTime();
+        $reset_sent_at = \OmegaUp\ApiUtils::getStringTime();
 
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
@@ -75,9 +75,9 @@ class ResetController extends Controller {
             throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
         }
 
-        $token = ApiUtils::GetRandomString();
+        $token = \OmegaUp\ApiUtils::getRandomString();
         $reset_digest = hash('sha1', $token);
-        $reset_sent_at = ApiUtils::GetStringTime();
+        $reset_sent_at = \OmegaUp\ApiUtils::getStringTime();
 
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;

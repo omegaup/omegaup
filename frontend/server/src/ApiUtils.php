@@ -1,30 +1,30 @@
 <?php
 
+namespace OmegaUp;
+
+use \Time;
+
 class ApiUtils {
     /**
      * Gets a random string
      */
-    public static function GetRandomString() {
-        return md5(uniqid(rand(), true));
+    public static function getRandomString() : string {
+        return md5(uniqid(strval(rand()), true));
     }
 
-    public static function GetStringTime($time = null) {
+    public static function getStringTime(?int $time = null) : string {
         if (is_null($time)) {
-            return date('Y-m-d H:i:s');
-        } else {
-            return date('Y-m-d H:i:s', $time);
+            return date('Y-m-d H:i:s', Time::get());
         }
+        return date('Y-m-d H:i:s', $time);
     }
 
     /**
      * Remove accents helper
      * From: http://stackoverflow.com/questions/1017599/how-do-i-remove-accents-from-characters-in-a-php-string
      * (Wordpress)
-     *
-     * @param type $string
-     * @return type
      */
-    public static function RemoveAccents($string) {
+    public static function removeAccents(string $string) : string {
         if (!preg_match('/[\x80-\xff]/', $string)) {
             return $string;
         }
@@ -126,16 +126,17 @@ class ApiUtils {
             chr(197) . chr(190) => 'z', chr(197) . chr(191) => 's'
         ];
 
-        $string = strtr($string, $chars);
-
-        return $string;
+        return strtr($string, $chars);
     }
 
-    public static function FormatString($format, $named_args) {
-        foreach ($named_args as $key => $value) {
+    /**
+     * @param string $format
+     * @param array<string, string> $namedArgs
+     */
+    public static function formatString(string $format, array $namedArgs) : string {
+        foreach ($namedArgs as $key => $value) {
             $format = str_replace("%($key)", $value, $format);
         }
-
         return $format;
     }
 }

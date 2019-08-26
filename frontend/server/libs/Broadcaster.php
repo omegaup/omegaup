@@ -58,11 +58,11 @@ class Broadcaster {
                     ('https://omegaup.com/arena/' . $r['contest']->alias . '#clarifications'),
                 'user_name' => $r['user']->username
             ];
-            $subject = ApiUtils::FormatString(
+            $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get('clarificationEmailSubject'),
                 $email_params
             );
-            $body = ApiUtils::FormatString(
+            $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get('clarificationEmailBody'),
                 $email_params
             );

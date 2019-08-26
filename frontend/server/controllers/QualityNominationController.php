@@ -329,11 +329,11 @@ class QualityNominationController extends Controller {
             'problem_name' => htmlspecialchars($r['problem']->title),
             'user_name' => $username
         ];
-        $mail_subject = ApiUtils::FormatString(
+        $mail_subject = \OmegaUp\ApiUtils::formatString(
             \OmegaUp\Translations::getInstance()->get('demotionProblemEmailSubject'),
             $email_params
         );
-        $mail_body = ApiUtils::FormatString(
+        $mail_body = \OmegaUp\ApiUtils::formatString(
             \OmegaUp\Translations::getInstance()->get('demotionProblemEmailBody'),
             $email_params
         );
