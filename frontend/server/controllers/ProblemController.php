@@ -72,7 +72,7 @@ class ProblemController extends Controller {
             $is_required = false;
 
             // We need to check problem_alias
-            Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+            \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
@@ -101,7 +101,7 @@ class ProblemController extends Controller {
                 if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
                 } else {
-                    Validators::validateInEnum(
+                    \OmegaUp\Validators::validateInEnum(
                         $r['visibility'],
                         'visibility',
                         [
@@ -113,7 +113,7 @@ class ProblemController extends Controller {
                     );
                 }
             }
-            Validators::validateInEnum(
+            \OmegaUp\Validators::validateInEnum(
                 $r['update_published'],
                 'update_published',
                 [
@@ -125,8 +125,8 @@ class ProblemController extends Controller {
                 false
             );
         } else {
-            Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-            Validators::validateInEnum(
+            \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+            \OmegaUp\Validators::validateInEnum(
                 $r['visibility'],
                 'visibility',
                 [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
@@ -141,9 +141,9 @@ class ProblemController extends Controller {
             }
         }
 
-        Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
-        Validators::validateStringNonEmpty($r['source'], 'source', $is_required);
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
+        \OmegaUp\Validators::validateStringNonEmpty($r['source'], 'source', $is_required);
+        \OmegaUp\Validators::validateInEnum(
             $r['validator'],
             'validator',
             ['token', 'token-caseless', 'token-numeric', 'custom', 'literal'],
@@ -164,7 +164,7 @@ class ProblemController extends Controller {
         } elseif (isset($r['languages']) && is_array($r['languages'])) {
             $r['languages'] = implode(',', $r['languages']);
         }
-        Validators::validateValidSubset(
+        \OmegaUp\Validators::validateValidSubset(
             $r['languages'],
             'languages',
             array_keys(RunController::$kSupportedLanguages),
@@ -274,7 +274,7 @@ class ProblemController extends Controller {
      */
     private static function validateRejudge(\OmegaUp\Request $r) {
         // We need to check problem_alias
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
@@ -308,7 +308,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -343,7 +343,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::findByAlias($r['group']);
 
@@ -375,8 +375,8 @@ class ProblemController extends Controller {
      */
     public static function apiAddTag(\OmegaUp\Request $r) {
         // Check problem_alias
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::validateStringNonEmpty($r['name'], 'name');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
 
         // Authenticate logged user
         self::authenticateRequest($r);
@@ -436,7 +436,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
@@ -472,7 +472,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check problem_alias
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $group = GroupsDAO::findByAlias($r['group']);
 
@@ -507,8 +507,8 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check whether problem exists
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::validateStringNonEmpty($r['name'], 'name');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -548,7 +548,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
 
         // Check whether problem exists
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -578,7 +578,7 @@ class ProblemController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -606,7 +606,7 @@ class ProblemController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         $includeAutogenerated = ($r['include_autogenerated'] == 'true');
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -680,7 +680,7 @@ class ProblemController extends Controller {
         self::validateCreateOrUpdate($r, true /* is update */);
 
         // Validate commit message.
-        Validators::validateStringNonEmpty($r['message'], 'message');
+        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
 
         // Update the Problem object
         $valueProperties = [
@@ -839,9 +839,9 @@ class ProblemController extends Controller {
         string $directory,
         string $contents
     ): array {
-        Validators::validateStringNonEmpty($r['message'], 'message');
+        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         // Check that lang is in the ISO 639-1 code list, default is "es".
-        Validators::validateInEnum($r['lang'], 'lang', ProblemController::ISO639_1, false /* is_required */);
+        \OmegaUp\Validators::validateInEnum($r['lang'], 'lang', ProblemController::ISO639_1, false /* is_required */);
         if (is_null($r['lang'])) {
             $r['lang'] = IdentityController::getPreferredLanguage($r);
         }
@@ -892,7 +892,7 @@ class ProblemController extends Controller {
     public static function apiUpdateStatement(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
-        Validators::validateStringNonEmpty($r['statement'], 'statement');
+        \OmegaUp\Validators::validateStringNonEmpty($r['statement'], 'statement');
         $updatedFileLanguages = self::updateLooseFile($r, $r['problem'], 'statements', $r['statement']);
         self::invalidateCache($r['problem'], $updatedFileLanguages);
         return [
@@ -910,7 +910,7 @@ class ProblemController extends Controller {
     public static function apiUpdateSolution(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         self::validateCreateOrUpdate($r, true);
-        Validators::validateStringNonEmpty($r['solution'], 'solution');
+        \OmegaUp\Validators::validateStringNonEmpty($r['solution'], 'solution');
         $updatedFileLanguages = self::updateLooseFile($r, $r['problem'], 'solutions', $r['solution']);
         self::invalidateSolutionCache($r['problem'], $updatedFileLanguages);
         return [
@@ -981,12 +981,12 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDetails(\OmegaUp\Request $r) {
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias', false);
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias', false);
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Lang is optional. Default is user's preferred.
         if (!is_null($r['lang'])) {
-            Validators::validateStringOfLengthInRange($r['lang'], 'lang', 2, 2);
+            \OmegaUp\Validators::validateStringOfLengthInRange($r['lang'], 'lang', 2, 2);
         } else {
             $r['lang'] = IdentityController::getPreferredLanguage($r);
         }
@@ -1240,7 +1240,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDownload(\OmegaUp\Request $r) {
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -1593,7 +1593,7 @@ class ProblemController extends Controller {
     public static function apiVersions(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -1640,11 +1640,11 @@ class ProblemController extends Controller {
     public static function apiSelectVersion(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-        Validators::validateStringNonEmpty($r['commit'], 'commit');
+        \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['commit'], 'commit');
         // ProblemController::UPDATE_PUBLISHED_NONE is not allowed here because
         // it would not make any sense!
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['update_published'],
             'update_published',
             [
@@ -1760,8 +1760,8 @@ class ProblemController extends Controller {
     public static function apiRunsDiff(\OmegaUp\Request $r) : array {
         self::authenticateRequest($r);
 
-        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-        Validators::validateStringNonEmpty($r['version'], 'version');
+        \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['version'], 'version');
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -1835,7 +1835,7 @@ class ProblemController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateRuns(\OmegaUp\Request $r) {
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Is the problem valid?
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -2081,7 +2081,7 @@ class ProblemController extends Controller {
             }
         }
 
-        Validators::validateStringNonEmpty($r['query'], 'query', false);
+        \OmegaUp\Validators::validateStringNonEmpty($r['query'], 'query', false);
     }
 
     /**

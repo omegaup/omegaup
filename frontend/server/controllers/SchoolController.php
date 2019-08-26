@@ -46,7 +46,7 @@ class SchoolController extends Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['name'], 'name');
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
 
         $state = self::getStateIdFromCountryAndState($r['country_id'], $r['state_id']);
 

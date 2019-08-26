@@ -21,7 +21,7 @@ class GroupScoreboardController extends Controller {
     ) {
         GroupController::validateGroup($groupAlias, $identity);
 
-        Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
+        \OmegaUp\Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
         $scoreboard = GroupsScoreboardsDAO::getByAlias($scoreboardAlias);
         if (is_null($scoreboard)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Scoreboard');
@@ -50,7 +50,7 @@ class GroupScoreboardController extends Controller {
             $scoreboardAlias
         );
 
-        Validators::validateValidAlias($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateValidAlias($contestAlias, 'contest_alias');
         $contest = ContestsDAO::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Contest');

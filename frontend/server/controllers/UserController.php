@@ -38,15 +38,15 @@ class UserController extends Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         // Validate request
-        Validators::validateValidUsername($r['username'], 'username');
+        \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
 
-        Validators::validateEmail($r['email'], 'email');
+        \OmegaUp\Validators::validateEmail($r['email'], 'email');
 
         if (empty($r['scholar_degree'])) {
             $r['scholar_degree'] = 'none';
         }
 
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['scholar_degree'],
             'scholar_degree',
             UserController::ALLOWED_SCHOLAR_DEGREES
@@ -369,7 +369,7 @@ class UserController extends Controller {
             if (is_null(self::$permissionKey) || self::$permissionKey != $r['permission_key']) {
                 throw new ForbiddenAccessException();
             }
-            Validators::validateStringNonEmpty($r['username'], 'username');
+            \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
             $user = UsersDAO::FindByUsername($r['username']);
             if (is_null($user)) {
@@ -386,7 +386,7 @@ class UserController extends Controller {
 
             if ($user->password != null) {
                 // Check the old password
-                Validators::validateStringNonEmpty($r['old_password'], 'old_password');
+                \OmegaUp\Validators::validateStringNonEmpty($r['old_password'], 'old_password');
 
                 $old_password_valid = SecurityTools::compareHashedStrings(
                     $r['old_password'],
@@ -442,14 +442,14 @@ class UserController extends Controller {
 
             self::$log->info('Admin verifiying user...' . $r['usernameOrEmail']);
 
-            Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+            \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
             $user = self::resolveUser($r['usernameOrEmail']);
 
             self::$redirectOnVerify = false;
         } else {
             // Normal user verification path
-            Validators::validateStringNonEmpty($r['id'], 'id');
+            \OmegaUp\Validators::validateStringNonEmpty($r['id'], 'id');
 
             $users = UsersDAO::getByVerification($r['id']);
             $user = !empty($users) ? $users[0] : null;
@@ -524,7 +524,7 @@ class UserController extends Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function resolveUser(?string $userOrEmail) : \OmegaUp\DAO\VO\Users {
-        Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
+        \OmegaUp\Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
         $user = UsersDAO::FindByUsername($userOrEmail);
         if (!is_null($user)) {
             return $user;
@@ -1191,7 +1191,7 @@ class UserController extends Controller {
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
         $currentTimestamp = \OmegaUp\Time::get();
         if (!empty($r['date'])) {
-            Validators::validateDate($r['date'], 'date', false);
+            \OmegaUp\Validators::validateDate($r['date'], 'date', false);
             $firstDay = date('Y-m-01', strtotime($r['date']));
         } else {
             // Get first day of the current month
@@ -1240,7 +1240,7 @@ class UserController extends Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r) {
-        Validators::validateDate($r['date'], 'date', false);
+        \OmegaUp\Validators::validateDate($r['date'], 'date', false);
         if (!is_null($r['date'])) {
             $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
         } else {
@@ -1271,7 +1271,7 @@ class UserController extends Controller {
         if (!Authorization::canChooseCoder($currentTimestamp)) {
             throw new ForbiddenAccessException('coderOfTheMonthIsNotInPeriodToBeChosen');
         }
-        Validators::validateStringNonEmpty($r['username'], 'username');
+        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
         $currentDate = date('Y-m-d', $currentTimestamp);
         $firstDayOfNextMonth = new DateTime($currentDate);
@@ -1326,8 +1326,8 @@ class UserController extends Controller {
     public static function apiInterviewStats(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
-        Validators::validateStringNonEmpty($r['interview'], 'interview');
-        Validators::validateStringNonEmpty($r['username'], 'username');
+        \OmegaUp\Validators::validateStringNonEmpty($r['interview'], 'interview');
+        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
         $contest = ContestsDAO::getByAlias($r['interview']);
         if (is_null($contest)) {
@@ -1536,7 +1536,7 @@ class UserController extends Controller {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterUsernameInUse', 'username');
             }
 
-            Validators::validateValidUsername($r['username'], 'username');
+            \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
             $r->user->username = $r['username'];
             $r->identity->username = $r['username'];
         }
@@ -1580,7 +1580,7 @@ class UserController extends Controller {
         self::authenticateRequest($r);
 
         if (!is_null($r['username'])) {
-            Validators::validateValidUsername($r['username'], 'username');
+            \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
             $user = UsersDAO::FindByUsername($r['username']);
             if ($r['username'] != $r->user->username && !is_null($user)) {
                 throw new DuplicatedEntryInDatabaseException('usernameInUse');
@@ -1588,15 +1588,15 @@ class UserController extends Controller {
         }
 
         if (!is_null($r['name'])) {
-            Validators::validateStringOfLengthInRange($r['name'], 'name', 1, 50);
+            \OmegaUp\Validators::validateStringOfLengthInRange($r['name'], 'name', 1, 50);
             $r->identity->name = $r['name'];
         }
 
         $state = null;
         if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
             // Both state and country must be specified together.
-            Validators::validateStringNonEmpty($r['country_id'], 'country_id', true);
-            Validators::validateStringNonEmpty($r['state_id'], 'state_id', true);
+            \OmegaUp\Validators::validateStringNonEmpty($r['country_id'], 'country_id', true);
+            \OmegaUp\Validators::validateStringNonEmpty($r['state_id'], 'state_id', true);
 
             $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
             if (is_null($state)) {
@@ -1627,13 +1627,13 @@ class UserController extends Controller {
             }
         }
 
-        Validators::validateStringNonEmpty($r['scholar_degree'], 'scholar_degree', false);
+        \OmegaUp\Validators::validateStringNonEmpty($r['scholar_degree'], 'scholar_degree', false);
 
         if (!is_null($r['graduation_date'])) {
             if (is_numeric($r['graduation_date'])) {
                 $r['graduation_date'] = (int)$r['graduation_date'];
             } else {
-                Validators::validateDate($r['graduation_date'], 'graduation_date', false);
+                \OmegaUp\Validators::validateDate($r['graduation_date'], 'graduation_date', false);
                 $r['graduation_date'] = strtotime($r['graduation_date']);
             }
         }
@@ -1641,7 +1641,7 @@ class UserController extends Controller {
             if (is_numeric($r['birth_date'])) {
                 $r['birth_date'] = (int)$r['birth_date'];
             } else {
-                Validators::validateDate($r['birth_date'], 'birth_date', false);
+                \OmegaUp\Validators::validateDate($r['birth_date'], 'birth_date', false);
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
 
@@ -1663,7 +1663,7 @@ class UserController extends Controller {
         $r->ensureBool('hide_problem_tags', false);
 
         if (!is_null($r['gender'])) {
-            Validators::validateInEnum(
+            \OmegaUp\Validators::validateInEnum(
                 $r['gender'],
                 'gender',
                 UserController::ALLOWED_GENDER_OPTIONS,
@@ -1736,13 +1736,13 @@ class UserController extends Controller {
 
         $identity = null;
         if (!is_null($r['username'])) {
-            Validators::validateStringNonEmpty($r['username'], 'username');
+            \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
             $identity = IdentitiesDAO::findByUsername($r['username']);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
-        Validators::validateInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
+        \OmegaUp\Validators::validateInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
 
         // Defaults for offset and rowcount
         if (null == $r['offset']) {
@@ -1836,7 +1836,7 @@ class UserController extends Controller {
     public static function apiUpdateMainEmail(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateEmail($r['email'], 'email');
+        \OmegaUp\Validators::validateEmail($r['email'], 'email');
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
@@ -1904,7 +1904,7 @@ class UserController extends Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiValidateFilter(\OmegaUp\Request $r) {
-        Validators::validateStringNonEmpty($r['filter'], 'filter');
+        \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
 
         $response = [
             'status' => 'ok',
@@ -2002,7 +2002,7 @@ class UserController extends Controller {
 
     private static function validateUser(\OmegaUp\Request $r) {
         // Validate request
-        Validators::validateValidUsername($r['username'], 'username');
+        \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
         $r['user'] = UsersDAO::FindByUsername($r['username']);
         if (is_null($r['user'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -2017,7 +2017,7 @@ class UserController extends Controller {
 
         self::validateUser($r);
 
-        Validators::validateStringNonEmpty($r['role'], 'role');
+        \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
         $r['role'] = RolesDAO::getByName($r['role']);
         if (is_null($r['role'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'role');
@@ -2036,7 +2036,7 @@ class UserController extends Controller {
 
         self::validateUser($r);
 
-        Validators::validateStringNonEmpty($r['group'], 'group');
+        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
         $r['group'] = GroupsDAO::getByName($r['group']);
         if (is_null($r['group'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'group');
@@ -2145,7 +2145,7 @@ class UserController extends Controller {
 
         self::validateUser($r);
 
-        Validators::validateStringNonEmpty($r['experiment'], 'experiment');
+        \OmegaUp\Validators::validateStringNonEmpty($r['experiment'], 'experiment');
         if (!in_array($r['experiment'], $experiments->getAllKnownExperiments())) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'experiment');
         }
@@ -2314,8 +2314,8 @@ class UserController extends Controller {
         $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['username'], 'username');
-        Validators::validateStringNonEmpty($r['password'], 'password');
+        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
+        \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
 
         $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
 
@@ -2398,7 +2398,7 @@ class UserController extends Controller {
     ) : array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['filter'],
             'filter',
             ['', 'country', 'state', 'school'],

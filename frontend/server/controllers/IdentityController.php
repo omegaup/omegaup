@@ -14,7 +14,7 @@ class IdentityController extends Controller {
      * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function resolveIdentity(?string $userOrEmail) : \OmegaUp\DAO\VO\Identities {
-        Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
+        \OmegaUp\Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
         $identity = IdentitiesDAO::findByUsername($userOrEmail);
         if (!is_null($identity)) {
             return $identity;
@@ -281,19 +281,19 @@ class IdentityController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'group_alias');
         }
         // Validate request
-        Validators::validateValidUsernameIdentity($username, 'username');
+        \OmegaUp\Validators::validateValidUsernameIdentity($username, 'username');
 
         if (!is_null($name)) {
             $name = trim($name);
-            Validators::validateStringNonEmpty($name, 'name', true);
-            Validators::validateStringOfLengthInRange($name, 'name', null, 50);
+            \OmegaUp\Validators::validateStringNonEmpty($name, 'name', true);
+            \OmegaUp\Validators::validateStringOfLengthInRange($name, 'name', null, 50);
         }
 
         if (!is_null($gender)) {
             $gender = trim($gender);
         }
         if (!empty($gender)) {
-            Validators::validateInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
+            \OmegaUp\Validators::validateInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
         }
     }
 

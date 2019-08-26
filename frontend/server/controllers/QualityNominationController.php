@@ -70,9 +70,9 @@ class QualityNominationController extends Controller {
         // Validate request
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::validateInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
-        Validators::validateStringNonEmpty($r['contents'], 'contents');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
+        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
@@ -227,8 +227,8 @@ class QualityNominationController extends Controller {
             throw new ForbiddenAccessException('lockdown');
         }
 
-        Validators::validateInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
-        Validators::validateStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
+        \OmegaUp\Validators::validateInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
+        \OmegaUp\Validators::validateStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
 
         // Validate request
         self::authenticateRequest($r);

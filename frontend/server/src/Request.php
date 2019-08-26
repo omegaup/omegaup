@@ -121,7 +121,7 @@ class Request extends \ArrayObject {
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
-        Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
         $this[$key] = (int)$val;
     }
 
@@ -142,7 +142,7 @@ class Request extends \ArrayObject {
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
-        Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
+        \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
         $this[$key] = (float)$val;
     }
 }

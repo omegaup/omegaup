@@ -1,5 +1,10 @@
 <?php
 
+namespace OmegaUp;
+
+use \DuplicatedEntryInDatabaseException;
+use \InvalidArgumentException;
+
 /**
  * Conjunto de validadores genéricos
  *
@@ -75,14 +80,14 @@ class Validators {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',
                 $parameterName,
-                ['min_length' => $minLength]
+                ['min_length' => strval($minLength)]
             );
         }
         if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooLong',
                 $parameterName,
-                ['max_length' => $maxLength]
+                ['max_length' => strval($maxLength)]
             );
         }
     }
@@ -234,14 +239,14 @@ class Validators {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNumberTooSmall',
                 $parameterName,
-                ['lower_bound' => $lowerBound]
+                ['lower_bound' => strval($lowerBound)]
             );
         }
         if (!is_null($upperBound) && $parameter > $upperBound) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNumberTooLarge',
                 $parameterName,
-                ['upper_bound' => $upperBound]
+                ['upper_bound' => strval($upperBound)]
             );
         }
     }
@@ -288,7 +293,10 @@ class Validators {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
                 $parameterName,
-                ['bad_elements' => $parameter, 'expected_set' => implode(', ', $enum)]
+                [
+                    'bad_elements' => strval($parameter),
+                    'expected_set' => implode(', ', $enum),
+                ]
             );
         }
     }
@@ -325,7 +333,10 @@ class Validators {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
                 $parameterName,
-                ['bad_elements' => implode(',', $badElements), 'expected_set' => implode(', ', $enum)]
+                [
+                    'bad_elements' => implode(',', $badElements),
+                    'expected_set' => implode(', ', $enum),
+                ]
             );
         }
     }
@@ -346,7 +357,10 @@ class Validators {
             return true;
         }
         if ($required) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $parameterName
+            );
         }
         return false;
     }

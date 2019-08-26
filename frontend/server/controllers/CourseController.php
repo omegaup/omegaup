@@ -42,8 +42,8 @@ class CourseController extends Controller {
         $courseStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->start_time);
         $courseFinishTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->finish_time);
 
-        Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
-        Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt(
             'start_time',
@@ -62,17 +62,17 @@ class CourseController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('courseInvalidStartTime');
         }
 
-        Validators::validateInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $isRequired);
-        Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
+        \OmegaUp\Validators::validateInEnum($r['assignment_type'], 'assignment_type', ['test', 'homework'], $isRequired);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
     }
 
     /**
      * Validates clone Courses
      */
     private static function validateClone(\OmegaUp\Request $r) {
-        Validators::validateStringNonEmpty($r['name'], 'name', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', true);
         $r->ensureInt('start_time', null, null, true);
-        Validators::validateValidAlias($r['alias'], 'alias', true);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
     }
 
     /**
@@ -135,18 +135,18 @@ class CourseController extends Controller {
     private static function validateBasicCreateOrUpdate(\OmegaUp\Request $r, bool $isUpdate = false) : void {
         $isRequired = true;
 
-        Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
-        Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
         $r->ensureInt('finish_time', null, null, !$isUpdate);
 
-        Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
 
         // Show scoreboard, needs basic information and request user information are always optional
         $r->ensureBool('needs_basic_information', false /*isRequired*/);
         $r->ensureBool('show_scoreboard', false /*isRequired*/);
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['requests_user_information'],
             'requests_user_information',
             ['no', 'optional', 'required'],
@@ -181,7 +181,7 @@ class CourseController extends Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCourseExists(string $courseAlias) : \OmegaUp\DAO\VO\Courses {
-        Validators::validateStringNonEmpty($courseAlias, 'course_alias', true /*is_required*/);
+        \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course_alias', true /*is_required*/);
         $course = CoursesDAO::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
@@ -1201,7 +1201,7 @@ class CourseController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $course = CoursesDAO::getByAlias($r['course_alias']);
         if (is_null($course)) {
@@ -1235,7 +1235,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $resolvedUser = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -1266,7 +1266,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
         if (is_null($resolvedIdentity->user_id)) {
@@ -1311,7 +1311,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $group = GroupsDAO::findByAlias($r['group']);
 
@@ -1346,7 +1346,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
 
         // Check course_alias
-        Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
         $group = GroupsDAO::findByAlias($r['group']);
 
@@ -1698,8 +1698,8 @@ class CourseController extends Controller {
         string $assignmentAlias,
         \OmegaUp\DAO\VO\Identities $identity
     ) : array {
-        Validators::validateStringNonEmpty($courseAlias, 'course', true /* is_required */);
-        Validators::validateStringNonEmpty($assignmentAlias, 'assignment', true /* is_required */);
+        \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course', true /* is_required */);
+        \OmegaUp\Validators::validateStringNonEmpty($assignmentAlias, 'assignment', true /* is_required */);
         $course = CoursesDAO::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
@@ -1831,7 +1831,7 @@ class CourseController extends Controller {
         if (!isset($r['rowcount'])) {
             $r['rowcount'] = 100;
         }
-        Validators::validateStringNonEmpty($r['assignment_alias'], 'assignment_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['assignment_alias'], 'assignment_alias');
 
         $course = self::validateCourseExists($r['course_alias']);
 
@@ -1849,12 +1849,12 @@ class CourseController extends Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
-        Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+        \OmegaUp\Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        \OmegaUp\Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
-            Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
+            \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
 
@@ -1863,7 +1863,7 @@ class CourseController extends Controller {
             }
         }
 
-        Validators::validateInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
+        \OmegaUp\Validators::validateInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
