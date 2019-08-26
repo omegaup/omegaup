@@ -255,7 +255,7 @@ class GroupController extends Controller {
             'name' => $r['name'],
             'description' =>$r['description'],
             'alias' => $r['alias'],
-            'create_time' => Time::get(),
+            'create_time' => \OmegaUp\Time::get(),
         ]));
 
         self::$log->info("New scoreboard created {$r['alias']}");

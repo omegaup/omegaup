@@ -801,7 +801,7 @@ class CourseController extends Controller {
             'status' => 'ok',
             'assignments' => [],
         ];
-        $time = Time::get();
+        $time = \OmegaUp\Time::get();
         foreach ($assignments as $assignment) {
             $assignment['has_runs'] = SubmissionsDAO::countTotalSubmissionsOfProblemset(
                 (int)$assignment['problemset_id']
@@ -1714,7 +1714,7 @@ class CourseController extends Controller {
             return [$course, $assignment];
         }
 
-        if ($assignment->start_time > Time::get() ||
+        if ($assignment->start_time > \OmegaUp\Time::get() ||
             !GroupRolesDAO::isContestant($identity->identity_id, $assignment->acl_id)
         ) {
             throw new ForbiddenAccessException();

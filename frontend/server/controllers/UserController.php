@@ -1189,7 +1189,7 @@ class UserController extends Controller {
      * @return array
      */
     public static function apiCoderOfTheMonth(Request $r) {
-        $currentTimestamp = Time::get();
+        $currentTimestamp = \OmegaUp\Time::get();
         if (!empty($r['date'])) {
             Validators::validateDate($r['date'], 'date', false);
             $firstDay = date('Y-m-01', strtotime($r['date']));
@@ -1263,7 +1263,7 @@ class UserController extends Controller {
      */
     public static function apiSelectCoderOfTheMonth(Request $r) {
         self::authenticateRequest($r);
-        $currentTimestamp = Time::get();
+        $currentTimestamp = \OmegaUp\Time::get();
 
         if (!Authorization::isMentor($r->identity)) {
             throw new ForbiddenAccessException('userNotAllowed');
@@ -1645,7 +1645,7 @@ class UserController extends Controller {
                 $r['birth_date'] = strtotime($r['birth_date']);
             }
 
-            if ($r['birth_date'] >= strtotime('-5 year', Time::get())) {
+            if ($r['birth_date'] >= strtotime('-5 year', \OmegaUp\Time::get())) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('birthdayInTheFuture', 'birth_date');
             }
         }
@@ -1885,7 +1885,7 @@ class UserController extends Controller {
         $newUsername = substr($email, 0, strpos($email, '@'));
         $newUsername = str_replace('-', '_', $newUsername);
         $newUsername = str_replace('.', '_', $newUsername);
-        return $newUsername . Time::get();
+        return $newUsername . \OmegaUp\Time::get();
     }
 
     /**
@@ -2447,7 +2447,7 @@ class UserController extends Controller {
         Request $r,
         ?Identities $identity
     ) : array {
-        $currentTimeStamp = Time::get();
+        $currentTimeStamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimeStamp);
         $firstDayOfNextMonth = new DateTime($currentDate);
         $firstDayOfNextMonth->modify('first day of next month');

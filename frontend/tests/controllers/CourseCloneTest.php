@@ -52,7 +52,7 @@ class CourseCloneTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
 
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
@@ -131,7 +131,7 @@ class CourseCloneTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
             'name' => Utils::CreateRandomString(),
             'alias' => $courseData['course_alias'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
     }
 
@@ -216,7 +216,7 @@ class CourseCloneTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
 
         $this->assertEquals($courseAlias, $clonedCourseData['alias']);

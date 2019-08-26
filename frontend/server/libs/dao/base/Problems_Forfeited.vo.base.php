@@ -49,7 +49,7 @@ class ProblemsForfeited extends VO {
              */
             $this->forfeited_date = DAO::fromMySQLTimestamp($data['forfeited_date']);
         } else {
-            $this->forfeited_date = Time::get();
+            $this->forfeited_date = \OmegaUp\Time::get();
         }
     }
 

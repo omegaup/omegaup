@@ -43,7 +43,7 @@ class ResetCreateTest extends OmegaupTestCase {
 
         // time travel
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
-            Time::get() - PASSWORD_RESET_MIN_WAIT - 1
+            \OmegaUp\Time::get() - PASSWORD_RESET_MIN_WAIT - 1
         );
         $user = UsersDAO::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;

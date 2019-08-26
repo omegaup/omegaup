@@ -16,8 +16,8 @@ class CourseDetailsTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Time::get()),
-            'finish_time' => (Time::get() + 120),
+            'start_time' => (\OmegaUp\Time::get()),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
         ]));
@@ -62,8 +62,8 @@ class CourseDetailsTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Time::get() + 60),
-            'finish_time' => (Time::get() + 120),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
         ]));
@@ -161,8 +161,8 @@ class CourseDetailsTest extends OmegaupTestCase {
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
             'description' => Utils::CreateRandomString(),
-            'start_time' => (Time::get() + 60),
-            'finish_time' => (Time::get() + 120),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
         ]));

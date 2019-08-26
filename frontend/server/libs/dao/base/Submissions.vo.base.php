@@ -71,7 +71,7 @@ class Submissions extends VO {
              */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
         } else {
-            $this->time = Time::get();
+            $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['submit_delay'])) {
             $this->submit_delay = (int)$data['submit_delay'];

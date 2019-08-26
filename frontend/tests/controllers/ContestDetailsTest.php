@@ -314,7 +314,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Set contest to not started yet
         $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Time::get() + 30);
+        $contest->start_time = Utils::GetTimeFromUnixTimestamp(\OmegaUp\Time::get() + 30);
         ContestsDAO::update($contest);
 
         // Prepare our request
@@ -513,15 +513,15 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Create runs
         $runsData = [];
         $runsData[0] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runsData[1] = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runsData[2] = RunsFactory::createRun($problemData, $contestData, $contestants[1]);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runsData[3] = RunsFactory::createRun($problemData, $contestData, $contestants[2]);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runDataDirector = RunsFactory::createRun($problemData, $contestData, $contestDirector);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runDataAdmin = RunsFactory::createRun($problemData, $contestData, $contestAdmin);
 
         // Grade the runs
@@ -638,14 +638,14 @@ class ContestDetailsTest extends OmegaupTestCase {
         }
 
         {
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
             $run = RunsFactory::createRun($problemData, $contestData, $contestants[0]);
             RunsFactory::gradeRun($run, 1, 'AC', 60);
             $runsData[] = $run;
         }
 
         {
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
             $run = RunsFactory::createRun($problemData, $contestData, $contestants[1]);
             RunsFactory::gradeRun($run, .9, 'PA');
             $runsData[] = $run;

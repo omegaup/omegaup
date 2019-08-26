@@ -3,7 +3,7 @@
 class DbConfigTest extends OmegaUpTestCase {
     public function testTimeSync() {
         $db_time = Utils::GetDbDatetime();
-        $php_time = date('Y-m-d H:i:s', Time::get());
+        $php_time = date('Y-m-d H:i:s', \OmegaUp\Time::get());
 
         $this->assertEquals($php_time, $db_time);
     }

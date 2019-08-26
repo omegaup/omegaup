@@ -82,7 +82,7 @@ class Runs extends VO {
              */
             $this->time = DAO::fromMySQLTimestamp($data['time']);
         } else {
-            $this->time = Time::get();
+            $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['judged_by'])) {
             $this->judged_by = strval($data['judged_by']);

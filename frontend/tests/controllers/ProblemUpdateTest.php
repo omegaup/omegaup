@@ -53,7 +53,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Create a run
         $runData[0] = RunsFactory::createRun($problemData, $contestData, $contestant);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runData[1] = RunsFactory::createRunToProblem($problemData, $contestant);
 
         // Grade the run
@@ -984,7 +984,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ?Users $contestDirector = null,
         ?Users $contestAdmin = null
     ) {
-        $originalTime = Time::get();
+        $originalTime = \OmegaUp\Time::get();
         try {
             $problemData = ProblemsFactory::createProblem(new ProblemParams([
                 'author' => $problemAuthor,
@@ -992,7 +992,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             $problem = $problemData['problem'];
             $contestant = UserFactory::createUser();
 
-            Time::setTimeForTesting($originalTime - 30 * 60);
+            \OmegaUp\Time::setTimeForTesting($originalTime - 30 * 60);
 
             // Create a standalone run.
             $pastStandaloneRunData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -1026,7 +1026,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             $presentRunData = RunsFactory::createRun($problemData, $presentContestData, $contestant);
             RunsFactory::gradeRun($presentRunData);
 
-            Time::setTimeForTesting($originalTime + 5 * 60);
+            \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
 
             $login = self::login($problemData['author']);
             // Change the problem to something completely different.
@@ -1063,7 +1063,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'presentContestData' => $presentContestData,
             ];
         } finally {
-            Time::setTimeForTesting($originalTime);
+            \OmegaUp\Time::setTimeForTesting($originalTime);
         }
     }
 

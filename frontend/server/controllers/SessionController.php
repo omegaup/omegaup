@@ -69,7 +69,7 @@ class SessionController extends Controller {
             return [
                 'status' => 'ok',
                 'session' => self::$current_session,
-                'time' => Time::get(),
+                'time' => \OmegaUp\Time::get(),
             ];
         }
         if (is_null($r)) {
@@ -97,7 +97,7 @@ class SessionController extends Controller {
         return [
             'status' => 'ok',
             'session' => self::$current_session,
-            'time' => Time::get(),
+            'time' => \OmegaUp\Time::get(),
         ];
     }
 

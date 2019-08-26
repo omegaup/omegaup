@@ -110,9 +110,9 @@ class SchoolController extends Controller {
             'offset' => $r['offset'] ?: 0,
             'rowcount' => $r['rowcount'] ?: 100,
             'start_time' => $r['start_time'] ?:
-                            strtotime('first day of this month', Time::get()),
+                            strtotime('first day of this month', \OmegaUp\Time::get()),
             'finish_time' => $r['finish_time'] ?:
-                             strtotime('first day of next month', Time::get()),
+                             strtotime('first day of next month', \OmegaUp\Time::get()),
             'can_use_cache' => is_null($r['start_time']) && is_null($r['finish_time'])
         ];
     }
@@ -197,8 +197,8 @@ class SchoolController extends Controller {
                 'rank' => self::getSchoolsRank(
                     /*$offset=*/0,
                     $rowCount,
-                    /*$startTime=*/strtotime('first day of this month', Time::get()),
-                    /*$finishTime=*/strtotime('first day of next month', Time::get()),
+                    /*$startTime=*/strtotime('first day of this month', \OmegaUp\Time::get()),
+                    /*$finishTime=*/strtotime('first day of next month', \OmegaUp\Time::get()),
                     /*$canUseCache=*/true
                 ),
             ]

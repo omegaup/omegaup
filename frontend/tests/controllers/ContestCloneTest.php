@@ -27,7 +27,7 @@ class ContestCloneTest extends OmegaupTestCase {
             'description' => Utils::CreateRandomString(),
             'alias' => $contestAlias,
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
 
         $this->assertEquals($contestAlias, $contestClonedData['alias']);
@@ -76,7 +76,7 @@ class ContestCloneTest extends OmegaupTestCase {
             'description' => Utils::CreateRandomString(),
             'alias' => $contestData['request']['alias'],
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
     }
 
@@ -110,7 +110,7 @@ class ContestCloneTest extends OmegaupTestCase {
             'description' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
     }
 }

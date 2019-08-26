@@ -53,7 +53,7 @@ class PrivacyStatementConsentLog extends VO {
              */
             $this->timestamp = DAO::fromMySQLTimestamp($data['timestamp']);
         } else {
-            $this->timestamp = Time::get();
+            $this->timestamp = \OmegaUp\Time::get();
         }
     }
 

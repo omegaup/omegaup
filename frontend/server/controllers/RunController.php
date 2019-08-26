@@ -106,7 +106,7 @@ class RunController extends Controller {
             // in this scenario.
             if (ProblemsDAO::isVisible($r['problem']) ||
                   Authorization::isProblemAdmin($r->identity, $r['problem']) ||
-                  Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
+                  \OmegaUp\Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                 if (!RunsDAO::isRunInsideSubmissionGap(
                     null,
                     null,
@@ -266,7 +266,7 @@ class RunController extends Controller {
 
             if (!is_null($start)) {
                 //asuming submit_delay is in minutes
-                $submitDelay = (int) ((Time::get() - $start) / 60);
+                $submitDelay = (int) ((\OmegaUp\Time::get() - $start) / 60);
             } else {
                 $submitDelay = 0;
             }
@@ -285,7 +285,7 @@ class RunController extends Controller {
             'problemset_id' => $problemsetId,
             'guid' => md5(uniqid(rand(), true)),
             'language' => $r['language'],
-            'time' => Time::get(),
+            'time' => \OmegaUp\Time::get(),
             'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
@@ -294,7 +294,7 @@ class RunController extends Controller {
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
-            'time' => Time::get(),
+            'time' => \OmegaUp\Time::get(),
             'memory' => 0,
             'score' => 0,
             'contest_score' => $problemsetId != null ? 0 : null,

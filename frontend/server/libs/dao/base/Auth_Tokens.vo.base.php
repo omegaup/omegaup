@@ -53,7 +53,7 @@ class AuthTokens extends VO {
              */
             $this->create_time = DAO::fromMySQLTimestamp($data['create_time']);
         } else {
-            $this->create_time = Time::get();
+            $this->create_time = \OmegaUp\Time::get();
         }
     }
 

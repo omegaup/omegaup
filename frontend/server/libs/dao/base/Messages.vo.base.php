@@ -61,7 +61,7 @@ class Messages extends VO {
              */
             $this->date = DAO::fromMySQLTimestamp($data['date']);
         } else {
-            $this->date = Time::get();
+            $this->date = \OmegaUp\Time::get();
         }
     }
 

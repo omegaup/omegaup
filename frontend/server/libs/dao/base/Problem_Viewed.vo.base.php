@@ -49,7 +49,7 @@ class ProblemViewed extends VO {
              */
             $this->view_time = DAO::fromMySQLTimestamp($data['view_time']);
         } else {
-            $this->view_time = Time::get();
+            $this->view_time = \OmegaUp\Time::get();
         }
     }
 

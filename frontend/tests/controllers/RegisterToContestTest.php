@@ -19,7 +19,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
-            'start_time' => Time::get() + 60 * 60,
+            'start_time' => \OmegaUp\Time::get() + 60 * 60,
         ]);
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);
@@ -48,7 +48,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         $request = new Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
-            'start_time' => Time::get() - 1,
+            'start_time' => \OmegaUp\Time::get() - 1,
         ]);
         $request['finish_time'] = $request['start_time'] + 60;
         ContestController::apiUpdate($request);

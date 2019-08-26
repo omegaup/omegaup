@@ -82,7 +82,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertNotNull($problemOpened);
 
         // Verify open time
-        $this->assertEquals(Time::get(), $problemOpened->open_time);
+        $this->assertEquals(\OmegaUp\Time::get(), $problemOpened->open_time);
     }
 
     /**

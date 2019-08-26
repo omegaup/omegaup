@@ -201,7 +201,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'title' => Utils::CreateRandomString(),
                 'description' => Utils::CreateRandomString(),
                 'alias' => Utils::CreateRandomString(),
-                'start_time' => Time::get(),
+                'start_time' => \OmegaUp\Time::get(),
             ]));
             $this->fail("{$identityStatus} identity can not clone contests");
         } catch (ForbiddenAccessException $e) {
@@ -232,7 +232,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'name' => Utils::CreateRandomString(),
                 'alias' => Utils::CreateRandomString(),
-                'start_time' => Time::get()
+                'start_time' => \OmegaUp\Time::get()
             ]));
             $this->fail("{$identityStatus} identity can not clone courses");
         } catch (ForbiddenAccessException $e) {
@@ -245,8 +245,8 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'name' => Utils::CreateRandomString(),
                 'alias' => Utils::CreateRandomString(),
                 'description' => Utils::CreateRandomString(),
-                'start_time' => (Time::get() + 60),
-                'finish_time' => (Time::get() + 120)
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120)
             ]));
             $this->fail("{$identityStatus} identity can not create courses");
         } catch (ForbiddenAccessException $e) {

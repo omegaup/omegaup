@@ -139,7 +139,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Validate next submission timestamp
         $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
-        $this->assertEquals(Time::get() + $submission_gap, $response['nextSubmissionTimestamp']);
+        $this->assertEquals(\OmegaUp\Time::get() + $submission_gap, $response['nextSubmissionTimestamp']);
 
         $log = SubmissionLogDAO::getByPK($submission->submission_id);
 
@@ -148,7 +148,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         if (!is_null($contest)) {
             $this->assertEquals(
-                (Time::get() - $contest->start_time) / 60,
+                (\OmegaUp\Time::get() - $contest->start_time) / 60,
                 $run->penalty,
                 '',
                 0.5
@@ -179,14 +179,14 @@ class RunCreateTest extends OmegaupTestCase {
      * Cannot submit run when contest ended
      */
     public function testRunWhenContestExpired() {
-        $startTime = Time::get() - 60 * 60;
+        $startTime = \OmegaUp\Time::get() - 60 * 60;
         $r = $this->setValidRequest(new ContestParams([
             'start_time' => $startTime,
             'finish_time' => $startTime + 2 * 60 * 60
         ]));
 
         // Now is one second after contest finishes
-        Time::setTimeForTesting($startTime + (2 * 60 * 60) + 1);
+        \OmegaUp\Time::setTimeForTesting($startTime + (2 * 60 * 60) + 1);
 
         try {
             // Call API
@@ -239,14 +239,14 @@ class RunCreateTest extends OmegaupTestCase {
      * Cannot submit run when contest not started yet
      */
     public function testRunWhenContestNotStarted() {
-        $startTime = Time::get();
+        $startTime = \OmegaUp\Time::get();
         $r = $this->setValidRequest(new ContestParams([
             'start_time' => $startTime,
             'finish_time' => $startTime + 2 * 60 * 60
         ]));
 
         // get back in time ten minutes before Contest starts
-        Time::setTimeForTesting($startTime - (10 * 60));
+        \OmegaUp\Time::setTimeForTesting($startTime - (10 * 60));
 
         try {
             // Call API
@@ -392,7 +392,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Alter time for testing such that contestant started
         // 21 minutes ago, this is, window length has expired by 1 minute
-        Time::setTimeForTesting(Time::get() + (21 * 60));
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + (21 * 60));
 
         try {
             // Call API
@@ -417,7 +417,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Manually set the contest start 10 mins in the future
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
-        $contest->start_time = Utils::GetTimeFromUnixTimestamp(Time::get() + 10);
+        $contest->start_time = Utils::GetTimeFromUnixTimestamp(\OmegaUp\Time::get() + 10);
         ContestsDAO::update($contest);
 
         // Call API
@@ -432,14 +432,14 @@ class RunCreateTest extends OmegaupTestCase {
      * @expectedException NotAllowedToSubmitException
      */
     public function testRunWhenContestEndedForContestDirector() {
-        $startTime = Time::get() - 60 * 60;
+        $startTime = \OmegaUp\Time::get() - 60 * 60;
         $r = $this->setValidRequest(new ContestParams([
             'start_time' => $startTime,
             'finish_time' => $startTime + 2 * 60 * 60
         ]));
 
         // Now is one second after contest finishes
-        Time::setTimeForTesting($startTime + (2 * 60 * 60) + 1);
+        \OmegaUp\Time::setTimeForTesting($startTime + (2 * 60 * 60) + 1);
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -741,11 +741,11 @@ class RunCreateTest extends OmegaupTestCase {
             'alias' => $this->courseData['request']['course']->alias,
             'course_alias' => $this->courseData['request']['course']->alias,
             'description' => $this->courseData['request']['course']->description,
-            'start_time' => Time::get() - 10,
-            'finish_time' => Time::get() - 1,
+            'start_time' => \OmegaUp\Time::get() - 10,
+            'finish_time' => \OmegaUp\Time::get() - 1,
         ]));
         // Creating a submission in the future
-        Time::setTimeForTesting(Time::get() + 60 * 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60 * 60);
 
         $login = self::login($this->student);
         $r['auth_token'] = $login->auth_token;

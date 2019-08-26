@@ -70,7 +70,7 @@ class ClarificationController extends Controller {
             'problemset_id' => $r['contest']->problemset_id,
             'problem_id' => $r['problem']->problem_id,
             'message' => $r['message'],
-            'time' => Time::get(),
+            'time' => \OmegaUp\Time::get(),
             'public' => $receiverId == $r->identity->identity_id ? '1' : '0',
         ]);
 
@@ -183,7 +183,7 @@ class ClarificationController extends Controller {
         $r['clarification'] = $clarification;
 
         // Save the clarification
-        $clarification->time = Time::get();
+        $clarification->time = \OmegaUp\Time::get();
         ClarificationsDAO::update($clarification);
 
         $r['problem'] = $r['contest'] = $r['user'] = null;
