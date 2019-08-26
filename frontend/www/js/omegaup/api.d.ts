@@ -60,7 +60,6 @@ declare namespace omegaup {
     version: string;
   }
 
-
   export interface Contest {
     alias: string;
     title: string;
@@ -68,10 +67,44 @@ declare namespace omegaup {
     start_time?: Date;
     finish_time?: Date;
     admission_mode?: string;
+    contestant_must_register?: boolean;
+    admin?: boolean;
+    available_languages?: omegaup.Languages;
+    description?: string;
+    director?: string;
+    feedback?: string;
+    languages?: Array<string>;
+    needs_basic_information?: boolean;
+    opened?: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: string;
+    partial_score?: boolean;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problems?: omegaup.Problem[];
+    problemset_id?: number;
+    requests_user_information?: string;
+    rerun_id?: number;
+    scoreboard?: number;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
+    show_penalty?: boolean;
+    show_scoreboard_after?: boolean;
+    submission_deadline?: Date;
+    submissions_gap?: number;
   }
 
   interface ContestAdmin {
     username: string;
+    role: string;
+  }
+
+  export interface ContestGroupAdmin {
+    role: string;
+    name: string;
+    alias: string;
   }
 
   interface ContestResult {
@@ -140,6 +173,8 @@ declare namespace omegaup {
   export interface IdentityContest {
     username: string;
     end_time: Date;
+    access_time?: Date;
+    country_id?: string;
   }
 
   export interface IdentityContestRequest {
@@ -149,7 +184,10 @@ declare namespace omegaup {
     last_update: Date;
     accepted: boolean;
     admin?: ContestAdmin;
+  }
 
+  interface Languages {
+    [language: string]: string;
   }
 
   interface Meta {

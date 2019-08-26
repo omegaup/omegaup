@@ -22,6 +22,6 @@ class NotificationsDAO extends NotificationsDAOBase {
                 ORDER BY
                     n.timestamp ASC;';
         $args = [$user->user_id];
-        return MySQLConnection::getInstance()->GetAll($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 }

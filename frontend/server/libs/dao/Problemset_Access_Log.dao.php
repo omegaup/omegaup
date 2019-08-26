@@ -41,7 +41,7 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                 ORDER BY `time`;';
         $val = [$problemset_id];
 
-        return MySQLConnection::getInstance()->GetAll($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     final public static function GetAccessForCourse($course_id) {
@@ -63,7 +63,7 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        return MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
     }
 
     final public static function getByProblemsetIdentityId($problemsetId, $identityId) {
@@ -76,7 +76,7 @@ class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
                 AND
                     identity_id = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problemsetId, $identityId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId, $identityId]);
 
         $problemsetAccessLog = [];
         foreach ($rs as $row) {

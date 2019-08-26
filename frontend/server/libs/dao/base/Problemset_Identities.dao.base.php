@@ -49,8 +49,8 @@ abstract class ProblemsetIdentitiesDAOBase {
             !is_null($Problemset_Identities->privacystatement_consent_id) ? intval($Problemset_Identities->privacystatement_consent_id) : null,
             intval($Problemset_Identities->is_invited),
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -73,8 +73,8 @@ abstract class ProblemsetIdentitiesDAOBase {
             is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
             is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -88,7 +88,7 @@ abstract class ProblemsetIdentitiesDAOBase {
     final public static function getByPK(?int $identity_id, ?int $problemset_id) : ?ProblemsetIdentities {
         $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`end_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` FROM Problemset_Identities WHERE (identity_id = ? AND problemset_id = ?) LIMIT 1;';
         $params = [$identity_id, $problemset_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -115,8 +115,8 @@ abstract class ProblemsetIdentitiesDAOBase {
         $sql = 'DELETE FROM `Problemset_Identities` WHERE identity_id = ? AND problemset_id = ?;';
         $params = [$Problemset_Identities->identity_id, $Problemset_Identities->problemset_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -148,13 +148,13 @@ abstract class ProblemsetIdentitiesDAOBase {
     ) : array {
         $sql = 'SELECT `Problemset_Identities`.`identity_id`, `Problemset_Identities`.`problemset_id`, `Problemset_Identities`.`access_time`, `Problemset_Identities`.`end_time`, `Problemset_Identities`.`score`, `Problemset_Identities`.`time`, `Problemset_Identities`.`share_user_information`, `Problemset_Identities`.`privacystatement_consent_id`, `Problemset_Identities`.`is_invited` from Problemset_Identities';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemsetIdentities($row);
         }
         return $allData;
@@ -183,8 +183,8 @@ abstract class ProblemsetIdentitiesDAOBase {
             is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
             (int)$Problemset_Identities->is_invited,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

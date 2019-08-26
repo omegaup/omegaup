@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
-
 class Broadcaster {
     // Logging.
     private $log = null;
@@ -60,12 +58,12 @@ class Broadcaster {
                     ('https://omegaup.com/arena/' . $r['contest']->alias . '#clarifications'),
                 'user_name' => $r['user']->username
             ];
-            $subject = ApiUtils::FormatString(
-                Translations::getInstance()->get('clarificationEmailSubject'),
+            $subject = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get('clarificationEmailSubject'),
                 $email_params
             );
-            $body = ApiUtils::FormatString(
-                Translations::getInstance()->get('clarificationEmailBody'),
+            $body = \OmegaUp\ApiUtils::formatString(
+                \OmegaUp\Translations::getInstance()->get('clarificationEmailBody'),
                 $email_params
             );
 

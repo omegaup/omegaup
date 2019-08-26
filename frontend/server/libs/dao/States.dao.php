@@ -26,7 +26,7 @@ class StatesDAO extends StatesDAOBase {
                 WHERE
                     country_id = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$countryId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$countryId]);
 
         $states = [];
         foreach ($rs as $row) {

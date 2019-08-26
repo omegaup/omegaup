@@ -32,7 +32,7 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
             WHERE
                 r.problemset_id = ?;';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
 
     public static function getRequestsForProblemset(int $problemsetId) : array {
@@ -65,7 +65,7 @@ class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
                 i.identity_id;';
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]) as $row) {
             $row['accepted'] = $row['accepted'] == '1';
             $result[] = $row;
         }

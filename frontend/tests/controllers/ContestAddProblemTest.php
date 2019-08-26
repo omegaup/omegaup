@@ -174,7 +174,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
                 'order_in_contest' => MAX_PROBLEMS_IN_CONTEST + 1,
             ]));
             $this->fail('Should have failed adding the problem to the contest');
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             $this->assertEquals($e->getMessage(), 'contestAddproblemTooManyProblems');
         }
     }

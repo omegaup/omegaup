@@ -53,8 +53,8 @@ abstract class ContestsDAOBase {
             (int)$Contests->recommended,
             (int)$Contests->contest_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -68,7 +68,7 @@ abstract class ContestsDAOBase {
     final public static function getByPK(int $contest_id) : ?Contests {
         $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` FROM Contests WHERE (contest_id = ?) LIMIT 1;';
         $params = [$contest_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -95,8 +95,8 @@ abstract class ContestsDAOBase {
         $sql = 'DELETE FROM `Contests` WHERE contest_id = ?;';
         $params = [$Contests->contest_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -128,13 +128,13 @@ abstract class ContestsDAOBase {
     ) : array {
         $sql = 'SELECT `Contests`.`contest_id`, `Contests`.`problemset_id`, `Contests`.`acl_id`, `Contests`.`title`, `Contests`.`description`, `Contests`.`start_time`, `Contests`.`finish_time`, `Contests`.`last_updated`, `Contests`.`window_length`, `Contests`.`rerun_id`, `Contests`.`admission_mode`, `Contests`.`alias`, `Contests`.`scoreboard`, `Contests`.`points_decay_factor`, `Contests`.`partial_score`, `Contests`.`submissions_gap`, `Contests`.`feedback`, `Contests`.`penalty`, `Contests`.`penalty_type`, `Contests`.`penalty_calc_policy`, `Contests`.`show_scoreboard_after`, `Contests`.`urgent`, `Contests`.`languages`, `Contests`.`recommended` from Contests';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new Contests($row);
         }
         return $allData;
@@ -177,12 +177,12 @@ abstract class ContestsDAOBase {
             $Contests->languages,
             (int)$Contests->recommended,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Contests->contest_id = MySQLConnection::getInstance()->Insert_ID();
+        $Contests->contest_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

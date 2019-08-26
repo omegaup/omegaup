@@ -32,8 +32,8 @@ abstract class LanguagesDAOBase {
             $Languages->country_id,
             (int)$Languages->language_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class LanguagesDAOBase {
     final public static function getByPK(int $language_id) : ?Languages {
         $sql = 'SELECT `Languages`.`language_id`, `Languages`.`name`, `Languages`.`country_id` FROM Languages WHERE (language_id = ?) LIMIT 1;';
         $params = [$language_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -74,8 +74,8 @@ abstract class LanguagesDAOBase {
         $sql = 'DELETE FROM `Languages` WHERE language_id = ?;';
         $params = [$Languages->language_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -107,13 +107,13 @@ abstract class LanguagesDAOBase {
     ) : array {
         $sql = 'SELECT `Languages`.`language_id`, `Languages`.`name`, `Languages`.`country_id` from Languages';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new Languages($row);
         }
         return $allData;
@@ -135,12 +135,12 @@ abstract class LanguagesDAOBase {
             $Languages->name,
             $Languages->country_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Languages->language_id = MySQLConnection::getInstance()->Insert_ID();
+        $Languages->language_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

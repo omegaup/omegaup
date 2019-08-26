@@ -49,7 +49,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         // Mock time
         $currentTime = time();
         Time::setTimeForTesting($currentTime);
-        MySQLConnection::getInstance()->Execute("SET TIMESTAMP = {$currentTime};");
+        \OmegaUp\MySQLConnection::getInstance()->Execute("SET TIMESTAMP = {$currentTime};");
 
         //Clean $_REQUEST before each test
         unset($_REQUEST);
@@ -445,7 +445,7 @@ class NoOpGrader extends Grader {
             WHERE
                 s.submission_id = ?;
         ';
-        $guid = MySQLConnection::getInstance()->GetOne($sql, [$run->submission_id]);
+        $guid = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$run->submission_id]);
         $this->_submissions[$guid] = $source;
         array_push($this->_runs, $run);
     }

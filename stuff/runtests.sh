@@ -32,4 +32,6 @@ fi
 	--configuration frontend/tests/phpunit.xml \
 	$FILTER_ARG $OMEGAUP_ROOT/frontend/tests/badges
 
+find $OMEGAUP_ROOT/frontend/server/src/ -type d | xargs ./vendor/bin/psalm
+
 /usr/bin/python3 -m pytest $OMEGAUP_ROOT/frontend/tests/ui/ -s

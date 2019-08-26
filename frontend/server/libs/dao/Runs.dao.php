@@ -67,7 +67,7 @@ class RunsDAO extends RunsDAOBase {
                 Runs r ON r.run_id = s.current_run_id;';
         $val = [$problemId, $problemId];
 
-        return MySQLConnection::getInstance()->GetAll($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
@@ -91,7 +91,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problemsetId];
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -166,7 +166,7 @@ class RunsDAO extends RunsDAOBase {
             $val[] = (int) $rowcount;
         }
 
-        return MySQLConnection::getInstance()->GetAll($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /*
@@ -189,7 +189,7 @@ class RunsDAO extends RunsDAOBase {
         $val = [$problemId];
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -216,7 +216,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$problemsetId, $verdict];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -240,7 +240,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$problemId, $verdict];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -269,7 +269,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$identityId];
 
-        return MySQLConnection::getInstance()->GetAll($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
@@ -295,7 +295,7 @@ class RunsDAO extends RunsDAOBase {
         ';
         $val = [$problemsetId];
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, $val);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $val);
         if (empty($row)) {
             return null;
         }
@@ -388,7 +388,7 @@ class RunsDAO extends RunsDAOBase {
             $sql .= ';';
         }
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $val);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         $ar = [];
         foreach ($rs as $row) {
@@ -429,7 +429,7 @@ class RunsDAO extends RunsDAOBase {
             ' ORDER BY s.submission_id;';
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$problemset->problemset_id]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset->problemset_id]) as $row) {
             array_push($result, $row);
         }
         return $result;
@@ -460,7 +460,7 @@ class RunsDAO extends RunsDAOBase {
             LIMIT 1;
         ';
         $val = [$identityId, $problemsetId, $problemId];
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -487,7 +487,7 @@ class RunsDAO extends RunsDAOBase {
             LIMIT 1;
         ';
         $val = [$identityId, $problemId];
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     final public static function getByProblemset(int $problemsetId) : array {
@@ -519,7 +519,7 @@ class RunsDAO extends RunsDAOBase {
                 s.`time` DESC;
         ';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
 
     final public static function getByProblem(
@@ -538,7 +538,7 @@ class RunsDAO extends RunsDAOBase {
                 s.problem_id = ?;
         ';
         $params = [$problemId];
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         $runs = [];
         foreach ($rs as $row) {
             array_push($runs, new Runs($row));
@@ -570,7 +570,7 @@ class RunsDAO extends RunsDAOBase {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        return MySQLConnection::getInstance()->GetAll($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function isRunInsideSubmissionGap(
@@ -631,7 +631,7 @@ class RunsDAO extends RunsDAOBase {
         ';
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$problemId, $submissionId]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemId, $submissionId]) as $row) {
             array_push($result, new Runs($row));
         }
         return $result;
@@ -660,8 +660,8 @@ class RunsDAO extends RunsDAOBase {
             $problem_id
         ];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -734,8 +734,8 @@ class RunsDAO extends RunsDAOBase {
             return 0;
         }
         $params = [$contest->problemset_id];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -761,7 +761,7 @@ class RunsDAO extends RunsDAOBase {
             ORDER BY
                 s.submission_id;
         ';
-        MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 
     /**
@@ -785,7 +785,7 @@ class RunsDAO extends RunsDAOBase {
                 r.version = ? AND
                 s.problem_id = ?;
         ';
-        MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 
     /**
@@ -811,7 +811,7 @@ class RunsDAO extends RunsDAOBase {
         $params = [$problem->current_version, $problem->problem_id];
 
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $row) {
             $result[] = new Runs($row);
         }
         return $result;
@@ -879,7 +879,7 @@ class RunsDAO extends RunsDAOBase {
             LIMIT 0, 1000;
         ';
 
-        $result = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         foreach ($result as &$row) {
             $row['old_score'] = floatval($row['old_score']);
             $row['new_score'] = floatval($row['new_score']);

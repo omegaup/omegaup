@@ -21,7 +21,7 @@ class TagsDAO extends TagsDAOBase {
     final public static function getByName(string $name) : ?Tags {
         $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }
@@ -32,7 +32,7 @@ class TagsDAO extends TagsDAOBase {
         $sql = "SELECT * FROM Tags WHERE name LIKE CONCAT('%', ?, '%') LIMIT 100";
         $args = [$name];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $row) {
             array_push($result, new Tags($row));

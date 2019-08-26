@@ -21,7 +21,7 @@ class BadgesTestCase extends OmegaupTestCase {
     }
 
     public static function getSortedResults(string $query) {
-        $rs = MySQLConnection::getInstance()->GetAll($query);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($query);
         $results = [];
         foreach ($rs as $user) {
             $results[] = $user['user_id'];

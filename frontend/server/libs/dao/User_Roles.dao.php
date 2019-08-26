@@ -34,7 +34,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             $acl_id,
         ];
 
-        $admins = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $sql = '
             SELECT
@@ -46,7 +46,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             WHERE
                 a.acl_id = ?;';
         $params = [$acl_id];
-        $owner = MySQLConnection::getInstance()->GetOne($sql, $params);
+        $owner = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
 
         $found = false;
         for ($i = 0; $i < count($admins); $i++) {
@@ -86,7 +86,7 @@ class UserRolesDAO extends UserRolesDAOBase {
             Authorization::SYSTEM_ACL,
             $acl_id,
         ];
-        return MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
     }
 
     public static function getContestAdmins(Contests $contest) {
@@ -117,7 +117,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         ];
 
         $roles = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
             $roles[] = $role['name'];
         }
         return $roles;
@@ -138,7 +138,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         ];
 
         $groups = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $group) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $group) {
             $groups[] = $group['name'];
         }
 

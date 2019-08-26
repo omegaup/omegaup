@@ -143,7 +143,11 @@ class SecurityTools {
      * @return string The Bearer authorization token.
      */
     public static function getGitserverAuthorizationToken(string $problem, string $username) : string {
-        require_once 'libs/third_party/sodium_compat/autoload-fast.php';
+        // Given that we already have an autoload configured, we cannot use
+        // sodium_compat's (fast) autoloader. Instead, simulate what it does
+        // here, with the full path of the standard autoload file.
+        require_once 'libs/third_party/sodium_compat/autoload.php';
+        ParagonIE_Sodium_Compat::$fastMult = true;
 
         require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
         require_once 'libs/third_party/constant_time_encoding/src/Base64.php';

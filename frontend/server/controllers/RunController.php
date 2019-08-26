@@ -32,7 +32,7 @@ class RunController extends Controller {
      * Validates Create Run request
      *
      * @param Request $r
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotAllowedToSubmitException
      * @throws InvalidParameterException
      * @throws ForbiddenAccessException

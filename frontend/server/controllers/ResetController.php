@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Translations.php';
-
 class ResetController extends Controller {
     /**
      * Creates a reset operation, the first of two steps needed to reset a
@@ -14,9 +12,9 @@ class ResetController extends Controller {
     public static function apiCreate(Request $r) {
         self::validateCreateRequest($r);
         $email = $r['email'];
-        $token = ApiUtils::GetRandomString();
+        $token = \OmegaUp\ApiUtils::getRandomString();
         $reset_digest = hash('sha1', $token);
-        $reset_sent_at = ApiUtils::GetStringTime();
+        $reset_sent_at = \OmegaUp\ApiUtils::getStringTime();
 
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
@@ -27,10 +25,10 @@ class ResetController extends Controller {
             return ['status' => 'ok', 'token' => $token];
         }
 
-        $subject = Translations::getInstance()->get('wordsReset');
+        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset');
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-        $message = Translations::getInstance()->get('wordsResetMessage');
+        $message = \OmegaUp\Translations::getInstance()->get('wordsResetMessage');
         $body = str_replace('[link]', $link, $message);
 
         try {
@@ -45,7 +43,7 @@ class ResetController extends Controller {
 
         return [
             'status' => 'ok',
-            'message' => Translations::getInstance()->get('passwordResetRequestSuccess')
+            'message' => \OmegaUp\Translations::getInstance()->get('passwordResetRequestSuccess')
         ];
     }
 
@@ -77,9 +75,9 @@ class ResetController extends Controller {
             throw new InvalidParameterException('userDoesNotHaveAnyPasswordChangeRequest');
         }
 
-        $token = ApiUtils::GetRandomString();
+        $token = \OmegaUp\ApiUtils::getRandomString();
         $reset_digest = hash('sha1', $token);
-        $reset_sent_at = ApiUtils::GetStringTime();
+        $reset_sent_at = \OmegaUp\ApiUtils::getStringTime();
 
         $user = UsersDAO::FindByEmail($email);
         $user->reset_digest = $reset_digest;
@@ -127,7 +125,7 @@ class ResetController extends Controller {
 
         return [
             'status' => 'ok',
-            'message' =>  IS_TEST ? 'message' : Translations::getInstance()->get('passwordResetResetSuccess')
+            'message' =>  IS_TEST ? 'message' : \OmegaUp\Translations::getInstance()->get('passwordResetResetSuccess')
         ];
     }
 

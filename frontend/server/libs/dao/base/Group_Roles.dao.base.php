@@ -29,7 +29,7 @@ abstract class GroupRolesDAOBase {
     final public static function getByPK(?int $group_id, ?int $role_id, ?int $acl_id) : ?GroupRoles {
         $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` FROM Group_Roles WHERE (group_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
         $params = [$group_id, $role_id, $acl_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -56,8 +56,8 @@ abstract class GroupRolesDAOBase {
         $sql = 'DELETE FROM `Group_Roles` WHERE group_id = ? AND role_id = ? AND acl_id = ?;';
         $params = [$Group_Roles->group_id, $Group_Roles->role_id, $Group_Roles->acl_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -89,13 +89,13 @@ abstract class GroupRolesDAOBase {
     ) : array {
         $sql = 'SELECT `Group_Roles`.`group_id`, `Group_Roles`.`role_id`, `Group_Roles`.`acl_id` from Group_Roles';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new GroupRoles($row);
         }
         return $allData;
@@ -118,8 +118,8 @@ abstract class GroupRolesDAOBase {
             is_null($Group_Roles->role_id) ? null : (int)$Group_Roles->role_id,
             is_null($Group_Roles->acl_id) ? null : (int)$Group_Roles->acl_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

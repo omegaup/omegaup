@@ -41,8 +41,8 @@ abstract class RunsDAOBase {
             $Runs->judged_by,
             (int)$Runs->run_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -56,7 +56,7 @@ abstract class RunsDAOBase {
     final public static function getByPK(int $run_id) : ?Runs {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
         $params = [$run_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -83,8 +83,8 @@ abstract class RunsDAOBase {
         $sql = 'DELETE FROM `Runs` WHERE run_id = ?;';
         $params = [$Runs->run_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -116,13 +116,13 @@ abstract class RunsDAOBase {
     ) : array {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` from Runs';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new Runs($row);
         }
         return $allData;
@@ -153,12 +153,12 @@ abstract class RunsDAOBase {
             DAO::toMySQLTimestamp($Runs->time),
             $Runs->judged_by,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Runs->run_id = MySQLConnection::getInstance()->Insert_ID();
+        $Runs->run_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

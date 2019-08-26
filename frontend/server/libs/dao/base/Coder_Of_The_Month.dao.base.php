@@ -36,8 +36,8 @@ abstract class CoderOfTheMonthDAOBase {
             is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
             (int)$Coder_Of_The_Month->coder_of_the_month_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -51,7 +51,7 @@ abstract class CoderOfTheMonthDAOBase {
     final public static function getByPK(int $coder_of_the_month_id) : ?CoderOfTheMonth {
         $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` FROM Coder_Of_The_Month WHERE (coder_of_the_month_id = ?) LIMIT 1;';
         $params = [$coder_of_the_month_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -78,8 +78,8 @@ abstract class CoderOfTheMonthDAOBase {
         $sql = 'DELETE FROM `Coder_Of_The_Month` WHERE coder_of_the_month_id = ?;';
         $params = [$Coder_Of_The_Month->coder_of_the_month_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -111,13 +111,13 @@ abstract class CoderOfTheMonthDAOBase {
     ) : array {
         $sql = 'SELECT `Coder_Of_The_Month`.`coder_of_the_month_id`, `Coder_Of_The_Month`.`user_id`, `Coder_Of_The_Month`.`description`, `Coder_Of_The_Month`.`time`, `Coder_Of_The_Month`.`interview_url`, `Coder_Of_The_Month`.`rank`, `Coder_Of_The_Month`.`selected_by` from Coder_Of_The_Month';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new CoderOfTheMonth($row);
         }
         return $allData;
@@ -143,12 +143,12 @@ abstract class CoderOfTheMonthDAOBase {
             is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
             is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Coder_Of_The_Month->coder_of_the_month_id = MySQLConnection::getInstance()->Insert_ID();
+        $Coder_Of_The_Month->coder_of_the_month_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

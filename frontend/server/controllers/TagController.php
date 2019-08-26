@@ -1,13 +1,11 @@
 <?php
 
-require_once 'libs/ApiUtils.php';
-
 /**
  * TagController
  */
 class TagController extends Controller {
     public static function normalize($name) {
-        $name = ApiUtils::RemoveAccents(trim($name));
+        $name = \OmegaUp\ApiUtils::removeAccents(trim($name));
         $name = preg_replace('/[^a-z0-9]/', '-', strtolower($name));
         $name = preg_replace('/--+/', '-', $name);
 

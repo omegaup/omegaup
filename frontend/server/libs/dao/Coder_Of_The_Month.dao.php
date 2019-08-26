@@ -92,7 +92,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $val = [$startTime, $endTime, $endTime];
 
-        $results = MySQLConnection::getInstance()->getAll($sql, $val);
+        $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
         if (empty($results)) {
             return null;
         }
@@ -123,7 +123,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
         ';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = $row;
@@ -160,7 +160,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
           LIMIT 100
         ';
-        return MySQLConnection::getInstance()->getAll($sql, [$date]);
+        return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, [$date]);
     }
 
     /**
@@ -184,7 +184,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 1
         ';
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, []);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, []);
         if (empty($rs)) {
             return false;
         }
@@ -201,7 +201,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                     `time` = ?
                 AND
                     `selected_by` ' . $clause . ';';
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
@@ -218,7 +218,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {

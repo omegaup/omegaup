@@ -35,8 +35,8 @@ abstract class QualityNominationCommentsDAOBase {
             $QualityNomination_Comments->contents,
             (int)$QualityNomination_Comments->qualitynomination_comment_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -50,7 +50,7 @@ abstract class QualityNominationCommentsDAOBase {
     final public static function getByPK(int $qualitynomination_comment_id) : ?QualityNominationComments {
         $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` FROM QualityNomination_Comments WHERE (qualitynomination_comment_id = ?) LIMIT 1;';
         $params = [$qualitynomination_comment_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -77,8 +77,8 @@ abstract class QualityNominationCommentsDAOBase {
         $sql = 'DELETE FROM `QualityNomination_Comments` WHERE qualitynomination_comment_id = ?;';
         $params = [$QualityNomination_Comments->qualitynomination_comment_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -110,13 +110,13 @@ abstract class QualityNominationCommentsDAOBase {
     ) : array {
         $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` from QualityNomination_Comments';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new QualityNominationComments($row);
         }
         return $allData;
@@ -141,12 +141,12 @@ abstract class QualityNominationCommentsDAOBase {
             is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $QualityNomination_Comments->qualitynomination_comment_id = MySQLConnection::getInstance()->Insert_ID();
+        $QualityNomination_Comments->qualitynomination_comment_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

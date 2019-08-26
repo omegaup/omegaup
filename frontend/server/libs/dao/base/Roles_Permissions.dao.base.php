@@ -29,7 +29,7 @@ abstract class RolesPermissionsDAOBase {
     final public static function getByPK(?int $role_id, ?int $permission_id) : ?RolesPermissions {
         $sql = 'SELECT `Roles_Permissions`.`role_id`, `Roles_Permissions`.`permission_id` FROM Roles_Permissions WHERE (role_id = ? AND permission_id = ?) LIMIT 1;';
         $params = [$role_id, $permission_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -56,8 +56,8 @@ abstract class RolesPermissionsDAOBase {
         $sql = 'DELETE FROM `Roles_Permissions` WHERE role_id = ? AND permission_id = ?;';
         $params = [$Roles_Permissions->role_id, $Roles_Permissions->permission_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -89,13 +89,13 @@ abstract class RolesPermissionsDAOBase {
     ) : array {
         $sql = 'SELECT `Roles_Permissions`.`role_id`, `Roles_Permissions`.`permission_id` from Roles_Permissions';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new RolesPermissions($row);
         }
         return $allData;
@@ -117,8 +117,8 @@ abstract class RolesPermissionsDAOBase {
             is_null($Roles_Permissions->role_id) ? null : (int)$Roles_Permissions->role_id,
             is_null($Roles_Permissions->permission_id) ? null : (int)$Roles_Permissions->permission_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

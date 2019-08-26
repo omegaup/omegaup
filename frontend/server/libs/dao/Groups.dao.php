@@ -21,7 +21,7 @@ class GroupsDAO extends GroupsDAOBase {
     public static function findByAlias($alias) {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
@@ -32,7 +32,7 @@ class GroupsDAO extends GroupsDAOBase {
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $ar = [];
         foreach ($rs as $row) {
             array_push($ar, new Groups($row));
@@ -43,7 +43,7 @@ class GroupsDAO extends GroupsDAOBase {
     public static function getByName($name) {
         $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {
             return null;
         }
@@ -81,7 +81,7 @@ class GroupsDAO extends GroupsDAOBase {
             $identity_id,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $groups = [];
         foreach ($rs as $row) {
@@ -109,7 +109,7 @@ class GroupsDAO extends GroupsDAOBase {
                 0, ?;';
 
         $identities = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
             $identities[] = new Identities($row);
         }
         return $identities;
