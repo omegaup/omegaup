@@ -77,10 +77,13 @@ class Request extends ArrayObject {
      * Executes the user-provided function and returns its result.
      */
     public function execute() {
+        if (is_null($this->method)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
+        }
         $response = call_user_func($this->method, $this);
 
         if ($response === false) {
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         return $response;

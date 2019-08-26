@@ -170,11 +170,11 @@ class Experiments {
     /**
      * Ensures an experiment is enabled.
      * @param string name The name of the experiment.
-     * @throws NotFoundException if the experiment is not enabled.
+     * @throws \OmegaUp\Exceptions\NotFoundException if the experiment is not enabled.
      */
     public function ensureEnabled($name) {
         if (!$this->isEnabled($name)) {
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
     }
 

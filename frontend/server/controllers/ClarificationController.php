@@ -22,7 +22,7 @@ class ClarificationController extends Controller {
      * Validate the request of apiCreate
      *
      * @param Request $r
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCreate(Request $r) {
         Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -37,16 +37,16 @@ class ClarificationController extends Controller {
             IdentitiesDAO::findByUsername($r['username']) : null;
 
         if (is_null($r['contest'])) {
-            throw new NotFoundException('contestNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Is the combination problemset_id and problem_id valid?
         if (is_null(ProblemsetProblemsDAO::getByPK($r['contest']->problemset_id, $r['problem']->problem_id))) {
-            throw new NotFoundException('problemNotFoundInContest');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFoundInContest');
         }
     }
 
@@ -87,7 +87,7 @@ class ClarificationController extends Controller {
      * Validate Details API request
      *
      * @param Request $r
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateDetails(Request $r) {
@@ -96,7 +96,7 @@ class ClarificationController extends Controller {
         // Check that the clarification actually exists
         $r['clarification'] = ClarificationsDAO::getByPK($r['clarification_id']);
         if (is_null($r['clarification'])) {
-            throw new NotFoundException('clarificationNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
         }
 
         // If the clarification is private, verify that our user is invited or is contest director
@@ -148,7 +148,7 @@ class ClarificationController extends Controller {
         // Check that clarification exists
         $r['clarification'] = ClarificationsDAO::GetByPK($r['clarification_id']);
         if (is_null($r['clarification'])) {
-            throw new NotFoundException('clarificationNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
         }
 
         if (!Authorization::canEditClarification(

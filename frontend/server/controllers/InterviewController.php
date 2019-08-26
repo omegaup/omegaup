@@ -101,14 +101,14 @@ class InterviewController extends Controller {
         // Does the interview exist ?
         $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
         if (is_null($r['interview'])) {
-            throw new NotFoundException('interviewNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('interviewNotFound');
         }
 
         // Does the user exist ?
         try {
             $r['user'] = null;
             $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
-        } catch (NotFoundException $e) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             // this is fine, we'll create an account for this user
         }
 
@@ -152,7 +152,7 @@ class InterviewController extends Controller {
         }
 
         if (is_null($r['user'])) {
-            throw new NotFoundException('userOrMailNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
         }
 
         // Only director is allowed to add people to interview
@@ -172,7 +172,7 @@ class InterviewController extends Controller {
         ]));
         $email = EmailsDAO::getByPK($r['user']->main_email_id);
         if (is_null($email)) {
-            throw new NotFoundException('userOrMailNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
         }
 
         include_once 'libs/Email.php';

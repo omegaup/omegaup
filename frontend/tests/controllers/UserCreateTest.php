@@ -271,7 +271,7 @@ class CreateUserTest extends OmegaupTestCase {
      * Admin can verify users only with username
      * Testing invalid username
      *
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testUsernameVerificationByAdminInvalidUsername() {
         // Admin will verify $user

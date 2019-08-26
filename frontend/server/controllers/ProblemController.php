@@ -58,7 +58,7 @@ class ProblemController extends Controller {
      * Validates a Create or Update Problem API request
      *
      * @param Request $r
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCreateOrUpdate(Request $r, $is_update = false) {
         $is_required = true;
@@ -76,7 +76,7 @@ class ProblemController extends Controller {
 
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
-                throw new NotFoundException('Problem not found');
+                throw new \OmegaUp\Exceptions\NotFoundException('Problem not found');
             }
 
             // We need to check that the user can actually edit the problem
@@ -270,7 +270,7 @@ class ProblemController extends Controller {
      * Validates a Rejudge Problem API request
      *
      * @param Request $r
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateRejudge(Request $r) {
         // We need to check problem_alias
@@ -278,7 +278,7 @@ class ProblemController extends Controller {
 
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if ($r['problem']->deprecated) {
@@ -314,7 +314,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Only an admin can add other problem admins
@@ -353,7 +353,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Only an admin can add other problem group admins
@@ -383,7 +383,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
@@ -442,7 +442,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -452,7 +452,7 @@ class ProblemController extends Controller {
 
         // Check if admin to delete is actually an admin
         if (!Authorization::isProblemAdmin($identity, $problem)) {
-            throw new NotFoundException();
+            throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
         ACLController::removeUser($problem->acl_id, $identity->user_id);
@@ -482,7 +482,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -512,12 +512,12 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problem');
+            throw new \OmegaUp\Exceptions\NotFoundException('problem');
         }
 
         $tag = TagsDAO::getByName($r['name']);
         if (is_null($tag)) {
-            throw new NotFoundException('tag');
+            throw new \OmegaUp\Exceptions\NotFoundException('tag');
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
@@ -552,7 +552,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
@@ -582,7 +582,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::isProblemAdmin($r->identity, $problem)) {
@@ -610,7 +610,7 @@ class ProblemController extends Controller {
         $includeAutogenerated = ($r['include_autogenerated'] == 'true');
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $response = [];
@@ -977,7 +977,7 @@ class ProblemController extends Controller {
      * @param Request $r
      * @return Array
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateDetails(Request $r) {
@@ -1002,7 +1002,7 @@ class ProblemController extends Controller {
         }
 
         if (isset($r['statement_type']) && $r['statement_type'] != 'markdown') {
-            throw new NotFoundException('invalidStatementType');
+            throw new \OmegaUp\Exceptions\NotFoundException('invalidStatementType');
         }
 
         // If we request a problem inside a contest
@@ -1236,7 +1236,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateDownload(Request $r) {
@@ -1244,7 +1244,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
@@ -1262,7 +1262,7 @@ class ProblemController extends Controller {
      * @param $contestAlias
      * @return Array
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateProblemset(Problems $problem, $problemsetId, $contestAlias = null) {
         $problemNotFound = null;
@@ -1271,18 +1271,18 @@ class ProblemController extends Controller {
             // Is it a valid contest_alias?
             $response['contest'] = ContestsDAO::getByAlias($contestAlias);
             if (is_null($response['contest'])) {
-                throw new NotFoundException('contestNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
             $response['problemset'] = ProblemsetsDAO::getByPK($response['contest']->problemset_id);
             if (is_null($response['problemset'])) {
-                throw new NotFoundException('contestNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
             $problemNotFound = 'problemNotFoundInContest';
         } elseif (!is_null($problemsetId)) {
             // Is it a valid problemset_id?
             $response['problemset'] = ProblemsetsDAO::getByPK($problemsetId);
             if (is_null($response['problemset'])) {
-                throw new NotFoundException('problemsetNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
             }
             $problemNotFound = 'problemNotFoundInProblemset';
         } else {
@@ -1296,7 +1296,7 @@ class ProblemController extends Controller {
             $problem->problem_id
         ))
         ) {
-            throw new NotFoundException($problemNotFound);
+            throw new \OmegaUp\Exceptions\NotFoundException($problemNotFound);
         }
 
         return $response;
@@ -1588,7 +1588,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ForbiddenAccessException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiVersions(Request $r) {
         self::authenticateRequest($r);
@@ -1597,7 +1597,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!Authorization::canEditProblem($r->identity, $problem)) {
             throw new ForbiddenAccessException();
@@ -1635,7 +1635,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws ForbiddenAccessException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiSelectVersion(Request $r) {
         self::authenticateRequest($r);
@@ -1662,7 +1662,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!Authorization::canEditProblem($r->identity, $problem)) {
             throw new ForbiddenAccessException();
@@ -1765,7 +1765,7 @@ class ProblemController extends Controller {
 
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!Authorization::canEditProblem($r->identity, $problem)) {
             throw new ForbiddenAccessException();
@@ -1790,7 +1790,7 @@ class ProblemController extends Controller {
      *
      * @return the SHA1 of a commit in the problem's master branch, plus
      *         the SHA1 of the private branch tree associated with that commit.
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function resolveCommit(
         Problems $problem,
@@ -1814,7 +1814,7 @@ class ProblemController extends Controller {
         }
 
         if ($masterCommit == null) {
-            throw new NotFoundException('problemVersionNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemVersionNotFound');
         }
 
         // The private branch is always the last parent.
@@ -1831,7 +1831,7 @@ class ProblemController extends Controller {
      *
      * @param Request $r
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws NotFoundException
+     * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws ForbiddenAccessException
      */
     private static function validateRuns(Request $r) {
@@ -1840,7 +1840,7 @@ class ProblemController extends Controller {
         // Is the problem valid?
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
     }
 
@@ -1867,7 +1867,7 @@ class ProblemController extends Controller {
                 try {
                     $r['identity'] = IdentitiesDAO::findByUsername($r['username']);
                 } catch (Exception $e) {
-                    throw new NotFoundException('userNotFound');
+                    throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
                 }
             }
             $runs = RunsDAO::getAllRuns(
@@ -2457,7 +2457,7 @@ class ProblemController extends Controller {
             'problemset' => $problemset,
         ] = self::getValidProblemAndProblemset($r);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Get problem details from API

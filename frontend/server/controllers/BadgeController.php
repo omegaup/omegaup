@@ -55,7 +55,7 @@ class BadgeController extends Controller {
     public static function apiUserList(Request $r) {
         $user = UsersDAO::FindByUsername($r['target_username']);
         if (is_null($user)) {
-            throw new NotFoundException('userNotExist');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return [
             'status' => 'ok',

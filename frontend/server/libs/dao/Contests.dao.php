@@ -765,7 +765,7 @@ class ContestsDAO extends ContestsDAOBase {
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
-            throw new NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
         return [
             'needsBasicInformation' => $rs['needs_basic_information'] == '1',

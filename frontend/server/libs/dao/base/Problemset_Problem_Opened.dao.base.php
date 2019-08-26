@@ -35,7 +35,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
      */
     final public static function replace(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         if (empty($Problemset_Problem_Opened->problemset_id) || empty($Problemset_Problem_Opened->problem_id) || empty($Problemset_Problem_Opened->identity_id)) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
@@ -94,12 +94,12 @@ abstract class ProblemsetProblemOpenedDAOBase {
      * {@link replace()}, ya que este último creará un nuevo registro con una
      * llave primaria distinta a la que estaba en el objeto eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link NotFoundException}
+     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
      * será arrojada.
      *
      * @param ProblemsetProblemOpened $Problemset_Problem_Opened El objeto de tipo ProblemsetProblemOpened a eliminar
      *
-     * @throws NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(ProblemsetProblemOpened $Problemset_Problem_Opened) : void {
         $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND identity_id = ?;';
@@ -107,7 +107,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
     }
 

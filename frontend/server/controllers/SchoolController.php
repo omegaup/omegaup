@@ -25,7 +25,7 @@ class SchoolController extends Controller {
 
         $schools = SchoolsDAO::findByName($r[$param]);
         if (is_null($schools)) {
-            throw new NotFoundException('schoolNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
         $response = [];

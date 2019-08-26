@@ -756,7 +756,7 @@ class RunCreateTest extends OmegaupTestCase {
 
     /**
      * Should not allow sending to banned public problems.
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testShouldNotAllowToSendPubliclyBannedProblems() {
         $problemData = ProblemsFactory::createProblem();
@@ -782,7 +782,7 @@ class RunCreateTest extends OmegaupTestCase {
 
      /**
      * Should not allow sending to privately banned problems.
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testShouldNotAllowToSendPrivatelyBannedProblems() {
         $problemData = ProblemsFactory::createProblem();

@@ -51,7 +51,7 @@ class CourseStudentListTest extends OmegaupTestCase {
 
     /**
      * Course does not exists test
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testCourseStudentListInvalidCourse() {
         // Call apiStudentList by another random user

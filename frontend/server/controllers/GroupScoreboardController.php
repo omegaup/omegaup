@@ -155,7 +155,7 @@ class GroupScoreboardController extends Controller {
         foreach ($gscs as $gsc) {
             $contest = ContestsDAO::getByProblemset($gsc->problemset_id);
             if (empty($contest)) {
-                throw new NotFoundException('contestNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
             $response['contests'][$i] = $contest->asArray();
             $response['contests'][$i]['only_ac'] = $gsc->only_ac;

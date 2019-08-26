@@ -31,12 +31,12 @@ class NotificationController extends Controller {
     public static function apiReadNotifications(Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
         if (empty($r['notifications'])) {
-            throw new NotFoundException('notificationIdsNotProvided');
+            throw new \OmegaUp\Exceptions\NotFoundException('notificationIdsNotProvided');
         }
         foreach ($r['notifications'] as $id) {
             $notification = NotificationsDAO::getByPK($id);
             if (is_null($notification)) {
-                throw new NotFoundException('notificationDoesntExist');
+                throw new \OmegaUp\Exceptions\NotFoundException('notificationDoesntExist');
             }
             if ($notification->user_id !== $r->user->user_id) {
                 throw new ForbiddenAccessException('userNotAllowed');

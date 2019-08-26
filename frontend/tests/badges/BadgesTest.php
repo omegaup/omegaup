@@ -322,7 +322,7 @@ class BadgesTest extends BadgesTestCase {
                 'badge_alias' => 'esteBadgeNoExiste',
             ]));
             $this->fail('Should have thrown a NotFoundException');
-        } catch (NotFoundException $e) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'badgeNotExist');
         }
     }
