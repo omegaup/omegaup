@@ -61,7 +61,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData[1]);
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         // We will submit 2 runs to the problem, a call to grader to rejudge them
@@ -364,7 +364,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Update Problem calls grader to rejudge, we need to detour grader calls
         $detourGrader = new ScopedGraderDetour();

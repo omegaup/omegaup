@@ -1,7 +1,6 @@
 <?php
 
 require_once OMEGAUP_ROOT . '/www/api/ApiCaller.php';
-require_once 'libs/FileHandler.php';
 
 /**
  * Test to ensure that all the badges are in the correct format.
@@ -99,7 +98,7 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function runBadgeTest($testPath, $queryPath, $badge): void {
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
         $content = json_decode(file_get_contents($testPath), true);
         Utils::CleanupFilesAndDb();
         switch ($content['testType']) {

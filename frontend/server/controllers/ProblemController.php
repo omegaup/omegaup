@@ -1,6 +1,5 @@
 <?php
 
-require_once 'libs/FileHandler.php';
 require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ProblemDeployer.php';
 require_once 'libs/dao/QualityNominations.dao.php';
@@ -716,7 +715,7 @@ class ProblemController extends Controller {
 
             $operation = ProblemDeployer::UPDATE_SETTINGS;
             if (isset($_FILES['problem_contents'])
-                && FileHandler::GetFileUploader()->isUploadedFile($_FILES['problem_contents']['tmp_name'])
+                && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile($_FILES['problem_contents']['tmp_name'])
             ) {
                 $operation = ProblemDeployer::UPDATE_CASES;
             }
