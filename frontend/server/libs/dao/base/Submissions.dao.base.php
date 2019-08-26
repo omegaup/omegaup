@@ -34,7 +34,7 @@ abstract class SubmissionsDAOBase {
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
-            DAO::toMySQLTimestamp($Submissions->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submissions->time),
             (int)$Submissions->submit_delay,
             $Submissions->type,
             (int)$Submissions->submission_id,
@@ -145,7 +145,7 @@ abstract class SubmissionsDAOBase {
             is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
             $Submissions->guid,
             $Submissions->language,
-            DAO::toMySQLTimestamp($Submissions->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submissions->time),
             (int)$Submissions->submit_delay,
             $Submissions->type,
         ];

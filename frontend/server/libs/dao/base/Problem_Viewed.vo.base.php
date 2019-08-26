@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemViewed extends VO {
+class ProblemViewed extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'problem_id' => true,
         'identity_id' => true,
@@ -47,7 +47,7 @@ class ProblemViewed extends VO {
              * @var string|int|float $data['view_time']
              * @var int $this->view_time
              */
-            $this->view_time = DAO::fromMySQLTimestamp($data['view_time']);
+            $this->view_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['view_time']);
         } else {
             $this->view_time = \OmegaUp\Time::get();
         }

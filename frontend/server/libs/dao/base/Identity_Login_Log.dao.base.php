@@ -72,7 +72,7 @@ abstract class IdentityLoginLogDAOBase {
         $params = [
             is_null($Identity_Login_Log->identity_id) ? null : (int)$Identity_Login_Log->identity_id,
             is_null($Identity_Login_Log->ip) ? null : (int)$Identity_Login_Log->ip,
-            DAO::toMySQLTimestamp($Identity_Login_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Identity_Login_Log->time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

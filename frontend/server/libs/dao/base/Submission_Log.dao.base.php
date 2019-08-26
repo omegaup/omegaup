@@ -44,7 +44,7 @@ abstract class SubmissionLogDAOBase {
             !is_null($Submission_Log->user_id) ? intval($Submission_Log->user_id) : null,
             !is_null($Submission_Log->identity_id) ? intval($Submission_Log->identity_id) : null,
             !is_null($Submission_Log->ip) ? intval($Submission_Log->ip) : null,
-            DAO::toMySQLTimestamp($Submission_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submission_Log->time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -64,7 +64,7 @@ abstract class SubmissionLogDAOBase {
             is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
             is_null($Submission_Log->identity_id) ? null : (int)$Submission_Log->identity_id,
             is_null($Submission_Log->ip) ? null : (int)$Submission_Log->ip,
-            DAO::toMySQLTimestamp($Submission_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submission_Log->time),
             is_null($Submission_Log->submission_id) ? null : (int)$Submission_Log->submission_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -172,7 +172,7 @@ abstract class SubmissionLogDAOBase {
             is_null($Submission_Log->user_id) ? null : (int)$Submission_Log->user_id,
             is_null($Submission_Log->identity_id) ? null : (int)$Submission_Log->identity_id,
             is_null($Submission_Log->ip) ? null : (int)$Submission_Log->ip,
-            DAO::toMySQLTimestamp($Submission_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submission_Log->time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

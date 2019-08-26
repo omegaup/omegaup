@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetIdentities extends VO {
+class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'identity_id' => true,
         'problemset_id' => true,
@@ -53,14 +53,14 @@ class ProblemsetIdentities extends VO {
              * @var string|int|float $data['access_time']
              * @var int $this->access_time
              */
-            $this->access_time = DAO::fromMySQLTimestamp($data['access_time']);
+            $this->access_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['access_time']);
         }
         if (isset($data['end_time'])) {
             /**
              * @var string|int|float $data['end_time']
              * @var int $this->end_time
              */
-            $this->end_time = DAO::fromMySQLTimestamp($data['end_time']);
+            $this->end_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['end_time']);
         }
         if (isset($data['score'])) {
             $this->score = (int)$data['score'];

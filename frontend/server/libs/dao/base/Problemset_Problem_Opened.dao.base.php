@@ -42,7 +42,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
             $Problemset_Problem_Opened->problemset_id,
             $Problemset_Problem_Opened->problem_id,
             $Problemset_Problem_Opened->identity_id,
-            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -58,7 +58,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
     final public static function update(ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
-            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
             is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
             is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
             is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
@@ -166,7 +166,7 @@ abstract class ProblemsetProblemOpenedDAOBase {
             is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
             is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
             is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
-            DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

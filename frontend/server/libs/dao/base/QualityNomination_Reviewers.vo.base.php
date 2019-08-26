@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class QualityNominationReviewers extends VO {
+class QualityNominationReviewers extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'qualitynomination_id' => true,
         'user_id' => true,

@@ -42,7 +42,7 @@ abstract class {{ table.class_name }}DAOBase {
         $params = [
   {%- for column in table.columns %}
     {%- if 'timestamp' in column.type or 'datetime' in column.type %}
-            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('?bool', '?int') and not column.primary_key %}
             !is_null(${{ table.name }}->{{ column.name }}) ? intval(${{ table.name }}->{{ column.name }}) : null,
     {%- elif column.php_type == '?float' %}
@@ -73,7 +73,7 @@ abstract class {{ table.class_name }}DAOBase {
         $params = [
   {%- for column in table.columns|rejectattr('primary_key') %}
     {%- if 'timestamp' in column.type or 'datetime' in column.type %}
-            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
     {%- elif column.php_type == '?float' %}
@@ -88,7 +88,7 @@ abstract class {{ table.class_name }}DAOBase {
   {%- endfor %}
   {%- for column in table.columns|selectattr('primary_key') %}
     {%- if 'timestamp' in column.type or 'datetime' in column.type %}
-            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
     {%- elif column.php_type == '?float' %}
@@ -215,7 +215,7 @@ abstract class {{ table.class_name }}DAOBase {
         $params = [
 {%- for column in table.columns|rejectattr('auto_increment') %}
   {%- if 'timestamp' in column.type or 'datetime' in column.type %}
-            DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
   {%- elif column.php_type in ('?bool', '?int') %}
             is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
   {%- elif column.php_type == '?float' %}

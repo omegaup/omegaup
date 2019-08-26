@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class {{ table.class_name }} extends VO {
+class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
 {%- for column in table.columns %}
         '{{ column.name }}' => true,
@@ -43,7 +43,7 @@ class {{ table.class_name }} extends VO {
              * @var string|int|float $data['{{ column.name }}']
              * @var int $this->{{ column.name }}
              */
-            $this->{{ column.name }} = DAO::fromMySQLTimestamp($data['{{ column.name }}']);
+            $this->{{ column.name }} = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['{{ column.name }}']);
 {%- elif column.php_primitive_type == 'bool' %}
             $this->{{ column.name }} = boolval($data['{{ column.name }}']);
 {%- elif column.php_primitive_type in ('int', 'float') %}

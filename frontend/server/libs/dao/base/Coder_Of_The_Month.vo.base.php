@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class CoderOfTheMonth extends VO {
+class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'coder_of_the_month_id' => true,
         'user_id' => true,

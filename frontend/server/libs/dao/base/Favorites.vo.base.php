@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class Favorites extends VO {
+class Favorites extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_id' => true,
         'problem_id' => true,

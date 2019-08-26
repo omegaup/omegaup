@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class QualityNominations extends VO {
+class QualityNominations extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'qualitynomination_id' => true,
         'user_id' => true,
@@ -60,7 +60,7 @@ class QualityNominations extends VO {
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = DAO::fromMySQLTimestamp($data['time']);
+            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
         } else {
             $this->time = \OmegaUp\Time::get();
         }

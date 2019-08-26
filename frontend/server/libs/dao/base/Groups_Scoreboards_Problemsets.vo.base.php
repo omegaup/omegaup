@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class GroupsScoreboardsProblemsets extends VO {
+class GroupsScoreboardsProblemsets extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'group_scoreboard_id' => true,
         'problemset_id' => true,

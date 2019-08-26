@@ -32,7 +32,7 @@ abstract class ContestLogDAOBase {
             is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            DAO::toMySQLTimestamp($Contest_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Contest_Log->time),
             (int)$Contest_Log->public_contest_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -139,7 +139,7 @@ abstract class ContestLogDAOBase {
             is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
-            DAO::toMySQLTimestamp($Contest_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Contest_Log->time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

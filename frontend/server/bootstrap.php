@@ -83,8 +83,8 @@ header('X-Frame-Options: DENY');
 require_once('libs/third_party/log4php/src/main/php/Logger.php');
 
 // Load DAOs and controllers lazily.
-require_once('libs/dao/Estructura.php');
-spl_autoload_register(function ($classname) {
+require_once('controllers/Controller.php');
+spl_autoload_register(function (string $classname) : void {
     $controllerSuffix = 'Controller';
     $daoSuffix = 'DAO';
     if ($classname == 'QualitynominationController') {

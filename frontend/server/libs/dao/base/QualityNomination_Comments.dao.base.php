@@ -30,7 +30,7 @@ abstract class QualityNominationCommentsDAOBase {
         $params = [
             is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
             is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
-            DAO::toMySQLTimestamp($QualityNomination_Comments->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Comments->time),
             is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
             (int)$QualityNomination_Comments->qualitynomination_comment_id,
@@ -137,7 +137,7 @@ abstract class QualityNominationCommentsDAOBase {
         $params = [
             is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
             is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
-            DAO::toMySQLTimestamp($QualityNomination_Comments->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Comments->time),
             is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
             $QualityNomination_Comments->contents,
         ];

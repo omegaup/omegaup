@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class ProblemsetIdentityRequestHistory extends VO {
+class ProblemsetIdentityRequestHistory extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'history_id' => true,
         'identity_id' => true,
@@ -53,7 +53,7 @@ class ProblemsetIdentityRequestHistory extends VO {
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = DAO::fromMySQLTimestamp($data['time']);
+            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
         } else {
             $this->time = \OmegaUp\Time::get();
         }

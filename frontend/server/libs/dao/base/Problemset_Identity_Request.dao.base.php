@@ -41,8 +41,8 @@ abstract class ProblemsetIdentityRequestDAOBase {
         $params = [
             $Problemset_Identity_Request->identity_id,
             $Problemset_Identity_Request->problemset_id,
-            DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
-            DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             !is_null($Problemset_Identity_Request->accepted) ? intval($Problemset_Identity_Request->accepted) : null,
             $Problemset_Identity_Request->extra_note,
         ];
@@ -60,8 +60,8 @@ abstract class ProblemsetIdentityRequestDAOBase {
     final public static function update(ProblemsetIdentityRequest $Problemset_Identity_Request) : int {
         $sql = 'UPDATE `Problemset_Identity_Request` SET `request_time` = ?, `last_update` = ?, `accepted` = ?, `extra_note` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
-            DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
-            DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
             is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
@@ -169,8 +169,8 @@ abstract class ProblemsetIdentityRequestDAOBase {
         $params = [
             is_null($Problemset_Identity_Request->identity_id) ? null : (int)$Problemset_Identity_Request->identity_id,
             is_null($Problemset_Identity_Request->problemset_id) ? null : (int)$Problemset_Identity_Request->problemset_id,
-            DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
-            DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request->request_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request->last_update),
             is_null($Problemset_Identity_Request->accepted) ? null : (int)$Problemset_Identity_Request->accepted,
             $Problemset_Identity_Request->extra_note,
         ];

@@ -41,8 +41,8 @@ abstract class ProblemsetIdentitiesDAOBase {
         $params = [
             $Problemset_Identities->identity_id,
             $Problemset_Identities->problemset_id,
-            DAO::toMySQLTimestamp($Problemset_Identities->access_time),
-            DAO::toMySQLTimestamp($Problemset_Identities->end_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->access_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->end_time),
             intval($Problemset_Identities->score),
             intval($Problemset_Identities->time),
             !is_null($Problemset_Identities->share_user_information) ? intval($Problemset_Identities->share_user_information) : null,
@@ -63,8 +63,8 @@ abstract class ProblemsetIdentitiesDAOBase {
     final public static function update(ProblemsetIdentities $Problemset_Identities) : int {
         $sql = 'UPDATE `Problemset_Identities` SET `access_time` = ?, `end_time` = ?, `score` = ?, `time` = ?, `share_user_information` = ?, `privacystatement_consent_id` = ?, `is_invited` = ? WHERE `identity_id` = ? AND `problemset_id` = ?;';
         $params = [
-            DAO::toMySQLTimestamp($Problemset_Identities->access_time),
-            DAO::toMySQLTimestamp($Problemset_Identities->end_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->access_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->end_time),
             (int)$Problemset_Identities->score,
             (int)$Problemset_Identities->time,
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
@@ -175,8 +175,8 @@ abstract class ProblemsetIdentitiesDAOBase {
         $params = [
             is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
             is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
-            DAO::toMySQLTimestamp($Problemset_Identities->access_time),
-            DAO::toMySQLTimestamp($Problemset_Identities->end_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->access_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->end_time),
             (int)$Problemset_Identities->score,
             (int)$Problemset_Identities->time,
             is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,

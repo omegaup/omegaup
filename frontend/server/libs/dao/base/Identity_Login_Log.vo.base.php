@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class IdentityLoginLog extends VO {
+class IdentityLoginLog extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'identity_id' => true,
         'ip' => true,
@@ -47,7 +47,7 @@ class IdentityLoginLog extends VO {
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = DAO::fromMySQLTimestamp($data['time']);
+            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
         } else {
             $this->time = \OmegaUp\Time::get();
         }

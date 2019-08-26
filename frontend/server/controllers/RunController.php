@@ -302,16 +302,16 @@ class RunController extends Controller {
         ]);
 
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
             // Push run into DB
             SubmissionsDAO::create($submission);
             $run->submission_id = $submission->submission_id;
             RunsDAO::create($run);
             $submission->current_run_id = $run->run_id;
             SubmissionsDAO::update($submission);
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
@@ -458,12 +458,12 @@ class RunController extends Controller {
 
         // Reset fields.
         try {
-            DAO::transBegin();
+            \OmegaUp\DAO\DAO::transBegin();
             $r['run']->status = 'new';
             RunsDAO::update($r['run']);
-            DAO::transEnd();
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
-            DAO::transRollback();
+            \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 

@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class ContestLog extends VO {
+class ContestLog extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'public_contest_id' => true,
         'contest_id' => true,
@@ -59,7 +59,7 @@ class ContestLog extends VO {
              * @var string|int|float $data['time']
              * @var int $this->time
              */
-            $this->time = DAO::fromMySQLTimestamp($data['time']);
+            $this->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['time']);
         } else {
             $this->time = \OmegaUp\Time::get();
         }

@@ -29,7 +29,7 @@ abstract class QualityNominationLogDAOBase {
         $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
         $params = [
             is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
-            DAO::toMySQLTimestamp($QualityNomination_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Log->time),
             is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
@@ -137,7 +137,7 @@ abstract class QualityNominationLogDAOBase {
         $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
             is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
-            DAO::toMySQLTimestamp($QualityNomination_Log->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Log->time),
             is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,

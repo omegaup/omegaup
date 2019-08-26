@@ -14,7 +14,7 @@
  * VO does not have any behaviour.
  * @access public
  */
-class UserRankCutoffs extends VO {
+class UserRankCutoffs extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'score' => true,
         'percentile' => true,

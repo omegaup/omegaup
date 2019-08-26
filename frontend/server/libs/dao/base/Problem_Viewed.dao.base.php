@@ -41,7 +41,7 @@ abstract class ProblemViewedDAOBase {
         $params = [
             $Problem_Viewed->problem_id,
             $Problem_Viewed->identity_id,
-            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -57,7 +57,7 @@ abstract class ProblemViewedDAOBase {
     final public static function update(ProblemViewed $Problem_Viewed) : int {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
-            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problem_Viewed->view_time),
             is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
             is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
         ];
@@ -163,7 +163,7 @@ abstract class ProblemViewedDAOBase {
         $params = [
             is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
             is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
-            DAO::toMySQLTimestamp($Problem_Viewed->view_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

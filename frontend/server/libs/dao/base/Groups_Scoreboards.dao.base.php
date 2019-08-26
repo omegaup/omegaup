@@ -29,7 +29,7 @@ abstract class GroupsScoreboardsDAOBase {
         $sql = 'UPDATE `Groups_Scoreboards` SET `group_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_scoreboard_id` = ?;';
         $params = [
             is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
-            DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,
             $Groups_Scoreboards->description,
@@ -136,7 +136,7 @@ abstract class GroupsScoreboardsDAOBase {
         $sql = 'INSERT INTO Groups_Scoreboards (`group_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
             is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
-            DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,
             $Groups_Scoreboards->description,

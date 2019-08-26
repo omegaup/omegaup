@@ -62,8 +62,8 @@ class CoursesDAO extends CoursesDAOBase {
             unset($row['assignment_id']);
             unset($row['problemset_id']);
             unset($row['course_id']);
-            $row['start_time'] =  DAO::fromMySQLTimestamp($row['start_time']);
-            $row['finish_time'] = DAO::fromMySQLTimestamp($row['finish_time']);
+            $row['start_time'] =  \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['start_time']);
+            $row['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['finish_time']);
             array_push($ar, $row);
         }
 
