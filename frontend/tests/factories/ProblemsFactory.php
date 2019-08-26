@@ -1,7 +1,6 @@
 <?php
 
 require_once 'libs/FileHandler.php';
-require_once 'libs/FileUploader.php';
 
 /**
  * ProblemParams
@@ -74,18 +73,14 @@ class ProblemParams implements ArrayAccess {
  *
  * Solution: We abstracted those PHP native functions in an object FileUploader.
  * We need to create a new FileUploader object that uses our own implementations.
- *
  */
-class FileUploaderMock extends FileUploader {
-    public function IsUploadedFile($filename) {
+class FileUploaderMock extends \OmegaUp\FileUploader {
+    public function isUploadedFile(string $filename) : bool {
         return file_exists($filename);
     }
 
-    public function MoveUploadedFile($filename, $targetPath) {
-        $filename = func_get_arg(0);
-        $targetpath = func_get_arg(1);
-
-        return copy($filename, $targetpath);
+    public function moveUploadedFile(string $filename, string $targetPath) : bool {
+        return copy($filename, $targetPath);
     }
 }
 

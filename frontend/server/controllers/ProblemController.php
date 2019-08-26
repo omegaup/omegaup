@@ -716,7 +716,7 @@ class ProblemController extends Controller {
 
             $operation = ProblemDeployer::UPDATE_SETTINGS;
             if (isset($_FILES['problem_contents'])
-                && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
+                && FileHandler::GetFileUploader()->isUploadedFile($_FILES['problem_contents']['tmp_name'])
             ) {
                 $operation = ProblemDeployer::UPDATE_CASES;
             }

@@ -1,18 +1,17 @@
 <?php
 
-require_once 'libs/FileUploader.php';
-
 class FileHandler {
-    protected static $fileUploader;
+    /** @var null|\OmegaUp\FileUploader */
+    protected static $fileUploader = null;
     public static $log;
 
-    public static function SetFileUploader(FileUploader $fileUploader) {
+    public static function SetFileUploader(\OmegaUp\FileUploader $fileUploader) {
         self::$fileUploader = $fileUploader;
     }
 
-    public static function GetFileUploader() {
+    public static function GetFileUploader() : \OmegaUp\FileUploader {
         if (is_null(self::$fileUploader)) {
-            self::$fileUploader = new FileUploader();
+            self::$fileUploader = new \OmegaUp\FileUploader();
         }
         return self::$fileUploader;
     }
@@ -52,8 +51,8 @@ class FileHandler {
     }
 
     public static function MoveFileFromRequestTo($fileUploadName, $targetPath) {
-        if (!(static::$fileUploader->IsUploadedFile($_FILES[$fileUploadName]['tmp_name']) &&
-                static::$fileUploader->MoveUploadedFile($_FILES[$fileUploadName]['tmp_name'], $targetPath))) {
+        if (!(static::$fileUploader->isUploadedFile($_FILES[$fileUploadName]['tmp_name']) &&
+                static::$fileUploader->moveUploadedFile($_FILES[$fileUploadName]['tmp_name'], $targetPath))) {
             throw new RuntimeException('FATAL: Not able to move tmp_file from _FILE. ' . implode('\n', $_FILES[$fileUploadName]));
         }
     }

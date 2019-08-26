@@ -300,48 +300,48 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      * native functions of PHP to move files around needed for store zip contents
      * in the required places.
      *
-     * Solution: We abstracted those PHP native functions in an object FileUploader.
-     * We need to create a new FileUploader object that uses our own implementations.
+     * Solution: We abstracted those PHP native functions in an object
+     * \OmegaUp\FileUploader.  We need to create a new \OmegaUp\FileUploader
+     * object that uses our own implementations.
      *
-     * Here we create a FileUploader and set our own implementations of is_uploaded_file
-     * and move_uploaded_file. PHPUnit will intercept those calls and use our owns instead (mock).
-     * Moreover, it will validate that they were actually called.
-     *
-     * @return $fileUploaderMock
+     * Here we create a \OmegaUp\FileUploader and set our own implementations
+     * of is_uploaded_file and move_uploaded_file. PHPUnit will intercept those
+     * calls and use our owns instead (mock).  Moreover, it will validate that
+     * they were actually called.
      */
-    public function createFileUploaderMock() {
+    public function createFileUploaderMock() : \OmegaUp\FileUploader {
         // Create fileUploader mock
-        $fileUploaderMock = $this->getMockBuilder('FileUploader')->getMock();
+        $fileUploaderMock = $this->getMockBuilder('\\OmegaUp\\FileUploader')
+                ->getMock();
 
-        // Detour IsUploadedFile function inside FileUploader to our own IsUploadedFile
+        // Detour isUploadedFile function inside \OmegaUp\FileUploader to our
+        // own isUploadedFile
         $fileUploaderMock->expects($this->any())
-                ->method('IsUploadedFile')
-                ->will($this->returnCallback([$this, 'IsUploadedFile']));
+                ->method('isUploadedFile')
+                ->will($this->returnCallback([$this, 'isUploadedFile']));
 
-        // Detour MoveUploadedFile function inside FileUploader to our own MoveUploadedFile
+        // Detour moveUploadedFile function inside \OmegaUp\FileUploader to our
+        // own moveUploadedFile
         $fileUploaderMock->expects($this->any())
-                ->method('MoveUploadedFile')
-                ->will($this->returnCallback([$this, 'MoveUploadedFile']));
+                ->method('moveUploadedFile')
+                ->will($this->returnCallback([$this, 'moveUploadedFile']));
 
         return $fileUploaderMock;
     }
 
     /**
-     * Redefinition of IsUploadedFile
+     * Redefinition of \OmegaUp\FileUploader::isUploadedFile
      *
      * @param string $filename
-     * @return type
      */
-    public function IsUploadedFile($filename) {
+    public function isUploadedFile($filename) : bool {
         return file_exists($filename);
     }
 
     /**
-     * Redefinition of MoveUploadedFile
-     *
-     * @return type
+     * Redefinition of \OmegaUp\FileUploader::moveUploadedFile
      */
-    public function MoveUploadedFile() {
+    public function moveUploadedFile() : bool {
         $filename = func_get_arg(0);
         $targetpath = func_get_arg(1);
 
