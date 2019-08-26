@@ -4,12 +4,25 @@ declare namespace omegaup {
     assignment_type: string,
     description: string;
     finish_time: Date;
-    has_runs: boolean;
+    has_runs?: boolean;
+    max_points?: number;
     name: string;
     order: number;
+    publish_time_delay?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
     start_time: Date;
+  }
+
+  export interface AssignmentProblem {
+    alias: string;
+    commit: string;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    title: string;
+    version: string;
   }
 
   export interface Badge {
@@ -98,6 +111,23 @@ declare namespace omegaup {
     data: omegaup.Contest;
     length?: string;
     place: number;
+  }
+
+  export interface Course {
+    alias: string;
+    assignments: Assignment[];
+    basic_information_required: boolean;
+    description: string;
+    finish_time: Date;
+    is_admin: boolean;
+    name: string;
+    public: boolean;
+    requests_user_information: string;
+    school_id?: number;
+    school_name: string;
+    show_scoreboard: boolean;
+    start_time: Date;
+    student_count: boolean;
   }
 
   export interface CourseAdmin {

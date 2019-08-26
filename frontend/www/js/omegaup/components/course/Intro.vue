@@ -37,41 +37,55 @@
   </div>
 </template>
 
-<script>
-import {T, UI} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
 
-export default {
-  props: {
-    name: String,
-    description: String,
-    needsBasicInformation: Boolean,
-    requestsUserInformation: String,
-    shouldShowAcceptTeacher: Boolean,
-    statements: Object,
-  },
-  computed: {
-    consentHtml: function() {
-      return this.markdownConverter.makeHtml(this.statements.privacy.markdown);
-    },
-    acceptTeacherConsentHtml: function() {
-      return this.markdownConverter.makeHtml(
-          this.statements.acceptTeacher.markdown);
-    },
-    isButtonDisabled: function() {
-      return this.needsBasicInformation ||
-             (this.requestsUserInformation == 'optional' &&
-              this.shareUserInformation == undefined) ||
-             (this.requestsUserInformation == 'required' &&
-              this.shareUserInformation != 1) ||
-             this.acceptTeacher == undefined;
-    }
-  },
-  data: function() {
-    return {
-      T: T, shareUserInformation: undefined,
-          markdownConverter: UI.markdownConverter(), acceptTeacher: undefined,
-    }
-  },
-  methods: {onSubmit() { this.$emit('submit', this);}}
+interface Statement {
+  [name: string]: {
+    gitObjectId?: string;
+    markdown?: string;
+    statementType?: string;
+  };
 }
+
+@Component
+export default class CourseIntro extends Vue {
+  @Prop() name!: string;
+  @Prop() description!: string;
+  @Prop() needsBasicInformation!: boolean;
+  @Prop() requestsUserInformation!: string;
+  @Prop() shouldShowAcceptTeacher!: boolean;
+  @Prop() statements!: Statement;
+
+  T = T;
+  shareUserInformation = 0;
+  markdownConverter = UI.markdownConverter();
+  acceptTeacher = 'no';
+
+  get consentHtml(): string {
+    const markdown = this.statements.privacy.markdown || '';
+    return this.markdownConverter.makeHtml(markdown);
+  }
+
+  get acceptTeacherConsentHtml(): string {
+    const markdown = this.statements.acceptTeacher.markdown || '';
+    return this.markdownConverter.makeHtml(markdown);
+  }
+
+  get isButtonDisabled(): boolean {
+    return (
+      this.needsBasicInformation ||
+      (this.requestsUserInformation === 'required' &&
+        this.shareUserInformation !== 1)
+    );
+  }
+
+  onSubmit(): void {
+    this.$emit('submit', this);
+  }
+}
+
 </script>
