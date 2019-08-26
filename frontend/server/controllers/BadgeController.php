@@ -72,8 +72,8 @@ class BadgeController extends Controller {
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
-        Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
-        Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
+        \OmegaUp\Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
+        \OmegaUp\Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
         return [
             'status' => 'ok',
             'assignation_time' => is_null($r->user) ?
@@ -90,8 +90,8 @@ class BadgeController extends Controller {
      * @return array
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r) {
-        Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
-        Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
+        \OmegaUp\Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
+        \OmegaUp\Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
         $totalUsers = max(UsersDAO::getUsersCount(), 1);
         $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($r['badge_alias']);
         $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($r['badge_alias']);

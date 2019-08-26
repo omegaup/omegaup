@@ -44,7 +44,7 @@ class RunController extends Controller {
         }
 
         $allowedLanguages = array_keys(RunController::$kSupportedLanguages);
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Check that problem exists
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -61,12 +61,12 @@ class RunController extends Controller {
             $allowedLanguages,
             explode(',', $r['problem']->languages)
         );
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
             $allowedLanguages
         );
-        Validators::validateStringNonEmpty($r['source'], 'source');
+        \OmegaUp\Validators::validateStringNonEmpty($r['source'], 'source');
 
         // Can't set both problemset_id and contest_alias at the same time.
         if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
@@ -84,7 +84,7 @@ class RunController extends Controller {
         } elseif (!empty($r['contest_alias'])) {
             // Got a contest alias, need to fetch the problemset id.
             // Validate contest
-            Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+            \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
 
             if ($r['contest'] == null) {
@@ -136,7 +136,7 @@ class RunController extends Controller {
                 explode(',', $r['problemset']->languages)
             );
         }
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
             $allowedLanguages
@@ -382,7 +382,7 @@ class RunController extends Controller {
      * @throws ForbiddenAccessException
      */
     private static function validateDetailsRequest(\OmegaUp\Request $r) {
-        Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
 
         // If user is not judge, must be the run's owner.
         $r['submission'] = SubmissionsDAO::getByGuid($r['run_alias']);
@@ -645,7 +645,7 @@ class RunController extends Controller {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
         if (!RunController::downloadSubmission(
             $r['run_alias'],
             $r->identity,
@@ -802,12 +802,12 @@ class RunController extends Controller {
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
-        Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+        \OmegaUp\Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        \OmegaUp\Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
-            Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
+            \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
             $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
@@ -815,7 +815,7 @@ class RunController extends Controller {
             }
         }
 
-        Validators::validateInEnum(
+        \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
             array_keys(RunController::$kSupportedLanguages),

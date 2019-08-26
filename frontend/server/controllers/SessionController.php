@@ -258,7 +258,7 @@ class SessionController extends Controller {
         $username = substr($s_Email, 0, $idx);
 
         try {
-            Validators::validateValidUsername($username, 'username');
+            \OmegaUp\Validators::validateValidUsername($username, 'username');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // How can we know whats wrong with the username?
             // Things that could go wrong:
@@ -392,7 +392,7 @@ class SessionController extends Controller {
     public function NativeLogin(\OmegaUp\Request $r) {
         $identity = null;
 
-        Validators::validateStringNonEmpty($r['password'], 'password');
+        \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
 
         if (null != $r['returnAuthToken']) {
             $returnAuthToken = $r['returnAuthToken'];

@@ -122,7 +122,6 @@ require_once('libs/Grader.php');
 require_once('libs/Pager.php');
 require_once('libs/Scoreboard.php');
 require_once('libs/SecurityTools.php');
-require_once('libs/Validators.php');
 
 Logger::configure([
     'rootLogger' => [

@@ -38,16 +38,16 @@ class ContestController extends Controller {
             : ActiveStatus::ALL;
         // If the parameter was not set, the default should be ALL which is
         // a number and should pass this check.
-        Validators::validateNumber($active_contests, 'active', true /* required */);
+        \OmegaUp\Validators::validateNumber($active_contests, 'active', true /* required */);
         $recommended = isset($r['recommended'])
             ? RecommendedStatus::getIntValue($r['recommended'])
             : RecommendedStatus::ALL;
         // Same as above.
-        Validators::validateNumber($recommended, 'recommended', true /* required */);
+        \OmegaUp\Validators::validateNumber($recommended, 'recommended', true /* required */);
         $participating = isset($r['participating'])
             ? ParticipatingStatus::getIntValue($r['participating'])
             : ParticipatingStatus::NO;
-        Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
+        \OmegaUp\Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
             'public',
             'private',
             'registration'
@@ -60,7 +60,7 @@ class ContestController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'participating');
         }
         $query = $r['query'];
-        Validators::validateStringOfLengthInRange($query, 'query', null, 255, false /* not required */);
+        \OmegaUp\Validators::validateStringOfLengthInRange($query, 'query', null, 255, false /* not required */);
         $cacheKey = "{$active_contests}-{$recommended}-{$page}-{$page_size}";
         if (is_null($r->identity)) {
             // Get all public contests
@@ -276,7 +276,7 @@ class ContestController extends Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateBasicDetails(?string $contestAlias) : array {
-        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         // If the contest is private, verify that our user is invited
         $contestProblemset = ContestsDAO::getByAliasWithExtraInformation($contestAlias);
         if (is_null($contestProblemset)) {
@@ -300,7 +300,7 @@ class ContestController extends Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function validateContest(string $contestAlias) : \OmegaUp\DAO\VO\Contests {
-        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         $contest = ContestsDAO::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -482,7 +482,7 @@ class ContestController extends Controller {
     }
 
     public static function apiPublicDetails(\OmegaUp\Request $r) {
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $result = [];
 
@@ -1092,8 +1092,8 @@ class ContestController extends Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateCommonCreateOrUpdate(\OmegaUp\Request $r, ?\OmegaUp\DAO\VO\Contests $contest = null, bool $isRequired = true) : void {
-        Validators::validateStringNonEmpty($r['title'], 'title', $isRequired);
-        Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
+        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', $isRequired);
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt('start_time', null, null, $isRequired);
         $r->ensureInt('finish_time', null, null, $isRequired);
@@ -1126,19 +1126,19 @@ class ContestController extends Controller {
             );
         }
 
-        Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
+        \OmegaUp\Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
             'public',
             'private',
             'registration'
         ], false);
-        Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
         $r->ensureFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureBool('partial_score', false);
         $r->ensureInt('submissions_gap', 0, null, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
-        Validators::validateNumberInRange(
+        \OmegaUp\Validators::validateNumberInRange(
             $r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60),
             'submissions_gap',
             1,
@@ -1146,9 +1146,9 @@ class ContestController extends Controller {
             $isRequired
         );
 
-        Validators::validateInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $isRequired);
-        Validators::validateInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $isRequired);
-        Validators::validateInEnum($r['penalty_calc_policy'], 'penalty_calc_policy', ['sum', 'max'], false);
+        \OmegaUp\Validators::validateInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $isRequired);
+        \OmegaUp\Validators::validateInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $isRequired);
+        \OmegaUp\Validators::validateInEnum($r['penalty_calc_policy'], 'penalty_calc_policy', ['sum', 'max'], false);
 
         // Problems is optional
         if (!is_null($r['problems'])) {
@@ -1184,7 +1184,7 @@ class ContestController extends Controller {
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                Validators::validateInEnum($language, 'languages', array_keys(RunController::$kSupportedLanguages), false);
+                \OmegaUp\Validators::validateInEnum($language, 'languages', array_keys(RunController::$kSupportedLanguages), false);
             }
         }
     }
@@ -1281,7 +1281,7 @@ class ContestController extends Controller {
         // Authenticate user
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         // Only director is allowed to create problems in contest
         $contest = self::validateContestAdmin(
@@ -1369,7 +1369,7 @@ class ContestController extends Controller {
         string $contestAlias,
         ?string $problemAlias
     ) : Array {
-        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         // Only director is allowed to create problems in contest
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
@@ -1381,7 +1381,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('cannotAddProb');
         }
 
-        Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
 
         $problem = ProblemsDAO::getByAlias($problemAlias);
         if (is_null($problem)) {
@@ -1455,7 +1455,7 @@ class ContestController extends Controller {
         ?string $problemAlias,
         \OmegaUp\DAO\VO\Identities $identity
     ) : Array {
-        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         $contest = ContestsDAO::getByAlias($contestAlias);
         if (is_null($contest)) {
@@ -1466,7 +1466,7 @@ class ContestController extends Controller {
             throw new ForbiddenAccessException('cannotRemoveProblem');
         }
 
-        Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
 
         $problem = ProblemsDAO::getByAlias($problemAlias);
         if (is_null($problem)) {
@@ -1503,9 +1503,9 @@ class ContestController extends Controller {
     public static function apiRunsDiff(\OmegaUp\Request $r) : array {
         self::authenticateRequest($r);
 
-        Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
-        Validators::validateStringNonEmpty($r['version'], 'version');
+        \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['version'], 'version');
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
@@ -1549,7 +1549,7 @@ class ContestController extends Controller {
         \OmegaUp\DAO\VO\Identities $identity
     ) : Array {
         // Check contest_alias
-        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         $identityToRemove = IdentityController::resolveIdentity($usernameOrEmail);
         $contest = self::validateContestAdmin($contestAlias, $identity);
@@ -1631,7 +1631,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
@@ -1654,7 +1654,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
@@ -1686,7 +1686,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $group = GroupsDAO::findByAlias($r['group']);
 
@@ -1713,7 +1713,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         // Check contest_alias
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $group = GroupsDAO::findByAlias($r['group']);
 
@@ -1736,7 +1736,7 @@ class ContestController extends Controller {
      */
     private static function validateClarifications(\OmegaUp\Request $r) : \OmegaUp\DAO\VO\Contests {
         // Check contest_alias
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $contest = ContestsDAO::getByAlias($r['contest_alias']);
         if (is_null($contest)) {
@@ -1860,10 +1860,10 @@ class ContestController extends Controller {
         // Get the current user
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['contest_aliases'], 'contest_aliases');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_aliases'], 'contest_aliases');
         $contest_aliases = explode(',', $r['contest_aliases']);
 
-        Validators::validateStringNonEmpty($r['usernames_filter'], 'usernames_filter', false);
+        \OmegaUp\Validators::validateStringNonEmpty($r['usernames_filter'], 'usernames_filter', false);
 
         $usernames_filter = [];
         if (isset($r['usernames_filter'])) {
@@ -1981,7 +1981,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
@@ -2029,7 +2029,7 @@ class ContestController extends Controller {
     public static function apiArbitrateRequest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         if (is_null($r['resolution'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
@@ -2082,7 +2082,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         return [
@@ -2103,7 +2103,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
@@ -2256,7 +2256,7 @@ class ContestController extends Controller {
             $r->identity
         );
 
-        Validators::validateStringNonEmpty($r['username'], 'username');
+        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
         $r->ensureInt('end_time');
 
         $identity = IdentityController::resolveIdentity($r['username']);
@@ -2333,19 +2333,19 @@ class ContestController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
-        Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+        \OmegaUp\Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
+        \OmegaUp\Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
 
         $problem = null;
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
-            Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
+            \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
             $problem = ProblemsDAO::getByAlias($r['problem_alias']);
             if (is_null($problem)) {
@@ -2353,7 +2353,7 @@ class ContestController extends Controller {
             }
         }
 
-        Validators::validateInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
+        \OmegaUp\Validators::validateInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
 
         // Get user if we have something in username
         $identity = null;
@@ -2416,7 +2416,7 @@ class ContestController extends Controller {
         string $contestAlias,
         \OmegaUp\DAO\VO\Identities $identity
     ) : \OmegaUp\DAO\VO\Contests {
-        Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         return self::validateContestAdmin($contestAlias, $identity);
     }
@@ -2513,7 +2513,7 @@ class ContestController extends Controller {
         $scoreboard = new Scoreboard($params);
 
         // Check the filter if we have one
-        Validators::validateStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);
+        \OmegaUp\Validators::validateStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);
 
         return $scoreboard->generate(
             true, // with run details for reporting

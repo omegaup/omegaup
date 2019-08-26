@@ -124,7 +124,7 @@ class BadgesTest extends BadgesTestCase {
                 continue;
             }
 
-            if (!Validators::isValidAlias($alias)) {
+            if (!\OmegaUp\Validators::isValidAlias($alias)) {
                 throw new Exception('The alias for this badge is invalid.');
             }
 

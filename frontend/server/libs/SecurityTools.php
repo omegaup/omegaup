@@ -46,11 +46,9 @@ class SecurityTools {
         return password_verify($passwordToCheck, $hashedPassword);
     }
 
-    public static function testStrongPassword(?string $password) : bool {
+    public static function testStrongPassword(?string $password) : void {
         // Setting max passwd length to 72 to avoid DoS attacks
-        Validators::validateStringOfLengthInRange($password, 'password', 8, 72);
-
-        return true;
+        \OmegaUp\Validators::validateStringOfLengthInRange($password, 'password', 8, 72);
     }
 
     /**

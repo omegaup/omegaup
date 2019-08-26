@@ -82,7 +82,7 @@ class Controller {
         $user = $r->user;
 
         if (!is_null($r['username'])) {
-            Validators::validateStringNonEmpty($r['username'], 'username');
+            \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
             $user = UsersDAO::FindByUsername($r['username']);
             if (is_null($user)) {
@@ -111,7 +111,7 @@ class Controller {
         if (is_null($r['username'])) {
             return $identity;
         }
-        Validators::validateStringNonEmpty($r['username'], 'username');
+        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
         $identity = IdentitiesDAO::findByUsername($r['username']);
         if (is_null($identity)) {

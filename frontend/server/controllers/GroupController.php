@@ -50,9 +50,9 @@ class GroupController extends Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateValidAlias($r['alias'], 'alias', true);
-        Validators::validateStringNonEmpty($r['name'], 'name', true);
-        Validators::validateStringNonEmpty($r['description'], 'description', false);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', false);
 
         self::createGroup(
             $r['alias'],
@@ -76,7 +76,7 @@ class GroupController extends Controller {
         string $groupAlias,
         \OmegaUp\DAO\VO\Identities $identity
     ) {
-        Validators::validateStringNonEmpty($groupAlias, 'group_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($groupAlias, 'group_alias');
         $group = GroupsDAO::findByAlias($groupAlias);
         if (is_null($group)) {
             return null;
@@ -246,9 +246,9 @@ class GroupController extends Controller {
         self::authenticateRequest($r);
         $group = self::validateGroup($r['group_alias'], $r->identity);
 
-        Validators::validateValidAlias($r['alias'], 'alias', true);
-        Validators::validateStringNonEmpty($r['name'], 'name', true);
-        Validators::validateStringNonEmpty($r['description'], 'description', false);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', false);
 
         GroupsScoreboardsDAO::create(new \OmegaUp\DAO\VO\GroupsScoreboards([
             'group_id' => $group->group_id,
