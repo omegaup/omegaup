@@ -1,5 +1,10 @@
 <?php
 
+namespace OmegaUp;
+
+use \ProblemDeploymentFailedException;
+use \SecurityTools;
+
 /**
  * Class to abstract interactions with omegaup-gitserver.
  */
@@ -9,14 +14,28 @@ class ProblemDeployer {
     const UPDATE_STATEMENTS = 2;
     const CREATE = 3;
 
+    /** @var \Logger */
     private $log;
 
+    /** @var string */
     private $alias;
-    private $zipPath = null;
+
+    /** @var string */
+    private $zipPath;
+
+    /** @var null|string */
     public $privateTreeHash = null;
+
+    /** @var null|string */
     public $publishedCommit = null;
+
+    /** @var string[] */
     private $updatedLanguages = [];
+
+    /** @var bool */
     private $acceptsSubmissions = true;
+
+    /** @var bool */
     private $updatePublished = true;
 
     public function __construct(
@@ -24,13 +43,16 @@ class ProblemDeployer {
         bool $acceptsSubmissions = true,
         bool $updatePublished = true
     ) {
-        $this->log = Logger::getLogger('ProblemDeployer');
+        $this->log = \Logger::getLogger('ProblemDeployer');
         $this->alias = $alias;
 
         if (isset($_FILES['problem_contents'])
-            && \OmegaUp\FileHandler::getFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
+            && isset($_FILES['problem_contents']['tmp_name'])
+            && is_string($_FILES['problem_contents']['tmp_name'])
+            && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile($_FILES['problem_contents']['tmp_name'])
         ) {
-            $this->zipPath = $_FILES['problem_contents']['tmp_name'];
+            /** @psalm-suppress MixedArrayAccess */
+            $this->zipPath = strval($_FILES['problem_contents']['tmp_name']);
         } else {
             $this->zipPath = __DIR__ . '/empty.zip';
         }
@@ -51,27 +73,27 @@ class ProblemDeployer {
         $mergeStrategy = 'ours';
 
         switch ($operation) {
-            case ProblemDeployer::UPDATE_SETTINGS:
+            case self::UPDATE_SETTINGS:
                 $mergeStrategy = 'ours';
                 break;
-            case ProblemDeployer::CREATE:
+            case self::CREATE:
                 $mergeStrategy = 'theirs';
                 break;
-            case ProblemDeployer::UPDATE_CASES:
+            case self::UPDATE_CASES:
                 $mergeStrategy = 'theirs';
                 break;
-            case ProblemDeployer::UPDATE_STATEMENTS:
+            case self::UPDATE_STATEMENTS:
                 $mergeStrategy = 'recursive-theirs';
                 break;
         }
         $result = $this->execute(
             $this->zipPath,
-            $user->username,
+            strval($user->username),
             $message,
             $problemSettings,
             null,
             $mergeStrategy,
-            $operation == ProblemDeployer::CREATE,
+            $operation == self::CREATE,
             $this->acceptsSubmissions,
             $this->updatePublished
         );
@@ -85,11 +107,9 @@ class ProblemDeployer {
      * the list of updated statement languages, as well as updating the
      * libinteractive template files if needed.
      *
-     * @param array $result the JSON from omegaup-gitserver.
-     *
-     * @return void
+     * @param array{status: string, error?: string, updated_refs?: array{name: string, from: string, to: string, from_tree: string, to_tree: string}[], updated_files: array{path: string, type: string}[]} $result the JSON from omegaup-gitserver.
      */
-    private function processResult($result) {
+    private function processResult(array $result) : void {
         if (!empty($result['updated_refs'])) {
             foreach ($result['updated_refs'] as $ref) {
                 if ($ref['name'] == 'refs/heads/private') {
@@ -103,27 +123,27 @@ class ProblemDeployer {
         $updatedInteractiveFiles = false;
         $updatedExamples = false;
         if (!empty($result['updated_files'])) {
-            foreach ($result['updated_files'] as $updated_file) {
-                if (strpos($updated_file['path'], 'examples/') === 0) {
+            foreach ($result['updated_files'] as $updatedFile) {
+                if (strpos($updatedFile['path'], 'examples/') === 0) {
                     $updatedExamples = true;
                 }
                 if (preg_match(
                     '%statements/([a-z]{2})\\.markdown%',
-                    $updated_file['path'],
+                    $updatedFile['path'],
                     $matches
                 ) === 1) {
                     $this->updatedLanguages[] = $matches[1];
                 }
                 if (preg_match(
                     '%solutions/([a-z]{2})\\.markdown%',
-                    $updated_file['path'],
+                    $updatedFile['path'],
                     $matches
                 ) === 1) {
                     $this->updatedLanguages[] = $matches[1];
                 }
                 if (preg_match(
                     '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
-                    $updated_file['path']
+                    $updatedFile['path']
                 ) === 1) {
                     $updatedInteractiveFiles = true;
                 }
@@ -137,17 +157,16 @@ class ProblemDeployer {
      *
      * Calling this function is a no-op if the problem turns out to not be an
      * interactive problem.
-     *
-     * @return void
      */
     public function generateLibinteractiveTemplates(?string $publishedCommit) : void {
         if (is_null($publishedCommit)) {
             return;
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($this->alias, $publishedCommit);
+        /** @var null|array{interactive?: array{module_name: string, language: string}, cases: array<string, mixed>} */
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
-            JSON_OBJECT_AS_ARRAY
+            /*assoc=*/true
         );
         if (empty($distribSettings['interactive'])) {
             // oops, this was not an interactive problem.
@@ -169,6 +188,7 @@ class ProblemDeployer {
                 )
             );
             @mkdir("{$tmpDir}/examples");
+            /** @var mixed $data */
             foreach ($distribSettings['cases'] as $filename => $data) {
                 file_put_contents(
                     "{$tmpDir}/examples/{$filename}.in",
@@ -182,7 +202,7 @@ class ProblemDeployer {
                 '--package-directory', $target, '--package-prefix',
                 "{$this->alias}_", '--shift-time-for-zip'];
             $this->executeRaw($args, $target);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'problemDeployerLibinteractiveValidationError',
                 $e->getMessage()
@@ -195,17 +215,21 @@ class ProblemDeployer {
     /**
      * Updates loose files.
      *
-     * @param \OmegaUp\Request $r
+     * @param string $message
+     * @param \OmegaUp\DAO\VO\Users $user
+     * @param array<string, string> $blobUpdate
+     *
      * @throws ProblemDeploymentFailedException
      */
-    public function commitLooseFiles($message, $user, $blobUpdate) {
+    public function commitLooseFiles(string $message, \OmegaUp\DAO\VO\Users $user, array $blobUpdate) : void {
         $tmpfile = tmpfile();
         try {
             $zipPath = stream_get_meta_data($tmpfile)['uri'];
-            $zipArchive = new ZipArchive();
+            $zipArchive = new \ZipArchive();
+            /** @var true|int */
             $err = $zipArchive->open(
                 $zipPath,
-                ZipArchive::OVERWRITE
+                \ZipArchive::OVERWRITE
             );
             if ($err !== true) {
                 throw new ProblemDeploymentFailedException(
@@ -220,7 +244,7 @@ class ProblemDeployer {
 
             $result = $this->execute(
                 $zipPath,
-                $user->username,
+                strval($user->username),
                 $message,
                 null,
                 $blobUpdate,
@@ -263,10 +287,15 @@ class ProblemDeployer {
 
         if (!is_resource($proc)) {
             $errors = error_get_last();
-            $this->log->error(
-                "$cmd failed: {$errors['type']} {$errors['message']}"
-            );
-            throw new Exception($errors['message']);
+            if (is_null($errors)) {
+                $this->log->error("$cmd failed");
+                throw new \RuntimeException("$cmd failed");
+            } else {
+                $this->log->error(
+                    "$cmd failed: {$errors['type']} {$errors['message']}"
+                );
+                throw new \RuntimeException($errors['message']);
+            }
         }
 
         fclose($pipes[0]);
@@ -289,6 +318,18 @@ class ProblemDeployer {
 
     /**
      * Performs the operation by calling the omegaup-gitserver API.
+     *
+     * @param string $zipPath,
+     * @param string $author,
+     * @param string $commitMessage,
+     * @param null|array $problemSettings,
+     * @param null|array<string, string> $blobUpdate,
+     * @param string $mergeStrategy,
+     * @param bool $create,
+     * @param bool $acceptsSubmissions,
+     * @param bool $updatePublished
+     *
+     * @return array{status: string, error?: string, updated_refs?: array{name: string, from: string, to: string, from_tree: string, to_tree: string}[], updated_files: array{path: string, type: string}[]}
      */
     private function execute(
         string $zipPath,
@@ -300,9 +341,10 @@ class ProblemDeployer {
         bool $create,
         bool $acceptsSubmissions,
         bool $updatePublished
-    ) {
+    ) : array {
         $curl = curl_init();
         $zipFile = fopen($zipPath, 'r');
+        /** @var int */
         $zipFileSize = fstat($zipFile)['size'];
         try {
             $queryParams = [
@@ -327,7 +369,10 @@ class ProblemDeployer {
                         // Unsetting Expect:, since it kind of breaks the gitserver.
                         'Expect: ',
                         "Content-Length: $zipFileSize",
-                        SecurityTools::getGitserverAuthorizationHeader($this->alias, $author),
+                        SecurityTools::getGitserverAuthorizationHeader(
+                            $this->alias,
+                            $author
+                        ),
                     ],
                     CURLOPT_INFILE => $zipFile,
                     CURLOPT_INFILESIZE => $zipFileSize,
@@ -336,11 +381,12 @@ class ProblemDeployer {
                 ]
             );
             $output = curl_exec($curl);
+            /** @var int */
             $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             $retval = ($output !== false && $retval == 200) ? 0 : 1;
             $result = [
                 'retval' => $retval,
-                'output' => (string)$output,
+                'output' => strval($output),
             ];
         } finally {
             curl_close($curl);
@@ -351,47 +397,53 @@ class ProblemDeployer {
             $errorMessage = 'problemDeployerInternalError';
             $context = null;
             if (!empty($result['output'])) {
-                $output = json_decode($result['output']);
-                $errorMapping = [
-                    'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
-                    'config-bad-layout' => 'problemDeployerConfigBadLayout',
-                    'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',
-                    'config-repository-not-absolute-url' => 'problemDeployerConfigRepositoryNotAbsoluteUrl',
-                    'config-subdirectory-missing-target' => 'problemDeployerConfigSubdirectoryMissingTarget',
-                    'interactive-bad-layout' => 'problemDeployerInteractiveBadLayout',
-                    'internal-error' => 'problemDeployerInternalError',
-                    'internal-git-error' => 'problemDeployerInternalGitError',
-                    'invalid-zip-filename' => 'problemDeployerInvalidZipFilename',
-                    'json-parse-error' => 'problemDeployerJsonParseError',
-                    'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
-                    'no-statements' => 'problemDeployerNoStatements',
-                    'not-a-review' => 'problemDeployerNotAReview',
-                    'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
-                    'problem-bad-layout' => 'problemDeployerProblemBadLayout',
-                    'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
-                    'review-bad-layout' => 'problemDeployerReviewBadLayout',
-                    'slow-rejected' => 'problemDeployerSlowRejected',
-                    'tests-bad-layout' => 'problemDeployerTestsBadLayout',
-                    'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
-                ];
-                $tokens = explode(': ', $output->error, 2);
-                if (array_key_exists($tokens[0], $errorMapping)) {
-                    $errorMessage = $errorMapping[$tokens[0]];
-                    if (count($tokens) == 2) {
-                        $context = $tokens[1];
-                    }
+                /** @var null|array{error: string} */
+                $output = json_decode($result['output'], /*assoc=*/true);
+                if (is_null($output)) {
+                    $context = $result['output'];
                 } else {
-                    $context = $output->error;
+                    $errorMapping = [
+                        'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
+                        'config-bad-layout' => 'problemDeployerConfigBadLayout',
+                        'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',
+                        'config-repository-not-absolute-url' => 'problemDeployerConfigRepositoryNotAbsoluteUrl',
+                        'config-subdirectory-missing-target' => 'problemDeployerConfigSubdirectoryMissingTarget',
+                        'interactive-bad-layout' => 'problemDeployerInteractiveBadLayout',
+                        'internal-error' => 'problemDeployerInternalError',
+                        'internal-git-error' => 'problemDeployerInternalGitError',
+                        'invalid-zip-filename' => 'problemDeployerInvalidZipFilename',
+                        'json-parse-error' => 'problemDeployerJsonParseError',
+                        'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
+                        'no-statements' => 'problemDeployerNoStatements',
+                        'not-a-review' => 'problemDeployerNotAReview',
+                        'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
+                        'problem-bad-layout' => 'problemDeployerProblemBadLayout',
+                        'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
+                        'review-bad-layout' => 'problemDeployerReviewBadLayout',
+                        'slow-rejected' => 'problemDeployerSlowRejected',
+                        'tests-bad-layout' => 'problemDeployerTestsBadLayout',
+                        'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
+                    ];
+                    $tokens = explode(': ', $output['error'], 2);
+                    if (array_key_exists($tokens[0], $errorMapping)) {
+                        $errorMessage = $errorMapping[$tokens[0]];
+                        if (count($tokens) == 2) {
+                            $context = $tokens[1];
+                        }
+                    } else {
+                        $context = $output['error'];
+                    }
                 }
             }
             $error = new ProblemDeploymentFailedException($errorMessage, $context);
             $this->log->error(
-                'update zip failed: ' . json_encode($result) . ' ' .$error
+                'update zip failed: ' . json_encode($result) . " {$error}"
             );
             throw $error;
         }
 
-        return json_decode($result['output'], JSON_OBJECT_AS_ARRAY);
+        /** @var array{status: string, error?: string, updated_refs?: array{name: string, from: string, to: string, from_tree: string, to_tree: string}[], updated_files: array{path: string, type: string}[]} */
+        return json_decode($result['output'], /*assoc=*/true);
     }
 
     /**
@@ -401,7 +453,7 @@ class ProblemDeployer {
         string $oldOid,
         string $newOid,
         \OmegaUp\DAO\VO\Users $user
-    ) {
+    ) : void {
         $curl = curl_init();
 
         $pktline = "${oldOid} ${newOid} refs/heads/published\n";
@@ -418,7 +470,10 @@ class ProblemDeployer {
                 [
                     CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-receive-pack",
                     CURLOPT_HTTPHEADER => [
-                        SecurityTools::getGitserverAuthorizationHeader($this->alias, $user->username),
+                        SecurityTools::getGitserverAuthorizationHeader(
+                            $this->alias,
+                            strval($user->username)
+                        ),
                     ],
                     CURLOPT_POSTFIELDS => $payload,
                     CURLOPT_POST => 1,
@@ -426,6 +481,7 @@ class ProblemDeployer {
                 ]
             );
             $output = curl_exec($curl);
+            /** @var int */
             $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($output === false || $retval != 200) {
                 throw new ProblemDeploymentFailedException(
