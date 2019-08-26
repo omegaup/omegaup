@@ -1,4 +1,9 @@
 <?php
+
+namespace OmegaUp;
+
+use \UsersExperimentsDAO;
+
 /**
  * Allows for runtime inclusion/exclusion of certain experiments.
  *
@@ -8,7 +13,7 @@
  * following code at the beginning of the API function.
  *
  *     public static function apiFoo(\OmegaUp\Request $r) {
- *         $experiments->ensureEnabled(Experiments::FOO);
+ *         $experiments->ensureEnabled(\OmegaUp\Experiments::FOO);
  *         //...
  *     }
  *
@@ -48,7 +53,7 @@ class Experiments {
     /**
      * An array with all the known experiments.
      */
-    private static $kKnownExperiments = [
+    private const KNOWN_EXPERIMENTS = [
         self::EPHEMERAL,
         self::IDENTITIES,
     ];
@@ -60,6 +65,7 @@ class Experiments {
 
     const EXPERIMENT_REQUEST_NAME = 'experiments';
 
+    /** @var string[] */
     private $enabledExperiments = [];
 
     /**
@@ -68,8 +74,8 @@ class Experiments {
      * @param \OmegaUp\DAO\VO\Users $user The currently logged in user.
      * @param array<string, mixed> $defines Typically get_defined_constants(true)['user'],
      *                       except in tests.
-     * @param array $knownExperiments Typically
-     *                                Experiments::$kKnownExperiments, except
+     * @param string[] $knownExperiments Typically
+     *                                \OmegaUp\Experiments::KNOWN_EXPERIMENTS, except
      *                                in tests.
      */
     public function __construct(
@@ -79,9 +85,10 @@ class Experiments {
         array $knownExperiments = null
     ) {
         if (is_null($knownExperiments)) {
-            $knownExperiments = self::$kKnownExperiments;
+            $knownExperiments = self::KNOWN_EXPERIMENTS;
         }
         if (is_null($defines)) {
+            /** @var array<string, mixed> */
             $defines = get_defined_constants(true)['user'];
         }
 
@@ -100,16 +107,15 @@ class Experiments {
 
     /**
      * Loads experiments from config (defines).
-     * @param array $defines Typically get_defined_constants(true)['user'],
-     *                       except in tests.
-     * @param array $knownExperiments Typically
-     *                                Experiments::$kKnownExperiments, except
-     *                                in tests.
+     * @param array<string, mixed> $defines Typically
+     * get_defined_constants(true)['user'], except in tests.
+     * @param string[] $knownExperiments Typically
+     * \OmegaUp\Experiments::KNOWN_EXPERIMENTS, except in tests.
      */
     private function loadExperimentsFromConfig(
         array $defines,
         array $knownExperiments
-    ) {
+    ) : void {
         foreach ($knownExperiments as $name) {
             if ($this->isEnabledByConfig($name, $defines)) {
                 $this->enabledExperiments[] = $name;
@@ -121,14 +127,18 @@ class Experiments {
      * Loads experiments for a particular user.
      * @param \OmegaUp\DAO\VO\Users $user The user.
      * @param string[] $knownExperiments Typically
-     * Experiments::KNOWN_EXPERIMENTS, except in tests.
+     * \OmegaUp\Experiments::KNOWN_EXPERIMENTS, except in tests.
      */
     private function loadExperimentsForUser(
         \OmegaUp\DAO\VO\Users $user,
         array $knownExperiments
-    ) {
+    ) : void {
+        if (is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         foreach (UsersExperimentsDAO::getByUserId($user->user_id) as $ue) {
             if (in_array($ue->experiment, $knownExperiments) &&
+                !is_null($ue->experiment) &&
                 !$this->isEnabled($ue->experiment)
             ) {
                 $this->enabledExperiments[] = $ue->experiment;
@@ -140,15 +150,15 @@ class Experiments {
      * Loads experiments from request parameters. To avoid users enabling
      * experiments without permission, the request must provide both the name
      * of the experiment as well as an HMAC-hashed version.
-     * @param array $request Typically $_REQUEST, except in tests.
-     * @param array $knownExperiments Typically
-     *                                Experiments::$kKnownExperiments, except
+     * @param array<string, string> $request Typically $_REQUEST, except in tests.
+     * @param string[] $knownExperiments Typically
+     *                                \OmegaUp\Experiments::KNOWN_EXPERIMENTS, except
      *                                in tests.
      */
     private function loadExperimentsFromRequest(
         array $request,
         array $knownExperiments
-    ) {
+    ) : void {
         $tokens = explode(',', $request[self::EXPERIMENT_REQUEST_NAME]);
         foreach ($tokens as $token) {
             $kvp = explode('=', $token);
@@ -168,10 +178,10 @@ class Experiments {
 
     /**
      * Ensures an experiment is enabled.
-     * @param string name The name of the experiment.
+     * @param string $name The name of the experiment.
      * @throws \OmegaUp\Exceptions\NotFoundException if the experiment is not enabled.
      */
-    public function ensureEnabled($name) {
+    public function ensureEnabled(string $name) : void {
         if (!$this->isEnabled($name)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -180,9 +190,9 @@ class Experiments {
     /**
      * Returns whether an experiment is enabled.
      * @param string $name The experiment name.
-     * @return boolean True iff the experiment is enabled.
+     * @return bool True iff the experiment is enabled.
      */
-    public function isEnabled($name) {
+    public function isEnabled(string $name) : bool {
         return in_array($name, $this->enabledExperiments);
     }
 
@@ -191,33 +201,33 @@ class Experiments {
      * @param string $name The experiment name.
      * @return string The hashed experiment name.
      */
-    public static function getExperimentHash($name) {
+    public static function getExperimentHash(string $name) : string {
         return hash_hmac('sha1', $name, OMEGAUP_EXPERIMENT_SECRET);
     }
 
     /**
      * Returns an array with all the enabled experiments.
-     * @return array The array with all experiment names.
+     * @return string[] The array with all experiment names.
      */
-    public function getEnabledExperiments() {
+    public function getEnabledExperiments() : array {
         return $this->enabledExperiments;
     }
 
     /**
      * Returns an array with all the known experiments.
-     * @return array The array with all the known experiment names.
+     * @return string[] The array with all the known experiment names.
      */
-    public function getAllKnownExperiments() {
-        return self::$kKnownExperiments;
+    public function getAllKnownExperiments() : array {
+        return self::KNOWN_EXPERIMENTS;
     }
 
     /**
      * Returns whether an experiment is enabled by a config definition.
      * @param string $name The experiment name.
-     * @param array $defines The array with all the user-defined constants.
-     * @return boolean True iff the experiment is enabled by config.
+     * @param array<string, mixed> $defines The array with all the user-defined constants.
+     * @return bool True iff the experiment is enabled by config.
      */
-    public function isEnabledByConfig($name, $defines) {
+    public function isEnabledByConfig(string $name, array $defines) : bool {
         return array_key_exists(
             self::EXPERIMENT_PREFIX . strtoupper($name),
             $defines

@@ -2311,7 +2311,7 @@ class UserController extends Controller {
      */
     public static function apiAssociateIdentity(\OmegaUp\Request $r) {
         global $experiments;
-        $experiments->ensureEnabled(Experiments::IDENTITIES);
+        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
         Validators::validateStringNonEmpty($r['username'], 'username');
@@ -2348,7 +2348,7 @@ class UserController extends Controller {
      */
     public static function apiListAssociatedIdentities(\OmegaUp\Request $r) {
         global $experiments;
-        $experiments->ensureEnabled(Experiments::IDENTITIES);
+        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::authenticateRequest($r);
 
         return [

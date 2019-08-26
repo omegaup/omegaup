@@ -10,19 +10,19 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     private static function getRequestForExperiments(array $experiments) {
         $kvp = [];
         foreach ($experiments as $name) {
-            $kvp[] = $name . '=' . Experiments::getExperimentHash($name);
+            $kvp[] = $name . '=' . \OmegaUp\Experiments::getExperimentHash($name);
         }
         return [
-            Experiments::EXPERIMENT_REQUEST_NAME => implode(',', $kvp),
+            \OmegaUp\Experiments::EXPERIMENT_REQUEST_NAME => implode(',', $kvp),
         ];
     }
 
     public function testConfigExperiments() {
         $defines = [
-            Experiments::EXPERIMENT_PREFIX . strtoupper(self::TEST) => true,
+            \OmegaUp\Experiments::EXPERIMENT_PREFIX . strtoupper(self::TEST) => true,
         ];
         $experiments = new
-            Experiments([], null, $defines, self::$kKnownExperiments);
+            \OmegaUp\Experiments([], null, $defines, self::$kKnownExperiments);
 
         $this->assertEquals(
             self::$kKnownExperiments,
@@ -33,7 +33,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
     public function testRequestExperiments() {
         $experiments = new
-            Experiments(
+            \OmegaUp\Experiments(
                 self::getRequestForExperiments([self::TEST]),
                 null,
                 [],
@@ -49,7 +49,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
     public function testRequestUnknownExperiments() {
         $experiments = new
-            Experiments(
+            \OmegaUp\Experiments(
                 self::getRequestForExperiments(['foo']),
                 null,
                 [],
@@ -62,9 +62,9 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
     public function testRequestInvalidExperiments() {
         $experiments = new
-            Experiments(
+            \OmegaUp\Experiments(
                 [
-                    Experiments::EXPERIMENT_REQUEST_NAME =>
+                    \OmegaUp\Experiments::EXPERIMENT_REQUEST_NAME =>
                         self::TEST . '=invalid_hash',
                 ],
                 null,
@@ -79,7 +79,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     public function testUserExperiments() {
         $user = UserFactory::createUser();
         $experiments = new
-            Experiments(
+            \OmegaUp\Experiments(
                 [],
                 $user,
                 [],
@@ -97,7 +97,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
         ]));
 
         $experiments = new
-            Experiments(
+            \OmegaUp\Experiments(
                 [],
                 $user,
                 [],

@@ -7,5 +7,5 @@ if (count($argv) < 2) {
     die(1);
 }
 
-$experiments = new Experiments([], null);
+$experiments = new \OmegaUp\Experiments([], null);
 echo $experiments->getExperimentHash($argv[1]) . "\n";

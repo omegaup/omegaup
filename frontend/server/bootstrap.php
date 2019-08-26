@@ -119,7 +119,6 @@ require_once('libs/ApiException.php');
 require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Cache.php');
-require_once('libs/Experiments.php');
 require_once('libs/Grader.php');
 require_once('libs/Pager.php');
 require_once('libs/Scoreboard.php');
@@ -190,7 +189,7 @@ Logger::configure([
 $log = Logger::getLogger('bootstrap');
 
 $session = SessionController::apiCurrentSession(new \OmegaUp\Request($_REQUEST))['session'];
-$experiments = new Experiments(
+$experiments = new \OmegaUp\Experiments(
     $_REQUEST,
     array_key_exists('user', $session) ? $session['user'] : null
 );
