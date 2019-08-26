@@ -56,8 +56,8 @@ abstract class {{ table.class_name }}DAOBase {
     {%- endif %}
   {%- endfor %}
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 {% endif %}
 {%- if table.columns|selectattr('primary_key')|list and table.columns|rejectattr('primary_key')|list %}
@@ -102,8 +102,8 @@ abstract class {{ table.class_name }}DAOBase {
     {%- endif %}
   {%- endfor %}
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 {% endif %}
 {%- if table.columns|selectattr('primary_key')|list %}
@@ -123,7 +123,7 @@ abstract class {{ table.class_name }}DAOBase {
   {%- endif %}
         $sql = 'SELECT {{ table.fieldnames }} FROM {{ table.name }} WHERE ({{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }}) LIMIT 1;';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -150,8 +150,8 @@ abstract class {{ table.class_name }}DAOBase {
         $sql = 'DELETE FROM `{{ table.name }}` WHERE {{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }};';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(', ') }}];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -183,13 +183,13 @@ abstract class {{ table.class_name }}DAOBase {
     ) : array {
         $sql = 'SELECT {{ table.fieldnames }} from {{ table.name }}';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new {{ table.class_name }}($row);
         }
         return $allData;
@@ -229,13 +229,13 @@ abstract class {{ table.class_name }}DAOBase {
   {%- endif %}
 {%- endfor %}
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
 {%- for column in table.columns|selectattr('auto_increment') %}
-        ${{ table.name }}->{{ column.name }} = MySQLConnection::getInstance()->Insert_ID();
+        ${{ table.name }}->{{ column.name }} = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 {%- endfor %}
 
         return $affectedRows;

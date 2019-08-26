@@ -18,7 +18,7 @@ class DbConfigTest extends OmegaUpTestCase {
         // Go to the DB
 
         $sql = "select timediff(now(),convert_tz(now(),@@session.time_zone,'+00:00')) d";
-        $rs = MySQLConnection::getInstance()->GetRow($sql);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
 
         $this->assertEquals('00:00:00', $rs['d']);
     }

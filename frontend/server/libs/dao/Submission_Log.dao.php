@@ -51,7 +51,7 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
                     `time`;';
         $val = [$problemset_id];
 
-        return MySQLConnection::getInstance()->GetAll($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     final public static function GetSubmissionsForCourse($course_id) {
@@ -82,6 +82,6 @@ class SubmissionLogDAO extends SubmissionLogDAOBase {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        return MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
     }
 }

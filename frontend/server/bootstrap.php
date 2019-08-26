@@ -1,9 +1,10 @@
 <?php
-// Set default time
-date_default_timezone_set('UTC');
-
 //set paths
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . __DIR__);
+require_once 'autoload.php';
+
+// Set default time
+date_default_timezone_set('UTC');
 
 if (!(defined('IS_TEST') && IS_TEST === true)) {
     if (!is_file(__DIR__ . '/config.php')) { ?>
@@ -119,7 +120,6 @@ require_once('libs/ApiUtils.php');
 require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Cache.php');
-require_once('libs/Database.php');
 require_once('libs/Experiments.php');
 require_once('libs/Grader.php');
 require_once('libs/Pager.php');

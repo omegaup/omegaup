@@ -34,8 +34,8 @@ abstract class NotificationsDAOBase {
             $Notifications->contents,
             (int)$Notifications->notification_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -49,7 +49,7 @@ abstract class NotificationsDAOBase {
     final public static function getByPK(int $notification_id) : ?Notifications {
         $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`contents` FROM Notifications WHERE (notification_id = ?) LIMIT 1;';
         $params = [$notification_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -76,8 +76,8 @@ abstract class NotificationsDAOBase {
         $sql = 'DELETE FROM `Notifications` WHERE notification_id = ?;';
         $params = [$Notifications->notification_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -109,13 +109,13 @@ abstract class NotificationsDAOBase {
     ) : array {
         $sql = 'SELECT `Notifications`.`notification_id`, `Notifications`.`user_id`, `Notifications`.`timestamp`, `Notifications`.`read`, `Notifications`.`contents` from Notifications';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new Notifications($row);
         }
         return $allData;
@@ -139,12 +139,12 @@ abstract class NotificationsDAOBase {
             (int)$Notifications->read,
             $Notifications->contents,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Notifications->notification_id = MySQLConnection::getInstance()->Insert_ID();
+        $Notifications->notification_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

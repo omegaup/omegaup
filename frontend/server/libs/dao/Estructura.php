@@ -8,16 +8,16 @@
  */
 final class DAO {
     final public static function transBegin() : void {
-        MySQLConnection::getInstance()->StartTrans();
+        \OmegaUp\MySQLConnection::getInstance()->StartTrans();
     }
 
     final public static function transEnd() : void {
-        MySQLConnection::getInstance()->CompleteTrans();
+        \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
     }
 
     final public static function transRollback() : void {
-        MySQLConnection::getInstance()->FailTrans();
-        MySQLConnection::getInstance()->CompleteTrans();
+        \OmegaUp\MySQLConnection::getInstance()->FailTrans();
+        \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
     }
 
     final public static function isDuplicateEntryException(Exception $e) : bool {

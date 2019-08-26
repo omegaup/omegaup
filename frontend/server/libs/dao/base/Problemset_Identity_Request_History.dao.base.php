@@ -35,8 +35,8 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
             is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
             (int)$Problemset_Identity_Request_History->history_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -50,7 +50,7 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
     final public static function getByPK(int $history_id) : ?ProblemsetIdentityRequestHistory {
         $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` FROM Problemset_Identity_Request_History WHERE (history_id = ?) LIMIT 1;';
         $params = [$history_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -77,8 +77,8 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
         $sql = 'DELETE FROM `Problemset_Identity_Request_History` WHERE history_id = ?;';
         $params = [$Problemset_Identity_Request_History->history_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -110,13 +110,13 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
     ) : array {
         $sql = 'SELECT `Problemset_Identity_Request_History`.`history_id`, `Problemset_Identity_Request_History`.`identity_id`, `Problemset_Identity_Request_History`.`problemset_id`, `Problemset_Identity_Request_History`.`time`, `Problemset_Identity_Request_History`.`accepted`, `Problemset_Identity_Request_History`.`admin_id` from Problemset_Identity_Request_History';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemsetIdentityRequestHistory($row);
         }
         return $allData;
@@ -141,12 +141,12 @@ abstract class ProblemsetIdentityRequestHistoryDAOBase {
             is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
             is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Problemset_Identity_Request_History->history_id = MySQLConnection::getInstance()->Insert_ID();
+        $Problemset_Identity_Request_History->history_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }

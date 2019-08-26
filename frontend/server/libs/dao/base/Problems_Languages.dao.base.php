@@ -29,7 +29,7 @@ abstract class ProblemsLanguagesDAOBase {
     final public static function getByPK(?int $problem_id, ?int $language_id) : ?ProblemsLanguages {
         $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` FROM Problems_Languages WHERE (problem_id = ? AND language_id = ?) LIMIT 1;';
         $params = [$problem_id, $language_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -56,8 +56,8 @@ abstract class ProblemsLanguagesDAOBase {
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ? AND language_id = ?;';
         $params = [$Problems_Languages->problem_id, $Problems_Languages->language_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -89,13 +89,13 @@ abstract class ProblemsLanguagesDAOBase {
     ) : array {
         $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` from Problems_Languages';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new ProblemsLanguages($row);
         }
         return $allData;
@@ -117,8 +117,8 @@ abstract class ProblemsLanguagesDAOBase {
             is_null($Problems_Languages->problem_id) ? null : (int)$Problems_Languages->problem_id,
             is_null($Problems_Languages->language_id) ? null : (int)$Problems_Languages->language_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }

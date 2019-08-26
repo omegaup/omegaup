@@ -33,8 +33,8 @@ abstract class PrivacyStatementConsentLogDAOBase {
             DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
             (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -48,7 +48,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
     final public static function getByPK(int $privacystatement_consent_id) : ?PrivacyStatementConsentLog {
         $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` FROM PrivacyStatement_Consent_Log WHERE (privacystatement_consent_id = ?) LIMIT 1;';
         $params = [$privacystatement_consent_id];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
@@ -75,8 +75,8 @@ abstract class PrivacyStatementConsentLogDAOBase {
         $sql = 'DELETE FROM `PrivacyStatement_Consent_Log` WHERE privacystatement_consent_id = ?;';
         $params = [$PrivacyStatement_Consent_Log->privacystatement_consent_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        if (MySQLConnection::getInstance()->Affected_Rows() == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
             throw new NotFoundException('recordNotFound');
         }
     }
@@ -108,13 +108,13 @@ abstract class PrivacyStatementConsentLogDAOBase {
     ) : array {
         $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` from PrivacyStatement_Consent_Log';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
             $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
         }
         $allData = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
             $allData[] = new PrivacyStatementConsentLog($row);
         }
         return $allData;
@@ -137,12 +137,12 @@ abstract class PrivacyStatementConsentLogDAOBase {
             is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
             DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        $affectedRows = MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $PrivacyStatement_Consent_Log->privacystatement_consent_id = MySQLConnection::getInstance()->Insert_ID();
+        $PrivacyStatement_Consent_Log->privacystatement_consent_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
 
         return $affectedRows;
     }
