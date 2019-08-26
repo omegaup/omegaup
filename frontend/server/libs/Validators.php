@@ -23,7 +23,7 @@ class Validators {
             return;
         }
         if (!filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
         }
     }
 
@@ -46,7 +46,7 @@ class Validators {
 
         // Validate data is string
         if (!is_string($parameter) || empty($parameter)) {
-            throw new InvalidParameterException('parameterEmpty', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $parameterName);
         }
     }
 
@@ -68,18 +68,18 @@ class Validators {
             return;
         }
         if (!is_string($parameter)) {
-            throw new InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
         }
 
         if (!is_null($minLength) && strlen($parameter) < $minLength) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',
                 $parameterName,
                 ['min_length' => $minLength]
             );
         }
         if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooLong',
                 $parameterName,
                 ['max_length' => $maxLength]
@@ -106,13 +106,13 @@ class Validators {
             empty($parameter) ||
             strlen($parameter) > 32
         ) {
-            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
         if (self::isRestrictedAlias($parameter)) {
             throw new DuplicatedEntryInDatabaseException('aliasInUse');
         }
         if (!self::isValidAlias($parameter)) {
-            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
     }
 
@@ -143,7 +143,7 @@ class Validators {
      * @param string $parameter
      * @param string $parameterName
      * @param bool $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsername(
         $parameter,
@@ -156,7 +156,7 @@ class Validators {
         self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, $required);
 
         if (preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
-            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
     }
 
@@ -166,7 +166,7 @@ class Validators {
      * @param string $parameter
      * @param string $parameterName
      * @param bool $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsernameIdentity(
         $parameter,
@@ -179,7 +179,7 @@ class Validators {
         self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, $required);
 
         if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
-            throw new InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
     }
 
@@ -188,7 +188,7 @@ class Validators {
      * @param mixed $parameter
      * @param string $parameterName
      * @param bool $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateDate(
         $parameter,
@@ -202,7 +202,7 @@ class Validators {
         // Validate that we are working with a date
         // @TODO This strtotime() allows nice strings like "next Thursday".
         if (!is_string($parameter) || strtotime($parameter) === false) {
-            throw new InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
         }
     }
 
@@ -213,7 +213,7 @@ class Validators {
      * @param int|float|null $lowerBound
      * @param int|float|null $upperBound
      * @param boolean   $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateNumberInRange(
         $parameter,
@@ -226,19 +226,19 @@ class Validators {
             return;
         }
         if (!is_numeric($parameter)) {
-            throw new InvalidParameterException('parameterNotANumber', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotANumber', $parameterName);
         }
         // Coerce $parameter into a numeric value.
         $parameter = $parameter + 0;
         if (!is_null($lowerBound) && $parameter < $lowerBound) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNumberTooSmall',
                 $parameterName,
                 ['lower_bound' => $lowerBound]
             );
         }
         if (!is_null($upperBound) && $parameter > $upperBound) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNumberTooLarge',
                 $parameterName,
                 ['upper_bound' => $upperBound]
@@ -251,7 +251,7 @@ class Validators {
      * @param mixed  $parameter
      * @param string $parameterName
      * @param bool   $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateNumber(
         $parameter,
@@ -262,7 +262,7 @@ class Validators {
             return;
         }
         if (!is_numeric($parameter)) {
-            throw new InvalidParameterException('parameterNotANumber', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotANumber', $parameterName);
         }
     }
 
@@ -272,7 +272,7 @@ class Validators {
      * @param string $parameterName
      * @param array $enum
      * @param bool $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateInEnum(
         $parameter,
@@ -285,7 +285,7 @@ class Validators {
         }
 
         if (!in_array($parameter, $enum)) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
                 $parameterName,
                 ['bad_elements' => $parameter, 'expected_set' => implode(', ', $enum)]
@@ -299,7 +299,7 @@ class Validators {
      * @param string $parameterName
      * @param array $enum
      * @param bool $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidSubset(
         $parameter,
@@ -311,7 +311,7 @@ class Validators {
             return;
         }
         if (!is_string($parameter)) {
-            throw new InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
         }
 
         $badElements = [];
@@ -322,7 +322,7 @@ class Validators {
             }
         }
         if (!empty($badElements)) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotInExpectedSet',
                 $parameterName,
                 ['bad_elements' => implode(',', $badElements), 'expected_set' => implode(', ', $enum)]
@@ -335,7 +335,7 @@ class Validators {
      * @param mixed $parameter
      * @param string $parameterName
      * @param bool $required
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function isPresent(
         $parameter,
@@ -346,7 +346,7 @@ class Validators {
             return true;
         }
         if ($required) {
-            throw new InvalidParameterException('parameterEmpty', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $parameterName);
         }
         return false;
     }

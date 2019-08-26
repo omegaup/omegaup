@@ -34,7 +34,7 @@ class RunController extends Controller {
      * @param Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws NotAllowedToSubmitException
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws ForbiddenAccessException
      */
     private static function validateCreateRequest(Request $r) {
@@ -70,7 +70,7 @@ class RunController extends Controller {
 
         // Can't set both problemset_id and contest_alias at the same time.
         if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'incompatibleArgs',
                 'problemset_id and contest_alias'
             );
@@ -88,7 +88,7 @@ class RunController extends Controller {
             $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
 
             if ($r['contest'] == null) {
-                throw new InvalidParameterException('parameterNotFound', 'contest_alias');
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'contest_alias');
             }
 
             $problemset_id = $r['contest']->problemset_id;
@@ -126,7 +126,7 @@ class RunController extends Controller {
 
         $r['problemset'] = ProblemsetsDAO::getByPK($problemset_id);
         if ($r['problemset'] == null) {
-            throw new InvalidParameterException('parameterNotFound', 'problemset_id');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problemset_id');
         }
 
         // Validate the language.
@@ -147,7 +147,7 @@ class RunController extends Controller {
             $problemset_id,
             $r['problem']->problem_id
         )) {
-            throw new InvalidParameterException('parameterNotFound', 'problem_alias');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
         $problemsetIdentity = ProblemsetIdentitiesDAO::getByPK(

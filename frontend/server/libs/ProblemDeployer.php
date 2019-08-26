@@ -186,7 +186,7 @@ class ProblemDeployer {
                 "{$this->alias}_", '--shift-time-for-zip'];
             $this->executeRaw($args, $target);
         } catch (Exception $e) {
-            throw new InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'problemDeployerLibinteractiveValidationError',
                 $e->getMessage()
             );

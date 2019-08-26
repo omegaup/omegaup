@@ -1,43 +1,6 @@
 <?php
 
 /**
- * InvalidArgumentException
- *
- */
-class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
-    private $parameter;
-    private $additional_parameters;
-
-    /**
-     *
-     * @param string $message
-     * @param Exception $previous
-     */
-    public function __construct($message, $parameter = null, $additional_parameters = []) {
-        parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400);
-        $this->parameter = $parameter;
-        $this->additional_parameters = $additional_parameters;
-    }
-
-    public function getErrorMessage() : string {
-        $localizedText = \OmegaUp\Translations::getInstance()->get($this->message);
-        if (empty($localizedText)) {
-            self::$log->error("Untranslated error message: {$this->message}");
-            return "{untranslated:{$this->message}}";
-        }
-        $localizedText = \OmegaUp\ApiUtils::FormatString(
-            $localizedText,
-            $this->additional_parameters
-        );
-        if ($this->parameter == null) {
-            return $localizedText;
-        } else {
-            return "$localizedText: {$this->parameter}";
-        }
-    }
-}
-
-/**
  * DuplicatedEntryInDatabaseException
  *
  */

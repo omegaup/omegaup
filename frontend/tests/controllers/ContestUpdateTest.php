@@ -53,7 +53,7 @@ class UpdateContestTest extends OmegaupTestCase {
     /**
      * Update from private to public. Should fail if no problems in contest
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUpdatePrivateContestToPublicWithoutProblems() {
         // Get a contest
@@ -157,7 +157,7 @@ class UpdateContestTest extends OmegaupTestCase {
     /**
      * Contest length can't be too long
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUpdateContestLengthTooLong() {
         // Get a contest
@@ -214,7 +214,7 @@ class UpdateContestTest extends OmegaupTestCase {
     /**
      * Contest start can't be updated if already contains runs
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUpdateContestStartWithRuns() {
         // Get a contest
@@ -474,7 +474,7 @@ class UpdateContestTest extends OmegaupTestCase {
             // Call API
             ContestController::apiUpdate($r);
             $this->fail('Only numbers are allowed in window_length field');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Pass
             $this->assertEquals('parameterNotANumber', $e->getMessage());
         }
@@ -542,7 +542,7 @@ class UpdateContestTest extends OmegaupTestCase {
         try {
             ContestController::apiUpdate($r);
             $this->fail('Window length can not greater than contest length');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Pass
             $this->assertEquals('parameterNumberTooLarge', $e->getMessage());
         }

@@ -112,7 +112,7 @@ class Request extends ArrayObject {
                 if (!$required) {
                     return;
                 }
-                throw new InvalidParameterException('parameterEmpty', $key);
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
             }
             $this[$key] = $val == '1' || $val == 'true';
         }
@@ -131,7 +131,7 @@ class Request extends ArrayObject {
             if (!$required) {
                 return;
             }
-            throw new InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
         }
         $val = self::offsetGet($key);
         Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
@@ -151,7 +151,7 @@ class Request extends ArrayObject {
             if (!$required) {
                 return;
             }
-            throw new InvalidParameterException('parameterEmpty', $key);
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $key);
         }
         $val = self::offsetGet($key);
         Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);

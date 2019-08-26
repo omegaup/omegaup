@@ -140,7 +140,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             ]));
             $this->fail('Identity should not be associated because identity ' .
                         'username does not match');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Exception expected
             $this->assertEquals($e->getMessage(), 'parameterInvalid');
         }
@@ -188,7 +188,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             ]));
             $this->fail('Identity should not be associated because identity ' .
                         'password does not match');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Exception expected
             $this->assertEquals($e->getMessage(), 'parameterInvalid');
         }

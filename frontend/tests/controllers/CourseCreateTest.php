@@ -209,7 +209,7 @@ class CourseCreateTest extends OmegaupTestCase {
 
     /**
      * Try to create an assignment with inverted times.
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testCreateAssignmentWithInvertedTimes() {
         $admin = UserFactory::createUser();

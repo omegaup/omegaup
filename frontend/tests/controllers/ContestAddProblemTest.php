@@ -58,7 +58,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
     /**
      * Add a problem to contest with invalid params
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testAddProblemToContestInvalidProblem() {
         // Get a problem
@@ -83,7 +83,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
     /**
      * Add a problem to contest with invalid params
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testAddProblemToContestInvalidContest() {
         // Get a problem

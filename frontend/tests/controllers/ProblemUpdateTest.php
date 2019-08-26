@@ -251,7 +251,7 @@ class UpdateProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUpdateProblemWithInvalidLanguages() {
         // Get a problem
@@ -642,7 +642,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'message' => 'public -> promoted',
             ]));
             $this->fail('Cannot ban problem from API');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
         }
 
         // Ban the problem.
@@ -669,7 +669,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'message' => 'banned -> private',
             ]));
             $this->fail('Cannot un-ban problem from API');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenBanned');
         }
 
@@ -681,7 +681,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'message' => 'banned -> public',
             ]));
             $this->fail('Cannot un-ban problem from API');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenBanned');
         }
 
@@ -709,7 +709,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'message' => 'promoted -> private',
             ]));
             $this->fail('Cannot un-promote problem from API');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenPromoted');
         }
 
@@ -721,7 +721,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'message' => 'promoted -> public',
             ]));
             $this->fail('Cannot un-promote problem from API');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'qualityNominationProblemHasBeenPromoted');
         }
     }
@@ -795,7 +795,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'public' => 'true',
             ]));
             $this->fail('Should not have been able to remove restricted tag');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('tagRestricted', $e->getMessage());
         }
     }

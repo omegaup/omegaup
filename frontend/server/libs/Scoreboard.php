@@ -92,12 +92,12 @@ class ScoreboardParams implements ArrayAccess {
      * @param  boolean $required
      * @param    $default
      * @return boolean
-     * @throws InvalidParameterException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateParameter($parameter, array& $array, $required = true, $default = null) {
         if (!isset($array[$parameter])) {
             if ($required) {
-                throw new InvalidParameterException('parameterEmpty', $parameter);
+                throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $parameter);
             }
 
             $array[$parameter] = $default;
