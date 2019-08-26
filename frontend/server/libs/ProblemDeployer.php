@@ -1,6 +1,5 @@
 <?php
 
-require_once 'libs/FileHandler.php';
 require_once 'libs/ProblemArtifacts.php';
 
 /**
@@ -31,7 +30,7 @@ class ProblemDeployer {
         $this->alias = $alias;
 
         if (isset($_FILES['problem_contents'])
-            && FileHandler::GetFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
+            && \OmegaUp\FileHandler::getFileUploader()->IsUploadedFile($_FILES['problem_contents']['tmp_name'])
         ) {
             $this->zipPath = $_FILES['problem_contents']['tmp_name'];
         } else {
@@ -156,7 +155,7 @@ class ProblemDeployer {
             // oops, this was not an interactive problem.
             return;
         }
-        $tmpDir = FileHandler::TempDir('/tmp', 'ProblemDeployer', 0755);
+        $tmpDir = \OmegaUp\FileHandler::tempDir('/tmp', 'ProblemDeployer', 0755);
         try {
             $idlPath = "{$tmpDir}/{$distribSettings['interactive']['module_name']}.idl";
             file_put_contents(
@@ -191,7 +190,7 @@ class ProblemDeployer {
                 $e->getMessage()
             );
         } finally {
-            FileHandler::DeleteDirRecursive($tmpDir);
+            \OmegaUp\FileHandler::deleteDirRecursively($tmpDir);
         }
     }
 

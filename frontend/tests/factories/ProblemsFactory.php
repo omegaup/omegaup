@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/FileHandler.php';
-
 /**
  * ProblemParams
  */
@@ -173,7 +171,7 @@ class ProblemsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader(new FileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting(new FileUploaderMock());
 
         // Call the API
         ProblemController::apiCreate($r);

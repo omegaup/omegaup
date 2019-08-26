@@ -5,7 +5,6 @@
  *
  * @author juan.pablo
  */
-require_once 'libs/FileHandler.php';
 
 class IdentityCreateTest extends OmegaupTestCase {
     /**

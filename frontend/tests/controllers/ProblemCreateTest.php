@@ -5,7 +5,6 @@
  *
  * @author joemmanuel
  */
-require_once 'libs/FileHandler.php';
 
 class CreateProblemTest extends OmegaupTestCase {
     /**
@@ -22,7 +21,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -93,7 +92,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -134,7 +133,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -175,7 +174,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -199,7 +198,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testRequiredParameters() {
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Array of valid keys
         $valid_keys = [
@@ -242,7 +241,7 @@ class CreateProblemTest extends OmegaupTestCase {
      */
     public function testInvalidLanguage() {
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         foreach (['abc', 'c,cpp,cows', 'java,coffee,espresso'] as $languages) {
             // Get the problem data
@@ -282,7 +281,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -342,7 +341,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -387,7 +386,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -439,7 +438,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);
@@ -496,7 +495,7 @@ class CreateProblemTest extends OmegaupTestCase {
         );
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         ProblemController::apiCreate($r);
@@ -537,7 +536,7 @@ class CreateProblemTest extends OmegaupTestCase {
         ]);
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         try {
             // Call the API
@@ -564,7 +563,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         try {
@@ -591,7 +590,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         try {
@@ -618,7 +617,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Get File Uploader Mock and tell Omegaup API to use it
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
         $response = ProblemController::apiCreate($r);

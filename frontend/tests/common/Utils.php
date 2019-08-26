@@ -54,7 +54,7 @@ class Utils {
     }
 
     public static function CleanPath($path) {
-        FileHandler::DeleteDirRecursive($path);
+        \OmegaUp\FileHandler::deleteDirRecursively($path);
         mkdir($path, 0755, true);
     }
 
