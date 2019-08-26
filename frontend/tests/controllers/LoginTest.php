@@ -102,9 +102,9 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new Request([
-                    'usernameOrEmail' => $email,
-                    'password' => 'badpasswordD:'
-                ]);
+            'usernameOrEmail' => $email,
+            'password' => 'badpasswordD:'
+        ]);
 
         // Call the API
         $response = UserController::apiLogin($r);
