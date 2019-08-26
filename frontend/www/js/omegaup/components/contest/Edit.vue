@@ -76,8 +76,11 @@
   </div>
 </template>
 
-<script>
-import {T, UI} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
 import contest_AddProblem from './AddProblem.vue';
 import contest_Admins from './Admins.vue';
 import contest_Clone from './Clone.vue';
@@ -88,23 +91,16 @@ import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import contest_Publish from './Publish.vue';
 
-export default {
-  props: {
-    data: Object,
-  },
-  data: function() {
-    return {
-      showTab: UI.isVirtual(this.data.contest) ? 'contestants' : 'new_form',
-      T: T, virtual: UI.isVirtual(this.data.contest),
-      UI: UI,
-      contest: this.data.contest,
-      problems: this.data.problems,
-      users: this.data.users,
-      requests: this.data.requests,
-      admins: this.data.admins,
-      groupAdmins: this.data.groupAdmins,
-    };
-  },
+interface ContestEdit {
+  admins: omegaup.ContestAdmin[];
+  contest: omegaup.Contest;
+  groupAdmins: omegaup.ContestGroupAdmin[];
+  problems: omegaup.Problem[];
+  requests: omegaup.IdentityContestRequest[];
+  users: omegaup.IdentityContest[];
+}
+
+@Component({
   components: {
     'omegaup-contest-add-problem': contest_AddProblem,
     'omegaup-contest-admins': contest_Admins,
@@ -116,5 +112,20 @@ export default {
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-contest-publish': contest_Publish,
   },
-};
+})
+export default class Edit extends Vue {
+  @Prop() data!: ContestEdit;
+
+  T = T;
+  UI = UI;
+  showTab = UI.isVirtual(this.data.contest) ? 'contestants' : 'new_form';
+  virtual = UI.isVirtual(this.data.contest);
+  contest = this.data.contest;
+  problems = this.data.problems;
+  users = this.data.users;
+  requests = this.data.requests;
+  admins = this.data.admins;
+  groupAdmins = this.data.groupAdmins;
+}
+
 </script>

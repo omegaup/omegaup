@@ -197,86 +197,89 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 import DateTimePicker from '../DateTimePicker.vue';
 
-export default {
-  props: {
-    update: Boolean,
-    data: Object,
-  },
-  data: function() {
-    return {
-      alias: this.data.alias,
-      availableLanguages: this.data.available_languages,
-      contest: this.data,
-      contestantMustRegister: this.data.contestant_must_register,
-      description: this.data.description,
-      feedback: this.data.feedback,
-      finishTime: this.data.finish_time,
-      scoreboard: this.data.scoreboard,
-      languages: this.data.languages,
-      needsBasicInformation: this.data.needs_basic_information,
-      penalty: this.data.penalty,
-      penaltyType: this.data.penalty_type,
-      penaltyCalcPolicy: this.data.penalty_calc_policy,
-      pointsDecayFactor: this.data.points_decay_factor,
-      requestsUserInformation: this.data.requests_user_information,
-      startTime: this.data.start_time,
-      showPenalty: this.data.show_penalty,
-      showScoreboardAfter: this.data.show_scoreboard_after,
-      submissionsGap: this.data.submissions_gap,
-      title: this.data.title,
-      titlePlaceHolder: '',
-      windowLength: this.data.window_length || 0,
-      windowLengthEnabled: this.data.window_length != 0 &&
-                               this.data.window_length != '' &&
-                               this.data.window_length != null,
-      T: T,
-    };
-  },
-  methods: {
-    fillOmi: function() {
-      this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
-      this.windowLengthEnabled = false;
-      this.windowLength = 0;
-      this.scoreboard = 0;
-      this.pointsDecayFactor = 0;
-      this.submissionsGap = 1;
-      this.feedback = 'yes';
-      this.penalty = 0;
-      this.penaltyType = 'none';
-      this.showScoreboardAfter = true;
-    },
-    fillPreIoi: function() {
-      this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
-      this.windowLengthEnabled = true;
-      this.windowLength = 180;
-      this.scoreboard = 0;
-      this.pointsDecayFactor = 0;
-      this.submissionsGap = 0;
-      this.feedback = 'yes';
-      this.penalty = 0;
-      this.penaltyType = 'none';
-      this.showScoreboardAfter = true;
-    },
-    fillConacup: function() {
-      this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
-      this.windowLengthEnabled = false;
-      this.windowLength = '';
-      this.scoreboard = 75;
-      this.pointsDecayFactor = 0;
-      this.submissionsGap = 1;
-      this.feedback = 'yes';
-      this.penalty = 20;
-      this.penaltyType = 'none';
-      this.showScoreboardAfter = true;
-    },
-    onSubmit: function() { this.$parent.$emit('update-contest', this);},
-  },
+@Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
   },
-};
+})
+export default class NewForm extends Vue {
+  @Prop() data!: omegaup.Contest;
+  @Prop() update!: boolean;
+
+  T = T;
+  alias = this.data.alias;
+  availableLanguages = this.data.available_languages;
+  contest = this.data;
+  contestantMustRegister = this.data.contestant_must_register;
+  description = this.data.description;
+  feedback = this.data.feedback;
+  finishTime = this.data.finish_time;
+  scoreboard = this.data.scoreboard;
+  languages = this.data.languages;
+  needsBasicInformation = this.data.needs_basic_information;
+  penalty = this.data.penalty;
+  penaltyType = this.data.penalty_type;
+  penaltyCalcPolicy = this.data.penalty_calc_policy;
+  pointsDecayFactor = this.data.points_decay_factor;
+  requestsUserInformation = this.data.requests_user_information;
+  startTime = this.data.start_time;
+  showPenalty = this.data.show_penalty;
+  showScoreboardAfter = this.data.show_scoreboard_after;
+  submissionsGap = this.data.submissions_gap;
+  title = this.data.title;
+  titlePlaceHolder = '';
+  windowLength = this.data.window_length || 0;
+  windowLengthEnabled =
+    this.data.window_length != 0 && this.data.window_length != null;
+
+  fillOmi(): void {
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
+    this.windowLengthEnabled = false;
+    this.windowLength = 0;
+    this.scoreboard = 0;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 1;
+    this.feedback = 'yes';
+    this.penalty = 0;
+    this.penaltyType = 'none';
+    this.showScoreboardAfter = true;
+  }
+
+  fillPreIoi(): void {
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
+    this.windowLengthEnabled = true;
+    this.windowLength = 180;
+    this.scoreboard = 0;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 0;
+    this.feedback = 'yes';
+    this.penalty = 0;
+    this.penaltyType = 'none';
+    this.showScoreboardAfter = true;
+  }
+
+  fillConacup(): void {
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
+    this.windowLengthEnabled = false;
+    this.windowLength = 0;
+    this.scoreboard = 75;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 1;
+    this.feedback = 'yes';
+    this.penalty = 20;
+    this.penaltyType = 'none';
+    this.showScoreboardAfter = true;
+  }
+
+  onSubmit() {
+    this.$parent.$emit('update-contest', this);
+  }
+}
+
 </script>
