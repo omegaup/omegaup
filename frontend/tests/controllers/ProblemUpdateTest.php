@@ -90,7 +90,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals(true, $response['rejudged']);
 
         {
-            $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
 
             // Verify problem contents were copied
             $this->assertTrue($problemArtifacts->exists('cases'));
@@ -129,7 +129,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['rejudged']);
         {
-            $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
 
             // Verify problem contents were copied
             $this->assertTrue($problemArtifacts->exists('cases'));
@@ -168,7 +168,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData[0]);
 
         {
-            $problemArtifacts = new ProblemArtifacts($problemAlias);
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
             $this->assertTrue($problemArtifacts->exists('cases'));
             $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
             $problemSettings = json_decode($problemArtifacts->get('settings.json'));
@@ -205,7 +205,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Verify problem settings were set.
         {
-            $problemArtifacts = new ProblemArtifacts($problemAlias);
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
             $this->assertTrue($problemArtifacts->exists('cases'));
             $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
             $problemSettings = json_decode($problemArtifacts->get('settings.json'));
@@ -291,7 +291,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
 
         $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
 
@@ -350,7 +350,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $this->assertEquals($response['status'], 'ok');
 
         // Check statment contents
-        $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
         $statementMarkdownContents = $problemArtifacts->get('statements/es.markdown');
 
         $this->assertEquals($statement, $statementMarkdownContents);
@@ -388,7 +388,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Verify contents were not erased
-        $problemArtifacts = new ProblemArtifacts($problemData['request']['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemData['request']['problem_alias']);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));

@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/ProblemArtifacts.php';
-
 /**
  * Class to abstract interactions with omegaup-gitserver.
  */
@@ -146,7 +144,7 @@ class ProblemDeployer {
         if (is_null($publishedCommit)) {
             return;
         }
-        $problemArtifacts = new ProblemArtifacts($this->alias, $publishedCommit);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($this->alias, $publishedCommit);
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
             JSON_OBJECT_AS_ARRAY

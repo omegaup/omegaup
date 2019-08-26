@@ -1,6 +1,5 @@
 <?php
 
-require_once 'libs/ProblemArtifacts.php';
 require_once 'libs/ProblemDeployer.php';
 require_once 'libs/dao/QualityNominations.dao.php';
 
@@ -815,7 +814,7 @@ class ProblemController extends Controller {
             ProblemController::addTag('lenguaje', true, $problem, true);
         }
 
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
             JSON_OBJECT_AS_ARRAY
@@ -1060,7 +1059,7 @@ class ProblemController extends Controller {
      * @throws InvalidFilesystemOperationException
      */
     public static function getProblemResourceImpl(array $params) : array {
-        $problemArtifacts = new ProblemArtifacts($params['alias'], $params['commit']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($params['alias'], $params['commit']);
         $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
 
         // Read the file that contains the source
@@ -1201,7 +1200,7 @@ class ProblemController extends Controller {
      */
     public static function getProblemSettingsDistribImpl(array $params) : array {
         return json_decode(
-            (new ProblemArtifacts($params['alias'], $params['commit']))->get('settings.distrib.json'),
+            (new \OmegaUp\ProblemArtifacts($params['alias'], $params['commit']))->get('settings.distrib.json'),
             JSON_OBJECT_AS_ARRAY
         );
     }
@@ -1224,7 +1223,7 @@ class ProblemController extends Controller {
         header('Content-Type: application/zip');
         header("Content-Disposition: attachment;filename={$problem->alias}.zip");
         header('Content-Transfer-Encoding: binary');
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         $problemArtifacts->download();
 
         die();
@@ -1603,12 +1602,12 @@ class ProblemController extends Controller {
         }
 
         $privateTreeMapping = [];
-        foreach ((new ProblemArtifacts($problem->alias, 'private'))->log() as $logEntry) {
+        foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, 'private'))->log() as $logEntry) {
             $privateTreeMapping[$logEntry['commit']] = $logEntry['tree'];
         }
 
         $masterLog = [];
-        foreach ((new ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
+        foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
             if (count($logEntry['parents']) < 3) {
                 // Master commits always have 3 or 4 parents. If they have
                 // fewer, it's one of the commits in the merged branches.
@@ -1616,7 +1615,7 @@ class ProblemController extends Controller {
             }
             $logEntry['version'] = $privateTreeMapping[$logEntry['parents'][count($logEntry['parents']) - 1]];
             $logEntry['tree'] = [];
-            foreach ((new ProblemArtifacts($problem->alias, $logEntry['commit']))->lsTreeRecursive() as $treeEntry) {
+            foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, $logEntry['commit']))->lsTreeRecursive() as $treeEntry) {
                 $logEntry['tree'][$treeEntry['path']] = $treeEntry['id'];
             }
             array_push($masterLog, $logEntry);
@@ -1624,7 +1623,7 @@ class ProblemController extends Controller {
 
         return [
             'status' => 'ok',
-            'published' => (new ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
+            'published' => (new \OmegaUp\ProblemArtifacts($problem->alias, 'published'))->commit()['commit'],
             'log' => $masterLog,
         ];
     }
@@ -1681,7 +1680,7 @@ class ProblemController extends Controller {
             ];
         }
 
-        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias, $problem->commit);
 
         // Update problem fields.
         $problemSettings = json_decode(
@@ -1694,7 +1693,7 @@ class ProblemController extends Controller {
             // Begin transaction
             \OmegaUp\DAO\DAO::transBegin();
             $problemDeployer->updatePublished(
-                ((new ProblemArtifacts($problem->alias, 'published'))->commit())['commit'],
+                ((new \OmegaUp\ProblemArtifacts($problem->alias, 'published'))->commit())['commit'],
                 $problem->commit,
                 $r->user
             );
@@ -1797,9 +1796,9 @@ class ProblemController extends Controller {
     ) : array {
         $masterCommit = null;
         if (is_null($commit)) {
-            $masterCommit = (new ProblemArtifacts($problem->alias, 'published'))->commit();
+            $masterCommit = (new \OmegaUp\ProblemArtifacts($problem->alias, 'published'))->commit();
         } else {
-            foreach ((new ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
+            foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
                 if (count($logEntry['parents']) < 3) {
                     // Master commits always have 3 or 4 parents. If they have
                     // fewer, it's one of the commits in the merged branches.
@@ -1818,7 +1817,7 @@ class ProblemController extends Controller {
 
         // The private branch is always the last parent.
         $privateCommitHash = $masterCommit['parents'][count($masterCommit['parents']) - 1];
-        $problemArtifacts = new ProblemArtifacts($problem->alias, $privateCommitHash);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias, $privateCommitHash);
         $privateCommit = $problemArtifacts->commit();
 
         // Update problem fields.
@@ -2343,7 +2342,7 @@ class ProblemController extends Controller {
      * @return Array
      */
     private static function updateLanguages(\OmegaUp\DAO\VO\Problems $problem) {
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
@@ -2547,7 +2546,7 @@ class ProblemController extends Controller {
     private static function getProblemSolutionExistenceImpl(
         \OmegaUp\DAO\VO\Problems $problem
     ): bool {
-        $problemArtifacts = new ProblemArtifacts($problem->alias, $problem->commit);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias, $problem->commit);
         $existingFiles = $problemArtifacts->lsTree('solutions');
         foreach ($existingFiles as $file) {
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
