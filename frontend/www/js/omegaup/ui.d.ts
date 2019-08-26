@@ -5,6 +5,7 @@ declare namespace omegaup {
     error: (message: string) => void;
     escape: (s: string) => string;
     formatDate: (date: Date) => string;
+    formatDateTime: (date: Date) => string;
     formatString: (template: string, values: { [key: string]: string; }) => string;
     groupTypeahead: (elem: HTMLElement, cb: (event: HTMLEvent, val: any) => void) => void;
     isVirtual: (contest: omegaup.Contest) => boolean,

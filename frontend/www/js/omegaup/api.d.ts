@@ -141,6 +141,23 @@ declare namespace omegaup {
     alias: string;
   }
 
+  export interface CourseProblem extends Problem {
+    commit: string;
+    letter: string;
+    order: number;
+    runs: CourseProblemRun[];
+    submissions: number;
+    visits: number;
+  }
+
+  export interface CourseProblemRun {
+    penalty: number;
+    score: number;
+    source: string;
+    time: string;
+    verdict: string;
+  }
+
   interface CourseProgress {
     [assignment: string]: number;
   }
