@@ -54,7 +54,7 @@ class RunStatusTest extends OmegaupTestCase {
                 false
             );
             $this->fail('Should not have allowed to download submission');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 

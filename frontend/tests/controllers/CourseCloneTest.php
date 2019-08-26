@@ -83,7 +83,7 @@ class CourseCloneTest extends OmegaupTestCase {
     /**
      * Creating a clone with the original course alias
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateCourseCloneWithTheSameAlias() {
         $homeworkCount = 2;
@@ -196,7 +196,7 @@ class CourseCloneTest extends OmegaupTestCase {
                     'problem_alias' => $problems[0]['problem']->alias,
                 ]));
                 $this->fail('Only creator can see private problem');
-            } catch (ForbiddenAccessException $e) {
+            } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
                 // Expected
                 $this->assertEquals('problemIsPrivate', $e->getMessage());
             }

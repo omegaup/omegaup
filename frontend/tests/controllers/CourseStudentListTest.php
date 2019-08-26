@@ -36,7 +36,7 @@ class CourseStudentListTest extends OmegaupTestCase {
 
     /**
      * List can only be retreived by an admin
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCourseStudentListNonAdmin() {
         $courseData = CoursesFactory::createCourse();

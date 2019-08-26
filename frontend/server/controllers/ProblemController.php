@@ -61,7 +61,7 @@ class ProblemController extends Controller {
         $is_required = true;
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->user->username == 'omi') {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         // In case of update, params are optional
@@ -78,7 +78,7 @@ class ProblemController extends Controller {
 
             // We need to check that the user can actually edit the problem
             if (!Authorization::canEditProblem($r->identity, $r['problem'])) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             // Only reviewers can revert bans.
@@ -91,7 +91,7 @@ class ProblemController extends Controller {
             }
 
             if ($r['problem']->deprecated) {
-                throw new PreconditionFailedException('problemDeprecated');
+                throw new \OmegaUp\Exceptions\PreconditionFailedException('problemDeprecated');
             }
 
             if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
@@ -173,7 +173,7 @@ class ProblemController extends Controller {
      * Create a new problem
      *
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
@@ -251,7 +251,7 @@ class ProblemController extends Controller {
             \OmegaUp\DAO\DAO::transRollback();
 
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('problemTitleExists', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('problemTitleExists', $e);
             }
             throw $e;
         }
@@ -279,13 +279,13 @@ class ProblemController extends Controller {
         }
 
         if ($r['problem']->deprecated) {
-            throw new PreconditionFailedException('problemDeprecated');
+            throw new \OmegaUp\Exceptions\PreconditionFailedException('problemDeprecated');
         }
 
         // We need to check that the user actually has admin privileges over
         // the problem.
         if (!Authorization::isProblemAdmin($r->identity, $r['problem'])) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
 
@@ -294,11 +294,11 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiAddAdmin(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate logged user
@@ -316,7 +316,7 @@ class ProblemController extends Controller {
 
         // Only an admin can add other problem admins
         if (!Authorization::isProblemAdmin($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         ACLController::addUser($problem->acl_id, $user->user_id);
@@ -329,11 +329,11 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate logged user
@@ -355,7 +355,7 @@ class ProblemController extends Controller {
 
         // Only an admin can add other problem group admins
         if (!Authorization::isProblemAdmin($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         ACLController::addGroup($problem->acl_id, $group->group_id);
@@ -368,7 +368,7 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiAddTag(\OmegaUp\Request $r) {
         // Check problem_alias
@@ -384,7 +384,7 @@ class ProblemController extends Controller {
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         self::addTag($r['name'], $r['public'] || false, $problem);
@@ -426,7 +426,7 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiRemoveAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
@@ -444,7 +444,7 @@ class ProblemController extends Controller {
 
         // Only admin is alowed to make modifications
         if (!Authorization::isProblemAdmin($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
@@ -462,7 +462,7 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
@@ -484,7 +484,7 @@ class ProblemController extends Controller {
 
         // Only admin is alowed to make modifications
         if (!Authorization::isProblemAdmin($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         ACLController::removeGroup($problem->acl_id, $group->group_id);
@@ -497,7 +497,7 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiRemoveTag(\OmegaUp\Request $r) {
         // Authenticate logged user
@@ -518,7 +518,7 @@ class ProblemController extends Controller {
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         if (in_array($tag->name, self::RESTRICTED_TAG_NAMES)) {
@@ -538,7 +538,7 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDelete(\OmegaUp\Request $r) {
         // Authenticate logged user
@@ -553,11 +553,11 @@ class ProblemController extends Controller {
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         if (ProblemsDAO::hasBeenUsedInCoursesOrContests($problem)) {
-            throw new ForbiddenAccessException('problemHasBeenUsedInContestOrCourse');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemHasBeenUsedInContestOrCourse');
         }
 
         ProblemsDAO::deleteProblem($problem->problem_id);
@@ -583,7 +583,7 @@ class ProblemController extends Controller {
         }
 
         if (!Authorization::isProblemAdmin($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         return [
@@ -975,7 +975,7 @@ class ProblemController extends Controller {
      * @return Array
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDetails(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias', false);
@@ -1013,19 +1013,19 @@ class ProblemController extends Controller {
                             $r->identity->identity_id,
                             $problemset['problemset']->problemset_id
                         ))) {
-                            throw new ForbiddenAccessException();
+                            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
                         }
                     }
                     // If the contest has not started, non-admin users should not see it
                     if (!ContestsDAO::hasStarted($problemset['contest'])) {
-                        throw new ForbiddenAccessException('contestNotStarted');
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestNotStarted');
                     }
                 } else {    // Not a contest, but we still have a problemset
                     if (!Authorization::canSubmitToProblemset(
                         $r->identity,
                         $problemset['problemset']
                     )) {
-                        throw new ForbiddenAccessException();
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException();
                     }
                     // TODO: Check start times.
                 }
@@ -1037,7 +1037,7 @@ class ProblemController extends Controller {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
                 if (!ProblemsDAO::isVisible($problem)) {
-                    throw new ForbiddenAccessException('problemIsPrivate');
+                    throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
                 }
             }
         }
@@ -1055,7 +1055,7 @@ class ProblemController extends Controller {
      *                      statement.
      *
      * @return array The contents of the resource, plus some metadata.
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function getProblemResourceImpl(array $params) : array {
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($params['alias'], $params['commit']);
@@ -1076,7 +1076,7 @@ class ProblemController extends Controller {
         try {
             $result['markdown'] = mb_convert_encoding($problemArtifacts->get($sourcePath), 'utf-8');
         } catch (Exception $e) {
-            throw new InvalidFilesystemOperationException('statementNotFound');
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException('statementNotFound');
         }
 
         // Get all the images' mappings.
@@ -1114,7 +1114,7 @@ class ProblemController extends Controller {
      *                           Spanish if not found.
      *
      * @return array The contents of the file.
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -1145,7 +1145,7 @@ class ProblemController extends Controller {
      *                           Spanish if not found.
      *
      * @return array The contents of the file.
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function getProblemSolution(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -1208,7 +1208,7 @@ class ProblemController extends Controller {
      * Entry point for Problem Download API
      *
      * @param \OmegaUp\Request $r
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiDownload(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
@@ -1234,7 +1234,7 @@ class ProblemController extends Controller {
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDownload(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
@@ -1245,7 +1245,7 @@ class ProblemController extends Controller {
         }
 
         if (!Authorization::canEditProblem($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         return $problem;
@@ -1303,7 +1303,7 @@ class ProblemController extends Controller {
      * Entry point for Problem Details API
      *
      * @param \OmegaUp\Request $r
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiDetails(\OmegaUp\Request $r) : array {
         $r->ensureBool('show_solvers', /*required=*/false);
@@ -1330,12 +1330,12 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return \OmegaUp\DAO\VO\Problems
-     * @throws UnauthorizedException
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
      */
     private static function getValidProblemAndProblemset(\OmegaUp\Request $r) : array {
         try {
             self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             if (!is_null($r['contest_alias']) || !is_null($r['problemset_id'])) {
                 throw $e;
             }
@@ -1517,7 +1517,7 @@ class ProblemController extends Controller {
      * Returns the solution for a problem if conditions are satisfied.
      *
      * @param \OmegaUp\Request $r
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiSolution(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
@@ -1554,14 +1554,14 @@ class ProblemController extends Controller {
         if (!Authorization::canViewProblemSolution($r->identity, $problem)) {
             $r->ensureBool('forfeit_problem', false /*isRequired*/);
             if ($r['forfeit_problem'] !== true) {
-                throw new ForbiddenAccessException('problemSolutionNotVisible');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemSolutionNotVisible');
             }
             $seenSolutions = ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user);
             $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
                                 ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
             // Validate that the user will not exceed the number of allowed solutions.
             if ($seenSolutions >= $allowedSolutions) {
-                throw new ForbiddenAccessException('allowedSolutionsLimitReached');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('allowedSolutionsLimitReached');
             }
             ProblemsForfeitedDAO::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
                 'user_id' => $r->user->user_id,
@@ -1584,7 +1584,7 @@ class ProblemController extends Controller {
      * Entry point for Problem Versions API
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiVersions(\OmegaUp\Request $r) {
@@ -1597,7 +1597,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!Authorization::canEditProblem($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $privateTreeMapping = [];
@@ -1631,7 +1631,7 @@ class ProblemController extends Controller {
      * Change the version of the problem.
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiSelectVersion(\OmegaUp\Request $r) {
@@ -1662,7 +1662,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!Authorization::canEditProblem($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $oldVersion = $problem->current_version;
@@ -1765,7 +1765,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!Authorization::canEditProblem($r->identity, $problem)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         return [
@@ -1829,7 +1829,7 @@ class ProblemController extends Controller {
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRuns(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
@@ -1845,7 +1845,7 @@ class ProblemController extends Controller {
      * Entry point for Problem runs API
      *
      * @param \OmegaUp\Request $r
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiRuns(\OmegaUp\Request $r) {
         // Get user
@@ -1858,7 +1858,7 @@ class ProblemController extends Controller {
 
         if ($r['show_all']) {
             if (!Authorization::isProblemAdmin($r->identity, $r['problem'])) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             if (!is_null($r['username'])) {
                 try {
@@ -1919,7 +1919,7 @@ class ProblemController extends Controller {
      * Entry point for Problem clarifications API
      *
      * @param \OmegaUp\Request $r
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiClarifications(\OmegaUp\Request $r) {
         // Get user
@@ -1956,7 +1956,7 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiStats(\OmegaUp\Request $r) {
         // Get user
@@ -1967,7 +1967,7 @@ class ProblemController extends Controller {
 
         // We need to check that the user has priviledges on the problem
         if (!Authorization::isProblemAdmin($r->identity, $r['problem'])) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         // Array of GUIDs of pending runs
@@ -2090,7 +2090,7 @@ class ProblemController extends Controller {
         // Authenticate request
         try {
             self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing, we allow unauthenticated users to use this API
         }
 
@@ -2540,7 +2540,7 @@ class ProblemController extends Controller {
      *
      * @param \OmegaUp\DAO\VO\Problems $problem The problem object.
      * @return bool The problem solution status.
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     private static function getProblemSolutionExistenceImpl(
         \OmegaUp\DAO\VO\Problems $problem

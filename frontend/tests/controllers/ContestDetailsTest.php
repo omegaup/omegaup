@@ -169,7 +169,7 @@ class ContestDetailsTest extends OmegaupTestCase {
     /**
      * Dont show private contests for users that are not in the private list
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDontShowPrivateContestForAnyUser() {
         // Get a contest
@@ -303,7 +303,7 @@ class ContestDetailsTest extends OmegaupTestCase {
     /**
      * Try to view a contest before it has started
      *
-     * @expectedException PreconditionFailedException
+     * @expectedException \OmegaUp\Exceptions\PreconditionFailedException
      */
     public function testContestNotStartedYet() {
         // Get a contest
@@ -409,7 +409,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         try {
             ContestController::apiDetails($r);
             $this->assertTrue(false, 'User that has not opened contest was able to see its details');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
         }
 
@@ -421,7 +421,7 @@ class ContestDetailsTest extends OmegaupTestCase {
     /**
      * Test accesing api with invalid scoreboard token. Should fail.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDetailsUsingInvalidToken() {
         // Get a private contest
@@ -579,7 +579,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         try {
             ContestController::apiDetails($r);
             $this->assertTrue(false, 'User with no access could see the contest');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -594,7 +594,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
             ProblemController::apiDetails($problem_request);
             $this->assertTrue(false, 'User with no access could see the problem');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -603,7 +603,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         try {
             ContestController::apiDetails($r);
             $this->assertTrue(false, 'User with no access could see the contest');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }

@@ -2,7 +2,6 @@
 
 namespace OmegaUp;
 
-use \ProblemDeploymentFailedException;
 use \SecurityTools;
 
 /**
@@ -219,7 +218,7 @@ class ProblemDeployer {
      * @param \OmegaUp\DAO\VO\Users $user
      * @param array<string, string> $blobUpdate
      *
-     * @throws ProblemDeploymentFailedException
+     * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
      */
     public function commitLooseFiles(string $message, \OmegaUp\DAO\VO\Users $user, array $blobUpdate) : void {
         $tmpfile = tmpfile();
@@ -232,7 +231,7 @@ class ProblemDeployer {
                 \ZipArchive::OVERWRITE
             );
             if ($err !== true) {
-                throw new ProblemDeploymentFailedException(
+                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
                     $err
                 );
@@ -435,7 +434,10 @@ class ProblemDeployer {
                     }
                 }
             }
-            $error = new ProblemDeploymentFailedException($errorMessage, $context);
+            $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                $errorMessage,
+                $context
+            );
             $this->log->error(
                 'update zip failed: ' . json_encode($result) . " {$error}"
             );
@@ -484,7 +486,7 @@ class ProblemDeployer {
             /** @var int */
             $retval = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($output === false || $retval != 200) {
-                throw new ProblemDeploymentFailedException(
+                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
                     $retval
                 );

@@ -11,7 +11,7 @@ class Email {
      * @param $email
      * @param $subject
      * @param $body
-     * @throws EmailVerificationSendException
+     * @throws \OmegaUp\Exceptions\EmailVerificationSendException
      */
     public static function sendEmail($emails, $subject, $body) {
         if (self::$emailSender != null) {
@@ -54,7 +54,7 @@ class Email {
 
         if (!$mail->Send()) {
             self::$log->error('Failed to send mail: ' . $mail->ErrorInfo);
-            throw new EmailVerificationSendException();
+            throw new \OmegaUp\Exceptions\EmailVerificationSendException();
         }
     }
 

@@ -137,7 +137,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to add a problem with a normal user.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddProblemForbiddenAccess() {
         $user = UserFactory::createUser();
@@ -161,7 +161,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to add a problem with a student.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddProblemForbiddenAccessStudent() {
         $user = UserFactory::createUser();
@@ -185,7 +185,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to remove a problem with a normal user.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDeleteProblemForbiddenAccess() {
         $user = UserFactory::createUser();
@@ -217,7 +217,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to remove a problem with a student.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDeleteProblemForbiddenAccessStudent() {
         $user = UserFactory::createUser();

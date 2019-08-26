@@ -33,7 +33,7 @@ class UpdateContestTest extends OmegaupTestCase {
 
     /**
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testUpdateContestNonDirector() {
         // Get a contest
@@ -136,7 +136,7 @@ class UpdateContestTest extends OmegaupTestCase {
      /**
       * Set Recommended flag to a given contest from non admin account
       *
-      * @expectedException ForbiddenAccessException
+      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
       */
     public function testSetRecommendedFlagNonAdmin() {
         // Get a contest
@@ -451,7 +451,7 @@ class UpdateContestTest extends OmegaupTestCase {
             // Trying to create a run out of contest time
             RunsFactory::createRun($problemData, $contestData, $contestant);
             $this->fail('User could not create a run when is out of contest time');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
@@ -595,7 +595,7 @@ class UpdateContestTest extends OmegaupTestCase {
         try {
             RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('Contestant should not create a run after contest finishes');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         } finally {
@@ -655,7 +655,7 @@ class UpdateContestTest extends OmegaupTestCase {
         try {
             RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('Contestant should not create a run after window length expires');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         } finally {
@@ -765,7 +765,7 @@ class UpdateContestTest extends OmegaupTestCase {
         try {
             RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('User should not be able to send runs beause window_length is over');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
@@ -791,7 +791,7 @@ class UpdateContestTest extends OmegaupTestCase {
         try {
             RunsFactory::createRun($problem, $contest, $contestant);
             $this->fail('User should not be able to send runs beause window_length is over');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }

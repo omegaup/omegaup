@@ -32,11 +32,11 @@ class IdentityController extends Controller {
     public static function testPassword(\OmegaUp\DAO\VO\Identities $identity, string $password) : bool {
         if (is_null($identity->password)) {
             // The user had logged in through a third-party account.
-            throw new LoginDisabledException('loginThroughThirdParty');
+            throw new \OmegaUp\Exceptions\LoginDisabledException('loginThroughThirdParty');
         }
 
         if (empty($identity->password)) {
-            throw new LoginDisabledException('loginDisabled');
+            throw new \OmegaUp\Exceptions\LoginDisabledException('loginDisabled');
         }
 
         return SecurityTools::compareHashedStrings(
@@ -50,7 +50,7 @@ class IdentityController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) : array {
         global $experiments;
@@ -130,7 +130,7 @@ class IdentityController extends Controller {
     private static function validateGroupOwnership(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         if (!Authorization::isGroupIdentityCreator($r->identity)) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
         $group = GroupController::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
@@ -184,7 +184,7 @@ class IdentityController extends Controller {
         } catch (Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;
         }
@@ -231,7 +231,7 @@ class IdentityController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiChangePassword(\OmegaUp\Request $r) {
         global $experiments;
@@ -262,7 +262,7 @@ class IdentityController extends Controller {
     private static function validateUpdateRequest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         if (!Authorization::isGroupIdentityCreator($r->identity)) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
         GroupController::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {

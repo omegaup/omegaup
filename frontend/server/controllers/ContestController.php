@@ -23,7 +23,7 @@ class ContestController extends Controller {
         // the list of contests
         try {
             self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing.
         }
 
@@ -241,7 +241,7 @@ class ContestController extends Controller {
      * @param \OmegaUp\DAO\VO\Contests $contest
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function canAccessContest(
         \OmegaUp\DAO\VO\Contests $contest,
@@ -253,7 +253,7 @@ class ContestController extends Controller {
                 $contest->problemset_id
             )) && !Authorization::isContestAdmin($identity, $contest)
             ) {
-                throw new ForbiddenAccessException('userNotAllowed');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
             }
         } elseif ($contest->admission_mode == 'registration' &&
             !Authorization::isContestAdmin($identity, $contest)
@@ -263,7 +263,7 @@ class ContestController extends Controller {
                 $contest->problemset_id
             );
             if (is_null($req) || $req->accepted === '0') {
-                throw new ForbiddenAccessException('contestNotRegistered');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestNotRegistered');
             }
         }
     }
@@ -443,8 +443,8 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return [$contest, $contestAdmin]
-     * @throws ForbiddenAccessException
-     * @throws PreconditionFailedException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\PreconditionFailedException
      */
     public static function validateDetails(\OmegaUp\Request $r) : Array {
         [$contest, $problemset] = self::validateBasicDetails($r['contest_alias']);
@@ -461,7 +461,7 @@ class ContestController extends Controller {
 
             $contestAdmin = Authorization::isContestAdmin($r->identity, $contest);
             if (!ContestsDAO::hasStarted($contest) && !$contestAdmin) {
-                $exception = new PreconditionFailedException('contestNotStarted');
+                $exception = new \OmegaUp\Exceptions\PreconditionFailedException('contestNotStarted');
                 $exception->addCustomMessageToArray('start_time', $contest->start_time);
 
                 throw $exception;
@@ -471,7 +471,7 @@ class ContestController extends Controller {
                 $contestAdmin = true;
                 $contestAlias = $contest->alias;
             } elseif ($r['token'] !== $problemset->scoreboard_url) {
-                throw new ForbiddenAccessException('invalidScoreboardUrl');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('invalidScoreboardUrl');
             }
         }
         return [
@@ -557,7 +557,7 @@ class ContestController extends Controller {
      * Joins a contest - explicitly adds a identity to a contest.
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiOpen(\OmegaUp\Request $r) {
         $response = self::validateDetails($r);
@@ -571,7 +571,7 @@ class ContestController extends Controller {
               (!$session['identity']->country_id || !$session['identity']->state_id
                 || !$session['identity']->school_id)
         ) {
-            throw new ForbiddenAccessException('contestBasicInformationNeeded');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestBasicInformationNeeded');
         }
 
         $r->ensureBool('share_user_information', false);
@@ -773,7 +773,7 @@ class ContestController extends Controller {
         $response = self::validateDetails($r);
 
         if (!Authorization::isContestAdmin($r->identity, $response['contest'])) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $result = self::getCachedDetails($r['contest_alias'], $response['contest']);
@@ -798,7 +798,7 @@ class ContestController extends Controller {
         $response = self::validateDetails($r);
 
         if (!$response['contest_admin']) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($response['contest']->problemset_id);
@@ -825,11 +825,11 @@ class ContestController extends Controller {
      *
      * @return Array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiClone(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate user
@@ -902,7 +902,7 @@ class ContestController extends Controller {
     public static function apiCreateVirtual(\OmegaUp\Request $r) {
         global $experiments;
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate user
@@ -914,7 +914,7 @@ class ContestController extends Controller {
         }
 
         if ($originalContest->finish_time > \OmegaUp\Time::get()) {
-            throw new ForbiddenAccessException('originalContestHasNotEnded');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('originalContestHasNotEnded');
         }
 
         $virtualContestAlias = ContestsDAO::generateAlias($originalContest);
@@ -1017,7 +1017,7 @@ class ContestController extends Controller {
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('titleInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('titleInUse', $e);
             }
             throw $e;
         }
@@ -1034,11 +1034,11 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate user
@@ -1240,7 +1240,7 @@ class ContestController extends Controller {
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @return \OmegaUp\DAO\VO\Contests
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateContestAdmin(
         string $contestAlias,
@@ -1253,7 +1253,7 @@ class ContestController extends Controller {
         }
 
         if (!Authorization::isContestAdmin($identity, $contest)) {
-            throw new ForbiddenAccessException($message);
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException($message);
         }
         return $contest;
     }
@@ -1263,11 +1263,11 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return void
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function forbiddenInVirtual(\OmegaUp\DAO\VO\Contests $contest) {
         if (ContestsDAO::isVirtual($contest)) {
-            throw new ForbiddenAccessException('forbiddenInVirtualContest');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('forbiddenInVirtualContest');
         }
     }
 
@@ -1309,7 +1309,7 @@ class ContestController extends Controller {
      */
     public static function apiAddProblem(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate user
@@ -1328,7 +1328,7 @@ class ContestController extends Controller {
 
         if (ProblemsetProblemsDAO::countProblemsetProblems($problemset)
                 >= MAX_PROBLEMS_IN_CONTEST) {
-            throw new PreconditionFailedException('contestAddproblemTooManyProblems');
+            throw new \OmegaUp\Exceptions\PreconditionFailedException('contestAddproblemTooManyProblems');
         }
 
         [$masterCommit, $currentVersion] = ProblemController::resolveCommit(
@@ -1362,7 +1362,7 @@ class ContestController extends Controller {
      * @param string $problemAlias
      * @return Array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateAddToContestRequest(
         \OmegaUp\Request $r,
@@ -1378,7 +1378,7 @@ class ContestController extends Controller {
         }
         // Only contest admin is allowed to create problems in contest
         if (!Authorization::isContestAdmin($r->identity, $contest)) {
-            throw new ForbiddenAccessException('cannotAddProb');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotAddProb');
         }
 
         \OmegaUp\Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
@@ -1390,13 +1390,13 @@ class ContestController extends Controller {
 
         if ($problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
             || $problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
-            throw new ForbiddenAccessException('problemIsBanned');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin(
             $r->identity,
             $problem
         )) {
-            throw new ForbiddenAccessException('problemIsPrivate');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
         }
 
         $r->ensureFloat('points', 0, INF);
@@ -1448,7 +1448,7 @@ class ContestController extends Controller {
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @return Array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRemoveFromContestRequest(
         string $contestAlias,
@@ -1463,7 +1463,7 @@ class ContestController extends Controller {
         }
         // Only contest admin is allowed to remove problems in contest
         if (!Authorization::isContestAdmin($identity, $contest)) {
-            throw new ForbiddenAccessException('cannotRemoveProblem');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblem');
         }
 
         \OmegaUp\Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
@@ -1479,7 +1479,7 @@ class ContestController extends Controller {
             (int)$contest->problemset_id
         ) > 0 &&
             !Authorization::isSystemAdmin($identity)) {
-            throw new ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
 
         if (self::isPublic($contest->admission_mode)) {
@@ -1541,7 +1541,7 @@ class ContestController extends Controller {
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @return Array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateAddRemoveUser(
         string $contestAlias,
@@ -1563,11 +1563,11 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiAddUser(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate logged user
@@ -1620,11 +1620,11 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiAddAdmin(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate logged user
@@ -1647,7 +1647,7 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiRemoveAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
@@ -1675,11 +1675,11 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiAddGroupAdmin(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate logged user
@@ -1706,7 +1706,7 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
@@ -1839,7 +1839,7 @@ class ContestController extends Controller {
             } elseif ($r['token'] === $problemset->scoreboard_url_admin) {
                 $showAllRuns = true;
             } else {
-                throw new ForbiddenAccessException('invalidScoreboardUrl');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('invalidScoreboardUrl');
             }
         }
 
@@ -2136,7 +2136,7 @@ class ContestController extends Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate request
@@ -2247,7 +2247,7 @@ class ContestController extends Controller {
      */
     public static function apiUpdateEndTimeForIdentity(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -2322,7 +2322,7 @@ class ContestController extends Controller {
      * @param \OmegaUp\Request $r
      * @return Array
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRuns(\OmegaUp\Request $r) : Array {
         // Defaults for offset and rowcount
@@ -2410,7 +2410,7 @@ class ContestController extends Controller {
      * @param string $contestAlias
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @return \OmegaUp\DAO\VO\Contests
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateStats(
         string $contestAlias,
@@ -2426,7 +2426,7 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiStats(\OmegaUp\Request $r) {
         // Get user
@@ -2737,7 +2737,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         if (!Authorization::isSystemAdmin($r->identity)) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         // Validate & get contest_alias
@@ -2763,7 +2763,7 @@ class ContestController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiContestants(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
@@ -2771,7 +2771,7 @@ class ContestController extends Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         if (!ContestsDAO::requestsUserInformation($contest->contest_id)) {
-            throw new ForbiddenAccessException('contestInformationNotRequired');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestInformationNotRequired');
         }
 
         // Get contestants info

@@ -25,7 +25,7 @@ class ApiCaller {
             $response = $e->asResponseArray();
         } catch (Exception $e) {
             self::$log->error($e);
-            $apiException = new InternalServerErrorException($e);
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
             $response = $apiException->asResponseArray();
         }
 
@@ -65,19 +65,19 @@ class ApiCaller {
         $apiException = null;
         try {
             if (self::isCSRFAttempt()) {
-                throw new CSRFException();
+                throw new \OmegaUp\Exceptions\CSRFException();
             }
             $r = self::createRequest();
             $response = $r->execute();
             if (is_null($response) || !is_array($response)) {
-                $apiException = new InternalServerErrorException(
+                $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
                     new Exception('API did not return an array.')
                 );
             }
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             $apiException = $e;
         } catch (Exception $e) {
-            $apiException = new InternalServerErrorException($e);
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
         }
 
         if (!is_null($apiException)) {
@@ -145,7 +145,7 @@ class ApiCaller {
                 );
             }
             if ($jsonResult === false) {
-                $apiException = new InternalServerErrorException();
+                $apiException = new \OmegaUp\Exceptions\InternalServerErrorException();
                 self::$log->error($apiException);
                 if (extension_loaded('newrelic')) {
                     newrelic_notice_error($apiException);
@@ -255,7 +255,7 @@ class ApiCaller {
         if ($e instanceof \OmegaUp\Exceptions\ApiException) {
             $apiException = $e;
         } else {
-            $apiException = new InternalServerErrorException($e);
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
         }
 
         if ($apiException->getCode() == 401) {

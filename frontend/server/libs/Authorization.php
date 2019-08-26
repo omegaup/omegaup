@@ -79,7 +79,7 @@ class Authorization {
         }
 
         if ($problem->deprecated) {
-            throw new PreconditionFailedException('problemDeprecated');
+            throw new \OmegaUp\Exceptions\PreconditionFailedException('problemDeprecated');
         }
 
         if (!is_null($submission->problemset_id)) {

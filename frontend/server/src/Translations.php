@@ -3,7 +3,6 @@
 namespace OmegaUp;
 
 use \IdentityController;
-use \Request;
 
 /**
  * Utility class to lazily load translation strings to be used in controllers

@@ -2,9 +2,6 @@
 
 namespace OmegaUp;
 
-use \DuplicatedEntryInDatabaseException;
-use \InvalidArgumentException;
-
 /**
  * Conjunto de validadores genéricos
  *
@@ -17,7 +14,6 @@ class Validators {
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
      * @param bool $required If $required is TRUE and the parameter is not present, check fails.
-     * @throws InvalidArgumentException
      */
     public static function validateEmail(
         $parameter,
@@ -38,7 +34,6 @@ class Validators {
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
      * @param bool $required If $required is TRUE and the parameter is not present, check fails.
-     * @throws InvalidArgumentException
      */
     public static function validateStringNonEmpty(
         $parameter,
@@ -114,7 +109,7 @@ class Validators {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
         }
         if (self::isRestrictedAlias($parameter)) {
-            throw new DuplicatedEntryInDatabaseException('aliasInUse');
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse');
         }
         if (!self::isValidAlias($parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);

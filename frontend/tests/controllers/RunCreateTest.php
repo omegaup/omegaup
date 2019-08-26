@@ -192,7 +192,7 @@ class RunCreateTest extends OmegaupTestCase {
             // Call API
             RunController::apiCreate($r);
             $this->fail('api should have not created run, because contest has expired.');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
     }
@@ -217,7 +217,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Test a invalid submission to a private contest
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunPrivateContestWithUserNotRegistred() {
         $r = $this->setValidRequest(new ContestParams([
@@ -252,7 +252,7 @@ class RunCreateTest extends OmegaupTestCase {
             // Call API
             RunController::apiCreate($r);
             $this->fail('api should have not created run, because contest has not started yet.');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
     }
@@ -261,7 +261,7 @@ class RunCreateTest extends OmegaupTestCase {
      * Test that a user cannot submit once he has already submitted something
      * and the submissions gap time has not expired
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testInvalidRunInsideSubmissionsGap() {
         // Set the context
@@ -398,7 +398,7 @@ class RunCreateTest extends OmegaupTestCase {
             // Call API
             RunController::apiCreate($r);
             $this->fail('Contestant should not submitted a run because windows length has expired');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
     }
@@ -429,7 +429,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Admin is god, but even he is unable to submit even when contest has ended
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunWhenContestEndedForContestDirector() {
         $startTime = \OmegaUp\Time::get() - 60 * 60;
@@ -585,7 +585,7 @@ class RunCreateTest extends OmegaupTestCase {
      * User cannot send runs to a private problem, regardless of it being
      * in a contest
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunToPrivateProblemWhileInsideAPublicContest() {
         // Get a contest
@@ -619,7 +619,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * User should wait between consecutive runs.
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunsToPublicProblemInsideSubmissionGap() {
         $originalGap = RunController::$defaultSubmissionGap;
@@ -700,7 +700,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Can't submit by a user that is not enrolled in a course.
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunInAssignmentFromNonStudent() {
         $r = $this->setUpAssignment();
@@ -714,7 +714,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Run from a student before assignment opens.
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunInAssignmentFromStudentBeforeStart() {
         $r = $this->setUpAssignment(10);
@@ -729,7 +729,7 @@ class RunCreateTest extends OmegaupTestCase {
     /**
      * Run from a student after the deadline passed.
      *
-     * @expectedException NotAllowedToSubmitException
+     * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunInAssignmentFromStudentAfterDeadline() {
         $r = $this->setUpAssignment();
@@ -862,7 +862,7 @@ class RunCreateTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
             ]));
             $this->fail('User should not have been able to view another users\' run details');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK
         }
     }

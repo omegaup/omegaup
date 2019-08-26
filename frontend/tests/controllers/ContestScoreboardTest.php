@@ -433,7 +433,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
     /**
      * Test invalid token
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testScoreboardUrlInvalidToken() {
         // Create our user not added to the contest

@@ -88,7 +88,7 @@ class ClarificationController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDetails(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
@@ -105,7 +105,7 @@ class ClarificationController extends Controller {
                 $r->identity,
                 $r['clarification']
             )) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
         }
     }
@@ -137,7 +137,7 @@ class ClarificationController extends Controller {
      * Validate update API request
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateUpdate(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
@@ -155,7 +155,7 @@ class ClarificationController extends Controller {
             $r->identity,
             $r['clarification']
         )) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
 

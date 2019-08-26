@@ -60,11 +60,11 @@ class QualityNominationController extends Controller {
      * @param \OmegaUp\Request $r
      *
      * @return array
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Validate request
@@ -86,7 +86,7 @@ class QualityNominationController extends Controller {
             // All nominations types, except demotions, are only allowed for
             // uses who have already solved the problem.
             if (!ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
-                throw new PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
+                throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
         }
         if ($r['nomination'] == 'suggestion') {
@@ -123,7 +123,7 @@ class QualityNominationController extends Controller {
                     $tag = TagController::normalize($tag);
                 }
                 if (self::hasDuplicates($contents['tags'])) {
-                    throw new DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
+                    throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
                 }
             }
         } elseif ($r['nomination'] == 'promotion') {
@@ -141,7 +141,7 @@ class QualityNominationController extends Controller {
                 $tag = TagController::normalize($tag);
             }
             if (self::hasDuplicates($contents['tags'])) {
-                throw new DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
             }
             // Statements must be a dictionary of language => { 'markdown': string }.
             foreach ($contents['statements'] as $language => $statement) {
@@ -224,7 +224,7 @@ class QualityNominationController extends Controller {
      */
     public static function apiResolve(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         \OmegaUp\Validators::validateInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
@@ -382,11 +382,11 @@ class QualityNominationController extends Controller {
      * @param \OmegaUp\Request $r The request.
      *
      * @return void
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateMemberOfReviewerGroup(\OmegaUp\Request $r) {
         if (!Authorization::isQualityReviewer($r->identity)) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
     }
 
@@ -405,11 +405,11 @@ class QualityNominationController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Validate request
@@ -424,11 +424,11 @@ class QualityNominationController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiMyAssignedList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Validate request
@@ -444,11 +444,11 @@ class QualityNominationController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Validate request
@@ -463,11 +463,11 @@ class QualityNominationController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Validate request
@@ -484,7 +484,7 @@ class QualityNominationController extends Controller {
         $currentUserIsNominator = ($r->user->username == $response['nominator']['username']);
         $currentUserReviewer = Authorization::isQualityReviewer($r->identity);
         if (!$currentUserIsNominator && !$currentUserReviewer) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         // Get information from the original problem.

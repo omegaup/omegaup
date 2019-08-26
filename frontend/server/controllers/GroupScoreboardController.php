@@ -58,7 +58,7 @@ class GroupScoreboardController extends Controller {
 
         if (!ContestController::isPublic($contest->admission_mode) &&
             !Authorization::isContestAdmin($identity, $contest)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         return [
             'contest' => $contest,

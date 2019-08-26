@@ -60,7 +60,7 @@ class CreateUserTest extends OmegaupTestCase {
         try {
             UserController::apiCreate($r);
             $this->fail('User creation should have failed');
-        } catch (DuplicatedEntryInDatabaseException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('mailInUse', $e->getMessage());
         }
     }
@@ -68,7 +68,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Try to create 2 users with same username, should fail.
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicatedUsernames() {
         UserController::$permissionKey = uniqid();
@@ -94,7 +94,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Test create 2 users with same email (diff username) should fail
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicatedEmails() {
         UserController::$permissionKey = uniqid();
@@ -288,7 +288,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Normal user trying to verify herself through the admin path
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testUsernameVerificationByAdminNotAdmin() {
         // User to be verified
@@ -308,7 +308,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Normal user trying to backfill mailing list
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testMailingListBackfillNotAdmin() {
         $user = UserFactory::createUser();

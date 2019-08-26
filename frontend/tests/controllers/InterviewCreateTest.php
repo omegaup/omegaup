@@ -104,7 +104,7 @@ class InterviewCreateTest extends OmegaupTestCase {
      *
      * Only site-admins and interviewers can create interviews for now
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testOnlyInterviewersCanCreateInterviews() {
         $r = new \OmegaUp\Request();
