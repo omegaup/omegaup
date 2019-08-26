@@ -54,7 +54,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem settings.
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
         $this->assertEquals(false, $problemSettings->Slow);
         $this->assertEquals($r['validator'], $problemSettings->Validator->Name);
@@ -112,7 +112,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertNotNull($problem);
 
         // Verify problem settings.
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
         $this->assertEquals(true, $problemSettings->Slow);
     }
@@ -153,7 +153,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertNotNull($problem);
 
         // Verify problem settings.
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
         $this->assertEquals(false, $problemSettings->Slow);
     }
@@ -184,7 +184,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
 
         $this->assertTrue($problemArtifacts->exists('settings.json'));
         $this->assertTrue($problemArtifacts->exists('cases'));
@@ -313,7 +313,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
@@ -355,7 +355,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $problem = $problems[0];
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
 
@@ -395,7 +395,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($r['problem_alias']);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
         $this->assertTrue($problemArtifacts->exists('statements/bunny.jpg'));
@@ -462,7 +462,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($r['title'], $problem->title);
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
 
         $this->assertTrue($problemArtifacts->exists('settings.json'));
         $this->assertTrue($problemArtifacts->exists('cases'));
@@ -649,7 +649,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied
-        $problemArtifacts = new ProblemArtifacts($problem->alias);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
 
         $this->assertTrue($problemArtifacts->exists('cases'));
         $this->assertTrue($problemArtifacts->exists('statements/es.markdown'));
