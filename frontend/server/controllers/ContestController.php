@@ -240,7 +240,7 @@ class ContestController extends Controller {
      *
      * @param Contests $contest
      * @param Identities $identity
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      * @throws ForbiddenAccessException
      */
     private static function canAccessContest(

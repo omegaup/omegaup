@@ -11,7 +11,7 @@ class IdentityController extends Controller {
      *
      * @param ?string $userOrEmail
      * @return Identities
-     * @throws ApiException
+     * @throws \OmegaUp\Exceptions\ApiException
      */
     public static function resolveIdentity(?string $userOrEmail) : Identities {
         Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
@@ -83,7 +83,7 @@ class IdentityController extends Controller {
             self::saveIdentityGroup($identity, $group->group_id);
 
             DAO::transEnd();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             DAO::transRollback();
             throw $e;
         }
@@ -128,7 +128,7 @@ class IdentityController extends Controller {
             }
 
             DAO::transEnd();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             DAO::transRollback();
             throw $e;
         }
@@ -263,7 +263,7 @@ class IdentityController extends Controller {
         try {
             // Update password
             IdentitiesDAO::update($identity);
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             throw $e;
         }
 

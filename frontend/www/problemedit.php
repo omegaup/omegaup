@@ -39,7 +39,7 @@ try {
         }
         $smarty->assign('STATUS_SUCCESS', 'Problem updated succesfully!');
     }
-} catch (ApiException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 
