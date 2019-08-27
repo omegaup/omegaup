@@ -1,17 +1,18 @@
 <?php
 
 include_once('base/Submissions.dao.base.php');
-include_once('base/Submissions.vo.base.php');
 
-/** Submissions Data Access Object (DAO).
+/**
+ * Submissions Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link Submissions }.
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Submissions}.
  *
  * @access public
  */
 class SubmissionsDAO extends SubmissionsDAOBase {
-    final public static function getByGuid(string $guid) : ?Submissions {
+    final public static function getByGuid(string $guid) : ?\OmegaUp\DAO\VO\Submissions {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
@@ -20,7 +21,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
             return null;
         }
 
-        return new Submissions($rs);
+        return new \OmegaUp\DAO\VO\Submissions($rs);
     }
 
     final public static function disqualify(string $guid) : void {

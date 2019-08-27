@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \DatabaseOperationException;
-
 /**
  * A minimalistic database access layer that has an interface mostly compatible
  * with ADOdb.

@@ -15,7 +15,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
         $locale = LanguagesDAO::getByName('pt');
         $states = StatesDAO::getByCountry('MX');
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'country_id' => 'MX',
@@ -42,7 +42,7 @@ class UserUpdateTest extends OmegaupTestCase {
         // Edit all fields again with diff values
         $locale = LanguagesDAO::getByName('pseudo');
         $states = StatesDAO::getByCountry('US');
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'country_id' => $states[0]->country_id,
@@ -67,7 +67,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => $user->username
         ]);
         $this->assertEquals($locale->name, IdentityController::getPreferredLanguage(
@@ -83,7 +83,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             // Invalid state_id
@@ -100,7 +100,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
         $new_username = Utils::CreateRandomString();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             //new username
             'username' => $new_username
@@ -113,13 +113,13 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * Update profile username with existed username
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicateUsernameUpdate() {
         $old_user = UserFactory::createUser();
         $user = UserFactory::createUser();
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             //update username with existed username
             'username' => $old_user->username
@@ -135,7 +135,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             // Invalid name
             'name' => 'TThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong ThisIsWayTooLong hisIsWayTooLong ',
@@ -153,7 +153,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             // Invalid name
             'name' => '',
@@ -170,7 +170,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'birth_date' => strtotime('2088-01-01'),
         ]);
@@ -189,7 +189,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
         // Omit state.
         $country_id = 'MX';
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'country_id' => $country_id,
         ]);
@@ -212,7 +212,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $login = self::login($user);
 
         //generate wrong gender option
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => Utils::CreateRandomString(),
         ]);
@@ -234,7 +234,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => 'female',
         ]);
@@ -251,7 +251,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => null,
         ]);
@@ -269,7 +269,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $login = self::login($user);
 
         //generate wrong gender option
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'gender' => '',
         ]);
@@ -289,7 +289,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $this->assertNull($user->git_token);
         $login = self::login($user);
-        $response = UserController::apiGenerateGitToken(new Request([
+        $response = UserController::apiGenerateGitToken(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $this->assertNotEquals($response['token'], '');

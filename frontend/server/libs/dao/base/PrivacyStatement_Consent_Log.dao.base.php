@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link PrivacyStatementConsentLog}.
+ * {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog}.
  * @access public
  * @abstract
- *
  */
 abstract class PrivacyStatementConsentLogDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param PrivacyStatementConsentLog $PrivacyStatement_Consent_Log El objeto de tipo PrivacyStatementConsentLog a actualizar.
+     * @param \OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log El objeto de tipo PrivacyStatementConsentLog a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
+    final public static function update(\OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         $sql = 'UPDATE `PrivacyStatement_Consent_Log` SET `identity_id` = ?, `privacystatement_id` = ?, `timestamp` = ? WHERE `privacystatement_consent_id` = ?;';
         $params = [
             is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
@@ -38,40 +36,45 @@ abstract class PrivacyStatementConsentLogDAOBase {
     }
 
     /**
-     * Obtener {@link PrivacyStatementConsentLog} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link PrivacyStatementConsentLog} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?PrivacyStatementConsentLog Un objeto del tipo {@link PrivacyStatementConsentLog}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\PrivacyStatementConsentLog Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $privacystatement_consent_id) : ?PrivacyStatementConsentLog {
+    final public static function getByPK(int $privacystatement_consent_id) : ?\OmegaUp\DAO\VO\PrivacyStatementConsentLog {
         $sql = 'SELECT `PrivacyStatement_Consent_Log`.`privacystatement_consent_id`, `PrivacyStatement_Consent_Log`.`identity_id`, `PrivacyStatement_Consent_Log`.`privacystatement_id`, `PrivacyStatement_Consent_Log`.`timestamp` FROM PrivacyStatement_Consent_Log WHERE (privacystatement_consent_id = ?) LIMIT 1;';
         $params = [$privacystatement_consent_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new PrivacyStatementConsentLog($row);
+        return new \OmegaUp\DAO\VO\PrivacyStatementConsentLog($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto PrivacyStatementConsentLog suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param PrivacyStatementConsentLog $PrivacyStatement_Consent_Log El objeto de tipo PrivacyStatementConsentLog a eliminar
+     * @param \OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log El
+     * objeto de tipo \OmegaUp\DAO\VO\PrivacyStatementConsentLog a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : void {
+    final public static function delete(\OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : void {
         $sql = 'DELETE FROM `PrivacyStatement_Consent_Log` WHERE privacystatement_consent_id = ?;';
         $params = [$PrivacyStatement_Consent_Log->privacystatement_consent_id];
 
@@ -85,7 +88,8 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link PrivacyStatementConsentLog}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -96,9 +100,10 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return PrivacyStatementConsentLog[] Un arreglo que contiene objetos del tipo {@link PrivacyStatementConsentLog}.
+     * @return \OmegaUp\DAO\VO\PrivacyStatementConsentLog[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog}.
      *
-     * @psalm-return array<int, PrivacyStatementConsentLog>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\PrivacyStatementConsentLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -115,7 +120,7 @@ abstract class PrivacyStatementConsentLogDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new PrivacyStatementConsentLog($row);
+            $allData[] = new \OmegaUp\DAO\VO\PrivacyStatementConsentLog($row);
         }
         return $allData;
     }
@@ -124,13 +129,15 @@ abstract class PrivacyStatementConsentLogDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto PrivacyStatementConsentLog suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog}
+     * suministrado.
      *
-     * @param PrivacyStatementConsentLog $PrivacyStatement_Consent_Log El objeto de tipo PrivacyStatementConsentLog a crear.
+     * @param \OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\PrivacyStatementConsentLog} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
+    final public static function create(\OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?);';
         $params = [
             is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,

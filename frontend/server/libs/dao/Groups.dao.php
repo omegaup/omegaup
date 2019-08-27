@@ -1,22 +1,18 @@
 <?php
 
 require_once('base/Groups.dao.base.php');
-require_once('base/Groups.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
-/** Groups Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Groups }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+
+/**
+ * Groups Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Groups}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class GroupsDAO extends GroupsDAOBase {
     public static function findByAlias($alias) {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
@@ -25,7 +21,7 @@ class GroupsDAO extends GroupsDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Groups($rs);
+        return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
     public static function SearchByName($name) {
@@ -35,7 +31,7 @@ class GroupsDAO extends GroupsDAOBase {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $ar = [];
         foreach ($rs as $row) {
-            array_push($ar, new Groups($row));
+            array_push($ar, new \OmegaUp\DAO\VO\Groups($row));
         }
         return $ar;
     }
@@ -47,7 +43,7 @@ class GroupsDAO extends GroupsDAOBase {
         if (empty($rs)) {
             return null;
         }
-        return new Groups($rs);
+        return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
     /**
@@ -85,7 +81,7 @@ class GroupsDAO extends GroupsDAOBase {
 
         $groups = [];
         foreach ($rs as $row) {
-            array_push($groups, new Groups($row));
+            array_push($groups, new \OmegaUp\DAO\VO\Groups($row));
         }
         return $groups;
     }
@@ -93,7 +89,7 @@ class GroupsDAO extends GroupsDAOBase {
     /**
      * Gets a random sample (of up to size $n) of group members.
      */
-    final public static function sampleMembers(Groups $group, $n) {
+    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, $n) {
         $sql = '
             SELECT
                 i.*
@@ -110,7 +106,7 @@ class GroupsDAO extends GroupsDAOBase {
 
         $identities = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
-            $identities[] = new Identities($row);
+            $identities[] = new \OmegaUp\DAO\VO\Identities($row);
         }
         return $identities;
     }

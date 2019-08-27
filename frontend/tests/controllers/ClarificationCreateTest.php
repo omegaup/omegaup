@@ -139,7 +139,7 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         $login = self::login($contestant);
         // Call API
-        $response = ContestController::apiClarifications(new Request([
+        $response = ContestController::apiClarifications(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]));
@@ -150,7 +150,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $logins[$i] = self::login($users[$i]);
 
-            $response = ContestController::apiClarifications(new Request([
+            $response = ContestController::apiClarifications(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $logins[$i]->auth_token,
             ]));
@@ -169,7 +169,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         );
 
         for ($i = 0; $i < $n; $i++) {
-            $response = ContestController::apiClarifications(new Request([
+            $response = ContestController::apiClarifications(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $logins[$i]->auth_token,
             ]));

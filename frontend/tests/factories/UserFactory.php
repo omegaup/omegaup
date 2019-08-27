@@ -85,7 +85,7 @@ class UserFactory {
 
         // Populate a new Request to pass to the API
         UserController::$permissionKey = uniqid();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => $params['username'],
             'name' => $params['name'],
             'password' => $params['password'],
@@ -154,11 +154,11 @@ class UserFactory {
     /**
      * Verifies a user and returns its DAO
      *
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Users $user
      * @return type
      */
-    public static function verifyUser(Users $user) {
-        UserController::apiVerifyEmail(new Request([
+    public static function verifyUser(\OmegaUp\DAO\VO\Users $user) {
+        UserController::apiVerifyEmail(new \OmegaUp\Request([
             'id' => $user->verification_id
         ]));
 
@@ -224,7 +224,7 @@ class UserFactory {
      * @param string $email
      * @return User
      */
-    public static function createGroupIdentityCreator($params = null) : Users {
+    public static function createGroupIdentityCreator($params = null) : \OmegaUp\DAO\VO\Users {
         $user = self::createUser($params);
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
@@ -236,11 +236,11 @@ class UserFactory {
     /**
      * Adds a system role to the user.
      *
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Users $user
      * @param int $role_id
      */
-    public static function addSystemRole(Users $user, $role_id) {
-        UserRolesDAO::create(new UserRoles([
+    public static function addSystemRole(\OmegaUp\DAO\VO\Users $user, $role_id) {
+        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $user->user_id,
             'role_id' => $role_id,
             'acl_id' => Authorization::SYSTEM_ACL,
@@ -250,14 +250,14 @@ class UserFactory {
     /**
      * Adds mentor role to the identity
      *
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      */
-    public static function addMentorRole(Identities $identity) {
+    public static function addMentorRole(\OmegaUp\DAO\VO\Identities $identity) {
         $mentor_group = GroupsDAO::findByAlias(
             Authorization::MENTOR_GROUP_ALIAS
         );
 
-        GroupsIdentitiesDao::create(new GroupsIdentities([
+        GroupsIdentitiesDao::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $mentor_group->group_id,
         ]));
@@ -266,14 +266,14 @@ class UserFactory {
     /**
      * Adds support role to the identity
      *
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      */
-    public static function addSupportRole(Identities $identity) {
+    public static function addSupportRole(\OmegaUp\DAO\VO\Identities $identity) {
         $support_group = GroupsDAO::findByAlias(
             Authorization::SUPPORT_GROUP_ALIAS
         );
 
-        GroupsIdentitiesDao::create(new GroupsIdentities([
+        GroupsIdentitiesDao::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $support_group->group_id,
         ]));
@@ -282,14 +282,14 @@ class UserFactory {
     /**
      * Adds group identity creator
      *
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      */
-    public static function addGroupIdentityCreator(Identities $identity) {
+    public static function addGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity) {
         $groupIdentityCreator = GroupsDAO::findByAlias(
             Authorization::IDENTITY_CREATOR_GROUP_ALIAS
         );
 
-        GroupsIdentitiesDao::create(new GroupsIdentities([
+        GroupsIdentitiesDao::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $identity->identity_id,
             'group_id' => $groupIdentityCreator->group_id,
         ]));
@@ -301,7 +301,7 @@ class UserFactory {
      * @return Boolean
      */
     public static function createPrivacyStatement($type = 'privacy_policy') {
-        return PrivacyStatementsDAO::create(new PrivacyStatements([
+        return PrivacyStatementsDAO::create(new \OmegaUp\DAO\VO\PrivacyStatements([
             'git_object_id' => Utils::CreateRandomString(),
             'type' => $type,
         ]));

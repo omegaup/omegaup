@@ -19,7 +19,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
         // Call api using identity creator group member
-        IdentityController::apiCreate(new Request([
+        IdentityController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -40,7 +40,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $this->assertEquals('male', $identity->gender);
 
         $newIdentityName = substr(Utils::CreateRandomString(), - 10);
-        IdentityController::apiUpdate(new Request([
+        IdentityController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $newIdentityName,
@@ -74,7 +74,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $username = "{$group['group']->alias}:{$identityName}";
         $originalPassword = Utils::CreateRandomString();
         // Call api using identity creator group member
-        IdentityController::apiCreate(new Request([
+        IdentityController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -92,7 +92,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
 
         // Changing password
         $newPassword = Utils::CreateRandomString();
-        IdentityController::apiChangePassword(new Request([
+        IdentityController::apiChangePassword(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'password' => $newPassword,
@@ -118,7 +118,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $username = "{$group['group']->alias}:{$identityName}";
         $originalPassword = Utils::CreateRandomString();
         // Call api using identity creator group member
-        IdentityController::apiCreate(new Request([
+        IdentityController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -136,7 +136,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
 
         // Changing password
         $newPassword = Utils::CreateRandomString();
-        IdentityController::apiChangePassword(new Request([
+        IdentityController::apiChangePassword(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'password' => $newPassword,
@@ -149,7 +149,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         try {
             $identityLogin = self::login($identity);
             $this->fail('Identity can not login with old password');
-        } catch (InvalidCredentialsException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
             $this->assertEquals($e->getMessage(), 'usernameOrPassIsWrong');
         }
     }
@@ -170,7 +170,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $username = "{$group['group']->alias}:{$identityName}";
         $originalPassword = Utils::CreateRandomString();
         // Call api using identity creator group member
-        IdentityController::apiCreate(new Request([
+        IdentityController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -189,14 +189,14 @@ class IdentityUpdateTest extends OmegaupTestCase {
         try {
             // Trying to change the password, it must fail
             $newPassword = Utils::CreateRandomString();
-            IdentityController::apiChangePassword(new Request([
+            IdentityController::apiChangePassword(new \OmegaUp\Request([
                 'auth_token' => $creatorLogin2->auth_token,
                 'username' => $username,
                 'password' => $newPassword,
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Creators are not authorized to change passwords from other groups they do not belong');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }
@@ -214,7 +214,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $username = "{$group['group']->alias}:{$identityName}";
         $originalPassword = Utils::CreateRandomString();
         // Call api using identity creator group member
-        IdentityController::apiCreate(new Request([
+        IdentityController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -237,14 +237,14 @@ class IdentityUpdateTest extends OmegaupTestCase {
         try {
             // Changing password
             $newPassword = Utils::CreateRandomString();
-            IdentityController::apiChangePassword(new Request([
+            IdentityController::apiChangePassword(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'username' => $username,
                 'password' => $newPassword,
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('User is not allowed to change password');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }

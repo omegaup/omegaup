@@ -12,7 +12,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
     private function assertProblemRemovedFromContest($problemData, $contestData) {
         $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
@@ -32,7 +32,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
     private function assertProblemExistsInContest($problemData, $contestData) {
         $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
@@ -80,7 +80,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($contestData['director']);
 
         // Create a new request
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -104,7 +104,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Log in as contest director
         $login = OmegaupTestCase::login($contestData['director']);
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => 'this contest doesnt exists',
@@ -119,7 +119,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem from contest while loged in with a user that
      * is not a contest admin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemPrivateContestNotBeingContestAdmin() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -129,7 +129,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         $login = OmegaupTestCase::login($contestant);
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -146,7 +146,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     private function makeContestPublic($contestData) {
         $login = OmegaupTestCase::login($contestData['director']);
 
-        $r = new Request(
+        $r = new \OmegaUp\Request(
             [
                 'auth_token' =>  $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -276,7 +276,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
         // Add the sysadmin role to the contest director
-        UserRolesDAO::create(new UserRoles([
+        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,
@@ -305,7 +305,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         // Prepare request
         $login = OmegaupTestCase::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $secondaryAdmin->username,
             'contest_alias' => $contestData['request']['alias'],
@@ -337,7 +337,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs from a private contest while loged in
      * with a user that is not sysadmin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsFromPrivateContest() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -359,7 +359,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs only from admins from a private contest while
      * loged in with a user that is not sysadmin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithMixedRunsFromContestNotBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -411,7 +411,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs made outside and inside the contest from a private contest
      * while logged in as Contest Admin. Should fail.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsOutsideAndInsideContestFromPrivateContest() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -449,7 +449,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        UserRolesDAO::create(new UserRoles([
+        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => Authorization::ADMIN_ROLE,
             'acl_id' => Authorization::SYSTEM_ACL,

@@ -1,22 +1,18 @@
 <?php
 
 require_once('base/Problems.dao.base.php');
-require_once('base/Problems.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
-/** Problems Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Problems }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+
+/**
+ * Problems Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Problems}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class ProblemsDAO extends ProblemsDAOBase {
     final private static function addTagFilter(
         string $identityType,
@@ -342,7 +338,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? UsersDAO::getHideTags($identityId) : false;
         if (!is_null($result)) {
             foreach ($result as $row) {
-                $temp = new Problems(array_intersect_key($row, Problems::FIELD_NAMES));
+                $temp = new \OmegaUp\DAO\VO\Problems(array_intersect_key($row, \OmegaUp\DAO\VO\Problems::FIELD_NAMES));
                 $problem = $temp->asFilteredArray($filters);
 
                 // score, points and ratio are not actually fields of a Problems object.
@@ -365,7 +361,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 return null;
         }
 
-        return new Problems($rs);
+        return new \OmegaUp\DAO\VO\Problems($rs);
     }
 
     final public static function searchByAlias($alias) {
@@ -381,7 +377,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $result = [];
 
         foreach ($rs as $r) {
-            array_push($result, new Problems($r));
+            array_push($result, new \OmegaUp\DAO\VO\Problems($r));
         }
 
         return $result;
@@ -417,7 +413,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$id]);
     }
 
-    public static function getProblemsSolvedCount(Identities $identity): int {
+    public static function getProblemsSolvedCount(\OmegaUp\DAO\VO\Identities $identity): int {
         $sql = 'SELECT
             COUNT(*)
         FROM
@@ -455,7 +451,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $result = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
-            array_push($result, new Problems($row));
+            array_push($result, new \OmegaUp\DAO\VO\Problems($row));
         }
         return $result;
     }
@@ -493,7 +489,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $problems = [];
         foreach ($rs as $r) {
-            array_push($problems, new Problems($r));
+            array_push($problems, new \OmegaUp\DAO\VO\Problems($r));
         }
         return $problems;
     }
@@ -607,7 +603,7 @@ class ProblemsDAO extends ProblemsDAOBase {
     }
 
     final public static function isProblemSolved(
-        Problems $problem,
+        \OmegaUp\DAO\VO\Problems $problem,
         int $identityId
     ) : bool {
         $sql = '
@@ -626,7 +622,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
 
-    public static function getPrivateCount(Users $user) : int {
+    public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user) : int {
         $sql = 'SELECT
             COUNT(*) as total
         FROM
@@ -642,7 +638,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
-    public static function getExplicitAdminEmails(Problems $problem) {
+    public static function getExplicitAdminEmails(\OmegaUp\DAO\VO\Problems $problem) {
         $sql = '
             SELECT DISTINCT
                 e.email
@@ -679,7 +675,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
-    public static function getAdminUser(Problems $problem) {
+    public static function getAdminUser(\OmegaUp\DAO\VO\Problems $problem) {
         $sql = '
             SELECT DISTINCT
                 e.email,
@@ -767,7 +763,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $problems = [];
         foreach ($rs as $row) {
-            array_push($problems, new Problems($row));
+            array_push($problems, new \OmegaUp\DAO\VO\Problems($row));
         }
         return $problems;
     }
@@ -806,7 +802,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $problems = [];
         foreach ($rs as $row) {
-            array_push($problems, new Problems($row));
+            array_push($problems, new \OmegaUp\DAO\VO\Problems($row));
         }
         return $problems;
     }
@@ -825,7 +821,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_DELETED]);
         $allData = [];
         foreach ($rs as $row) {
-            $allData[] = new Problems($row);
+            $allData[] = new \OmegaUp\DAO\VO\Problems($row);
         }
         return $allData;
     }
@@ -865,7 +861,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $identities;
     }
 
-    final public static function isVisible(Problems $problem) {
+    final public static function isVisible(\OmegaUp\DAO\VO\Problems $problem) {
         return ((int) $problem->visibility) >= 1;
     }
 
@@ -884,7 +880,7 @@ class ProblemsDAO extends ProblemsDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    public static function hasBeenUsedInCoursesOrContests(Problems $problem) {
+    public static function hasBeenUsedInCoursesOrContests(\OmegaUp\DAO\VO\Problems $problem) {
         $sql = '
             SELECT
                 COUNT(*)
@@ -917,7 +913,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $problems = [];
         foreach ($rs as $row) {
-            array_push($problems, new Problems($row));
+            array_push($problems, new \OmegaUp\DAO\VO\Problems($row));
         }
         return $problems;
     }
@@ -934,7 +930,7 @@ class ProblemsDAO extends ProblemsDAOBase {
 
         $problems = [];
         foreach ($rs as $row) {
-            array_push($problems, new Problems($row));
+            array_push($problems, new \OmegaUp\DAO\VO\Problems($row));
         }
         return $problems;
     }

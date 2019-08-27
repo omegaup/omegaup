@@ -1,19 +1,20 @@
 <?php
 
 require_once('base/Problems_Forfeited.dao.base.php');
-require_once('base/Problems_Forfeited.vo.base.php');
 
-/** Problems_Forfeited Data Access Object (DAO).
+/**
+ * Problems_Forfeited Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link roblemsForfeited }.
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\ProblemsForfeited}.
+ *
  * @author carlosabcs
  * @access public
  * @package docs
- *
  */
 class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
-    public static function getProblemsForfeitedCount(Users $user): int {
+    public static function getProblemsForfeitedCount(\OmegaUp\DAO\VO\Users $user): int {
         $sql = 'SELECT
                     COUNT(*)
                 FROM
@@ -25,8 +26,8 @@ class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
     }
 
     public static function isProblemForfeited(
-        Problems $problem,
-        Identities $identity
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity
     ) : bool {
         $sql = 'SELECT
                     COUNT(*)

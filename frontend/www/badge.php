@@ -8,7 +8,7 @@ if (empty($_REQUEST['badge_alias'])) {
 }
 
 try {
-    Validators::validateBadgeExists($_REQUEST['badge_alias'], BadgeController::getAllBadges());
+    \OmegaUp\Validators::validateBadgeExists($_REQUEST['badge_alias'], BadgeController::getAllBadges());
     $smarty->assign('badge_alias', $_REQUEST['badge_alias']);
 } catch (\OmegaUp\Exceptions\NotFoundException $e) {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());

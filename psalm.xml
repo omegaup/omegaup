@@ -19,4 +19,9 @@
     <issueHandlers>
         <LessSpecificReturnType errorLevel="info" />
     </issueHandlers>
+
+    <stubs>
+       <!-- For PASSWORD_ARGON2ID -->
+       <file name="vendor/jetbrains/phpstorm-stubs/standard/password.php" />
+    </stubs>
 </psalm>

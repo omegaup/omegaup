@@ -1,14 +1,16 @@
 <?php
 
 include_once('base/Problemset_Identity_Request.dao.base.php');
-include_once('base/Problemset_Identity_Request.vo.base.php');
-/** ProblemsetIdentityRequest Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetIdentityRequest }.
-  * @access public
-  *
-  */
+
+/**
+ * ProblemsetIdentityRequest Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\ProblemsetIdentityRequest}.
+ *
+ * @access public
+ */
 class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId

@@ -1,7 +1,7 @@
 <?php
 
 require_once('../server/bootstrap_smarty.php');
-$r = new Request([
+$r = new \OmegaUp\Request([
     'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
     'contest_alias' => $_REQUEST['contest'],
 ]);

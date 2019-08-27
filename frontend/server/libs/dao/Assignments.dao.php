@@ -1,15 +1,16 @@
 <?php
 
 include('base/Assignments.dao.base.php');
-include('base/Assignments.vo.base.php');
 
-/** Assignments Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Assignments }.
-  * @access public
-  *
-  */
+/**
+ * Assignments Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Assignments}.
+ *
+ * @access public
+ */
 class AssignmentsDAO extends AssignmentsDAOBase {
     public static function getProblemset($courseId, $assignmentAlias = null) {
         $sql = 'SELECT
@@ -34,7 +35,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
             return null;
         }
 
-        return new Problemsets($rs);
+        return new \OmegaUp\DAO\VO\Problemsets($rs);
     }
 
     public static function getAssignmentCountsForCourse($course_id) {
@@ -67,7 +68,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
             return null;
         }
 
-        return new Assignments($row);
+        return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
     final public static function getByAliasAndCourse($assignment_alias, $course_id) {
@@ -86,7 +87,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
             return null;
         }
 
-        return new Assignments($row);
+        return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
     final public static function getByIdWithScoreboardUrls($assignmentId) {
@@ -114,7 +115,6 @@ class AssignmentsDAO extends AssignmentsDAOBase {
       * Update assignments order.
       *
       * @return Affected Rows
-      * @param Assignments [$Assignments]
       */
     final public static function updateAssignmentsOrder($assignment_id, $order) {
         $sql = 'UPDATE `Assignments` SET `order` = ? WHERE `assignment_id` = ?;';

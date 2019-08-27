@@ -1,14 +1,16 @@
 <?php
 
 include('base/Problemsets.dao.base.php');
-include('base/Problemsets.vo.base.php');
-/** Problemsets Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Problemsets }.
-  * @access public
-  *
-  */
+
+/**
+ * Problemsets Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Problemsets}.
+ *
+ * @access public
+ */
 class ProblemsetsDAO extends ProblemsetsDAOBase {
     public static function getProblemsetContainer($problemset_id) {
         if (is_null($problemset_id)) {
@@ -41,7 +43,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
      */
     public static function isLateSubmission(
         Object $container,
-        ?ProblemsetIdentities $problemsetIdentity
+        ?\OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentity
     ) : bool {
         if (is_null($problemsetIdentity)) {
             return isset($container->finish_time) &&
@@ -99,10 +101,10 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
      * identities and are currently logged in with one of them.
      * In this case a flag is turned on and a message will be displayed in arena
      *
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Users $user
      */
     public static function shouldShowFirstAssociatedIdentityRunWarning(
-        Users $user
+        \OmegaUp\DAO\VO\Users $user
     ) : bool {
         $sql = '
             SELECT

@@ -1,22 +1,17 @@
 <?php
 
 require_once('base/Coder_Of_The_Month.dao.base.php');
-require_once('base/Coder_Of_The_Month.vo.base.php');
-/** Page-level DocBlock .
- *
- * @author alanboy
- * @package docs
- *
- */
 
-/** CoderOfTheMonth Data Access Object (DAO).
+/**
+ * CoderOfTheMonth Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link CoderOfTheMonth }.
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\CoderOfTheMonth}.
+ *
  * @author alanboy
  * @access public
  * @package docs
- *
  */
 class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     /**
@@ -25,7 +20,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      *
      * @param string (date) $startTime
      * @param string (date) $endTime
-     * @return null|Users
+     * @return null|\OmegaUp\DAO\VO\Users
      */
     public static function calculateCoderOfTheMonth($startTime, $endTime) {
         $sql = "
@@ -135,7 +130,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      * Get all coder of the months based on month
      *
      * @params string (date) $firstDay
-     * @return Users
+     * @return \OmegaUp\DAO\VO\Users
      */
     final public static function getMonthlyList($firstDay) {
         $date = date('Y-m-01', strtotime($firstDay));
@@ -205,7 +200,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $coders = [];
         foreach ($rs as $row) {
-            array_push($coders, new CoderOfTheMonth($row));
+            array_push($coders, new \OmegaUp\DAO\VO\CoderOfTheMonth($row));
         }
         return $coders;
     }
@@ -222,7 +217,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $coders = [];
         foreach ($rs as $row) {
-            array_push($coders, new CoderOfTheMonth($row));
+            array_push($coders, new \OmegaUp\DAO\VO\CoderOfTheMonth($row));
         }
         return $coders;
     }

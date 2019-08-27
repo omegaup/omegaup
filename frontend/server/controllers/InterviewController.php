@@ -1,34 +1,34 @@
 <?php
 
 class InterviewController extends Controller {
-    private static function validateCreateOrUpdate(Request $r, $is_update = false) {
+    private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
         if (!Authorization::isSystemAdmin($r->identity) &&
             !UsersDAO::IsUserInterviewer($r->user->user_id)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
-        Validators::validateStringNonEmpty($r['description'], 'description', false);
+        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', false);
         $r->ensureInt('duration', 60, 60 * 5, false);
-        Validators::validateValidAlias($r['alias'], 'alias', $is_required);
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', $is_required);
     }
 
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
 
         self::validateCreateOrUpdate($r, false);
 
-        $acl = new ACLs([
+        $acl = new \OmegaUp\DAO\VO\ACLs([
             'owner_id' => $r->user->user_id,
         ]);
-        $interview = new Interviews([
+        $interview = new \OmegaUp\DAO\VO\Interviews([
             'alias' => $r['alias'],
             'title' => $r['title'],
             'description' => array_key_exists('description', $r) ? $r['description'] : $r['title'],
@@ -41,7 +41,7 @@ class InterviewController extends Controller {
             ACLsDAO::create($acl);
             $interview->acl_id = $acl->acl_id;
 
-            $problemset = new Problemsets([
+            $problemset = new \OmegaUp\DAO\VO\Problemsets([
                 'acl_id' => $acl->acl_id,
                 'type' => 'Interview',
                 'scoreboard_url' => SecurityTools::randomString(30),
@@ -61,7 +61,7 @@ class InterviewController extends Controller {
             \OmegaUp\DAO\DAO::transRollback();
 
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;
         }
@@ -71,19 +71,19 @@ class InterviewController extends Controller {
         return ['status' => 'ok'];
     }
 
-    public static function apiAddUsers(Request $r) {
+    public static function apiAddUsers(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
         $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
 
         foreach ($usersToAdd as $addThisUser) {
-            $requestToInternal = new Request($r);
+            $requestToInternal = new \OmegaUp\Request($r);
             $requestToInternal['usernameOrEmail'] = $addThisUser;
             $requestToInternal->user = $r->user;
             $requestToInternal->identity = $r->identity;
@@ -95,8 +95,8 @@ class InterviewController extends Controller {
     }
 
     private static function addUserInternal($r) {
-        Validators::validateStringNonEmpty($r['interview_alias'], 'interview_alias');
-        Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+        \OmegaUp\Validators::validateStringNonEmpty($r['interview_alias'], 'interview_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
         // Does the interview exist ?
         $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
@@ -118,7 +118,7 @@ class InterviewController extends Controller {
             // create a new user
             self::$log->info('Could not find user, this must be a new email, registering: ' . $r['usernameOrEmail']);
 
-            $newUserRequest = new Request($r);
+            $newUserRequest = new \OmegaUp\Request($r);
             $newUserRequest['email'] = $r['usernameOrEmail'];
             $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
             $newUserRequest['password'] = SecurityTools::randomString(8);
@@ -159,11 +159,11 @@ class InterviewController extends Controller {
         if (is_null($r->identity)
             || !Authorization::isInterviewAdmin($r->identity, $r['interview'])
         ) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         // add the user to the interview
-        ProblemsetIdentitiesDAO::create(new ProblemsetIdentities([
+        ProblemsetIdentitiesDAO::create(new \OmegaUp\DAO\VO\ProblemsetIdentities([
             'problemset_id' => $r['interview']->problemset_id,
             'identity_id' => $r['user']->main_identity_id,
             'access_time' => null,
@@ -183,7 +183,7 @@ class InterviewController extends Controller {
         return true;
     }
 
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         $interview = InterviewsDAO::getByAlias($r['interview_alias']);
@@ -196,7 +196,7 @@ class InterviewController extends Controller {
 
         // Only admins can view interview details
         if (!Authorization::isInterviewAdmin($r->identity, $interview)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
@@ -225,7 +225,7 @@ class InterviewController extends Controller {
         ];
     }
 
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         $interviews = null;
@@ -236,7 +236,7 @@ class InterviewController extends Controller {
         ];
     }
 
-    public static function showIntro(Request $r) {
+    public static function showIntro(\OmegaUp\Request $r) {
         $contest = ContestController::validateContest($r['contest_alias'] ?? '');
         // TODO: Arreglar esto para que Problemsets se encargue de obtener
         //       la info correcta

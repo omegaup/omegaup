@@ -31,7 +31,7 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php');
     Utils::CleanupFilesAndDb();
     // Clean APC cache
-    Cache::clearCacheForTesting();
+    \OmegaUp\Cache::clearCacheForTesting();
     QualityNominationFactory::initQualityReviewers();
     QualityNominationFactory::initTags();
 

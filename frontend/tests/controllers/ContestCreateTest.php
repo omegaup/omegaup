@@ -83,7 +83,7 @@ class CreateContestTest extends OmegaupTestCase {
     /**
      * Tests that 2 contests with same name cannot be created
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
@@ -184,7 +184,7 @@ class CreateContestTest extends OmegaupTestCase {
     /**
      * Public contest with private problems is not valid.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePublicContestWithPrivateProblems() {
         $problem = ProblemsFactory::createProblem(new ProblemParams([
@@ -256,7 +256,7 @@ class CreateContestTest extends OmegaupTestCase {
             $run = RunsFactory::createRun($problem, $contest, $contestant);
             RunsFactory::gradeRun($run, 1.0, 'AC', 10);
             $this->fail('Contestant should not create a run after contest finishes');
-        } catch (NotAllowedToSubmitException $e) {
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         } finally {

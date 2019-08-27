@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,17 +11,17 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link IdentityLoginLog}.
+ * {@link \OmegaUp\DAO\VO\IdentityLoginLog}.
  * @access public
  * @abstract
- *
  */
 abstract class IdentityLoginLogDAOBase {
     /**
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link IdentityLoginLog}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\IdentityLoginLog}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -33,9 +32,10 @@ abstract class IdentityLoginLogDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return IdentityLoginLog[] Un arreglo que contiene objetos del tipo {@link IdentityLoginLog}.
+     * @return \OmegaUp\DAO\VO\IdentityLoginLog[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\IdentityLoginLog}.
      *
-     * @psalm-return array<int, IdentityLoginLog>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\IdentityLoginLog>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -52,7 +52,7 @@ abstract class IdentityLoginLogDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new IdentityLoginLog($row);
+            $allData[] = new \OmegaUp\DAO\VO\IdentityLoginLog($row);
         }
         return $allData;
     }
@@ -61,13 +61,15 @@ abstract class IdentityLoginLogDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto IdentityLoginLog suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\IdentityLoginLog}
+     * suministrado.
      *
-     * @param IdentityLoginLog $Identity_Login_Log El objeto de tipo IdentityLoginLog a crear.
+     * @param \OmegaUp\DAO\VO\IdentityLoginLog $Identity_Login_Log El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\IdentityLoginLog} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(IdentityLoginLog $Identity_Login_Log) : int {
+    final public static function create(\OmegaUp\DAO\VO\IdentityLoginLog $Identity_Login_Log) : int {
         $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
         $params = [
             is_null($Identity_Login_Log->identity_id) ? null : (int)$Identity_Login_Log->identity_id,
