@@ -41,7 +41,7 @@
               </template>{{ problem.title }} ({{ problem.runs.length }})</a>
             </li>
           </ul>
-          <div v-if="selectedProblem !== {} || selectedProblem.runs.length == 0">
+          <div v-if="!selectedProblem || selectedProblem.runs.length == 0">
             <div class="empty-category">
               {{ T.courseAssignmentProblemRunsEmpty }}
             </div>
