@@ -30,7 +30,7 @@ class ClarificationsFactory {
         ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
 
         // Create the request for our api
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['message'] = ($message === null ? Utils::CreateRandomString() : $message);
         $r['contest_alias'] = $contestData['request']['alias'];
         $r['problem_alias'] = $problemData['request']['problem_alias'];
@@ -69,7 +69,7 @@ class ClarificationsFactory {
         $public = '0'
     ) {
         // Prepare request
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in the user

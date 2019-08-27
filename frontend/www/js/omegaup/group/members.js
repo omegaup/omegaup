@@ -16,7 +16,8 @@ OmegaUp.on('ready', function() {
           identitiesCsv: this.identitiesCsv,
           groupAlias: this.groupAlias,
           countries: this.countries,
-          show: this.show,
+          showEditForm: this.showEditForm,
+          showChangePasswordForm: this.showChangePasswordForm,
         },
         on: {
           'add-member': function(groupMembersInstance, username) {
@@ -32,7 +33,8 @@ OmegaUp.on('ready', function() {
                 .fail(UI.apiError);
           },
           'edit-identity': function(groupMembersInstance, identity) {
-            groupMembersInstance.show = true;
+            groupMembersInstance.showEditForm = true;
+            groupMembersInstance.showChangePasswordForm = false;
             groupMembersInstance.identity = identity;
             groupMembersInstance.username = identity.username;
           },
@@ -50,15 +52,19 @@ OmegaUp.on('ready', function() {
                         })
                 .then(function(data) {
                   UI.success(T.groupEditMemberUpdated);
-                  groupMembersInstance.show = false;
+                  groupMembersInstance.showEditForm = false;
                   refreshMemberList();
                 })
-                .fail(function(response) { UI.apiError(response); });
+                .fail(apiError);
+          },
+          'change-password-identity': function(groupMembersInstance, username) {
+            groupMembersInstance.showEditForm = false;
+            groupMembersInstance.showChangePasswordForm = true;
+            groupMembersInstance.username = username;
           },
           'change-password-identity-member': function(
               groupMembersInstance, username, newPassword, newPasswordRepeat) {
             if (newPassword !== newPasswordRepeat) {
-              $('.modal').modal('hide');
               UI.error(T.userPasswordMustBeSame);
               return;
             }
@@ -71,12 +77,10 @@ OmegaUp.on('ready', function() {
                 .then(function(data) {
                   refreshMemberList();
                   UI.success(T.groupEditMemberPasswordUpdated);
+                  groupMembersInstance.showChangePasswordForm = false;
                   groupMembersInstance.reset();
                 })
-                .fail(function(response) {
-                  $('.modal').modal('hide');
-                  UI.apiError(response);
-                });
+                .fail(UI.apiError);
           },
           remove: function(username) {
             API.Group.removeUser(
@@ -89,7 +93,8 @@ OmegaUp.on('ready', function() {
           },
           cancel: function(groupMembersInstance) {
             refreshMemberList();
-            groupMembersInstance.show = false;
+            groupMembersInstance.showEditForm = false;
+            groupMembersInstance.showChangePasswordForm = false;
             groupMembersInstance.$el.scrollIntoView();
           },
         },
@@ -100,7 +105,8 @@ OmegaUp.on('ready', function() {
       identitiesCsv: [],
       groupAlias: groupAlias,
       countries: payload.countries,
-      show: false,
+      showEditForm: false,
+      showChangePasswordForm: false,
     },
     components: {
       'omegaup-group-members': group_Members,
@@ -108,7 +114,6 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshMemberList() {
-    $('.modal').modal('hide');
     API.Group.members({group_alias: groupAlias})
         .then(function(data) {
           groupMembers.identities = [];

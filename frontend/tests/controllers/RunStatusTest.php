@@ -24,7 +24,7 @@ class RunStatusTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 
         $login = self::login($contestant);
-        $response = RunController::apiStatus(new Request([
+        $response = RunController::apiStatus(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData['response']['guid'],
         ]));
@@ -54,7 +54,7 @@ class RunStatusTest extends OmegaupTestCase {
                 false
             );
             $this->fail('Should not have allowed to download submission');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 

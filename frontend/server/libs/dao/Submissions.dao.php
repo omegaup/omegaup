@@ -1,26 +1,27 @@
 <?php
 
 include_once('base/Submissions.dao.base.php');
-include_once('base/Submissions.vo.base.php');
 
-/** Submissions Data Access Object (DAO).
+/**
+ * Submissions Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link Submissions }.
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Submissions}.
  *
  * @access public
  */
 class SubmissionsDAO extends SubmissionsDAOBase {
-    final public static function getByGuid(string $guid) : ?Submissions {
+    final public static function getByGuid(string $guid) : ?\OmegaUp\DAO\VO\Submissions {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
 
-        return new Submissions($rs);
+        return new \OmegaUp\DAO\VO\Submissions($rs);
     }
 
     final public static function disqualify(string $guid) : void {
@@ -32,7 +33,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
             WHERE
                 s.guid = ?;
         ';
-        MySQLConnection::getInstance()->Execute($sql, [$guid]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$guid]);
     }
 
     /**
@@ -51,7 +52,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemId];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -74,7 +75,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemId, $problemsetId];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -93,7 +94,7 @@ class SubmissionsDAO extends SubmissionsDAOBase {
         ';
         $val = [$problemsetId];
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /**
@@ -132,6 +133,6 @@ class SubmissionsDAO extends SubmissionsDAOBase {
             $val = [$identityId, $problemId, $problemsetId];
         }
 
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 }

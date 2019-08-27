@@ -1,15 +1,16 @@
 <?php
 
 include('base/Assignments.dao.base.php');
-include('base/Assignments.vo.base.php');
 
-/** Assignments Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Assignments }.
-  * @access public
-  *
-  */
+/**
+ * Assignments Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Assignments}.
+ *
+ * @access public
+ */
 class AssignmentsDAO extends AssignmentsDAOBase {
     public static function getProblemset($courseId, $assignmentAlias = null) {
         $sql = 'SELECT
@@ -24,17 +25,17 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                     a.course_id = ?';
         $params = [$courseId];
         if (is_null($assignmentAlias)) {
-            return MySQLConnection::getInstance()->GetAll($sql, $params);
+            return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         }
         $sql .= ' AND a.alias = ?';
         $params[] = $assignmentAlias;
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
 
-        return new Problemsets($rs);
+        return new \OmegaUp\DAO\VO\Problemsets($rs);
     }
 
     public static function getAssignmentCountsForCourse($course_id) {
@@ -42,7 +43,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 FROM Assignments a
                 WHERE a.course_id = ?
                 GROUP BY a.assignment_type;';
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
         $counts = [];
         foreach ($rs as $row) {
             $counts[$row['assignment_type']] = intval($row['count']);
@@ -62,12 +63,12 @@ class AssignmentsDAO extends AssignmentsDAOBase {
         $sql = 'SELECT * FROM Assignments WHERE (problemset_id = ?) LIMIT 1;';
         $params = [$problemset_id];
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
 
-        return new Assignments($row);
+        return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
     final public static function getByAliasAndCourse($assignment_alias, $course_id) {
@@ -81,12 +82,12 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                     alias = ?
                 LIMIT 1;';
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, [$course_id, $assignment_alias]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$course_id, $assignment_alias]);
         if (empty($row)) {
             return null;
         }
 
-        return new Assignments($row);
+        return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
     final public static function getByIdWithScoreboardUrls($assignmentId) {
@@ -103,7 +104,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 WHERE
                     a.assignment_id = ? LIMIT 1;';
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, [$assignmentId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$assignmentId]);
         if (empty($rs)) {
             return null;
         }
@@ -114,7 +115,6 @@ class AssignmentsDAO extends AssignmentsDAOBase {
       * Update assignments order.
       *
       * @return Affected Rows
-      * @param Assignments [$Assignments]
       */
     final public static function updateAssignmentsOrder($assignment_id, $order) {
         $sql = 'UPDATE `Assignments` SET `order` = ? WHERE `assignment_id` = ?;';
@@ -123,8 +123,8 @@ class AssignmentsDAO extends AssignmentsDAOBase {
             $assignment_id,
         ];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -153,7 +153,7 @@ class AssignmentsDAO extends AssignmentsDAOBase {
                 ORDER BY
                     `order` ASC, `start_time` ASC';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$courseId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$courseId]);
         $ar = [];
         foreach ($rs as $row) {
             $ar[] = $row;

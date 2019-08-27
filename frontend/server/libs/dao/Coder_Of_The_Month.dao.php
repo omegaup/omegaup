@@ -1,22 +1,17 @@
 <?php
 
 require_once('base/Coder_Of_The_Month.dao.base.php');
-require_once('base/Coder_Of_The_Month.vo.base.php');
-/** Page-level DocBlock .
- *
- * @author alanboy
- * @package docs
- *
- */
 
-/** CoderOfTheMonth Data Access Object (DAO).
+/**
+ * CoderOfTheMonth Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link CoderOfTheMonth }.
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\CoderOfTheMonth}.
+ *
  * @author alanboy
  * @access public
  * @package docs
- *
  */
 class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
     /**
@@ -25,7 +20,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      *
      * @param string (date) $startTime
      * @param string (date) $endTime
-     * @return null|Users
+     * @return null|\OmegaUp\DAO\VO\Users
      */
     public static function calculateCoderOfTheMonth($startTime, $endTime) {
         $sql = "
@@ -92,7 +87,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
 
         $val = [$startTime, $endTime, $endTime];
 
-        $results = MySQLConnection::getInstance()->getAll($sql, $val);
+        $results = \OmegaUp\MySQLConnection::getInstance()->getAll($sql, $val);
         if (empty($results)) {
             return null;
         }
@@ -123,7 +118,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
         ';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = $row;
@@ -135,7 +130,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
      * Get all coder of the months based on month
      *
      * @params string (date) $firstDay
-     * @return Users
+     * @return \OmegaUp\DAO\VO\Users
      */
     final public static function getMonthlyList($firstDay) {
         $date = date('Y-m-01', strtotime($firstDay));
@@ -160,7 +155,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
             cm.time DESC
           LIMIT 100
         ';
-        return MySQLConnection::getInstance()->getAll($sql, [$date]);
+        return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, [$date]);
     }
 
     /**
@@ -184,7 +179,7 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
           LIMIT 1
         ';
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, []);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, []);
         if (empty($rs)) {
             return false;
         }
@@ -201,11 +196,11 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                     `time` = ?
                 AND
                     `selected_by` ' . $clause . ';';
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
-            array_push($coders, new CoderOfTheMonth($row));
+            array_push($coders, new \OmegaUp\DAO\VO\CoderOfTheMonth($row));
         }
         return $coders;
     }
@@ -218,11 +213,11 @@ class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
                 WHERE
                     `time` = ?;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$time]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$time]);
 
         $coders = [];
         foreach ($rs as $row) {
-            array_push($coders, new CoderOfTheMonth($row));
+            array_push($coders, new \OmegaUp\DAO\VO\CoderOfTheMonth($row));
         }
         return $coders;
     }

@@ -5,7 +5,7 @@ UITools::redirectToLoginIfNotLoggedIn();
 
 try {
     $result = ContestController::getContestReportDetailsForSmarty(
-        new Request($_REQUEST)
+        new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
     ApiCaller::handleException($e);

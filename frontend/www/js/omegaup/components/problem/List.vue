@@ -109,14 +109,14 @@ export default class ProblemList extends Vue {
   T = T;
   UI = UI;
   showFinderWizard = false;
-  static readonly QUALITY_TAGS = [
+  QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
     T.qualityFormQualityBad,
     T.qualityFormQualityFair,
     T.qualityFormQualityGood,
     T.qualityFormQualityVeryGood,
   ];
-  static readonly DIFFICULTY_TAGS = [
+  DIFFICULTY_TAGS = [
     T.qualityFormDifficultyVeryEasy,
     T.qualityFormDifficultyEasy,
     T.qualityFormDifficultyMedium,
