@@ -351,7 +351,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
             $times = $this->once();
         }
 
-        $broadcasterMock = $this->getMockBuilder('Broadcaster')->getMock();
+        $broadcasterMock = $this->getMockBuilder('\\OmegaUp\\Broadcaster')
+            ->getMock();
         $broadcasterMock
             ->expects($times)
             ->method('broadcastClarification');
@@ -488,7 +489,7 @@ class NoOpGrader extends \OmegaUp\Grader {
 
     public function broadcast(
         ?string $contestAlias,
-        ?string $problemsetId,
+        ?int $problemsetId,
         ?string $problemAlias,
         string $message,
         bool $public,
