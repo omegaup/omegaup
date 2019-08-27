@@ -94,31 +94,6 @@
   </form>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-import arena_CodeView from './CodeView.vue';
-
-export default {
-  props: {
-    data: Object,
-  },
-  components: {
-    'omegaup-arena-code-view': arena_CodeView,
-  },
-  data: function() {
-    return {
-      T: T, groupVisible: {}
-    }
-  },
-  methods: {
-    toggle(group) {
-      const visible = this.groupVisible[group];
-      this.$set(this.groupVisible, group, !visible);
-    },
-  }
-}
-</script>
-
 <style>
   .dropdown-cases {
     height: 100%;
@@ -129,3 +104,32 @@ export default {
     border-radius: 5px;
   }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import arena_CodeView from './CodeView.vue';
+
+interface groupVisibility {
+  [name: string]: boolean;
+}
+
+@Component({
+  components: {
+    'omegaup-arena-code-view': arena_CodeView,
+  },
+})
+export default class ArenaRunDetails extends Vue {
+  @Prop() data!: omegaup.RunDetails;
+
+  T = T;
+  groupVisible: groupVisibility = {};
+
+  toggle(group: string): void {
+    const visible = this.groupVisible[group];
+    this.$set(this.groupVisible, group, !visible);
+  }
+}
+
+</script>

@@ -306,12 +306,19 @@ declare namespace omegaup {
   }
 
   interface RunDetails {
-    admin: boolean;
-    details: omegaup.Details;
+    admin?: boolean;
+    compile_error?: string;
+    details?: Details;
+    groups?: DetailsGroup[];
     guid: string;
     judged_by: string;
     language: string;
     logs: string;
+    problem_admin?: boolean;
+    source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
   }
 
   export interface SchoolsRank {
