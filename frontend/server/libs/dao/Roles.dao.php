@@ -1,22 +1,18 @@
 <?php
 
 require_once('base/Roles.dao.base.php');
-require_once('base/Roles.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
-/** Roles Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Roles }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+
+/**
+ * Roles Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Roles}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class RolesDAO extends RolesDAOBase {
     final public static function getByName($name) {
         $sql = 'SELECT
@@ -26,11 +22,11 @@ class RolesDAO extends RolesDAOBase {
                 WHERE
                     name = ?';
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
         }
 
-        return new Roles($row);
+        return new \OmegaUp\DAO\VO\Roles($row);
     }
 }

@@ -18,7 +18,7 @@ class IdentityFactory {
         $identities = [];
         $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
         if (($handle = fopen($path_file, 'r')) == false) {
-            throw new InvalidParameterException('parameterInvalid', 'identities');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'identities');
         }
         $headers = fgetcsv($handle, 1000, ',');
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
@@ -37,12 +37,12 @@ class IdentityFactory {
     }
 
     public static function createIdentitiesFromAGroup(
-        Groups $group,
+        \OmegaUp\DAO\VO\Groups $group,
         ScopedLoginToken $adminLogin,
         string $password
     ) : array {
         // Call api using identity creator group member
-        IdentityController::apiBulkCreate(new Request([
+        IdentityController::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'identities' => IdentityFactory::getCsvData(
                 'identities.csv',
@@ -53,7 +53,7 @@ class IdentityFactory {
         ]));
 
         // Getting the identities members list
-        $response = GroupController::apiMembers(new Request([
+        $response = GroupController::apiMembers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'group_alias' => $group->alias,
         ]));

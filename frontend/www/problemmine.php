@@ -4,7 +4,7 @@ require_once('../server/bootstrap_smarty.php');
 
 try {
     $smartyProperties = ProblemController::getProblemsMineInfoForSmarty(
-        new Request($_REQUEST)
+        new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
     ApiCaller::handleException($e);

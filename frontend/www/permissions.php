@@ -9,7 +9,7 @@ if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
 
 UITools::redirectToLoginIfNotLoggedIn();
 
-$r = new Request($_REQUEST);
+$r = new \OmegaUp\Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];
 
 $systemRoles = UserRolesDAO::getSystemRoles($session['user']->user_id);

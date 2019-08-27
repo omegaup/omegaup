@@ -2,7 +2,7 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $r = new Request([
+    $r = new \OmegaUp\Request([
             'contest_alias' => $_REQUEST['alias'],
             'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
         ]);
@@ -19,7 +19,7 @@ try {
 
 $problems = $contest['problems'];
 foreach ($problems as &$problem) {
-    $problem['payload'] = ProblemController::apiDetails(new Request([
+    $problem['payload'] = ProblemController::apiDetails(new \OmegaUp\Request([
         'contest_alias' => $_REQUEST['alias'],
         'problem_alias' => $problem['alias'],
         'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
