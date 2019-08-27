@@ -261,9 +261,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
     }
 
     /**
-     * Removes a problem with runs from a private contest while loged in
+     * Removes a problem with runs from a private contest while logged in
      * with a user that is sysadmin.
-     *
      */
     public function testRemoveProblemWithRunsFromPrivateContestBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -278,8 +277,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         // Add the sysadmin role to the contest director
         UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
-            'role_id' => Authorization::ADMIN_ROLE,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
 
         $response = ContestsFactory::removeProblemFromContest(
@@ -451,8 +450,8 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
 
         UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
-            'role_id' => Authorization::ADMIN_ROLE,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
 
         $response = ContestsFactory::removeProblemFromContest(

@@ -25,8 +25,8 @@ class UserRolesDAO extends UserRolesDAOBase {
             WHERE
                 ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
-            Authorization::ADMIN_ROLE,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
 
@@ -46,7 +46,7 @@ class UserRolesDAO extends UserRolesDAOBase {
 
         $found = false;
         for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['acl'] == Authorization::SYSTEM_ACL) {
+            if ($admins[$i]['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
                 $admins[$i]['role'] = 'site-admin';
             } elseif ($admins[$i]['username'] == $owner) {
                 $admins[$i]['role'] = 'owner';
@@ -79,7 +79,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         $params = [
             $identity_id,
             $role_id,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
@@ -109,7 +109,7 @@ class UserRolesDAO extends UserRolesDAOBase {
                 ur.user_id = ? AND ur.acl_id = ?;';
         $params = [
             $user_id,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::SYSTEM_ACL,
         ];
 
         $roles = [];

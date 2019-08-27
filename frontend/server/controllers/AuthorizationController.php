@@ -20,8 +20,8 @@ class AuthorizationController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $isAdmin = Authorization::isProblemAdmin($resolvedIdentity, $problem);
-        $canEdit = $isAdmin || Authorization::canEditProblem($resolvedIdentity, $problem);
+        $isAdmin = \OmegaUp\Authorization::isProblemAdmin($resolvedIdentity, $problem);
+        $canEdit = $isAdmin || \OmegaUp\Authorization::canEditProblem($resolvedIdentity, $problem);
         return [
             'status' => 'ok',
             'has_solved' => ProblemsDAO::isProblemSolved($problem, $resolvedIdentity->identity_id),

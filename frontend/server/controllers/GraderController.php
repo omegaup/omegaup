@@ -15,7 +15,7 @@ class GraderController extends Controller {
     private static function validateRequest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
@@ -32,7 +32,7 @@ class GraderController extends Controller {
         self::$log->debug('Getting grader /status');
         return [
             'status' => 'ok',
-            'grader' => Grader::getInstance()->status(),
+            'grader' => \OmegaUp\Grader::getInstance()->status(),
         ];
     }
 }

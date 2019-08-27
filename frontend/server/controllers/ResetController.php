@@ -11,7 +11,7 @@ class ResetController extends Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         self::validateCreateRequest($r);
-        $email = $r['email'];
+        $email = strval($r['email']);
         $token = \OmegaUp\ApiUtils::getRandomString();
         $reset_digest = hash('sha1', $token);
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime();
@@ -25,15 +25,16 @@ class ResetController extends Controller {
             return ['status' => 'ok', 'token' => $token];
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset');
+        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset')
+            ?: 'wordsReset';
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
-        $message = \OmegaUp\Translations::getInstance()->get('wordsResetMessage');
+        $message = \OmegaUp\Translations::getInstance()->get('wordsResetMessage')
+            ?: 'wordsResetMessage';
         $body = str_replace('[link]', $link, $message);
 
         try {
-            include_once 'libs/Email.php';
-            Email::sendEmail($email, $subject, $body);
+            \OmegaUp\Email::sendEmail([$email], $subject, $body);
         } catch (Exception $e) {
             self::$log->error('Failed to send reset password email ' . $e->getMessage());
             $user->reset_digest = null;
@@ -58,7 +59,7 @@ class ResetController extends Controller {
     public static function apiGenerateToken(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity)) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -140,7 +141,7 @@ class ResetController extends Controller {
         }
 
         // Support doesn't need wait to resest passwords
-        if (!is_null($r->identity) && Authorization::isSupportTeamMember($r->identity)) {
+        if (!is_null($r->identity) && \OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             return;
         }
 

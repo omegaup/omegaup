@@ -53,7 +53,7 @@ $response = ProblemController::apiList($r);
 
 $params = ['query' => $keyword, 'language' => $language, 'order_by' => $order_by, 'mode' => $mode, 'tag' => $tags];
 
-$pager_items = Pager::paginate(
+$pager_items = \OmegaUp\Pager::paginate(
     $response['total'],
     $page,
     '/problem/list/',

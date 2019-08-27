@@ -35,5 +35,5 @@ namespace {
     QualityNominationFactory::initQualityReviewers();
     QualityNominationFactory::initTags();
 
-    Grader::setInstanceForTesting(new NoOpGrader());
+    \OmegaUp\Grader::setInstanceForTesting(new NoOpGrader());
 }
