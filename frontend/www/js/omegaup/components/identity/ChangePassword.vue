@@ -6,7 +6,7 @@
     <div class="panel-body">
       <form class="form-horizontal"
             role="form"
-            v-on:submit.prevent="emitChangePasswordToParent">
+            v-on:submit.prevent="$emit('emit-change-password', newPassword, newPasswordRepeat)">
         <div class="row">
           <div class="form-group">
             <label class="col-md-4 col-sm-4 control-label">{{ T.username }}</label>
@@ -43,7 +43,7 @@
           <button class="btn btn-primary"
                type="submit">{{ T.wordsSaveChanges }}</button> <button class="btn btn-secundary"
                type="reset"
-               v-on:click="emitCancelToParent">{{ T.wordsCancel }}</button>
+               v-on:click="$emit('emit-cancel');">{{ T.wordsCancel }}</button>
         </div>
       </form>
     </div>
@@ -53,23 +53,14 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
 
 @Component({})
-export default class IdentityEdit extends Vue {
+export default class IdentityChangePassword extends Vue {
   @Prop() username!: string;
 
   T = T;
   newPassword = '';
   newPasswordRepeat = '';
-
-  emitChangePasswordToParent(): void {
-    this.$emit('emitChangePassword', this.newPassword, this.newPasswordRepeat);
-  }
-
-  emitCancelToParent(): void {
-    this.$emit('emitCancel');
-  }
 }
 
 </script>

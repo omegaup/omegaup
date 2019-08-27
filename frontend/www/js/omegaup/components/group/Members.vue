@@ -78,8 +78,9 @@
          v-if="showEditForm"></omegaup-identity-edit>
          <omegaup-identity-change-password v-bind:username="username"
          v-if="showChangePasswordForm"
-         v-on:emitcancel="onChildCancel"
-         v-on:emitchangepassword="onChildChangePasswordMember"></omegaup-identity-change-password>
+         v-on:emit-cancel="onChildCancel"
+         v-on:emit-change-password=
+         "onChildChangePasswordMember"></omegaup-identity-change-password>
   </div>
 </template>
 
