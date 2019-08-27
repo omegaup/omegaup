@@ -168,7 +168,7 @@ class CourseController extends Controller {
         // Only curator can set public
         if (!is_null($r['public'])
             && $r['public'] == true
-            && !Authorization::canCreatePublicCourse($r->identity)) {
+            && !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
@@ -342,7 +342,7 @@ class CourseController extends Controller {
             GroupRolesDAO::create(new \OmegaUp\DAO\VO\GroupRoles([
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
-                'role_id' => Authorization::CONTESTANT_ROLE,
+                'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
             ]));
 
             $course->group_id = $group->group_id;
@@ -461,7 +461,7 @@ class CourseController extends Controller {
         $course = self::validateCourseExists($r['course_alias']);
         self::validateCreateAssignment($r, $course);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -497,7 +497,7 @@ class CourseController extends Controller {
             $r['assignment'],
             $r->identity
         );
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -567,7 +567,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -616,7 +616,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -665,7 +665,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -694,7 +694,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -726,7 +726,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -757,7 +757,7 @@ class CourseController extends Controller {
             (int)$problem->problem_id,
             (int)$problemSet->problemset_id
         ) > 0 &&
-            !Authorization::isSystemAdmin($r->identity)) {
+            !\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
         ProblemsetProblemsDAO::delete($problemsetProblem);
@@ -785,7 +785,7 @@ class CourseController extends Controller {
         $group = self::resolveGroup($course, $r['group']);
 
         // Only Course Admins or Group Members (students) can see these results
-        if (!Authorization::canViewCourse(
+        if (!\OmegaUp\Authorization::canViewCourse(
             $r->identity,
             $course,
             $group
@@ -808,7 +808,7 @@ class CourseController extends Controller {
             ) > 0;
             unset($assignment['problemset_id']);
             if ($assignment['start_time'] > $time &&
-                !Authorization::isCourseAdmin($r->identity, $course)
+                !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
             ) {
                 // Non-admins should not be able to see the assignments ahead
                 // of time.
@@ -834,7 +834,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -889,7 +889,7 @@ class CourseController extends Controller {
         // TODO(pablo): Cache
         // Courses the user is an admin for.
         $admin_courses = [];
-        if (Authorization::isSystemAdmin($r->identity)) {
+        if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             $admin_courses = CoursesDAO::getAll(
                 $page,
                 $pageSize,
@@ -946,7 +946,7 @@ class CourseController extends Controller {
         // Default values to search courses for legged user
         $page = 1;
         $pageSize = 1;
-        if (Authorization::isSystemAdmin($identity)) {
+        if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             $result = CoursesDAO::getAll($page, $pageSize, 'course_id', 'DESC');
             if (!empty($result)) {
                 return true;
@@ -974,7 +974,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -997,7 +997,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1065,7 +1065,7 @@ class CourseController extends Controller {
         $group = self::resolveGroup($course, $r['group']);
 
         // Only Course Admins or Group Members (students) can see these results
-        if (!Authorization::canViewCourse(
+        if (!\OmegaUp\Authorization::canViewCourse(
             $r->identity,
             $course,
             $group
@@ -1101,7 +1101,7 @@ class CourseController extends Controller {
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         // Only course admins or users adding themselves when the course is public
-        if (!Authorization::isCourseAdmin($r->identity, $course)
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
             && ($course->public == false
             || $resolvedIdentity->identity_id !== $r->identity->identity_id)
             && $course->requests_user_information == 'no'
@@ -1170,7 +1170,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1208,7 +1208,7 @@ class CourseController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1245,7 +1245,7 @@ class CourseController extends Controller {
         }
 
         // Only director is allowed to make modifications
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1281,12 +1281,12 @@ class CourseController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isCourseAdmin($resolvedIdentity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($resolvedIdentity, $course)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
@@ -1325,7 +1325,7 @@ class CourseController extends Controller {
         }
 
         // Only admins are allowed to modify course
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1360,7 +1360,7 @@ class CourseController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1397,14 +1397,14 @@ class CourseController extends Controller {
         $course = self::validateCourseExists($r['course_alias']);
         $group = self::resolveGroup($course, $r['group']);
         $showAssignment = !empty($r['assignment_alias']);
-        $shouldShowIntro = !Authorization::canViewCourse(
+        $shouldShowIntro = !\OmegaUp\Authorization::canViewCourse(
             $r->identity,
             $course,
             $group
         );
         $isFirstTimeAccess = false;
         $shouldShowAcceptTeacher = false;
-        if (!Authorization::isGroupAdmin($r->identity, $group)) {
+        if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
             $sharingInformation = CoursesDAO::getSharingInformation(
                 $r->identity->identity_id,
                 $course,
@@ -1511,7 +1511,7 @@ class CourseController extends Controller {
         } else {
             $smartyProperties = [
                 'showRanking' => !is_null($r->identity) &&
-                    Authorization::isCourseAdmin($r->identity, $course)
+                    \OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
             ];
             $template = 'course.details.tpl';
         }
@@ -1534,7 +1534,7 @@ class CourseController extends Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         bool $onlyIntroDetails
     ) : array {
-        $isAdmin = Authorization::isCourseAdmin($identity, $course);
+        $isAdmin = \OmegaUp\Authorization::isCourseAdmin($identity, $course);
 
         if ($onlyIntroDetails) {
             $result = [
@@ -1596,7 +1596,7 @@ class CourseController extends Controller {
         $course = self::validateCourseExists($r['alias']);
         $group = self::resolveGroup($course, $r['group']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1613,7 +1613,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1652,7 +1652,7 @@ class CourseController extends Controller {
 
             return [
                 'hasToken' => false,
-                'courseAdmin' => Authorization::isCourseAdmin(
+                'courseAdmin' => \OmegaUp\Authorization::isCourseAdmin(
                     $r->identity,
                     $course
                 ),
@@ -1710,7 +1710,7 @@ class CourseController extends Controller {
         }
 
         // Admins are almighty, no need to check anything else.
-        if (Authorization::isCourseAdmin($identity, $course)) {
+        if (\OmegaUp\Authorization::isCourseAdmin($identity, $course)) {
             return [$course, $assignment];
         }
 
@@ -1843,7 +1843,7 @@ class CourseController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -1886,7 +1886,7 @@ class CourseController extends Controller {
         $group = self::resolveGroup($course, $r['group']);
 
         // Only Course Admins or Group Members (students) can see these results
-        if (!Authorization::canViewCourse($r->identity, $course, $group)) {
+        if (!\OmegaUp\Authorization::canViewCourse($r->identity, $course, $group)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1910,7 +1910,7 @@ class CourseController extends Controller {
 
         self::authenticateRequest($r);
         $originalCourse = self::validateUpdate($r, $r['course_alias']);
-        if (!Authorization::isCourseAdmin($r->identity, $originalCourse)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $originalCourse)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1959,7 +1959,7 @@ class CourseController extends Controller {
         $group = self::resolveGroup($tokenAuthenticationResult['course'], $r['group']);
 
         if (!$tokenAuthenticationResult['hasToken'] &&
-            !Authorization::canViewCourse(
+            !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
                 $tokenAuthenticationResult['course'],
                 $group
@@ -2025,7 +2025,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
         $solvedProblems = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
@@ -2046,7 +2046,7 @@ class CourseController extends Controller {
         self::authenticateRequest($r);
         $course = self::validateCourseExists($r['course_alias']);
 
-        if (!Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -2068,7 +2068,7 @@ class CourseController extends Controller {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group
     ) : bool {
-        return Authorization::canViewCourse($identity, $course, $group) &&
+        return \OmegaUp\Authorization::canViewCourse($identity, $course, $group) &&
                $course->show_scoreboard;
     }
 }

@@ -385,12 +385,13 @@ class ScopedLoginToken {
     public $auth_token = null;
 
     public function __construct($auth_token) {
+        \OmegaUp\Authorization::clearCacheForTesting();
         $this->auth_token = $auth_token;
     }
 
     public function __destruct() {
         OmegaUpTestCase::logout();
-        Authorization::clearCacheForTesting();
+        \OmegaUp\Authorization::clearCacheForTesting();
     }
 }
 

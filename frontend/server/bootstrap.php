@@ -115,7 +115,6 @@ spl_autoload_register(function (string $classname) : void {
     }
 });
 
-require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
 require_once('libs/Grader.php');
 require_once('libs/Pager.php');

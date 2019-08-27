@@ -58,7 +58,7 @@ class ResetController extends Controller {
     public static function apiGenerateToken(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity)) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -140,7 +140,7 @@ class ResetController extends Controller {
         }
 
         // Support doesn't need wait to resest passwords
-        if (!is_null($r->identity) && Authorization::isSupportTeamMember($r->identity)) {
+        if (!is_null($r->identity) && \OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             return;
         }
 

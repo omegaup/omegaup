@@ -237,10 +237,10 @@ class ProblemsDAO extends ProblemsDAOBase {
                 ) gr ON p.acl_id = gr.acl_id ' . $languageJoin;
             $args[] = $identityId;
             $args[] = $userId;
-            $args[] = Authorization::ADMIN_ROLE;
+            $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
             $args[] = $identityId;
             $args[] = $identityId;
-            $args[] = Authorization::ADMIN_ROLE;
+            $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
 
             array_push(
                 $clauses,
@@ -750,9 +750,9 @@ class ProblemsDAO extends ProblemsDAOBase {
                 ?, ?';
         $params = [
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
             ProblemController::VISIBILITY_DELETED,
             (int)$offset,

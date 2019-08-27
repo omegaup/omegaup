@@ -270,13 +270,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         [$mentorUser, $mentorIdentity] = UserFactory::createMentorIdentity();
 
         $login = self::login($mentorUser);
-        $this->assertTrue(Authorization::isMentor($mentorIdentity));
+        $this->assertTrue(\OmegaUp\Authorization::isMentor($mentorIdentity));
 
         // Testing with an intermediate day of the month
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-15', $timestampTest);
         $timestampTest = strtotime($dateTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
 
         // Setting the date to the last day of the current month and testing mentor can choose the coder
@@ -286,21 +286,21 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertTrue($canChooseCoder);
 
         // Setting the date to the first day of the next month and testing mentor can not choose the coder
         \OmegaUp\Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
 
         // Setting the date to the second day of the next month and testing mentor can not choose the coder
         \OmegaUp\Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
         $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
     }
 }

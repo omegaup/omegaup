@@ -81,7 +81,7 @@ class ContestController extends Controller {
             $contests = ContestsDAO::getContestsParticipating($r->identity->identity_id, $page, $page_size, $query);
         } elseif ($public) {
             $contests = ContestsDAO::getRecentPublicContests($r->identity->identity_id, $page, $page_size, $query);
-        } elseif (Authorization::isSystemAdmin($r->identity)) {
+        } elseif (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             // Get all contests
             $contests = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN,
@@ -144,7 +144,7 @@ class ContestController extends Controller {
 
         // Create array of relevant columns
         $contests = null;
-        if (Authorization::isSystemAdmin($r->identity)) {
+        if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             $contests = ContestsDAO::getAllContestsWithScoreboard(
                 $page,
                 $pageSize,
@@ -251,12 +251,12 @@ class ContestController extends Controller {
             if (is_null(ProblemsetIdentitiesDAO::getByPK(
                 $identity->identity_id,
                 $contest->problemset_id
-            )) && !Authorization::isContestAdmin($identity, $contest)
+            )) && !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
             }
         } elseif ($contest->admission_mode == 'registration' &&
-            !Authorization::isContestAdmin($identity, $contest)
+            !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
         ) {
             $req = ProblemsetIdentityRequestDAO::getByPK(
                 $identity->identity_id,
@@ -459,7 +459,7 @@ class ContestController extends Controller {
             self::authenticateRequest($r);
             self::canAccessContest($contest, $r->identity);
 
-            $contestAdmin = Authorization::isContestAdmin($r->identity, $contest);
+            $contestAdmin = \OmegaUp\Authorization::isContestAdmin($r->identity, $contest);
             if (!ContestsDAO::hasStarted($contest) && !$contestAdmin) {
                 $exception = new \OmegaUp\Exceptions\PreconditionFailedException('contestNotStarted');
                 $exception->addCustomMessageToArray('start_time', $contest->start_time);
@@ -741,7 +741,7 @@ class ContestController extends Controller {
                     $problemsetIdentity->access_time + $response['contest']->window_length * 60
                 );
             }
-            $result['admin'] = Authorization::isContestAdmin(
+            $result['admin'] = \OmegaUp\Authorization::isContestAdmin(
                 $r->identity,
                 $response['contest']
             );
@@ -772,7 +772,7 @@ class ContestController extends Controller {
     public static function apiAdminDetails(\OmegaUp\Request $r) {
         $response = self::validateDetails($r);
 
-        if (!Authorization::isContestAdmin($r->identity, $response['contest'])) {
+        if (!\OmegaUp\Authorization::isContestAdmin($r->identity, $response['contest'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1252,7 +1252,7 @@ class ContestController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        if (!Authorization::isContestAdmin($identity, $contest)) {
+        if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException($message);
         }
         return $contest;
@@ -1377,7 +1377,7 @@ class ContestController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'contest_alias');
         }
         // Only contest admin is allowed to create problems in contest
-        if (!Authorization::isContestAdmin($r->identity, $contest)) {
+        if (!\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotAddProb');
         }
 
@@ -1392,7 +1392,7 @@ class ContestController extends Controller {
             || $problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
         }
-        if (!ProblemsDAO::isVisible($problem) && !Authorization::isProblemAdmin(
+        if (!ProblemsDAO::isVisible($problem) && !\OmegaUp\Authorization::isProblemAdmin(
             $r->identity,
             $problem
         )) {
@@ -1462,7 +1462,7 @@ class ContestController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problem_alias');
         }
         // Only contest admin is allowed to remove problems in contest
-        if (!Authorization::isContestAdmin($identity, $contest)) {
+        if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblem');
         }
 
@@ -1475,10 +1475,11 @@ class ContestController extends Controller {
 
         // Disallow removing problem from contest if it already has runs within the contest
         if (SubmissionsDAO::countTotalRunsOfProblemInProblemset(
-            (int)$problem->problem_id,
-            (int)$contest->problemset_id
-        ) > 0 &&
-            !Authorization::isSystemAdmin($identity)) {
+            intval($problem->problem_id),
+            intval($contest->problemset_id)
+        ) > 0
+            && !\OmegaUp\Authorization::isSystemAdmin($identity)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
 
@@ -1661,7 +1662,7 @@ class ContestController extends Controller {
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isContestAdmin($identity, $contest)) {
+        if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
@@ -1760,7 +1761,7 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
         $contest = self::validateClarifications($r);
 
-        $isContestDirector = Authorization::isContestAdmin(
+        $isContestDirector = \OmegaUp\Authorization::isContestAdmin(
             $r->identity,
             $contest
         );
@@ -1798,7 +1799,7 @@ class ContestController extends Controller {
 
         $params = ScoreboardParams::fromContest($response['contest']);
         $params['admin'] = (
-            Authorization::isContestAdmin($r->identity, $response['contest']) &&
+            \OmegaUp\Authorization::isContestAdmin($r->identity, $response['contest']) &&
             !ContestsDAO::isVirtual($response['contest'])
         );
         $params['show_all_runs'] = !ContestsDAO::isVirtual($response['contest']);
@@ -1830,7 +1831,7 @@ class ContestController extends Controller {
 
             self::canAccessContest($contest, $r->identity);
 
-            if (Authorization::isContestAdmin($r->identity, $contest)) {
+            if (\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)) {
                 $showAllRuns = true;
             }
         } else {
@@ -2702,7 +2703,7 @@ class ContestController extends Controller {
         try {
             if ($r['contest_alias'] == 'all-events') {
                 self::authenticateRequest($r);
-                if (Authorization::isSystemAdmin($r->identity)) {
+                if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
                     return [
                         'status' => 'ok',
                         'admin' => true
@@ -2736,7 +2737,7 @@ class ContestController extends Controller {
     public static function apiSetRecommended(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 

@@ -14,7 +14,7 @@ require_once('base/Groups.dao.base.php');
  * @package docs
  */
 class GroupsDAO extends GroupsDAOBase {
-    public static function findByAlias($alias) {
+    public static function findByAlias(string $alias) : ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -71,9 +71,9 @@ class GroupsDAO extends GroupsDAOBase {
                 g.group_id DESC;';
         $params = [
             $user_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $user_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
         ];
 

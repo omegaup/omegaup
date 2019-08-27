@@ -103,7 +103,7 @@ class RunController extends Controller {
             // Check for practice or public problem, there is no contest info
             // in this scenario.
             if (ProblemsDAO::isVisible($r['problem']) ||
-                  Authorization::isProblemAdmin($r->identity, $r['problem']) ||
+                  \OmegaUp\Authorization::isProblemAdmin($r->identity, $r['problem']) ||
                   \OmegaUp\Time::get() > ProblemsDAO::getPracticeDeadline($r['problem']->problem_id)) {
                 if (!RunsDAO::isRunInsideSubmissionGap(
                     null,
@@ -111,7 +111,7 @@ class RunController extends Controller {
                     (int)$r['problem']->problem_id,
                     (int)$r->identity->identity_id
                 )
-                        && !Authorization::isSystemAdmin($r->identity)) {
+                        && !\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
                         throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runWaitGap');
                 }
 
@@ -162,10 +162,10 @@ class RunController extends Controller {
         }
 
         // Contest admins can skip following checks
-        if (!Authorization::isAdmin($r->identity, $r['problemset'])) {
+        if (!\OmegaUp\Authorization::isAdmin($r->identity, $r['problemset'])) {
             // Before submit something, user had to open the problem/problemset.
             if (is_null($problemsetIdentity) &&
-                !Authorization::canSubmitToProblemset(
+                !\OmegaUp\Authorization::canSubmitToProblemset(
                     $r->identity,
                     $r['problemset']
                 )
@@ -271,7 +271,7 @@ class RunController extends Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
 
-            $type = (Authorization::isAdmin($r->identity, $r['problemset']) &&
+            $type = (\OmegaUp\Authorization::isAdmin($r->identity, $r['problemset']) &&
                 !is_null($r['contest']) &&
                 !ContestsDAO::isVirtual($r['contest'])) ? 'test' : 'normal';
         }
@@ -407,7 +407,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
+        if (!\OmegaUp\Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -448,7 +448,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
+        if (!\OmegaUp\Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -493,7 +493,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
+        if (!\OmegaUp\Authorization::canEditSubmission($r->identity, $r['submission'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -551,14 +551,14 @@ class RunController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
+        if (!\OmegaUp\Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         // Get the source
         $response = [
             'status' => 'ok',
-            'admin' => Authorization::isProblemAdmin($r->identity, $r['problem']),
+            'admin' => \OmegaUp\Authorization::isProblemAdmin($r->identity, $r['problem']),
             'guid' => $r['submission']->guid,
             'language' => $r['submission']->language,
         ];
@@ -592,7 +592,7 @@ class RunController extends Controller {
 
         self::validateDetailsRequest($r);
 
-        if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
+        if (!\OmegaUp\Authorization::canViewSubmission($r->identity, $r['submission'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -674,7 +674,7 @@ class RunController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::isProblemAdmin($identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -794,7 +794,7 @@ class RunController extends Controller {
             $r['rowcount'] = 100;
         }
 
-        if (!Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 

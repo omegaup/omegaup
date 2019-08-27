@@ -196,7 +196,7 @@ class QualityNominationController extends Controller {
 
         if ($nomination->nomination == 'promotion') {
             $qualityReviewerGroup = GroupsDAO::findByAlias(
-                Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+                \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
             );
             foreach (GroupsDAO::sampleMembers(
                 $qualityReviewerGroup,
@@ -385,7 +385,7 @@ class QualityNominationController extends Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateMemberOfReviewerGroup(\OmegaUp\Request $r) {
-        if (!Authorization::isQualityReviewer($r->identity)) {
+        if (!\OmegaUp\Authorization::isQualityReviewer($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
     }
@@ -482,7 +482,7 @@ class QualityNominationController extends Controller {
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
         $currentUserIsNominator = ($r->user->username == $response['nominator']['username']);
-        $currentUserReviewer = Authorization::isQualityReviewer($r->identity);
+        $currentUserReviewer = \OmegaUp\Authorization::isQualityReviewer($r->identity);
         if (!$currentUserIsNominator && !$currentUserReviewer) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
