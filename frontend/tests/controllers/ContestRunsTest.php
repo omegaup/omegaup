@@ -49,7 +49,7 @@ class ContestRunsTest extends OmegaupTestCase {
         $directorIdentity = IdentityController::resolveIdentity(
             $contestData['director']->username
         );
-        $this->assertFalse(Authorization::isProblemAdmin(
+        $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $directorIdentity,
             $problemData['problem']
         ));

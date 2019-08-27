@@ -57,7 +57,7 @@ class CourseRunsTest extends OmegaupTestCase {
         $adminIdentity = IdentityController::resolveIdentity(
             $courseData['admin']->username
         );
-        $this->assertFalse(Authorization::isProblemAdmin(
+        $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $adminIdentity,
             $problemData['problem']
         ));

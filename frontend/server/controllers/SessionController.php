@@ -177,7 +177,7 @@ class SessionController extends Controller {
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => Authorization::isSystemAdmin($currentIdentity),
+            'is_admin' => \OmegaUp\Authorization::isSystemAdmin($currentIdentity),
         ];
     }
 

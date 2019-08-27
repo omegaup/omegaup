@@ -10,7 +10,7 @@ class QualityNominationFactory {
 
     public static function initQualityReviewers() {
         $qualityReviewerGroup = GroupsDAO::findByAlias(
-            Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+            \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
         );
         for ($i = 0; $i < 5; $i++) {
             $reviewer = UserFactory::createUser();

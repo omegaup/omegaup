@@ -301,9 +301,9 @@ class ContestsDAO extends ContestsDAOBase {
 
         $params = [
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
             $offset,
             $pageSize,
@@ -592,7 +592,7 @@ class ContestsDAO extends ContestsDAOBase {
                          $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $identity_id;
-        $params[] = Authorization::ADMIN_ROLE;
+        $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {
@@ -620,7 +620,7 @@ class ContestsDAO extends ContestsDAOBase {
                          $recommended_check AND $end_check AND $query_check
                  ) ";
         $params[] = $identity_id;
-        $params[] = Authorization::ADMIN_ROLE;
+        $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
         if ($filter['type'] === FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === FilteredStatus::SIMPLE) {

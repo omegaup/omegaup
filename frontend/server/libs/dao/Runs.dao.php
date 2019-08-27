@@ -325,8 +325,8 @@ class RunsDAO extends RunsDAOBase {
                 $val = [
                     $problemsetId,
                     $aclId,
-                    Authorization::SYSTEM_ACL,
-                    Authorization::ADMIN_ROLE,
+                    \OmegaUp\Authorization::SYSTEM_ACL,
+                    \OmegaUp\Authorization::ADMIN_ROLE,
                 ];
                 if ($excludeAdmin) {
                     $sql = $sql . ' AND i.user_id != (SELECT a.owner_id FROM ACLs a WHERE a.acl_id = ?)';
@@ -350,8 +350,8 @@ class RunsDAO extends RunsDAOBase {
                     $groupId,
                     $aclId,
                     $aclId,
-                    Authorization::SYSTEM_ACL,
-                    Authorization::ADMIN_ROLE,
+                    \OmegaUp\Authorization::SYSTEM_ACL,
+                    \OmegaUp\Authorization::ADMIN_ROLE,
                 ];
             }
         } else {

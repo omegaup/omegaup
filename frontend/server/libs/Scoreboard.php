@@ -402,7 +402,7 @@ class Scoreboard {
         $log = Logger::getLogger('Scoreboard');
         try {
             $log->debug('Sending updated scoreboards');
-            Grader::getInstance()->broadcast(
+            \OmegaUp\Grader::getInstance()->broadcast(
                 $params['alias'],
                 (int)$problemset->problemset_id,
                 null,
@@ -416,7 +416,7 @@ class Scoreboard {
                 -1,  // user_id
                 true  // user_only
             );
-            Grader::getInstance()->broadcast(
+            \OmegaUp\Grader::getInstance()->broadcast(
                 $params['alias'],
                 (int)$problemset->problemset_id,
                 null,

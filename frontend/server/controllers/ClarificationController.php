@@ -6,15 +6,16 @@
  * @author joemmanuel
  */
 class ClarificationController extends Controller {
+    /** @var null|\OmegaUp\Broadcaster */
     public static $broadcaster = null;
 
     /**
      * Creates an instance of Broadcaster if not already created
      */
-    private static function initializeBroadcaster() {
+    private static function initializeBroadcaster() : void {
         if (is_null(self::$broadcaster)) {
             // Create new grader
-            self::$broadcaster = new Broadcaster();
+            self::$broadcaster = new \OmegaUp\Broadcaster();
         }
     }
 
@@ -101,7 +102,7 @@ class ClarificationController extends Controller {
 
         // If the clarification is private, verify that our user is invited or is contest director
         if ($r['clarification']->public != 1) {
-            if (!Authorization::canViewClarification(
+            if (!\OmegaUp\Authorization::canViewClarification(
                 $r->identity,
                 $r['clarification']
             )) {
@@ -151,7 +152,7 @@ class ClarificationController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
         }
 
-        if (!Authorization::canEditClarification(
+        if (!\OmegaUp\Authorization::canEditClarification(
             $r->identity,
             $r['clarification']
         )) {
@@ -195,7 +196,10 @@ class ClarificationController extends Controller {
         return $response;
     }
 
-    private static function clarificationUpdated(\OmegaUp\Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
+    private static function clarificationUpdated(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Clarifications $clarification
+    ) : void {
         try {
             if (is_null($r['problem'])) {
                 $r['problem'] = ProblemsDAO::GetByPK($clarification->problem_id);
@@ -211,6 +215,11 @@ class ClarificationController extends Controller {
             return;
         }
         self::initializeBroadcaster();
-        self::$broadcaster->broadcastClarification($r, $clarification);
+        self::$broadcaster->broadcastClarification(
+            $clarification,
+            $r['problem'],
+            $r['user'],
+            $r['contest']
+        );
     }
 }

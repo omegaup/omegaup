@@ -77,7 +77,7 @@ class ProblemController extends Controller {
             }
 
             // We need to check that the user can actually edit the problem
-            if (!Authorization::canEditProblem($r->identity, $r['problem'])) {
+            if (!\OmegaUp\Authorization::canEditProblem($r->identity, $r['problem'])) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
@@ -86,7 +86,7 @@ class ProblemController extends Controller {
                   $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED)
                     && array_key_exists('visibility', $r)
                     && $r['problem']->visibility != $r['visibility']
-                    && !Authorization::isQualityReviewer($r->identity)) {
+                    && !\OmegaUp\Authorization::isQualityReviewer($r->identity)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('qualityNominationProblemHasBeenBanned', 'visibility');
             }
 
@@ -284,7 +284,7 @@ class ProblemController extends Controller {
 
         // We need to check that the user actually has admin privileges over
         // the problem.
-        if (!Authorization::isProblemAdmin($r->identity, $r['problem'])) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $r['problem'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
@@ -315,7 +315,7 @@ class ProblemController extends Controller {
         }
 
         // Only an admin can add other problem admins
-        if (!Authorization::isProblemAdmin($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -354,7 +354,7 @@ class ProblemController extends Controller {
         }
 
         // Only an admin can add other problem group admins
-        if (!Authorization::isProblemAdmin($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -383,7 +383,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -443,12 +443,12 @@ class ProblemController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isProblemAdmin($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         // Check if admin to delete is actually an admin
-        if (!Authorization::isProblemAdmin($identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
@@ -483,7 +483,7 @@ class ProblemController extends Controller {
         }
 
         // Only admin is alowed to make modifications
-        if (!Authorization::isProblemAdmin($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -517,7 +517,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('tag');
         }
 
-        if (!Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -552,7 +552,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -582,7 +582,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::isProblemAdmin($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -613,7 +613,7 @@ class ProblemController extends Controller {
         $response = [];
         $response['tags'] = ProblemsTagsDAO::getProblemTags(
             $problem,
-            !Authorization::canEditProblem($r->identity, $problem),
+            !\OmegaUp\Authorization::canEditProblem($r->identity, $problem),
             $includeAutogenerated
         );
 
@@ -655,7 +655,7 @@ class ProblemController extends Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
-        Grader::getInstance()->rejudge($runs, false);
+        \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
         $response = [];
 
@@ -779,7 +779,7 @@ class ProblemController extends Controller {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
                 $runs = RunsDAO::getNewRunsForVersion($problem);
-                Grader::getInstance()->rejudge($runs, false);
+                \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
                 // Expire details of the runs
                 foreach ($runs as $run) {
@@ -1005,7 +1005,7 @@ class ProblemController extends Controller {
         // If we request a problem inside a contest
         $problemset = self::validateProblemset($problem, $r['problemset_id'], $r['contest_alias']);
         if (!is_null($problemset) && isset($problemset['problemset'])) {
-            if (!Authorization::isAdmin($r->identity, $problemset['problemset'])) {
+            if (!\OmegaUp\Authorization::isAdmin($r->identity, $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
                     if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
@@ -1021,7 +1021,7 @@ class ProblemController extends Controller {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestNotStarted');
                     }
                 } else {    // Not a contest, but we still have a problemset
-                    if (!Authorization::canSubmitToProblemset(
+                    if (!\OmegaUp\Authorization::canSubmitToProblemset(
                         $r->identity,
                         $problemset['problemset']
                     )) {
@@ -1032,7 +1032,7 @@ class ProblemController extends Controller {
             }
         } else {
             if (is_null($r->identity)
-                || !Authorization::canEditProblem($r->identity, $problem)
+                || !\OmegaUp\Authorization::canEditProblem($r->identity, $problem)
             ) {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
@@ -1244,7 +1244,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1415,7 +1415,7 @@ class ProblemController extends Controller {
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
         if (ProblemsDAO::isVisible($problem) ||
-            Authorization::isProblemAdmin($r->identity, $problem)) {
+            \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             $acl = ACLsDAO::getByPK($problem->acl_id);
             $problemsetter = IdentitiesDAO::findByUserId($acl->owner_id);
             $response['problemsetter'] = [
@@ -1451,7 +1451,7 @@ class ProblemController extends Controller {
         }
 
         if (!is_null($problemset)) {
-            $result['admin'] = Authorization::isAdmin($r->identity, $problemset);
+            $result['admin'] = \OmegaUp\Authorization::isAdmin($r->identity, $problemset);
             if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
                 // At this point, contestant_user relationship should be established.
                 $container = ProblemsetsDAO::getProblemsetContainer(
@@ -1460,7 +1460,7 @@ class ProblemController extends Controller {
                 ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
                     $r->identity,
                     $container,
-                    Authorization::canSubmitToProblemset(
+                    \OmegaUp\Authorization::canSubmitToProblemset(
                         $r->identity,
                         $problemset
                     )
@@ -1551,7 +1551,7 @@ class ProblemController extends Controller {
             $version = $problemsetProblem->version;
         }
 
-        if (!Authorization::canViewProblemSolution($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canViewProblemSolution($r->identity, $problem)) {
             $r->ensureBool('forfeit_problem', false /*isRequired*/);
             if ($r['forfeit_problem'] !== true) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemSolutionNotVisible');
@@ -1596,7 +1596,7 @@ class ProblemController extends Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        if (!Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1661,7 +1661,7 @@ class ProblemController extends Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        if (!Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1722,7 +1722,7 @@ class ProblemController extends Controller {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
                 $runs = RunsDAO::getNewRunsForVersion($problem);
-                Grader::getInstance()->rejudge($runs, false);
+                \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
                 // Expire details of the runs
                 foreach ($runs as $run) {
@@ -1764,7 +1764,7 @@ class ProblemController extends Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        if (!Authorization::canEditProblem($r->identity, $problem)) {
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1857,7 +1857,7 @@ class ProblemController extends Controller {
         $response = [];
 
         if ($r['show_all']) {
-            if (!Authorization::isProblemAdmin($r->identity, $r['problem'])) {
+            if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $r['problem'])) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             if (!is_null($r['username'])) {
@@ -1926,7 +1926,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r);
         self::validateRuns($r);
 
-        $is_problem_admin = Authorization::isProblemAdmin(
+        $is_problem_admin = \OmegaUp\Authorization::isProblemAdmin(
             $r->identity,
             $r['problem']
         );
@@ -1966,7 +1966,7 @@ class ProblemController extends Controller {
         self::validateRuns($r);
 
         // We need to check that the user has priviledges on the problem
-        if (!Authorization::isProblemAdmin($r->identity, $r['problem'])) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $r['problem'])) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -2017,10 +2017,9 @@ class ProblemController extends Controller {
             }
 
             // Try to open the details file. It's okay if the file is missing.
-            $details = Grader::getInstance()->getGraderResource(
+            $details = \OmegaUp\Grader::getInstance()->getGraderResource(
                 $run,
                 'details.json',
-                /*passthru=*/false,
                 /*missingOk=*/true
             );
             if (!is_null($details)) {
@@ -2133,11 +2132,11 @@ class ProblemController extends Controller {
                 $authorUserId = intval($r->user->user_id);
             }
 
-            if (Authorization::isSystemAdmin($r->identity) ||
-                Authorization::hasRole(
+            if (\OmegaUp\Authorization::isSystemAdmin($r->identity) ||
+                \OmegaUp\Authorization::hasRole(
                     $r->identity,
-                    Authorization::SYSTEM_ACL,
-                    Authorization::REVIEWER_ROLE
+                    \OmegaUp\Authorization::SYSTEM_ACL,
+                    \OmegaUp\Authorization::REVIEWER_ROLE
                 )
             ) {
                 $identityType = IDENTITY_ADMIN;
@@ -2201,7 +2200,7 @@ class ProblemController extends Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
-        if (Authorization::isSystemAdmin($r->identity)) {
+        if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             $problems = ProblemsDAO::getAll(
                 $page,
                 $pageSize,
@@ -2442,7 +2441,7 @@ class ProblemController extends Controller {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         return [
-            'isSysadmin' => Authorization::isSystemAdmin($r->identity),
+            'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin($r->identity),
         ];
     }
 
@@ -2510,7 +2509,7 @@ class ProblemController extends Controller {
             $problem,
             $r->identity
         );
-        $isProblemAdmin = Authorization::isProblemAdmin(
+        $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
             $r->identity,
             $problem
         );
@@ -2591,7 +2590,7 @@ class ProblemController extends Controller {
         if (!$exists) {
             return self::SOLUTION_NOT_FOUND;
         }
-        if (Authorization::canViewProblemSolution($identity, $problem)) {
+        if (\OmegaUp\Authorization::canViewProblemSolution($identity, $problem)) {
             return self::SOLUTION_UNLOCKED;
         }
         return self::SOLUTION_LOCKED;

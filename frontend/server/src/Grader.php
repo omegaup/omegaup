@@ -1,38 +1,49 @@
 <?php
 
+namespace OmegaUp;
+
+use \SubmissionsDAO;
+
 class Grader {
-    private static $instance = null;
+    /** @var null|\OmegaUp\Grader */
+    private static $_instance = null;
 
     const REQUEST_MODE_JSON = 1;
     const REQUEST_MODE_RAW = 2;
     const REQUEST_MODE_PASSTHRU = 3;
 
-    public static function getInstance() {
-        if (is_null(self::$instance)) {
-            self::$instance = new Grader();
+    public static function getInstance() : \OmegaUp\Grader {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new \OmegaUp\Grader();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
-    public static function setInstanceForTesting($instance) {
-        self::$instance = $instance;
+    public static function setInstanceForTesting(?\OmegaUp\Grader $instance) : void {
+        self::$_instance = $instance;
     }
 
     /**
      * Call /run/new/ endpoint with run id as parameter.
      *
-     * @param \OmegaUp\DAO\VO\Runs   $run    the run to be graded.
+     * @param \OmegaUp\DAO\VO\Runs $run the run to be graded.
      * @param string $source the source of the submission.
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) {
+    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) : void {
         if (OMEGAUP_GRADER_FAKE) {
+            if (is_null($run->submission_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+            }
             $submission = SubmissionsDAO::getByPK($run->submission_id);
+            if (is_null($submission)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+            }
             file_put_contents("/tmp/{$submission->guid}", $source);
             return;
         }
-        return $this->curlRequest(
+        $this->curlRequest(
             OMEGAUP_GRADER_URL . "/run/new/{$run->run_id}/",
             self::REQUEST_MODE_RAW,
             $source
@@ -45,13 +56,13 @@ class Grader {
      * @param array $runs  the array of runs to be graded.
      * @param bool  $debug whether this is a debug-rejudge.
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function rejudge(array $runs, bool $debug) {
+    public function rejudge(array $runs, bool $debug) : void {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
-        return $this->curlRequest(
+        $this->curlRequest(
             OMEGAUP_GRADER_URL . '/run/grade/',
             self::REQUEST_MODE_JSON,
             [
@@ -69,12 +80,13 @@ class Grader {
      *
      * @param string $guid the submission guid.
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getSource(string $guid) {
+    public function getSource(string $guid) : string {
         if (OMEGAUP_GRADER_FAKE) {
             return file_get_contents("/tmp/{$guid}");
         }
+        /** @var string */
         return $this->curlRequest(
             OMEGAUP_GRADER_URL . "/submission/source/{$guid}/",
             self::REQUEST_MODE_RAW
@@ -84,9 +96,9 @@ class Grader {
     /**
      * Returns the response of the /status entry point
      *
-     * @return array json array
+     * @return array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: array{name: string, id: int}[], run_queue_length: int, runner_queue_length: 0, runners: string[]}} json array
      */
-    public function status() {
+    public function status() : array {
         if (OMEGAUP_GRADER_FAKE) {
             return [
                 'status' => 'ok',
@@ -100,6 +112,7 @@ class Grader {
                 ],
             ];
         }
+        /** @var array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: array{name: string, id: int}[], run_queue_length: int, runner_queue_length: 0, runners: string[]}} */
         return $this->curlRequest(
             OMEGAUP_GRADER_URL . '/grader/status/',
             self::REQUEST_MODE_JSON
@@ -107,19 +120,19 @@ class Grader {
     }
 
     public function broadcast(
-        /* string? */ $contestAlias,
-        /* string? */ $problemsetId,
-        /* string? */ $problemAlias,
+        ?string $contestAlias,
+        ?int $problemsetId,
+        ?string $problemAlias,
         string $message,
         bool $public,
-        /* string? */ $username,
+        ?string $username,
         int $userId = -1,
         bool $userOnly = false
-    ) {
+    ) : void {
         if (OMEGAUP_GRADER_FAKE) {
             return;
         }
-        return $this->curlRequest(
+        $this->curlRequest(
             OMEGAUP_GRADER_URL . '/broadcast/',
             self::REQUEST_MODE_JSON,
             [
@@ -140,15 +153,35 @@ class Grader {
     public function getGraderResource(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $passthru = false,
         bool $missingOk = false
-    ) {
+    ) : ?string {
         if (OMEGAUP_GRADER_FAKE) {
             return null;
         }
+        /** @var null|string */
         return $this->curlRequest(
             OMEGAUP_GRADER_URL . '/run/resource/',
-            $passthru ? self::REQUEST_MODE_PASSTHRU : self::REQUEST_MODE_RAW,
+            self::REQUEST_MODE_RAW,
+            [
+                'run_id' => (int)$run->run_id,
+                'filename' => $filename,
+            ],
+            $missingOk
+        );
+    }
+
+    public function getGraderResourcePassthru(
+        \OmegaUp\DAO\VO\Runs $run,
+        string $filename,
+        bool $missingOk = false
+    ) : ?bool {
+        if (OMEGAUP_GRADER_FAKE) {
+            return null;
+        }
+        /** @var null|bool */
+        return $this->curlRequest(
+            OMEGAUP_GRADER_URL . '/run/resource/',
+            self::REQUEST_MODE_PASSTHRU,
             [
                 'run_id' => (int)$run->run_id,
                 'filename' => $filename,
@@ -179,7 +212,9 @@ class Grader {
         try {
             $curl = curl_init();
             if ($curl === false) {
-                throw new Exception('curl_init failed: ' . curl_error($curl));
+                throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                    new \RuntimeException('curl_init failed')
+                );
             }
 
             curl_setopt_array(
@@ -212,7 +247,9 @@ class Grader {
             }
 
             // Execute call
+            /** @var bool|string */
             $response = curl_exec($curl);
+            /** @var int */
             $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             if ($response === false || $httpStatus != 200) {
@@ -221,23 +258,28 @@ class Grader {
                 }
                 $message = 'curl_exec failed: ' . curl_error($curl) . ' ' .
                     curl_errno($curl) . " HTTP {$httpStatus}";
-                throw new Exception($message);
+                throw new \RuntimeException($message);
             }
 
-            if ($mode == self::REQUEST_MODE_JSON) {
+            if ($mode == self::REQUEST_MODE_JSON && is_string($response)) {
+                /** @var null|false|array{status: string} */
                 $responseArray = json_decode($response, true);
-                if ($responseArray === false) {
-                    throw new Exception('json_decode failed with: ' . json_last_error() . 'for : ' . $response);
+                if (!is_array($responseArray)) {
+                    throw new \RuntimeException(
+                        'json_decode failed with: ' . json_last_error() . "for : {$response}"
+                    );
                 } elseif ($responseArray['status'] !== 'ok') {
-                    throw new Exception('Grader did not return status OK: ' . $response);
+                    throw new \RuntimeException(
+                        "Grader did not return status OK: {$response}"
+                    );
                 }
 
                 return $responseArray;
             } else {
                 return $response;
             }
-        } catch (Exception $e) {
-            Logger::getLogger('Grader')->error("curl failed for {$url}: {$e}");
+        } catch (\Exception $e) {
+            \Logger::getLogger('Grader')->error("curl failed for {$url}", $e);
             throw $e;
         } finally {
             if (is_resource($curl)) {

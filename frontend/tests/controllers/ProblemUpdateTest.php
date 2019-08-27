@@ -545,7 +545,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         }
 
         // Promote to reviewer, can see the problem now.
-        UserFactory::addSystemRole($reviewer, Authorization::REVIEWER_ROLE);
+        UserFactory::addSystemRole($reviewer, \OmegaUp\Authorization::REVIEWER_ROLE);
         $response = ProblemController::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));

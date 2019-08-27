@@ -5,7 +5,7 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::isSystemAdmin($r->identity) &&
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
             !UsersDAO::IsUserInterviewer($r->user->user_id)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -112,7 +112,8 @@ class InterviewController extends Controller {
             // this is fine, we'll create an account for this user
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailSubject');
+        $subject = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailSubject')
+            ?: 'interviewInvitationEmailSubject';
 
         if (is_null($r['user'])) {
             // create a new user
@@ -157,7 +158,7 @@ class InterviewController extends Controller {
 
         // Only director is allowed to add people to interview
         if (is_null($r->identity)
-            || !Authorization::isInterviewAdmin($r->identity, $r['interview'])
+            || !\OmegaUp\Authorization::isInterviewAdmin($r->identity, $r['interview'])
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -171,12 +172,10 @@ class InterviewController extends Controller {
             'time' => '0',
         ]));
         $email = EmailsDAO::getByPK($r['user']->main_email_id);
-        if (is_null($email)) {
+        if (is_null($email) || is_null($email->email)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
         }
-
-        include_once 'libs/Email.php';
-        Email::sendEmail($email, $subject, $body);
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
 
         self::$log->info('Added ' . $r['username'] . ' to interview.');
 
@@ -195,7 +194,7 @@ class InterviewController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isInterviewAdmin($r->identity, $interview)) {
+        if (!\OmegaUp\Authorization::isInterviewAdmin($r->identity, $interview)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 

@@ -7,7 +7,7 @@ class CourseCreateTest extends OmegaupTestCase {
         parent::setUpBeforeClass();
 
         $curatorGroup = GroupsDAO::findByAlias(
-            Authorization::COURSE_CURATOR_GROUP_ALIAS
+            \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
         );
 
         self::$curator = UserFactory::createUser();
