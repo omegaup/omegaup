@@ -55,7 +55,12 @@ OmegaUp.on('ready', function() {
                   groupMembersInstance.showEditForm = false;
                   refreshMemberList();
                 })
-                .fail(function(response) { UI.apiError(response); });
+                .fail(UI.apiError);
+          },
+          'change-password-identity': function(groupMembersInstance, username) {
+            groupMembersInstance.showEditForm = false;
+            groupMembersInstance.showChangePasswordForm = true;
+            groupMembersInstance.username = username;
           },
           'change-password-identity': function(groupMembersInstance, username) {
             groupMembersInstance.showEditForm = false;
@@ -65,7 +70,6 @@ OmegaUp.on('ready', function() {
           'change-password-identity-member': function(
               groupMembersInstance, username, newPassword, newPasswordRepeat) {
             if (newPassword !== newPasswordRepeat) {
-              $('.modal').modal('hide');
               UI.error(T.userPasswordMustBeSame);
               return;
             }
@@ -81,10 +85,7 @@ OmegaUp.on('ready', function() {
                   groupMembersInstance.showChangePasswordForm = false;
                   groupMembersInstance.reset();
                 })
-                .fail(function(response) {
-                  $('.modal').modal('hide');
-                  UI.apiError(response);
-                });
+                .fail(UI.apiError);
           },
           remove: function(username) {
             API.Group.removeUser(
@@ -118,7 +119,6 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshMemberList() {
-    $('.modal').modal('hide');
     API.Group.members({group_alias: groupAlias})
         .then(function(data) {
           groupMembers.identities = [];

@@ -1,15 +1,34 @@
 declare namespace omegaup {
+  enum RequestStatements {
+    No = 'no',
+    Optional = 'optional',
+    Required = 'required',
+  }
+
   export interface Assignment {
     alias: string;
     assignment_type: string,
     description: string;
     finish_time: Date;
-    has_runs: boolean;
+    has_runs?: boolean;
+    max_points?: number;
     name: string;
     order: number;
+    publish_time_delay?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
     start_time: Date;
+  }
+
+  export interface AssignmentProblem {
+    alias: string;
+    commit: string;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    title: string;
+    version: string;
   }
 
   export interface Badge {
@@ -72,7 +91,7 @@ declare namespace omegaup {
     points_decay_factor?: number;
     problems?: omegaup.Problem[];
     problemset_id?: number;
-    requests_user_information?: string;
+    requests_user_information?: omegaup.RequestStatements;
     rerun_id?: number;
     scoreboard?: number;
     scoreboard_url?: string;
@@ -100,6 +119,23 @@ declare namespace omegaup {
     place: number;
   }
 
+  export interface Course {
+    alias: string;
+    assignments: Assignment[];
+    basic_information_required: boolean;
+    description: string;
+    finish_time: Date;
+    is_admin: boolean;
+    name: string;
+    public: boolean;
+    requests_user_information: omegaup.RequestStatements;
+    school_id?: number;
+    school_name: string;
+    show_scoreboard: boolean;
+    start_time: Date;
+    student_count: boolean;
+  }
+
   export interface CourseAdmin {
     username: string;
     role: string;
@@ -109,6 +145,23 @@ declare namespace omegaup {
     role: string;
     name: string;
     alias: string;
+  }
+
+  export interface CourseProblem extends Problem {
+    commit: string;
+    letter: string;
+    order: number;
+    runs: CourseProblemRun[];
+    submissions: number;
+    visits: number;
+  }
+
+  export interface CourseProblemRun {
+    penalty: number;
+    score: number;
+    source: string;
+    time: string;
+    verdict: string;
   }
 
   interface CourseProgress {

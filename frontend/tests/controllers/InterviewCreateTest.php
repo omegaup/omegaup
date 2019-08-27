@@ -6,14 +6,14 @@
 class InterviewCreateTest extends OmegaupTestCase {
     public function testCreateAndListInterview() {
         $interviewer = UserFactory::createUser();
-        UserFactory::addSystemRole($interviewer, Authorization::INTERVIEWER_ROLE);
+        UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         // Verify I started with nothing
         $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
         $this->assertEquals(0, count($interviews));
 
         $login = self::login($interviewer);
-        $response = InterviewController::apiCreate(new Request([
+        $response = InterviewController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My first interview',
             'alias' => 'my-first-interview',
@@ -30,10 +30,10 @@ class InterviewCreateTest extends OmegaupTestCase {
 
     public function testInterviewsMustBePrivate() {
         $interviewer = UserFactory::createUser();
-        UserFactory::addSystemRole($interviewer, Authorization::INTERVIEWER_ROLE);
+        UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         $login = self::login($interviewer);
-        $response = InterviewController::apiCreate(new Request([
+        $response = InterviewController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My second interview',
             'alias' => 'my-second-interview',
@@ -45,11 +45,11 @@ class InterviewCreateTest extends OmegaupTestCase {
 
     public function testAddUsersToInterview() {
         $interviewer = UserFactory::createUser();
-        UserFactory::addSystemRole($interviewer, Authorization::INTERVIEWER_ROLE);
+        UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         $login = self::login($interviewer);
         $interviewAlias = 'my-third-interview';
-        $response = InterviewController::apiCreate(new Request([
+        $response = InterviewController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My third interview',
             'alias' => $interviewAlias,
@@ -62,7 +62,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $email1 = Utils::CreateRandomString() . 'a@foobar.net';
         $email2 = Utils::CreateRandomString() . 'b@foobar.net';
 
-        $response = InterviewController::apiAddUsers(new Request([
+        $response = InterviewController::apiAddUsers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'interview_alias' => $interviewAlias,
             'usernameOrEmailsCSV' => $email1 . ',' . $email2,
@@ -81,7 +81,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $emailFor2 = Utils::CreateRandomString().'@mail.com';
         $interviewee2 = UserFactory::createUser(new UserParams(['email' => $emailFor2]));
 
-        $response = InterviewController::apiAddUsers(new Request([
+        $response = InterviewController::apiAddUsers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'interview_alias' => $interviewAlias,
             'usernameOrEmailsCSV' => $emailFor1 . ',' . $emailFor2,
@@ -92,7 +92,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $interviewee3 = UserFactory::createUser();
         $interviewee4 = UserFactory::createUser();
 
-        $response = InterviewController::apiAddUsers(new Request([
+        $response = InterviewController::apiAddUsers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'interview_alias' => $interviewAlias,
             'usernameOrEmailsCSV' => $interviewee3->username . ',' . $interviewee4->username,
@@ -104,16 +104,16 @@ class InterviewCreateTest extends OmegaupTestCase {
      *
      * Only site-admins and interviewers can create interviews for now
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testOnlyInterviewersCanCreateInterviews() {
-        $r = new Request();
+        $r = new \OmegaUp\Request();
 
         // Create an interview
         $interviewer = UserFactory::createUser();
 
         $login = self::login($interviewer);
-        $response = InterviewController::apiCreate(new Request([
+        $response = InterviewController::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My fourth interview',
             'alias' => 'my-fourth-interview',

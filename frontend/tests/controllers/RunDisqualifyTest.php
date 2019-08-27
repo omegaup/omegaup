@@ -25,7 +25,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
 
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData['response']['guid']
         ]);
@@ -59,14 +59,14 @@ class RunDisqualifyTest extends OmegaupTestCase {
 
         // Disqualify run by contestant1
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData1['response']['guid']
         ]);
         RunController::apiDisqualify($r);
 
         // Check scoreboard
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);

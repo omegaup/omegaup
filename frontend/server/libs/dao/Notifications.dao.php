@@ -1,18 +1,20 @@
 <?php
 
 require_once('base/Notifications.dao.base.php');
-require_once('base/Notifications.vo.base.php');
-/** Notifications Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Notifications }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+
+/**
+ * Notifications Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Notifications}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class NotificationsDAO extends NotificationsDAOBase {
-    public static function getUnreadNotifications(Users $user) {
+    public static function getUnreadNotifications(\OmegaUp\DAO\VO\Users $user) {
         $sql = 'SELECT
                     n.notification_id, n.contents, UNIX_TIMESTAMP(n.timestamp) as timestamp
                 FROM
@@ -22,6 +24,6 @@ class NotificationsDAO extends NotificationsDAOBase {
                 ORDER BY
                     n.timestamp ASC;';
         $args = [$user->user_id];
-        return MySQLConnection::getInstance()->GetAll($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 }

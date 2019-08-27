@@ -51,7 +51,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         );
 
         // Prepare the request object
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the contest director
@@ -91,7 +91,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         );
 
         // Prepare the request object
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
@@ -108,7 +108,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
     /**
      * Checks that private clarifications cant be viewed by someone else
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testClarificationsCreatedPrivateAsDefault() {
         // Get a problem
@@ -135,7 +135,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         );
 
         // Prepare the request object
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification
@@ -176,7 +176,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         ClarificationsDAO::update($clarification);
 
         // Prepare the request object
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $r['clarification_id'] = $clarificationData['response']['clarification_id'];
 
         // Log in with the author of the clarification

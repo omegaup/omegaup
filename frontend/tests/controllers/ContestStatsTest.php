@@ -25,14 +25,14 @@ class ContestStatsTest extends OmegaupTestCase {
 
         // Create a run that we will wait to grade it
         $maxWaitRunData = RunsFactory::createRun($problemData, $contestData, $contestant);
-        Time::setTimeForTesting(Time::get() + 60);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
 
         // Create some runs to be pending
         $pendingRunsCount = 10;
         $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
             $pendingRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $ACRunsCount = 7;
@@ -42,7 +42,7 @@ class ContestStatsTest extends OmegaupTestCase {
 
             // Grade the run
             RunsFactory::gradeRun($ACRunsData[$i]);
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $WARunsCount = 5;
@@ -52,12 +52,12 @@ class ContestStatsTest extends OmegaupTestCase {
 
             // Grade the run with WA
             RunsFactory::gradeRun($WARunsData[$i], 0, 'WA');
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
@@ -99,12 +99,12 @@ class ContestStatsTest extends OmegaupTestCase {
 
             // Grade the run
             RunsFactory::gradeRun($ACRunsData[$i]);
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);

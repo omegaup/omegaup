@@ -27,7 +27,7 @@
             <a class="glyphicon glyphicon-remove"
                 href="#"
                 v-bind:title="T.groupEditMembersRemove"
-                v-on:click="onRemove(identity.username)"></a>
+                v-on:click="$emit('remove', identity.username)"></a>
           </td>
         </tr>
       </tbody>
@@ -64,7 +64,7 @@
                 "glyphicon glyphicon-remove"
                 href="#"
                 v-bind:title="T.groupEditMembersRemove"
-                v-on:click="onRemove(identity.username)"></a>
+                v-on:click="$emit('remove', identity.username)"></a>
           </td>
         </tr>
       </tbody>
@@ -75,7 +75,10 @@
          v-bind:username="username"
          v-if="showEditForm"></omegaup-identity-edit>
          <omegaup-identity-change-password v-bind:username="username"
-         v-if="showChangePasswordForm"></omegaup-identity-change-password>
+         v-if="showChangePasswordForm"
+         v-on:emit-cancel="onChildCancel"
+         v-on:emit-change-password=
+         "onChildChangePasswordMember"></omegaup-identity-change-password>
   </div>
 </template>
 
@@ -129,9 +132,21 @@ export default class UserProfile extends Vue {
     this.$emit('change-password-identity', this, username);
   }
 
-  @Emit('remove')
-  onRemove(username: string): string {
-    return username;
+  onChildChangePasswordMember(
+    newPassword: string,
+    newPasswordRepeat: string,
+  ): void {
+    this.$emit(
+      'change-password-identity-member',
+      this,
+      this.username,
+      newPassword,
+      newPasswordRepeat,
+    );
+  }
+
+  onChildCancel(): void {
+    this.$emit('cancel', this);
   }
 
   reset(): void {

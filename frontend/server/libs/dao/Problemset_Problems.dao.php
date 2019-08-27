@@ -1,17 +1,19 @@
 <?php
 
 include('base/Problemset_Problems.dao.base.php');
-include('base/Problemset_Problems.vo.base.php');
-/** ProblemsetProblems Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetProblems }.
-  * @access public
-  *
-  */
+
+/**
+ * ProblemsetProblems Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\ProblemsetProblems}.
+ *
+ * @access public
+ */
 class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     final public static function getProblemsAssignmentByCourseAlias(
-        Courses $course
+        \OmegaUp\DAO\VO\Courses $course
     ) : array {
         // Build SQL statement
         $sql = '
@@ -36,7 +38,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         ';
         $val = [$course->alias];
 
-        $problemsAssignments = MySQLConnection::getInstance()->GetAll($sql, $val);
+        $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         $result = [];
 
@@ -66,13 +68,13 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     /*
      * Get number of problems in problemset.
      */
-    final public static function countProblemsetProblems(Problemsets $problemset) {
+    final public static function countProblemsetProblems(\OmegaUp\DAO\VO\Problemsets $problemset) {
         // Build SQL statement
         $sql = 'SELECT COUNT(pp.problem_id) ' .
                'FROM Problemset_Problems pp ' .
                'WHERE pp.problemset_id = ?';
         $val = [$problemset->problemset_id];
-        return MySQLConnection::getInstance()->GetOne($sql, $val);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
     /*
@@ -107,7 +109,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
 
     /*
@@ -124,11 +126,11 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 ORDER BY
                     `order`, `problem_id` ASC;';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
 
         $problemsetProblems = [];
         foreach ($rs as $row) {
-            array_push($problemsetProblems, new ProblemsetProblems($row));
+            array_push($problemsetProblems, new \OmegaUp\DAO\VO\ProblemsetProblems($row));
         }
         return $problemsetProblems;
     }
@@ -137,7 +139,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      *
      * Get relevant problems including problemset alias
      */
-    final public static function getRelevantProblems(Problemsets $problemset) {
+    final public static function getRelevantProblems(\OmegaUp\DAO\VO\Problemsets $problemset) {
         // Build SQL statement
         $sql = '
             SELECT
@@ -151,8 +153,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             ORDER BY pp.`order`, `pp`.`problem_id` ASC;';
         $val = [$problemset->problemset_id];
         $result = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
-            $result[] = new Problems($row);
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+            $result[] = new \OmegaUp\DAO\VO\Problems($row);
         }
         return $result;
     }
@@ -174,8 +176,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 Problemset_Problems.problemset_id = ?;
         ';
         $params = [$newProblemsetId, $oldProblemsetId];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
@@ -193,8 +195,8 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             $problemsetId,
             $problemId,
         ];
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /*
@@ -209,23 +211,23 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 WHERE
                     problemset_id = ?;';
 
-        return MySQLConnection::getInstance()->GetOne($sql, [$problemset_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problemset_id]);
     }
 
     /**
      * Update the version of the problem across all problemsets to the current
      * version.
      *
-     * @param Problems $problem         the problem.
-     * @param Users    $user            the user that is making the change.
+     * @param \OmegaUp\DAO\VO\Problems $problem         the problem.
+     * @param \OmegaUp\DAO\VO\Users    $user            the user that is making the change.
      * @param string   $updatePublished the way to update the problemset runs.
      */
     final public static function updateVersionToCurrent(
-        Problems $problem,
-        Users $user,
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Users $user,
         string $updatePublished
     ) : void {
-        $now = Time::get();
+        $now = \OmegaUp\Time::get();
 
         if ($updatePublished == ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
             $sql = '
@@ -250,7 +252,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
-            MySQLConnection::getInstance()->Execute($sql, [
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
                 $problem->commit,
                 $problem->current_version,
                 $now,
@@ -280,7 +282,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
-            MySQLConnection::getInstance()->Execute($sql, [
+            \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
                 $problem->commit,
                 $problem->current_version,
                 $now,
@@ -307,12 +309,12 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     UNIX_TIMESTAMP(c.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
-            $rs = MySQLConnection::getInstance()->GetAll($sql, [
+            $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
             ]);
             foreach ($rs as $row) {
-                array_push($problemsets, new Problemsets($row));
+                array_push($problemsets, new \OmegaUp\DAO\VO\Problemsets($row));
             }
 
             $sql = '
@@ -332,24 +334,24 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                     UNIX_TIMESTAMP(a.finish_time) >= ? AND
                     pp.problem_id = ?;
             ';
-            $rs = MySQLConnection::getInstance()->GetAll($sql, [
+            $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $now,
                 $problem->problem_id,
             ]);
             foreach ($rs as $row) {
-                array_push($problemsets, new Problemsets($row));
+                array_push($problemsets, new \OmegaUp\DAO\VO\Problemsets($row));
             }
 
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
             $problemsets = array_filter(
                 $problemsets,
-                function (Problemsets $problemset) use ($identity) {
-                    return Authorization::isAdmin($identity, $problemset);
+                function (\OmegaUp\DAO\VO\Problemsets $problemset) use ($identity) {
+                    return \OmegaUp\Authorization::isAdmin($identity, $problemset);
                 }
             );
 
             if (!empty($problemsets)) {
-                $problemsetIds = array_map(function (Problemsets $p) {
+                $problemsetIds = array_map(function (\OmegaUp\DAO\VO\Problemsets $p) {
                     return (int)$p->problemset_id;
                 }, $problemsets);
                 $problemsetPlaceholders = implode(', ', array_fill(0, count($problemsetIds), '?'));
@@ -363,7 +365,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                         pp.problem_id = ? AND
                         pp.problemset_id IN ($problemsetPlaceholders);
                 ";
-                MySQLConnection::getInstance()->Execute($sql, array_merge([
+                \OmegaUp\MySQLConnection::getInstance()->Execute($sql, array_merge([
                     $problem->commit,
                     $problem->current_version,
                     $problem->problem_id,
@@ -390,11 +392,11 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 pp.version = ? AND
                 pp.problem_id = ?;
         ';
-        MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
     }
 
     public static function updateProblemsetProblemSubmissions(
-        ProblemsetProblems $problemsetProblem
+        \OmegaUp\DAO\VO\ProblemsetProblems $problemsetProblem
     ) : void {
         $sql = '
             INSERT IGNORE INTO
@@ -411,7 +413,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             ORDER BY
                 s.submission_id;
         ';
-        MySQLConnection::getInstance()->Execute($sql, [
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
             $problemsetProblem->version,
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
@@ -436,7 +438,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 pp.problemset_id = ? AND
                 pp.problem_id = ?;
         ';
-        MySQLConnection::getInstance()->Execute($sql, [
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
         ]);

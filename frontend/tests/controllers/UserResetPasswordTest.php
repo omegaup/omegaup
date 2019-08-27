@@ -14,7 +14,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,
             'password' => Utils::CreateRandomString(),
@@ -40,14 +40,14 @@ class UserResetPasswordTest extends OmegaupTestCase {
     /**
      * Reset my password
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testResetMyPasswordBadOldPassword() {
         // Create an user in omegaup
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,
             'password' => Utils::CreateRandomString(),

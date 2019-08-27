@@ -9,7 +9,7 @@ $c_Session = new SessionController;
 if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     // user wants to login natively
 
-    $r = new Request();
+    $r = new \OmegaUp\Request();
     $r['usernameOrEmail'] = $_POST['user'];
     $r['password'] = $_POST['pass'];
     $r->method = 'UserController::apiLogin';

@@ -15,17 +15,17 @@ class UserPrivilegesTest extends OmegaupTestCase {
 
         $login = self::login($user);
         // Call to API Add Role
-        $response = UserController::apiAddRole(new Request([
+        $response = UserController::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Admin'
         ]));
-        $response = UserController::apiAddRole(new Request([
+        $response = UserController::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Reviewer'
         ]));
-        $response = UserController::apiAddRole(new Request([
+        $response = UserController::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Mentor'
@@ -37,7 +37,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
         $this->assertContains('Mentor', $systemRoles);
 
         // Call to API Remove Role
-        $response = UserController::apiRemoveRole(new Request([
+        $response = UserController::apiRemoveRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Mentor'
@@ -56,17 +56,17 @@ class UserPrivilegesTest extends OmegaupTestCase {
 
         $login = self::login($user);
         // Call to API Add Group
-        $response = UserController::apiAddGroup(new Request([
+        $response = UserController::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:quality-reviewer'
         ]));
-        $response = UserController::apiAddGroup(new Request([
+        $response = UserController::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:course-curator'
         ]));
-        $response = UserController::apiAddGroup(new Request([
+        $response = UserController::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:mentor'
@@ -78,7 +78,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
         $this->assertContains('omegaup:mentor', $systemGroups);
 
         // Call to API Remove Group
-        $response = UserController::apiRemoveGroup(new Request([
+        $response = UserController::apiRemoveGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:mentor'

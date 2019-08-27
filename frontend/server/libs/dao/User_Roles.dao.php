@@ -1,22 +1,18 @@
 <?php
 
 require_once('base/User_Roles.dao.base.php');
-require_once('base/User_Roles.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
-/** UserRoles Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link UserRoles }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+
+/**
+ * UserRoles Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\UserRoles}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class UserRolesDAO extends UserRolesDAOBase {
     private static function getAdmins($acl_id) {
         $sql = '
@@ -29,12 +25,12 @@ class UserRolesDAO extends UserRolesDAOBase {
             WHERE
                 ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
-            Authorization::ADMIN_ROLE,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
 
-        $admins = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $sql = '
             SELECT
@@ -46,11 +42,11 @@ class UserRolesDAO extends UserRolesDAOBase {
             WHERE
                 a.acl_id = ?;';
         $params = [$acl_id];
-        $owner = MySQLConnection::getInstance()->GetOne($sql, $params);
+        $owner = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
 
         $found = false;
         for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['acl'] == Authorization::SYSTEM_ACL) {
+            if ($admins[$i]['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
                 $admins[$i]['role'] = 'site-admin';
             } elseif ($admins[$i]['username'] == $owner) {
                 $admins[$i]['role'] = 'owner';
@@ -83,21 +79,21 @@ class UserRolesDAO extends UserRolesDAOBase {
         $params = [
             $identity_id,
             $role_id,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
-        return MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
     }
 
-    public static function getContestAdmins(Contests $contest) {
+    public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest) {
         return self::getAdmins($contest->acl_id);
     }
 
-    public static function getCourseAdmins(Courses $course) {
+    public static function getCourseAdmins(\OmegaUp\DAO\VO\Courses $course) {
         return self::getAdmins($course->acl_id);
     }
 
-    public static function getProblemAdmins(Problems $problem) {
+    public static function getProblemAdmins(\OmegaUp\DAO\VO\Problems $problem) {
         return self::getAdmins($problem->acl_id);
     }
 
@@ -113,11 +109,11 @@ class UserRolesDAO extends UserRolesDAOBase {
                 ur.user_id = ? AND ur.acl_id = ?;';
         $params = [
             $user_id,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::SYSTEM_ACL,
         ];
 
         $roles = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
             $roles[] = $role['name'];
         }
         return $roles;
@@ -138,7 +134,7 @@ class UserRolesDAO extends UserRolesDAOBase {
         ];
 
         $groups = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, $params) as $group) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $group) {
             $groups[] = $group['name'];
         }
 

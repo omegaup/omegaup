@@ -8,7 +8,7 @@ class GroupsFactory {
      * @param type $name
      * @param type $description
      */
-    public static function createGroup(Users $owner = null, $name = null, $description = null, $alias = null, ScopedLoginToken $login = null) {
+    public static function createGroup(\OmegaUp\DAO\VO\Users $owner = null, $name = null, $description = null, $alias = null, ScopedLoginToken $login = null) {
         if (is_null($owner)) {
             $owner = UserFactory::createUser();
         }
@@ -28,7 +28,7 @@ class GroupsFactory {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($owner);
         }
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $name,
             'description' => $description,
@@ -50,13 +50,13 @@ class GroupsFactory {
      * Add user to group helper
      *
      * @param array $groupData
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Users $user
      */
-    public static function addUserToGroup(array $groupData, Users $user, ScopedLoginToken $login = null) {
+    public static function addUserToGroup(array $groupData, \OmegaUp\DAO\VO\Users $user, ScopedLoginToken $login = null) {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($groupData['owner']);
         }
-        GroupController::apiAddUser(new Request([
+        GroupController::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
             'group_alias' => $groupData['group']->alias
@@ -85,7 +85,7 @@ class GroupsFactory {
         }
 
         $login = OmegaupTestCase::login($groupData['owner']);
-        $request = new Request([
+        $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['group']->alias,
             'name' => $name,
@@ -112,7 +112,7 @@ class GroupsFactory {
      */
     public static function addContestToScoreboard($contestData, $scoreboardData, $groupData, $onlyAC = 0, $weight = 1) {
         $login = OmegaupTestCase::login($groupData['owner']);
-        GroupScoreboardController::apiAddContest(new Request([
+        GroupScoreboardController::apiAddContest(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'group_alias' => $groupData['request']['alias'],
             'scoreboard_alias' => $scoreboardData['request']['alias'],

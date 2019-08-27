@@ -5,7 +5,7 @@ UITools::redirectToLoginIfNotLoggedIn();
 
 try {
     $payload = [
-    'nominations' => QualityNominationController::apiMyList(new Request([]))['nominations'],
+    'nominations' => QualityNominationController::apiMyList(new \OmegaUp\Request([]))['nominations'],
     'currentUser' => $session['user']->username,
     'myView' => true,
     ];
