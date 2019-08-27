@@ -61,7 +61,7 @@
               </thead>
               <tbody>
                 <tr v-for="run in selectedProblem.runs">
-                  <td>{{ formatDateTime(run.time) }}</td>
+                  <td>{{ UI.formatDateTime(run.time) }}</td>
                   <td>{{ run.verdict }}</td>
                   <td class="numeric">{{ 100 * run.score }}</td>
                 </tr>
@@ -136,10 +136,6 @@ export default class CourseViewStudent extends Vue {
   bestScore(problem: omegaup.CourseProblem): number {
     const best = this.bestRun(problem);
     return (best && best.score) || 0.0;
-  }
-
-  formatDateTime(date: Date): string {
-    return UI.formatDateTime(date);
   }
 
   get courseUrl(): string {
