@@ -121,7 +121,7 @@ class Grader {
 
     public function broadcast(
         ?string $contestAlias,
-        ?string $problemsetId,
+        ?int $problemsetId,
         ?string $problemAlias,
         string $message,
         bool $public,

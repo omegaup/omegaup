@@ -638,7 +638,12 @@ class ProblemsDAO extends ProblemsDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
-    public static function getExplicitAdminEmails(\OmegaUp\DAO\VO\Problems $problem) {
+    /**
+     * @return string[]
+     */
+    public static function getExplicitAdminEmails(
+        \OmegaUp\DAO\VO\Problems $problem
+    ) : array {
         $sql = '
             SELECT DISTINCT
                 e.email
@@ -665,11 +670,11 @@ class ProblemsDAO extends ProblemsDAOBase {
         ';
 
         $params = [$problem->problem_id];
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
+        /** @var string[] */
         $result = [];
-        foreach ($rs as $r) {
-            $result[] = $r['email'];
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $row) {
+            $result[] = strval($row['email']);
         }
 
         return $result;
