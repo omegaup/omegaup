@@ -24,7 +24,7 @@ class Broadcaster {
             ]);
 
             $this->log->debug("Sending update $message");
-            Grader::getInstance()->broadcast(
+            \OmegaUp\Grader::getInstance()->broadcast(
                 is_null($r['contest']) ? null : $r['contest']->alias,
                 is_null($r['contest']) ? null : (int)$r['contest']->problemset_id,
                 is_null($r['problem']) ? null : $r['problem']->alias,

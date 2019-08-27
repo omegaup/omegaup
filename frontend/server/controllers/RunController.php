@@ -315,7 +315,7 @@ class RunController extends Controller {
 
         // Call Grader
         try {
-            Grader::getInstance()->grade($run, trim($r['source']));
+            \OmegaUp\Grader::getInstance()->grade($run, trim($r['source']));
         } catch (Exception $e) {
             // Welp, it failed. We cannot make this a real transaction
             // because the Run row would not be visible from the Grader
@@ -327,7 +327,7 @@ class RunController extends Controller {
             SubmissionsDAO::update($submission);
             RunsDAO::delete($run);
             SubmissionsDAO::delete($submission);
-            self::$log->error("Call to Grader::grade() failed: $e");
+            self::$log->error('Call to \OmegaUp\Grader::grade() failed', $e);
             throw $e;
         }
 
@@ -466,9 +466,9 @@ class RunController extends Controller {
         }
 
         try {
-            Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);
+            \OmegaUp\Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);
         } catch (Exception $e) {
-            self::$log->error("Call to Grader::rejudge() failed: {$e}");
+            self::$log->error('Call to \OmegaUp\Grader::rejudge() failed', $e);
         }
 
         $response = [];
@@ -681,18 +681,43 @@ class RunController extends Controller {
         if ($passthru) {
             header('Content-Type: application/zip');
             header("Content-Disposition: attachment; filename={$submission->guid}.zip");
+            return self::getGraderResourcePassthru($run, 'files.zip');
         }
-        return self::getGraderResource($run, 'files.zip', $passthru);
+        return self::getGraderResource($run, 'files.zip');
     }
 
     private static function getGraderResource(
         \OmegaUp\DAO\VO\Runs $run,
-        string $filename,
-        bool $passthru = false
+        string $filename
     ) {
-        $result = Grader::getInstance()->getGraderResource($run, $filename, $passthru, /*missingOk=*/true);
+        $result = \OmegaUp\Grader::getInstance()->getGraderResource(
+            $run,
+            $filename,
+            /*missingOk=*/true
+        );
         if (is_null($result)) {
-            $result = self::downloadResourceFromS3("{$run->run_id}/{$filename}", $passthru);
+            $result = self::downloadResourceFromS3(
+                "{$run->run_id}/{$filename}",
+                /*passthru=*/false
+            );
+        }
+        return $result;
+    }
+
+    private static function getGraderResourcePassthru(
+        \OmegaUp\DAO\VO\Runs $run,
+        string $filename
+    ) {
+        $result = \OmegaUp\Grader::getInstance()->getGraderResourcePassthru(
+            $run,
+            $filename,
+            /*missingOk=*/true
+        );
+        if (is_null($result)) {
+            $result = self::downloadResourceFromS3(
+                "{$run->run_id}/{$filename}",
+                /*passthru=*/true
+            );
         }
         return $result;
     }

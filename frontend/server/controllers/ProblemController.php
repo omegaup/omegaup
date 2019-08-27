@@ -655,7 +655,7 @@ class ProblemController extends Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
-        Grader::getInstance()->rejudge($runs, false);
+        \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
         $response = [];
 
@@ -779,7 +779,7 @@ class ProblemController extends Controller {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
                 $runs = RunsDAO::getNewRunsForVersion($problem);
-                Grader::getInstance()->rejudge($runs, false);
+                \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
                 // Expire details of the runs
                 foreach ($runs as $run) {
@@ -1722,7 +1722,7 @@ class ProblemController extends Controller {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
                 $runs = RunsDAO::getNewRunsForVersion($problem);
-                Grader::getInstance()->rejudge($runs, false);
+                \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
                 // Expire details of the runs
                 foreach ($runs as $run) {
@@ -2017,10 +2017,9 @@ class ProblemController extends Controller {
             }
 
             // Try to open the details file. It's okay if the file is missing.
-            $details = Grader::getInstance()->getGraderResource(
+            $details = \OmegaUp\Grader::getInstance()->getGraderResource(
                 $run,
                 'details.json',
-                /*passthru=*/false,
                 /*missingOk=*/true
             );
             if (!is_null($details)) {

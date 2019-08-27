@@ -437,14 +437,19 @@ class ScopedEmailSender implements \OmegaUp\EmailSender {
  *
  * We are not testing the Grader functionallity itself, we are only validating
  * that we populate the DB correctly and that we make a call to the function
- * Grader::grade(), without executing the contents.
+ * \OmegaUp\Grader::grade(), without executing the contents.
  */
-class NoOpGrader extends Grader {
+class NoOpGrader extends \OmegaUp\Grader {
+    /** @var array<string, string> */
     private $_resources = [];
+
+    /** @var array<string, string> */
     private $_submissions = [];
+
+    /** @var \OmegaUp\DAO\VO\Runs[] */
     private $_runs = [];
 
-    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) {
+    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) : void {
         $sql = '
             SELECT
                 s.guid
@@ -453,20 +458,21 @@ class NoOpGrader extends Grader {
             WHERE
                 s.submission_id = ?;
         ';
+        /** @var string */
         $guid = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$run->submission_id]);
         $this->_submissions[$guid] = $source;
         array_push($this->_runs, $run);
     }
 
-    public function rejudge(array $runs, bool $debug) {
+    public function rejudge(array $runs, bool $debug) : void {
         $this->_runs += $runs;
     }
 
-    public function getSource(string $guid) {
+    public function getSource(string $guid) : string {
         return $this->_submissions[$guid];
     }
 
-    public function status() {
+    public function status() : array {
         return [
             'status' => 'ok',
             'broadcaster_sockets' => 0,
@@ -481,26 +487,22 @@ class NoOpGrader extends Grader {
     }
 
     public function broadcast(
-        /* string? */ $contestAlias,
-        /* string? */ $problemsetId,
-        /* string? */ $problemAlias,
+        ?string $contestAlias,
+        ?string $problemsetId,
+        ?string $problemAlias,
         string $message,
         bool $public,
-        /* string? */ $username,
+        ?string $username,
         int $userId = -1,
         bool $userOnly = false
-    ) {
+    ) : void {
     }
 
     public function getGraderResource(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $passthru = false,
         bool $missingOk = false
-    ) {
-        if ($passthru) {
-            throw new \OmegaUp\Exceptions\UnimplementedException();
-        }
+    ) : ?string {
         $path = "{$run->run_id}/{$filename}";
         if (!array_key_exists($path, $this->_resources)) {
             if (!$missingOk) {
@@ -512,11 +514,19 @@ class NoOpGrader extends Grader {
         return $this->_resources[$path];
     }
 
+    public function getGraderResourcePassthru(
+        \OmegaUp\DAO\VO\Runs $run,
+        string $filename,
+        bool $missingOk = false
+    ) : ?bool {
+        throw new \OmegaUp\Exceptions\UnimplementedException();
+    }
+
     public function setGraderResourceForTesting(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         string $contents
-    ) {
+    ) : void {
         $path = "{$run->run_id}/{$filename}";
         $this->_resources[$path] = $contents;
     }
@@ -530,17 +540,20 @@ class NoOpGrader extends Grader {
  * Simple RAII class to detour grader calls to a mock instance.
  */
 class ScopedGraderDetour {
-    private $_originalInstance = null;
-    private $_instance = null;
+    /** @var OmegaUp\Grader */
+    private $_originalInstance;
+
+    /** @var NoOpGrader */
+    private $_instance;
 
     public function __construct() {
-        $this->_originalInstance = Grader::getInstance();
+        $this->_originalInstance = \OmegaUp\Grader::getInstance();
         $this->_instance = new NoOpGrader();
-        Grader::setInstanceForTesting($this->_instance);
+        \OmegaUp\Grader::setInstanceForTesting($this->_instance);
     }
 
     public function __destruct() {
-        Grader::setInstanceForTesting($this->_originalInstance);
+        \OmegaUp\Grader::setInstanceForTesting($this->_originalInstance);
     }
 
     public function getGraderCallCount() : int {

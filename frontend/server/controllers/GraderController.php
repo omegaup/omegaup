@@ -32,7 +32,7 @@ class GraderController extends Controller {
         self::$log->debug('Getting grader /status');
         return [
             'status' => 'ok',
-            'grader' => Grader::getInstance()->status(),
+            'grader' => \OmegaUp\Grader::getInstance()->status(),
         ];
     }
 }
