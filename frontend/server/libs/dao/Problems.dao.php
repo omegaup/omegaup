@@ -675,6 +675,9 @@ class ProblemsDAO extends ProblemsDAOBase {
         return $result;
     }
 
+    /**
+     * @return null|array{name: string, email: string}
+     */
     public static function getAdminUser(\OmegaUp\DAO\VO\Problems $problem) {
         $sql = '
             SELECT DISTINCT
@@ -700,14 +703,18 @@ class ProblemsDAO extends ProblemsDAOBase {
                1;
         ';
         $params = [$problem->acl_id];
+        /** @var null|array{email?: string, name?: string} */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        if (!array_key_exists('name', $row)) {
-                return null;
+        if (is_null($row)
+            || !array_key_exists('name', $row)
+            || !array_key_exists('email', $row)
+        ) {
+            return null;
         }
 
         return [
-            'name' => $row['name'],
-            'email' => $row['email']
+            'name' => strval($row['name']),
+            'email' => strval($row['email']),
         ];
     }
 

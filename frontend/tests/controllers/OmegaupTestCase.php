@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Email.php';
-
 /**
  * Parent class of all Test cases for Omegaup
  * Implements common methods for setUp and asserts
@@ -408,18 +406,29 @@ class ScopedScoreboardTestRun {
     }
 }
 
-class ScopedEmailSender {
+class ScopedEmailSender implements \OmegaUp\EmailSender {
+    /** @var array{email: string[], subject: string, body: string}[] */
     public static $listEmails = [];
+
     public function __construct() {
-        Email::setEmailSenderForTesting($this);
+        \OmegaUp\Email::setEmailSenderForTesting($this);
     }
 
     public function __destruct() {
-        Email::setEmailSenderForTesting(null);
+        \OmegaUp\Email::setEmailSenderForTesting(null);
     }
 
-    public function sendEmail($emails, $subject, $body) {
-        self::$listEmails[] = ['email' => $emails, 'subject' => $subject, 'body' => $body];
+    /**
+     * @param string[] $emails
+     * @param string $subject
+     * @param string $body
+     */
+    public function sendEmail(array $emails, string $subject, string $body) : void {
+        self::$listEmails[] = [
+            'email' => $emails,
+            'subject' => $subject,
+            'body' => $body,
+        ];
     }
 }
 

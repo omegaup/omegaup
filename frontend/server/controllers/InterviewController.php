@@ -112,7 +112,8 @@ class InterviewController extends Controller {
             // this is fine, we'll create an account for this user
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailSubject');
+        $subject = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailSubject')
+            ?: 'interviewInvitationEmailSubject';
 
         if (is_null($r['user'])) {
             // create a new user
@@ -171,12 +172,10 @@ class InterviewController extends Controller {
             'time' => '0',
         ]));
         $email = EmailsDAO::getByPK($r['user']->main_email_id);
-        if (is_null($email)) {
+        if (is_null($email) || is_null($email->email)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
         }
-
-        include_once 'libs/Email.php';
-        Email::sendEmail($email, $subject, $body);
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
 
         self::$log->info('Added ' . $r['username'] . ' to interview.');
 

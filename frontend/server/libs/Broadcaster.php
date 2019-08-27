@@ -67,8 +67,7 @@ class Broadcaster {
                 $email_params
             );
 
-            include_once 'libs/Email.php';
-            Email::sendEmail($emails, $subject, $body);
+            \OmegaUp\Email::sendEmail($emails, $subject, $body);
         } catch (Exception $e) {
             $this->log->error('Failed to send clarification email ' . $e->getMessage());
         }

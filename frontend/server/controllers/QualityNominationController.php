@@ -318,28 +318,39 @@ class QualityNominationController extends Controller {
     /**
      * Send a mail with demotion notification to the original creator
      */
-    private static function sendDemotionEmail(\OmegaUp\Request $r, \OmegaUp\DAO\VO\QualityNominations $qualitynomination, $rationale) {
-        $request = [];
-        $adminuser = ProblemsDAO::getAdminUser($r['problem']);
-        $email = $adminuser['email'];
-        $username = $adminuser['name'];
+    private static function sendDemotionEmail(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\QualityNominations $qualitynomination,
+        string $rationale
+    ) : void {
+        /** @var \OmegaUp\DAO\VO\Problems */
+        $problem = $r['problem'];
+        $adminUser = ProblemsDAO::getAdminUser($problem);
+        if (is_null($adminUser)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
+        [
+            'email' => $email,
+            'name' => $username,
+        ] = $adminUser;
 
-        $email_params = [
+        $emailParams = [
             'reason' => htmlspecialchars($rationale),
-            'problem_name' => htmlspecialchars($r['problem']->title),
-            'user_name' => $username
+            'problem_name' => htmlspecialchars(strval($problem->title)),
+            'user_name' => $username,
         ];
-        $mail_subject = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get('demotionProblemEmailSubject'),
-            $email_params
+        $subject = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get('demotionProblemEmailSubject')
+                ?: 'demotionProblemEmailSubject',
+            $emailParams
         );
-        $mail_body = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get('demotionProblemEmailBody'),
-            $email_params
+        $body = \OmegaUp\ApiUtils::formatString(
+            \OmegaUp\Translations::getInstance()->get('demotionProblemEmailBody')
+                ?: 'demotionProblemEmailBody',
+            $emailParams
         );
 
-        include_once 'libs/Email.php';
-        Email::sendEmail($email, $mail_subject, $mail_body);
+        \OmegaUp\Email::sendEmail([$email], $subject, $body);
     }
 
     /**

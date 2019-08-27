@@ -273,7 +273,7 @@ class UserController extends Controller {
      */
     private static function sendVerificationEmail(\OmegaUp\DAO\VO\Users $user) {
         $email = EmailsDAO::getByPK($user->main_email_id);
-        if (is_null($email)) {
+        if (is_null($email) || is_null($email->email)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotfound');
         }
 
@@ -282,15 +282,16 @@ class UserController extends Controller {
             return;
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get('verificationEmailSubject');
+        $subject = \OmegaUp\Translations::getInstance()->get('verificationEmailSubject')
+            ?: 'verificationEmailSubject';
         $body = sprintf(
-            \OmegaUp\Translations::getInstance()->get('verificationEmailBody'),
+            \OmegaUp\Translations::getInstance()->get('verificationEmailBody')
+                ?: 'verificationEmailBody',
             OMEGAUP_URL,
-            $user->verification_id
+            strval($user->verification_id)
         );
 
-        include_once 'libs/Email.php';
-        Email::sendEmail($email->email, $subject, $body);
+        \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
     }
 
     /**
