@@ -10,12 +10,12 @@ class ProblemsetController extends Controller {
     ) {
         if ($problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
             $problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
-            throw new ForbiddenAccessException('problemIsBanned');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem)
             && !Authorization::isProblemAdmin($identity, $problem)
         ) {
-            throw new ForbiddenAccessException('problemIsPrivate');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
         }
     }
 

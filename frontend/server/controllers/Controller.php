@@ -23,7 +23,7 @@ class Controller {
      *
      * @param \OmegaUp\Request $r
      * @param bool $requireMainUserIdentity
-     * @throws UnauthorizedException
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
      */
     protected static function authenticateRequest(
         \OmegaUp\Request $r,
@@ -34,7 +34,7 @@ class Controller {
         if (is_null($session['identity'])) {
             $r->user = null;
             $r->identity = null;
-            throw new UnauthorizedException();
+            throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         if (!is_null($session['user'])) {
             $r->user = $session['user'];
@@ -43,7 +43,7 @@ class Controller {
         if ($requireMainUserIdentity && (is_null($r->user) ||
             $r->user->main_identity_id != $r->identity->identity_id)
         ) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
 
@@ -58,7 +58,7 @@ class Controller {
     protected static function authenticateOrAllowUnauthenticatedRequest(\OmegaUp\Request $r) {
         try {
             self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // allow unauthenticated only if it has $r["username"]
             if (is_null($r['username'])) {
                 throw $e;

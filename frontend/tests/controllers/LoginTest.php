@@ -58,7 +58,7 @@ class LoginTest extends OmegaupTestCase {
     /**
      * Test user login with invalid credentials, username and password
      *
-     * @expectedException InvalidCredentialsException
+     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginByUserInvalidPassword() {
         // Create an user in omegaup
@@ -77,7 +77,7 @@ class LoginTest extends OmegaupTestCase {
     /**
      * Test user login with invalid credentials, username and password
      *
-     * @expectedException InvalidCredentialsException
+     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginByUserInvalidUsername() {
         // Inflate request with user data
@@ -93,7 +93,7 @@ class LoginTest extends OmegaupTestCase {
     /**
      * Test user login with invalid credentials, email and password
      *
-     * @expectedException InvalidCredentialsException
+     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginByEmailInvalidPassword() {
         // Create an user in omegaup
@@ -170,7 +170,7 @@ class LoginTest extends OmegaupTestCase {
     /**
      * Test user login with valid credentials, username and password
      *
-     * @expectedException InvalidCredentialsException
+     * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginWithOldPassword() {
         // Create an user in omegaup
@@ -232,7 +232,7 @@ class LoginTest extends OmegaupTestCase {
             $user->password = 'foo';
             self::login($user);
             $this->fail('User should have not been able to log in');
-        } catch (LoginDisabledException $e) {
+        } catch (\OmegaUp\Exceptions\LoginDisabledException $e) {
             $this->assertEquals('loginDisabled', $e->getMessage());
         }
     }

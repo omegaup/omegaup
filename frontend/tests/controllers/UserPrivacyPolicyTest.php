@@ -81,7 +81,7 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
                 'statement_type' => $latest_privacy_policy['statement_type'],
             ]));
             $this->fail('Should have thrown a DuplicatedEntryInDatabaseException');
-        } catch (DuplicatedEntryInDatabaseException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // OK.
         }
     }

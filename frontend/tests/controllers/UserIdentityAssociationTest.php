@@ -248,7 +248,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             ]));
             $this->fail('Identity should not be associated because user has ' .
                         'already another identity of the same group');
-        } catch (DuplicatedEntryInDatabaseException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // Exception expected
             $this->assertEquals($e->getMessage(), 'identityAlreadyAssociated');
         }

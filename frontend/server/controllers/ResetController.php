@@ -53,13 +53,13 @@ class ResetController extends Controller {
      * @param \OmegaUp\Request $r
      * @return array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiGenerateToken(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         if (!Authorization::isSupportTeamMember($r->identity)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         self::validateCreateRequest($r);

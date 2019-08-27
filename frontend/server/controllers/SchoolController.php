@@ -95,7 +95,7 @@ class SchoolController extends Controller {
 
         try {
             self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             if (!is_null($r['start_time'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('paramterInvalid', 'start_time');
             }

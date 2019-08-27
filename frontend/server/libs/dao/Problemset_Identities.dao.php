@@ -33,7 +33,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         if (is_null($problemsetIdentity)) {
             if (!$grantAccess) {
                 // User was not authorized to do this.
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $problemsetIdentity = new \OmegaUp\DAO\VO\ProblemsetIdentities([
                 'identity_id' => $identity->identity_id,

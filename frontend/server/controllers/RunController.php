@@ -31,14 +31,14 @@ class RunController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
-     * @throws NotAllowedToSubmitException
+     * @throws \OmegaUp\Exceptions\NotAllowedToSubmitException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateCreateRequest(\OmegaUp\Request $r) {
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->identity->username == 'omi') {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $allowedLanguages = array_keys(RunController::$kSupportedLanguages);
@@ -48,7 +48,7 @@ class RunController extends Controller {
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
 
         if ($r['problem']->deprecated) {
-            throw new PreconditionFailedException('problemDeprecated');
+            throw new \OmegaUp\Exceptions\PreconditionFailedException('problemDeprecated');
         }
         // check that problem is not publicly or privately banned.
         if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
@@ -112,13 +112,13 @@ class RunController extends Controller {
                     (int)$r->identity->identity_id
                 )
                         && !Authorization::isSystemAdmin($r->identity)) {
-                        throw new NotAllowedToSubmitException('runWaitGap');
+                        throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runWaitGap');
                 }
 
                 self::$practice = true;
                 return;
             } else {
-                throw new NotAllowedToSubmitException('problemIsNotPublic');
+                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('problemIsNotPublic');
             }
         }
 
@@ -158,7 +158,7 @@ class RunController extends Controller {
             $r['container'],
             $problemsetIdentity
         )) {
-            throw new NotAllowedToSubmitException('runNotInsideContest');
+            throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runNotInsideContest');
         }
 
         // Contest admins can skip following checks
@@ -170,12 +170,12 @@ class RunController extends Controller {
                     $r['problemset']
                 )
             ) {
-                throw new NotAllowedToSubmitException('runNotEvenOpened');
+                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runNotEvenOpened');
             }
 
             // Validate that the run is timely inside contest
             if (!ProblemsetsDAO::isSubmissionWindowOpen($r['container'])) {
-                throw new NotAllowedToSubmitException('runNotInsideContest');
+                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runNotInsideContest');
             }
 
             // Validate if the user is allowed to submit given the submissions_gap
@@ -185,7 +185,7 @@ class RunController extends Controller {
                 (int)$r['problem']->problem_id,
                 (int)$r->identity->identity_id
             )) {
-                throw new NotAllowedToSubmitException('runWaitGap');
+                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runWaitGap');
             }
         }
     }
@@ -196,7 +196,7 @@ class RunController extends Controller {
      * @param \OmegaUp\Request $r
      * @return array
      * @throws Exception
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         self::$practice = false;
@@ -212,7 +212,7 @@ class RunController extends Controller {
 
         if (self::$practice) {
             if (OMEGAUP_LOCKDOWN) {
-                throw new ForbiddenAccessException('lockdown');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
             }
             $submitDelay = 0;
             $problemsetId = null;
@@ -244,7 +244,7 @@ class RunController extends Controller {
                             //holy moly, he is submitting a run
                             //and he hasnt even opened the problem
                             //what should be done here?
-                            throw new NotAllowedToSubmitException('runEvenOpened');
+                            throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runEvenOpened');
                         }
 
                         $start = $opened->open_time;
@@ -377,7 +377,7 @@ class RunController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDetailsRequest(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
@@ -399,7 +399,7 @@ class RunController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws InvalidFilesystemOperationException
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiStatus(\OmegaUp\Request $r) {
         // Get the user who is calling this API
@@ -408,7 +408,7 @@ class RunController extends Controller {
         self::validateDetailsRequest($r);
 
         if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         // Fill response
@@ -449,7 +449,7 @@ class RunController extends Controller {
         self::validateDetailsRequest($r);
 
         if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         self::$log->info('Run being rejudged!!');
@@ -494,7 +494,7 @@ class RunController extends Controller {
         self::validateDetailsRequest($r);
 
         if (!Authorization::canEditSubmission($r->identity, $r['submission'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         SubmissionsDAO::disqualify($r['submission']->guid);
@@ -552,7 +552,7 @@ class RunController extends Controller {
         }
 
         if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         // Get the source
@@ -584,7 +584,7 @@ class RunController extends Controller {
      * Used in the arena, any contestant can view its own codes and compile errors
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiSource(\OmegaUp\Request $r) {
         // Get the user who is calling this API
@@ -593,7 +593,7 @@ class RunController extends Controller {
         self::validateDetailsRequest($r);
 
         if (!Authorization::canViewSubmission($r->identity, $r['submission'])) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         $response = [
@@ -634,11 +634,11 @@ class RunController extends Controller {
      * Given the run alias, returns a .zip file with all the .out files generated for a run.
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDownload(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
         // Get the user who is calling this API
         self::authenticateRequest($r);
@@ -675,7 +675,7 @@ class RunController extends Controller {
         }
 
         if (!Authorization::isProblemAdmin($identity, $problem)) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         if ($passthru) {
@@ -782,7 +782,7 @@ class RunController extends Controller {
      * Validator for List API
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateList(\OmegaUp\Request $r) {
@@ -795,7 +795,7 @@ class RunController extends Controller {
         }
 
         if (!Authorization::isSystemAdmin($r->identity)) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         $r->ensureInt('offset', null, null, false);

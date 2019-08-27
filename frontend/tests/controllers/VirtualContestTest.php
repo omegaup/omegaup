@@ -85,7 +85,7 @@ class VirtualContestTest extends OmegaupTestCase {
         try {
             $response = ContestController::apiCreateVirtual($r);
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'originalContestHasNotEnded');
         }
     }
@@ -120,7 +120,7 @@ class VirtualContestTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }
@@ -157,7 +157,7 @@ class VirtualContestTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }
@@ -188,7 +188,7 @@ class VirtualContestTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }

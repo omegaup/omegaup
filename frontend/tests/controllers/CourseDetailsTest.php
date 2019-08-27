@@ -93,7 +93,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
     /**
      * Get details with user not registered to the Course. Should fail.
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testGetCourseDetailsNoCourseMember() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
@@ -108,7 +108,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
     /**
      * Get details with user not registered to the Course. Should fail even if course is Public.
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testGetCourseDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
@@ -178,7 +178,7 @@ class CourseDetailsTest extends OmegaupTestCase {
                 'assignment' => $courseData['assignment_alias'],
             ]));
             $this->fail('Exception was expected.');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK!
         }
 
@@ -200,7 +200,7 @@ class CourseDetailsTest extends OmegaupTestCase {
                 'assignment' => $assignmentAlias,
             ]));
             $this->fail('Exception was expected.');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK!
         }
     }

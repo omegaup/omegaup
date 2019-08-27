@@ -113,7 +113,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
                 'description' => 'pwnd',
             ]));
             $this->fail('Expected ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK.
         }
     }

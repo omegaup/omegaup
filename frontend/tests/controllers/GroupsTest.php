@@ -48,7 +48,7 @@ class GroupsTest extends OmegaupTestCase {
                 'description' => Utils::CreateRandomString(),
             ]));
             $this->fail('Group creation should have failed');
-        } catch (DuplicatedEntryInDatabaseException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals($e->getMessage(), 'aliasInUse');
         }
     }
@@ -76,7 +76,7 @@ class GroupsTest extends OmegaupTestCase {
     /**
      * Add user to group
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddUserToGroupNotOwned() {
         $group = GroupsFactory::createGroup();
@@ -132,7 +132,7 @@ class GroupsTest extends OmegaupTestCase {
     /**
      * Remove user from group test
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveUserFromGroupUserNotOwner() {
         $groupData = GroupsFactory::createGroup();
@@ -257,7 +257,7 @@ class GroupsTest extends OmegaupTestCase {
     /**
      * Adding a contest to a scoreboard not being contest admin
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddContestToScoreboardNoContestAdmin() {
         $groupData = GroupsFactory::createGroup();

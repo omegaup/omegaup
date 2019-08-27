@@ -53,7 +53,7 @@ class ContestCloneTest extends OmegaupTestCase {
     /**
      * Creating a clone with the original contest alias
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateContestCloneWithTheSameAlias() {
         // Get a problem
@@ -83,7 +83,7 @@ class ContestCloneTest extends OmegaupTestCase {
     /**
      * Creating a clone of a private contest without its access
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePrivateContestCloneWithoutAccess() {
         // Get a problem

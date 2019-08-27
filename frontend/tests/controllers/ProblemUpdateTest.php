@@ -383,7 +383,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'message' => 'This should fail',
             ]));
             $this->fail('Expected update to fail');
-        } catch (ProblemDeploymentFailedException $e) {
+        } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
             $this->assertEquals('problemDeployerNoStatements', $e->getMessage());
         }
 
@@ -439,7 +439,7 @@ class UpdateProblemTest extends OmegaupTestCase {
     /**
      * Tests removed problem admin can't edit a problem anymore
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testUpdateProblemWithRemovedProblemAdmin() {
         // Get a problem
@@ -540,7 +540,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
             $this->fail('Should not have been able to see the problem');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'problemIsPrivate');
         }
 

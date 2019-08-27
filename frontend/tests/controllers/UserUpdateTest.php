@@ -113,7 +113,7 @@ class UserUpdateTest extends OmegaupTestCase {
 
     /**
      * Update profile username with existed username
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicateUsernameUpdate() {
         $old_user = UserFactory::createUser();

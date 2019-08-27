@@ -14,7 +14,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testUnauthorizedAccess() {
         UserController::apiValidateFilter(new \OmegaUp\Request([
@@ -23,7 +23,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testInsufficientPrivileges() {
         $user = UserFactory::createUser();
@@ -62,7 +62,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testOtherUsersEvents() {
         $user1 = UserFactory::createUser();
@@ -110,7 +110,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException UnauthorizedException
+     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousPublicProblemsetAccess() {
         $contest = ContestsFactory::createContest()['contest'];
@@ -121,7 +121,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException UnauthorizedException
+     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousPublicContestAccess() {
         $contest = ContestsFactory::createContest()['contest'];
@@ -132,7 +132,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException UnauthorizedException
+     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousProblemsetAccess() {
         $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
@@ -143,7 +143,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException UnauthorizedException
+     * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousContestAccess() {
         $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
@@ -221,7 +221,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     /**
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAnonymousProblemAccess() {
         $problem = ProblemsFactory::createProblem(new ProblemParams([

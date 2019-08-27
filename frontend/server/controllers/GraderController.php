@@ -10,13 +10,13 @@ class GraderController extends Controller {
      * Validate requests for grader apis
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRequest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         if (!Authorization::isSystemAdmin($r->identity)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
 

@@ -232,7 +232,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
                 'username' => $user3->username,
             ]));
             $this->fail('Exception was expected, because date is not in the range to select coder');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'coderOfTheMonthIsNotInPeriodToBeChosen');
             // Pass
         }

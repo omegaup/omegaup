@@ -43,7 +43,7 @@ class CourseCreateTest extends OmegaupTestCase {
     /**
      * Two courses cannot have the same alias
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateCourseDuplicatedName() {
         $sameAlias = Utils::CreateRandomString();
@@ -230,7 +230,7 @@ class CourseCreateTest extends OmegaupTestCase {
 
     /**
      * Public course can't be created by default
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePublicCourseFailForNonCurator() {
         $user = UserFactory::createUser();

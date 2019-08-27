@@ -28,7 +28,7 @@ class ProblemRunsTest extends OmegaupTestCase {
                 'show_all' => true,
             ]));
             $this->fail('Should not have been able to call this API');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK.
         }
 

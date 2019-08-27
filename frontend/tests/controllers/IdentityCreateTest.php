@@ -183,7 +183,7 @@ class IdentityCreateTest extends OmegaupTestCase {
 
     /**
      * Test for uploading csv file with duplicated usernames
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testUploadCsvFileWithDuplicatedUsernames() {
         // Identity creator group member will upload csv file
@@ -199,7 +199,7 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
-        } catch (DuplicatedEntryInDatabaseException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // OK.
         }
     }

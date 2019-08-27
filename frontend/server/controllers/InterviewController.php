@@ -7,7 +7,7 @@ class InterviewController extends Controller {
         // Only site-admins and interviewers can create interviews for now
         if (!Authorization::isSystemAdmin($r->identity) &&
             !UsersDAO::IsUserInterviewer($r->user->user_id)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
@@ -18,7 +18,7 @@ class InterviewController extends Controller {
 
     public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -61,7 +61,7 @@ class InterviewController extends Controller {
             \OmegaUp\DAO\DAO::transRollback();
 
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;
         }
@@ -73,7 +73,7 @@ class InterviewController extends Controller {
 
     public static function apiAddUsers(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         // Authenticate logged user
@@ -159,7 +159,7 @@ class InterviewController extends Controller {
         if (is_null($r->identity)
             || !Authorization::isInterviewAdmin($r->identity, $r['interview'])
         ) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         // add the user to the interview
@@ -196,7 +196,7 @@ class InterviewController extends Controller {
 
         // Only admins can view interview details
         if (!Authorization::isInterviewAdmin($r->identity, $interview)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);

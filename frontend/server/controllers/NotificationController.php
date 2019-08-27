@@ -39,7 +39,7 @@ class NotificationController extends Controller {
                 throw new \OmegaUp\Exceptions\NotFoundException('notificationDoesntExist');
             }
             if ($notification->user_id !== $r->user->user_id) {
-                throw new ForbiddenAccessException('userNotAllowed');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
             }
             $notification->read = 1;
             NotificationsDAO::update($notification);

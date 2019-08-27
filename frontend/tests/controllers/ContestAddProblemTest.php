@@ -109,7 +109,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
     /**
      * Add a problem to contest with unauthorized user
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddProblemToContestWithUnauthorizedUser() {
         // Get a problem
@@ -204,7 +204,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
                 'order_in_contest' => 1,
             ]));
             $this->fail('Banned problems should not be able to be added to a contest');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'problemIsBanned');
         }
 

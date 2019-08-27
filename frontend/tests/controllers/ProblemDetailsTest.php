@@ -151,7 +151,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
     /**
      * User can't see problem details
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testPrivateProblemDetailsOutsideOfContest() {
         // Get 1 problem public
@@ -173,7 +173,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
     /**
      * Non-user can't see problem details
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testPrivateProblemDetailsAnonymousOutsideOfContest() {
         // Get 1 problem public
@@ -373,7 +373,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
                 'forfeit_problem' => true,
             ]));
             $this->fail('User should not have been able to view solution');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('allowedSolutionsLimitReached', $e->getMessage());
         }
 

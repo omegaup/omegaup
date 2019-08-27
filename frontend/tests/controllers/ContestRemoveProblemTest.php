@@ -119,7 +119,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem from contest while loged in with a user that
      * is not a contest admin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemPrivateContestNotBeingContestAdmin() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -337,7 +337,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs from a private contest while loged in
      * with a user that is not sysadmin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsFromPrivateContest() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -359,7 +359,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs only from admins from a private contest while
      * loged in with a user that is not sysadmin.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithMixedRunsFromContestNotBeingSysAdmin() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -411,7 +411,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * Removes a problem with runs made outside and inside the contest from a private contest
      * while logged in as Contest Admin. Should fail.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testRemoveProblemWithRunsOutsideAndInsideContestFromPrivateContest() {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));

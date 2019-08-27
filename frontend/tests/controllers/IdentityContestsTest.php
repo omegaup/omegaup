@@ -129,7 +129,7 @@ class IdentityContestsTest extends OmegaupTestCase {
                 $password
             );
             $this->fail('Only invited identities can access to private contest');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }

@@ -118,7 +118,7 @@ class NotificationTest extends OmegaupTestCase {
                 'notifications' => [$notification->notification_id],
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }

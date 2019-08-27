@@ -149,7 +149,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         try {
             $identityLogin = self::login($identity);
             $this->fail('Identity can not login with old password');
-        } catch (InvalidCredentialsException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
             $this->assertEquals($e->getMessage(), 'usernameOrPassIsWrong');
         }
     }
@@ -196,7 +196,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Creators are not authorized to change passwords from other groups they do not belong');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }
@@ -244,7 +244,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('User is not allowed to change password');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }

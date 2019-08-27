@@ -108,7 +108,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
     /**
      * Checks that private clarifications cant be viewed by someone else
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testClarificationsCreatedPrivateAsDefault() {
         // Get a problem

@@ -34,7 +34,7 @@ class UserController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         // Validate request
@@ -76,7 +76,7 @@ class UserController extends Controller {
                         'username' => $user->username,
                     ];
                 }
-                throw new DuplicatedEntryInDatabaseException('mailInUse');
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('mailInUse');
             }
 
             $user = new \OmegaUp\DAO\VO\Users([
@@ -88,7 +88,7 @@ class UserController extends Controller {
                 UsersDAO::savePassword($user);
             } catch (Exception $e) {
                 if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                    throw new DuplicatedEntryInDatabaseException('usernameInUse', $e);
+                    throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse', $e);
                 }
                 throw $e;
             }
@@ -100,7 +100,7 @@ class UserController extends Controller {
         }
 
         if (!is_null($user)) {
-            throw new DuplicatedEntryInDatabaseException('usernameInUse');
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse');
         }
 
         // Prepare DAOs
@@ -154,19 +154,19 @@ class UserController extends Controller {
 
             if ($result === false) {
                 self::$log->error('POST Request to Google Recaptcha failed.');
-                throw new CaptchaVerificationFailedException();
+                throw new \OmegaUp\Exceptions\CaptchaVerificationFailedException();
             }
 
             $resultAsJson = json_decode($result, true);
             if (is_null($resultAsJson)) {
                 self::$log->error('Captcha response was not a json');
                 self::$log->error('Here is the result:' . $result);
-                throw new CaptchaVerificationFailedException();
+                throw new \OmegaUp\Exceptions\CaptchaVerificationFailedException();
             }
 
             if (!(array_key_exists('success', $resultAsJson) && $resultAsJson['success'])) {
                 self::$log->error('Captcha response said no');
-                throw new CaptchaVerificationFailedException();
+                throw new \OmegaUp\Exceptions\CaptchaVerificationFailedException();
             }
         }
 
@@ -269,7 +269,7 @@ class UserController extends Controller {
      * Send the mail with verification link to the user in the Request
      *
      * @param \OmegaUp\Request $r
-     * @throws EmailVerificationSendException
+     * @throws \OmegaUp\Exceptions\EmailVerificationSendException
      */
     private static function sendVerificationEmail(\OmegaUp\DAO\VO\Users $user) {
         $email = EmailsDAO::getByPK($user->main_email_id);
@@ -297,7 +297,7 @@ class UserController extends Controller {
      * Check if email of user in request has been verified
      *
      * @param \OmegaUp\Request $r
-     * @throws EmailNotVerifiedException
+     * @throws \OmegaUp\Exceptions\EmailNotVerifiedException
      */
     public static function checkEmailVerification(\OmegaUp\DAO\VO\Users $user) {
         if ($user->verified != '0') {
@@ -322,7 +322,7 @@ class UserController extends Controller {
             self::sendVerificationEmail($user);
         }
 
-        throw new EmailNotVerifiedException();
+        throw new \OmegaUp\Exceptions\EmailNotVerifiedException();
     }
 
     /**
@@ -340,7 +340,7 @@ class UserController extends Controller {
         $r['returnAuthToken'] = true;
         $auth_token = $sessionController->NativeLogin($r);
         if ($auth_token === false) {
-            throw new InvalidCredentialsException();
+            throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
         return [
             'status' => 'ok',
@@ -353,11 +353,11 @@ class UserController extends Controller {
      *
      * @param \OmegaUp\Request $rﬁ
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiChangePassword(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -367,7 +367,7 @@ class UserController extends Controller {
         if (isset($r['username']) && $r['username'] != $user->username) {
             // This is usable only in tests.
             if (is_null(self::$permissionKey) || self::$permissionKey != $r['permission_key']) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
@@ -437,7 +437,7 @@ class UserController extends Controller {
             self::authenticateRequest($r);
 
             if (!Authorization::isSupportTeamMember($r->identity)) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             self::$log->info('Admin verifiying user...' . $r['usernameOrEmail']);
@@ -482,13 +482,13 @@ class UserController extends Controller {
      * Registers to the mailing list all users that have not been added before. Admin only
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiMailingListBackfill(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         if (!Authorization::isSystemAdmin($r->identity)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $usersAdded = [];
@@ -584,7 +584,7 @@ class UserController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiGenerateOmiUsers(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
@@ -596,7 +596,7 @@ class UserController extends Controller {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             // Arreglo de estados de MX
@@ -639,7 +639,7 @@ class UserController extends Controller {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys = [
@@ -680,7 +680,7 @@ class UserController extends Controller {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys = [
@@ -721,7 +721,7 @@ class UserController extends Controller {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys = [
@@ -763,7 +763,7 @@ class UserController extends Controller {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys = [
@@ -805,7 +805,7 @@ class UserController extends Controller {
             if ($r->user->username != 'kuko.coder'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -824,7 +824,7 @@ class UserController extends Controller {
             if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -834,7 +834,7 @@ class UserController extends Controller {
             if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -844,7 +844,7 @@ class UserController extends Controller {
             if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -856,7 +856,7 @@ class UserController extends Controller {
             if ($r->user->username != 'rsolis'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -871,7 +871,7 @@ class UserController extends Controller {
             if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -881,7 +881,7 @@ class UserController extends Controller {
             if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -891,7 +891,7 @@ class UserController extends Controller {
             if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -901,7 +901,7 @@ class UserController extends Controller {
             if ($r->user->username != 'EfrenGonzalez'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -911,7 +911,7 @@ class UserController extends Controller {
             if ($r->user->username != 'cope_quintana'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
             $keys =  [
@@ -922,7 +922,7 @@ class UserController extends Controller {
                 && $r->user->username != 'manuel52'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys =  [
                 'UNAMFC16' => 65
@@ -931,7 +931,7 @@ class UserController extends Controller {
             if ($r->user->username != 'covi.academico'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys =  [
                 'OVI19' => 200
@@ -940,7 +940,7 @@ class UserController extends Controller {
             if ($r->user->username != 'Diego_Briaares'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys =  [
                 'UDCCUP-2017' => 40
@@ -949,7 +949,7 @@ class UserController extends Controller {
             if ($r->user->username != 'licgerman-yahoo'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             // Arreglo de concurso
             $keys = [
@@ -959,7 +959,7 @@ class UserController extends Controller {
             if ($r->user->username != 'reyes811'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys =  [
                 'OIC-16' => 225
@@ -968,7 +968,7 @@ class UserController extends Controller {
             if ($r->user->username != 'pablobatun'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys = [
                 'OMIROO-Prim-20' => 100,
@@ -979,7 +979,7 @@ class UserController extends Controller {
             if ($r->user->username != 'lacj20'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys = [
                 'TEBAEV' => 250,
@@ -988,7 +988,7 @@ class UserController extends Controller {
             if ($r->user->username != 'joemmanuel'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys = [
                 'PYE-AGS18' => 40,
@@ -997,7 +997,7 @@ class UserController extends Controller {
             if ($r->user->username != 'galloska'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys = [
                 'ESCOM2018' => 50,
@@ -1006,7 +1006,7 @@ class UserController extends Controller {
             if ($r->user->username != 'galloska'
                 && !$is_system_admin
             ) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $keys = [
                 'Virtual-ESCOM2018' => 50,
@@ -1131,14 +1131,14 @@ class UserController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return response array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiStatusVerified(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         if (!Authorization::isSupportTeamMember($r->identity)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $response = IdentitiesDAO::getStatusVerified($r['email']);
@@ -1160,14 +1160,14 @@ class UserController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return response array
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiExtraInformation(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         if (!Authorization::isSupportTeamMember($r->identity)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $response = IdentitiesDAO::getExtraInformation($r['email']);
@@ -1257,8 +1257,8 @@ class UserController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @return Array
-     * @throws ForbiddenAccessException
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiSelectCoderOfTheMonth(\OmegaUp\Request $r) {
@@ -1266,10 +1266,10 @@ class UserController extends Controller {
         $currentTimestamp = \OmegaUp\Time::get();
 
         if (!Authorization::isMentor($r->identity)) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
         if (!Authorization::canChooseCoder($currentTimestamp)) {
-            throw new ForbiddenAccessException('coderOfTheMonthIsNotInPeriodToBeChosen');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('coderOfTheMonthIsNotInPeriodToBeChosen');
         }
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
@@ -1281,7 +1281,7 @@ class UserController extends Controller {
         $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($dateToSelect);
 
         if (!empty($codersOfTheMonth)) {
-            throw new DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
         }
         // Generate the coder
         $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect);
@@ -1336,7 +1336,7 @@ class UserController extends Controller {
 
         // Only admins can view interview details
         if (!Authorization::isContestAdmin($r->identity->identity_id, $contest)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $user = self::resolveTargetUser($r);
@@ -1494,7 +1494,7 @@ class UserController extends Controller {
      * Get stats
      *
      * @param \OmegaUp\Request $r
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiStats(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1509,7 +1509,7 @@ class UserController extends Controller {
                 !Authorization::isSystemAdmin($r->identity)))
             && (!is_null($user) && $user->is_private == 1)
         ) {
-            throw new ForbiddenAccessException('userProfileIsPrivate');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userProfileIsPrivate');
         }
 
         return [
@@ -1583,7 +1583,7 @@ class UserController extends Controller {
             \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
             $user = UsersDAO::FindByUsername($r['username']);
             if ($r['username'] != $r->user->username && !is_null($user)) {
-                throw new DuplicatedEntryInDatabaseException('usernameInUse');
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse');
             }
         }
 
@@ -1866,7 +1866,7 @@ class UserController extends Controller {
         } catch (Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('mailInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('mailInUse', $e);
             }
             throw $e;
         }
@@ -1934,7 +1934,7 @@ class UserController extends Controller {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
                     if (!$session['is_admin']) {
-                        throw new ForbiddenAccessException('userNotAllowed');
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
                     }
                     break;
                 case 'user':
@@ -1942,7 +1942,7 @@ class UserController extends Controller {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
                     if ($tokens[2] != $identity->username && !$session['is_admin']) {
-                        throw new ForbiddenAccessException('userNotAllowed');
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
                     }
                     break;
                 case 'contest':
@@ -1990,7 +1990,7 @@ class UserController extends Controller {
                     )) {
                         $response['problem_admin'][] = $tokens[2];
                     } elseif (!ProblemsDAO::isVisible($problem)) {
-                        throw new ForbiddenAccessException('problemIsPrivate');
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
                     }
 
                     break;
@@ -2012,7 +2012,7 @@ class UserController extends Controller {
     private static function validateAddRemoveRole(\OmegaUp\Request $r) {
         if (!Authorization::isSystemAdmin($r->identity) &&
             !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         self::validateUser($r);
@@ -2025,13 +2025,13 @@ class UserController extends Controller {
 
         if ($r['role']->role_id == Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             // System-admin role cannot be added/removed from the UI, only when OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
     }
 
     private static function validateAddRemoveGroup(\OmegaUp\Request $r) {
         if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
-            throw new ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         self::validateUser($r);
@@ -2050,7 +2050,7 @@ class UserController extends Controller {
      */
     public static function apiAddRole(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -2074,7 +2074,7 @@ class UserController extends Controller {
      */
     public static function apiRemoveRole(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -2098,7 +2098,7 @@ class UserController extends Controller {
      */
     public static function apiAddGroup(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -2120,7 +2120,7 @@ class UserController extends Controller {
      */
     public static function apiRemoveGroup(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -2140,7 +2140,7 @@ class UserController extends Controller {
         global $experiments;
 
         if (!Authorization::isSystemAdmin($r->identity)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         self::validateUser($r);
@@ -2158,7 +2158,7 @@ class UserController extends Controller {
      */
     public static function apiAddExperiment(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -2181,7 +2181,7 @@ class UserController extends Controller {
      */
     public static function apiRemoveExperiment(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
-            throw new ForbiddenAccessException('lockdown');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
         self::authenticateRequest($r);
@@ -2196,7 +2196,7 @@ class UserController extends Controller {
 
     /**
      * Gets the last privacy policy saved in the data base
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function getPrivacyPolicy(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
@@ -2276,7 +2276,7 @@ class UserController extends Controller {
      * Keeps a record of a user who accepts the privacy policy
      *
      * @param \OmegaUp\Request $r
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiAcceptPrivacyPolicy(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
@@ -2293,7 +2293,7 @@ class UserController extends Controller {
             );
         } catch (Exception $e) {
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy', $e);
             }
             throw $e;
         }
@@ -2307,7 +2307,7 @@ class UserController extends Controller {
      *
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws DuplicatedEntryInDatabaseException
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiAssociateIdentity(\OmegaUp\Request $r) {
         global $experiments;
@@ -2324,7 +2324,7 @@ class UserController extends Controller {
         }
 
         if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r->user->user_id, (int)$identity->identity_id)) {
-            throw new DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 
         $passwordCheck = SecurityTools::compareHashedStrings(

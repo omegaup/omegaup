@@ -36,7 +36,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         try {
             $response = ContestController::apiOpen($request2);
             $this->AssertFalse(true, 'User gained access to contest even though its registration needed.');
-        } catch (PreconditionFailedException $fae) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $fae) {
             // Expected contestNotStarted exception. Continue.
         }
 
@@ -120,7 +120,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         try {
             $response = ContestController::apiDetails($r2);
             $this->fail('User gained access to contest even though its registration needed.');
-        } catch (ForbiddenAccessException $fae) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $fae) {
             // Expected. Continue.
         }
 
@@ -150,7 +150,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         try {
             $response = ContestController::apiDetails($r2);
             $this->fail('User gained access to contest even though its registration needed.');
-        } catch (ForbiddenAccessException $fae) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $fae) {
             // Expected. Continue.
         }
 
@@ -208,7 +208,7 @@ class RegisterToContestTest extends OmegaupTestCase {
         try {
             ContestController::apiArbitrateRequest($r3);
             $this->fail('Should have thrown an exception');
-        } catch (ForbiddenAccessException $fae) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $fae) {
             // Expected. Continue.
         }
     }
@@ -217,7 +217,7 @@ class RegisterToContestTest extends OmegaupTestCase {
      * Test user cannot join the contest because he doesn't have registered
      * his basic profile information (country, state and school)
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testUserNotAllowedJoinTheContest() {
         // create a contest and its admin

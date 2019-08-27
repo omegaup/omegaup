@@ -10,7 +10,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
     /**
      * Tests problem with submissions in a contest or a course can't be deleted anymore
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testProblemCanNotBeDeletedAfterSubmissionsInACourseOrContest() {
         // Get a user

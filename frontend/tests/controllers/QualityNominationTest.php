@@ -108,7 +108,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to nominate the problem');
-        } catch (PreconditionFailedException $e) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // still expected.
         }
 
@@ -169,7 +169,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to make suggestion about the problem');
-        } catch (PreconditionFailedException $e) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // still expected.
         }
 
@@ -249,7 +249,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             $response = QualityNominationController::apiResolve($request);
             $this->fail("Normal user shouldn't be able to resolve demotion");
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Expected.
         }
     }
@@ -668,7 +668,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 ]),
             ]));
             $this->fail('Duplicate tags should be caught.');
-        } catch (DuplicatedEntryInArrayException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInArrayException $e) {
             // Expected.
         }
 
@@ -684,7 +684,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 ]),
             ]));
             $this->fail('Duplicate tags should be caught.');
-        } catch (DuplicatedEntryInArrayException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInArrayException $e) {
             // Expected.
         }
 
@@ -806,7 +806,7 @@ class QualityNominationTest extends OmegaupTestCase {
         try {
             QualityNominationController::apiCreate($r);
             $this->fail('Should not have been able to dismissed the problem');
-        } catch (PreconditionFailedException $e) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -823,7 +823,7 @@ class QualityNominationTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
         try {
             $this->assertEquals(0, count($problemDismissed), 'Should not have been able to dismiss the problem');
-        } catch (PreconditionFailedException $e) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
         try {
@@ -836,7 +836,7 @@ class QualityNominationTest extends OmegaupTestCase {
                 'open'
             );
             $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
-        } catch (PreconditionFailedException $e) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
     }

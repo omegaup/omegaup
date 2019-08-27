@@ -144,7 +144,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     /**
      * Students can only be added by course admins
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddStudentNonAdmin() {
         $courseData = CoursesFactory::createCourse();
@@ -161,7 +161,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
 
     /**
      * Can't self-register unless Public
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testSelfAddStudentNoPublic() {
         $courseData = CoursesFactory::createCourse();
@@ -219,7 +219,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
                 'auth_token' => $studentLogin->auth_token,
                 'course_alias' => $courseDataPrivate['course_alias']
                 ]));
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK!
         }
 

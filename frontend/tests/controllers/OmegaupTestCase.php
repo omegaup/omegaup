@@ -489,7 +489,7 @@ class NoOpGrader extends Grader {
         bool $missingOk = false
     ) {
         if ($passthru) {
-            throw new UnimplementedException();
+            throw new \OmegaUp\Exceptions\UnimplementedException();
         }
         $path = "{$run->run_id}/{$filename}";
         if (!array_key_exists($path, $this->_resources)) {

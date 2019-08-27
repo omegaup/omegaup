@@ -300,7 +300,7 @@ class SessionController extends Controller {
         try {
             $loginTicket = $client->verifyIdToken($r['storeToken']);
         } catch (Google_Auth_Exception $ge) {
-            throw new UnauthorizedException('loginRequired', $ge);
+            throw new \OmegaUp\Exceptions\UnauthorizedException('loginRequired', $ge);
         }
 
         $payload = $loginTicket->getAttributes()['payload'];

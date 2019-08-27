@@ -53,7 +53,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
                 'problem_alias' => $extraProblem['problem']->alias,
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'problemSolutionNotVisible');
         }
 
@@ -82,7 +82,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
                 'forfeit_problem' => true,
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'allowedSolutionsLimitReached');
         }
     }

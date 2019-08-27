@@ -34,7 +34,7 @@ class GroupController extends Controller {
         } catch (Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new DuplicatedEntryInDatabaseException('aliasInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse', $e);
             }
             throw $e;
         }
@@ -70,7 +70,7 @@ class GroupController extends Controller {
      * @param string $groupAlias
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function validateGroup(
         string $groupAlias,
@@ -83,7 +83,7 @@ class GroupController extends Controller {
         }
 
         if (!Authorization::isGroupAdmin($identity, $group)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         return $group;
     }
