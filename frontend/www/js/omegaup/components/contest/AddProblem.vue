@@ -9,7 +9,8 @@
                v-model="alias"></omegaup-autocomplete>
         </div>
         <div class="form-group">
-          <label>{{T.contestAddproblemProblemPoints}}</label> <input class="form-control"
+          <label>{{T.contestAddproblemProblemPoints}}</label> <input class=
+          "form-control problem-points"
                size="3"
                v-model="points">
         </div>
@@ -68,6 +69,16 @@ import omegaup from '../../api.js';
 import Autocomplete from '../Autocomplete.vue';
 import problem_Versions from '../problem/Versions.vue';
 
+const emptyCommit = {
+  author: null,
+  commit: '',
+  commiter: null,
+  message: '',
+  parents: [],
+  tree: {},
+  version: '',
+};
+
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
@@ -77,20 +88,6 @@ import problem_Versions from '../problem/Versions.vue';
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() data!: omegaup.Problem[];
-  @Prop({
-    default: () => {
-      return {
-        author: null,
-        commit: '',
-        commiter: null,
-        message: '',
-        parents: [],
-        tree: {},
-        version: '',
-      };
-    },
-  })
-  emptyCommit!: omegaup.Commit;
 
   T = T;
   UI = UI;
@@ -98,10 +95,10 @@ export default class AddProblem extends Vue {
   points = 100;
   order = this.data.length + 1;
   problems = this.data;
-  selected = {};
+  selected: omegaup.Problem = { alias: '', order: 1, points: 100, title: '' };
   versionLog: omegaup.Commit[] = [];
-  publishedRevision = this.emptyCommit;
-  selectedRevision = this.emptyCommit;
+  publishedRevision = emptyCommit;
+  selectedRevision = emptyCommit;
 
   onSubmit(): void {
     this.$parent.$emit('add-problem', this);
@@ -152,7 +149,7 @@ export default class AddProblem extends Vue {
   onAliasChange(newProblemAlias: string) {
     if (!newProblemAlias) {
       this.versionLog = [];
-      this.selectedRevision = this.publishedRevision = this.emptyCommit;
+      this.selectedRevision = this.publishedRevision = emptyCommit;
       return;
     }
     this.$parent.$emit('get-versions', newProblemAlias, this);
