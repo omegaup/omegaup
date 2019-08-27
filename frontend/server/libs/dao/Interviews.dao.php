@@ -40,7 +40,7 @@ class InterviewsDAO extends InterviewsDAOBase {
                 a.owner_id = ?
                 OR (SELECT COUNT(*) FROM User_Roles WHERE user_id = ? AND role_id = ? AND acl_id = a.acl_id) > 0;';
 
-        $params = [$user_id, $user_id, Authorization::ADMIN_ROLE];
+        $params = [$user_id, $user_id, \OmegaUp\Authorization::ADMIN_ROLE];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 

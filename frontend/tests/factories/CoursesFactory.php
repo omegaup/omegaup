@@ -15,7 +15,7 @@ class CoursesFactory {
         $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
         if ($public != false) {
             $curatorGroup = GroupsDAO::findByAlias(
-                Authorization::COURSE_CURATOR_GROUP_ALIAS
+                \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
             GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([

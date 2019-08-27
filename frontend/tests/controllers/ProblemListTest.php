@@ -636,15 +636,17 @@ class ProblemList extends OmegaupTestCase {
 
         $user = UserFactory::createUser();
         $userLogin = self::login($user);
-        $admin = UserFactory::createAdminUser();
-        $adminLogin = self::login($admin);
 
         // Expect public problem only
         $response = ProblemController::apiList(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'query' => substr($problemDataPublic['request']['title'], 2, 5),
         ]));
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['problem_alias']);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPublic['request']['problem_alias']
+        );
 
         // Expect 0 problems, matches are private for $user
         $response = ProblemController::apiList(new \OmegaUp\Request([
@@ -654,17 +656,29 @@ class ProblemList extends OmegaupTestCase {
         $this->assertEquals(0, count($response['results']));
 
         // Expect 1 problem, admin can see private problem
-        $response = ProblemController::apiList(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'query' => substr($problemDataPrivate['request']['title'], 2, 5),
-        ]));
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
+        {
+            $admin = UserFactory::createAdminUser();
+            $adminLogin = self::login($admin);
+            $response = ProblemController::apiList(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'query' => substr($problemDataPrivate['request']['title'], 2, 5),
+            ]));
+            $this->assertArrayContainsInKey(
+                $response['results'],
+                'alias',
+                $problemDataPrivate['request']['problem_alias']
+            );
+        }
 
         // Expect public problem only
         $response = ProblemController::apiList(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
         ]));
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPublic['request']['problem_alias']);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPublic['request']['problem_alias']
+        );
     }
 
     /**

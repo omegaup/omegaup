@@ -1,27 +1,56 @@
 <?php
 
+namespace OmegaUp;
+
+use \ACLsDAO;
+use \GroupRolesDAO;
+use \GroupsDAO;
+use \GroupsIdentitiesDAO;
+use \ProblemsDAO;
+use \ProblemsetsDAO;
+use \ProblemsForfeitedDAO;
+use \UserRolesDAO;
+
 /**
- * Authorization.php - Contains static function calls that return true if an identity is authorized to perform certain action.
+ * Contains static function calls that return true if an identity is authorized
+ * to perform certain action.
  */
-
 class Authorization {
-    // Cache for the system admin privilege. This is used sort of frequently.
-    private static $is_system_admin = null;
+    /**
+     * Cache for the system admin privilege. This is used sort of frequently.
+     * @var null|bool
+     */
+    private static $_isSystemAdmin = null;
 
-    // Cache for system group for quality reviewers.
-    private static $quality_reviewer_group = null;
+    /**
+     * Cache for system group for quality reviewers.
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_qualityReviewerGroup = null;
 
-    // Cache for system group for course curators
-    private static $course_curator_group = null;
+    /**
+     * Cache for system group for course curators
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_courseCuratorGroup = null;
 
-    // Cache for system group for mentors
-    private static $mentor_group = null;
+    /**
+     * Cache for system group for mentors
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_mentorGroup = null;
 
-    // Cache for system group for support team members
-    private static $support_group = null;
+    /**
+     * Cache for system group for support team members
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_supportGroup = null;
 
-    // Cache for system group identity creators
-    private static $groupIdentityCreator = null;
+    /**
+     * Cache for system group identity creators
+     * @var null|\OmegaUp\DAO\VO\Groups
+     */
+    private static $_groupIdentityCreator = null;
 
     // Administrator for an ACL.
     const ADMIN_ROLE = 1;
@@ -65,7 +94,7 @@ class Authorization {
     ) : bool {
         return (
             $submission->identity_id === $identity->identity_id  ||
-            Authorization::canEditSubmission($identity, $submission)
+            self::canEditSubmission($identity, $submission)
         );
     }
 
@@ -73,18 +102,20 @@ class Authorization {
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Submissions $submission
     ) : bool {
+        if (is_null($submission->problem_id)) {
+            return false;
+        }
         $problem = ProblemsDAO::getByPK($submission->problem_id);
         if (is_null($problem)) {
             return false;
         }
-
         if ($problem->deprecated) {
             throw new \OmegaUp\Exceptions\PreconditionFailedException('problemDeprecated');
         }
 
         if (!is_null($submission->problemset_id)) {
             $problemset = ProblemsetsDAO::getByPK($submission->problemset_id);
-            if (!is_null($problemset) && Authorization::isAdmin(
+            if (!is_null($problemset) && self::isAdmin(
                 $identity,
                 $problemset
             )) {
@@ -92,13 +123,17 @@ class Authorization {
             }
         }
 
-        return Authorization::isProblemAdmin($identity, $problem);
+        return self::isProblemAdmin($identity, $problem);
     }
 
     public static function canViewClarification(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Clarifications $clarification
     ) : bool {
+        if (is_null($clarification->problemset_id)) {
+            return false;
+        }
+
         // TODO Temporary until isAdmin function is fixed
         $identity_id = $identity->identity_id;
         if ($clarification->author_id === $identity_id) {
@@ -110,25 +145,31 @@ class Authorization {
             return false;
         }
 
-        return Authorization::isAdmin($identity, $problemset);
+        return self::isAdmin($identity, $problemset);
     }
 
     public static function canEditClarification(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Clarifications $clarification
     ) : bool {
+        if (is_null($clarification->problemset_id)
+            || is_null($clarification->problem_id)
+        ) {
+            return false;
+        }
+
         $problemset = ProblemsetsDAO::getByPK($clarification->problemset_id);
         if (is_null($problemset)) {
             return false;
         }
 
         $problem = ProblemsDAO::getByPK($clarification->problem_id);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->acl_id)) {
             return false;
         }
 
         return (self::isOwner($identity, $problem->acl_id)
-                || Authorization::isAdmin($identity, $problemset));
+                || self::isAdmin($identity, $problemset));
     }
 
     /**
@@ -139,12 +180,15 @@ class Authorization {
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Problems $problem
     ) : bool {
+        if (is_null($problem->acl_id)) {
+            return false;
+        }
         return self::isProblemAdmin($identity, $problem) ||
             self::isQualityReviewer($identity) ||
             self::hasRole(
                 $identity,
                 $problem->acl_id,
-                Authorization::REVIEWER_ROLE
+                self::REVIEWER_ROLE
             );
     }
 
@@ -159,7 +203,7 @@ class Authorization {
         if (is_null($identity->identity_id)) {
             return false;
         }
-        return Authorization::canEditProblem($identity, $problem) ||
+        return self::canEditProblem($identity, $problem) ||
             ProblemsDAO::isProblemSolved($problem, $identity->identity_id) ||
             ProblemsForfeitedDAO::isProblemForfeited($problem, $identity);
     }
@@ -177,8 +221,8 @@ class Authorization {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group
     ) : bool {
-        if (!Authorization::isCourseAdmin($identity, $course) &&
-            !Authorization::isGroupMember($identity, $group)
+        if (!self::isCourseAdmin($identity, $course) &&
+            !self::isGroupMember($identity, $group)
         ) {
             return false;
         }
@@ -190,14 +234,18 @@ class Authorization {
         \OmegaUp\DAO\VO\Identities $identity,
         Object $entity
     ) : bool {
-        if (is_null($entity) || is_null($identity->user_id)) {
+        if (is_null($identity->user_id)) {
             return false;
         }
+        if (is_null($entity->acl_id)) {
+            return false;
+        }
+        /** @var int $entity->acl_id */
         return self::isOwner($identity, $entity->acl_id) ||
             self::hasRole(
                 $identity,
                 $entity->acl_id,
-                Authorization::ADMIN_ROLE
+                self::ADMIN_ROLE
             );
     }
 
@@ -241,48 +289,53 @@ class Authorization {
     }
 
     public static function isSystemAdmin(\OmegaUp\DAO\VO\Identities $identity) : bool {
-        if (self::$is_system_admin == null) {
-            self::$is_system_admin = Authorization::hasRole(
+        if (is_null(self::$_isSystemAdmin)) {
+            self::$_isSystemAdmin = self::hasRole(
                 $identity,
-                Authorization::SYSTEM_ACL,
-                Authorization::ADMIN_ROLE
+                self::SYSTEM_ACL,
+                self::ADMIN_ROLE
             );
         }
-        return self::$is_system_admin;
+        return self::$_isSystemAdmin;
     }
 
     public static function isQualityReviewer(\OmegaUp\DAO\VO\Identities $identity) : bool {
-        if (self::$quality_reviewer_group == null) {
-            self::$quality_reviewer_group = GroupsDAO::findByAlias(
-                Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+        if (is_null(self::$_qualityReviewerGroup)) {
+            self::$_qualityReviewerGroup = GroupsDAO::findByAlias(
+                self::QUALITY_REVIEWER_GROUP_ALIAS
             );
+            if (is_null(self::$_qualityReviewerGroup)) {
+                return false;
+            }
         }
-        return Authorization::isGroupMember(
+        return self::isGroupMember(
             $identity,
-            self::$quality_reviewer_group
+            self::$_qualityReviewerGroup
         );
     }
 
     public static function isMentor(\OmegaUp\DAO\VO\Identities $identity) : bool {
-        if (self::$mentor_group == null) {
-            self::$mentor_group = GroupsDAO::findByAlias(
-                Authorization::MENTOR_GROUP_ALIAS
+        if (is_null(self::$_mentorGroup)) {
+            self::$_mentorGroup = GroupsDAO::findByAlias(
+                self::MENTOR_GROUP_ALIAS
             );
+            if (is_null(self::$_mentorGroup)) {
+                return false;
+            }
         }
-        return Authorization::isGroupMember(
+        return self::isGroupMember(
             $identity,
-            self::$mentor_group
+            self::$_mentorGroup
         );
     }
 
     /**
      * Only last two days of the month mentor is available to choose
      * the coder of the month
-     * @return Array
      */
     public static function canChooseCoder(int $currentTimestamp) : bool {
         $today = date('Y-m-d', $currentTimestamp);
-        $lastDayOfMonth = date('t', $currentTimestamp);
+        $lastDayOfMonth = intval(date('t', $currentTimestamp));
         $availableDateToChooseCoder = [];
         $availableDateToChooseCoder[] = date('Y-m-', $currentTimestamp) . $lastDayOfMonth;
         $availableDateToChooseCoder[] = date('Y-m-', $currentTimestamp) . ($lastDayOfMonth - 1);
@@ -290,30 +343,39 @@ class Authorization {
     }
 
     public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity) : bool {
-        if (self::$groupIdentityCreator == null) {
-            self::$groupIdentityCreator = GroupsDAO::findByAlias(
-                Authorization::IDENTITY_CREATOR_GROUP_ALIAS
+        if (is_null(self::$_groupIdentityCreator)) {
+            self::$_groupIdentityCreator = GroupsDAO::findByAlias(
+                self::IDENTITY_CREATOR_GROUP_ALIAS
             );
+            if (is_null(self::$_groupIdentityCreator)) {
+                return false;
+            }
         }
-        return Authorization::isGroupMember(
+        return self::isGroupMember(
             $identity,
-            self::$groupIdentityCreator
+            self::$_groupIdentityCreator
         );
     }
 
     public static function isSupportTeamMember(\OmegaUp\DAO\VO\Identities $identity) : bool {
-        if (self::$support_group == null) {
-            self::$support_group = GroupsDAO::findByAlias(
-                Authorization::SUPPORT_GROUP_ALIAS
+        if (is_null(self::$_supportGroup)) {
+            self::$_supportGroup = GroupsDAO::findByAlias(
+                self::SUPPORT_GROUP_ALIAS
             );
+            if (is_null(self::$_supportGroup)) {
+                return false;
+            }
         }
-        return Authorization::isGroupMember(
+        return self::isGroupMember(
             $identity,
-            self::$support_group
+            self::$_supportGroup
         );
     }
 
-    public static function isGroupAdmin(\OmegaUp\DAO\VO\Identities $identity, \OmegaUp\DAO\VO\Groups $group) : bool {
+    public static function isGroupAdmin(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Groups $group
+    ) : bool {
         if (is_null($identity->user_id)) {
             return false;
         }
@@ -322,6 +384,9 @@ class Authorization {
 
     private static function isOwner(\OmegaUp\DAO\VO\Identities $identity, int $aclId) : bool {
         $acl = ACLsDAO::getByPK($aclId);
+        if (is_null($acl)) {
+            return false;
+        }
         return $acl->owner_id == $identity->user_id;
     }
 
@@ -342,7 +407,7 @@ class Authorization {
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Groups $group
     ) : bool {
-        if (Authorization::isSystemAdmin($identity)) {
+        if (self::isSystemAdmin($identity)) {
             return true;
         }
         $groupUsers = GroupsIdentitiesDAO::getByPK(
@@ -353,23 +418,26 @@ class Authorization {
     }
 
     public static function isCourseCurator(\OmegaUp\DAO\VO\Identities $identity) : bool {
-        if (self::$course_curator_group == null) {
-            self::$course_curator_group = GroupsDAO::findByAlias(
-                Authorization::COURSE_CURATOR_GROUP_ALIAS
+        if (is_null(self::$_courseCuratorGroup)) {
+            self::$_courseCuratorGroup = GroupsDAO::findByAlias(
+                self::COURSE_CURATOR_GROUP_ALIAS
             );
+            if (is_null(self::$_courseCuratorGroup)) {
+                return false;
+            }
         }
-        return Authorization::isGroupMember(
+        return self::isGroupMember(
             $identity,
-            self::$course_curator_group
+            self::$_courseCuratorGroup
         );
     }
 
     public static function clearCacheForTesting() : void {
-        self::$is_system_admin = null;
-        self::$quality_reviewer_group = null;
-        self::$mentor_group = null;
-        self::$support_group = null;
-        self::$groupIdentityCreator = null;
+        self::$_isSystemAdmin = null;
+        self::$_qualityReviewerGroup = null;
+        self::$_mentorGroup = null;
+        self::$_supportGroup = null;
+        self::$_groupIdentityCreator = null;
     }
 
     public static function canSubmitToProblemset(

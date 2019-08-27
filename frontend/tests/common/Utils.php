@@ -150,13 +150,13 @@ class Utils {
             'password' => 'testtesttest',
         ]));
         ACLsDAO::create(new \OmegaUp\DAO\VO\ACLs([
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,
         ]));
         UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $admin->user_id,
-            'role_id' => Authorization::ADMIN_ROLE,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
         UserFactory::createUser(new UserParams([
             'username' => 'test',

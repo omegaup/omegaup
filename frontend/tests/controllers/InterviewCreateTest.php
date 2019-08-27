@@ -6,7 +6,7 @@
 class InterviewCreateTest extends OmegaupTestCase {
     public function testCreateAndListInterview() {
         $interviewer = UserFactory::createUser();
-        UserFactory::addSystemRole($interviewer, Authorization::INTERVIEWER_ROLE);
+        UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         // Verify I started with nothing
         $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
@@ -30,7 +30,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
     public function testInterviewsMustBePrivate() {
         $interviewer = UserFactory::createUser();
-        UserFactory::addSystemRole($interviewer, Authorization::INTERVIEWER_ROLE);
+        UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         $login = self::login($interviewer);
         $response = InterviewController::apiCreate(new \OmegaUp\Request([
@@ -45,7 +45,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
     public function testAddUsersToInterview() {
         $interviewer = UserFactory::createUser();
-        UserFactory::addSystemRole($interviewer, Authorization::INTERVIEWER_ROLE);
+        UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         $login = self::login($interviewer);
         $interviewAlias = 'my-third-interview';

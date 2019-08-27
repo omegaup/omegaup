@@ -436,7 +436,7 @@ class UserController extends Controller {
         if (isset($r['usernameOrEmail'])) {
             self::authenticateRequest($r);
 
-            if (!Authorization::isSupportTeamMember($r->identity)) {
+            if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
@@ -487,7 +487,7 @@ class UserController extends Controller {
     public static function apiMailingListBackfill(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -591,7 +591,7 @@ class UserController extends Controller {
 
         $response = [];
 
-        $is_system_admin = Authorization::isSystemAdmin($r->identity);
+        $is_system_admin = \OmegaUp\Authorization::isSystemAdmin($r->identity);
         if ($r['contest_type'] == 'OMI') {
             if ($r->user->username != 'andreasantillana'
                 && !$is_system_admin
@@ -1106,7 +1106,7 @@ class UserController extends Controller {
         $response = IdentityController::getProfile($r, $r['identity'], $r['user'], boolval($r['omit_rank']));
         if ((is_null($r->identity) || $r->identity->username != $r['identity']->username)
             && (!is_null($r['user']) && $r['user']->is_private == 1)
-            && (is_null($r->identity) || !Authorization::isSystemAdmin($r->identity))
+            && (is_null($r->identity) || !\OmegaUp\Authorization::isSystemAdmin($r->identity))
         ) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
@@ -1137,7 +1137,7 @@ class UserController extends Controller {
     public static function apiStatusVerified(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity)) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1166,7 +1166,7 @@ class UserController extends Controller {
     public static function apiExtraInformation(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSupportTeamMember($r->identity)) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1265,10 +1265,10 @@ class UserController extends Controller {
         self::authenticateRequest($r);
         $currentTimestamp = \OmegaUp\Time::get();
 
-        if (!Authorization::isMentor($r->identity)) {
+        if (!\OmegaUp\Authorization::isMentor($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
-        if (!Authorization::canChooseCoder($currentTimestamp)) {
+        if (!\OmegaUp\Authorization::canChooseCoder($currentTimestamp)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('coderOfTheMonthIsNotInPeriodToBeChosen');
         }
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
@@ -1335,7 +1335,7 @@ class UserController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isContestAdmin($r->identity->identity_id, $contest)) {
+        if (!\OmegaUp\Authorization::isContestAdmin($r->identity->identity_id, $contest)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1506,7 +1506,7 @@ class UserController extends Controller {
 
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
             && (is_null($r->identity) || (!is_null($r->identity) &&
-                !Authorization::isSystemAdmin($r->identity)))
+                !\OmegaUp\Authorization::isSystemAdmin($r->identity)))
             && (!is_null($user) && $user->is_private == 1)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userProfileIsPrivate');
@@ -1984,7 +1984,7 @@ class UserController extends Controller {
                     if (is_null($problem)) {
                         throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
-                    if (!is_null($identity) && Authorization::isProblemAdmin(
+                    if (!is_null($identity) && \OmegaUp\Authorization::isProblemAdmin(
                         $identity,
                         $problem
                     )) {
@@ -2010,7 +2010,7 @@ class UserController extends Controller {
     }
 
     private static function validateAddRemoveRole(\OmegaUp\Request $r) {
-        if (!Authorization::isSystemAdmin($r->identity) &&
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
             !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2023,7 +2023,7 @@ class UserController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'role');
         }
 
-        if ($r['role']->role_id == Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+        if ($r['role']->role_id == \OmegaUp\Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             // System-admin role cannot be added/removed from the UI, only when OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
@@ -2059,7 +2059,7 @@ class UserController extends Controller {
         UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $r['user']->user_id,
             'role_id' => $r['role']->role_id,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
 
         return [
@@ -2083,7 +2083,7 @@ class UserController extends Controller {
         UserRolesDAO::delete(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $r['user']->user_id,
             'role_id' => $r['role']->role_id,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
 
         return [
@@ -2139,7 +2139,7 @@ class UserController extends Controller {
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r) {
         global $experiments;
 
-        if (!Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -2453,7 +2453,7 @@ class UserController extends Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $isMentor = !is_null($identity) && Authorization::isMentor($identity);
+        $isMentor = !is_null($identity) && \OmegaUp\Authorization::isMentor($identity);
 
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
@@ -2482,7 +2482,7 @@ class UserController extends Controller {
         $response['options'] = [
             'bestCoders' => $bestCoders,
             'canChooseCoder' =>
-                Authorization::canChooseCoder($currentTimeStamp),
+                \OmegaUp\Authorization::canChooseCoder($currentTimeStamp),
             'coderIsSelected' =>
                 !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
         ];

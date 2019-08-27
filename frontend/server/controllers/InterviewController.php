@@ -5,7 +5,7 @@ class InterviewController extends Controller {
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!Authorization::isSystemAdmin($r->identity) &&
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
             !UsersDAO::IsUserInterviewer($r->user->user_id)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -157,7 +157,7 @@ class InterviewController extends Controller {
 
         // Only director is allowed to add people to interview
         if (is_null($r->identity)
-            || !Authorization::isInterviewAdmin($r->identity, $r['interview'])
+            || !\OmegaUp\Authorization::isInterviewAdmin($r->identity, $r['interview'])
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -195,7 +195,7 @@ class InterviewController extends Controller {
         }
 
         // Only admins can view interview details
-        if (!Authorization::isInterviewAdmin($r->identity, $interview)) {
+        if (!\OmegaUp\Authorization::isInterviewAdmin($r->identity, $interview)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 

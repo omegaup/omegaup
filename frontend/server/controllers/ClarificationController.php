@@ -101,7 +101,7 @@ class ClarificationController extends Controller {
 
         // If the clarification is private, verify that our user is invited or is contest director
         if ($r['clarification']->public != 1) {
-            if (!Authorization::canViewClarification(
+            if (!\OmegaUp\Authorization::canViewClarification(
                 $r->identity,
                 $r['clarification']
             )) {
@@ -151,7 +151,7 @@ class ClarificationController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
         }
 
-        if (!Authorization::canEditClarification(
+        if (!\OmegaUp\Authorization::canEditClarification(
             $r->identity,
             $r['clarification']
         )) {

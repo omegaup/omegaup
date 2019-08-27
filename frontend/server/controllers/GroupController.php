@@ -82,7 +82,7 @@ class GroupController extends Controller {
             return null;
         }
 
-        if (!Authorization::isGroupAdmin($identity, $group)) {
+        if (!\OmegaUp\Authorization::isGroupAdmin($identity, $group)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         return $group;

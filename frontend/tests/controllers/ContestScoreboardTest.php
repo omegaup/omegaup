@@ -717,7 +717,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // least one run has been added.
         UserFactory::addSystemRole(
             $testData['contestData']['director'],
-            Authorization::ADMIN_ROLE
+            \OmegaUp\Authorization::ADMIN_ROLE
         );
         $login = self::login($testData['contestData']['director']);
         ContestController::apiRemoveProblem(new \OmegaUp\Request([

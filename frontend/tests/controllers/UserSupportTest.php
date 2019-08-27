@@ -14,10 +14,10 @@ class UserSupportTest extends OmegaupTestCase {
         [, $mentorIdentity] = UserFactory::createMentorIdentity();
 
         // Asserting that user belongs to the support group
-        $this->assertTrue(Authorization::isSupportTeamMember($supportIdentity));
+        $this->assertTrue(\OmegaUp\Authorization::isSupportTeamMember($supportIdentity));
 
         // Asserting that user doesn't belong to the support group
-        $this->assertFalse(Authorization::isSupportTeamMember($mentorIdentity));
+        $this->assertFalse(\OmegaUp\Authorization::isSupportTeamMember($mentorIdentity));
     }
 
     /**

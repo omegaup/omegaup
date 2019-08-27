@@ -13,7 +13,7 @@ class ProblemsetController extends Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
         }
         if (!ProblemsDAO::isVisible($problem)
-            && !Authorization::isProblemAdmin($identity, $problem)
+            && !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
         }

@@ -15,7 +15,7 @@ class GraderController extends Controller {
     private static function validateRequest(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
