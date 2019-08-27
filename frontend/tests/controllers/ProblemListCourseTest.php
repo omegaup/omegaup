@@ -41,13 +41,13 @@ class ProblemListCourseTest extends OmegaupTestCase {
         // Users must join course
         for ($i=0; $i<$num_users; $i++) {
             $userLogin[$i] = self::login($user[$i]);
-            $details = CourseController::apiIntroDetails(new Request([
+            $details = CourseController::apiIntroDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
             ]));
 
             $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
-            CourseController::apiAddStudent(new Request([
+            CourseController::apiAddStudent(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
@@ -56,11 +56,11 @@ class ProblemListCourseTest extends OmegaupTestCase {
             ]));
         }
         $adminLogin = self::login($courseData['admin']);
-        $solvedProblems = CourseController::apiListSolvedProblems(new Request([
+        $solvedProblems = CourseController::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new Request([
+        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
@@ -75,11 +75,11 @@ class ProblemListCourseTest extends OmegaupTestCase {
         // Now, user[0] submit one run with AC verdict
         $runs[5] = RunsFactory::createRunToProblem($problem[0], $user[0]);
         RunsFactory::gradeRun($runs[5]);
-        $solvedProblems = CourseController::apiListSolvedProblems(new Request([
+        $solvedProblems = CourseController::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new Request([
+        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
@@ -120,11 +120,11 @@ class ProblemListCourseTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runs[3]); // run with a AC verdict
         RunsFactory::gradeRun($runs[4]); // run with a AC verdict
         $adminLogin = self::login($courseData['admin']);
-        $solvedProblems = CourseController::apiListSolvedProblems(new Request([
+        $solvedProblems = CourseController::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new Request([
+        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
@@ -134,13 +134,13 @@ class ProblemListCourseTest extends OmegaupTestCase {
         // Users must join course
         for ($i=0; $i<($num_users - 1); $i++) {
             $userLogin[$i] = self::login($user[$i]);
-            $details = CourseController::apiIntroDetails(new Request([
+            $details = CourseController::apiIntroDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias']
             ]));
 
             $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
-            CourseController::apiAddStudent(new Request([
+            CourseController::apiAddStudent(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'usernameOrEmail' => $user[$i]->username,
@@ -148,11 +148,11 @@ class ProblemListCourseTest extends OmegaupTestCase {
                 'accept_teacher_git_object_id' => $gitObjectId,
             ]));
         }
-        $solvedProblems = CourseController::apiListSolvedProblems(new Request([
+        $solvedProblems = CourseController::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new Request([
+        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
@@ -161,24 +161,24 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $this->assertEquals(0, count($unsolvedProblems['user_problems']));
         // User[2] accept teacher's request
         $userLogin[2] = self::login($user[2]);
-        $details = CourseController::apiIntroDetails(new Request([
+        $details = CourseController::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin[$i]->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
 
         $gitObjectId = $details['statements']['acceptTeacher']['gitObjectId'];
-        CourseController::apiAddStudent(new Request([
+        CourseController::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $userLogin[2]->auth_token,
             'course_alias' => $courseData['course_alias'],
             'usernameOrEmail' => $user[2]->username,
             'accept_teacher' => 'yes',
             'accept_teacher_git_object_id' => $gitObjectId,
         ]));
-        $solvedProblems = CourseController::apiListSolvedProblems(new Request([
+        $solvedProblems = CourseController::apiListSolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new Request([
+        $unsolvedProblems = CourseController::apiListUnsolvedProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));

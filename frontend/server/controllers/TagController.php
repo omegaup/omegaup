@@ -1,13 +1,11 @@
 <?php
 
-require_once 'libs/ApiUtils.php';
-
 /**
  * TagController
  */
 class TagController extends Controller {
     public static function normalize($name) {
-        $name = ApiUtils::RemoveAccents(trim($name));
+        $name = \OmegaUp\ApiUtils::removeAccents(trim($name));
         $name = preg_replace('/[^a-z0-9]/', '-', strtolower($name));
         $name = preg_replace('/--+/', '-', $name);
 
@@ -17,16 +15,16 @@ class TagController extends Controller {
     /**
      * Gets a list of tags
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         $param = '';
         if (!is_null($r['term'])) {
             $param = 'term';
         } elseif (!is_null($r['query'])) {
             $param = 'query';
         } else {
-            throw new InvalidParameterException('parameterEmpty', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
         }
 
         $tags = TagsDAO::FindByName($r[$param]);

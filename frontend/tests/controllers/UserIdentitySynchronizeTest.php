@@ -12,7 +12,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
     public function testCreateUserPositive() {
         // Inflate request
         UserController::$permissionKey = uniqid();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
@@ -40,7 +40,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,
             'password' => Utils::CreateRandomString(),
@@ -77,7 +77,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         $locale = LanguagesDAO::getByName('pt');
         $states = StatesDAO::getByCountry('MX');
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => 'new_username',
             'name' => Utils::CreateRandomString(),
@@ -107,7 +107,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $locale = LanguagesDAO::getByName('pseudo');
         $states = StatesDAO::getByCountry('US');
         $newName = Utils::CreateRandomString();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $newName,
             'country_id' => $states[0]->country_id,
@@ -134,7 +134,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Double check language update with the appropiate API
         $this->assertEquals(
             $locale->name,
-            IdentityController::getPreferredLanguage(new Request([
+            IdentityController::getPreferredLanguage(new \OmegaUp\Request([
                 'username' => $identityDb->username
             ]))
         );
@@ -154,7 +154,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         $newUsername = 'new_username_basic_info';
         $newPassword = Utils::CreateRandomString();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $newUsername,
             'password' => $newPassword,

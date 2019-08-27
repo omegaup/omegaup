@@ -18,7 +18,7 @@ class CourseUsersTest extends OmegaupTestCase {
         $userLogin = self::login($user);
 
         // Call the details API for the assignment that's already started.
-        CourseController::apiAssignmentDetails(new Request([
+        CourseController::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course' => $courseData['course_alias'],
             'assignment' => $courseData['assignment_aliases'][0],
@@ -26,7 +26,7 @@ class CourseUsersTest extends OmegaupTestCase {
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiActivityReport(new Request([
+        $response = CourseController::apiActivityReport(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));

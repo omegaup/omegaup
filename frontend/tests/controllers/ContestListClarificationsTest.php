@@ -58,7 +58,7 @@ class ListClarificationsContest extends OmegaupTestCase {
 
         // Prepare the request
         $login = self::login($contestant1);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);

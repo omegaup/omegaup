@@ -25,8 +25,6 @@ Logger::configure([
     ],
 ]);
 
-require_once 'libs/ProblemDeployer.php';
-
 function listDir(string $path) : Generator {
     $dh = opendir($path);
     if (!is_resource($dh)) {
@@ -54,7 +52,7 @@ function pathJoin(string $parent, string... $components) : string {
 }
 
 foreach (listDir(TEMPLATES_PATH) as $problemAlias) {
-    $problemDeployer = new ProblemDeployer($problemAlias);
+    $problemDeployer = new \OmegaUp\ProblemDeployer($problemAlias);
     foreach (listDir(pathJoin(TEMPLATES_PATH, $problemAlias)) as $problemCommit) {
         $problemDeployer->generateLibinteractiveTemplates($problemCommit);
     }

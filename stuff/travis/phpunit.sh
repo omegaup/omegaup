@@ -14,6 +14,7 @@ stage_install() {
 
 	curl -sSfL -o ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit \
 		https://phar.phpunit.de/phpunit-6.5.9.phar
+	composer install
 
 	install_omegaup_gitserver
 }
@@ -38,6 +39,7 @@ stage_script() {
 		frontend/tests/badges
 	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
 	python3 stuff/policy-tool.py --database=omegaup-test validate
+	find frontend/server/src/ -type d | xargs ./vendor/bin/psalm
 }
 
 stage_after_success() {

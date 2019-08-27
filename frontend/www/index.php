@@ -8,7 +8,7 @@ if (OMEGAUP_LOCKDOWN) {
 
 // Fetch ranks
 try {
-    $coderOfTheMonthResponse = UserController::apiCoderOfTheMonth(new Request());
+    $coderOfTheMonthResponse = UserController::apiCoderOfTheMonth(new \OmegaUp\Request());
     $smarty->assign('coderOfTheMonthData', $coderOfTheMonthResponse['userinfo']);
 
     $smartyProperties = SchoolController::getSchoolsRankForSmarty(

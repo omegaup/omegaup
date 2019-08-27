@@ -28,7 +28,7 @@ class ProblemStatsTest extends OmegaupTestCase {
         $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
             $pendingRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $ACRunsCount = 2;
@@ -38,7 +38,7 @@ class ProblemStatsTest extends OmegaupTestCase {
 
             // Grade the run
             RunsFactory::gradeRun($ACRunsData[$i]);
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $WARunsCount = 1;
@@ -48,12 +48,12 @@ class ProblemStatsTest extends OmegaupTestCase {
 
             // Grade the run with WA
             RunsFactory::gradeRun($WARunsData[$i], 0, 'WA');
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         // Create request
         $login = self::login($problemData['author']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]);

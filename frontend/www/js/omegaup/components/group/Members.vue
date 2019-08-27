@@ -75,68 +75,12 @@
          v-bind:selected-country="identity.country_id"
          v-bind:selected-state="identity.state_id"
          v-bind:username="username"
-         v-if="show"></omegaup-identity-edit><!-- Modal Change Password-->
-    <div class="modal fade modal-change-password"
-         role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form class="form-horizontal"
-                role="form"
-                v-on:submit.prevent="onChangePasswordMember">
-            <div class="modal-header">
-              <button class="close"
-                   data-dismiss="modal"
-                   type="button">×</button>
-              <h4 class="modal-title">{{ T.userEditChangePassword }}</h4>
-            </div>
-            <div class="modal-body">
-              <div class="panel-body">
-                <div class="form-group">
-                  <label class="col-md-4 col-sm-4 control-label"
-                       for="username">{{ T.username }}</label>
-                  <div class="col-md-7 col-sm-7">
-                    <input class="form-control"
-                         disabled="disabled"
-                         name="username"
-                         size="30"
-                         type="text"
-                         v-bind:value="username">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 col-sm-4 control-label"
-                       for="new-password-1">{{ T.userEditChangePasswordNewPassword }}</label>
-                  <div class="col-md-7 col-sm-7">
-                    <input class="form-control"
-                         name="new-password-1"
-                         size="30"
-                         type="password"
-                         v-model="newPassword">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 col-sm-4 control-label"
-                       for="new-password-2">{{ T.userEditChangePasswordRepeatNewPassword }}</label>
-                  <div class="col-md-7 col-sm-7">
-                    <input class="form-control"
-                         name="new-password-2"
-                         size="30"
-                         type="password"
-                         v-model="newPasswordRepeat">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-default"
-                   data-dismiss="modal"
-                   type="button">{{ T.wordsCancel }}</button> <button class="btn btn-primary"
-                   type="submit">{{ T.wordsSaveChanges }}</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+         v-if="showEditForm"></omegaup-identity-edit>
+         <omegaup-identity-change-password v-bind:username="username"
+         v-if="showChangePasswordForm"
+         v-on:emit-cancel="onChildCancel"
+         v-on:emit-change-password=
+         "onChildChangePasswordMember"></omegaup-identity-change-password>
   </div>
 </template>
 
@@ -150,6 +94,8 @@ label {
 import {T, UI} from '../../omegaup.js';
 import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
+import identity_ChangePassword from '../identity/ChangePassword.vue';
+
 export default {
   props: {
     identities: Array,
@@ -167,7 +113,8 @@ export default {
       username: '',
       newPassword: '',
       newPasswordRepeat: '',
-      show: false,
+      showEditForm: false,
+      showChangePasswordForm: false,
     };
   },
   mounted: function() {
@@ -192,12 +139,11 @@ export default {
     },
     onEdit: function(identity) { this.$emit('edit-identity', this, identity);},
     onChangePass: function(username) {
-      this.username = username;
-      $('.modal-change-password').modal();
+      this.$emit('change-password-identity', this, username);
     },
-    onChangePasswordMember: function() {
+    onChildChangePasswordMember: function(newPassword, newPasswordRepeat) {
       this.$emit('change-password-identity-member', this, this.username,
-                 this.newPassword, this.newPasswordRepeat);
+                 newPassword, newPasswordRepeat);
     },
     onRemove: function(username) { this.$emit('remove', username);},
     reset: function() {
@@ -206,10 +152,12 @@ export default {
       inputElem.typeahead('close');
       inputElem.val('');
     },
+    onChildCancel: function() { this.$emit('cancel', this);}
   },
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-identity-edit': identity_Edit,
+    'omegaup-identity-change-password': identity_ChangePassword,
   },
 };
 </script>

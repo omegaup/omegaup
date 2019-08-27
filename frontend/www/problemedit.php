@@ -10,7 +10,7 @@ $smarty->assign('LOAD_PAGEDOWN', 1);
 try {
     if (isset($_POST['request'])) {
         if ($_POST['request'] == 'submit') {
-            ProblemController::apiUpdate(new Request([
+            ProblemController::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                 'problem_alias' => $_POST['problem_alias'] ?? null,
                 'title' => $_POST['title'] ?? null,
@@ -39,7 +39,7 @@ try {
         }
         $smarty->assign('STATUS_SUCCESS', 'Problem updated succesfully!');
     }
-} catch (ApiException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 

@@ -15,7 +15,7 @@ class UserProblemsTest extends OmegaupTestCase {
 
         // Call API
         $login = self::login($author);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ProblemController::apiMyList($r);
@@ -31,7 +31,7 @@ class UserProblemsTest extends OmegaupTestCase {
 
         // Call API
         $login = self::login($author);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ProblemController::apiMyList($r);
@@ -70,7 +70,7 @@ class UserProblemsTest extends OmegaupTestCase {
 
         // Call api
         $login = self::login($author);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ProblemController::apiAdminList($r);

@@ -1,18 +1,20 @@
 <?php
 
 require_once('base/Users_Badges.dao.base.php');
-require_once('base/Users_Badges.vo.base.php');
-/** UsersBadges Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link UsersBadges }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+
+/**
+ * UsersBadges Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\UsersBadges}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class UsersBadgesDAO extends UsersBadgesDAOBase {
-    public static function getUserOwnedBadges(Users $user): array {
+    public static function getUserOwnedBadges(\OmegaUp\DAO\VO\Users $user): array {
         $sql = 'SELECT
                     ub.badge_alias, ub.assignation_time
                 FROM
@@ -22,10 +24,10 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                 ORDER BY
                     ub.assignation_time ASC;';
         $args = [$user->user_id];
-        return MySQLConnection::getInstance()->GetAll($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 
-    public static function getUserBadgeAssignationTime(Users $user, string $badge): ?int {
+    public static function getUserBadgeAssignationTime(\OmegaUp\DAO\VO\Users $user, string $badge): ?int {
         $sql = 'SELECT
                     UNIX_TIMESTAMP(ub.assignation_time)
                 FROM
@@ -33,7 +35,7 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                 WHERE
                     ub.user_id = ? AND ub.badge_alias = ?;';
         $args = [$user->user_id, $badge];
-        return MySQLConnection::getInstance()->getOne($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 
     public static function getBadgeOwnersCount(string $badge) {
@@ -44,7 +46,7 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                 WHERE
                     badge_alias = ?;';
         $args = [$badge];
-        return MySQLConnection::getInstance()->getOne($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 
     public static function getBadgeFirstAssignationTime(string $badge) {
@@ -56,6 +58,6 @@ class UsersBadgesDAO extends UsersBadgesDAOBase {
                     ub.badge_alias = ?
                 LIMIT 1;';
         $args = [$badge];
-        return MySQLConnection::getInstance()->getOne($sql, $args);
+        return \OmegaUp\MySQLConnection::getInstance()->getOne($sql, $args);
     }
 }
