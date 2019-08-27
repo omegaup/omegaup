@@ -2,8 +2,8 @@
   <omegaup-arena-codemirror ref="cm-wrapper"
         v-bind:options="editorOptions"
         v-bind:value="value"
-        v-on:change="$emit('change', value)"
-        v-on:input="$emit('input', value)"></omegaup-arena-codemirror>
+        v-on:change="onChange"
+        v-on:input="onInput"></omegaup-arena-codemirror>
 </template>
 
 <script lang="ts">
@@ -59,17 +59,11 @@ interface EditorOptions {
 })
 export default class ArenaCodeView extends Vue {
   @Prop() language!: string;
-  @Prop() readonly!: boolean;
+  @Prop({ default: false }) readonly!: boolean;
   @Prop() value!: string;
 
   T = T;
-  mode?: string = languageModeMap[this.language];
-
-  data(): { [key: string]: any } {
-    return {
-      mode: languageModeMap[this.language],
-    };
-  }
+  mode = languageModeMap[this.language] || languageModeMap['cpp11'];
 
   get editorOptions(): EditorOptions {
     return {
@@ -78,6 +72,14 @@ export default class ArenaCodeView extends Vue {
       mode: this.mode,
       readOnly: this.readonly,
     };
+  }
+
+  onChange(value: string): void {
+    this.$emit('change', value);
+  }
+
+  onInput(value: string): void {
+    this.$emit('input', value);
   }
 
   @Watch('language')
