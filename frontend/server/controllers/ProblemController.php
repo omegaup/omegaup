@@ -1,6 +1,5 @@
 <?php
 
-require_once 'libs/ProblemDeployer.php';
 require_once 'libs/dao/QualityNominations.dao.php';
 
 /**
@@ -210,14 +209,14 @@ class ProblemController extends Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Commit at the very end
-            $problemDeployer = new ProblemDeployer(
+            $problemDeployer = new \OmegaUp\ProblemDeployer(
                 $r['problem_alias'],
                 $acceptsSubmissions
             );
             $problemDeployer->commit(
                 'Initial commit',
                 $r->user,
-                ProblemDeployer::CREATE,
+                \OmegaUp\ProblemDeployer::CREATE,
                 $problemSettings
             );
             $problem->commit = $problemDeployer->publishedCommit;
@@ -712,13 +711,13 @@ class ProblemController extends Controller {
             //Begin transaction
             \OmegaUp\DAO\DAO::transBegin();
 
-            $operation = ProblemDeployer::UPDATE_SETTINGS;
+            $operation = \OmegaUp\ProblemDeployer::UPDATE_SETTINGS;
             if (isset($_FILES['problem_contents'])
                 && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile($_FILES['problem_contents']['tmp_name'])
             ) {
-                $operation = ProblemDeployer::UPDATE_CASES;
+                $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
             }
-            $problemDeployer = new ProblemDeployer(
+            $problemDeployer = new \OmegaUp\ProblemDeployer(
                 $problem->alias,
                 $acceptsSubmissions,
                 $updatePublished != ProblemController::UPDATE_PUBLISHED_NONE
@@ -850,7 +849,7 @@ class ProblemController extends Controller {
 
         $updatedFileLanguages = [];
         try {
-            $problemDeployer = new ProblemDeployer($r['problem_alias']);
+            $problemDeployer = new \OmegaUp\ProblemDeployer($r['problem_alias']);
             $problemDeployer->commitLooseFiles(
                 "{$r['lang']}.markdown: {$r['message']}",
                 $r->user,
@@ -1688,7 +1687,7 @@ class ProblemController extends Controller {
             JSON_OBJECT_AS_ARRAY
         );
 
-        $problemDeployer = new ProblemDeployer($problem->alias);
+        $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
         try {
             // Begin transaction
             \OmegaUp\DAO\DAO::transBegin();
