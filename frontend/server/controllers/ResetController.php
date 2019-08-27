@@ -5,11 +5,11 @@ class ResetController extends Controller {
      * Creates a reset operation, the first of two steps needed to reset a
      * password. The first step consist of sending an email to the user with
      * instructions to reset he's password, if and only if the email is valid.
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         self::validateCreateRequest($r);
         $email = $r['email'];
         $token = \OmegaUp\ApiUtils::getRandomString();
@@ -50,16 +50,16 @@ class ResetController extends Controller {
     /**
      * Creates a reset operation, support team members can generate a valid
      * token and then they can send it to end user
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    public static function apiGenerateToken(Request $r) {
+    public static function apiGenerateToken(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         if (!Authorization::isSupportTeamMember($r->identity)) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         self::validateCreateRequest($r);
@@ -94,11 +94,11 @@ class ResetController extends Controller {
      * Updates the password of a given user, this is the second and last step
      * in order to reset the password. This operation is done if and only if
      * the correct parameters are suplied.
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function apiUpdate(Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r) {
         self::validateUpdateRequest($r);
         $user = UsersDAO::FindByEmail($r['email']);
         if (is_null($user)) {

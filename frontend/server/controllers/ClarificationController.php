@@ -21,15 +21,15 @@ class ClarificationController extends Controller {
     /**
      * Validate the request of apiCreate
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateCreate(Request $r) {
-        Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
-        Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
-        Validators::validateStringNonEmpty($r['username'], 'username', false);
-        Validators::validateStringNonEmpty($r['message'], 'message');
-        Validators::validateStringOfLengthInRange($r['message'], 'message', null, 200);
+    private static function validateCreate(\OmegaUp\Request $r) {
+        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username', false);
+        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['message'], 'message', null, 200);
 
         $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -53,10 +53,10 @@ class ClarificationController extends Controller {
     /**
      * Creates a Clarification
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -64,7 +64,7 @@ class ClarificationController extends Controller {
         self::validateCreate($r);
 
         $receiverId = $r['identity'] ? $r['identity']->identity_id : null;
-        $r['clarification'] = new Clarifications([
+        $r['clarification'] = new \OmegaUp\DAO\VO\Clarifications([
             'author_id' => $r->identity->identity_id,
             'receiver_id' => $receiverId,
             'problemset_id' => $r['contest']->problemset_id,
@@ -86,11 +86,11 @@ class ClarificationController extends Controller {
     /**
      * Validate Details API request
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateDetails(Request $r) {
+    private static function validateDetails(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists
@@ -105,7 +105,7 @@ class ClarificationController extends Controller {
                 $r->identity,
                 $r['clarification']
             )) {
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
         }
     }
@@ -113,10 +113,10 @@ class ClarificationController extends Controller {
     /**
      * API for getting a clarification
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiDetails(Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) {
         // Authenticate the user
         self::authenticateRequest($r);
 
@@ -136,14 +136,14 @@ class ClarificationController extends Controller {
     /**
      * Validate update API request
      *
-     * @param Request $r
-     * @throws ForbiddenAccessException
+     * @param \OmegaUp\Request $r
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateUpdate(Request $r) {
+    private static function validateUpdate(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
         $r->ensureBool('public', false /* not required */);
-        Validators::validateStringNonEmpty($r['answer'], 'answer', false /* not required */);
-        Validators::validateStringNonEmpty($r['message'], 'message', false /* not required */);
+        \OmegaUp\Validators::validateStringNonEmpty($r['answer'], 'answer', false /* not required */);
+        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message', false /* not required */);
 
         // Check that clarification exists
         $r['clarification'] = ClarificationsDAO::GetByPK($r['clarification_id']);
@@ -155,17 +155,17 @@ class ClarificationController extends Controller {
             $r->identity,
             $r['clarification']
         )) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
 
     /**
      * Update a clarification
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiUpdate(Request $r) {
+    public static function apiUpdate(\OmegaUp\Request $r) {
         // Authenticate user
         self::authenticateRequest($r);
 
@@ -195,7 +195,7 @@ class ClarificationController extends Controller {
         return $response;
     }
 
-    private static function clarificationUpdated(Request $r, Clarifications $clarification) {
+    private static function clarificationUpdated(\OmegaUp\Request $r, \OmegaUp\DAO\VO\Clarifications $clarification) {
         try {
             if (is_null($r['problem'])) {
                 $r['problem'] = ProblemsDAO::GetByPK($clarification->problem_id);

@@ -57,7 +57,7 @@ class ContestStatsTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
@@ -104,7 +104,7 @@ class ContestStatsTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);

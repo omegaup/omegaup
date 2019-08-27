@@ -30,7 +30,7 @@ class IdentityContestsTest extends OmegaupTestCase {
 
         // Create valid run
         $contestantLogin = self::login($contestant);
-        $runRequest = new Request([
+        $runRequest = new \OmegaUp\Request([
             'auth_token' => $contestantLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -66,7 +66,7 @@ class IdentityContestsTest extends OmegaupTestCase {
         $password = Utils::CreateRandomString();
 
         // Call api using identity creator group member
-        IdentityController::apiBulkCreate(new Request([
+        IdentityController::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'identities' => IdentityFactory::getCsvData(
                 'identities.csv',
@@ -76,7 +76,7 @@ class IdentityContestsTest extends OmegaupTestCase {
             'group_alias' => $group['group']->alias,
         ]));
 
-        $members = GroupController::apiMembers(new Request([
+        $members = GroupController::apiMembers(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'group_alias' => $group['group']->alias,
         ]));
@@ -98,14 +98,14 @@ class IdentityContestsTest extends OmegaupTestCase {
 
         // Updating admission_mode for the contest
         $directorLogin = self::login($contestData['director']);
-        ContestController::apiUpdate(new Request([
+        ContestController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'private',
         ]));
 
         // Expictly added identity to contest
-        ContestController::apiAddUser(new Request([
+        ContestController::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'usernameOrEmail' => $invitedIdentityPrivateContest['username'],
@@ -129,7 +129,7 @@ class IdentityContestsTest extends OmegaupTestCase {
                 $password
             );
             $this->fail('Only invited identities can access to private contest');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }

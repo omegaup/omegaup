@@ -81,7 +81,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -120,7 +120,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -155,7 +155,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -169,7 +169,7 @@ class ContestDetailsTest extends OmegaupTestCase {
     /**
      * Dont show private contests for users that are not in the private list
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDontShowPrivateContestForAnyUser() {
         // Get a contest
@@ -183,7 +183,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -206,7 +206,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -242,7 +242,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -280,7 +280,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -303,7 +303,7 @@ class ContestDetailsTest extends OmegaupTestCase {
     /**
      * Try to view a contest before it has started
      *
-     * @expectedException PreconditionFailedException
+     * @expectedException \OmegaUp\Exceptions\PreconditionFailedException
      */
     public function testContestNotStartedYet() {
         // Get a contest
@@ -319,7 +319,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -343,7 +343,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get the scoreboard url by using the MyList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiMyList($r);
@@ -364,7 +364,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call details using token
         $login = self::login($externalUser);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url,
@@ -376,7 +376,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call details using admin token
         $login = self::login($externalUser);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url,
@@ -400,7 +400,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $contestDirector = $contestData['director'];
 
         $login = self::login($contestDirector);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
@@ -409,7 +409,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         try {
             ContestController::apiDetails($r);
             $this->assertTrue(false, 'User that has not opened contest was able to see its details');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
         }
 
@@ -421,7 +421,7 @@ class ContestDetailsTest extends OmegaupTestCase {
     /**
      * Test accesing api with invalid scoreboard token. Should fail.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDetailsUsingInvalidToken() {
         // Get a private contest
@@ -432,7 +432,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call details using token
         $login = self::login($externalUser);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'token' => 'invalid token',
@@ -450,7 +450,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Get the scoreboard url by using the MyList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiMyList($r);
@@ -469,7 +469,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call details using token
-        $detailsResponse = ContestController::apiDetails(new Request([
+        $detailsResponse = ContestController::apiDetails(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url
         ]));
@@ -477,7 +477,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertContestDetails($contestData, [], $detailsResponse);
 
         // Call details using admin token
-        $detailsResponse = ContestController::apiDetails(new Request([
+        $detailsResponse = ContestController::apiDetails(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url
         ]));
@@ -534,7 +534,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Create API
         $login = self::login($contestDirector);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
@@ -570,7 +570,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Prepare our request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
@@ -579,14 +579,14 @@ class ContestDetailsTest extends OmegaupTestCase {
         try {
             ContestController::apiDetails($r);
             $this->assertTrue(false, 'User with no access could see the contest');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 
         // Get details from a problem in that contest. This should also fail.
         try {
-            $problem_request = new Request([
+            $problem_request = new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problems[0]['request']['problem_alias'],
@@ -594,7 +594,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
             ProblemController::apiDetails($problem_request);
             $this->assertTrue(false, 'User with no access could see the problem');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -603,7 +603,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         try {
             ContestController::apiDetails($r);
             $this->assertTrue(false, 'User with no access could see the contest');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }

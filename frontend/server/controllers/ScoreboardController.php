@@ -8,16 +8,16 @@ class ScoreboardController extends Controller {
     /**
      * Returns a list of contests
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiRefresh(Request $r) {
+    public static function apiRefresh(\OmegaUp\Request $r) {
         // This is not supposed to be called by end-users, but by the
         // Grader service. Regular sessions cannot be used since they
         // expire, so use a pre-shared secret to authenticate that
         // grants admin-level privileges just for this call.
         if ($r['token'] !== OMEGAUP_GRADER_SECRET) {
-            throw new ForbiddenAccessException();
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $contest = ContestsDAO::getByAlias($r['alias']);

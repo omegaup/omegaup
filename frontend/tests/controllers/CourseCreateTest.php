@@ -12,7 +12,7 @@ class CourseCreateTest extends OmegaupTestCase {
 
         self::$curator = UserFactory::createUser();
         $identity = IdentitiesDAO::getByPK(self::$curator->main_identity_id);
-        GroupsIdentitiesDAO::create(new GroupsIdentities([
+        GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $curatorGroup->group_id,
             'identity_id' => $identity->identity_id,
         ]));
@@ -25,7 +25,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
@@ -43,7 +43,7 @@ class CourseCreateTest extends OmegaupTestCase {
     /**
      * Two courses cannot have the same alias
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateCourseDuplicatedName() {
         $sameAlias = Utils::CreateRandomString();
@@ -52,7 +52,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $sameName,
             'alias' => $sameAlias,
@@ -70,7 +70,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $sameName,
             'alias' => $sameAlias,
@@ -89,7 +89,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $courseAlias = Utils::CreateRandomString();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $courseAlias,
@@ -105,7 +105,7 @@ class CourseCreateTest extends OmegaupTestCase {
         // Create a test course
         $login = self::login($user);
         $assignmentAlias = Utils::CreateRandomString();
-        $response = CourseController::apiCreateAssignment(new Request([
+        $response = CourseController::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -128,7 +128,7 @@ class CourseCreateTest extends OmegaupTestCase {
             'user' => $user
         ]), $login);
         $points = 1337;
-        CourseController::apiAddProblem(new Request([
+        CourseController::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignment->alias,
@@ -149,7 +149,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
 
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiListAssignments(new Request([
+        $response = CourseController::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -160,7 +160,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourseWithAssignments(5);
 
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiListAssignments(new Request([
+        $response = CourseController::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -179,7 +179,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 1
-        CourseController::apiCreateAssignment(new Request([
+        CourseController::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -195,7 +195,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $courseAlias = $courseFactoryResult['course_alias'];
 
         // Create the assignment number 2
-        CourseController::apiCreateAssignment(new Request([
+        CourseController::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -216,7 +216,7 @@ class CourseCreateTest extends OmegaupTestCase {
         $adminLogin = OmegaupTestCase::login($admin);
         $courseData = CoursesFactory::createCourse($admin, $adminLogin);
 
-        CourseController::apiCreateAssignment(new Request([
+        CourseController::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
@@ -230,13 +230,13 @@ class CourseCreateTest extends OmegaupTestCase {
 
     /**
      * Public course can't be created by default
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePublicCourseFailForNonCurator() {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
@@ -255,7 +255,7 @@ class CourseCreateTest extends OmegaupTestCase {
     public function testCreatePublicCourse() {
         $login = self::login(self::$curator);
         $school = SchoolsFactory::createSchool()['school'];
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
@@ -289,7 +289,7 @@ class CourseCreateTest extends OmegaupTestCase {
         // User linked to course
         $student = UserFactory::createUser();
         $identityStudent = IdentitiesDAO::getByPK($student->main_identity_id);
-        $response = CourseController::apiAddStudent(new Request([
+        $response = CourseController::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $student->username,
             'course_alias' => $courseData['course_alias'],
@@ -311,7 +311,7 @@ class CourseCreateTest extends OmegaupTestCase {
         ));
 
         // Turning off show_scoreboard flag
-        CourseController::apiUpdate(new Request([
+        CourseController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'name' => $courseData['request']['course']->name,

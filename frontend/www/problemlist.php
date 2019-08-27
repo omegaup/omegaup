@@ -28,7 +28,7 @@ function getDifficultyRange() {
 }
 
 require_once('../server/bootstrap_smarty.php');
-$r = new Request();
+$r = new \OmegaUp\Request();
 $mode = isset($_GET['mode']) ? $_GET['mode'] : 'asc';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $order_by = isset($_GET['order_by']) ? $_GET['order_by'] : 'title';

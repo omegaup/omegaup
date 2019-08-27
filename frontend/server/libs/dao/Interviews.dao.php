@@ -1,14 +1,16 @@
 <?php
 
 include('base/Interviews.dao.base.php');
-include('base/Interviews.vo.base.php');
-/** Interviews Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Interviews }.
-  * @access public
-  *
-  */
+
+/**
+ * Interviews Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Interviews}.
+ *
+ * @access public
+ */
 class InterviewsDAO extends InterviewsDAOBase {
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
@@ -19,7 +21,7 @@ class InterviewsDAO extends InterviewsDAOBase {
             return null;
         }
 
-        $interview = new Interviews($rs);
+        $interview = new \OmegaUp\DAO\VO\Interviews($rs);
 
         return $interview;
     }
@@ -67,6 +69,6 @@ class InterviewsDAO extends InterviewsDAOBase {
             return null;
         }
 
-        return new Interviews($interviews);
+        return new \OmegaUp\DAO\VO\Interviews($interviews);
     }
 }

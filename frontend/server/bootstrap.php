@@ -115,17 +115,12 @@ spl_autoload_register(function (string $classname) : void {
     }
 });
 
-require_once('libs/ApiException.php');
 require_once('libs/Authorization.php');
 require_once('libs/Broadcaster.php');
-require_once('libs/Cache.php');
-require_once('libs/Experiments.php');
 require_once('libs/Grader.php');
 require_once('libs/Pager.php');
-require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');
 require_once('libs/SecurityTools.php');
-require_once('libs/Validators.php');
 
 Logger::configure([
     'rootLogger' => [
@@ -150,7 +145,7 @@ Logger::configure([
                 'params' => [
                     'conversionPattern' => (
                         '%date [%level]: ' .
-                        Request::requestId() .
+                        \OmegaUp\Request::requestId() .
                         ' %server{REQUEST_URI} %message (%F:%L) %newline'
                     ),
                 ],
@@ -190,8 +185,8 @@ Logger::configure([
 ]);
 $log = Logger::getLogger('bootstrap');
 
-$session = SessionController::apiCurrentSession(new Request($_REQUEST))['session'];
-$experiments = new Experiments(
+$session = SessionController::apiCurrentSession(new \OmegaUp\Request($_REQUEST))['session'];
+$experiments = new \OmegaUp\Experiments(
     $_REQUEST,
     array_key_exists('user', $session) ? $session['user'] : null
 );

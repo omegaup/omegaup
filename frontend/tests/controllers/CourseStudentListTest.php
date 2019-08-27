@@ -21,7 +21,7 @@ class CourseStudentListTest extends OmegaupTestCase {
 
         // Call apiStudentList by an admin
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiListStudents(new Request([
+        $response = CourseController::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -36,14 +36,14 @@ class CourseStudentListTest extends OmegaupTestCase {
 
     /**
      * List can only be retreived by an admin
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCourseStudentListNonAdmin() {
         $courseData = CoursesFactory::createCourse();
 
         // Call apiStudentList by another random user
         $userLogin = self::login(UserFactory::createUser());
-        $response = CourseController::apiListStudents(new Request([
+        $response = CourseController::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -56,7 +56,7 @@ class CourseStudentListTest extends OmegaupTestCase {
     public function testCourseStudentListInvalidCourse() {
         // Call apiStudentList by another random user
         $userLogin = self::login(UserFactory::createUser());
-        $response = CourseController::apiListStudents(new Request([
+        $response = CourseController::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => 'foo'
         ]));
@@ -84,7 +84,7 @@ class CourseStudentListTest extends OmegaupTestCase {
 
             for ($j = 0; $j < $problemsPerAssignment; $j++) {
                 $problemData = ProblemsFactory::createProblem();
-                CourseController::apiAddProblem(new Request([
+                CourseController::apiAddProblem(new \OmegaUp\Request([
                     'auth_token' => $adminLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
                     'assignment_alias' => $assignmentAlias,
@@ -114,7 +114,7 @@ class CourseStudentListTest extends OmegaupTestCase {
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiListStudents(new Request([
+        $response = CourseController::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));

@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,28 +11,28 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link GroupsIdentities}.
+ * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
  * @access public
  * @abstract
- *
  */
 abstract class GroupsIdentitiesDAOBase {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link GroupsIdentities}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @throws Exception si la operacion fallo.
+     * @throws Exception si la operacion falló.
      *
-     * @param GroupsIdentities $Groups_Identities El objeto de tipo GroupsIdentities
+     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsIdentities}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(GroupsIdentities $Groups_Identities) : int {
+    final public static function replace(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
         if (empty($Groups_Identities->group_id) || empty($Groups_Identities->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
@@ -52,11 +51,11 @@ abstract class GroupsIdentitiesDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param GroupsIdentities $Groups_Identities El objeto de tipo GroupsIdentities a actualizar.
+     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El objeto de tipo GroupsIdentities a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(GroupsIdentities $Groups_Identities) : int {
+    final public static function update(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
         $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ?, `privacystatement_consent_id` = ?, `accept_teacher` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
         $params = [
             is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
@@ -70,40 +69,45 @@ abstract class GroupsIdentitiesDAOBase {
     }
 
     /**
-     * Obtener {@link GroupsIdentities} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\GroupsIdentities} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link GroupsIdentities} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?GroupsIdentities Un objeto del tipo {@link GroupsIdentities}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\GroupsIdentities Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\GroupsIdentities} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(?int $group_id, ?int $identity_id) : ?GroupsIdentities {
+    final public static function getByPK(?int $group_id, ?int $identity_id) : ?\OmegaUp\DAO\VO\GroupsIdentities {
         $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
         $params = [$group_id, $identity_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new GroupsIdentities($row);
+        return new \OmegaUp\DAO\VO\GroupsIdentities($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto GroupsIdentities suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\GroupsIdentities} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param GroupsIdentities $Groups_Identities El objeto de tipo GroupsIdentities a eliminar
+     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El
+     * objeto de tipo \OmegaUp\DAO\VO\GroupsIdentities a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(GroupsIdentities $Groups_Identities) : void {
+    final public static function delete(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : void {
         $sql = 'DELETE FROM `Groups_Identities` WHERE group_id = ? AND identity_id = ?;';
         $params = [$Groups_Identities->group_id, $Groups_Identities->identity_id];
 
@@ -117,7 +121,8 @@ abstract class GroupsIdentitiesDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link GroupsIdentities}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -128,9 +133,10 @@ abstract class GroupsIdentitiesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return GroupsIdentities[] Un arreglo que contiene objetos del tipo {@link GroupsIdentities}.
+     * @return \OmegaUp\DAO\VO\GroupsIdentities[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
      *
-     * @psalm-return array<int, GroupsIdentities>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\GroupsIdentities>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -147,7 +153,7 @@ abstract class GroupsIdentitiesDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new GroupsIdentities($row);
+            $allData[] = new \OmegaUp\DAO\VO\GroupsIdentities($row);
         }
         return $allData;
     }
@@ -156,13 +162,15 @@ abstract class GroupsIdentitiesDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto GroupsIdentities suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * suministrado.
      *
-     * @param GroupsIdentities $Groups_Identities El objeto de tipo GroupsIdentities a crear.
+     * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsIdentities} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(GroupsIdentities $Groups_Identities) : int {
+    final public static function create(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
         $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
         $params = [
             is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,

@@ -1,17 +1,19 @@
 <?php
 
 include('base/Problemset_Problems.dao.base.php');
-include('base/Problemset_Problems.vo.base.php');
-/** ProblemsetProblems Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetProblems }.
-  * @access public
-  *
-  */
+
+/**
+ * ProblemsetProblems Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\ProblemsetProblems}.
+ *
+ * @access public
+ */
 class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     final public static function getProblemsAssignmentByCourseAlias(
-        Courses $course
+        \OmegaUp\DAO\VO\Courses $course
     ) : array {
         // Build SQL statement
         $sql = '
@@ -66,7 +68,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     /*
      * Get number of problems in problemset.
      */
-    final public static function countProblemsetProblems(Problemsets $problemset) {
+    final public static function countProblemsetProblems(\OmegaUp\DAO\VO\Problemsets $problemset) {
         // Build SQL statement
         $sql = 'SELECT COUNT(pp.problem_id) ' .
                'FROM Problemset_Problems pp ' .
@@ -128,7 +130,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
 
         $problemsetProblems = [];
         foreach ($rs as $row) {
-            array_push($problemsetProblems, new ProblemsetProblems($row));
+            array_push($problemsetProblems, new \OmegaUp\DAO\VO\ProblemsetProblems($row));
         }
         return $problemsetProblems;
     }
@@ -137,7 +139,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      *
      * Get relevant problems including problemset alias
      */
-    final public static function getRelevantProblems(Problemsets $problemset) {
+    final public static function getRelevantProblems(\OmegaUp\DAO\VO\Problemsets $problemset) {
         // Build SQL statement
         $sql = '
             SELECT
@@ -152,7 +154,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
         $val = [$problemset->problemset_id];
         $result = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
-            $result[] = new Problems($row);
+            $result[] = new \OmegaUp\DAO\VO\Problems($row);
         }
         return $result;
     }
@@ -216,13 +218,13 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
      * Update the version of the problem across all problemsets to the current
      * version.
      *
-     * @param Problems $problem         the problem.
-     * @param Users    $user            the user that is making the change.
+     * @param \OmegaUp\DAO\VO\Problems $problem         the problem.
+     * @param \OmegaUp\DAO\VO\Users    $user            the user that is making the change.
      * @param string   $updatePublished the way to update the problemset runs.
      */
     final public static function updateVersionToCurrent(
-        Problems $problem,
-        Users $user,
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Users $user,
         string $updatePublished
     ) : void {
         $now = \OmegaUp\Time::get();
@@ -312,7 +314,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 $problem->problem_id,
             ]);
             foreach ($rs as $row) {
-                array_push($problemsets, new Problemsets($row));
+                array_push($problemsets, new \OmegaUp\DAO\VO\Problemsets($row));
             }
 
             $sql = '
@@ -337,19 +339,19 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
                 $problem->problem_id,
             ]);
             foreach ($rs as $row) {
-                array_push($problemsets, new Problemsets($row));
+                array_push($problemsets, new \OmegaUp\DAO\VO\Problemsets($row));
             }
 
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
             $problemsets = array_filter(
                 $problemsets,
-                function (Problemsets $problemset) use ($identity) {
+                function (\OmegaUp\DAO\VO\Problemsets $problemset) use ($identity) {
                     return Authorization::isAdmin($identity, $problemset);
                 }
             );
 
             if (!empty($problemsets)) {
-                $problemsetIds = array_map(function (Problemsets $p) {
+                $problemsetIds = array_map(function (\OmegaUp\DAO\VO\Problemsets $p) {
                     return (int)$p->problemset_id;
                 }, $problemsets);
                 $problemsetPlaceholders = implode(', ', array_fill(0, count($problemsetIds), '?'));
@@ -394,7 +396,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     }
 
     public static function updateProblemsetProblemSubmissions(
-        ProblemsetProblems $problemsetProblem
+        \OmegaUp\DAO\VO\ProblemsetProblems $problemsetProblem
     ) : void {
         $sql = '
             INSERT IGNORE INTO

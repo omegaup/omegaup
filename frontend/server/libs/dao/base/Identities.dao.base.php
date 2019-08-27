@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Identities}.
+ * {@link \OmegaUp\DAO\VO\Identities}.
  * @access public
  * @abstract
- *
  */
 abstract class IdentitiesDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param Identities $Identities El objeto de tipo Identities a actualizar.
+     * @param \OmegaUp\DAO\VO\Identities $Identities El objeto de tipo Identities a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(Identities $Identities) : int {
+    final public static function update(\OmegaUp\DAO\VO\Identities $Identities) : int {
         $sql = 'UPDATE `Identities` SET `username` = ?, `password` = ?, `name` = ?, `user_id` = ?, `language_id` = ?, `country_id` = ?, `state_id` = ?, `school_id` = ?, `gender` = ? WHERE `identity_id` = ?;';
         $params = [
             $Identities->username,
@@ -44,40 +42,45 @@ abstract class IdentitiesDAOBase {
     }
 
     /**
-     * Obtener {@link Identities} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\Identities} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Identities} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Identities}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?Identities Un objeto del tipo {@link Identities}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\Identities Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\Identities} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $identity_id) : ?Identities {
+    final public static function getByPK(int $identity_id) : ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT `Identities`.`identity_id`, `Identities`.`username`, `Identities`.`password`, `Identities`.`name`, `Identities`.`user_id`, `Identities`.`language_id`, `Identities`.`country_id`, `Identities`.`state_id`, `Identities`.`school_id`, `Identities`.`gender` FROM Identities WHERE (identity_id = ?) LIMIT 1;';
         $params = [$identity_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new Identities($row);
+        return new \OmegaUp\DAO\VO\Identities($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Identities suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\Identities} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param Identities $Identities El objeto de tipo Identities a eliminar
+     * @param \OmegaUp\DAO\VO\Identities $Identities El
+     * objeto de tipo \OmegaUp\DAO\VO\Identities a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Identities $Identities) : void {
+    final public static function delete(\OmegaUp\DAO\VO\Identities $Identities) : void {
         $sql = 'DELETE FROM `Identities` WHERE identity_id = ?;';
         $params = [$Identities->identity_id];
 
@@ -91,7 +94,8 @@ abstract class IdentitiesDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Identities}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\Identities}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -102,9 +106,10 @@ abstract class IdentitiesDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return Identities[] Un arreglo que contiene objetos del tipo {@link Identities}.
+     * @return \OmegaUp\DAO\VO\Identities[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\Identities}.
      *
-     * @psalm-return array<int, Identities>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\Identities>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -121,7 +126,7 @@ abstract class IdentitiesDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new Identities($row);
+            $allData[] = new \OmegaUp\DAO\VO\Identities($row);
         }
         return $allData;
     }
@@ -130,13 +135,15 @@ abstract class IdentitiesDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Identities suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\Identities}
+     * suministrado.
      *
-     * @param Identities $Identities El objeto de tipo Identities a crear.
+     * @param \OmegaUp\DAO\VO\Identities $Identities El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Identities} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Identities $Identities) : int {
+    final public static function create(\OmegaUp\DAO\VO\Identities $Identities) : int {
         $sql = 'INSERT INTO Identities (`username`, `password`, `name`, `user_id`, `language_id`, `country_id`, `state_id`, `school_id`, `gender`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             $Identities->username,

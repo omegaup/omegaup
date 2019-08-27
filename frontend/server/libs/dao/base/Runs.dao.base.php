@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link Runs}.
+ * {@link \OmegaUp\DAO\VO\Runs}.
  * @access public
  * @abstract
- *
  */
 abstract class RunsDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param Runs $Runs El objeto de tipo Runs a actualizar.
+     * @param \OmegaUp\DAO\VO\Runs $Runs El objeto de tipo Runs a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(Runs $Runs) : int {
+    final public static function update(\OmegaUp\DAO\VO\Runs $Runs) : int {
         $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `judged_by` = ? WHERE `run_id` = ?;';
         $params = [
             is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
@@ -46,40 +44,45 @@ abstract class RunsDAOBase {
     }
 
     /**
-     * Obtener {@link Runs} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\Runs} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link Runs} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Runs}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?Runs Un objeto del tipo {@link Runs}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\Runs Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\Runs} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $run_id) : ?Runs {
+    final public static function getByPK(int $run_id) : ?\OmegaUp\DAO\VO\Runs {
         $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
         $params = [$run_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new Runs($row);
+        return new \OmegaUp\DAO\VO\Runs($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto Runs suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\Runs} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param Runs $Runs El objeto de tipo Runs a eliminar
+     * @param \OmegaUp\DAO\VO\Runs $Runs El
+     * objeto de tipo \OmegaUp\DAO\VO\Runs a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(Runs $Runs) : void {
+    final public static function delete(\OmegaUp\DAO\VO\Runs $Runs) : void {
         $sql = 'DELETE FROM `Runs` WHERE run_id = ?;';
         $params = [$Runs->run_id];
 
@@ -93,7 +96,8 @@ abstract class RunsDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link Runs}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\Runs}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -104,9 +108,10 @@ abstract class RunsDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return Runs[] Un arreglo que contiene objetos del tipo {@link Runs}.
+     * @return \OmegaUp\DAO\VO\Runs[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\Runs}.
      *
-     * @psalm-return array<int, Runs>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\Runs>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -123,7 +128,7 @@ abstract class RunsDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new Runs($row);
+            $allData[] = new \OmegaUp\DAO\VO\Runs($row);
         }
         return $allData;
     }
@@ -132,13 +137,15 @@ abstract class RunsDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto Runs suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\Runs}
+     * suministrado.
      *
-     * @param Runs $Runs El objeto de tipo Runs a crear.
+     * @param \OmegaUp\DAO\VO\Runs $Runs El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Runs} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(Runs $Runs) : int {
+    final public static function create(\OmegaUp\DAO\VO\Runs $Runs) : int {
         $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
             is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,

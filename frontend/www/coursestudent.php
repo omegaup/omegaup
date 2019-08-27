@@ -6,10 +6,10 @@ $student_username = $_REQUEST['student'];
 
 try {
     $payload = [
-        'course' => CourseController::apiAdminDetails(new Request([
+        'course' => CourseController::apiAdminDetails(new \OmegaUp\Request([
             'alias' => $course_alias,
         ])),
-        'students' => CourseController::apiListStudents(new Request([
+        'students' => CourseController::apiListStudents(new \OmegaUp\Request([
             'course_alias' => $course_alias,
         ]))['students'],
         'student' => $student_username,

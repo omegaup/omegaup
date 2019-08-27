@@ -49,7 +49,7 @@ class UserRegistrationTest extends OmegaupTestCase {
 
         // Inflate request
         UserController::$permissionKey = uniqid();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => $username,
             'password' => $password,
             'email' => $username.'@isp.com',
@@ -84,7 +84,7 @@ class UserRegistrationTest extends OmegaupTestCase {
 
         // Inflate request
         UserController::$permissionKey = uniqid();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => 'Z'.$username,
             'password' => Utils::CreateRandomString(),
             'email' => $email,

@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -12,20 +11,19 @@
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link ProblemOfTheWeek}.
+ * {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}.
  * @access public
  * @abstract
- *
  */
 abstract class ProblemOfTheWeekDAOBase {
     /**
      * Actualizar registros.
      *
-     * @param ProblemOfTheWeek $Problem_Of_The_Week El objeto de tipo ProblemOfTheWeek a actualizar.
+     * @param \OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week El objeto de tipo ProblemOfTheWeek a actualizar.
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(ProblemOfTheWeek $Problem_Of_The_Week) : int {
+    final public static function update(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'UPDATE `Problem_Of_The_Week` SET `problem_id` = ?, `time` = ?, `difficulty` = ? WHERE `problem_of_the_week_id` = ?;';
         $params = [
             is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
@@ -38,40 +36,45 @@ abstract class ProblemOfTheWeekDAOBase {
     }
 
     /**
-     * Obtener {@link ProblemOfTheWeek} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\ProblemOfTheWeek} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link ProblemOfTheWeek} de la base
-     * de datos usando sus llaves primarias.
+     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @return ?ProblemOfTheWeek Un objeto del tipo {@link ProblemOfTheWeek}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\ProblemOfTheWeek Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\ProblemOfTheWeek} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK(int $problem_of_the_week_id) : ?ProblemOfTheWeek {
+    final public static function getByPK(int $problem_of_the_week_id) : ?\OmegaUp\DAO\VO\ProblemOfTheWeek {
         $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` FROM Problem_Of_The_Week WHERE (problem_of_the_week_id = ?) LIMIT 1;';
         $params = [$problem_of_the_week_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new ProblemOfTheWeek($row);
+        return new \OmegaUp\DAO\VO\ProblemOfTheWeek($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto ProblemOfTheWeek suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link replace()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\ProblemOfTheWeek} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link \OmegaUp\Exceptions\NotFoundException}
-     * será arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param ProblemOfTheWeek $Problem_Of_The_Week El objeto de tipo ProblemOfTheWeek a eliminar
+     * @param \OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week El
+     * objeto de tipo \OmegaUp\DAO\VO\ProblemOfTheWeek a eliminar
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(ProblemOfTheWeek $Problem_Of_The_Week) : void {
+    final public static function delete(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : void {
         $sql = 'DELETE FROM `Problem_Of_The_Week` WHERE problem_of_the_week_id = ?;';
         $params = [$Problem_Of_The_Week->problem_of_the_week_id];
 
@@ -85,7 +88,8 @@ abstract class ProblemOfTheWeekDAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link ProblemOfTheWeek}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -96,9 +100,10 @@ abstract class ProblemOfTheWeekDAOBase {
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return ProblemOfTheWeek[] Un arreglo que contiene objetos del tipo {@link ProblemOfTheWeek}.
+     * @return \OmegaUp\DAO\VO\ProblemOfTheWeek[] Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}.
      *
-     * @psalm-return array<int, ProblemOfTheWeek>
+     * @psalm-return array<int, \OmegaUp\DAO\VO\ProblemOfTheWeek>
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -115,7 +120,7 @@ abstract class ProblemOfTheWeekDAOBase {
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new ProblemOfTheWeek($row);
+            $allData[] = new \OmegaUp\DAO\VO\ProblemOfTheWeek($row);
         }
         return $allData;
     }
@@ -124,13 +129,15 @@ abstract class ProblemOfTheWeekDAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto ProblemOfTheWeek suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}
+     * suministrado.
      *
-     * @param ProblemOfTheWeek $Problem_Of_The_Week El objeto de tipo ProblemOfTheWeek a crear.
+     * @param \OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemOfTheWeek} a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function create(ProblemOfTheWeek $Problem_Of_The_Week) : int {
+    final public static function create(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
         $params = [
             is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,

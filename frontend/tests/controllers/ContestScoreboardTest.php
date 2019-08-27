@@ -113,7 +113,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($testData['contestants'][0]);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]);
@@ -145,7 +145,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Now get the scoreboard as an contest director
         $login = self::login($testData['contestData']['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]);
@@ -203,7 +203,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
         ]);
@@ -247,7 +247,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
         ]);
@@ -297,7 +297,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
         ]);
@@ -351,7 +351,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_aliases' => $contestData['request']['alias'] . ',' . $contestData2['request']['alias'],
         ]);
@@ -389,7 +389,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Get the scoreboard url by using the MyList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiMyList($r);
@@ -410,7 +410,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Call scoreboard api from the user
         $login = self::login($externalUser);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
             'token' => $scoreboard_url,
@@ -420,7 +420,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals('0', $scoreboardResponse['ranking'][0]['total']['points']);
 
         // Call scoreboard api from the user with admin token
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $contestData['contest']->problemset_id,
             'token' => $scoreboard_admin_url,
@@ -433,7 +433,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
     /**
      * Test invalid token
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testScoreboardUrlInvalidToken() {
         // Create our user not added to the contest
@@ -444,7 +444,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Call scoreboard api from the user
         $login = self::login($externalUser);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' =>  $contestData['contest']->problemset_id,
             'token' => 'invalid token',
@@ -474,7 +474,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         // Get the scoreboard url by using the AdminList api being the
         // contest director
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiAdminList($r);
@@ -494,7 +494,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call scoreboard api from the user
-        $scoreboardResponse = ProblemsetController::apiScoreboard(new Request([
+        $scoreboardResponse = ProblemsetController::apiScoreboard(new \OmegaUp\Request([
             'problemset_id' =>  $contestData['contest']->problemset_id,
             'token' => $scoreboard_url
         ]));
@@ -502,7 +502,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals('0', $scoreboardResponse['ranking'][0]['total']['points']);
 
         // Call scoreboard api from the user with admin token
-        $scoreboardResponse = ProblemsetController::apiScoreboard(new Request([
+        $scoreboardResponse = ProblemsetController::apiScoreboard(new \OmegaUp\Request([
             'problemset_id' => $contestData['contest']->problemset_id,
             'token' => $scoreboard_admin_url
         ]));
@@ -561,7 +561,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         $testData = $this->prepareContestScoreboardData(3, $runMap);
         $login = self::login($testData['contestants'][0]);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]);
@@ -664,7 +664,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         $testData = $this->prepareContestScoreboardData(2, $runMap);
         $login = self::login(($isAdmin ? $testData['contestData']['director'] : $testData['contestants'][0]));
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]);
@@ -720,14 +720,14 @@ class ContestScoreboardTest extends OmegaupTestCase {
             Authorization::ADMIN_ROLE
         );
         $login = self::login($testData['contestData']['director']);
-        ContestController::apiRemoveProblem(new Request([
+        ContestController::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $testData['contestData']['contest']->alias,
             'problem_alias' => $testData['problemData'][1]['problem']->alias,
         ]));
 
         // Now the scoreboard should be available with a single problem.
-        $response = ProblemsetController::apiScoreboard(new Request([
+        $response = ProblemsetController::apiScoreboard(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]));

@@ -8,7 +8,7 @@ try {
         'smartyProperties' => $smartyProperties,
         'template' => $template
     ] = CourseController::getCourseDetailsForSmarty(
-        new Request($_REQUEST)
+        new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
     ApiCaller::handleException($e);

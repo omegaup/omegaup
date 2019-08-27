@@ -53,7 +53,7 @@ class ProblemStatsTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($problemData['author']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]);

@@ -9,9 +9,9 @@ class SchoolController extends Controller {
     /**
      * Gets a list of schools
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function apiList(Request $r) {
+    public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
         $param = '';
@@ -40,13 +40,13 @@ class SchoolController extends Controller {
     /**
      * Api to create new school
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiCreate(Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        Validators::validateStringNonEmpty($r['name'], 'name');
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
 
         $state = self::getStateIdFromCountryAndState($r['country_id'], $r['state_id']);
 
@@ -65,7 +65,7 @@ class SchoolController extends Controller {
      */
     public static function createSchool($name, $state) {
         // Create school object
-        $school = new Schools([
+        $school = new \OmegaUp\DAO\VO\Schools([
             'name' => $name,
             'country_id' => $state != null ? $state->country_id : null,
             'state_id' => $state != null ? $state->state_id : null,
@@ -84,10 +84,10 @@ class SchoolController extends Controller {
     /**
      * Ensures that all the numeric parameters have valid values.
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    private static function validateRankDetails(Request $r) : array {
+    private static function validateRankDetails(\OmegaUp\Request $r) : array {
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', 5, 100, false);
         $r->ensureInt('start_time', null, null, false);
@@ -95,7 +95,7 @@ class SchoolController extends Controller {
 
         try {
             self::authenticateRequest($r);
-        } catch (UnauthorizedException $e) {
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             if (!is_null($r['start_time'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('paramterInvalid', 'start_time');
             }
@@ -120,10 +120,10 @@ class SchoolController extends Controller {
     /**
      * Returns rank of best schools in last month
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiRank(Request $r) {
+    public static function apiRank(\OmegaUp\Request $r) {
         [
             'offset' => $offset,
             'rowcount' => $rowCount,
@@ -170,8 +170,8 @@ class SchoolController extends Controller {
         };
 
         if ($canUseCache) {
-            return Cache::getFromCacheOrSet(
-                Cache::SCHOOL_RANK,
+            return \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::SCHOOL_RANK,
                 "{$offset}-{$rowCount}",
                 $fetch,
                 60 * 60 * 24 // 1 day

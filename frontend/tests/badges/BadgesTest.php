@@ -1,8 +1,6 @@
 <?php
 
 require_once OMEGAUP_ROOT . '/www/api/ApiCaller.php';
-require_once 'libs/FileHandler.php';
-require_once 'libs/FileUploader.php';
 
 /**
  * Test to ensure that all the badges are in the correct format.
@@ -22,7 +20,7 @@ class BadgesTest extends BadgesTestCase {
     }
 
     private static function RunRequest(array $apicall): void {
-        $login = self::login(new Identities([
+        $login = self::login(new \OmegaUp\DAO\VO\Identities([
             'username' => $apicall['username'],
             'password' => $apicall['password'],
         ]));
@@ -39,7 +37,7 @@ class BadgesTest extends BadgesTestCase {
             if ($req['api'] === 'QualityNominationController::apiCreate') {
                 $params['contents'] = json_encode($params['contents']);
             }
-            $r = new Request($params);
+            $r = new \OmegaUp\Request($params);
             $r->method = $req['api'];
             $fullResponse = ApiCaller::call($r);
             if ($fullResponse['status'] !== 'ok') {
@@ -100,7 +98,7 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function runBadgeTest($testPath, $queryPath, $badge): void {
-        FileHandler::SetFileUploader($this->createFileUploaderMock());
+        \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
         $content = json_decode(file_get_contents($testPath), true);
         Utils::CleanupFilesAndDb();
         switch ($content['testType']) {
@@ -124,7 +122,7 @@ class BadgesTest extends BadgesTestCase {
                 continue;
             }
 
-            if (!Validators::isValidAlias($alias)) {
+            if (!\OmegaUp\Validators::isValidAlias($alias)) {
                 throw new Exception('The alias for this badge is invalid.');
             }
 
@@ -182,7 +180,7 @@ class BadgesTest extends BadgesTestCase {
         $results = [];
         try {
             mkdir($newBadgePath);
-            $results = BadgeController::apiList(new Request([]));
+            $results = BadgeController::apiList(new \OmegaUp\Request([]));
         } finally {
             rmdir($newBadgePath);
         }
@@ -205,7 +203,7 @@ class BadgesTest extends BadgesTestCase {
         {
             $login = self::login($userOne);
             // Fetch badges through apiMyList
-            $userOneBadges = BadgeController::apiMyList(new Request([
+            $userOneBadges = BadgeController::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
             ]));
@@ -217,7 +215,7 @@ class BadgesTest extends BadgesTestCase {
             $this->assertFalse(in_array('contestManager', $expectedUserOneResults));
 
             // Fetch badges through apiUserList
-            $userTwoBadges = BadgeController::apiUserList(new Request([
+            $userTwoBadges = BadgeController::apiUserList(new \OmegaUp\Request([
                 'target_username' => $userTwo->username,
             ]));
             $results = self::getBadgesFromArray($userTwoBadges['badges']);
@@ -227,7 +225,7 @@ class BadgesTest extends BadgesTestCase {
             );
 
             // Now check if notifications have been created for both users
-            $userOneNotifications = NotificationController::apiMyList(new Request([
+            $userOneNotifications = NotificationController::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
             ]));
@@ -240,7 +238,7 @@ class BadgesTest extends BadgesTestCase {
         }
         {
             $login = self::login($userTwo);
-            $userTwoNotifications = NotificationController::apiMyList(new Request([
+            $userTwoNotifications = NotificationController::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
             ]));
@@ -260,7 +258,7 @@ class BadgesTest extends BadgesTestCase {
         Utils::RunAssignBadges();
 
         $login = self::login($user);
-        $problemSetterResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+        $problemSetterResult = BadgeController::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
             'badge_alias' => 'problemSetter',
@@ -274,7 +272,7 @@ class BadgesTest extends BadgesTestCase {
             )
         );
 
-        $contestManagerResult = BadgeController::apiMyBadgeAssignationTime(new Request([
+        $contestManagerResult = BadgeController::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
             'badge_alias' => 'contestManager',
@@ -296,7 +294,7 @@ class BadgesTest extends BadgesTestCase {
         // In total they must exist 4 users: admintest, test,
         // the user created by createProblemWithAuthor and $user
 
-        $details = BadgeController::apiBadgeDetails(new Request([
+        $details = BadgeController::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'problemSetter',
         ]));
         $this->assertNotNull($details['first_assignation']);
@@ -309,7 +307,7 @@ class BadgesTest extends BadgesTestCase {
         );
         $this->assertEquals(25, $details['owners_percentage']);
 
-        $details = BadgeController::apiBadgeDetails(new Request([
+        $details = BadgeController::apiBadgeDetails(new \OmegaUp\Request([
             'badge_alias' => 'contestManager',
         ]));
         $this->assertEquals(0, $details['owners_percentage']);
@@ -318,7 +316,7 @@ class BadgesTest extends BadgesTestCase {
 
     public function testBadgeDetailsException() {
         try {
-            BadgeController::apiBadgeDetails(new Request([
+            BadgeController::apiBadgeDetails(new \OmegaUp\Request([
                 'badge_alias' => 'esteBadgeNoExiste',
             ]));
             $this->fail('Should have thrown a NotFoundException');

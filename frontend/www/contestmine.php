@@ -3,7 +3,7 @@
 require_once('../server/bootstrap_smarty.php');
 
 try {
-    $payload = ContestController::apiMyList(new Request([]));
+    $payload = ContestController::apiMyList(new \OmegaUp\Request([]));
 
     // If the user have private material (contests/problems), an alert is issued
     // suggesting to contribute to the community by releasing the material to
