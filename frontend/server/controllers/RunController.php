@@ -539,8 +539,10 @@ class RunController extends Controller {
      * Gets the details of a run. Includes admin details if admin.
      *
      * @param \OmegaUp\Request $r
+     *
+     * @return array{status: string, admin: bool, guid: string, language: string, source?: string, compile_error?: string, details?: array{compile_meta: array<string, array{verdict: string, time: float, sys_time: float, wall_time: float, memory: float}>, contest_score: float, groups: array{group: string, score: float, contest_score: float, max_score: float, cases: array{name: string, score: float, contest_score: float, max_score: float, verdict: string, meta: array<string, mixed>}[]}[], judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, logs?: string, judged_by?: string}
      */
-    public static function apiDetails(\OmegaUp\Request $r) {
+    public static function apiDetails(\OmegaUp\Request $r) : array {
         // Get the user who is calling this API
         self::authenticateRequest($r);
 
@@ -556,6 +558,7 @@ class RunController extends Controller {
         }
 
         // Get the source
+        /** @val array{status: string, admin: bool, guid: string, language: string, source?: string, compile_error?: string, details?: array{compile_meta: array<string, array{verdict: string, time: float, sys_time: float, wall_time: float, memory: float}>, contest_score: float, groups: array{group: string, score: float, contest_score: float, max_score: float, cases: array{name: string, score: float, contest_score: float, max_score: float, verdict: string, meta: array<string, mixed>}[]}[], judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, logs?: string, judged_by?: string} */
         $response = [
             'status' => 'ok',
             'admin' => \OmegaUp\Authorization::isProblemAdmin($r->identity, $r['problem']),
@@ -576,6 +579,7 @@ class RunController extends Controller {
             $response['judged_by'] = $r['run']->judged_by;
         }
 
+        /** @val array{status: string, admin: bool, guid: string, language: string, source?: string, compile_error?: string, details?: array{compile_meta: array<string, array{verdict: string, time: float, sys_time: float, wall_time: float, memory: float}>, contest_score: float, groups: array{group: string, score: float, contest_score: float, max_score: float, cases: array{name: string, score: float, contest_score: float, max_score: float, verdict: string, meta: array<string, mixed>}[]}[], judged_by: string, max_score: float, memory: float, score: float, time: float, verdict: string, wall_time: float}, logs?: string, judged_by?: string} $response */
         return $response;
     }
 

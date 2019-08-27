@@ -1967,8 +1967,8 @@ class CourseController extends Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $scoreboard = new Scoreboard(
-            new ScoreboardParams([
+        $scoreboard = new \OmegaUp\Scoreboard(
+            new \OmegaUp\ScoreboardParams([
                 'alias' => $tokenAuthenticationResult['assignment']->alias,
                 'title' => $tokenAuthenticationResult['assignment']->name,
                 'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
@@ -2001,8 +2001,8 @@ class CourseController extends Controller {
             $r
         );
 
-        $scoreboard = new Scoreboard(
-            ScoreboardParams::fromAssignment(
+        $scoreboard = new \OmegaUp\Scoreboard(
+            \OmegaUp\ScoreboardParams::fromAssignment(
                 $tokenAuthenticationResult['assignment'],
                 $tokenAuthenticationResult['course']->group_id,
                 $tokenAuthenticationResult['courseAdmin']/*show_all_runs*/

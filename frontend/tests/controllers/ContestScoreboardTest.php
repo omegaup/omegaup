@@ -670,23 +670,23 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         $response1 = ProblemsetController::$testApi($r);
-        $this->assertEquals(false, Scoreboard::getIsLastRunFromCacheForTesting());
+        $this->assertEquals(false, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
 
         $response2 = ProblemsetController::$testApi($r);
-        $this->assertEquals(true, Scoreboard::getIsLastRunFromCacheForTesting());
+        $this->assertEquals(true, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
 
         $this->assertEquals($response1, $response2);
 
         // Invalidate previously cached scoreboard
-        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($testData['contestData']['contest']));
         $response3 = ProblemsetController::$testApi($r);
-        $this->assertEquals(false, Scoreboard::getIsLastRunFromCacheForTesting());
+        $this->assertEquals(false, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
 
         // Single invalidation works, now invalidate again and check force referesh API
-        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
-        Scoreboard::refreshScoreboardCache(ScoreboardParams::fromContest($testData['contestData']['contest']));
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($testData['contestData']['contest']));
+        \OmegaUp\Scoreboard::refreshScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($testData['contestData']['contest']));
         $response4 = ProblemsetController::$testApi($r);
-        $this->assertEquals(true, Scoreboard::getIsLastRunFromCacheForTesting());
+        $this->assertEquals(true, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
         $this->assertEquals($response3, $response4);
     }
 
