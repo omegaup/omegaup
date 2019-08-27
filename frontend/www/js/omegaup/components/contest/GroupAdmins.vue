@@ -5,7 +5,7 @@
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{T.wordsGroupAdmin}}</label> <omegaup-autocomplete v-bind:init=
-          "el =&gt; UI.typeahead(el, API.Group.list)"
+          "el =&gt; UI.groupTypeahead(el)"
                v-model="groupName"></omegaup-autocomplete>
         </div><button class="btn btn-primary"
               type="submit">{{T.contestAddgroupAddGroup}}</button>
@@ -35,33 +35,35 @@
   </div>
 </template>
 
-<script>
-import {T, UI, API} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
 import Autocomplete from '../Autocomplete.vue';
 
-export default {
-  props: {
-    data: Array,
-  },
-  data: function() {
-    return {
-      T: T,
-      UI: UI,
-      API: API,
-      groupName: '',
-      groupAdmins: this.data,
-      selected: {},
-    };
-  },
-  methods: {
-    onSubmit: function() { this.$parent.$emit('add-group-admin', this);},
-    onRemove: function(group) {
-      this.selected = group;
-      this.$parent.$emit('remove-group-admin', this);
-    },
-  },
+@Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
   },
-};
+})
+export default class GroupAdmin extends Vue {
+  @Prop() data!: omegaup.ContestGroupAdmin[];
+
+  T = T;
+  UI = UI;
+  groupName = '';
+  groupAdmins = this.data;
+  selected = {};
+
+  onSubmit(): void {
+    this.$parent.$emit('add-group-admin', this);
+  }
+
+  onRemove(group: omegaup.ContestGroupAdmin): void {
+    this.selected = group;
+    this.$parent.$emit('remove-group-admin', this);
+  }
+}
+
 </script>

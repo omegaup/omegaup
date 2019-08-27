@@ -46,11 +46,9 @@ class SecurityTools {
         return password_verify($passwordToCheck, $hashedPassword);
     }
 
-    public static function testStrongPassword(?string $password) : bool {
+    public static function testStrongPassword(?string $password) : void {
         // Setting max passwd length to 72 to avoid DoS attacks
-        Validators::validateStringOfLengthInRange($password, 'password', 8, 72);
-
-        return true;
+        \OmegaUp\Validators::validateStringOfLengthInRange($password, 'password', 8, 72);
     }
 
     /**
@@ -143,7 +141,11 @@ class SecurityTools {
      * @return string The Bearer authorization token.
      */
     public static function getGitserverAuthorizationToken(string $problem, string $username) : string {
-        require_once 'libs/third_party/sodium_compat/autoload-fast.php';
+        // Given that we already have an autoload configured, we cannot use
+        // sodium_compat's (fast) autoloader. Instead, simulate what it does
+        // here, with the full path of the standard autoload file.
+        require_once 'libs/third_party/sodium_compat/autoload.php';
+        ParagonIE_Sodium_Compat::$fastMult = true;
 
         require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
         require_once 'libs/third_party/constant_time_encoding/src/Base64.php';

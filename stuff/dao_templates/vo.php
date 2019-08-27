@@ -1,5 +1,4 @@
 <?php
-
 /** ******************************************************************************* *
   *                    !ATENCION!                                                   *
   *                                                                                 *
@@ -8,33 +7,27 @@
   *                                                                                 *
   * ******************************************************************************* */
 
+namespace OmegaUp\DAO\VO;
+
 /**
- * Value Object file for table {{ table.name }}.
+ * Value Object class for table `{{ table.name }}`.
  *
- * VO does not have any behaviour.
  * @access public
  */
-class {{ table.class_name }} extends VO {
+class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
 {%- for column in table.columns %}
         '{{ column.name }}' => true,
 {%- endfor %}
     ];
 
-    /**
-     * Constructor de {{ table.class_name }}
-     *
-     * Para construir un objeto de tipo {{ table.class_name }} debera llamarse a el constructor
-     * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
-     * cuyos campos son iguales a las variables que constituyen a este objeto.
-     */
     function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {
@@ -43,7 +36,7 @@ class {{ table.class_name }} extends VO {
              * @var string|int|float $data['{{ column.name }}']
              * @var int $this->{{ column.name }}
              */
-            $this->{{ column.name }} = DAO::fromMySQLTimestamp($data['{{ column.name }}']);
+            $this->{{ column.name }} = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['{{ column.name }}']);
 {%- elif column.php_primitive_type == 'bool' %}
             $this->{{ column.name }} = boolval($data['{{ column.name }}']);
 {%- elif column.php_primitive_type in ('int', 'float') %}
@@ -53,7 +46,7 @@ class {{ table.class_name }} extends VO {
 {%- endif %}
     {%- if column.default == 'CURRENT_TIMESTAMP' %}
         } else {
-            $this->{{ column.name }} = Time::get();
+            $this->{{ column.name }} = \OmegaUp\Time::get();
     {%- endif %}
         }
 {%- endfor %}

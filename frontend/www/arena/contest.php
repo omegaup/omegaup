@@ -2,7 +2,7 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $r = new Request($_REQUEST);
+    $r = new \OmegaUp\Request($_REQUEST);
     $r->ensureBool('is_practice', false);
 
     $contest = ContestController::validateContest($_REQUEST['contest_alias'] ?? '');

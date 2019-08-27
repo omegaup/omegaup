@@ -1,14 +1,15 @@
 <?php
 
 include('base/Courses.dao.base.php');
-include('base/Courses.vo.base.php');
-/** Courses Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Courses }.
-  * @access public
-  *
-  */
+
+/**
+ * Courses Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Courses}.
+ * @access public
+ */
 class CoursesDAO extends CoursesDAOBase {
     public static function findByName($name) {
         $sql = "SELECT DISTINCT c.*
@@ -16,11 +17,11 @@ class CoursesDAO extends CoursesDAOBase {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        $resultRows = MySQLConnection::getInstance()->GetAll($sql, [$name]);
+        $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$name]);
         $finalResult = [];
 
         foreach ($resultRows as $row) {
-            array_push($finalResult, new Courses($row));
+            array_push($finalResult, new \OmegaUp\DAO\VO\Courses($row));
         }
 
         return $finalResult;
@@ -54,14 +55,16 @@ class CoursesDAO extends CoursesDAOBase {
             ORDER BY
                 start_time;";
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$alias]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
         foreach ($rs as $row) {
+            unset($row['acl_id']);
             unset($row['assignment_id']);
+            unset($row['problemset_id']);
             unset($row['course_id']);
-            $row['start_time'] =  DAO::fromMySQLTimestamp($row['start_time']);
-            $row['finish_time'] = DAO::fromMySQLTimestamp($row['finish_time']);
+            $row['start_time'] =  \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['start_time']);
+            $row['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['finish_time']);
             array_push($ar, $row);
         }
 
@@ -79,10 +82,10 @@ class CoursesDAO extends CoursesDAOBase {
                 ) gg
                 ON c.group_id = gg.group_id;
                ';
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$identity_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$identity_id]);
         $courses = [];
         foreach ($rs as $row) {
-            array_push($courses, new Courses($row));
+            array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
     }
@@ -121,7 +124,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ) pr
                 ON pr.identity_id = i.identity_id';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$group_id, $course_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_id, $course_id]);
         $progress = [];
         foreach ($rs as $row) {
             $username = $row['username'];
@@ -177,7 +180,7 @@ class CoursesDAO extends CoursesDAOBase {
                 ON a.assignment_id = pr.assignment_id
                 where a.course_id = ?';
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, [$course_id, $identity_id, $course_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id, $identity_id, $course_id]);
 
         $progress = [];
         foreach ($rs as $row) {
@@ -229,19 +232,19 @@ class CoursesDAO extends CoursesDAOBase {
                 ?, ?';
         $params = [
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
             (int)$offset,
             (int)$pageSize,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
-            array_push($courses, new Courses($row));
+            array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
     }
@@ -274,11 +277,11 @@ class CoursesDAO extends CoursesDAOBase {
             (int)$pageSize,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
         foreach ($rs as $row) {
-            array_push($courses, new Courses($row));
+            array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
     }
@@ -287,27 +290,27 @@ class CoursesDAO extends CoursesDAOBase {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
         $params = [$alias];
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
 
-        return new Courses($row);
+        return new \OmegaUp\DAO\VO\Courses($row);
     }
 
-    final public static function getAssignmentByAlias(Courses $course, string $assignmentAlias) {
+    final public static function getAssignmentByAlias(\OmegaUp\DAO\VO\Courses $course, string $assignmentAlias) {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
         $params = [$assignmentAlias, $course->course_id];
 
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
 
-        return new Assignments($row);
+        return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
-    final public static function updateAssignmentMaxPoints(Courses $course, string $assignment_alias) {
+    final public static function updateAssignmentMaxPoints(\OmegaUp\DAO\VO\Courses $course, string $assignment_alias) {
         $sql = 'UPDATE Assignments a
                 JOIN (
                     SELECT assignment_id, sum(psp.points) as max_points
@@ -322,12 +325,12 @@ class CoursesDAO extends CoursesDAOBase {
 
         $params = [$assignment_alias, $course->course_id];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    final public static function getSharingInformation($identity_id, Courses $course, Groups $group) {
+    final public static function getSharingInformation($identity_id, \OmegaUp\DAO\VO\Courses $course, \OmegaUp\DAO\VO\Groups $group) {
         if ($course->group_id != $group->group_id) {
             return true;
         }
@@ -349,7 +352,7 @@ class CoursesDAO extends CoursesDAOBase {
             $identity_id,
             $group->group_id,
         ];
-        $row = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }

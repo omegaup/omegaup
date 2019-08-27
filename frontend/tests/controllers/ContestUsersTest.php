@@ -30,7 +30,7 @@ class ContestUsersTest extends OmegaupTestCase {
 
         // Log in with the admin of the contest
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
@@ -50,14 +50,14 @@ class ContestUsersTest extends OmegaupTestCase {
         ContestsFactory::openContest($contestData, $user);
 
         $userLogin = self::login($user);
-        ContestController::apiDetails(new Request([
+        ContestController::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
 
         // Call API
         $directorLogin = self::login($contestData['director']);
-        $response = ContestController::apiActivityReport(new Request([
+        $response = ContestController::apiActivityReport(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -84,7 +84,7 @@ class ContestUsersTest extends OmegaupTestCase {
         }
 
         $userLogin = self::login($user[0]);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
@@ -99,7 +99,7 @@ class ContestUsersTest extends OmegaupTestCase {
         );
 
         // Explicitly join contest
-        ContestController::apiOpen(new Request([
+        ContestController::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
@@ -112,7 +112,7 @@ class ContestUsersTest extends OmegaupTestCase {
         // Call API
         $directorLogin = self::login($contestData['director']);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token
         ]);
@@ -130,7 +130,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $userLogin = self::login($user[1]);
 
         // Explicitly join contest
-        ContestController::apiOpen(new Request([
+        ContestController::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
@@ -150,7 +150,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $userLogin = self::login($user[2]);
 
         // Explicitly join contest
-        ContestController::apiOpen(new Request([
+        ContestController::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
@@ -174,7 +174,7 @@ class ContestUsersTest extends OmegaupTestCase {
 
         $shouldShowIntro =
             ContestController::shouldShowIntro(
-                new Request([
+                new \OmegaUp\Request([
                     'contest_alias' => $contestData['request']['alias'],
                 ]),
                 $contestData['contest']
@@ -193,7 +193,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $userLogin = self::login($user);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);

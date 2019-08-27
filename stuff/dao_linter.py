@@ -38,7 +38,10 @@ class DaoLinter(linters.Linter):
         for filename, contents in dao_utils.generate_dao(
                 contents_callback('frontend/database/schema.sql').decode(
                     'utf-8')):
-            path = os.path.join('frontend/server/libs/dao/base', filename)
+            if '.dao.base.php' in filename:
+                path = os.path.join('frontend/server/libs/dao/base', filename)
+            else:
+                path = os.path.join('frontend/server/src/DAO/VO', filename)
             original_contents[path] = contents_callback(path)
             new_contents[path] = contents.encode('utf-8')
 

@@ -29,12 +29,11 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php');
-    require_once(OMEGAUP_ROOT . '/server/libs/Time.php');
     Utils::CleanupFilesAndDb();
     // Clean APC cache
-    Cache::clearCacheForTesting();
+    \OmegaUp\Cache::clearCacheForTesting();
     QualityNominationFactory::initQualityReviewers();
     QualityNominationFactory::initTags();
 
-    Grader::setInstanceForTesting(new NoOpGrader());
+    \OmegaUp\Grader::setInstanceForTesting(new NoOpGrader());
 }

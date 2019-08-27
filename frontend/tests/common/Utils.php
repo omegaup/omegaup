@@ -39,13 +39,13 @@ class Utils {
     public static function GetDbDatetime() {
         // Go to the DB
 
-        return MySQLConnection::getInstance()->GetOne('SELECT NOW();');
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne('SELECT NOW();');
     }
 
     public static function GetTimeFromUnixTimestamp($time) {
         // Go to the DB to take the unix timestamp
 
-        return MySQLConnection::getInstance()->GetOne('SELECT FROM_UNIXTIME(?);', [$time]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne('SELECT FROM_UNIXTIME(?);', [$time]);
     }
 
     public static function CleanLog() {
@@ -54,27 +54,27 @@ class Utils {
     }
 
     public static function CleanPath($path) {
-        FileHandler::DeleteDirRecursive($path);
+        \OmegaUp\FileHandler::deleteDirRecursively($path);
         mkdir($path, 0755, true);
     }
 
     public static function deleteAllSuggestions() {
-        MySQLConnection::getInstance()->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
+        \OmegaUp\MySQLConnection::getInstance()->Execute("DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';");
     }
 
     public static function deleteAllRanks() {
-        MySQLConnection::getInstance()->Execute('DELETE FROM `User_Rank`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `User_Rank`;');
     }
 
     public static function deleteAllPreviousRuns() {
-        MySQLConnection::getInstance()->Execute('DELETE FROM `Submission_Log`;');
-        MySQLConnection::getInstance()->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
-        MySQLConnection::getInstance()->Execute('DELETE FROM `Runs`;');
-        MySQLConnection::getInstance()->Execute('DELETE FROM `Submissions`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Submission_Log`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute('UPDATE `Submissions` SET `current_run_id` = NULL;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Runs`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Submissions`;');
     }
 
     public static function deleteAllProblemsOfTheWeek() {
-        MySQLConnection::getInstance()->Execute('DELETE FROM `Problem_Of_The_Week`;');
+        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Problem_Of_The_Week`;');
     }
 
     /**
@@ -116,7 +116,7 @@ class Utils {
 
         RunsDAO::update($run);
 
-        Grader::getInstance()->setGraderResourceForTesting(
+        \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
             'details.json',
             json_encode([
@@ -127,14 +127,14 @@ class Utils {
             ])
         );
         // An empty gzip file.
-        Grader::getInstance()->setGraderResourceForTesting(
+        \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
             'logs.txt.gz',
             "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
             "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         );
         // An empty zip file.
-        Grader::getInstance()->setGraderResourceForTesting(
+        \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
             'files.zip',
             "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
@@ -149,14 +149,14 @@ class Utils {
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));
-        ACLsDAO::create(new ACLs([
-            'acl_id' => Authorization::SYSTEM_ACL,
+        ACLsDAO::create(new \OmegaUp\DAO\VO\ACLs([
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,
         ]));
-        UserRolesDAO::create(new UserRoles([
+        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $admin->user_id,
-            'role_id' => Authorization::ADMIN_ROLE,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
         UserFactory::createUser(new UserParams([
             'username' => 'test',
@@ -232,27 +232,27 @@ class Utils {
 
         try {
             // Disable foreign checks
-            MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 0;');
+            \OmegaUp\MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 0;');
 
             foreach ($tables as $t) {
-                MySQLConnection::getInstance()->Execute("TRUNCATE TABLE `$t`;");
+                \OmegaUp\MySQLConnection::getInstance()->Execute("TRUNCATE TABLE `$t`;");
             }
 
             // Tables with special entries.
-            MySQLConnection::getInstance()->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
+            \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Groups` WHERE `alias` NOT LIKE "%:%";');
 
             // The format of the question changed from this id
-            MySQLConnection::getInstance()->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
+            \OmegaUp\MySQLConnection::getInstance()->Execute('ALTER TABLE QualityNominations auto_increment = 18664');
 
             // Make sure the user_id and identity_id never matches in tests.
-            MySQLConnection::getInstance()->Execute('ALTER TABLE Identities auto_increment = 100000;');
+            \OmegaUp\MySQLConnection::getInstance()->Execute('ALTER TABLE Identities auto_increment = 100000;');
             self::setUpDefaultDataConfig();
         } catch (Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';
             var_dump($e->getMessage());
         } finally {
             // Enabling them again
-            MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 1;');
+            \OmegaUp\MySQLConnection::getInstance()->Execute('SET foreign_key_checks = 1;');
         }
         self::commit();
     }
@@ -272,9 +272,9 @@ class Utils {
 
     public static function Commit() {
         try {
-            MySQLConnection::getInstance()->StartTrans();
+            \OmegaUp\MySQLConnection::getInstance()->StartTrans();
         } finally {
-            MySQLConnection::getInstance()->CompleteTrans();
+            \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
         }
     }
 

@@ -263,7 +263,17 @@ export default {
 
     addStudent: _call('/api/course/addStudent/'),
 
-    adminDetails: _call('/api/course/adminDetails/', _convertTimes),
+    adminDetails: _call(
+        '/api/course/adminDetails/',
+        function(result) {
+          result.start_time = new Date(result.start_time * 1000);
+          result.finish_time = new Date(result.finish_time * 1000);
+          result.assignments.forEach(assignment => {
+            assignment.start_time = new Date(assignment.start_time * 1000);
+            assignment.finish_time = new Date(assignment.finish_time * 1000);
+          });
+          return result;
+        }),
 
     admins: _call('/api/course/admins/'),
 

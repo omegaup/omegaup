@@ -3,7 +3,7 @@ require_once('../../server/bootstrap_smarty.php');
 
 try {
     $hasActivityInCourses = CourseController::userHasActivityInCourses(
-        new Request($_REQUEST)
+        new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
     ApiCaller::handleException($e);
