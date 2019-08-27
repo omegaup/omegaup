@@ -27,10 +27,10 @@
         <tbody>
           <tr v-for="role in roleNames">
             <td><input type="checkbox"
-                   v-bind:checked="hasRole(role.title)"
+                   v-bind:checked="hasRole(role.name)"
                    v-bind:disabled="role == 'Admin'"
                    v-on:change.prevent="onChangeRole($event, role)"></td>
-            <td>{{ role.title }}</td>
+            <td>{{ role.name }}</td>
           </tr>
         </tbody>
       </table>

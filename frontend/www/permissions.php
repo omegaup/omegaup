@@ -19,12 +19,16 @@ $groups = GroupsDAO::SearchByName('omegaup:');
 $userSystemRoles = [];
 $userSystemGroups = [];
 foreach ($roles as $key => $role) {
-    $userSystemRoles[$key]['title'] = $role->name;
-    $userSystemRoles[$key]['value'] = in_array($role->name, $systemRoles);
+    $userSystemRoles[$key] = [
+        'name' => $role->name,
+        'value' => in_array($role->name, $systemRoles),
+    ];
 }
 foreach ($groups as $key => $group) {
-    $userSystemGroups[$key]['alias'] = $group->name;
-    $userSystemGroups[$key]['value'] = in_array($group->name, $systemGroups);
+    $userSystemGroups[$key] = [
+        'name' => $group->name,
+        'value' => in_array($group->name, $systemGroups),
+    ];
 }
 $payload = [
     'userSystemRoles' => $userSystemRoles,

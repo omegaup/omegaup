@@ -11,7 +11,7 @@
             <td><input type="checkbox"
                    v-model="role.value"
                    v-on:change.prevent="onChangeRole($event, role)"></td>
-            <td>{{ role.title }}</td>
+            <td>{{ role.name }}</td>
           </tr>
         </tbody>
       </table>
@@ -22,7 +22,7 @@
             <td><input type="checkbox"
                    v-model="group.value"
                    v-on:change.prevent="onChangeGroup($event, group)"></td>
-            <td>{{ group.alias }}</td>
+            <td>{{ group.name }}</td>
           </tr>
         </tbody>
       </table>
