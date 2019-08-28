@@ -256,18 +256,32 @@ declare namespace omegaup {
   export interface Problem {
     accepted?: number;
     alias: string;
+    commit?: string;
     difficulty?: number;
+    languages?: string;
+    letter?: string;
+    order?: number;
     penalty?: number;
     percent?: number;
     points?: number;
     quality?: number;
     ratio?: number;
     run_details?: omegaup.RunDetails;
+    runs?: CourseProblemRun[];
     score?: number;
+    source?: string;
+    statement?: {
+      images: string[];
+      language: string;
+      markdown: string;
+    }
     submissions?: number;
+    templates?: string;
     tags?: Tag[];
     title: string;
+    version?: string;
     visibility?: number;
+    visits?: number;
   }
 
   export interface QueryParameters {
@@ -292,6 +306,26 @@ declare namespace omegaup {
     place: number;
     totalPenalty: number;
     totalPoints: number;
+  }
+
+  export interface ScoreboardUser extends User {
+    country?: string;
+    is_invited: number;
+    place: number;
+    problems: ScoreboardUserProblem[];
+    total: {
+      penalty: number;
+      points: number;
+    }
+  }
+
+  export interface ScoreboardUserProblem {
+    alias: string;
+    penalty: number;
+    pending?: boolean;
+    percent: number;
+    points: number;
+    runs: number;
   }
 
   export interface Report {

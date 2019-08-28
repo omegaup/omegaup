@@ -25,7 +25,7 @@
           <td class="legend"
               v-bind:style="{ backgroundColor: legendColor(userIndex) }"></td>
           <td class="position">{{ user.place }}</td>
-          <td class="user">{{ renderUser(user) }} <img alt=""
+          <td class="user">{{ UI.rankingUsername(user) }} <img alt=""
                height="11"
                v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
                v-bind:title="user.country"
@@ -61,69 +61,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import UI from '../../ui.js';
-export default {
-  props: {
-    T: Object,
-    scoreboardColors: Array,
-    problems: Array,
-    ranking: Array,
-    lastUpdated: Date,
-    showPenalty: {
-      type: Boolean,
-      'default': true,
-    },
-    digitsAfterDecimalPoint: {
-      type: Number,
-      'default': 2,
-    },
-  },
-  data: function() {
-    return {
-      UI: UI,
-      onlyShowExplicitlyInvited: true,
-    };
-  },
-  computed: {
-    lastUpdatedString: function() {
-      if (!this.lastUpdated) {
-        return '';
-      }
-      return this.lastUpdated.toString();
-    },
-  },
-  methods: {
-    legendColor: function(idx) {
-      return (idx < this.scoreboardColors.length) ? this.scoreboardColors[idx] :
-                                                    '';
-    },
-    renderUser: function(u) { return UI.rankingUsername(u);},
-    renderPoints: function(p) {
-      return (p.points > 0 ? '+' : '') +
-             p.points.toFixed(this.digitsAfterDecimalPoint);
-    },
-    totalRuns: function(u) {
-      return u.problems.reduce((acc, val) => acc + val.runs, 0);
-    },
-    problemClass: function(p, alias) {
-      if (p.percent == 100) {
-        return alias + ' accepted';
-      } else if (p.pending) {
-        return alias + ' pending';
-      } else if (p.percent == 0 && p.runs > 0) {
-        return alias + ' wrong';
-      } else {
-        return alias;
-      }
-    },
-    showUser: function(userIsInvited) {
-      return userIsInvited || !this.onlyShowExplicitlyInvited;
-    },
-  },
-};
-</script>
 
 <style>
 .omegaup-scoreboard {
@@ -190,3 +127,64 @@ export default {
   border-left-width: 0;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+
+@Component
+export default class ArenaScoreboard extends Vue {
+  @Prop() scoreboardColors!: string[];
+  @Prop() problems!: omegaup.Problem[];
+  @Prop() ranking!: omegaup.ScoreboardUser[];
+  @Prop() lastUpdated!: Date;
+  @Prop({ default: true }) showPenalty!: boolean;
+  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+
+  T = T;
+  UI = UI;
+  onlyShowExplicitlyInvited = true;
+
+  get lastUpdatedString(): string {
+    return !this.lastUpdated ? '' : this.lastUpdated.toString();
+  }
+
+  legendColor(idx: number): string {
+    return this.scoreboardColors && idx < this.scoreboardColors.length
+      ? this.scoreboardColors[idx]
+      : '';
+  }
+
+  renderPoints(p: omegaup.ScoreboardUserProblem): string {
+    return (
+      (p.points > 0 ? '+' : '') + p.points.toFixed(this.digitsAfterDecimalPoint)
+    );
+  }
+
+  totalRuns(u: omegaup.ScoreboardUser): number {
+    return u.problems.reduce(
+      (acc: number, val: omegaup.ScoreboardUserProblem) => acc + val.runs,
+      0,
+    );
+  }
+
+  problemClass(p: omegaup.ScoreboardUserProblem, alias: string): string {
+    if (p.percent === 100) {
+      return `${alias} accepted`;
+    } else if (p.pending) {
+      return `${alias} pending`;
+    } else if (p.percent === 0 && p.runs > 0) {
+      return `${alias} wrong`;
+    } else {
+      return alias;
+    }
+  }
+
+  showUser(userIsInvited: boolean): boolean {
+    return userIsInvited || !this.onlyShowExplicitlyInvited;
+  }
+}
+
+</script>
