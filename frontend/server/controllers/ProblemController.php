@@ -1596,24 +1596,23 @@ class ProblemController extends Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        $masterLog = [];
         if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
-            $entryLog = [
-                'commit' => $problem->commit,
-                'tree' => null,
-                'author' => [
-                    'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
-                ],
-                'committer' => [
-                    'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
-                ],
-                'version' => $problem->current_version,
-            ];
-            array_push($masterLog, $entryLog);
             return [
                 'status' => 'ok',
                 'published' => $problem->commit,
-                'log' => $masterLog,
+                'log' => [
+                    [
+                        'commit' => $problem->commit,
+                        'tree' => null,
+                        'author' => [
+                            'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
+                        ],
+                        'committer' => [
+                            'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
+                        ],
+                        'version' => $problem->current_version,
+                    ],
+                ],
             ];
         }
 
@@ -1622,6 +1621,7 @@ class ProblemController extends Controller {
             $privateTreeMapping[$logEntry['commit']] = $logEntry['tree'];
         }
 
+        $masterLog = [];
         foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
             if (count($logEntry['parents']) < 3) {
                 // Master commits always have 3 or 4 parents. If they have
@@ -2233,7 +2233,7 @@ class ProblemController extends Controller {
 
         $addedProblems = [];
 
-        $hiddenTags = UsersDAO::getHideTags($r->identity->identity_id);
+        $hiddenTags = UsersDao::getHideTags($r->identity->identity_id);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
@@ -2269,7 +2269,7 @@ class ProblemController extends Controller {
 
         $addedProblems = [];
 
-        $hiddenTags = UsersDAO::getHideTags($r->identity->identity_id);
+        $hiddenTags = UsersDao::getHideTags($r->identity->identity_id);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
