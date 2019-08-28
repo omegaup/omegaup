@@ -1,14 +1,16 @@
 <?php
 
 include('base/Problemsets.dao.base.php');
-include('base/Problemsets.vo.base.php');
-/** Problemsets Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Problemsets }.
-  * @access public
-  *
-  */
+
+/**
+ * Problemsets Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Problemsets}.
+ *
+ * @access public
+ */
 class ProblemsetsDAO extends ProblemsetsDAOBase {
     public static function getProblemsetContainer($problemset_id) {
         if (is_null($problemset_id)) {
@@ -41,18 +43,18 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
      */
     public static function isLateSubmission(
         Object $container,
-        ?ProblemsetIdentities $problemsetIdentity
+        ?\OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentity
     ) : bool {
         if (is_null($problemsetIdentity)) {
             return isset($container->finish_time) &&
-                   (Time::get() > $container->finish_time);
+                   (\OmegaUp\Time::get() > $container->finish_time);
         }
-        return Time::get() > $problemsetIdentity->end_time;
+        return \OmegaUp\Time::get() > $problemsetIdentity->end_time;
     }
 
     public static function isSubmissionWindowOpen(Object $container) : bool {
         return isset($container->start_time) &&
-                Time::get() >= $container->start_time;
+                \OmegaUp\Time::get() >= $container->start_time;
     }
 
     public static function getWithTypeByPK($problemset_id) {
@@ -86,7 +88,7 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
                     1;';
         $params = [$problemset_id];
 
-        $problemset = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $problemset = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($problemset)) {
             return null;
         }
@@ -99,10 +101,10 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
      * identities and are currently logged in with one of them.
      * In this case a flag is turned on and a message will be displayed in arena
      *
-     * @param Users $user
+     * @param \OmegaUp\DAO\VO\Users $user
      */
     public static function shouldShowFirstAssociatedIdentityRunWarning(
-        Users $user
+        \OmegaUp\DAO\VO\Users $user
     ) : bool {
         $sql = '
             SELECT
@@ -123,6 +125,6 @@ class ProblemsetsDAO extends ProblemsetsDAOBase {
             LIMIT
                 1;';
 
-        return MySQLConnection::getInstance()->GetOne($sql, [$user->user_id]) == '0';
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$user->user_id]) == '0';
     }
 }

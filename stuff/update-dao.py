@@ -24,9 +24,13 @@ def _main():
     args = parser.parse_args()
 
     for filename, contents in dao_utils.generate_dao(args.script.read()):
-        with open(
-                os.path.join(_OMEGAUP_ROOT, 'frontend/server/libs/dao/base',
-                             filename), 'w') as f:
+        if '.dao.base.php' in filename:
+            filename = os.path.join(_OMEGAUP_ROOT,
+                                    'frontend/server/libs/dao/base', filename)
+        else:
+            filename = os.path.join(_OMEGAUP_ROOT,
+                                    'frontend/server/src/DAO/VO', filename)
+        with open(filename, 'w') as f:
             f.write(contents)
 
 

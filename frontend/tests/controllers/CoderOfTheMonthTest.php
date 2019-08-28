@@ -15,13 +15,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         $this->createRuns($user, $runCreationDate, 10 /*numRuns*/);
 
-        $response = UserController::apiCoderOfTheMonth(new Request());
+        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request());
 
         $this->assertEquals($user->username, $response['userinfo']['username']);
         $this->assertFalse(array_key_exists('email', $response['userinfo']));
 
         // Calling API again to verify response is the same that in first time
-        $response = UserController::apiCoderOfTheMonth(new Request());
+        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request());
 
         $this->assertEquals($user->username, $response['userinfo']['username']);
     }
@@ -30,7 +30,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $auth_token = self::login($user);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $auth_token
         ]);
 
@@ -40,14 +40,14 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         // Adding parameter date should return the same value, it helps
         // to test getMonthlyList function, which never was tested
-        $r['date'] = date('Y-m-d', Time::get());
+        $r['date'] = date('Y-m-d', \OmegaUp\Time::get());
         $response = UserController::apiCoderOfTheMonthList($r);
         $this->assertCount(0, $response['coders']);
     }
 
     public function testCoderOfTheMonthDetailsForSmarty() {
         // Test coder of the month details when user is not logged
-        $r = new Request();
+        $r = new \OmegaUp\Request();
         $response = UserController::getCoderOfTheMonthDetailsForSmarty($r, null);
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
@@ -116,7 +116,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             $user = UserFactory::createUser();
         }
         if (!$runCreationDate) {
-            $runCreationDate = date('Y-m-d', Time::get());
+            $runCreationDate = date('Y-m-d', \OmegaUp\Time::get());
         }
         $contest = ContestsFactory::createContest();
         $problem = ProblemsFactory::createProblem();
@@ -127,7 +127,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             $runData = RunsFactory::createRun($problem, $contest, $user);
             RunsFactory::gradeRun($runData);
             //sumbmission gap between runs must be 60 seconds
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
 
             // Force the submission to be in any date
             $submission = SubmissionsDAO::getByGuid($runData['response']['guid']);
@@ -144,8 +144,8 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         date_add($reviewDate, date_interval_create_from_date_string($interval));
         $reviewDate = date_format($reviewDate, 'Y-m-01');
 
-        Time::setTimeForTesting(strtotime($reviewDate) + (60 * 60 * 24));
-        $response = UserController::apiCoderOfTheMonth(new Request([]));
+        \OmegaUp\Time::setTimeForTesting(strtotime($reviewDate) + (60 * 60 * 24));
+        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request([]));
         return $response;
     }
 
@@ -156,7 +156,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         [$mentorUser,] = UserFactory::createMentorIdentity();
 
         $login = self::login($mentorUser);
-        $response = UserController::apiCoderOfTheMonthList(new Request([
+        $response = UserController::apiCoderOfTheMonthList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -167,7 +167,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $coders = array_unique($coders);
 
         foreach ($coders as $index => $coder) {
-            $profile = UserController::apiProfile(new Request([
+            $profile = UserController::apiProfile(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $coder
             ]));
@@ -184,7 +184,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $user_login = self::login($user);
 
         foreach ($coders as $index => $coder) {
-            $profile = UserController::apiProfile(new Request([
+            $profile = UserController::apiProfile(new \OmegaUp\Request([
                 'auth_token' => $user_login->auth_token,
                 'username' => $coder
             ]));
@@ -202,10 +202,10 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         [$mentorUser,] = UserFactory::createMentorIdentity();
 
         // Setting time to the 15th of next month.
-        $runCreationDate = new DateTimeImmutable(date('Y-m-d', Time::get()));
+        $runCreationDate = new DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
         $runCreationDate = $runCreationDate->modify('first day of next month');
         $runCreationDate = new DateTimeImmutable($runCreationDate->format('Y-m-15'));
-        Time::setTimeForTesting(strtotime($runCreationDate->format('Y-m-d')));
+        \OmegaUp\Time::setTimeForTesting(strtotime($runCreationDate->format('Y-m-d')));
 
         // Submitting some runs with new users
         $user1 = UserFactory::createUser();
@@ -220,39 +220,39 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Setting new date to the first of the month following the run
         // creation.
         $firstDayOfNextMonth = $runCreationDate->modify('first day of next month');
-        Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
+        \OmegaUp\Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
 
         // Selecting one user as coder of the month
         $login = self::login($mentorUser);
 
         // Call api. This should fail.
         try {
-            UserController::apiSelectCoderOfTheMonth(new Request([
+            UserController::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $user3->username,
             ]));
             $this->fail('Exception was expected, because date is not in the range to select coder');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'coderOfTheMonthIsNotInPeriodToBeChosen');
             // Pass
         }
 
         // Changing date to the last day of the month in which the run was created.
-        Time::setTimeForTesting(strtotime($runCreationDate->format('Y-m-t')));
+        \OmegaUp\Time::setTimeForTesting(strtotime($runCreationDate->format('Y-m-t')));
 
         // Call api again.
-        UserController::apiSelectCoderOfTheMonth(new Request([
+        UserController::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user3->username,
         ]));
 
         // Set date to first day of next month
-        Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
+        \OmegaUp\Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
 
-        $response = UserController::apiCoderOfTheMonth(new Request());
+        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request());
         $this->assertNotNull($response['userinfo'], 'A user has been selected by a mentor');
         $this->assertEquals($response['userinfo']['username'], $user3->username);
-        $response = UserController::apiCoderOfTheMonthList(new Request());
+        $response = UserController::apiCoderOfTheMonthList(new \OmegaUp\Request());
 
         $this->assertEquals($firstDayOfNextMonth->format('Y-m-d'), $response['coders'][0]['date']);
     }
@@ -270,37 +270,37 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         [$mentorUser, $mentorIdentity] = UserFactory::createMentorIdentity();
 
         $login = self::login($mentorUser);
-        $this->assertTrue(Authorization::isMentor($mentorIdentity));
+        $this->assertTrue(\OmegaUp\Authorization::isMentor($mentorIdentity));
 
         // Testing with an intermediate day of the month
-        $timestampTest = Time::get();
+        $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-15', $timestampTest);
         $timestampTest = strtotime($dateTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
 
         // Setting the date to the last day of the current month and testing mentor can choose the coder
         $date = new DateTime('now');
         $date->modify('last day of this month');
         $date->format('Y-m-d');
-        Time::setTimeForTesting($date->getTimestamp());
-        $timestampTest = Time::get();
+        \OmegaUp\Time::setTimeForTesting($date->getTimestamp());
+        $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertTrue($canChooseCoder);
 
         // Setting the date to the first day of the next month and testing mentor can not choose the coder
-        Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
-        $timestampTest = Time::get();
+        \OmegaUp\Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 24));
+        $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
 
         // Setting the date to the second day of the next month and testing mentor can not choose the coder
-        Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
-        $timestampTest = Time::get();
+        \OmegaUp\Time::setTimeForTesting($date->getTimestamp() + (60 * 60 * 48));
+        $timestampTest = \OmegaUp\Time::get();
         $dateTest = date('Y-m-d', $timestampTest);
-        $canChooseCoder = Authorization::canChooseCoder($timestampTest);
+        $canChooseCoder = \OmegaUp\Authorization::canChooseCoder($timestampTest);
         $this->assertFalse($canChooseCoder);
     }
 }

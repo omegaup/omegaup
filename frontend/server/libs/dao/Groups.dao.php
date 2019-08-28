@@ -1,41 +1,37 @@
 <?php
 
 require_once('base/Groups.dao.base.php');
-require_once('base/Groups.vo.base.php');
-/** Page-level DocBlock .
-  *
-  * @author alanboy
-  * @package docs
-  *
-  */
-/** Groups Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Groups }.
-  * @author alanboy
-  * @access public
-  * @package docs
-  *
-  */
+
+/**
+ * Groups Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Groups}.
+ *
+ * @author alanboy
+ * @access public
+ * @package docs
+ */
 class GroupsDAO extends GroupsDAOBase {
-    public static function findByAlias($alias) {
+    public static function findByAlias(string $alias) : ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
-        return new Groups($rs);
+        return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
     public static function SearchByName($name) {
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $args);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $ar = [];
         foreach ($rs as $row) {
-            array_push($ar, new Groups($row));
+            array_push($ar, new \OmegaUp\DAO\VO\Groups($row));
         }
         return $ar;
     }
@@ -43,11 +39,11 @@ class GroupsDAO extends GroupsDAOBase {
     public static function getByName($name) {
         $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, [$name]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {
             return null;
         }
-        return new Groups($rs);
+        return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
     /**
@@ -75,17 +71,17 @@ class GroupsDAO extends GroupsDAOBase {
                 g.group_id DESC;';
         $params = [
             $user_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $user_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
         ];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $groups = [];
         foreach ($rs as $row) {
-            array_push($groups, new Groups($row));
+            array_push($groups, new \OmegaUp\DAO\VO\Groups($row));
         }
         return $groups;
     }
@@ -93,7 +89,7 @@ class GroupsDAO extends GroupsDAOBase {
     /**
      * Gets a random sample (of up to size $n) of group members.
      */
-    final public static function sampleMembers(Groups $group, $n) {
+    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, $n) {
         $sql = '
             SELECT
                 i.*
@@ -109,8 +105,8 @@ class GroupsDAO extends GroupsDAOBase {
                 0, ?;';
 
         $identities = [];
-        foreach (MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
-            $identities[] = new Identities($row);
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
+            $identities[] = new \OmegaUp\DAO\VO\Identities($row);
         }
         return $identities;
     }

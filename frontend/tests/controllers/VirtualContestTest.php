@@ -18,13 +18,13 @@ class VirtualContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Let assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         // Create a new contestant
         $contestant = UserFactory::createUser();
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -54,8 +54,12 @@ class VirtualContestTest extends OmegaupTestCase {
         $this->assertEquals($originalContest->languages, $virtualContest->languages);
 
         // Assert virtual contest problenset problems
-        $originalProblems = ProblemsetProblemsDAO::getProblems($originalContest->problemset_id);
-        $virtualProblems = ProblemsetProblemsDAO::getProblems($virtualContest->problemset_id);
+        $originalProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+            $originalContest->problemset_id
+        );
+        $virtualProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+            $virtualContest->problemset_id
+        );
         // Number of problems must be equal
         $this->assertEquals(count($originalProblems), count($virtualProblems));
 
@@ -71,17 +75,17 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
 
-        Time::setTimeForTesting(Time::get() - 100);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() - 100);
 
         try {
             $response = ContestController::apiCreateVirtual($r);
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'originalContestHasNotEnded');
         }
     }
@@ -97,10 +101,10 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Lets assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -109,14 +113,14 @@ class VirtualContestTest extends OmegaupTestCase {
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiAddProblem(new Request([
+            ContestController::apiAddProblem(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'problem_alias' => $problemData['problem']->alias,
                 'points' => 100,
                 'auth_token' => $login->auth_token
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }
@@ -135,10 +139,10 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Lets assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -147,13 +151,13 @@ class VirtualContestTest extends OmegaupTestCase {
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiRemoveProblem(new Request([
+            ContestController::apiRemoveProblem(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'problem_alias' => $problemData['problem']->alias,
                 'auth_token' => $login->auth_token
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }
@@ -166,10 +170,10 @@ class VirtualContestTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Lets assume the original contest has been finished
-        Time::setTimeForTesting(Time::get() + 3600);
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         $login = self::login($contestant);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
         ]);
@@ -178,13 +182,13 @@ class VirtualContestTest extends OmegaupTestCase {
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiUpdate(new Request([
+            ContestController::apiUpdate(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'title' => 'testtest',
                 'auth_token' => $login->auth_token
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'forbiddenInVirtualContest');
         }
     }

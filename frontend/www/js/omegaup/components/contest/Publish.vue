@@ -25,25 +25,22 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {
-    data: Object,
-  },
-  data: function() {
-    return {
-      contest: this.data,
-      T: T,
-      admissionMode: this.data.admission_mode,
-    };
-  },
-  watch: {
-    contest: function() { this.admissionMode = this.contest.admission_mode;},
-  },
-  methods: {
-    onSubmit: function() { this.$parent.$emit('update-admission-mode', this);},
-  },
-};
+@Component({})
+export default class Publish extends Vue {
+  @Prop() data!: omegaup.Contest;
+
+  T = T;
+  contest = this.data;
+  admissionMode = this.data.admission_mode;
+
+  onSubmit(): void {
+    this.$parent.$emit('update-admission-mode', this);
+  }
+}
+
 </script>

@@ -1,5 +1,5 @@
 <?php
-    require_once('../../../server/bootstrap_smarty.php');
+require_once('../../../server/bootstrap_smarty.php');
 
 if ($_POST) {
     if (!in_array($_POST['language'], ['c', 'cpp', 'java'])) {
@@ -15,7 +15,7 @@ if ($_POST) {
         $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
         $smarty->assign('error_field', 'idl');
     } else {
-        $dirname = FileHandler::TempDir(sys_get_temp_dir(), 'libinteractive');
+        $dirname = \OmegaUp\FileHandler::TempDir(sys_get_temp_dir(), 'libinteractive');
         try {
             file_put_contents("{$dirname}/{$_POST['name']}.idl", $_POST['idl']);
             $args = ['/usr/bin/java', '-jar', '/usr/share/java/libinteractive.jar',
@@ -78,15 +78,16 @@ if ($_POST) {
                     header('Content-Type: application/zip');
                     header("Content-Disposition: attachment; filename={$_POST['name']}.zip");
                     readfile("{$dirname}/interactive.zip");
-                    FileHandler::DeleteDirRecursive($dirname);
+                    \OmegaUp\FileHandler::deleteDirRecursively($dirname);
                     die();
                 }
             }
         } catch (Exception $e) {
             $smarty->assign('error', $e);
         } finally {
-            FileHandler::DeleteDirRecursive($dirname);
+            \OmegaUp\FileHandler::deleteDirRecursively($dirname);
         }
     }
 }
-    $smarty->display('../../../templates/libinteractive.gen.tpl');
+
+$smarty->display('../../../templates/libinteractive.gen.tpl');

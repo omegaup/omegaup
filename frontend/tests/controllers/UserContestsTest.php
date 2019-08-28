@@ -18,7 +18,7 @@ class UserContestsTest extends OmegaupTestCase {
 
         // Call api
         $login = self::login($director);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiMyList($r);
@@ -64,7 +64,7 @@ class UserContestsTest extends OmegaupTestCase {
 
         // Call api
         $login = self::login($director);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
         $response = ContestController::apiAdminList($r);

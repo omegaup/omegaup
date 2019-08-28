@@ -1,14 +1,16 @@
 <?php
 
 include_once('base/Problemset_Identities.dao.base.php');
-include_once('base/Problemset_Identities.vo.base.php');
-/** ProblemsetIdentities Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link ProblemsetIdentities }.
-  * @access public
-  *
-  */
+
+/**
+ * ProblemsetIdentities Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\ProblemsetIdentities}.
+ *
+ * @access public
+ */
 class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     public static function checkProblemsetOpened(
         int $identityId,
@@ -18,12 +20,12 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
     }
 
     public static function checkAndSaveFirstTimeAccess(
-        Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         Object $container,
         bool $grantAccess = false,
         bool $shareUserInformation = false
-    ) : ProblemsetIdentities {
-        $currentTime = Time::get();
+    ) : \OmegaUp\DAO\VO\ProblemsetIdentities {
+        $currentTime = \OmegaUp\Time::get();
         $problemsetIdentity  = self::getByPK(
             $identity->identity_id,
             $container->problemset_id
@@ -31,9 +33,9 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
         if (is_null($problemsetIdentity)) {
             if (!$grantAccess) {
                 // User was not authorized to do this.
-                throw new ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
-            $problemsetIdentity = new ProblemsetIdentities([
+            $problemsetIdentity = new \OmegaUp\DAO\VO\ProblemsetIdentities([
                 'identity_id' => $identity->identity_id,
                 'problemset_id' => $container->problemset_id,
                 'score' => 0,
@@ -82,7 +84,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 WHERE
                     p.problemset_id = ?;';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
     }
 
     final public static function getIdentitiesByProblemset($problemset_id) {
@@ -109,7 +111,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             WHERE
                 pi.problemset_id = ?;';
 
-        return MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset_id]);
     }
 
     /**
@@ -118,7 +120,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
      *
      */
     public static function recalculateEndTimeForProblemsetIdentities(
-        Contests $contest
+        \OmegaUp\DAO\VO\Contests $contest
     ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
@@ -131,17 +133,17 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                     Problemset_Identities.`problemset_id` = ?
                     AND `access_time` IS NOT NULL;';
 
-        MySQLConnection::getInstance()->Execute($sql, [
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
             $contest->finish_time,
             $contest->window_length,
             $contest->problemset_id
         ]);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function recalculateEndTimeAsFinishTime(
-        Contests $contest
+        \OmegaUp\DAO\VO\Contests $contest
     ) : int {
         $sql = 'UPDATE
                     `Problemset_Identities`
@@ -150,12 +152,12 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 WHERE
                     `problemset_id` = ?;';
 
-        MySQLConnection::getInstance()->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$contest->finish_time, $contest->problemset_id]);
 
-        return MySQLConnection::getInstance()->Affected_Rows();
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    public static function updatePrivacyStatementConsent(ProblemsetIdentities $problemset_identity) {
+    public static function updatePrivacyStatementConsent(\OmegaUp\DAO\VO\ProblemsetIdentities $problemset_identity) {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
@@ -169,7 +171,7 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
             $problemset_identity->problemset_id,
         ];
 
-        MySQLConnection::getInstance()->Execute($sql, $params);
-        return MySQLConnection::getInstance()->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }

@@ -13,7 +13,7 @@ class CreateUserTest extends OmegaupTestCase {
     public function testCreateUserPositive() {
         // Inflate request
         UserController::$permissionKey = uniqid();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
@@ -40,7 +40,7 @@ class CreateUserTest extends OmegaupTestCase {
     public function testCreateUserIdempotent() {
         // Inflate request
         UserController::$permissionKey = uniqid();
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
@@ -60,7 +60,7 @@ class CreateUserTest extends OmegaupTestCase {
         try {
             UserController::apiCreate($r);
             $this->fail('User creation should have failed');
-        } catch (DuplicatedEntryInDatabaseException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('mailInUse', $e->getMessage());
         }
     }
@@ -68,13 +68,13 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Try to create 2 users with same username, should fail.
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicatedUsernames() {
         UserController::$permissionKey = uniqid();
 
         // Inflate request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
@@ -94,13 +94,13 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Test create 2 users with same email (diff username) should fail
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicatedEmails() {
         UserController::$permissionKey = uniqid();
 
         // Inflate request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
@@ -120,13 +120,13 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Creating a user without password
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoPassword() {
         UserController::$permissionKey = uniqid();
 
         // Inflate request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
             'permission_key' => UserController::$permissionKey
@@ -139,13 +139,13 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Creating a user without email
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoEmail() {
         UserController::$permissionKey = uniqid();
 
         // Inflate request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'permission_key' => UserController::$permissionKey
@@ -158,13 +158,13 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Create a user without username...
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoUser() {
         UserController::$permissionKey = uniqid();
 
         // Inflate request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
             'permission_key' => UserController::$permissionKey
@@ -203,13 +203,13 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Tests usernames with invalid chars. Exception is expected
      *
-     * @expectedException InvalidParameterException
+     * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUsernameWithInvalidChars() {
         UserController::$permissionKey = uniqid();
 
         // Inflate request
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'username' => 'ínvalid username',
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
@@ -229,7 +229,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call API
         try {
-            $response = UserController::apiCreate(new Request([
+            $response = UserController::apiCreate(new \OmegaUp\Request([
                 'username' => 'invalid:username',
                 'password' => Utils::CreateRandomString(),
                 'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
@@ -237,7 +237,7 @@ class CreateUserTest extends OmegaupTestCase {
             ]));
 
             $this->fail('Expected because of the invalid group name');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK
             $this->assertEquals('parameterInvalidAlias', $e->getMessage());
         }
@@ -255,7 +255,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $adminLogin = self::login($admin);
-        $response = UserController::apiVerifyEmail(new Request([
+        $response = UserController::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $user->username,
         ]));
@@ -271,7 +271,7 @@ class CreateUserTest extends OmegaupTestCase {
      * Admin can verify users only with username
      * Testing invalid username
      *
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testUsernameVerificationByAdminInvalidUsername() {
         // Admin will verify $user
@@ -279,7 +279,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $adminLogin = self::login($admin);
-        $response = UserController::apiVerifyEmail(new Request([
+        $response = UserController::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => Utils::CreateRandomString(),
         ]));
@@ -288,7 +288,7 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Normal user trying to verify herself through the admin path
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testUsernameVerificationByAdminNotAdmin() {
         // User to be verified
@@ -299,7 +299,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $login = self::login($user2);
-        $response = UserController::apiVerifyEmail(new Request([
+        $response = UserController::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
         ]));
@@ -308,13 +308,13 @@ class CreateUserTest extends OmegaupTestCase {
     /**
      * Normal user trying to backfill mailing list
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testMailingListBackfillNotAdmin() {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $response = UserController::apiMailingListBackfill(new Request([
+        $response = UserController::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
     }
@@ -334,7 +334,7 @@ class CreateUserTest extends OmegaupTestCase {
         UserController::$urlHelper = $urlHelperMock;
 
         $adminLogin = self::login(UserFactory::createAdminUser());
-        $response = UserController::apiMailingListBackfill(new Request([
+        $response = UserController::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
@@ -356,7 +356,7 @@ class CreateUserTest extends OmegaupTestCase {
         UserController::$urlHelper = $urlHelperMock;
 
         $adminLogin = self::login(UserFactory::createAdminUser());
-        $response = UserController::apiMailingListBackfill(new Request([
+        $response = UserController::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 

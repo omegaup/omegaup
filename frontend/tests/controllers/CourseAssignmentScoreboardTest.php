@@ -20,7 +20,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         for ($i = 0; $i < $problemsInAssignment; $i++) {
             $problemData = ProblemsFactory::createProblem();
 
-            CourseController::apiAddProblem(new Request([
+            CourseController::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
@@ -46,7 +46,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiAssignmentScoreboard(new Request([
+        $response = CourseController::apiAssignmentScoreboard(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course' => $courseData['course_alias'],
             'assignment' => $courseData['assignment_alias']
@@ -99,7 +99,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
                 $adminLogin
             );
 
-            CourseController::apiAddProblem(new Request([
+            CourseController::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
@@ -128,7 +128,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         );
 
         // Call API
-        $response = ProblemsetController::apiScoreboardEvents(new Request([
+        $response = ProblemsetController::apiScoreboardEvents(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'problemset_id' => $courseData['problemset_id'],
         ]));
