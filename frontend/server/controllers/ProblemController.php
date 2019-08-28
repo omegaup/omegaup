@@ -1597,11 +1597,7 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
-            return [
-                'status' => 'ok',
-                'published' => '',
-                'log' => [],
-            ];
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $privateTreeMapping = [];

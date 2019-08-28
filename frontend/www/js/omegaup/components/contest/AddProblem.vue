@@ -162,7 +162,10 @@ export default {
               }
             }
           })
-          .fail(UI.apiError);
+          .fail(function() {
+            self.versionLog = [];
+            self.selectedRevision = self.publishedRevision = null;
+          });
     },
   },
   components: {
