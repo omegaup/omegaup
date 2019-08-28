@@ -1,4 +1,10 @@
 declare namespace omegaup {
+  enum AdmissionMode {
+    Private = 'private',
+    Registration = 'registration',
+    Public = 'public',
+  }
+
   enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',
@@ -72,7 +78,7 @@ declare namespace omegaup {
     window_length?: number;
     start_time?: Date;
     finish_time?: Date;
-    admission_mode?: string;
+    admission_mode?: omegaup.AdmissionMode;
     contestant_must_register?: boolean;
     admin?: boolean;
     available_languages?: omegaup.Languages;
@@ -108,9 +114,9 @@ declare namespace omegaup {
   }
 
   export interface ContestGroupAdmin {
-    role: string;
-    name: string;
-    alias: string;
+    role?: string;
+    name?: string;
+    alias?: string;
   }
 
   interface ContestResult {
@@ -199,7 +205,7 @@ declare namespace omegaup {
 
   export interface IdentityContest {
     username: string;
-    end_time: Date;
+    end_time?: Date;
     access_time?: Date;
     country_id?: string;
   }
