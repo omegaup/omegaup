@@ -22,13 +22,13 @@ OmegaUp.on('ready', function() {
           submit: function(ev) {
             let contents = {};
 
-            if (!!ev.difficulty) {
+            if (ev.difficulty !== '') {
               contents.difficulty = Number.parseInt(ev.difficulty, 10);
             }
             if (ev.tags.length > 0) {
               contents.tags = ev.tags;
             }
-            if (!!ev.quality) {
+            if (ev.quality !== '') {
               contents.quality = Number.parseInt(ev.quality, 10);
             }
             API.QualityNomination.create({
