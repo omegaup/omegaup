@@ -47,7 +47,11 @@
       <div class="tab-pane active problems"
            v-if="showTab === 'problems'">
         <omegaup-contest-add-problem v-bind:contest-alias="contest.alias"
-             v-bind:data="problems"></omegaup-contest-add-problem>
+             v-bind:data="problems"
+             v-on:emit-add-problem="onChildAddProblem"
+             v-on:emit-change-alias="onChildChangeAlias"
+             v-on:emit-remove-problem="onChildRemoveProblem"
+             v-on:emit-runs-diff="onChildRunsDiff"></omegaup-contest-add-problem>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'publish'">
@@ -61,8 +65,11 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
-        <omegaup-contest-admins v-bind:data="admins"></omegaup-contest-admins>
-        <omegaup-contest-group-admins v-bind:data="groupAdmins"></omegaup-contest-group-admins>
+        <omegaup-contest-admins v-bind:data="admins"
+             v-on:emit-add-admin="onChildAddAdmin"
+             v-on:emit-remove-admin="onChildRemoveAdmin"></omegaup-contest-admins>
+             <omegaup-contest-group-admins v-bind:data=
+             "groupAdmins"></omegaup-contest-group-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'links'">
@@ -70,7 +77,7 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'clone'">
-        <omegaup-contest-clone></omegaup-contest-clone>
+        <omegaup-contest-clone v-on:emit-clone="onChildClone"></omegaup-contest-clone>
       </div>
     </div>
   </div>
@@ -100,6 +107,29 @@ interface ContestEdit {
   users: omegaup.IdentityContest[];
 }
 
+interface AddProblemComponent {
+  order: number;
+  alias: string;
+  points: number;
+  selectedRevision: omegaup.Commit;
+  publishedRevision: omegaup.Commit;
+  selected: omegaup.Problem;
+  versionLog: omegaup.Commit[];
+  problems: omegaup.Problem[];
+}
+
+interface AddAdminComponent {
+  user: string;
+  selected: omegaup.User;
+}
+
+interface CloneComponent {
+  title: string;
+  alias: string;
+  description: string;
+  start_time: Date;
+}
+
 @Component({
   components: {
     'omegaup-contest-add-problem': contest_AddProblem,
@@ -126,6 +156,42 @@ export default class Edit extends Vue {
   requests = this.data.requests;
   admins = this.data.admins;
   groupAdmins = this.data.groupAdmins;
+
+  onChildAddProblem(addProblemComponent: AddProblemComponent): void {
+    this.$emit('add-problem', addProblemComponent);
+  }
+
+  onChildRemoveProblem(addProblemComponent: AddProblemComponent): void {
+    this.$emit('remove-problem', addProblemComponent);
+  }
+
+  onChildRunsDiff(
+    addProblemComponent: AddProblemComponent,
+    versions: omegaup.Commit[],
+    selectedCommit: omegaup.Commit,
+  ): void {
+    this.$emit('runs-diff', addProblemComponent, versions, selectedCommit);
+  }
+
+  onChildChangeAlias(
+    addProblemComponent: AddProblemComponent,
+    newProblemAlias: string,
+  ): void {
+    console.log(newProblemAlias);
+    this.$emit('get-versions', newProblemAlias, addProblemComponent);
+  }
+
+  onChildAddAdmin(addAdminComponent: AddAdminComponent): void {
+    this.$emit('add-admin', addAdminComponent);
+  }
+
+  onChildRemoveAdmin(addAdminComponent: AddAdminComponent): void {
+    this.$emit('remove-admin', addAdminComponent);
+  }
+
+  onChildClone(cloneComponent: CloneComponent): void {
+    this.$emit('clone-contest', cloneComponent);
+  }
 }
 
 </script>

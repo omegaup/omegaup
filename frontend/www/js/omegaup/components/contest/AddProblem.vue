@@ -101,7 +101,7 @@ export default class AddProblem extends Vue {
   selectedRevision = emptyCommit;
 
   onSubmit(): void {
-    this.$parent.$emit('add-problem', this);
+    this.$emit('emit-add-problem', this);
   }
 
   onEdit(problem: omegaup.Problem): void {
@@ -112,7 +112,7 @@ export default class AddProblem extends Vue {
 
   onRemove(problem: omegaup.Problem): void {
     this.selected = problem;
-    this.$parent.$emit('remove-problem', this);
+    this.$emit('emit-remove-problem', this);
   }
 
   onRunsDiff(versions: omegaup.Commit[], selectedCommit: omegaup.Commit): void {
@@ -126,7 +126,7 @@ export default class AddProblem extends Vue {
     if (!found) {
       return;
     }
-    this.$parent.$emit('runs-diff', this, versions, selectedCommit);
+    this.$emit('emit-runs-diff', this, versions, selectedCommit);
   }
 
   get addProblemButtonLabel(): string {
@@ -147,12 +147,14 @@ export default class AddProblem extends Vue {
 
   @Watch('alias')
   onAliasChange(newProblemAlias: string) {
+    console.log(newProblemAlias);
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision = emptyCommit;
       return;
     }
-    this.$parent.$emit('get-versions', newProblemAlias, this);
+    console.log(this);
+    this.$emit('emit-change-alias', this, newProblemAlias);
   }
 }
 

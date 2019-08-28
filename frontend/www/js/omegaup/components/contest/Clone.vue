@@ -66,7 +66,7 @@ export default class Clone extends Vue {
   startTime = new Date();
 
   onSubmit() {
-    this.$parent.$emit('clone-contest', this);
+    this.$emit('emit-clone', this);
   }
 }
 
