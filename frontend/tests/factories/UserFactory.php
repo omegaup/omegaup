@@ -177,7 +177,7 @@ class UserFactory {
     public static function createAdminUser($params = null) {
         $user = self::createUser($params);
 
-        self::addSystemRole($user, Authorization::ADMIN_ROLE);
+        self::addSystemRole($user, \OmegaUp\Authorization::ADMIN_ROLE);
 
         return $user;
     }
@@ -243,7 +243,7 @@ class UserFactory {
         UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $user->user_id,
             'role_id' => $role_id,
-            'acl_id' => Authorization::SYSTEM_ACL,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
     }
 
@@ -254,7 +254,7 @@ class UserFactory {
      */
     public static function addMentorRole(\OmegaUp\DAO\VO\Identities $identity) {
         $mentor_group = GroupsDAO::findByAlias(
-            Authorization::MENTOR_GROUP_ALIAS
+            \OmegaUp\Authorization::MENTOR_GROUP_ALIAS
         );
 
         GroupsIdentitiesDao::create(new \OmegaUp\DAO\VO\GroupsIdentities([
@@ -270,7 +270,7 @@ class UserFactory {
      */
     public static function addSupportRole(\OmegaUp\DAO\VO\Identities $identity) {
         $support_group = GroupsDAO::findByAlias(
-            Authorization::SUPPORT_GROUP_ALIAS
+            \OmegaUp\Authorization::SUPPORT_GROUP_ALIAS
         );
 
         GroupsIdentitiesDao::create(new \OmegaUp\DAO\VO\GroupsIdentities([
@@ -286,7 +286,7 @@ class UserFactory {
      */
     public static function addGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity) {
         $groupIdentityCreator = GroupsDAO::findByAlias(
-            Authorization::IDENTITY_CREATOR_GROUP_ALIAS
+            \OmegaUp\Authorization::IDENTITY_CREATOR_GROUP_ALIAS
         );
 
         GroupsIdentitiesDao::create(new \OmegaUp\DAO\VO\GroupsIdentities([

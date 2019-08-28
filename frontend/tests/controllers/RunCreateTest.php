@@ -824,7 +824,7 @@ class RunCreateTest extends OmegaupTestCase {
         $contestantIdentity = IdentityController::resolveIdentity(
             $contestant->username
         );
-        $this->assertFalse(Authorization::isProblemAdmin(
+        $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $contestantIdentity,
             $problemData['problem']
         ));

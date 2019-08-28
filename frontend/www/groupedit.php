@@ -10,7 +10,7 @@ if (is_null($session['identity'])) {
 }
 
 $is_organizer = $experiments->isEnabled(\OmegaUp\Experiments::IDENTITIES) &&
-    Authorization::canCreateGroupIdentities($session['identity']);
+    \OmegaUp\Authorization::canCreateGroupIdentities($session['identity']);
 $smarty->assign('IS_ORGANIZER', $is_organizer);
 $smarty->assign('payload', [
     'countries' => CountriesDAO::getAll(null, 100, 'name'),

@@ -23,15 +23,15 @@ class GroupRolesDAO extends GroupRolesDAOBase {
             WHERE
                 gr.role_id = ? AND gr.acl_id IN (?, ?);';
         $params = [
-            Authorization::ADMIN_ROLE,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
 
         $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         for ($i = 0; $i < count($admins); $i++) {
-            if ($admins[$i]['acl'] == Authorization::SYSTEM_ACL) {
+            if ($admins[$i]['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
                 $admins[$i]['role'] = 'site-admin';
             } else {
                 $admins[$i]['role'] = 'admin';
@@ -55,7 +55,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
         $params = [
             $identity_id,
             $role_id,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::SYSTEM_ACL,
             $acl_id,
         ];
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
@@ -73,7 +73,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
                 gi.identity_id = ? AND gr.role_id = ? AND gr.acl_id = ?;';
         $params = [
             $identity_id,
-            Authorization::CONTESTANT_ROLE,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
             $acl_id,
         ];
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
@@ -105,7 +105,7 @@ class GroupRolesDAO extends GroupRolesDAOBase {
                 gi.identity_id = ? AND gr.acl_id = ?;';
         $params = [
             $identity_id,
-            Authorization::SYSTEM_ACL,
+            \OmegaUp\Authorization::SYSTEM_ACL,
         ];
 
         $roles = [];

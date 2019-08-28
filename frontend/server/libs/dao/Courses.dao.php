@@ -232,9 +232,9 @@ class CoursesDAO extends CoursesDAOBase {
                 ?, ?';
         $params = [
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
             (int)$offset,
             (int)$pageSize,

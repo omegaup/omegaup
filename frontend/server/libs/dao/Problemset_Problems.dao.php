@@ -346,7 +346,7 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
             $problemsets = array_filter(
                 $problemsets,
                 function (\OmegaUp\DAO\VO\Problemsets $problemset) use ($identity) {
-                    return Authorization::isAdmin($identity, $problemset);
+                    return \OmegaUp\Authorization::isAdmin($identity, $problemset);
                 }
             );
 

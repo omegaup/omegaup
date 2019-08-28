@@ -237,10 +237,10 @@ class ProblemsDAO extends ProblemsDAOBase {
                 ) gr ON p.acl_id = gr.acl_id ' . $languageJoin;
             $args[] = $identityId;
             $args[] = $userId;
-            $args[] = Authorization::ADMIN_ROLE;
+            $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
             $args[] = $identityId;
             $args[] = $identityId;
-            $args[] = Authorization::ADMIN_ROLE;
+            $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
 
             array_push(
                 $clauses,
@@ -638,7 +638,12 @@ class ProblemsDAO extends ProblemsDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
-    public static function getExplicitAdminEmails(\OmegaUp\DAO\VO\Problems $problem) {
+    /**
+     * @return string[]
+     */
+    public static function getExplicitAdminEmails(
+        \OmegaUp\DAO\VO\Problems $problem
+    ) : array {
         $sql = '
             SELECT DISTINCT
                 e.email
@@ -665,16 +670,19 @@ class ProblemsDAO extends ProblemsDAOBase {
         ';
 
         $params = [$problem->problem_id];
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
+        /** @var string[] */
         $result = [];
-        foreach ($rs as $r) {
-            $result[] = $r['email'];
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $row) {
+            $result[] = strval($row['email']);
         }
 
         return $result;
     }
 
+    /**
+     * @return null|array{name: string, email: string}
+     */
     public static function getAdminUser(\OmegaUp\DAO\VO\Problems $problem) {
         $sql = '
             SELECT DISTINCT
@@ -700,14 +708,18 @@ class ProblemsDAO extends ProblemsDAOBase {
                1;
         ';
         $params = [$problem->acl_id];
+        /** @var null|array{email?: string, name?: string} */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        if (!array_key_exists('name', $row)) {
-                return null;
+        if (is_null($row)
+            || !array_key_exists('name', $row)
+            || !array_key_exists('email', $row)
+        ) {
+            return null;
         }
 
         return [
-            'name' => $row['name'],
-            'email' => $row['email']
+            'name' => strval($row['name']),
+            'email' => strval($row['email']),
         ];
     }
 
@@ -750,9 +762,9 @@ class ProblemsDAO extends ProblemsDAOBase {
                 ?, ?';
         $params = [
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
             ProblemController::VISIBILITY_DELETED,
             (int)$offset,

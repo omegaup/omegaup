@@ -82,7 +82,7 @@ class GroupController extends Controller {
             return null;
         }
 
-        if (!Authorization::isGroupAdmin($identity, $group)) {
+        if (!\OmegaUp\Authorization::isGroupAdmin($identity, $group)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         return $group;
@@ -110,6 +110,15 @@ class GroupController extends Controller {
         self::authenticateRequest($r);
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+
+        if (!is_null(GroupsIdentitiesDAO::getByPK(
+            $group->group_id,
+            $resolvedIdentity->identity_id
+        ))) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'identityInGroup'
+            );
+        }
 
         GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $group->group_id,
