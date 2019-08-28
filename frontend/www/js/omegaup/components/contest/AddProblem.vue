@@ -162,10 +162,7 @@ export default {
               }
             }
           })
-          .fail(function() {
-            self.versionLog = [];
-            self.selectedRevision = self.publishedRevision = null;
-          });
+          .fail(UI.apiError);
     },
   },
   components: {

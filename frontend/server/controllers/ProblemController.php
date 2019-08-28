@@ -1596,8 +1596,25 @@ class ProblemController extends Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
+        $masterLog = [];
         if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            $entryLog = [
+                'commit' => $problem->commit,
+                'tree' => null,
+                'author' => [
+                    'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
+                ],
+                'committer' => [
+                    'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
+                ],
+                'version' => $problem->current_version,
+            ];
+            array_push($masterLog, $entryLog);
+            return [
+                'status' => 'ok',
+                'published' => $problem->commit,
+                'log' => $masterLog,
+            ];
         }
 
         $privateTreeMapping = [];
@@ -1605,7 +1622,6 @@ class ProblemController extends Controller {
             $privateTreeMapping[$logEntry['commit']] = $logEntry['tree'];
         }
 
-        $masterLog = [];
         foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
             if (count($logEntry['parents']) < 3) {
                 // Master commits always have 3 or 4 parents. If they have
