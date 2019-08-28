@@ -1,5 +1,5 @@
 declare namespace omegaup {
-  enum RequestStatements {
+  enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',
     Required = 'required',
@@ -91,7 +91,7 @@ declare namespace omegaup {
     points_decay_factor?: number;
     problems?: omegaup.Problem[];
     problemset_id?: number;
-    requests_user_information?: omegaup.RequestStatements;
+    requests_user_information?: omegaup.RequestsUserInformation;
     rerun_id?: number;
     scoreboard?: number;
     scoreboard_url?: string;
@@ -128,7 +128,7 @@ declare namespace omegaup {
     is_admin: boolean;
     name: string;
     public: boolean;
-    requests_user_information: omegaup.RequestStatements;
+    requests_user_information: omegaup.RequestsUserInformation;
     school_id?: number;
     school_name: string;
     show_scoreboard: boolean;
