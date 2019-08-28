@@ -33,25 +33,24 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {
-    groups: Array,
-  },
-  data: function() {
-    return {
-      T: T,
-    };
-  },
-  methods: {
-    groupScoreboardUrl: function(group) {
-      return '/group/' + group.alias + '/edit/#scoreboards';
-    },
-    groupEditUrl: function(group) {
-      return '/group/' + group.alias + '/edit/#edit';
-    },
-  },
-};
+@Component({})
+export default class GroupList extends Vue {
+  @Prop() groups!: omegaup.Group[];
+
+  T = T;
+
+  groupScoreboardUrl(group: omegaup.Group): string {
+    return `/group/${group.alias}/edit/#scoreboards`;
+  }
+
+  groupEditUrl(group: omegaup.Group): string {
+    return `/group/${group.alias}/edit/#edit`;
+  }
+}
+
 </script>

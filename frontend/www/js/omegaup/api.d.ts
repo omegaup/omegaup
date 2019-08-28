@@ -186,6 +186,13 @@ declare namespace omegaup {
     group: omegaup.DetailsGroup[];
   }
 
+  export interface Group {
+    alias: string;
+    create_time: Date;
+    description: string;
+    name: string;
+  }
+
   export interface Identity extends User {
     school: string;
     school_name?: string;

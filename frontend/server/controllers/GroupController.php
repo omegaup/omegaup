@@ -166,14 +166,10 @@ class GroupController extends Controller {
             $r->identity->identity_id
         );
 
-        $response = [
+        return [
             'status' => 'ok',
-            'groups' => [],
+            'groups' => $groups,
         ];
-        foreach ($groups as $group) {
-            $response['groups'][] = $group->asArray();
-        }
-        return $response;
     }
 
     /**

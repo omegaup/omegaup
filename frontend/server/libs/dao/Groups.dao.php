@@ -52,7 +52,11 @@ class GroupsDAO extends GroupsDAOBase {
     final public static function getAllGroupsAdminedByUser($user_id, $identity_id) {
         $sql = '
             SELECT
-                DISTINCT g.*
+                DISTINCT g.alias,
+                g.create_time,
+                g.description,
+                g.name,
+                g.group_id
             FROM
                 Groups g
             INNER JOIN
@@ -69,18 +73,18 @@ class GroupsDAO extends GroupsDAOBase {
                 (gr.role_id = ? AND gi.identity_id = ?)
             ORDER BY
                 g.group_id DESC;';
-        $params = [
-            $user_id,
-            \OmegaUp\Authorization::ADMIN_ROLE,
-            $user_id,
-            \OmegaUp\Authorization::ADMIN_ROLE,
-            $identity_id,
-        ];
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
+                $user_id,
+                \OmegaUp\Authorization::ADMIN_ROLE,
+                $user_id,
+                \OmegaUp\Authorization::ADMIN_ROLE,
+                $identity_id,
+            ]);
 
         $groups = [];
         foreach ($rs as $row) {
+            unset($row['group_id']);
             array_push($groups, new \OmegaUp\DAO\VO\Groups($row));
         }
         return $groups;
