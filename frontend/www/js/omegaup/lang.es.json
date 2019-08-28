@@ -372,6 +372,7 @@
 	"groupsInvalidCsv": "Favor de cargar un archivo CSV v\u00e1lido.",
 	"groupsUploadCsvFile": "Carga el archivo CSV",
 	"identityAlreadyAssociated": "Ya cuentas con una identidad asociada con el mimso grupo.",
+	"identityInGroup": "La identidad ya est\u00e1 asociada al grupo.",
 	"incompatibleArgs": "Parametros no se pueden utilizar al mismo tiempo",
 	"index": "Coder del mes",
 	"interviewCreateNew": "Crear nueva entrevista",

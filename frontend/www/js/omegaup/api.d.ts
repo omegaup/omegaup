@@ -1,4 +1,10 @@
 declare namespace omegaup {
+  enum RequestsUserInformation {
+    No = 'no',
+    Optional = 'optional',
+    Required = 'required',
+  }
+
   export interface Assignment {
     alias: string;
     assignment_type: string,
@@ -85,7 +91,7 @@ declare namespace omegaup {
     points_decay_factor?: number;
     problems?: omegaup.Problem[];
     problemset_id?: number;
-    requests_user_information?: string;
+    requests_user_information?: omegaup.RequestsUserInformation;
     rerun_id?: number;
     scoreboard?: number;
     scoreboard_url?: string;
@@ -122,7 +128,7 @@ declare namespace omegaup {
     is_admin: boolean;
     name: string;
     public: boolean;
-    requests_user_information: string;
+    requests_user_information: omegaup.RequestsUserInformation;
     school_id?: number;
     school_name: string;
     show_scoreboard: boolean;
@@ -139,6 +145,23 @@ declare namespace omegaup {
     role: string;
     name: string;
     alias: string;
+  }
+
+  export interface CourseProblem extends Problem {
+    commit: string;
+    letter: string;
+    order: number;
+    runs: CourseProblemRun[];
+    submissions: number;
+    visits: number;
+  }
+
+  export interface CourseProblemRun {
+    penalty: number;
+    score: number;
+    source: string;
+    time: string;
+    verdict: string;
   }
 
   interface CourseProgress {
@@ -165,9 +188,13 @@ declare namespace omegaup {
 
   export interface Identity extends User {
     school: string;
+    school_name?: string;
+    gender?: string;
+    password?: string;
     school_id: number;
     country_id: string;
     state_id: string;
+    classname: string;
   }
 
   export interface IdentityContest {

@@ -21,7 +21,6 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-course-viewstudent', {
         props: {
-          T: T,
           assignments: payload.course.assignments,
           course: payload.course,
           initialStudent: initialStudent,
