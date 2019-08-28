@@ -160,7 +160,7 @@ OmegaUp.on('ready', function() {
     el: '#assignments div.list',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentlist', {
-        props: {T: T, assignments: this.assignments, courseAlias: courseAlias},
+        props: {assignments: this.assignments, courseAlias: courseAlias},
         on: {
           'edit': function(assignment) {
             assignmentDetails.show = true;
@@ -225,12 +225,8 @@ OmegaUp.on('ready', function() {
     el: '#assignments div.form',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentdetails', {
-        props: {
-          T: T,
-          show: this.show,
-          update: this.update,
-          assignment: this.assignment
-        },
+        props:
+            {show: this.show, update: this.update, assignment: this.assignment},
         on: {
           submit: function(ev) {
             if (ev.update) {
@@ -297,11 +293,11 @@ OmegaUp.on('ready', function() {
     el: '#edit div',
     render: function(createElement) {
       return createElement('omegaup-course-details', {
-        props: {T: T, update: true, course: this.course},
+        props: {update: true, course: this.course},
         on: {
           submit: function(ev) {
             var schoolIdDeferred = $.Deferred();
-            if (ev.school_id) {
+            if (ev.school_id !== undefined) {
               schoolIdDeferred.resolve(ev.school_id);
             } else if (ev.school_name) {
               API.School.create({name: ev.school_name})
@@ -363,7 +359,6 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-course-problemlist', {
         props: {
-          T: T,
           assignments: this.assignments,
           assignmentProblems: this.assignmentProblems,
           taggedProblems: this.taggedProblems
@@ -440,7 +435,6 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-course-addstudents', {
         props: {
-          T: T,
           students: this.students,
           courseAlias: courseAlias,
         },

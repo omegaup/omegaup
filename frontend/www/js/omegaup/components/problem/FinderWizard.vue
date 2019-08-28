@@ -164,11 +164,74 @@ interface Priority {
   text: string;
 }
 
+<<<<<<< HEAD
 interface TagsObject {
   [key: string]: string;
 }
 
 @Component({
+=======
+export default {
+  props: {
+    possibleTags: Array,
+  },
+  data: function() {
+    return {
+      T, karel: false, selectedTags:[], difficultyRange:[0, 4],
+          sliderMarks:
+              {
+                '0': T.qualityFormDifficultyVeryEasy,
+                '1': T.qualityFormDifficultyEasy,
+                '2': T.qualityFormDifficultyMedium,
+                '3': T.qualityFormDifficultyHard,
+                '4': T.qualityFormDifficultyVeryHard,
+              },
+          selectedPriority: 'quality', priorities:[
+            {
+              type: 'quality',
+              text: T.wordsQuality,
+            },
+            {
+              type: 'points',
+              text: T.wordsPointsForRank,
+            },
+            {
+              type: 'submissions',
+              text: T.wizardPriorityPopularity,
+            },
+          ],
+    }
+  },
+  computed: {
+    tagsObject: function() {
+      const self = this;
+      const singleTagsObject = {};
+      self.possibleTags.forEach(tagObject => singleTagsObject[tagObject.name] =
+                                    tagObject.name);
+      return singleTagsObject;
+    },
+  },
+  methods: {
+    searchProblems: function() {
+      const self = this;
+      // Build query parameters
+      let queryParameters = {
+        'some_tags': true,
+        'min_difficulty': self.difficultyRange[0],
+        'max_difficulty': self.difficultyRange[1],
+        'order_by': self.selectedPriority,
+        'mode': 'desc'
+      };
+      if (self.karel) {
+        queryParameters['only_karel'] = true;
+      }
+      if (self.selectedTags.length > 0) {
+        queryParameters.tag = self.selectedTags;
+      }
+      self.$emit('search-problems', queryParameters);
+    },
+  },
+>>>>>>> master
   components: {
     FormWizard,
     TabContent,

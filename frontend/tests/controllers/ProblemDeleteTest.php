@@ -10,7 +10,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
     /**
      * Tests problem with submissions in a contest or a course can't be deleted anymore
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testProblemCanNotBeDeletedAfterSubmissionsInACourseOrContest() {
         // Get a user
@@ -40,7 +40,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
 
         // Call API
-        $response = ProblemController::apiDelete(new Request([
+        $response = ProblemController::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
@@ -67,13 +67,13 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
 
         // Call API to delete a problem
-        ProblemController::apiDelete(new Request([
+        ProblemController::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $deletedProblemData['request']['problem_alias'],
         ]));
 
         // Get problems list
-        $response = ProblemController::apiList(new Request([]));
+        $response = ProblemController::apiList(new \OmegaUp\Request([]));
 
         // Asserting deleted problem is not in the list
         foreach ($response['results'] as $key => $problem) {
@@ -111,13 +111,13 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
 
         // Call API to delete a problem
-        ProblemController::apiDelete(new Request([
+        ProblemController::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $deletedProblemData['request']['problem_alias'],
         ]));
 
         // Get problems list
-        $response = ProblemController::apiList(new Request([
+        $response = ProblemController::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -137,7 +137,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $this->assertTrue($problemIsInTheList);
 
         // Get My admin problems list
-        $response = ProblemController::apiAdminList(new Request([
+        $response = ProblemController::apiAdminList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -184,13 +184,13 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $login = self::login($adminLogin);
 
         // Call API to delete a problem
-        ProblemController::apiDelete(new Request([
+        ProblemController::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $deletedProblemData['request']['problem_alias'],
         ]));
 
         // Get problems list
-        $response = ProblemController::apiList(new Request([
+        $response = ProblemController::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -210,7 +210,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $this->assertTrue($problemIsInTheList);
 
         // Get My admin problems list
-        $response = ProblemController::apiAdminList(new Request([
+        $response = ProblemController::apiAdminList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 

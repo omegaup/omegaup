@@ -1,9 +1,10 @@
 <?php
-// Set default time
-date_default_timezone_set('UTC');
-
 //set paths
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . __DIR__);
+require_once 'autoload.php';
+
+// Set default time
+date_default_timezone_set('UTC');
 
 if (!(defined('IS_TEST') && IS_TEST === true)) {
     if (!is_file(__DIR__ . '/config.php')) { ?>
@@ -82,8 +83,8 @@ header('X-Frame-Options: DENY');
 require_once('libs/third_party/log4php/src/main/php/Logger.php');
 
 // Load DAOs and controllers lazily.
-require_once('libs/dao/Estructura.php');
-spl_autoload_register(function ($classname) {
+require_once('controllers/Controller.php');
+spl_autoload_register(function (string $classname) : void {
     $controllerSuffix = 'Controller';
     $daoSuffix = 'DAO';
     if ($classname == 'QualitynominationController') {
@@ -114,21 +115,8 @@ spl_autoload_register(function ($classname) {
     }
 });
 
-require_once('libs/ApiException.php');
-require_once('libs/ApiUtils.php');
-require_once('libs/Authorization.php');
-require_once('libs/Broadcaster.php');
-require_once('libs/Cache.php');
-require_once('libs/Database.php');
-require_once('libs/Experiments.php');
-require_once('libs/Grader.php');
-require_once('libs/Pager.php');
-require_once('libs/Request.php');
 require_once('libs/Scoreboard.php');
 require_once('libs/SecurityTools.php');
-require_once('libs/SessionManager.php');
-require_once('libs/Time.php');
-require_once('libs/Validators.php');
 
 Logger::configure([
     'rootLogger' => [
@@ -153,7 +141,7 @@ Logger::configure([
                 'params' => [
                     'conversionPattern' => (
                         '%date [%level]: ' .
-                        Request::requestId() .
+                        \OmegaUp\Request::requestId() .
                         ' %server{REQUEST_URI} %message (%F:%L) %newline'
                     ),
                 ],
@@ -193,8 +181,8 @@ Logger::configure([
 ]);
 $log = Logger::getLogger('bootstrap');
 
-$session = SessionController::apiCurrentSession(new Request($_REQUEST))['session'];
-$experiments = new Experiments(
+$session = SessionController::apiCurrentSession(new \OmegaUp\Request($_REQUEST))['session'];
+$experiments = new \OmegaUp\Experiments(
     $_REQUEST,
     array_key_exists('user', $session) ? $session['user'] : null
 );

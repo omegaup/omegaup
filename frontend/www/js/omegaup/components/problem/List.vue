@@ -50,14 +50,14 @@
                 v-else=""><span data-wenk-pos="right"
                   v-bind:data-wenk=
                   "`${UI.formatString(T.wordsOutOf4, {Score: problem.quality.toFixed(1)})}`">{{
-                  qualityTags[parseInt(problem.quality)] }}</span></td>
+                  QUALITY_TAGS[parseInt(problem.quality)] }}</span></td>
             <td class="numericColumn"
                 v-if="problem.difficulty === null">—</td>
             <td class="tooltip_column"
                 v-else=""><span data-wenk-pos="right"
                   v-bind:data-wenk=
                   "`${UI.formatString(T.wordsOutOf4, {Score: problem.difficulty.toFixed(1)})}`">{{
-                  difficultyTags[parseInt(problem.difficulty)] }}</span></td>
+                  DIFFICULTY_TAGS[parseInt(problem.difficulty)] }}</span></td>
             <td class="numericColumn">{{ (100.0 * problem.ratio).toFixed(2) }}%</td>
             <td class="numericColumn">{{ problem.points.toFixed(2) }}</td>
             <td class="numericColumn"
@@ -88,71 +88,70 @@
 }
 </style>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
-import problemFinderWizard from './FinderWizard.vue';
+import omegaup from '../../api.js';
+import problem_FinderWizard from './FinderWizard.vue';
 
-export default {
-  props: {
-    problems: Array,
-    loggedIn: Boolean,
-    currentTags: Array,
-    wizardTags: Array,
-  },
-  data: function() {
-    return {
-      T: T, UI: UI, qualityTags:
-                        [
-                          T.qualityFormQualityVeryBad,
-                          T.qualityFormQualityBad,
-                          T.qualityFormQualityFair,
-                          T.qualityFormQualityGood,
-                          T.qualityFormQualityVeryGood,
-                        ],
-          difficultyTags:
-              [
-                T.qualityFormDifficultyVeryEasy,
-                T.qualityFormDifficultyEasy,
-                T.qualityFormDifficultyMedium,
-                T.qualityFormDifficultyHard,
-                T.qualityFormDifficultyVeryHard
-              ],
-          showFinderWizard: false,
-    }
-  },
-  methods: {
-    rowClassForProblem: function(problemVisibility) {
-      return problemVisibility >= 2 ? 'high-quality' : '';
-    },
-    iconClassForProblem: function(problemVisibility) {
-      if (problemVisibility < 0)
-        return 'glyphicon-ban-circle';
-      else if (problemVisibility == 0)
-        return 'glyphicon-eye-close';
-      else if (problemVisibility >= 2)
-        return 'omegaup-quality-badge';
-    },
-    iconTitleForProblem: function(problemVisibility) {
-      if (problemVisibility < 0)
-        return T.wordsBannedProblem;
-      else if (problemVisibility == 0)
-        return T.wordsPrivate;
-      else if (problemVisibility >= 2)
-        return T.wordsHighQualityProblem;
-    },
-    hrefForProblemTag: function(currentTags, problemTag) {
-      if (!currentTags) return `/problem/?tag[]=${problemTag}`;
-      let tags = currentTags.slice();
-      if (!tags.includes(problemTag)) tags.push(problemTag);
-      return `/problem/?tag[]=${tags.join('&tag[]=')}`;
-    },
-    wizardSearch: function(queryParameters) {
-      this.$emit('wizard-search', queryParameters);
-    },
-  },
+@Component({
   components: {
-    'omegaup-problem-finder': problemFinderWizard,
+    'omegaup-problem-finder': problem_FinderWizard,
   },
+})
+export default class ProblemList extends Vue {
+  @Prop() problems!: omegaup.Problem[];
+  @Prop() loggedIn!: boolean;
+  @Prop() currentTags!: string[];
+  @Prop() wizardTags!: omegaup.Tag[];
+
+  T = T;
+  UI = UI;
+  showFinderWizard = false;
+  QUALITY_TAGS = [
+    T.qualityFormQualityVeryBad,
+    T.qualityFormQualityBad,
+    T.qualityFormQualityFair,
+    T.qualityFormQualityGood,
+    T.qualityFormQualityVeryGood,
+  ];
+  DIFFICULTY_TAGS = [
+    T.qualityFormDifficultyVeryEasy,
+    T.qualityFormDifficultyEasy,
+    T.qualityFormDifficultyMedium,
+    T.qualityFormDifficultyHard,
+    T.qualityFormDifficultyVeryHard,
+  ];
+
+  rowClassForProblem(problemVisibility: number): string {
+    return problemVisibility >= 2 ? 'high-quality' : '';
+  }
+
+  iconClassForProblem(problemVisibility: number): string {
+    if (problemVisibility < 0) return 'glyphicon-ban-circle';
+    else if (problemVisibility == 0) return 'glyphicon-eye-close';
+    else if (problemVisibility >= 2) return 'omegaup-quality-badge';
+    return '';
+  }
+
+  iconTitleForProblem(problemVisibility: number): string {
+    if (problemVisibility < 0) return this.T.wordsBannedProblem;
+    else if (problemVisibility == 0) return this.T.wordsPrivate;
+    else if (problemVisibility >= 2) return this.T.wordsHighQualityProblem;
+    return '';
+  }
+
+  hrefForProblemTag(currentTags: string[], problemTag: string): string {
+    if (!currentTags) return `/problem/?tag[]=${problemTag}`;
+    let tags = currentTags.slice();
+    if (!tags.includes(problemTag)) tags.push(problemTag);
+    return `/problem/?tag[]=${tags.join('&tag[]=')}`;
+  }
+
+  wizardSearch(queryParameters: omegaup.QueryParameters): void {
+    this.$emit('wizard-search', queryParameters);
+  }
 }
+
 </script>

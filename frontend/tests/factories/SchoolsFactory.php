@@ -20,7 +20,7 @@ class SchoolsFactory {
 
         $user = UserFactory::createUser();
         $login = OmegaupTestCase::login($user);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
         ]);
@@ -43,7 +43,7 @@ class SchoolsFactory {
      */
     public static function addUserToSchool($schoolData, $user) {
         $login = OmegaupTestCase::login($user);
-        $response = UserController::apiUpdate(new Request([
+        $response = UserController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $schoolData['school']->school_id
         ]));

@@ -31,7 +31,7 @@ class ContestRunsTest extends OmegaupTestCase {
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
@@ -49,11 +49,11 @@ class ContestRunsTest extends OmegaupTestCase {
         $directorIdentity = IdentityController::resolveIdentity(
             $contestData['director']->username
         );
-        $this->assertFalse(Authorization::isProblemAdmin(
+        $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $directorIdentity,
             $problemData['problem']
         ));
-        $response = RunController::apiDetails(new Request([
+        $response = RunController::apiDetails(new \OmegaUp\Request([
             'problemset_id' => $contestData['contest']->problemset_id,
             'run_alias' => $response['runs'][0]['guid'],
             'auth_token' => $login->auth_token,
@@ -89,14 +89,14 @@ class ContestRunsTest extends OmegaupTestCase {
         $directorLogin = self::login($contestData['director']);
 
         // Call API
-        $response = ContestController::apiRuns(new Request([
+        $response = ContestController::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));
 
         $this->assertEquals(100, $response['runs'][0]['contest_score']);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -108,7 +108,7 @@ class ContestRunsTest extends OmegaupTestCase {
         ContestController::apiAddProblem($r);
 
         // Call API
-        $response = ContestController::apiRuns(new Request([
+        $response = ContestController::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));

@@ -20,7 +20,7 @@ $defines = get_defined_constants(true)['user'];
 foreach ($experiments->getAllKnownExperiments() as $experiment) {
     $systemExperiments[] = [
         'name' => $experiment,
-        'hash' => Experiments::getExperimentHash($experiment),
+        'hash' => \OmegaUp\Experiments::getExperimentHash($experiment),
         'config' => $experiments->isEnabledByConfig($experiment, $defines),
     ];
 }

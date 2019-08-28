@@ -20,13 +20,21 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Assert that the problem was correctly added
-        $getAssignmentResponse = CourseController::apiAssignmentDetails(new Request([
+        $getAssignmentResponse = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
         ]));
         $this->assertEquals(1, sizeof($getAssignmentResponse['problems']));
         $this->assertEquals($problem['problem']->alias, $getAssignmentResponse['problems'][0]['alias']);
+        $this->assertEquals(
+            $problem['problem']->commit,
+            $getAssignmentResponse['problems'][0]['commit']
+        );
+        $this->assertEquals(
+            $problem['problem']->current_version,
+            $getAssignmentResponse['problems'][0]['version']
+        );
     }
 
     public function testDeleteProblemFromAssignment() {
@@ -46,7 +54,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problem]);
 
         // Remove a problem from the assignment
-        $removeProblemResponse = CourseController::apiRemoveProblem(new Request([
+        $removeProblemResponse = CourseController::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
@@ -55,7 +63,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $this->assertEquals('ok', $removeProblemResponse['status']);
 
         // Assert that the problem was correctly removed
-        $getAssignmentResponse = CourseController::apiAssignmentDetails(new Request([
+        $getAssignmentResponse = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
@@ -93,7 +101,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $this->assertEquals('ok', $responses[2]['status']);
 
         // Assert that the problems were correctly added
-        $getAssignmentResponse = CourseController::apiAssignmentDetails(new Request([
+        $getAssignmentResponse = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
@@ -101,14 +109,14 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $this->assertEquals(3, sizeof($getAssignmentResponse['problems']));
 
         // Remove multiple problems from the assignment
-        $removeProblemResponse = CourseController::apiRemoveProblem(new Request([
+        $removeProblemResponse = CourseController::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
             'problem_alias' => $problems[0]['problem']->alias,
         ]));
         $this->assertEquals('ok', $removeProblemResponse['status']);
-        $removeProblemResponse = CourseController::apiRemoveProblem(new Request([
+        $removeProblemResponse = CourseController::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
@@ -117,7 +125,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $this->assertEquals('ok', $removeProblemResponse['status']);
 
         // Assert that the problems were correctly removed
-        $getAssignmentResponse = CourseController::apiAssignmentDetails(new Request([
+        $getAssignmentResponse = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course' => $courseAlias,
             'assignment' => $assignmentAlias,
@@ -129,7 +137,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to add a problem with a normal user.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddProblemForbiddenAccess() {
         $user = UserFactory::createUser();
@@ -153,7 +161,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to add a problem with a student.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddProblemForbiddenAccessStudent() {
         $user = UserFactory::createUser();
@@ -177,7 +185,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to remove a problem with a normal user.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDeleteProblemForbiddenAccess() {
         $user = UserFactory::createUser();
@@ -198,7 +206,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Remove a problem from the assignment with a normal user
         $forbiddenUser = UserFactory::createUser();
         $forbiddenUserLogin = self::login($forbiddenUser);
-        $removeProblemResponse = CourseController::apiRemoveProblem(new Request([
+        $removeProblemResponse = CourseController::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $forbiddenUserLogin->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
@@ -209,7 +217,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to remove a problem with a student.
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDeleteProblemForbiddenAccessStudent() {
         $user = UserFactory::createUser();
@@ -230,7 +238,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         // Remove a problem from the assignment with a student
         $forbiddenUser = CoursesFactory::addStudentToCourse($courseData);
         $forbiddenUserLogin = self::login($forbiddenUser);
-        $removeProblemResponse = CourseController::apiRemoveProblem(new Request([
+        $removeProblemResponse = CourseController::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $forbiddenUserLogin->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
@@ -241,7 +249,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     /**
      * Attempts to remove an invalid problem.
      *
-     * @expectedException NotFoundException
+     * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testDeleteNonExistingProblem() {
         $user = UserFactory::createUser();
@@ -253,7 +261,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Remove an invalid problem from the assignment
-        $removeProblemResponse = CourseController::apiRemoveProblem(new Request([
+        $removeProblemResponse = CourseController::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,

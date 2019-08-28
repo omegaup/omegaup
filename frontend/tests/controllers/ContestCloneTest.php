@@ -20,25 +20,25 @@ class ContestCloneTest extends OmegaupTestCase {
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = ContestController::apiClone(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'title' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
             'alias' => $contestAlias,
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
 
         $this->assertEquals($contestAlias, $contestClonedData['alias']);
 
         // Call API
-        $clonedContestProblemsResponse = ContestController::apiProblems(new Request([
+        $clonedContestProblemsResponse = ContestController::apiProblems(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestAlias,
         ]));
 
-        $originalContestProblemsResponse = ContestController::apiProblems(new Request([
+        $originalContestProblemsResponse = ContestController::apiProblems(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -53,7 +53,7 @@ class ContestCloneTest extends OmegaupTestCase {
     /**
      * Creating a clone with the original contest alias
      *
-     * @expectedException DuplicatedEntryInDatabaseException
+     * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testCreateContestCloneWithTheSameAlias() {
         // Get a problem
@@ -69,21 +69,21 @@ class ContestCloneTest extends OmegaupTestCase {
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = ContestController::apiClone(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'title' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
             'alias' => $contestData['request']['alias'],
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
     }
 
     /**
      * Creating a clone of a private contest without its access
      *
-     * @expectedException ForbiddenAccessException
+     * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testCreatePrivateContestCloneWithoutAccess() {
         // Get a problem
@@ -97,20 +97,20 @@ class ContestCloneTest extends OmegaupTestCase {
 
         // Create new user
         $user = UserFactory::createUser();
-        $login = UserController::apiLogin(new Request([
+        $login = UserController::apiLogin(new \OmegaUp\Request([
             'usernameOrEmail' => $user->username,
             'password' => $user->password
         ]));
 
         // Clone the contest
-        $contestClonedData = ContestController::apiClone(new Request([
+        $contestClonedData = ContestController::apiClone(new \OmegaUp\Request([
             'auth_token' => $login['auth_token'],
             'contest_alias' => $contestData['request']['alias'],
             'title' => Utils::CreateRandomString(),
             'description' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
             'contest' => $contestData['contest'],
-            'start_time' => Time::get()
+            'start_time' => \OmegaUp\Time::get()
         ]));
     }
 }

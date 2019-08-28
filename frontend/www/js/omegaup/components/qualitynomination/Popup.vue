@@ -2,7 +2,7 @@
   <div class="qualitynomination-popup">
     <a href="#"
          v-on:click="onShowSuggestion"
-         v-show="showSugestLink">{{ T.qualityNominationRateProblem }}</a>
+         v-show="showSuggestLink">{{ T.qualityNominationRateProblem }}</a>
     <transition name="fade">
       <form class="panel panel-default popup"
             v-on:submit.prevent=""
@@ -81,107 +81,6 @@
     </transition>
   </div>
 </template>
-
-<script>
-import {API, T} from '../../omegaup.js';
-import UI from '../../ui.js';
-
-export default {
-  props: {
-    solved: Boolean,
-    nominated: Boolean,
-    dismissed: Boolean,
-    canNominateProblem: Boolean,
-  },
-  data: function() {
-    return {
-      API: API,
-      T: T,
-      UI: UI,
-      currentView: 'suggestion',
-      difficulty: undefined,
-      quality: undefined,
-      showFormOverride: true,
-      tags: [],
-      problemTopics: [
-        'problemTopic2Sat',
-        'problemTopicArrays',
-        'problemTopicBacktracking',
-        'problemTopicBigNumbers',
-        'problemTopicBinarySearch',
-        'problemTopicBitmasks',
-        'problemTopicBreadthDepthFirstSearch',
-        'problemTopicBruteForce',
-        'problemTopicBuckets',
-        'problemTopicCombinatorics',
-        'problemTopicDataStructures',
-        'problemTopicDisjointSets',
-        'problemTopicDivideAndConquer',
-        'problemTopicDynamicProgramming',
-        'problemTopicFastFourierTransform',
-        'problemTopicGameTheory',
-        'problemTopicGeometry',
-        'problemTopicGraphTheory',
-        'problemTopicGreedy',
-        'problemTopicHashing',
-        'problemTopicIfElseSwitch',
-        'problemTopicImplementation',
-        'problemTopicInputOutput',
-        'problemTopicLoops',
-        'problemTopicMath',
-        'problemTopicMatrices',
-        'problemTopicMaxFlow',
-        'problemTopicMeetInTheMiddle',
-        'problemTopicNumberTheory',
-        'problemTopicParsing',
-        'problemTopicProbability',
-        'problemTopicShortestPath',
-        'problemTopicSimulation',
-        'problemTopicSorting',
-        'problemTopicStackQueue',
-        'problemTopicStrings',
-        'problemTopicSuffixArray',
-        'problemTopicSuffixTree',
-        'problemTopicTernarySearch',
-        'problemTopicTrees',
-        'problemTopicTwoPointers',
-      ],
-    };
-  },
-  computed: {
-    showForm: function() {
-      return this.showFormOverride && this.solved && !this.nominated &&
-             !this.dismissed && this.canNominateProblem;
-    },
-    showSugestLink: function() { return this.solved && !this.nominated;},
-    sortedProblemTopics: function() {
-      let topics =
-          this.problemTopics.map(x => { return {value: x, text: T[x]}; });
-      return topics.sort((a, b) => a.text.localeCompare(b.text, T.lang));
-    }
-  },
-  methods: {
-    onHide(isDismissed) {
-      this.showFormOverride = false;
-      if (isDismissed) {
-        this.$emit('dismiss', this);
-      }
-    },
-    onShowSuggestion() {
-      this.showFormOverride = true;
-      this.dismissed = false;
-    },
-    onSubmit() {
-      this.$emit('submit', this);
-      this.currentView = 'thanks';
-      this.nominated = true;
-
-      var self = this;
-      setTimeout(function() { self.onHide(false) }, 1000);
-    }
-  }
-};
-</script>
 
 <style>
 .qualitynomination-popup .popup {
@@ -272,3 +171,136 @@ label.tag-select:hover {
     color: HighlightText;
 }
 </style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import omegaup from '../../api.js';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+
+interface ProblemTopic {
+  text: string;
+  value: string;
+}
+
+@Component
+export default class QualityNominationPopup extends Vue {
+  @Prop() solved!: boolean;
+  @Prop() nominated!: boolean;
+  @Prop() dismissed!: boolean;
+  @Prop() canNominateProblem!: boolean;
+
+  T = T;
+  UI = UI;
+  currentView = 'suggestion';
+  difficulty = '';
+  quality = '';
+  showFormOverride = true;
+  localDismissed = this.dismissed;
+  localNominated = this.nominated;
+  tags: string[] = [];
+  static readonly PROBLEM_TOPICS = [
+    'problemTopic2Sat',
+    'problemTopicArrays',
+    'problemTopicBacktracking',
+    'problemTopicBigNumbers',
+    'problemTopicBinarySearch',
+    'problemTopicBitmasks',
+    'problemTopicBreadthDepthFirstSearch',
+    'problemTopicBruteForce',
+    'problemTopicBuckets',
+    'problemTopicCombinatorics',
+    'problemTopicDataStructures',
+    'problemTopicDisjointSets',
+    'problemTopicDivideAndConquer',
+    'problemTopicDynamicProgramming',
+    'problemTopicFastFourierTransform',
+    'problemTopicGameTheory',
+    'problemTopicGeometry',
+    'problemTopicGraphTheory',
+    'problemTopicGreedy',
+    'problemTopicHashing',
+    'problemTopicIfElseSwitch',
+    'problemTopicImplementation',
+    'problemTopicInputOutput',
+    'problemTopicLoops',
+    'problemTopicMath',
+    'problemTopicMatrices',
+    'problemTopicMaxFlow',
+    'problemTopicMeetInTheMiddle',
+    'problemTopicNumberTheory',
+    'problemTopicParsing',
+    'problemTopicProbability',
+    'problemTopicShortestPath',
+    'problemTopicSimulation',
+    'problemTopicSorting',
+    'problemTopicStackQueue',
+    'problemTopicStrings',
+    'problemTopicSuffixArray',
+    'problemTopicSuffixTree',
+    'problemTopicTernarySearch',
+    'problemTopicTrees',
+    'problemTopicTwoPointers',
+  ];
+
+  get showForm(): boolean {
+    return (
+      this.showFormOverride &&
+      this.solved &&
+      !this.localNominated &&
+      !this.localDismissed &&
+      this.canNominateProblem
+    );
+  }
+
+  get showSuggestLink(): boolean {
+    return this.solved && !this.localNominated;
+  }
+
+  get sortedProblemTopics(): ProblemTopic[] {
+    let self = this;
+    let topics: ProblemTopic[] = QualityNominationPopup.PROBLEM_TOPICS.map(
+      (x: string) => {
+        return {
+          value: x,
+          text: self.T[x],
+        };
+      },
+    );
+    return topics.sort((a: ProblemTopic, b: ProblemTopic): number => {
+      return a.text.localeCompare(b.text, self.T.lang);
+    });
+  }
+
+  onHide(isDismissed: boolean): void {
+    this.showFormOverride = false;
+    if (isDismissed) {
+      this.$emit('dismiss', this);
+    }
+  }
+
+  onShowSuggestion(): void {
+    this.showFormOverride = true;
+    this.localDismissed = false;
+  }
+
+  onSubmit(): void {
+    this.$emit('submit', this);
+    this.currentView = 'thanks';
+    this.localNominated = true;
+
+    setTimeout(() => this.onHide(false), 1000);
+  }
+
+  @Watch('dismissed')
+  onDismissedChange(newValue: boolean, oldValue: boolean) {
+    this.localDismissed = newValue;
+  }
+
+  @Watch('nominated')
+  onNominatedChange(newValue: boolean, oldValue: boolean) {
+    this.localNominated = newValue;
+  }
+}
+
+</script>

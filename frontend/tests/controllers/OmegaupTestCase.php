@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/Email.php';
-
 /**
  * Parent class of all Test cases for Omegaup
  * Implements common methods for setUp and asserts
@@ -44,12 +42,12 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     public function setUp() {
         parent::setUp();
         UserController::$sendEmailOnVerify = false;
-        SessionController::$setCookieOnRegisterSession = false;
+        SessionController::setCookieOnRegisterSessionForTesting(false);
 
         // Mock time
         $currentTime = time();
-        Time::setTimeForTesting($currentTime);
-        MySQLConnection::getInstance()->Execute("SET TIMESTAMP = {$currentTime};");
+        \OmegaUp\Time::setTimeForTesting($currentTime);
+        \OmegaUp\MySQLConnection::getInstance()->Execute("SET TIMESTAMP = {$currentTime};");
 
         //Clean $_REQUEST before each test
         unset($_REQUEST);
@@ -78,24 +76,23 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Override session_start, phpunit doesn't like it, but we still validate that it is called once
+     * Override session_start, validating that it is called once.
      */
-    public function mockSessionManager() {
+    public function mockSessionManager() : void {
         $sessionManagerMock =
-            $this->getMockBuilder('SessionManager')->getMock();
+            $this->getMockBuilder('\\OmegaUp\\SessionManager')->getMock();
         $sessionManagerMock->expects($this->once())
-                ->method('sessionStart')
-                ->will($this->returnValue(''));
-        SessionController::$_sessionManager = $sessionManagerMock;
+                ->method('sessionStart');
+        SessionController::setSessionManagerForTesting($sessionManagerMock);
     }
 
     /**
      * Given an Identity, checks that login let state as supposed
      *
-     * @param Identities $identity
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @param type $auth_token
      */
-    public function assertLogin(Identities $identity, $auth_token = null) {
+    public function assertLogin(\OmegaUp\DAO\VO\Identities $identity, $auth_token = null) {
         // Check auth token
         $auth_tokens_bd = AuthTokensDAO::getByIdentityId($identity->identity_id);
 
@@ -128,11 +125,10 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         UserController::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
-        $oldCookieSetting = SessionController::$setCookieOnRegisterSession;
-        SessionController::$setCookieOnRegisterSession = false;
+        $oldCookieSetting = SessionController::setCookieOnRegisterSessionForTesting(false);
 
         // Inflate request with identity data
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'usernameOrEmail' => $identity->username,
             'password' => $identity->password,
         ]);
@@ -147,7 +143,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         unset($_REQUEST);
 
         // Set cookie setting as it was before the login
-        SessionController::$setCookieOnRegisterSession = $oldCookieSetting;
+        SessionController::setCookieOnRegisterSessionForTesting($oldCookieSetting);
 
         return new ScopedLoginToken($response['auth_token']);
     }
@@ -155,9 +151,9 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Assert that contest in the request actually exists in the DB
      *
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public function assertContest(Request $r) {
+    public function assertContest(\OmegaUp\Request $r) {
         // Validate that data was written to DB by getting the contest by title
         $contests = ContestsDAO::getByTitle($r['title']);
         $contest = $contests[0];
@@ -302,48 +298,48 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      * native functions of PHP to move files around needed for store zip contents
      * in the required places.
      *
-     * Solution: We abstracted those PHP native functions in an object FileUploader.
-     * We need to create a new FileUploader object that uses our own implementations.
+     * Solution: We abstracted those PHP native functions in an object
+     * \OmegaUp\FileUploader.  We need to create a new \OmegaUp\FileUploader
+     * object that uses our own implementations.
      *
-     * Here we create a FileUploader and set our own implementations of is_uploaded_file
-     * and move_uploaded_file. PHPUnit will intercept those calls and use our owns instead (mock).
-     * Moreover, it will validate that they were actually called.
-     *
-     * @return $fileUploaderMock
+     * Here we create a \OmegaUp\FileUploader and set our own implementations
+     * of is_uploaded_file and move_uploaded_file. PHPUnit will intercept those
+     * calls and use our owns instead (mock).  Moreover, it will validate that
+     * they were actually called.
      */
-    public function createFileUploaderMock() {
+    public function createFileUploaderMock() : \OmegaUp\FileUploader {
         // Create fileUploader mock
-        $fileUploaderMock = $this->getMockBuilder('FileUploader')->getMock();
+        $fileUploaderMock = $this->getMockBuilder('\\OmegaUp\\FileUploader')
+                ->getMock();
 
-        // Detour IsUploadedFile function inside FileUploader to our own IsUploadedFile
+        // Detour isUploadedFile function inside \OmegaUp\FileUploader to our
+        // own isUploadedFile
         $fileUploaderMock->expects($this->any())
-                ->method('IsUploadedFile')
-                ->will($this->returnCallback([$this, 'IsUploadedFile']));
+                ->method('isUploadedFile')
+                ->will($this->returnCallback([$this, 'isUploadedFile']));
 
-        // Detour MoveUploadedFile function inside FileUploader to our own MoveUploadedFile
+        // Detour moveUploadedFile function inside \OmegaUp\FileUploader to our
+        // own moveUploadedFile
         $fileUploaderMock->expects($this->any())
-                ->method('MoveUploadedFile')
-                ->will($this->returnCallback([$this, 'MoveUploadedFile']));
+                ->method('moveUploadedFile')
+                ->will($this->returnCallback([$this, 'moveUploadedFile']));
 
         return $fileUploaderMock;
     }
 
     /**
-     * Redefinition of IsUploadedFile
+     * Redefinition of \OmegaUp\FileUploader::isUploadedFile
      *
      * @param string $filename
-     * @return type
      */
-    public function IsUploadedFile($filename) {
+    public function isUploadedFile($filename) : bool {
         return file_exists($filename);
     }
 
     /**
-     * Redefinition of MoveUploadedFile
-     *
-     * @return type
+     * Redefinition of \OmegaUp\FileUploader::moveUploadedFile
      */
-    public function MoveUploadedFile() {
+    public function moveUploadedFile() : bool {
         $filename = func_get_arg(0);
         $targetpath = func_get_arg(1);
 
@@ -355,7 +351,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
             $times = $this->once();
         }
 
-        $broadcasterMock = $this->getMockBuilder('Broadcaster')->getMock();
+        $broadcasterMock = $this->getMockBuilder('\\OmegaUp\\Broadcaster')
+            ->getMock();
         $broadcasterMock
             ->expects($times)
             ->method('broadcastClarification');
@@ -387,12 +384,13 @@ class ScopedLoginToken {
     public $auth_token = null;
 
     public function __construct($auth_token) {
+        \OmegaUp\Authorization::clearCacheForTesting();
         $this->auth_token = $auth_token;
     }
 
     public function __destruct() {
         OmegaUpTestCase::logout();
-        Authorization::clearCacheForTesting();
+        \OmegaUp\Authorization::clearCacheForTesting();
     }
 }
 
@@ -409,18 +407,29 @@ class ScopedScoreboardTestRun {
     }
 }
 
-class ScopedEmailSender {
+class ScopedEmailSender implements \OmegaUp\EmailSender {
+    /** @var array{email: string[], subject: string, body: string}[] */
     public static $listEmails = [];
+
     public function __construct() {
-        Email::setEmailSenderForTesting($this);
+        \OmegaUp\Email::setEmailSenderForTesting($this);
     }
 
     public function __destruct() {
-        Email::setEmailSenderForTesting(null);
+        \OmegaUp\Email::setEmailSenderForTesting(null);
     }
 
-    public function sendEmail($emails, $subject, $body) {
-        self::$listEmails[] = ['email' => $emails, 'subject' => $subject, 'body' => $body];
+    /**
+     * @param string[] $emails
+     * @param string $subject
+     * @param string $body
+     */
+    public function sendEmail(array $emails, string $subject, string $body) : void {
+        self::$listEmails[] = [
+            'email' => $emails,
+            'subject' => $subject,
+            'body' => $body,
+        ];
     }
 }
 
@@ -429,14 +438,19 @@ class ScopedEmailSender {
  *
  * We are not testing the Grader functionallity itself, we are only validating
  * that we populate the DB correctly and that we make a call to the function
- * Grader::grade(), without executing the contents.
+ * \OmegaUp\Grader::grade(), without executing the contents.
  */
-class NoOpGrader extends Grader {
+class NoOpGrader extends \OmegaUp\Grader {
+    /** @var array<string, string> */
     private $_resources = [];
+
+    /** @var array<string, string> */
     private $_submissions = [];
+
+    /** @var \OmegaUp\DAO\VO\Runs[] */
     private $_runs = [];
 
-    public function grade(Runs $run, string $source) {
+    public function grade(\OmegaUp\DAO\VO\Runs $run, string $source) : void {
         $sql = '
             SELECT
                 s.guid
@@ -445,20 +459,21 @@ class NoOpGrader extends Grader {
             WHERE
                 s.submission_id = ?;
         ';
-        $guid = MySQLConnection::getInstance()->GetOne($sql, [$run->submission_id]);
+        /** @var string */
+        $guid = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$run->submission_id]);
         $this->_submissions[$guid] = $source;
         array_push($this->_runs, $run);
     }
 
-    public function rejudge(array $runs, bool $debug) {
+    public function rejudge(array $runs, bool $debug) : void {
         $this->_runs += $runs;
     }
 
-    public function getSource(string $guid) {
+    public function getSource(string $guid) : string {
         return $this->_submissions[$guid];
     }
 
-    public function status() {
+    public function status() : array {
         return [
             'status' => 'ok',
             'broadcaster_sockets' => 0,
@@ -473,26 +488,22 @@ class NoOpGrader extends Grader {
     }
 
     public function broadcast(
-        /* string? */ $contestAlias,
-        /* string? */ $problemsetId,
-        /* string? */ $problemAlias,
+        ?string $contestAlias,
+        ?int $problemsetId,
+        ?string $problemAlias,
         string $message,
         bool $public,
-        /* string? */ $username,
+        ?string $username,
         int $userId = -1,
         bool $userOnly = false
-    ) {
+    ) : void {
     }
 
     public function getGraderResource(
-        Runs $run,
+        \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $passthru = false,
         bool $missingOk = false
-    ) {
-        if ($passthru) {
-            throw new UnimplementedException();
-        }
+    ) : ?string {
         $path = "{$run->run_id}/{$filename}";
         if (!array_key_exists($path, $this->_resources)) {
             if (!$missingOk) {
@@ -504,11 +515,19 @@ class NoOpGrader extends Grader {
         return $this->_resources[$path];
     }
 
+    public function getGraderResourcePassthru(
+        \OmegaUp\DAO\VO\Runs $run,
+        string $filename,
+        bool $missingOk = false
+    ) : ?bool {
+        throw new \OmegaUp\Exceptions\UnimplementedException();
+    }
+
     public function setGraderResourceForTesting(
-        Runs $run,
+        \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         string $contents
-    ) {
+    ) : void {
         $path = "{$run->run_id}/{$filename}";
         $this->_resources[$path] = $contents;
     }
@@ -522,17 +541,20 @@ class NoOpGrader extends Grader {
  * Simple RAII class to detour grader calls to a mock instance.
  */
 class ScopedGraderDetour {
-    private $_originalInstance = null;
-    private $_instance = null;
+    /** @var OmegaUp\Grader */
+    private $_originalInstance;
+
+    /** @var NoOpGrader */
+    private $_instance;
 
     public function __construct() {
-        $this->_originalInstance = Grader::getInstance();
+        $this->_originalInstance = \OmegaUp\Grader::getInstance();
         $this->_instance = new NoOpGrader();
-        Grader::setInstanceForTesting($this->_instance);
+        \OmegaUp\Grader::setInstanceForTesting($this->_instance);
     }
 
     public function __destruct() {
-        Grader::setInstanceForTesting($this->_originalInstance);
+        \OmegaUp\Grader::setInstanceForTesting($this->_originalInstance);
     }
 
     public function getGraderCallCount() : int {

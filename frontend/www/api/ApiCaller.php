@@ -14,18 +14,18 @@ class ApiCaller {
      * Execute the request and return the response as associative
      * array.
      *
-     * @param Request $request
+     * @param \OmegaUp\Request $request
      * @return array
      */
-    public static function call(Request $request) {
+    public static function call(\OmegaUp\Request $request) {
         try {
             $response = $request->execute();
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error($e);
             $response = $e->asResponseArray();
         } catch (Exception $e) {
             self::$log->error($e);
-            $apiException = new InternalServerErrorException($e);
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
             $response = $apiException->asResponseArray();
         }
 
@@ -65,19 +65,19 @@ class ApiCaller {
         $apiException = null;
         try {
             if (self::isCSRFAttempt()) {
-                throw new CSRFException();
+                throw new \OmegaUp\Exceptions\CSRFException();
             }
             $r = self::createRequest();
             $response = $r->execute();
             if (is_null($response) || !is_array($response)) {
-                $apiException = new InternalServerErrorException(
+                $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
                     new Exception('API did not return an array.')
                 );
             }
-        } catch (ApiException $e) {
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             $apiException = $e;
         } catch (Exception $e) {
-            $apiException = new InternalServerErrorException($e);
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
         }
 
         if (!is_null($apiException)) {
@@ -115,13 +115,13 @@ class ApiCaller {
      * Renders the response properly and sets the HTTP header.
      *
      * @param array $response
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    private static function render(array $response, ?Request $r = null) : string {
+    private static function render(array $response, ?\OmegaUp\Request $r = null) : string {
         // Only add the request ID if the response is an associative array. This
         // allows the APIs that return a flat array to return the right type.
         if (self::isAssociativeArray($response)) {
-            $response['_id'] = Request::requestId();
+            $response['_id'] = \OmegaUp\Request::requestId();
         }
         $jsonEncodeFlags = 0;
         // If this request is being explicitly made from the browser,
@@ -145,7 +145,7 @@ class ApiCaller {
                 );
             }
             if ($jsonResult === false) {
-                $apiException = new InternalServerErrorException();
+                $apiException = new \OmegaUp\Exceptions\InternalServerErrorException();
                 self::$log->error($apiException);
                 if (extension_loaded('newrelic')) {
                     newrelic_notice_error($apiException);
@@ -160,8 +160,8 @@ class ApiCaller {
      * Parses the URI from $_SERVER and determines which controller and
      * function to call in order to build a Request object.
      *
-     * @return Request
-     * @throws NotFoundException
+     * @return \OmegaUp\Request
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function createRequest() {
         $apiAsUrl = $_SERVER['REQUEST_URI'];
@@ -175,7 +175,7 @@ class ApiCaller {
 
         if ($args === false || count($args) < 2) {
             self::$log->error('Api called with URI with less args than expected: '.count($args));
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         $controllerName = ucfirst($args[2]);
@@ -188,11 +188,11 @@ class ApiCaller {
 
         if (!class_exists($controllerName)) {
             self::$log->error('Controller name was not found: '. $controllerName);
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         // Create request
-        $request = new Request($_REQUEST);
+        $request = new \OmegaUp\Request($_REQUEST);
 
         // Prepend api
         $methodName = 'api'.$methodName;
@@ -200,7 +200,7 @@ class ApiCaller {
         // Check the method
         if (!method_exists($controllerName, $methodName)) {
             self::$log->error('Method name was not found: '. $controllerName.'::'.$methodName);
-            throw new NotFoundException('apiNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
 
         // Get the auth_token and user data from cookies
@@ -228,7 +228,7 @@ class ApiCaller {
     private static function setHttpHeaders(array $response) {
         // Scumbag IE y su cache agresivo.
         header('Expires: Tue, 03 Jul 2001 06:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', Time::get()) . ' GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', \OmegaUp\Time::get()) . ' GMT');
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
@@ -252,10 +252,10 @@ class ApiCaller {
      */
     public static function handleException(Exception $e) : void {
         $apiException = null;
-        if ($e instanceof ApiException) {
+        if ($e instanceof \OmegaUp\Exceptions\ApiException) {
             $apiException = $e;
         } else {
-            $apiException = new InternalServerErrorException($e);
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
         }
 
         if ($apiException->getCode() == 401) {

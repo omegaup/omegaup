@@ -3,7 +3,7 @@
 class DbConfigTest extends OmegaUpTestCase {
     public function testTimeSync() {
         $db_time = Utils::GetDbDatetime();
-        $php_time = date('Y-m-d H:i:s', Time::get());
+        $php_time = date('Y-m-d H:i:s', \OmegaUp\Time::get());
 
         $this->assertEquals($php_time, $db_time);
     }
@@ -18,7 +18,7 @@ class DbConfigTest extends OmegaUpTestCase {
         // Go to the DB
 
         $sql = "select timediff(now(),convert_tz(now(),@@session.time_zone,'+00:00')) d";
-        $rs = MySQLConnection::getInstance()->GetRow($sql);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql);
 
         $this->assertEquals('00:00:00', $rs['d']);
     }

@@ -1,25 +1,27 @@
 <?php
 
 include('base/Interviews.dao.base.php');
-include('base/Interviews.vo.base.php');
-/** Interviews Data Access Object (DAO).
-  *
-  * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
-  * almacenar de forma permanente y recuperar instancias de objetos {@link Interviews }.
-  * @access public
-  *
-  */
+
+/**
+ * Interviews Data Access Object (DAO).
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Interviews}.
+ *
+ * @access public
+ */
 class InterviewsDAO extends InterviewsDAOBase {
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
         $params = [$alias];
 
-        $rs = MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
         }
 
-        $interview = new Interviews($rs);
+        $interview = new \OmegaUp\DAO\VO\Interviews($rs);
 
         return $interview;
     }
@@ -38,9 +40,9 @@ class InterviewsDAO extends InterviewsDAOBase {
                 a.owner_id = ?
                 OR (SELECT COUNT(*) FROM User_Roles WHERE user_id = ? AND role_id = ? AND acl_id = a.acl_id) > 0;';
 
-        $params = [$user_id, $user_id, Authorization::ADMIN_ROLE];
+        $params = [$user_id, $user_id, \OmegaUp\Authorization::ADMIN_ROLE];
 
-        $rs = MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $result = [];
 
@@ -62,11 +64,11 @@ class InterviewsDAO extends InterviewsDAOBase {
     public static function getByProblemset($problemset_id) {
         $sql = 'SELECT i.* from Interviews i where i.problemset_id = ?;';
 
-        $interviews = MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
+        $interviews = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
         if (empty($interviews)) {
             return null;
         }
 
-        return new Interviews($interviews);
+        return new \OmegaUp\DAO\VO\Interviews($interviews);
     }
 }
