@@ -111,6 +111,15 @@ class GroupController extends Controller {
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
+        if (!is_null(GroupsIdentitiesDAO::getByPK(
+            $group->group_id,
+            $resolvedIdentity->identity_id
+        ))) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'identityInGroup'
+            );
+        }
+
         GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $group->group_id,
             'identity_id' => $resolvedIdentity->identity_id

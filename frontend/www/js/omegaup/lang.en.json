@@ -372,6 +372,7 @@
 	"groupsInvalidCsv": "Please upload a valid CSV file.",
 	"groupsUploadCsvFile": "Upload CSV file",
 	"identityAlreadyAssociated": "You already have one identity associated with the same group.",
+	"identityInGroup": "Identity is already associated to the group.",
 	"incompatibleArgs": "Arguments can't be set simultaneously",
 	"index": "Coder of the month",
 	"interviewCreateNew": "Create a new interview",
