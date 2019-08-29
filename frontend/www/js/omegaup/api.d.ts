@@ -280,11 +280,7 @@ declare namespace omegaup {
     runs?: CourseProblemRun[];
     score?: number;
     source?: string;
-    statement?: {
-      images: string[];
-      language: string;
-      markdown: string;
-    }
+    statement?: Statement;
     submissions?: number;
     templates?: string;
     tags?: Tag[];
@@ -336,6 +332,12 @@ declare namespace omegaup {
     percent: number;
     points: number;
     runs: number;
+  }
+
+  interface Statement {
+    images: string[];
+    language: string;
+    markdown: string;
   }
 
   export interface Report {

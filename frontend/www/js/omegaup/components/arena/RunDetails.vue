@@ -111,7 +111,7 @@ import omegaup from '../../api.js';
 import { T } from '../../omegaup.js';
 import arena_CodeView from './CodeView.vue';
 
-interface groupVisibility {
+interface GroupVisibility {
   [name: string]: boolean;
 }
 
@@ -124,7 +124,7 @@ export default class ArenaRunDetails extends Vue {
   @Prop() data!: omegaup.RunDetails;
 
   T = T;
-  groupVisible: groupVisibility = {};
+  groupVisible: GroupVisibility = {};
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
