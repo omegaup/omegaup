@@ -39,7 +39,7 @@ stage_script() {
 		frontend/tests/badges
 	python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
 	python3 stuff/policy-tool.py --database=omegaup-test validate
-	find frontend/server/src/ -type d | xargs ./vendor/bin/psalm
+	find frontend/server/src/ frontend/server/cmd/ -type d | xargs ./vendor/bin/psalm
 }
 
 stage_after_success() {

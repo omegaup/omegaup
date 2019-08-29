@@ -55,8 +55,7 @@ class GroupsDAO extends GroupsDAOBase {
                 DISTINCT g.alias,
                 g.create_time,
                 g.description,
-                g.name,
-                g.group_id
+                g.name
             FROM
                 Groups g
             INNER JOIN
@@ -74,20 +73,13 @@ class GroupsDAO extends GroupsDAOBase {
             ORDER BY
                 g.group_id DESC;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $user_id,
                 \OmegaUp\Authorization::ADMIN_ROLE,
                 $user_id,
                 \OmegaUp\Authorization::ADMIN_ROLE,
                 $identity_id,
             ]);
-
-        $groups = [];
-        foreach ($rs as $row) {
-            unset($row['group_id']);
-            array_push($groups, new \OmegaUp\DAO\VO\Groups($row));
-        }
-        return $groups;
     }
 
     /**

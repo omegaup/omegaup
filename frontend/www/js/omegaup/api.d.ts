@@ -1,4 +1,9 @@
 declare namespace omegaup {
+  export class Selectable<T> {
+    value: T;
+    selected: boolean;
+  }
+
   enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',
@@ -186,6 +191,12 @@ declare namespace omegaup {
     group: omegaup.DetailsGroup[];
   }
 
+  export interface Experiment {
+    config: boolean;
+    hash: string;
+    name: string;
+  }
+
   export interface Group {
     alias: string;
     create_time: Date;
@@ -194,6 +205,8 @@ declare namespace omegaup {
   }
 
   export interface Identity extends User {
+    name: string;
+    username: string;
     school: string;
     school_name?: string;
     gender?: string;
@@ -273,18 +286,28 @@ declare namespace omegaup {
   export interface Problem {
     accepted?: number;
     alias: string;
+    commit?: string;
     difficulty?: number;
+    languages?: string;
+    letter?: string;
+    order?: number;
     penalty?: number;
     percent?: number;
     points?: number;
     quality?: number;
     ratio?: number;
     run_details?: omegaup.RunDetails;
+    runs?: CourseProblemRun[];
     score?: number;
+    source?: string;
+    statement?: Statement;
     submissions?: number;
+    templates?: string;
     tags?: Tag[];
     title: string;
+    version?: string;
     visibility?: number;
+    visits?: number;
   }
 
   export interface QueryParameters {
@@ -311,6 +334,32 @@ declare namespace omegaup {
     totalPoints: number;
   }
 
+  export interface ScoreboardUser extends User {
+    country?: string;
+    is_invited: number;
+    place: number;
+    problems: ScoreboardUserProblem[];
+    total: {
+      penalty: number;
+      points: number;
+    }
+  }
+
+  export interface ScoreboardUserProblem {
+    alias: string;
+    penalty: number;
+    pending?: boolean;
+    percent: number;
+    points: number;
+    runs: number;
+  }
+
+  interface Statement {
+    images: string[];
+    language: string;
+    markdown: string;
+  }
+
   export interface Report {
     classname: string;
     event: {
@@ -322,13 +371,24 @@ declare namespace omegaup {
     username: string;
   }
 
+  export interface Role {
+    name: string;
+  }
+
   interface RunDetails {
-    admin: boolean;
-    details: omegaup.Details;
+    admin?: boolean;
+    compile_error?: string;
+    details?: Details;
+    groups?: DetailsGroup[];
     guid: string;
     judged_by: string;
     language: string;
     logs: string;
+    problem_admin?: boolean;
+    source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
   }
 
   export interface SchoolsRank {

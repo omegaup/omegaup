@@ -60,7 +60,7 @@ import { T } from '../../omegaup.js';
 import UI from '../../ui.js';
 import omegaup from '../../api.js';
 
-@Component({})
+@Component
 export default class Identities extends Vue {
   @Prop() groupAlias!: string;
 
@@ -68,10 +68,10 @@ export default class Identities extends Vue {
   identities: omegaup.Identity[] = [];
 
   readCsv(): void {
-    const fileUpload: HTMLInputElement = <HTMLInputElement>(
+    const fileUpload = <HTMLInputElement>(
       this.$el.querySelector('input[type=file]')
     );
-    const regex: RegExp = /.*\.(?:csv|txt)$/;
+    const regex = /.*\.(?:csv|txt)$/;
 
     if (!regex.test(fileUpload.value.toLowerCase())) {
       UI.error(T.groupsInvalidCsv);
