@@ -126,7 +126,7 @@ OmegaUp.on('ready', function() {
                         problemComponent.versionLog = result.log;
                         let currentProblem = null;
                         for (const problem of problemComponent.problems) {
-                          if (problem.alias == problemAlias) {
+                          if (problem.alias === problemAlias) {
                             currentProblem = problem;
                             break;
                           }
@@ -136,7 +136,7 @@ OmegaUp.on('ready', function() {
                           publishedCommitHash = currentProblem.commit;
                         }
                         for (const revision of result.log) {
-                          if (publishedCommitHash == revision.commit) {
+                          if (publishedCommitHash === revision.commit) {
                             problemComponent.selectedRevision =
                                 problemComponent.publishedRevision = revision;
                             break;

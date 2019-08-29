@@ -118,7 +118,7 @@ export default class AddProblem extends Vue {
   onRunsDiff(versions: omegaup.Commit[], selectedCommit: omegaup.Commit): void {
     let found = false;
     for (const problem of this.problems) {
-      if (this.alias == problem.alias) {
+      if (this.alias === problem.alias) {
         found = true;
         break;
       }
@@ -131,7 +131,7 @@ export default class AddProblem extends Vue {
 
   get addProblemButtonLabel(): string {
     for (const problem of this.problems) {
-      if (this.alias == problem.alias) {
+      if (this.alias === problem.alias) {
         return T.wordsUpdateProblem;
       }
     }
@@ -147,13 +147,11 @@ export default class AddProblem extends Vue {
 
   @Watch('alias')
   onAliasChange(newProblemAlias: string) {
-    console.log(newProblemAlias);
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision = emptyCommit;
       return;
     }
-    console.log(this);
     this.$emit('emit-change-alias', this, newProblemAlias);
   }
 }
