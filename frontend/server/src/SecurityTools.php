@@ -1,5 +1,10 @@
 <?php
 
+namespace OmegaUp;
+
+use \Validators;
+use \InternalServerErrorException;
+
 /**
  * Password and token functions.
  */
@@ -26,8 +31,9 @@ class SecurityTools {
 
     /**
      * The secret key that is used to communicate with omegaup-gitserver.
+     * @var null|\ParagonIE\Paseto\Keys\AsymmetricSecretKey
      */
-    private static $_gitserverSecretKey;
+    private static $_gitserverSecretKey = null;
 
     /**
      * Given the plain password to check and a hash, returns true if there is
@@ -59,13 +65,25 @@ class SecurityTools {
      */
     public static function hashString(string $string) : string {
         if (!defined('PASSWORD_ARGON2ID')) {
-            return sodium_crypto_pwhash_str(
+            $hashedString = sodium_crypto_pwhash_str(
                 $string,
                 SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE,
                 self::ARGON2ID_MEMORY_COST * 1024
             );
+        } else {
+            /** @psalm-suppress MixedArgument blocked by https://github.com/vimeo/psalm/pull/2069 */
+            $hashedString = password_hash(
+                $string,
+                PASSWORD_ARGON2ID,
+                self::PASSWORD_HASH_OPTIONS
+            );
         }
-        return password_hash($string, PASSWORD_ARGON2ID, self::PASSWORD_HASH_OPTIONS);
+        if ($hashedString === false) {
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                new \Exception('Hash function returned false')
+            );
+        }
+        return $hashedString;
     }
 
     /**
@@ -86,19 +104,21 @@ class SecurityTools {
                 self::ARGON2ID_MEMORY_COST * 1024
             );
         }
+        /** @psalm-suppress MixedArgument blocked by https://github.com/vimeo/psalm/pull/2069 */
         return password_needs_rehash($hashedPassword, PASSWORD_ARGON2ID, self::PASSWORD_HASH_OPTIONS);
     }
 
     /**
      * Returns a random string of size $length
      *
-     * @param string $length
+     * @param int $length
      * @return string
      */
     public static function randomString(int $length) : string {
         $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         $str = '';
         $max = strlen($chars) - 1;
+        /** @var callable(int, int):int */
         $rng = function_exists('random_int') ? 'random_int' : 'mt_rand';
         for ($i = 0; $i < $length; $i++) {
             $str .= $chars[$rng(0, $max)];
@@ -114,7 +134,7 @@ class SecurityTools {
      * @return string The string.
      */
     public static function randomHexString(int $length) : string {
-        return bin2hex(random_bytes($length / 2));
+        return bin2hex(random_bytes(intval($length / 2)));
     }
 
     /**
@@ -145,7 +165,7 @@ class SecurityTools {
         // sodium_compat's (fast) autoloader. Instead, simulate what it does
         // here, with the full path of the standard autoload file.
         require_once 'libs/third_party/sodium_compat/autoload.php';
-        ParagonIE_Sodium_Compat::$fastMult = true;
+        \ParagonIE_Sodium_Compat::$fastMult = true;
 
         require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
         require_once 'libs/third_party/constant_time_encoding/src/Base64.php';
@@ -170,7 +190,7 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
         require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
 
-        if (self::$_gitserverSecretKey == null) {
+        if (is_null(self::$_gitserverSecretKey)) {
             self::$_gitserverSecretKey = new \ParagonIE\Paseto\Keys\AsymmetricSecretKey(
                 base64_decode(OMEGAUP_GITSERVER_SECRET_KEY)
             );
@@ -180,7 +200,7 @@ class SecurityTools {
             ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
             ->setPurpose(\ParagonIE\Paseto\Purpose::public())
             ->setExpiration(
-                (new DateTime('now'))->add(new DateInterval('PT5M'))
+                (new \DateTime('now'))->add(new \DateInterval('PT5M'))
             )
             ->setIssuer('omegaUp frontend')
             ->setSubject($username)
