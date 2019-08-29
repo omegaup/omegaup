@@ -29,7 +29,7 @@
                     v-bind:dot-size="18"
                     v-bind:enable-cross="false"
                     v-bind:included="true"
-                    v-bind:marks="sliderMarks"
+                    v-bind:marks="SLIDER_MARKS"
                     v-bind:max="4"
                     v-bind:min="0"
                     v-model="difficultyRange"></vue-slider></tab-content> <tab-content v-bind:title=
@@ -37,7 +37,7 @@
           <div class="tab-select">
             <label class="tab-select-el"
                  v-bind:class="{ 'tab-select-el-active': priority.type === selectedPriority }"
-                 v-for="priority in priorities">{{ priority.text }} <input class="hidden-radio"
+                 v-for="priority in PRIORITIES">{{ priority.text }} <input class="hidden-radio"
                    name="priority"
                    type="radio"
                    v-bind:value="priority.type"
@@ -184,7 +184,7 @@ export default class ProblemFinderWizard extends Vue {
   karel = false;
   selectedTags = [];
   difficultyRange = [0, 4];
-  sliderMarks: { [key: string]: string } = {
+  SLIDER_MARKS: { [key: string]: string } = {
     '0': T.qualityFormDifficultyVeryEasy,
     '1': T.qualityFormDifficultyEasy,
     '2': T.qualityFormDifficultyMedium,
@@ -192,7 +192,7 @@ export default class ProblemFinderWizard extends Vue {
     '4': T.qualityFormDifficultyVeryHard,
   };
   selectedPriority = 'quality';
-  priorities: Priority[] = [
+  PRIORITIES: Priority[] = [
     {
       type: 'quality',
       text: T.wordsQuality,
@@ -225,7 +225,7 @@ export default class ProblemFinderWizard extends Vue {
       mode: 'desc',
     };
     if (this.karel) {
-      queryParameters['only_karel'] = true;
+      queryParameters.only_karel = true;
     }
     if (this.selectedTags.length > 0) {
       queryParameters.tag = this.selectedTags;
