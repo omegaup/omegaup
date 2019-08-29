@@ -116,7 +116,6 @@ spl_autoload_register(function (string $classname) : void {
 });
 
 require_once('libs/Scoreboard.php');
-require_once('libs/SecurityTools.php');
 
 Logger::configure([
     'rootLogger' => [

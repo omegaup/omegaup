@@ -411,12 +411,12 @@ class SessionController extends Controller {
             self::$log->warn("Identity {$identity->username} has introduced invalid credentials.");
             return false;
         }
-        if (SecurityTools::isOldHash($identity->password)) {
+        if (\OmegaUp\SecurityTools::isOldHash($identity->password)) {
             // Update the password using the new Argon2i algorithm.
             self::$log->warn("Identity {$identity->username}'s password hash is being upgraded.");
             try {
                 \OmegaUp\DAO\DAO::transBegin();
-                $identity->password = SecurityTools::hashString($r['password']);
+                $identity->password = \OmegaUp\SecurityTools::hashString($r['password']);
                 IdentitiesDAO::update($identity);
                 if (!is_null($identity->user_id)) {
                     $user = UsersDAO::getByPK($identity->user_id);

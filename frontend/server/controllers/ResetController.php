@@ -105,7 +105,7 @@ class ResetController extends Controller {
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
-        $user->password = SecurityTools::hashString($r['password']);
+        $user->password = \OmegaUp\SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
         $user->reset_sent_at = null;
         $identity = IdentitiesDAO::getByPK($user->main_identity_id);
@@ -171,7 +171,7 @@ class ResetController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('passwordMismatch');
         }
 
-        SecurityTools::testStrongPassword($password);
+        \OmegaUp\SecurityTools::testStrongPassword($password);
 
         $seconds = \OmegaUp\Time::get() - $user->reset_sent_at;
         if ($seconds > PASSWORD_RESET_TIMEOUT) {

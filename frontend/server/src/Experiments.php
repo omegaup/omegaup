@@ -34,7 +34,7 @@ use \UsersExperimentsDAO;
  *       hash_hmac('sha1', ${NAME}, OMEGAUP_EXPERIMENT_SECRET).
  *
  *   This is done to avoid users from unintentionally enabling experiments that
- *   are not quite ready. frontend/server/libs/ExperimentHashCmd.php is a
+ *   are not quite ready. frontend/server/cmd/ExperimentHashCmd.php is a
  *   command-line script that can calculate these hashes for you.
  * * By adding a row to the Users_Experiments table.
  * * TODO(lhchavez): Add support (and guidelines) for randomized trials.
