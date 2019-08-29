@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
-import { Highcharts } from '@/third_party/js/highstock.js';
+import * as Highcharts from 'highcharts';
 import { oGraph } from '../../omegaup-graph.js';
 import { T } from '../omegaup.js';
 import UI from '../ui.js';
@@ -15,7 +15,10 @@ export default class DistributionChart extends Vue {
   @Prop() stats!: omegaup.Stats;
   @Prop() title!: string;
 
-  distributionChart: omegaup.Stats = Highcharts.Charts;
+  distributionChart: Highcharts.Chart = new Highcharts.Chart(
+    this.$el as HTMLElement,
+    {},
+  );
 
   mounted() {
     this.distributionChart = oGraph.distributionChart(
