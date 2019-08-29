@@ -993,8 +993,8 @@ class ContestController extends Controller {
             ACLsDAO::create($acl);
             $problemset->acl_id = $acl->acl_id;
             $problemset->type = 'Contest';
-            $problemset->scoreboard_url = SecurityTools::randomString(30);
-            $problemset->scoreboard_url_admin = SecurityTools::randomString(30);
+            $problemset->scoreboard_url = \OmegaUp\SecurityTools::randomString(30);
+            $problemset->scoreboard_url_admin = \OmegaUp\SecurityTools::randomString(30);
             $contest->acl_id = $acl->acl_id;
 
             // Save the problemset object with data sent by user to the database

@@ -14,35 +14,35 @@ OmegaUp.on('ready', function() {
           initialGroups: this.groups,
         },
         on: {
-          'change-role': function(role, enabled) {
-            if (enabled) {
+          'on-change-role': function(selectedRole) {
+            if (selectedRole.selected) {
               omegaup.API.User.addRole({
                                 username: payload.username,
-                                role: role,
+                                role: selectedRole.value.name,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeRole({
                                 username: payload.username,
-                                role: role,
+                                role: selectedRole.value.name,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             }
           },
-          'change-group': function(group, enabled) {
-            if (enabled) {
+          'on-change-group': function(selectedGroup) {
+            if (selectedGroup.selected) {
               omegaup.API.User.addGroup({
                                 username: payload.username,
-                                group: group,
+                                group: selectedGroup.value.name,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);
             } else {
               omegaup.API.User.removeGroup({
                                 username: payload.username,
-                                group: group,
+                                group: selectedGroup.value.name,
                               })
                   .then(function() { omegaup.UI.success(T.userEditSuccess); })
                   .fail(omegaup.UI.apiError);

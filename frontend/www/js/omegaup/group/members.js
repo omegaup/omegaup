@@ -55,7 +55,12 @@ OmegaUp.on('ready', function() {
                   groupMembersInstance.showEditForm = false;
                   refreshMemberList();
                 })
-                .fail(apiError);
+                .fail(UI.apiError);
+          },
+          'change-password-identity': function(groupMembersInstance, username) {
+            groupMembersInstance.showEditForm = false;
+            groupMembersInstance.showChangePasswordForm = true;
+            groupMembersInstance.username = username;
           },
           'change-password-identity': function(groupMembersInstance, username) {
             groupMembersInstance.showEditForm = false;
