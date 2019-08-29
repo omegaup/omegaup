@@ -55,7 +55,7 @@
            v-if="showTab === 'publish'">
         <omegaup-contest-publish v-bind:data="contest"
              v-on:emit-update-admission-mode=
-             "$emit('update-admission-mode', publishComponent)"></omegaup-contest-publish>
+             "publishComponent =&gt; $emit('update-admission-mode', publishComponent)"></omegaup-contest-publish>
       </div>
       <div class="tab-pane active contestants"
            v-if="showTab === 'contestants'">
