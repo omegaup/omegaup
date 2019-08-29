@@ -1597,7 +1597,23 @@ class ProblemController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            return [
+                'status' => 'ok',
+                'published' => $problem->commit,
+                'log' => [
+                    [
+                        'commit' => $problem->commit,
+                        'tree' => null,
+                        'author' => [
+                            'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
+                        ],
+                        'committer' => [
+                            'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp($problem->creation_date),
+                        ],
+                        'version' => $problem->current_version,
+                    ],
+                ],
+            ];
         }
 
         $privateTreeMapping = [];

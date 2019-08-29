@@ -371,6 +371,7 @@ groupsIdentityWarning = "Guarda las contraseñas en un lugar seguro, porque una 
 groupsInvalidCsv = "Favor de cargar un archivo CSV válido."
 groupsUploadCsvFile = "Carga el archivo CSV"
 identityAlreadyAssociated = "Ya cuentas con una identidad asociada con el mimso grupo."
+identityInGroup = "La identidad ya está asociada al grupo."
 incompatibleArgs = "Parametros no se pueden utilizar al mismo tiempo"
 index = "Coder del mes"
 interviewCreateNew = "Crear nueva entrevista"

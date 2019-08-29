@@ -39,7 +39,7 @@ class IdentityController extends Controller {
             throw new \OmegaUp\Exceptions\LoginDisabledException('loginDisabled');
         }
 
-        return SecurityTools::compareHashedStrings(
+        return \OmegaUp\SecurityTools::compareHashedStrings(
             $password,
             $identity->password
         );
@@ -239,8 +239,8 @@ class IdentityController extends Controller {
         self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
 
-        SecurityTools::testStrongPassword($r['password']);
-        $identity->password = SecurityTools::hashString($r['password']);
+        \OmegaUp\SecurityTools::testStrongPassword($r['password']);
+        $identity->password = \OmegaUp\SecurityTools::hashString($r['password']);
 
         // Save object into DB
         try {
@@ -313,8 +313,8 @@ class IdentityController extends Controller {
         $schoolId = SchoolController::createSchool(trim($school), $state);
 
         // Check password
-        SecurityTools::testStrongPassword($password);
-        $hashedPassword = SecurityTools::hashString($password);
+        \OmegaUp\SecurityTools::testStrongPassword($password);
+        $hashedPassword = \OmegaUp\SecurityTools::hashString($password);
 
         return new \OmegaUp\DAO\VO\Identities([
             'username' => $username,
@@ -413,10 +413,8 @@ class IdentityController extends Controller {
     /**
      * Returns the prefered language as a string (en,es,fra) of the identity given
      * If no identity is given, language is retrived from the browser.
-     *
-     * @return String
      */
-    public static function getPreferredLanguage(\OmegaUp\Request $r) {
+    public static function getPreferredLanguage(\OmegaUp\Request $r) : string {
         // for quick debugging
         if (isset($_GET['lang'])) {
             return self::convertToSupportedLanguage($_GET['lang']);
