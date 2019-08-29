@@ -1,6 +1,8 @@
 import problem_Stats from '../components/problem/Stats.vue';
 import Vue from 'vue';
 import {API, OmegaUp} from '../omegaup.js';
+import * as Highcharts from 'highcharts';
+import {oGraph} from '../omegaup-graph.js';
 
 OmegaUp.on('ready', function() {
   const problemAlias =

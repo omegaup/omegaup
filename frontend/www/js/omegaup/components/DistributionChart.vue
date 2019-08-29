@@ -3,22 +3,20 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import * as Highcharts from 'highcharts';
-import { oGraph } from '../../omegaup-graph.js';
+import { oGraph } from '../omegaup-graph.js';
 import { T } from '../omegaup.js';
 import UI from '../ui.js';
 import omegaup from '../api.js';
 
-@Component({})
+@Component
 export default class DistributionChart extends Vue {
   @Prop() stats!: omegaup.Stats;
   @Prop() title!: string;
 
-  distributionChart: Highcharts.Chart = new Highcharts.Chart(
-    this.$el as HTMLElement,
-    {},
-  );
+  oGraph = oGraph;
+  distributionChart: any = null;
 
   mounted() {
     this.distributionChart = oGraph.distributionChart(

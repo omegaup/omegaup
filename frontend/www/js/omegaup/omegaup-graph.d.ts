@@ -1,4 +1,4 @@
-import { Highcharts } from '@/third_party/js/highstock.js';
+import * as Highcharts from 'highcharts';
 import { omegaup } from '@/js/omegaup/api.js';
 
 declare interface OmegaupGraph {

@@ -3,22 +3,20 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import * as Highcharts from 'highcharts';
-import { oGraph } from '../../omegaup-graph.js';
+import { oGraph } from '../omegaup-graph.js';
 import { T } from '../omegaup.js';
 import UI from '../ui.js';
 import omegaup from '../api.js';
 
-@Component({})
+@Component
 export default class VerdictChart extends Vue {
   @Prop() stats!: omegaup.Stats;
   @Prop() title!: string;
 
-  runCountsChart: Highcharts.Chart = new Highcharts.Chart(
-    this.$el as HTMLElement,
-    {},
-  );
+  oGraph = oGraph;
+  runCountsChart: any = null;
 
   mounted() {
     this.runCountsChart = oGraph.verdictCounts(
