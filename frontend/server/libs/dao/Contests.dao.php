@@ -779,7 +779,7 @@ class ContestsDAO extends ContestsDAOBase {
         // Virtual contest alias format (alias-virtual-random)
         $alias = $contest->alias;
 
-        return substr($alias, 0, 20) . '-virtual-' . SecurityTools::randomString(3);
+        return substr($alias, 0, 20) . '-virtual-' . \OmegaUp\SecurityTools::randomString(3);
     }
 
     /**

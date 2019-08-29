@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \SecurityTools;
-
 /**
  * Class to abstract interactions with omegaup-gitserver.
  */
@@ -368,7 +366,7 @@ class ProblemDeployer {
                         // Unsetting Expect:, since it kind of breaks the gitserver.
                         'Expect: ',
                         "Content-Length: $zipFileSize",
-                        SecurityTools::getGitserverAuthorizationHeader(
+                        \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
                             $this->alias,
                             $author
                         ),
@@ -472,7 +470,7 @@ class ProblemDeployer {
                 [
                     CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-receive-pack",
                     CURLOPT_HTTPHEADER => [
-                        SecurityTools::getGitserverAuthorizationHeader(
+                        \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
                             $this->alias,
                             strval($user->username)
                         ),

@@ -55,7 +55,7 @@ class LinkedIn {
         $this->secret = $secret;
         $this->redirect_url = $redirect_url;
         $this->state = [
-            'ct' => SecurityTools::randomString(8) // CSRF Token
+            'ct' => \OmegaUp\SecurityTools::randomString(8) // CSRF Token
         ];
         if (!is_null($post_login_redirect)) {
             $this->state['rd'] = $post_login_redirect;
