@@ -1,4 +1,9 @@
 declare namespace omegaup {
+  export class Selectable<T> {
+    value: T;
+    selected: boolean;
+  }
+
   enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',
@@ -186,7 +191,19 @@ declare namespace omegaup {
     group: omegaup.DetailsGroup[];
   }
 
+  export interface Experiment {
+    config: boolean;
+    hash: string;
+    name: string;
+  }
+
+  export interface Group {
+    name: string;
+  }
+
   export interface Identity extends User {
+    name: string;
+    username: string;
     school: string;
     school_name?: string;
     gender?: string;
@@ -313,6 +330,10 @@ declare namespace omegaup {
     ip: string;
     time: string;
     username: string;
+  }
+
+  export interface Role {
+    name: string;
   }
 
   interface RunDetails {
