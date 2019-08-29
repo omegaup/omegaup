@@ -198,7 +198,7 @@ declare namespace omegaup {
   }
 
   export interface Group {
-    alias: string;
+    name: string;
   }
 
   export interface Identity extends User {
@@ -333,7 +333,7 @@ declare namespace omegaup {
   }
 
   export interface Role {
-    title: string;
+    name: string;
   }
 
   interface RunDetails {
