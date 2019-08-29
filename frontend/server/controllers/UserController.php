@@ -55,8 +55,8 @@ class UserController extends Controller {
         // Check password
         $hashedPassword = null;
         if (!isset($r['ignore_password'])) {
-            SecurityTools::testStrongPassword($r['password']);
-            $hashedPassword = SecurityTools::hashString($r['password']);
+            \OmegaUp\SecurityTools::testStrongPassword($r['password']);
+            $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
         }
 
         // Does user or email already exists?
@@ -67,7 +67,7 @@ class UserController extends Controller {
             if (!is_null($userByEmail->password)) {
                 // Check if the same user had already tried to create this account.
                 if (!is_null($user) && $user->user_id == $userByEmail->user_id
-                    && SecurityTools::compareHashedStrings(
+                    && \OmegaUp\SecurityTools::compareHashedStrings(
                         $r['password'],
                         $user->password
                     )) {
@@ -112,7 +112,7 @@ class UserController extends Controller {
             'username' => $r['username'],
             'password' => $hashedPassword,
             'verified' => 0,
-            'verification_id' => SecurityTools::randomString(50),
+            'verification_id' => \OmegaUp\SecurityTools::randomString(50),
         ];
         if (isset($r['is_private'])) {
             $userData['is_private'] = $r['is_private'];
@@ -314,7 +314,7 @@ class UserController extends Controller {
             self::$log->info('User does not have verification id. Generating.');
 
             try {
-                $user->verification_id = SecurityTools::randomString(50);
+                $user->verification_id = \OmegaUp\SecurityTools::randomString(50);
                 UsersDAO::update($user);
             } catch (Exception $e) {
                 self::$log->info("Unable to save verification ID: $e");
@@ -379,8 +379,8 @@ class UserController extends Controller {
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
             if (isset($r['password']) && $r['password'] != '') {
-                SecurityTools::testStrongPassword($r['password']);
-                $hashedPassword = SecurityTools::hashString($r['password']);
+                \OmegaUp\SecurityTools::testStrongPassword($r['password']);
+                $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
             }
         } else {
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
@@ -389,7 +389,7 @@ class UserController extends Controller {
                 // Check the old password
                 \OmegaUp\Validators::validateStringNonEmpty($r['old_password'], 'old_password');
 
-                $old_password_valid = SecurityTools::compareHashedStrings(
+                $old_password_valid = \OmegaUp\SecurityTools::compareHashedStrings(
                     $r['old_password'],
                     $user->password
                 );
@@ -399,8 +399,8 @@ class UserController extends Controller {
                 }
             }
 
-            SecurityTools::testStrongPassword($r['password']);
-            $hashedPassword = SecurityTools::hashString($r['password']);
+            \OmegaUp\SecurityTools::testStrongPassword($r['password']);
+            $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
         }
 
         $user->password = $hashedPassword;
@@ -1023,13 +1023,13 @@ class UserController extends Controller {
             );
         }
 
-        self::$permissionKey = $r['permission_key'] = SecurityTools::randomString(32);
+        self::$permissionKey = $r['permission_key'] = \OmegaUp\SecurityTools::randomString(32);
 
         foreach ($keys as $k => $n) {
             $digits = floor(log10($n) + 1);
             for ($i = 1; $i <= $n; $i++) {
                 $username = $k . '-' . str_pad($i, $digits, '0', STR_PAD_LEFT);
-                $password = SecurityTools::randomString(8);
+                $password = \OmegaUp\SecurityTools::randomString(8);
 
                 if (self::omiPrepareUser($r, $username, $password)) {
                     $response[$username] = $password;
@@ -1542,8 +1542,8 @@ class UserController extends Controller {
             $r->identity->username = $r['username'];
         }
 
-        SecurityTools::testStrongPassword($r['password']);
-        $hashedPassword = SecurityTools::hashString($r['password']);
+        \OmegaUp\SecurityTools::testStrongPassword($r['password']);
+        $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
         $r->user->password = $hashedPassword;
         $r->identity->password = $hashedPassword;
 
@@ -1855,7 +1855,7 @@ class UserController extends Controller {
                     self::$log->info('User does not have verification id. Generating.');
 
                     try {
-                        $r->user->verification_id = SecurityTools::randomString(50);
+                        $r->user->verification_id = \OmegaUp\SecurityTools::randomString(50);
                         UsersDAO::update($r->user);
                     } catch (Exception $e) {
                         // best effort, eat exception
@@ -2328,7 +2328,7 @@ class UserController extends Controller {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 
-        $passwordCheck = SecurityTools::compareHashedStrings(
+        $passwordCheck = \OmegaUp\SecurityTools::compareHashedStrings(
             $r['password'],
             $identity->password
         );
@@ -2365,8 +2365,8 @@ class UserController extends Controller {
     public static function apiGenerateGitToken(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
-        $token = SecurityTools::randomHexString(40);
-        $r->user->git_token = SecurityTools::hashString($token);
+        $token = \OmegaUp\SecurityTools::randomHexString(40);
+        $r->user->git_token = \OmegaUp\SecurityTools::hashString($token);
         UsersDAO::update($r->user);
 
         return [

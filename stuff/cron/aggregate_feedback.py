@@ -110,10 +110,11 @@ def get_global_quality_and_difficulty_average(dbconn, rank_cutoffs):
 
             user_score = row[1]
             weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
-            if 'quality' in contents:
+            if 'quality' in contents and contents['quality'] is not None:
                 quality_sum += weighting_factor * contents['quality']
                 quality_n += weighting_factor
-            if 'difficulty' in contents:
+            if ('difficulty' in contents and
+                    contents['difficulty'] is not None):
                 difficulty_sum += weighting_factor * contents['difficulty']
                 difficulty_n += weighting_factor
 
@@ -141,11 +142,12 @@ def get_problem_aggregates(dbconn, problem_id, rank_cutoffs):
             contents = json.loads(row[0])
             user_score = row[1]
             weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
-            if 'quality' in contents:
+            if 'quality' in contents and contents['quality'] is not None:
                 quality_votes[contents['quality']].count += 1
                 quality_votes[contents['quality']].weighted_sum += (
                     weighting_factor)
-            if 'difficulty' in contents:
+            if ('difficulty' in contents and
+                    contents['difficulty'] is not None):
                 difficulty_votes[contents['difficulty']].count += 1
                 difficulty_votes[contents['difficulty']].weighted_sum += (
                     weighting_factor)
@@ -384,7 +386,7 @@ def update_problem_of_the_week(dbconn, difficulty):
                 logging.exception('Failed to parse contents')
                 continue
 
-            if 'quality' not in contents:
+            if 'quality' not in contents or contents['quality'] is None:
                 continue
 
             quality_map[problem_id] += contents['quality']

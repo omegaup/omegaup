@@ -44,8 +44,8 @@ class InterviewController extends Controller {
             $problemset = new \OmegaUp\DAO\VO\Problemsets([
                 'acl_id' => $acl->acl_id,
                 'type' => 'Interview',
-                'scoreboard_url' => SecurityTools::randomString(30),
-                'scoreboard_url_admin' => SecurityTools::randomString(30),
+                'scoreboard_url' => \OmegaUp\SecurityTools::randomString(30),
+                'scoreboard_url_admin' => \OmegaUp\SecurityTools::randomString(30),
             ]);
             ProblemsetsDAO::create($problemset);
             $interview->problemset_id = $problemset->problemset_id;
@@ -122,7 +122,7 @@ class InterviewController extends Controller {
             $newUserRequest = new \OmegaUp\Request($r);
             $newUserRequest['email'] = $r['usernameOrEmail'];
             $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
-            $newUserRequest['password'] = SecurityTools::randomString(8);
+            $newUserRequest['password'] = \OmegaUp\SecurityTools::randomString(8);
 
             UserController::apiCreate($newUserRequest);
 

@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \SecurityTools;
-
 /**
  * Class to abstract access to a problem's artifacts.
  *
@@ -206,7 +204,7 @@ class GitServerBrowser {
     public function __construct(string $alias, string $url, bool $passthru = false) {
         $this->curl = curl_init();
         $this->headers = [
-            SecurityTools::getGitserverAuthorizationHeader($alias, 'omegaup:system'),
+            \OmegaUp\SecurityTools::getGitserverAuthorizationHeader($alias, 'omegaup:system'),
         ];
         $this->passthru = $passthru;
         curl_setopt_array(
