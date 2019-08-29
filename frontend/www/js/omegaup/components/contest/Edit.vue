@@ -43,7 +43,8 @@
            v-if="showTab === 'new_form'">
         <omegaup-contest-new-form v-bind:data="contest"
              v-bind:update="true"
-             v-on:emit-update-contest="onChildUpdateContest"></omegaup-contest-new-form>
+             v-on:emit-update-contest=
+             "$emit('update-contest', newFormComponent)"></omegaup-contest-new-form>
       </div>
       <div class="tab-pane active problems"
            v-if="showTab === 'problems'">
@@ -54,25 +55,31 @@
            v-if="showTab === 'publish'">
         <omegaup-contest-publish v-bind:data="contest"
              v-on:emit-update-admission-mode=
-             "onChildUpdateAdmissionMode"></omegaup-contest-publish>
+             "$emit('update-admission-mode', publishComponent)"></omegaup-contest-publish>
       </div>
       <div class="tab-pane active contestants"
            v-if="showTab === 'contestants'">
         <omegaup-contest-contestant v-bind:contest="contest"
              v-bind:data="users"
-             v-on:emit-add-user="onChildAddUser"
-             v-on:emit-remove-user="onChildRemoveUser"
-             v-on:emit-save-end-time="onChildSaveEndTime"></omegaup-contest-contestant>
+             v-on:emit-add-user="contestantComponent =&gt; $emit('add-user', contestantComponent)"
+             v-on:emit-remove-user=
+             "contestantComponent =&gt; $emit('remove-user', contestantComponent)"
+             v-on:emit-save-end-time=
+             "selected =&gt; $emit('save-end-time', selected)"></omegaup-contest-contestant>
              <omegaup-contest-requests v-bind:data="requests"
-             v-on:emit-accept-request="onChildAcceptRequest"
-             v-on:emit-deny-request="onChildDenyRequest"></omegaup-contest-requests>
+             v-on:emit-accept-request=
+             "(requestsComponent, username) =&gt; $emit('accept-request', requestsComponent, username)"
+             v-on:emit-deny-request=
+             "(requestsComponent, username) =&gt; $emit('deny-request', requestsComponent, username)"></omegaup-contest-requests>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
         <omegaup-contest-admins v-bind:data="admins"></omegaup-contest-admins>
         <omegaup-contest-group-admins v-bind:data="groupAdmins"
-             v-on:emit-add-group-admin="onChildAddGroupAdmin"
-             v-on:emit-remove-group-admin="onChildRemoveGroupAdmin"></omegaup-contest-group-admins>
+             v-on:emit-add-group-admin=
+             "groupAdminsComponent =&gt; $emit('add-group-admin', groupAdminsComponent)"
+             v-on:emit-remove-group-admin=
+             "groupAdminsComponent =&gt; $emit('remove-group-admin', groupAdminsComponent)"></omegaup-contest-group-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'links'">
@@ -110,48 +117,6 @@ interface ContestEdit {
   users: omegaup.IdentityContest[];
 }
 
-interface ContestantComponent {
-  contestants: string;
-  contestant: string;
-  selected: omegaup.IdentityContest;
-}
-
-interface GroupAdminsComponent {
-  groupName: string;
-  selected: omegaup.ContestGroupAdmin;
-}
-
-interface NewFormComponent {
-  alias: string;
-  description: string;
-  feedback: string;
-  finishTime: Date;
-  scoreboard: omegaup.Scoreboard;
-  languages: Array<string>;
-  needsBasicInformation: boolean;
-  penalty: number;
-  penaltyType: string;
-  penaltyCalcPolicy: string;
-  pointsDecayFactor: number;
-  requestsUserInformation: omegaup.RequestsUserInformation;
-  startTime: Date;
-  showPenalty: boolean;
-  showScoreboardAfter: boolean;
-  submissionsGap: number;
-  title: string;
-  titlePlaceHolder: string;
-  windowLength: number;
-  windowLengthEnabled: number;
-}
-
-interface PublishComponent {
-  admissionMode: omegaup.AdmissionMode;
-}
-
-interface RequestsComponent {
-  requests: omegaup.IdentityContestRequest[];
-}
-
 @Component({
   components: {
     'omegaup-contest-add-problem': contest_AddProblem,
@@ -178,48 +143,6 @@ export default class Edit extends Vue {
   requests = this.data.requests;
   admins = this.data.admins;
   groupAdmins = this.data.groupAdmins;
-
-  onChildSaveEndTime(selected: omegaup.IdentityContest): void {
-    this.$emit('save-end-time', selected);
-  }
-
-  onChildAddUser(contestantComponent: ContestantComponent): void {
-    this.$emit('add-user', contestantComponent);
-  }
-
-  onChildRemoveUser(contestantComponent: ContestantComponent): void {
-    this.$emit('remove-user', contestantComponent);
-  }
-
-  onChildAddGroupAdmin(groupAdminsComponent: GroupAdminsComponent): void {
-    this.$emit('add-group-admin', groupAdminsComponent);
-  }
-
-  onChildRemoveGroupAdmin(groupAdminsComponent: GroupAdminsComponent): void {
-    this.$emit('remove-group-admin', groupAdminsComponent);
-  }
-
-  onChildUpdateContest(newFormComponent: NewFormComponent): void {
-    this.$emit('update-contest', newFormComponent);
-  }
-
-  onChildUpdateAdmissionMode(publishComponent: PublishComponent): void {
-    this.$emit('update-admission-mode', publishComponent);
-  }
-
-  onChildAcceptRequest(
-    requestsComponent: RequestsComponent,
-    username: string,
-  ): void {
-    this.$emit('accept-request', requestsComponent, username);
-  }
-
-  onChildDenyRequest(
-    requestsComponent: RequestsComponent,
-    username: string,
-  ): void {
-    this.$emit('deny-request', requestsComponent, username);
-  }
 }
 
 </script>
