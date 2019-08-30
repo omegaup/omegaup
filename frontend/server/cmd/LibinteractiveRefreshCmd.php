@@ -25,6 +25,9 @@ Logger::configure([
     ],
 ]);
 
+/**
+ * @return Generator<int, string>
+ */
 function listDir(string $path) : Generator {
     $dh = opendir($path);
     if (!is_resource($dh)) {
