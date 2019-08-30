@@ -1585,9 +1585,9 @@ class ContestController extends Controller {
             'identity_id' => $identity->identity_id,
             'access_time' => null,
             'end_time' => null,
-            'score' => '0',
-            'time' => '0',
-            'is_invited' => '1',
+            'score' => 0,
+            'time' => 0,
+            'is_invited' => true,
         ]));
 
         return ['status' => 'ok'];

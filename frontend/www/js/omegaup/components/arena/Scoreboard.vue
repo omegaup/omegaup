@@ -24,7 +24,7 @@
             v-if="showUser(user.is_invited)">
           <td class="legend"
               v-bind:style="{ backgroundColor: legendColor(userIndex) }"></td>
-          <td class="position">{{ user.place }}</td>
+          <td class="position">{{ user.place || '—' }}</td>
           <td class="user">{{ UI.rankingUsername(user) }} <img alt=""
                height="11"
                v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
