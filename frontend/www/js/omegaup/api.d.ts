@@ -333,7 +333,7 @@ declare namespace omegaup {
 
   export interface ScoreboardUser extends User {
     country?: string;
-    is_invited: number;
+    is_invited: boolean;
     place: number;
     problems: ScoreboardUserProblem[];
     total: {

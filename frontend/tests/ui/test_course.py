@@ -60,6 +60,10 @@ def test_user_ranking_course(driver):
                  '//a[contains(@href, "/assignment/%s/scoreboard/")]' %
                  assignment_alias))).click()
 
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//input[@class = "toggle-contestants"]'))).click()
+
         run_user = driver.browser.find_element_by_xpath(
             '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
             '"user"]')

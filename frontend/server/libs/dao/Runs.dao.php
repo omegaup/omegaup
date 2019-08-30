@@ -336,7 +336,7 @@ class RunsDAO extends RunsDAOBase {
             } else {
                 $sql = '
                     SELECT
-                        i.identity_id, i.username, i.name, i.country_id, \'0\' as is_invited
+                        i.identity_id, i.username, i.name, i.country_id, 0 as is_invited
                     FROM
                         Identities i
                     INNER JOIN
@@ -357,7 +357,7 @@ class RunsDAO extends RunsDAOBase {
         } else {
             $sql = '
                 SELECT
-                    i.identity_id, i.username, i.name, i.country_id, \'0\' as is_invited
+                    i.identity_id, i.username, i.name, i.country_id, 0 as is_invited
                 FROM
                     Identities i
                 INNER JOIN
@@ -383,14 +383,12 @@ class RunsDAO extends RunsDAOBase {
             $sql .= ';';
         }
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
-
-        $ar = [];
-        foreach ($rs as $row) {
-            array_push($ar, $row);
+        $result = [];
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+            $row['is_invited'] = boolval($row['is_invited']);
+            array_push($result, $row);
         }
-
-        return $ar;
+        return $result;
     }
 
     final public static function getProblemsetRuns(

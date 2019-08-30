@@ -40,7 +40,8 @@ class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
                 'problemset_id' => $container->problemset_id,
                 'score' => 0,
                 'time' => 0,
-                'is_invited' => 0,
+                'is_invited' => false,
+                'share_user_information' => $shareUserInformation,
             ]);
         }
         if (is_null($problemsetIdentity->access_time)) {
