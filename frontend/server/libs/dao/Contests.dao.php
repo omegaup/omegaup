@@ -784,10 +784,8 @@ class ContestsDAO extends ContestsDAOBase {
 
     /**
      * Check if contest is virtual contest
-     * @param Contest $contest
-     * @return boolean
      */
-    public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest) {
+    public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest) : bool {
         return $contest->rerun_id != 0;
     }
 
