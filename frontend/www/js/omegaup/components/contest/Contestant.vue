@@ -89,20 +89,20 @@ export default class Contestant extends Vue {
   contestant = '';
   contestants = '';
   users = this.data;
-  selected = {};
+  selected: omegaup.IdentityContest = { username: '' };
 
   onSaveEndTime(user: omegaup.IdentityContest): void {
     this.selected = user;
-    this.$parent.$emit('save-end-time', this.selected);
+    this.$emit('emit-save-end-time', this.selected);
   }
 
   onSubmit(): void {
-    this.$parent.$emit('add-user', this);
+    this.$emit('emit-add-user', this);
   }
 
   onRemove(user: omegaup.IdentityContest): void {
     this.selected = user;
-    this.$parent.$emit('remove-user', this);
+    this.$emit('emit-remove-user', this);
   }
 }
 
