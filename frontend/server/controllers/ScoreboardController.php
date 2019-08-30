@@ -30,9 +30,9 @@ class ScoreboardController extends Controller {
             if (is_null($assignment)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
             }
-            Scoreboard::refreshScoreboardCache(ScoreboardParams::fromAssignment($assignment, $course->group_id, true));
+            \OmegaUp\Scoreboard::refreshScoreboardCache(\OmegaUp\ScoreboardParams::fromAssignment($assignment, $course->group_id, true));
         } else {
-            Scoreboard::refreshScoreboardCache(ScoreboardParams::fromContest($contest));
+            \OmegaUp\Scoreboard::refreshScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($contest));
         }
 
         return [

@@ -115,8 +115,6 @@ spl_autoload_register(function (string $classname) : void {
     }
 });
 
-require_once('libs/Scoreboard.php');
-
 Logger::configure([
     'rootLogger' => [
         'appenders' => ['default'],

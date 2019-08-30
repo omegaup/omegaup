@@ -401,6 +401,7 @@ def add_students_bulk(driver, users):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CLASS_NAME, ('user-add-bulk')))).click()
+    util.dismiss_status(driver)
     for user in users:
         driver.wait.until(
             EC.visibility_of_element_located(
@@ -428,6 +429,7 @@ def add_problem_to_contest(driver, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, '.btn.add-problem'))).click()
+    util.dismiss_status(driver)
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,
@@ -494,6 +496,7 @@ def change_contest_admission_mode(driver, contest_admission_mode):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, '.btn.change-admission-mode'))).click()
+    util.dismiss_status(driver)
 
 
 @util.annotate

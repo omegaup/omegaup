@@ -78,7 +78,7 @@
           <button class="btn btn-primary"
                type="submit">{{ T.wordsSaveChanges }}</button> <button class="btn btn-secundary"
                type="reset"
-               v-on:click="onCancel">{{ T.wordsCancel }}</button>
+               v-on:click="$emit('emit-cancel')">{{ T.wordsCancel }}</button>
         </div>
       </form>
     </div>
@@ -133,18 +133,13 @@ export default class IdentityEdit extends Vue {
   }
 
   onEditMember(): void {
-    this.$parent.$emit(
-      'edit-identity-member',
+    this.$emit(
+      'emit-edit-identity-member',
       this,
-      this.$parent,
       this.identity,
       this.selectedCountry,
       this.selectedState,
     );
-  }
-
-  onCancel(): void {
-    this.$parent.$emit('cancel', this.$parent);
   }
 }
 

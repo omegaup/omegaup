@@ -1354,7 +1354,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
     }
@@ -1440,7 +1440,7 @@ class ContestController extends Controller {
 
         // Invalidar cache
         \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
-        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($params['contest']));
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($params['contest']));
 
         return ['status' => 'ok'];
     }
@@ -1591,9 +1591,9 @@ class ContestController extends Controller {
             'identity_id' => $identity->identity_id,
             'access_time' => null,
             'end_time' => null,
-            'score' => '0',
-            'time' => '0',
-            'is_invited' => '1',
+            'score' => 0,
+            'time' => 0,
+            'is_invited' => true,
         ]));
 
         return ['status' => 'ok'];
@@ -1803,13 +1803,13 @@ class ContestController extends Controller {
         // Get the current user
         $response = self::validateDetails($r);
 
-        $params = ScoreboardParams::fromContest($response['contest']);
-        $params['admin'] = (
+        $params = \OmegaUp\ScoreboardParams::fromContest($response['contest']);
+        $params->admin = (
             \OmegaUp\Authorization::isContestAdmin($r->identity, $response['contest']) &&
             !ContestsDAO::isVirtual($response['contest'])
         );
-        $params['show_all_runs'] = !ContestsDAO::isVirtual($response['contest']);
-        $scoreboard = new Scoreboard($params);
+        $params->show_all_runs = !ContestsDAO::isVirtual($response['contest']);
+        $scoreboard = new \OmegaUp\Scoreboard($params);
 
         // Push scoreboard data in response
         $response = [];
@@ -1851,9 +1851,9 @@ class ContestController extends Controller {
         }
 
         // Create scoreboard
-        $params = ScoreboardParams::fromContest($contest);
-        $params['admin'] = $showAllRuns;
-        $scoreboard = new Scoreboard($params);
+        $params = \OmegaUp\ScoreboardParams::fromContest($contest);
+        $params->admin = $showAllRuns;
+        $scoreboard = new \OmegaUp\Scoreboard($params);
 
         return $scoreboard->generate();
     }
@@ -1907,9 +1907,9 @@ class ContestController extends Controller {
                 $r['contest_params'] = $cp;
             }
 
-            $params = ScoreboardParams::fromContest($contest);
-            $params['only_ac'] = $r['contest_params'][$contest->alias]['only_ac'];
-            $s = new Scoreboard($params);
+            $params = \OmegaUp\ScoreboardParams::fromContest($contest);
+            $params->only_ac = $r['contest_params'][$contest->alias]['only_ac'];
+            $s = new \OmegaUp\Scoreboard($params);
 
             $scoreboards[$contest->alias] = $s->generate();
         }
@@ -2229,7 +2229,7 @@ class ContestController extends Controller {
         \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
 
         // Expire contest scoreboard cache
-        Scoreboard::invalidateScoreboardCache(ScoreboardParams::fromContest($contest));
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($contest));
 
         // Expire contest-list cache
         \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
@@ -2514,10 +2514,10 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
-        $params = ScoreboardParams::fromContest($contest);
-        $params['admin'] = true;
-        $params['auth_token'] = $r['auth_token'];
-        $scoreboard = new Scoreboard($params);
+        $params = \OmegaUp\ScoreboardParams::fromContest($contest);
+        $params->admin = true;
+        $params->auth_token = $r['auth_token'];
+        $scoreboard = new \OmegaUp\Scoreboard($params);
 
         // Check the filter if we have one
         \OmegaUp\Validators::validateStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);
