@@ -42,7 +42,9 @@
       <div class="tab-pane active"
            v-if="showTab === 'new_form'">
         <omegaup-contest-new-form v-bind:data="contest"
-             v-bind:update="true"></omegaup-contest-new-form>
+             v-bind:update="true"
+             v-on:emit-update-contest=
+             "$emit('update-contest', newFormComponent)"></omegaup-contest-new-form>
       </div>
       <div class="tab-pane active problems"
            v-if="showTab === 'problems'">
@@ -51,18 +53,33 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'publish'">
-        <omegaup-contest-publish v-bind:data="contest"></omegaup-contest-publish>
+        <omegaup-contest-publish v-bind:data="contest"
+             v-on:emit-update-admission-mode=
+             "publishComponent =&gt; $emit('update-admission-mode', publishComponent)"></omegaup-contest-publish>
       </div>
       <div class="tab-pane active contestants"
            v-if="showTab === 'contestants'">
         <omegaup-contest-contestant v-bind:contest="contest"
-             v-bind:data="users"></omegaup-contest-contestant>
-             <omegaup-contest-requests v-bind:data="requests"></omegaup-contest-requests>
+             v-bind:data="users"
+             v-on:emit-add-user="contestantComponent =&gt; $emit('add-user', contestantComponent)"
+             v-on:emit-remove-user=
+             "contestantComponent =&gt; $emit('remove-user', contestantComponent)"
+             v-on:emit-save-end-time=
+             "selected =&gt; $emit('save-end-time', selected)"></omegaup-contest-contestant>
+             <omegaup-contest-requests v-bind:data="requests"
+             v-on:emit-accept-request=
+             "(requestsComponent, username) =&gt; $emit('accept-request', requestsComponent, username)"
+             v-on:emit-deny-request=
+             "(requestsComponent, username) =&gt; $emit('deny-request', requestsComponent, username)"></omegaup-contest-requests>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
         <omegaup-contest-admins v-bind:data="admins"></omegaup-contest-admins>
-        <omegaup-contest-group-admins v-bind:data="groupAdmins"></omegaup-contest-group-admins>
+        <omegaup-contest-group-admins v-bind:data="groupAdmins"
+             v-on:emit-add-group-admin=
+             "groupAdminsComponent =&gt; $emit('add-group-admin', groupAdminsComponent)"
+             v-on:emit-remove-group-admin=
+             "groupAdminsComponent =&gt; $emit('remove-group-admin', groupAdminsComponent)"></omegaup-contest-group-admins>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'links'">

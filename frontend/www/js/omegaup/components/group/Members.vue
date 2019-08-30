@@ -73,7 +73,9 @@
          v-bind:selected-country="identity.country_id"
          v-bind:selected-state="identity.state_id"
          v-bind:username="username"
-         v-if="showEditForm"></omegaup-identity-edit>
+         v-if="showEditForm"
+         v-on:emit-cancel="onChildCancel"
+         v-on:emit-edit-identity-member="onChildEditIdentityMember"></omegaup-identity-edit>
          <omegaup-identity-change-password v-bind:username="username"
          v-if="showChangePasswordForm"
          v-on:emit-cancel="onChildCancel"
@@ -97,6 +99,10 @@ import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';
 import Autocomplete from '../Autocomplete.vue';
+
+interface EditMemberComponent {
+  username: string;
+}
 
 @Component({
   components: {
@@ -142,6 +148,22 @@ export default class UserProfile extends Vue {
       this.username,
       newPassword,
       newPasswordRepeat,
+    );
+  }
+
+  onChildEditIdentityMember(
+    editMemeberComponent: EditMemberComponent,
+    identity: omegaup.Identity,
+    selectedCountry: string,
+    selectedState: string,
+  ): void {
+    this.$emit(
+      'edit-identity-member',
+      editMemeberComponent,
+      this,
+      identity,
+      selectedCountry,
+      selectedState,
     );
   }
 

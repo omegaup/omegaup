@@ -54,15 +54,15 @@ export default class GroupAdmin extends Vue {
   UI = UI;
   groupName = '';
   groupAdmins = this.data;
-  selected = {};
+  selected: omegaup.ContestGroupAdmin = {};
 
   onSubmit(): void {
-    this.$parent.$emit('add-group-admin', this);
+    this.$emit('emit-add-group-admin', this);
   }
 
   onRemove(group: omegaup.ContestGroupAdmin): void {
     this.selected = group;
-    this.$parent.$emit('remove-group-admin', this);
+    this.$emit('emit-remove-group-admin', this);
   }
 }
 
