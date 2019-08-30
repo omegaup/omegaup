@@ -94,8 +94,11 @@ let UI = {
     $('#status .message').html(message);
     $('#status')
         .removeClass('alert-success alert-info alert-warning alert-danger')
-        .addClass(type)
-        .slideDown();
+        .addClass(type + ' animating')
+        .slideDown({
+          complete: function() { $('#status')
+                                     .removeClass('animating'); },
+        });
     if (type == 'alert-success') {
       setTimeout(UI.dismissNotifications, 5000);
     }
@@ -115,8 +118,14 @@ let UI = {
 
   ignoreError: function(response) {},
 
-  dismissNotifications: function() { $('#status')
-                                         .slideUp(); },
+  dismissNotifications: function() {
+    $('#status')
+        .addClass('animating')
+        .slideUp({
+          complete: function() { $('#status')
+                                     .removeClass('animating'); },
+        });
+  },
 
   bulkOperation: function(operation, onOperationFinished, options) {
     var isStopExecuted = false;

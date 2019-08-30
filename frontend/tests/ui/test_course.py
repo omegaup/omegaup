@@ -260,6 +260,7 @@ def add_assignment(driver, assignment_alias):
             (By.XPATH,
              '//*[contains(@class, "omegaup-course-assignmentlist")]'
              '//a[text()="%s"]' % assignment_alias)))
+    util.dismiss_status(driver)
 
 
 @util.annotate
