@@ -55,7 +55,9 @@ class GroupsDAO extends GroupsDAOBase {
                 DISTINCT g.alias,
                 g.create_time,
                 g.description,
-                g.name
+                g.name,
+                g.group_id # This column is only necesary to make ORDER BY works
+                           # because ONLY_FULL_GROUP_BY mode is enabled
             FROM
                 Groups g
             INNER JOIN
@@ -73,13 +75,19 @@ class GroupsDAO extends GroupsDAOBase {
             ORDER BY
                 g.group_id DESC;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
                 $user_id,
                 \OmegaUp\Authorization::ADMIN_ROLE,
                 $user_id,
                 \OmegaUp\Authorization::ADMIN_ROLE,
                 $identity_id,
             ]);
+
+        foreach ($rs as &$row) {
+            unset($row['group_id']);
+        }
+
+        return $rs;
     }
 
     /**
