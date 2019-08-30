@@ -322,18 +322,18 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         $this->assertEquals(count($problemsetIdentities), ($numberOfInvitedContestants + $numberOfNotInvitedContestants));
 
-        $this->assertIdentitiesAreInCorrectList($invitedContestants, '1' /*is_invited*/, $problemsetIdentities);
+        $this->assertIdentitiesAreInCorrectList($invitedContestants, true /*isInvited*/, $problemsetIdentities);
 
-        $this->assertIdentitiesAreInCorrectList($uninvitedContestants, '0' /*is_not_invited*/, $problemsetIdentities);
+        $this->assertIdentitiesAreInCorrectList($uninvitedContestants, false /*isInvited*/, $problemsetIdentities);
     }
 
-    private function assertIdentitiesAreInCorrectList($contestants, $is_invited, $identities) {
+    private function assertIdentitiesAreInCorrectList($contestants, bool $isInvited, $identities) {
         foreach ($contestants as $contestant) {
             $this->assertArrayContainsWithPredicate(
                 $identities,
-                function ($identity) use ($contestant, $is_invited) {
+                function ($identity) use ($contestant, $isInvited) {
                     return $identity['user_id'] == $contestant->user_id &&
-                    $identity['is_invited'] == $is_invited;
+                    $identity['is_invited'] == $isInvited;
                 }
             );
         }

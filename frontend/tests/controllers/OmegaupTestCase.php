@@ -399,11 +399,11 @@ class ScopedLoginToken {
  */
 class ScopedScoreboardTestRun {
     public function __construct() {
-        Scoreboard::setIsTestRunForTesting(true);
+        \OmegaUp\Scoreboard::setIsTestRunForTesting(true);
     }
 
     public function __destruct() {
-        Scoreboard::setIsTestRunForTesting(false);
+        \OmegaUp\Scoreboard::setIsTestRunForTesting(false);
     }
 }
 

@@ -53,10 +53,10 @@ export default class Requests extends Vue {
   requests = this.data;
 
   onAcceptRequest(username: string): void {
-    this.$parent.$emit('accept-request', this, username);
+    this.$emit('emit-accept-request', this, username);
   }
   onDenyRequest(username: string): void {
-    this.$parent.$emit('deny-request', this, username);
+    this.$emit('emit-deny-request', this, username);
   }
 }
 

@@ -29,7 +29,7 @@
                     v-bind:dot-size="18"
                     v-bind:enable-cross="false"
                     v-bind:included="true"
-                    v-bind:marks="sliderMarks"
+                    v-bind:marks="SLIDER_MARKS"
                     v-bind:max="4"
                     v-bind:min="0"
                     v-model="difficultyRange"></vue-slider></tab-content> <tab-content v-bind:title=
@@ -37,7 +37,7 @@
           <div class="tab-select">
             <label class="tab-select-el"
                  v-bind:class="{ 'tab-select-el-active': priority.type === selectedPriority }"
-                 v-for="priority in priorities">{{ priority.text }} <input class="hidden-radio"
+                 v-for="priority in PRIORITIES">{{ priority.text }} <input class="hidden-radio"
                    name="priority"
                    type="radio"
                    v-bind:value="priority.type"
@@ -143,12 +143,15 @@
 }
 </style>
 
-<script>
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import omegaup from '../../api.js';
 // https://binarcode.github.io/vue-form-wizard/
-import {FormWizard, TabContent} from 'vue-form-wizard';
+import { FormWizard, TabContent } from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 // https://www.npmjs.com/package/vue-js-toggle-button
-import {ToggleButton} from 'vue-js-toggle-button';
+import { ToggleButton } from 'vue-js-toggle-button';
 // https://github.com/voerro/vue-tagsinput
 import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
@@ -156,75 +159,79 @@ import '@voerro/vue-tagsinput/dist/style.css';
 import VueSlider from 'vue-slider-component';
 import 'vue-slider-component/theme/default.css';
 
-import {OmegaUp, T, API} from '../../omegaup.js';
+interface Priority {
+  type: string;
+  text: string;
+}
 
-export default {
-  props: {
-    possibleTags: Array,
-  },
-  data: function() {
-    return {
-      T, karel: false, selectedTags:[], difficultyRange:[0, 4],
-          sliderMarks:
-              {
-                '0': T.qualityFormDifficultyVeryEasy,
-                '1': T.qualityFormDifficultyEasy,
-                '2': T.qualityFormDifficultyMedium,
-                '3': T.qualityFormDifficultyHard,
-                '4': T.qualityFormDifficultyVeryHard,
-              },
-          selectedPriority: 'quality', priorities:[
-            {
-              type: 'quality',
-              text: T.wordsQuality,
-            },
-            {
-              type: 'points',
-              text: T.wordsPointsForRank,
-            },
-            {
-              type: 'submissions',
-              text: T.wizardPriorityPopularity,
-            },
-          ],
-    }
-  },
-  computed: {
-    tagsObject: function() {
-      const self = this;
-      const singleTagsObject = {};
-      self.possibleTags.forEach(tagObject => singleTagsObject[tagObject.name] =
-                                    tagObject.name);
-      return singleTagsObject;
-    },
-  },
-  methods: {
-    searchProblems: function() {
-      const self = this;
-      // Build query parameters
-      let queryParameters = {
-        'some_tags': true,
-        'min_difficulty': self.difficultyRange[0],
-        'max_difficulty': self.difficultyRange[1],
-        'order_by': self.selectedPriority,
-        'mode': 'desc'
-      };
-      if (self.karel) {
-        queryParameters['only_karel'] = true;
-      }
-      if (self.selectedTags.length > 0) {
-        queryParameters.tag = self.selectedTags;
-      }
-      self.$emit('search-problems', queryParameters);
-    },
-  },
+interface TagsObject {
+  [key: string]: string;
+}
+
+@Component({
   components: {
     FormWizard,
     TabContent,
     ToggleButton,
-    "tags-input": VoerroTagsInput,
+    'tags-input': VoerroTagsInput,
     VueSlider,
   },
+})
+export default class ProblemFinderWizard extends Vue {
+  @Prop() possibleTags!: { name: string }[];
+
+  T = T;
+  karel = false;
+  selectedTags = [];
+  difficultyRange = [0, 4];
+  SLIDER_MARKS: { [key: string]: string } = {
+    '0': T.qualityFormDifficultyVeryEasy,
+    '1': T.qualityFormDifficultyEasy,
+    '2': T.qualityFormDifficultyMedium,
+    '3': T.qualityFormDifficultyHard,
+    '4': T.qualityFormDifficultyVeryHard,
+  };
+  selectedPriority = 'quality';
+  PRIORITIES: Priority[] = [
+    {
+      type: 'quality',
+      text: T.wordsQuality,
+    },
+    {
+      type: 'points',
+      text: T.wordsPointsForRank,
+    },
+    {
+      type: 'submissions',
+      text: T.wizardPriorityPopularity,
+    },
+  ];
+
+  get tagsObject(): TagsObject {
+    const singleTagsObject: TagsObject = {};
+    this.possibleTags.forEach(
+      tagObject => (singleTagsObject[tagObject.name] = tagObject.name),
+    );
+    return singleTagsObject;
+  }
+
+  searchProblems(): void {
+    // Build query parameters
+    let queryParameters: omegaup.QueryParameters = {
+      some_tags: true,
+      min_difficulty: this.difficultyRange[0],
+      max_difficulty: this.difficultyRange[1],
+      order_by: this.selectedPriority,
+      mode: 'desc',
+    };
+    if (this.karel) {
+      queryParameters.only_karel = true;
+    }
+    if (this.selectedTags.length > 0) {
+      queryParameters.tag = this.selectedTags;
+    }
+    this.$emit('search-problems', queryParameters);
+  }
 }
 
 </script>

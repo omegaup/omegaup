@@ -136,10 +136,12 @@ class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
     }
 
     /*
-     *
      * Get relevant problems including problemset alias
+     * @return \OmegaUp\DAO\VO\Problems[]
      */
-    final public static function getRelevantProblems(\OmegaUp\DAO\VO\Problemsets $problemset) {
+    final public static function getRelevantProblems(
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ) : array {
         // Build SQL statement
         $sql = '
             SELECT

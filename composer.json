@@ -1,6 +1,12 @@
 {
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "https://github.com/vimeo/psalm.git"
+      }
+    ],
     "require-dev": {
-        "vimeo/psalm": "^3.4.12",
+        "vimeo/psalm": "dev-master#1f0aca00b3194b6643c92d89dcb7659f670db796",
         "jetbrains/phpstorm-stubs": "^2019.2"
     }
 }
