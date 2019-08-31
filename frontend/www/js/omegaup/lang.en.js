@@ -419,6 +419,7 @@ const translations = {
 	loginFederated: "Login using these sites",
 	loginFederatedFailed: "Login using the external party failed. Did you reject access?",
 	loginHeader: "Login to omegaUp",
+	loginLinkedInEmptyEmailError: "An email address is needed to use omegaUp. Please grant access to LinkedIn's email to continue",
 	loginLogIn: "Log in",
 	loginNative: "omegaUp account",
 	loginPassword: "Password",
