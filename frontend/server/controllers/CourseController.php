@@ -1,6 +1,5 @@
 <?php
 
-require_once 'libs/ActivityReport.php';
 require_once 'libs/PrivacyStatement.php';
 
 /**
@@ -1620,7 +1619,10 @@ class CourseController extends Controller {
         $accesses = ProblemsetAccessLogDAO::GetAccessForCourse($course->course_id);
         $submissions = SubmissionLogDAO::GetSubmissionsForCourse($course->course_id);
 
-        return ActivityReport::getActivityReport($accesses, $submissions);
+        return [
+            'status' => 'ok',
+            'events' => \OmegaUp\ActivityReport::getActivityReport($accesses, $submissions),
+        ];
     }
 
     /**
