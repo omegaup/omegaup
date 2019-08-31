@@ -20,7 +20,7 @@ try {
     $smarty->assign('privateContestsAlert', $privateContestsAlert);
     $smarty->assign('payload', $payload);
     $smarty->display('../templates/contest.mine.tpl');
-} catch (APIException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('contestlist')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('404.html'));
