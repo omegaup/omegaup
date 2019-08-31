@@ -1,5 +1,7 @@
 <?php
 
+namespace OmegaUp;
+
 class UrlHelper {
     /**
      * Wrapper of file_get_contents
