@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Users_Badges.dao.base.php');
-
 /**
  * UsersBadges Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Users_Badges.dao.base.php');
  * @access public
  * @package docs
  */
-class UsersBadgesDAO extends UsersBadgesDAOBase {
+class UsersBadgesDAO extends \OmegaUp\DAO\Base\UsersBadges {
     public static function getUserOwnedBadges(\OmegaUp\DAO\VO\Users $user): array {
         $sql = 'SELECT
                     ub.badge_alias, ub.assignation_time

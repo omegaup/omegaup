@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/QualityNomination_Reviewers.dao.base.php');
-
 /**
  * QualityNominationReviewers Data Access Object (DAO).
  *
@@ -11,5 +9,5 @@ include_once('base/QualityNomination_Reviewers.dao.base.php');
  *
  * @access public
  */
-class QualityNominationReviewersDAO extends QualityNominationReviewersDAOBase {
+class QualityNominationReviewersDAO extends \OmegaUp\DAO\Base\QualityNominationReviewers {
 }

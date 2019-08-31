@@ -1,7 +1,5 @@
 <?php
 
-include('base/User_Rank.dao.base.php');
-
 /**
  * UserRank Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/User_Rank.dao.base.php');
  *
  * @access public
  */
-class UserRankDAO extends UserRankDAOBase {
+class UserRankDAO extends \OmegaUp\DAO\Base\UserRank {
     public static function getFilteredRank(
         $page = null,
         $colsPerPage = null,

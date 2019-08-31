@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/User_Roles.dao.base.php');
-
 /**
  * UserRoles Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/User_Roles.dao.base.php');
  * @access public
  * @package docs
  */
-class UserRolesDAO extends UserRolesDAOBase {
+class UserRolesDAO extends \OmegaUp\DAO\Base\UserRoles {
     private static function getAdmins($acl_id) {
         $sql = '
             SELECT

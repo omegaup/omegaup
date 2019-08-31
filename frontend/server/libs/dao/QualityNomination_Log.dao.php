@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/QualityNomination_Log.dao.base.php');
-
 /**
  * QualityNominationLog Data Access Object (DAO).
  *
@@ -11,5 +9,5 @@ include_once('base/QualityNomination_Log.dao.base.php');
  *
  * @access public
  */
-class QualityNominationLogDAO extends QualityNominationLogDAOBase {
+class QualityNominationLogDAO extends \OmegaUp\DAO\Base\QualityNominationLog {
 }

@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Problems.dao.base.php');
-
 /**
  * Problems Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Problems.dao.base.php');
  * @access public
  * @package docs
  */
-class ProblemsDAO extends ProblemsDAOBase {
+class ProblemsDAO extends \OmegaUp\DAO\Base\Problems {
     final private static function addTagFilter(
         string $identityType,
         ?int $identityId,

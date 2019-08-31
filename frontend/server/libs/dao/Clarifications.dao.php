@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Clarifications.dao.base.php');
-
 /**
  * Clarifications Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Clarifications.dao.base.php');
  * @access public
  * @package docs
  */
-class ClarificationsDAO extends ClarificationsDAOBase {
+class ClarificationsDAO extends \OmegaUp\DAO\Base\Clarifications {
     final public static function GetProblemsetClarifications($problemset_id, $admin, $identity_id, $offset, $rowcount) {
         $sql = 'SELECT
                   c.clarification_id,

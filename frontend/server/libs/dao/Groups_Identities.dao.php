@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Groups_Identities.dao.base.php');
-
 /**
  * GroupsIdentities Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/Groups_Identities.dao.base.php');
  *
  * @access public
  */
-class GroupsIdentitiesDAO extends GroupsIdentitiesDAOBase {
+class GroupsIdentitiesDAO extends \OmegaUp\DAO\Base\GroupsIdentities {
     public static function GetMemberIdentities(\OmegaUp\DAO\VO\Groups $group) {
         $sql = '
             SELECT

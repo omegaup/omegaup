@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Countries.dao.base.php');
-
 /**
  * Countries Data Access Object (DAO).
  *
@@ -13,5 +11,5 @@ require_once('base/Countries.dao.base.php');
  * @access public
  * @package docs
  */
-class CountriesDAO extends CountriesDAOBase {
+class CountriesDAO extends \OmegaUp\DAO\Base\Countries {
 }

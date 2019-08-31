@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Submissions.dao.base.php');
-
 /**
  * Submissions Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/Submissions.dao.base.php');
  *
  * @access public
  */
-class SubmissionsDAO extends SubmissionsDAOBase {
+class SubmissionsDAO extends \OmegaUp\DAO\Base\Submissions {
     final public static function getByGuid(string $guid) : ?\OmegaUp\DAO\VO\Submissions {
         $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];

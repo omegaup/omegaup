@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Schools.dao.base.php');
-
 /**
  * Schools Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Schools.dao.base.php');
  * @access public
  * @package docs
  */
-class SchoolsDAO extends SchoolsDAOBase {
+class SchoolsDAO extends \OmegaUp\DAO\Base\Schools {
     /**
      * Finds schools that cotains 'name'
      *

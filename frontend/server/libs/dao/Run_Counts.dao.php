@@ -1,7 +1,5 @@
 <?php
 
-include('base/Run_Counts.dao.base.php');
-
 /**
  * RunCounts Data Access Object (DAO).
  *
@@ -11,5 +9,5 @@ include('base/Run_Counts.dao.base.php');
  *
  * @access public
  */
-class RunCountsDAO extends RunCountsDAOBase {
+class RunCountsDAO extends \OmegaUp\DAO\Base\RunCounts {
 }
