@@ -1097,7 +1097,7 @@ class UserController extends Controller {
      * Get general user info
      *
      * @param \OmegaUp\Request $r
-     * @return response array with user info
+     * @return array{status: 'ok'} with user info
      */
     public static function apiProfile(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
