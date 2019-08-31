@@ -446,9 +446,8 @@ class SessionController extends Controller {
         }
     }
 
-    public static function getLinkedInInstance() {
-        require_once 'libs/LinkedIn.php';
-        return new LinkedIn(
+    public static function getLinkedInInstance() : \OmegaUp\LinkedIn {
+        return new \OmegaUp\LinkedIn(
             OMEGAUP_LINKEDIN_CLIENTID,
             OMEGAUP_LINKEDIN_SECRET,
             OMEGAUP_URL.'/login?linkedin',
@@ -466,9 +465,12 @@ class SessionController extends Controller {
 
         try {
             $li = self::getLinkedInInstance();
-            $auth_token = $li->getAuthToken($_GET['code'], $_GET['state']);
-            $profile = $li->getProfileInfo($auth_token);
-            $li->maybeResetRedirect($_GET['state']);
+            $authToken = $li->getAuthToken($_GET['code'], $_GET['state']);
+            $profile = $li->getProfileInfo($authToken);
+            $redirect = $li->extractRedirect($_GET['state']);
+            if (!is_null($redirect)) {
+                $_GET['redirect'] = $redirect;
+            }
 
             return $this->ThirdPartyLogin(
                 'LinkedIn',
