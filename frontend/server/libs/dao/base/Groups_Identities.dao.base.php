@@ -42,7 +42,7 @@ abstract class GroupsIdentitiesDAOBase {
             $Groups_Identities->identity_id,
             !is_null($Groups_Identities->share_user_information) ? intval($Groups_Identities->share_user_information) : null,
             !is_null($Groups_Identities->privacystatement_consent_id) ? intval($Groups_Identities->privacystatement_consent_id) : null,
-            $Groups_Identities->accept_teacher,
+            !is_null($Groups_Identities->accept_teacher) ? intval($Groups_Identities->accept_teacher) : null,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -60,7 +60,7 @@ abstract class GroupsIdentitiesDAOBase {
         $params = [
             is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
             is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
-            $Groups_Identities->accept_teacher,
+            is_null($Groups_Identities->accept_teacher) ? null : (int)$Groups_Identities->accept_teacher,
             is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
             is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
         ];
@@ -177,7 +177,7 @@ abstract class GroupsIdentitiesDAOBase {
             is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
             is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
             is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
-            $Groups_Identities->accept_teacher,
+            is_null($Groups_Identities->accept_teacher) ? null : (int)$Groups_Identities->accept_teacher,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -537,7 +537,7 @@ class ProblemsDAO extends ProblemsDAOBase {
                 rp.identity_id = i.identity_id
             WHERE
                 c.alias = ?
-                AND gi.accept_teacher = 'yes'
+                AND gi.accept_teacher = true
             ORDER BY
                 i.username ASC,
                 rp.problem_id DESC;";
@@ -546,7 +546,7 @@ class ProblemsDAO extends ProblemsDAOBase {
     }
 
     final public static function getUnsolvedProblemsByUsersOfCourse($course_alias) {
-        $sql = "
+        $sql = '
             SELECT
                 rp.alias,
                 rp.title,
@@ -594,10 +594,10 @@ class ProblemsDAO extends ProblemsDAOBase {
                 rp.problem_id = p.problem_id
             WHERE
                 c.alias = ?
-                AND gi.accept_teacher = 'yes'
+                AND gi.accept_teacher = true
             ORDER BY
                 i.username ASC,
-                rp.problem_id DESC;";
+                rp.problem_id DESC;';
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
     }
