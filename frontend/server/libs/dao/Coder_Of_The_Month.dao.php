@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Coder_Of_The_Month.dao.base.php');
-
 /**
  * CoderOfTheMonth Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Coder_Of_The_Month.dao.base.php');
  * @access public
  * @package docs
  */
-class CoderOfTheMonthDAO extends CoderOfTheMonthDAOBase {
+class CoderOfTheMonthDAO extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     /**
      * Gets the users that solved the most problems during the provided
      * time period.

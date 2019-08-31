@@ -1,7 +1,5 @@
 <?php
 
-include('base/Problem_Viewed.dao.base.php');
-
 /**
  * ProblemViewed Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Problem_Viewed.dao.base.php');
  *
  * @access public
  */
-class ProblemViewedDAO extends ProblemViewedDAOBase {
+class ProblemViewedDAO extends \OmegaUp\DAO\Base\ProblemViewed {
     public static function MarkProblemViewed($identity_id, $problem_id) {
         $sql = 'INSERT IGNORE Problem_Viewed (identity_id, problem_id) VALUES (?, ?);';
         $values = [$identity_id, $problem_id];

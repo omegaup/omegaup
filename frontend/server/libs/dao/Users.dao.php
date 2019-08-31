@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Users.dao.base.php');
-
 /**
  * Users Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ require_once('base/Users.dao.base.php');
  * @access public
  * @package docs
  */
-class UsersDAO extends UsersDAOBase {
+class UsersDAO extends \OmegaUp\DAO\Base\Users {
     public static function FindByEmail($email) {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];

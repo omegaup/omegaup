@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Favorites.dao.base.php');
-
 /**
  * Favorites Data Access Object (DAO).
  *
@@ -13,5 +11,5 @@ require_once('base/Favorites.dao.base.php');
  * @access public
  * @package docs
  */
-class FavoritesDAO extends FavoritesDAOBase {
+class FavoritesDAO extends \OmegaUp\DAO\Base\Favorites {
 }

@@ -1,7 +1,5 @@
 <?php
 
-include('base/Courses.dao.base.php');
-
 /**
  * Courses Data Access Object (DAO).
  *
@@ -10,7 +8,7 @@ include('base/Courses.dao.base.php');
  * {@link \OmegaUp\DAO\VO\Courses}.
  * @access public
  */
-class CoursesDAO extends CoursesDAOBase {
+class CoursesDAO extends \OmegaUp\DAO\Base\Courses {
     public static function findByName($name) {
         $sql = "SELECT DISTINCT c.*
                 FROM Courses c

@@ -1,7 +1,5 @@
 <?php
 
-include('base/Problemset_Access_Log.dao.base.php');
-
 /**
  * ProblemsetAccessLog Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Problemset_Access_Log.dao.base.php');
  *
  * @access public
  */
-class ProblemsetAccessLogDAO extends ProblemsetAccessLogDAOBase {
+class ProblemsetAccessLogDAO extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
     public static function GetAccessForProblemset($problemset_id) {
         $sql = 'SELECT
                     i.username,

@@ -1,7 +1,5 @@
 <?php
 
-include('base/Interviews.dao.base.php');
-
 /**
  * Interviews Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Interviews.dao.base.php');
  *
  * @access public
  */
-class InterviewsDAO extends InterviewsDAOBase {
+class InterviewsDAO extends \OmegaUp\DAO\Base\Interviews {
     final public static function getByAlias($alias) {
         $sql = 'SELECT * FROM Interviews WHERE alias = ? LIMIT 1;';
         $params = [$alias];

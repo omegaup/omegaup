@@ -1,7 +1,5 @@
 <?php
 
-include('base/Submission_Log.dao.base.php');
-
 /**
  * SubmissionLog Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Submission_Log.dao.base.php');
  *
  * @access public
  */
-class SubmissionLogDAO extends SubmissionLogDAOBase {
+class SubmissionLogDAO extends \OmegaUp\DAO\Base\SubmissionLog {
     public static function GetSubmissionsForProblemset($problemset_id) {
         $sql = 'SELECT
                     i.username,

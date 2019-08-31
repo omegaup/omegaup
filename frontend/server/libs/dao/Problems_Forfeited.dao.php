@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Problems_Forfeited.dao.base.php');
-
 /**
  * Problems_Forfeited Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Problems_Forfeited.dao.base.php');
  * @access public
  * @package docs
  */
-class ProblemsForfeitedDAO extends ProblemsForfeitedDAOBase {
+class ProblemsForfeitedDAO extends \OmegaUp\DAO\Base\ProblemsForfeited {
     public static function getProblemsForfeitedCount(\OmegaUp\DAO\VO\Users $user): int {
         $sql = 'SELECT
                     COUNT(*)

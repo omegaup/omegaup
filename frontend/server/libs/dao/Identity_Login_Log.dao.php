@@ -1,7 +1,5 @@
 <?php
 
-include('base/Identity_Login_Log.dao.base.php');
-
 /**
  * IdentityLoginLog Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Identity_Login_Log.dao.base.php');
  *
  * @access public
  */
-class IdentityLoginLogDAO extends IdentityLoginLogDAOBase {
+class IdentityLoginLogDAO extends \OmegaUp\DAO\Base\IdentityLoginLog {
     final public static function getByIdentity($identityId) {
         $sql = 'SELECT
                     *

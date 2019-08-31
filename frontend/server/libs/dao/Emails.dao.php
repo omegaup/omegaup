@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Emails.dao.base.php');
-
 /**
  * Emails Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Emails.dao.base.php');
  * @access public
  * @package docs
  */
-class EmailsDAO extends EmailsDAOBase {
+class EmailsDAO extends \OmegaUp\DAO\Base\Emails {
     final public static function getByUserId($user_id) {
         $sql = 'SELECT
                     *

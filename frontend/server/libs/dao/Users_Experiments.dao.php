@@ -1,7 +1,5 @@
 <?php
 
-include('base/Users_Experiments.dao.base.php');
-
 /**
  * UsersExperiments Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Users_Experiments.dao.base.php');
  *
  * @access public
  */
-class UsersExperimentsDAO extends UsersExperimentsDAOBase {
+class UsersExperimentsDAO extends \OmegaUp\DAO\Base\UsersExperiments {
     public static function delete(int $userId, string $experiment) : void {
         $sql = '
             DELETE FROM

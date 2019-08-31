@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Languages.dao.base.php');
-
 /**
  * Languages Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Languages.dao.base.php');
  * @access public
  * @package docs
  */
-class LanguagesDAO extends LanguagesDAOBase {
+class LanguagesDAO extends \OmegaUp\DAO\Base\Languages {
     final public static function getByName($name) {
         $sql = 'SELECT
                     *

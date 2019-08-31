@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/QualityNomination_Comments.dao.base.php');
-
 /**
  * QualityNominationComments Data Access Object (DAO).
  *
@@ -11,5 +9,5 @@ include_once('base/QualityNomination_Comments.dao.base.php');
  *
  * @access public
  */
-class QualityNominationCommentsDAO extends QualityNominationCommentsDAOBase {
+class QualityNominationCommentsDAO extends \OmegaUp\DAO\Base\QualityNominationComments {
 }

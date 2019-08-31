@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Auth_Tokens.dao.base.php');
-
 /**
  * AuthTokens Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Auth_Tokens.dao.base.php');
  * @access public
  * @package docs
  */
-class AuthTokensDAO extends AuthTokensDAOBase {
+class AuthTokensDAO extends \OmegaUp\DAO\Base\AuthTokens {
     public static function getUserByToken($auth_token) {
         $sql = 'SELECT
                     u.*

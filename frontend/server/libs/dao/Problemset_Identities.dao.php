@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Problemset_Identities.dao.base.php');
-
 /**
  * ProblemsetIdentities Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/Problemset_Identities.dao.base.php');
  *
  * @access public
  */
-class ProblemsetIdentitiesDAO extends ProblemsetIdentitiesDAOBase {
+class ProblemsetIdentitiesDAO extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     public static function checkProblemsetOpened(
         int $identityId,
         int $problemsetId

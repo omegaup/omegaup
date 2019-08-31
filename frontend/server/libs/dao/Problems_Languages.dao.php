@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Problems_Languages.dao.base.php');
-
 /**
  * ProblemsLanguages Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Problems_Languages.dao.base.php');
  * @access public
  * @package docs
  */
-class ProblemsLanguagesDAO extends ProblemsLanguagesDAOBase {
+class ProblemsLanguagesDAO extends \OmegaUp\DAO\Base\ProblemsLanguages {
     final public static function deleteProblemLanguages(\OmegaUp\DAO\VO\ProblemsLanguages $problems_languages) {
         $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ?;';
         $params = [$problems_languages->problem_id];

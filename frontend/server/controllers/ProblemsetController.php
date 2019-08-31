@@ -53,15 +53,15 @@ class ProblemsetController extends Controller {
     private static function updateProblemsetProblem(
         \OmegaUp\DAO\VO\ProblemsetProblems $updatedProblemsetProblem
     ) {
-        $oldProblemsetProblem = ProblemsetProblemsDAOBase::getByPK(
+        $oldProblemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id
         );
         if (is_null($oldProblemsetProblem)) {
-            ProblemsetProblemsDAOBase::create($updatedProblemsetProblem);
+            \OmegaUp\DAO\Base\ProblemsetProblems::create($updatedProblemsetProblem);
             return;
         }
-        ProblemsetProblemsDAOBase::update($updatedProblemsetProblem);
+        \OmegaUp\DAO\Base\ProblemsetProblems::update($updatedProblemsetProblem);
         if ($oldProblemsetProblem->points == $updatedProblemsetProblem->points &&
             $oldProblemsetProblem->version == $updatedProblemsetProblem->version
         ) {

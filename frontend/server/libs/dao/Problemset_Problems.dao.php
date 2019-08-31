@@ -1,7 +1,5 @@
 <?php
 
-include('base/Problemset_Problems.dao.base.php');
-
 /**
  * ProblemsetProblems Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Problemset_Problems.dao.base.php');
  *
  * @access public
  */
-class ProblemsetProblemsDAO extends ProblemsetProblemsDAOBase {
+class ProblemsetProblemsDAO extends \OmegaUp\DAO\Base\ProblemsetProblems {
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
     ) : array {

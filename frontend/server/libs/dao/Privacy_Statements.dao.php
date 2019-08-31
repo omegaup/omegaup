@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/PrivacyStatements.dao.base.php');
-
 /**
  * PrivacyStatements Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/PrivacyStatements.dao.base.php');
  *
  * @access public
  */
-class PrivacyStatementsDAO extends PrivacyStatementsDAOBase {
+class PrivacyStatementsDAO extends \OmegaUp\DAO\Base\PrivacyStatements {
     public static function getLatestPublishedStatement($statement_type = 'privacy_policy') {
         $sql = 'SELECT
                   privacystatement_id,

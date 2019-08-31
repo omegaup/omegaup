@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Notifications.dao.base.php');
-
 /**
  * Notifications Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Notifications.dao.base.php');
  * @access public
  * @package docs
  */
-class NotificationsDAO extends NotificationsDAOBase {
+class NotificationsDAO extends \OmegaUp\DAO\Base\Notifications {
     public static function getUnreadNotifications(\OmegaUp\DAO\VO\Users $user) {
         $sql = 'SELECT
                     n.notification_id, n.contents, UNIX_TIMESTAMP(n.timestamp) as timestamp

@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Problem_Of_The_Week.dao.base.php');
-
 /**
  * ProblemOfTheWeek Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/Problem_Of_The_Week.dao.base.php');
  *
  * @access public
  */
-class ProblemOfTheWeekDAO extends ProblemOfTheWeekDAOBase {
+class ProblemOfTheWeekDAO extends \OmegaUp\DAO\Base\ProblemOfTheWeek {
     final public static function getByDificulty($difficulty) {
         $sql = 'SELECT
                     *

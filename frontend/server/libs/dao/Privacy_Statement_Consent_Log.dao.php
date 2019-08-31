@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/PrivacyStatement_Consent_Log.dao.base.php');
-
 /**
  * PrivacyStatementConsentLog Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/PrivacyStatement_Consent_Log.dao.base.php');
  *
  * @access public
  */
-class PrivacyStatementConsentLogDAO extends PrivacyStatementConsentLogDAOBase {
+class PrivacyStatementConsentLogDAO extends \OmegaUp\DAO\Base\PrivacyStatementConsentLog {
     public static function hasAcceptedPrivacyStatement($identity_id, $privacystatement_id) {
         $sql = 'SELECT
                   COUNT(1)

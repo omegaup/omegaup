@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Permissions.dao.base.php');
-
 /**
  * Permissions Data Access Object (DAO).
  *
@@ -13,5 +11,5 @@ require_once('base/Permissions.dao.base.php');
  * @access public
  * @package docs
  */
-class PermissionsDAO extends PermissionsDAOBase {
+class PermissionsDAO extends \OmegaUp\DAO\Base\Permissions {
 }
