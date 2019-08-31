@@ -622,6 +622,27 @@ class ProblemsDAO extends ProblemsDAOBase {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
 
+    final public static function hasTriedToSolveProblem(
+        \OmegaUp\DAO\VO\Problems $problem,
+        int $identityId
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(r.run_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ? AND s.identity_id = ? AND
+                r.verdict <> "AC" AND r.verdict <> "CE" AND r.verdict <> "JE";
+        ';
+
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
+    }
+
     public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user) : int {
         $sql = 'SELECT
             COUNT(*) as total

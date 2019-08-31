@@ -27,6 +27,8 @@ class QualityNominationController extends Controller {
      *             of the problem.
      * * `tags`: (Optional) An array of tag names that will be added to the
      *           problem upon promotion.
+     * * `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
+     *                before receiving an AC verdict for problem run.
      *
      * # Promotion
      *
@@ -82,14 +84,32 @@ class QualityNominationController extends Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if ($r['nomination'] != 'demotion') {
-            // All nominations types, except demotions, are only allowed for
-            // uses who have already solved the problem.
-            if (!ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
-                throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
+        if ($r['nomination'] !== 'demotion') {
+            if (isset($contents['before_ac']) &&
+                $contents['before_ac'] &&
+                ($r['nomination'] === 'dismissal' ||
+                $r['nomination'] === 'suggestion')
+            ) {
+                // Before AC suggestions or dismissals are only allowed
+                // for users who didn't solve a problem, but tried to.
+                if (ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
+                    throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustNotHaveSolvedProblem');
+                }
+
+                if (!ProblemsDAO::hasTriedToSolveProblem($problem, (int)
+                $r->identity->identity_id)) {
+                    throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveTriedToSolveProblem');
+                }
+            } else {
+                // All nominations types, except demotions and before AC
+                // suggestions/demotions,are only allowed for users who
+                // have already solved the problem.
+                if (!ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
+                    throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
+                }
             }
         }
-        if ($r['nomination'] == 'suggestion') {
+        if ($r['nomination'] === 'suggestion') {
             $atLeastOneFieldIsPresent = false;
             if (isset($contents['difficulty'])) {
                 if (!is_int($contents['difficulty']) || $contents['difficulty'] < 0 || $contents['difficulty'] > 4) {
@@ -126,7 +146,7 @@ class QualityNominationController extends Controller {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
                 }
             }
-        } elseif ($r['nomination'] == 'promotion') {
+        } elseif ($r['nomination'] === 'promotion') {
             if ((!isset($contents['statements']) || !is_array($contents['statements']))
                 || (!isset($contents['source']) || !is_string($contents['source']) || empty($contents['source']))
                 || (!isset($contents['tags']) || !is_array($contents['tags']))
@@ -151,15 +171,15 @@ class QualityNominationController extends Controller {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
             }
-        } elseif ($r['nomination'] == 'demotion') {
+        } elseif ($r['nomination'] === 'demotion') {
             if (!isset($contents['reason']) || !in_array($contents['reason'], ['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam', 'wrong-test-cases'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
-            if ($contents['reason'] == 'other' && !isset($contents['rationale'])) {
+            if ($contents['reason'] === 'other' && !isset($contents['rationale'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             // Duplicate reports need more validation.
-            if ($contents['reason'] == 'duplicate') {
+            if ($contents['reason'] === 'duplicate') {
                 if (!isset($contents['original']) || !is_string($contents['original']) || empty($contents['original'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
@@ -175,7 +195,7 @@ class QualityNominationController extends Controller {
                     }
                 }
             }
-        } elseif ($r['nomination'] == 'dismissal') {
+        } elseif ($r['nomination'] === 'dismissal') {
             if (isset($contents['origin']) || isset($contents['difficulty']) || isset($contents['source'])
                 || isset($contents['tags']) || isset($contents['statements']) || isset($statement['markdown'])
                 || isset($contents['reason'])
@@ -194,7 +214,7 @@ class QualityNominationController extends Controller {
         ]);
         QualityNominationsDAO::create($nomination);
 
-        if ($nomination->nomination == 'promotion') {
+        if ($nomination->nomination === 'promotion') {
             $qualityReviewerGroup = GroupsDAO::findByAlias(
                 \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
             );

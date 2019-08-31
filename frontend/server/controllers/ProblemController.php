@@ -2491,6 +2491,7 @@ class ProblemController extends Controller {
             'solvers' => $details['solvers'],
             'quality_payload' => [
                 'solved' => false,
+                'tried' => false,
                 'nominated' => false,
                 'dismissed' => false,
             ],
@@ -2529,6 +2530,17 @@ class ProblemController extends Controller {
             $r->identity,
             $problem
         );
+
+        $nominationStatus['tried'] = false;
+        $nominationStatus['solved'] = false;
+        foreach ($details['runs'] as $run) {
+            if ($run['verdict'] === 'AC') {
+                $nominationStatus['solved'] = true;
+                break;
+            } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'CE') {
+                $nominationStatus['tried'] = true;
+            }
+        }
         $nominationStatus['problem_alias'] = $details['alias'];
         $nominationStatus['language'] = $details['statement']['language'];
         $nominationStatus['can_nominate_problem'] = !is_null($r->user);

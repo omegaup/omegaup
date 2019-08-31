@@ -25,51 +25,58 @@ class QualityNominationsDAO extends QualityNominationsDAOBase {
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
     ) : array {
-        $sql = '
-            SELECT
-                COUNT(r.run_id) > 0 as solved,
-                (SELECT
-                    COUNT(*)
+        $response = [
+            'nominated' => false,
+            'dismissed' => false,
+            'nominatedBeforeAC' => false,
+            'dismissedBeforeAC' => false,
+        ];
+
+        $sql = "SELECT
+                    qnn.contents
                 FROM
                     QualityNominations qnn
                 WHERE
-                    qnn.problem_id = p.problem_id AND
-                    qnn.user_id = i.user_id AND
-                    qnn.nomination = \'suggestion\'
-                ) as nominated,
-                (SELECT
-                    COUNT(*)
-                FROM
-                    QualityNominations qnd
-                WHERE
-                    qnd.problem_id = p.problem_id AND
-                    qnd.user_id = i.user_id AND
-                    qnd.nomination = \'dismissal\'
-                ) as dismissed
-            FROM
-                Problems p
-            INNER JOIN
-                Submissions s
-            ON
-                s.problem_id = p.problem_id
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id AND r.verdict = "AC"
-            LEFT JOIN
-                Identities i
-            ON
-                s.identity_id = i.identity_id
-            WHERE
-                p.problem_id = ? AND i.identity_id = ?;
-        ';
+                    qnn.problem_id = ? AND
+                    qnn.user_id = ? AND
+                    qnn.nomination = 'suggestion'
+                ORDER BY
+                    qnn.qualitynomination_id DESC";
+        $suggestion = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
+        if ($suggestion !== null) {
+            $response['nominated'] = true;
+            $suggestionContents = (array) json_decode($suggestion['contents']);
+            if (isset($suggestionContents['before_ac']) && $suggestionContents['before_ac']) {
+                $response['nominated'] = false;
+                $response['nominatedBeforeAC'] = true;
+            }
+        }
 
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->identity_id]);
-        return [
-            'solved' => (bool) $result['solved'],
-            'nominated' => (bool) $result['nominated'],
-            'dismissed' => (bool) $result['dismissed'],
-        ];
+        $sql = "SELECT
+                    qnn.contents
+                FROM
+                    QualityNominations qnn
+                LEFT JOIN
+                    Identities i
+                ON
+                    qnn.user_id = i.user_id
+                WHERE
+                    qnn.problem_id = ? AND
+                    qnn.user_id = ? AND
+                    qnn.nomination = 'dismissal'
+                ORDER BY
+                    qnn.qualitynomination_id DESC";
+        $dismissal = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
+        if ($dismissal !== null) {
+            $response['dismissed'] = true;
+            $dismissalContents = (array) json_decode($dismissal['contents']);
+            if (isset($dismissalContents['before_ac']) && $dismissalContents['before_ac']) {
+                $response['dismissed'] = false;
+                $response['dismissedBeforeAC'] = true;
+            }
+        }
+
+        return $response;
     }
 
     /**
