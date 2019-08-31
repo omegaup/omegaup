@@ -9,7 +9,7 @@ $smarty->assign('LANGUAGES', array_keys(RunController::$kSupportedLanguages));
 $smarty->assign('IS_UPDATE', 1);
 try {
     $smarty->display('../templates/contest.edit.tpl');
-} catch (APIException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     header('HTTP/1.1 404 Not Found');
     die();
 }

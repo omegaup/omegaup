@@ -15,7 +15,7 @@ try {
 
     $smarty->assign('payload', $payload);
     $smarty->display('../templates/course.students.tpl');
-} catch (APIException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('coursestudents')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');
     die();
