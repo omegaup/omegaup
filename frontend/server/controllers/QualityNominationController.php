@@ -1,9 +1,5 @@
 <?php
 
-require_once 'libs/dao/QualityNomination_Log.dao.php';
-require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
-require_once 'libs/dao/QualityNominations.dao.php';
-
 class QualityNominationController extends \OmegaUp\Controllers\Controller {
     /**
      * Number of reviewers to automatically assign each nomination.
@@ -77,7 +73,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
         }
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -85,7 +81,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         if ($r['nomination'] != 'demotion') {
             // All nominations types, except demotions, are only allowed for
             // uses who have already solved the problem.
-            if (!ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
+            if (!\OmegaUp\DAO\Problems::isProblemSolved($problem, (int)$r->identity->identity_id)) {
                 throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
             }
         }
@@ -163,13 +159,13 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
                 if (!isset($contents['original']) || !is_string($contents['original']) || empty($contents['original'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
-                $original = ProblemsDAO::getByAlias($contents['original']);
+                $original = \OmegaUp\DAO\Problems::getByAlias($contents['original']);
                 if (is_null($original)) {
                     $contents['original'] = self::extractAliasFromArgument($contents['original']);
                     if (is_null($contents['original'])) {
                         throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
-                    $original = ProblemsDAO::getByAlias($contents['original']);
+                    $original = \OmegaUp\DAO\Problems::getByAlias($contents['original']);
                     if (is_null($original)) {
                         throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
@@ -192,17 +188,17 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
             'contents' => json_encode($contents), // re-encoding it for normalization.
             'status' => 'open',
         ]);
-        QualityNominationsDAO::create($nomination);
+        \OmegaUp\DAO\QualityNominations::create($nomination);
 
         if ($nomination->nomination == 'promotion') {
-            $qualityReviewerGroup = GroupsDAO::findByAlias(
+            $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
                 \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
             );
-            foreach (GroupsDAO::sampleMembers(
+            foreach (\OmegaUp\DAO\Groups::sampleMembers(
                 $qualityReviewerGroup,
                 self::REVIEWERS_PER_NOMINATION
             ) as $reviewer) {
-                QualityNominationReviewersDAO::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
+                \OmegaUp\DAO\QualityNominationReviewers::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
                     'qualitynomination_id' => $nomination->qualitynomination_id,
                     'user_id' => $reviewer->user_id,
                 ]));
@@ -234,7 +230,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
         self::validateMemberOfReviewerGroup($r);
 
-        $qualitynomination = QualityNominationsDAO::getByPK($r['qualitynomination_id']);
+        $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK($r['qualitynomination_id']);
         if (is_null($qualitynomination)) {
             throw new \OmegaUp\Exceptions\NotFoundException('qualitynominationNotFound');
         }
@@ -245,7 +241,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
             return ['status' => 'ok'];
         }
 
-        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -290,8 +286,8 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         try {
             $response = [];
             ProblemController::apiUpdate($r);
-            QualityNominationsDAO::update($qualitynomination);
-            QualityNominationLogDAO::create($qualitynominationlog);
+            \OmegaUp\DAO\QualityNominations::update($qualitynomination);
+            \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
             if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
               $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
@@ -325,7 +321,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
     ) : void {
         /** @var \OmegaUp\DAO\VO\Problems */
         $problem = $r['problem'];
-        $adminUser = ProblemsDAO::getAdminUser($problem);
+        $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
         if (is_null($adminUser)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -376,7 +372,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'nominations' => QualityNominationsDAO::getNominations(
+            'nominations' => \OmegaUp\DAO\QualityNominations::getNominations(
                 $nominator,
                 $assignee,
                 $page,
@@ -485,7 +481,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
 
         $r->ensureInt('qualitynomination_id');
-        $response = QualityNominationsDAO::getByID($r['qualitynomination_id']);
+        $response = \OmegaUp\DAO\QualityNominations::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\NotFoundException('qualityNominationNotFound');
         }
@@ -499,7 +495,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get information from the original problem.
-        $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($response['problem']['alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -515,7 +511,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
 
             // Don't leak private problem tags to nominator
             if ($currentUserReviewer) {
-                $response['original_contents']['tags'] = ProblemsDAO::getTagsForProblem($problem, false /* public */);
+                $response['original_contents']['tags'] = \OmegaUp\DAO\Problems::getTagsForProblem($problem, false /* public */);
             }
 
             // Pull original problem statements in every language the nominator is trying to override.

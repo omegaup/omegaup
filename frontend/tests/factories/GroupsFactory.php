@@ -36,7 +36,7 @@ class GroupsFactory {
         ]);
 
         $response = GroupController::apiCreate($r);
-        $group = GroupsDAO::findByAlias($alias);
+        $group = \OmegaUp\DAO\Groups::findByAlias($alias);
 
         return [
             'request' => $r,
@@ -94,7 +94,7 @@ class GroupsFactory {
         ]);
         $response = GroupController::apiCreateScoreboard($request);
 
-        $scoreboard = GroupsScoreboardsDAO::getByAlias($alias);
+        $scoreboard = \OmegaUp\DAO\GroupsScoreboards::getByAlias($alias);
 
         return [
             'request' => $request,

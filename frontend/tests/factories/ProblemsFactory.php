@@ -160,7 +160,7 @@ class ProblemsFactory {
         $problemData = self::getRequest($params);
         $r = $problemData['request'];
         $problemAuthorUser = $problemData['author'];
-        $problemAuthorIdentity = IdentitiesDAO::getByPK(
+        $problemAuthorIdentity = \OmegaUp\DAO\Identities::getByPK(
             $problemData['author']->main_identity_id
         );
 
@@ -175,7 +175,7 @@ class ProblemsFactory {
 
         // Call the API
         ProblemController::apiCreate($r);
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $visibility = $params['visibility'];
 
         if ($visibility == ProblemController::VISIBILITY_PUBLIC_BANNED
@@ -183,7 +183,7 @@ class ProblemsFactory {
             || $visibility == ProblemController::VISIBILITY_PROMOTED
         ) {
             $problem->visibility = $visibility;
-            ProblemsDAO::update($problem);
+            \OmegaUp\DAO\Problems::update($problem);
         }
 
         // Clean up our mess

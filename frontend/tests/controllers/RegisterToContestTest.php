@@ -270,7 +270,7 @@ class RegisterToContestTest extends OmegaupTestCase {
 
         // Updates contestant, with basic information
         $contestantLogin = self::login($contestant);
-        $states = StatesDAO::getByCountry('MX');
+        $states = \OmegaUp\DAO\States::getByCountry('MX');
         UserController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $contestantLogin->auth_token,
             'country_id' => 'MX',
@@ -318,7 +318,7 @@ class RegisterToContestTest extends OmegaupTestCase {
             ]));
         }
 
-        $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($contestData['contest']->problemset_id);
+        $problemsetIdentities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset($contestData['contest']->problemset_id);
 
         $this->assertEquals(count($problemsetIdentities), ($numberOfInvitedContestants + $numberOfNotInvitedContestants));
 

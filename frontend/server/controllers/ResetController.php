@@ -16,10 +16,10 @@ class ResetController extends \OmegaUp\Controllers\Controller {
         $reset_digest = hash('sha1', $token);
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime();
 
-        $user = UsersDAO::FindByEmail($email);
+        $user = \OmegaUp\DAO\Users::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         if (IS_TEST) {
             return ['status' => 'ok', 'token' => $token];
@@ -39,7 +39,7 @@ class ResetController extends \OmegaUp\Controllers\Controller {
             self::$log->error('Failed to send reset password email ' . $e->getMessage());
             $user->reset_digest = null;
             $user->reset_sent_at = null;
-            UsersDAO::update($user);
+            \OmegaUp\DAO\Users::update($user);
         }
 
         return [
@@ -66,7 +66,7 @@ class ResetController extends \OmegaUp\Controllers\Controller {
         self::validateCreateRequest($r);
         $email = $r['email'];
 
-        $lastRequest = IdentitiesDAO::getExtraInformation($email);
+        $lastRequest = \OmegaUp\DAO\Identities::getExtraInformation($email);
 
         if (is_null($lastRequest)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
@@ -80,10 +80,10 @@ class ResetController extends \OmegaUp\Controllers\Controller {
         $reset_digest = hash('sha1', $token);
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime();
 
-        $user = UsersDAO::FindByEmail($email);
+        $user = \OmegaUp\DAO\Users::FindByEmail($email);
         $user->reset_digest = $reset_digest;
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
@@ -101,22 +101,22 @@ class ResetController extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         self::validateUpdateRequest($r);
-        $user = UsersDAO::FindByEmail($r['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($r['email']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
         $user->password = \OmegaUp\SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
         $user->reset_sent_at = null;
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
         $identity->password = $user->password;
         try {
             \OmegaUp\DAO\DAO::transBegin();
-            UsersDAO::update($user);
-            IdentitiesDAO::update($identity);
+            \OmegaUp\DAO\Users::update($user);
+            \OmegaUp\DAO\Identities::update($identity);
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
@@ -131,7 +131,7 @@ class ResetController extends \OmegaUp\Controllers\Controller {
     }
 
     private static function validateCreateRequest($r) {
-        $user = UsersDAO::FindByEmail($r['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($r['email']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
@@ -152,7 +152,7 @@ class ResetController extends \OmegaUp\Controllers\Controller {
     }
 
     private static function validateUpdateRequest($r) {
-        $user = UsersDAO::FindByEmail($r['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($r['email']);
         $reset_token = $r['reset_token'];
         $password = $r['password'];
         $password_confirmation = $r['password_confirmation'];

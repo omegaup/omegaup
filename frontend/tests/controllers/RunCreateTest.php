@@ -76,8 +76,8 @@ class RunCreateTest extends OmegaupTestCase {
         $this->non_student = UserFactory::createUser();
 
         // Get the actual DB entries for later
-        $this->course = CoursesDAO::getByAlias($this->courseData['course_alias']);
-        $this->assignment = AssignmentsDAO::getByAliasAndCourse(
+        $this->course = \OmegaUp\DAO\Courses::getByAlias($this->courseData['course_alias']);
+        $this->assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $this->courseData['assignment_alias'],
             $this->course->course_id
         );
@@ -115,11 +115,11 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertArrayHasKey('guid', $response);
 
         // Get submissionn from DB
-        $submission = SubmissionsDAO::getByGuid($response['guid']);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($response['guid']);
         $this->assertNotNull($submission);
 
         // Get contest from DB to check times with respect to contest start
-        $contest = ContestsDAO::getByAlias($r['contest_alias'] ?? '');
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias'] ?? '');
 
         // Validate data
         $this->assertEquals($r['language'], $submission->language);
@@ -130,7 +130,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals($r['source'], $fileContent);
 
         // Validate defaults
-        $run = RunsDAO::getByPK($submission->current_run_id);
+        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
         $this->assertEquals('new', $run->status);
         $this->assertEquals(0, $run->runtime);
         $this->assertEquals(0, $run->memory);
@@ -141,7 +141,7 @@ class RunCreateTest extends OmegaupTestCase {
         $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
         $this->assertEquals(\OmegaUp\Time::get() + $submission_gap, $response['nextSubmissionTimestamp']);
 
-        $log = SubmissionLogDAO::getByPK($submission->submission_id);
+        $log = \OmegaUp\DAO\SubmissionLog::getByPK($submission->submission_id);
 
         $this->assertNotNull($log);
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
@@ -171,7 +171,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertRun($r, $response);
 
         // Check problem submissions (1)
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $this->assertEquals(1, $problem->submissions);
     }
 
@@ -269,9 +269,9 @@ class RunCreateTest extends OmegaupTestCase {
         $detourGrader = new ScopedGraderDetour();
 
         // Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -298,9 +298,9 @@ class RunCreateTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData2, $this->contestData);
 
         // Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API, send a run for the first problem
         $response = RunController::apiCreate($r);
@@ -416,9 +416,9 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Manually set the contest start 10 mins in the future
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->start_time = Utils::GetTimeFromUnixTimestamp(\OmegaUp\Time::get() + 10);
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -465,9 +465,9 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API
         $response = RunController::apiCreate($r);
@@ -668,7 +668,7 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertRun($r, $response);
 
         // Check problem submissions (1)
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $this->assertEquals(1, $problem->submissions);
     }
 

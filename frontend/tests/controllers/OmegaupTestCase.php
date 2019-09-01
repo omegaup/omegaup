@@ -94,7 +94,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function assertLogin(\OmegaUp\DAO\VO\Identities $identity, $auth_token = null) {
         // Check auth token
-        $auth_tokens_bd = AuthTokensDAO::getByIdentityId($identity->identity_id);
+        $auth_tokens_bd = \OmegaUp\DAO\AuthTokens::getByIdentityId($identity->identity_id);
 
         // Validar que el token se guardó en la BDD
         if (!is_null($auth_token)) {
@@ -155,7 +155,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function assertContest(\OmegaUp\Request $r) {
         // Validate that data was written to DB by getting the contest by title
-        $contests = ContestsDAO::getByTitle($r['title']);
+        $contests = \OmegaUp\DAO\Contests::getByTitle($r['title']);
         $contest = $contests[0];
 
         // Assert that we found our contest

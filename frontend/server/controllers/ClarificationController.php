@@ -31,10 +31,10 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['username'], 'username');
         \OmegaUp\Validators::validateStringOfLengthInRange($r['message'], 'message', 1, 200);
 
-        $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
-        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        $r['contest'] = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
+        $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $r['identity'] = !is_null($r['username']) ?
-            IdentitiesDAO::findByUsername($r['username']) : null;
+            \OmegaUp\DAO\Identities::findByUsername($r['username']) : null;
 
         if (is_null($r['contest'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -45,7 +45,7 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
         }
 
         // Is the combination problemset_id and problem_id valid?
-        if (is_null(ProblemsetProblemsDAO::getByPK($r['contest']->problemset_id, $r['problem']->problem_id))) {
+        if (is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK($r['contest']->problemset_id, $r['problem']->problem_id))) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFoundInContest');
         }
     }
@@ -74,7 +74,7 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
             'public' => $receiverId == $r->identity->identity_id ? '1' : '0',
         ]);
 
-        ClarificationsDAO::create($r['clarification']);
+        \OmegaUp\DAO\Clarifications::create($r['clarification']);
         self::clarificationUpdated($r, $r['clarification']);
 
         return [
@@ -94,7 +94,7 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists
-        $r['clarification'] = ClarificationsDAO::getByPK($r['clarification_id']);
+        $r['clarification'] = \OmegaUp\DAO\Clarifications::getByPK($r['clarification_id']);
         if (is_null($r['clarification'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
         }
@@ -146,7 +146,7 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['message'], 'message');
 
         // Check that clarification exists
-        $r['clarification'] = ClarificationsDAO::GetByPK($r['clarification_id']);
+        $r['clarification'] = \OmegaUp\DAO\Clarifications::GetByPK($r['clarification_id']);
         if (is_null($r['clarification'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('clarificationNotFound');
         }
@@ -184,7 +184,7 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
 
         // Save the clarification
         $clarification->time = \OmegaUp\Time::get();
-        ClarificationsDAO::update($clarification);
+        \OmegaUp\DAO\Clarifications::update($clarification);
 
         $r['problem'] = $r['contest'] = $r['user'] = null;
         self::clarificationUpdated($r, $clarification);
@@ -201,13 +201,13 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
     ) : void {
         try {
             if (is_null($r['problem'])) {
-                $r['problem'] = ProblemsDAO::GetByPK($clarification->problem_id);
+                $r['problem'] = \OmegaUp\DAO\Problems::GetByPK($clarification->problem_id);
             }
             if (is_null($r['contest']) && !is_null($clarification->problemset_id)) {
-                $r['contest'] = ContestsDAO::getByProblemset($clarification->problemset_id);
+                $r['contest'] = \OmegaUp\DAO\Contests::getByProblemset($clarification->problemset_id);
             }
             if (is_null($r['user'])) {
-                $r['user'] = IdentitiesDAO::GetByPK($clarification->author_id);
+                $r['user'] = \OmegaUp\DAO\Identities::GetByPK($clarification->author_id);
             }
         } catch (Exception $e) {
             self::$log->error('Failed to broadcast clarification', $e);

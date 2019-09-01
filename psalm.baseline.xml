@@ -101,7 +101,7 @@
       <code>$r['clarification_id']</code>
       <code>$r['clarification']</code>
       <code>$clarification</code>
-      <code>ContestsDAO::getByProblemset($clarification-&gt;problemset_id)</code>
+      <code>\OmegaUp\DAO\Contests::getByProblemset($clarification-&gt;problemset_id)</code>
       <code>$r['problem']</code>
       <code>$r['user']</code>
       <code>$r['contest']</code>
@@ -147,9 +147,6 @@
     <DocblockTypeContradiction occurrences="1">
       <code>$req-&gt;accepted === '0'</code>
     </DocblockTypeContradiction>
-    <InvalidArgument occurrences="3">
-      <code>$recommended</code>
-    </InvalidArgument>
     <InvalidReturnStatement occurrences="1">
       <code>['status' =&gt; 'ok']</code>
     </InvalidReturnStatement>
@@ -283,7 +280,6 @@
       <code>ContestController::escapeCsv($csvRow)</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
-      <code>$r['contest']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="43">
@@ -401,7 +397,6 @@
       <code>$csvRow[]</code>
       <code>$field</code>
       <code>$escapedRow[]</code>
-      <code>$contestants</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="2">
       <code>bool</code>
@@ -428,9 +423,6 @@
       <code>$entry['alias']</code>
       <code>$r['contest_alias']</code>
     </MixedOperand>
-    <MixedPropertyAssignment occurrences="1">
-      <code>$r['contest']</code>
-    </MixedPropertyAssignment>
     <MixedPropertyFetch occurrences="6">
       <code>$r['contest']-&gt;problemset_id</code>
       <code>$requestProblem-&gt;problem</code>
@@ -555,7 +547,7 @@
       <code>$original_contest-&gt;alias</code>
       <code>$original_contest-&gt;problemset_id</code>
       <code>$acl-&gt;owner_id</code>
-      <code>UsersDAO::getByPK($acl-&gt;owner_id)-&gt;username</code>
+      <code>\OmegaUp\DAO\Users::getByPK($acl-&gt;owner_id)-&gt;username</code>
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
@@ -921,7 +913,7 @@
     <PossiblyNullPropertyFetch occurrences="4">
       <code>$resolvedUser-&gt;user_id</code>
       <code>$acl-&gt;owner_id</code>
-      <code>UsersDAO::getByPK($acl-&gt;owner_id)-&gt;username</code>
+      <code>\OmegaUp\DAO\Users::getByPK($acl-&gt;owner_id)-&gt;username</code>
       <code>$r-&gt;identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
     <RedundantCondition occurrences="1"/>
@@ -1707,7 +1699,7 @@
       <code>wrapRequest</code>
     </MissingReturnType>
     <MixedArgument occurrences="3">
-      <code>ProblemsetsDAO::getWithTypeByPK($r['problemset_id'])</code>
+      <code>\OmegaUp\DAO\Problemsets::getWithTypeByPK($r['problemset_id'])</code>
       <code>$r['tokens']</code>
       <code>$run['guid']</code>
     </MixedArgument>
@@ -1962,7 +1954,7 @@
     <MixedArgument occurrences="46">
       <code>RunController::$kSupportedLanguages</code>
       <code>$r['problem']-&gt;languages</code>
-      <code>ProblemsetsDAO::getProblemsetContainer($problemset_id)</code>
+      <code>\OmegaUp\DAO\Problemsets::getProblemsetContainer($problemset_id)</code>
       <code>$r['contest']-&gt;languages</code>
       <code>$r['problem']</code>
       <code>$r['problem']</code>
@@ -2309,7 +2301,7 @@
     </DocblockTypeContradiction>
     <InvalidArgument occurrences="2">
       <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>CoderOfTheMonthDAO::getMonthlyList($currentDate)</code>
+      <code>\OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($currentDate)</code>
     </InvalidArgument>
     <InvalidNullableReturnType occurrences="1">
       <code>Array</code>
@@ -2434,7 +2426,7 @@
       <code>$coder['email']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="40">
+    <MixedArrayAccess occurrences="35">
       <code>$users[0]</code>
       <code>$userDb['email']</code>
       <code>$userDb['country']</code>
@@ -2450,8 +2442,6 @@
       <code>$users[0]</code>
       <code>$codersOfTheMonth[0]</code>
       <code>$response['userinfo']['email']</code>
-      <code>$user['username']</code>
-      <code>$user['user_id']</code>
       <code>$contest['alias']</code>
       <code>$contest['scoreboard_url_admin']</code>
       <code>$contest['alias']</code>
@@ -2469,7 +2459,6 @@
       <code>$r2['contest_alias']</code>
       <code>$latest_statement['privacystatement_id']</code>
       <code>$latest_statement['git_object_id']</code>
-      <code>$candidate['user_id']</code>
       <code>$coder['username']</code>
       <code>$coder['email']</code>
       <code>$coder['username']</code>
@@ -2490,7 +2479,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="66">
+    <MixedAssignment occurrences="60">
       <code>$user</code>
       <code>$userByEmail</code>
       <code>$userData['is_private']</code>
@@ -2561,8 +2550,6 @@
       <code>$filteredBy</code>
       <code>$privacystatement_id</code>
       <code>$identity</code>
-      <code>$candidates</code>
-      <code>$candidate</code>
       <code>$coder</code>
       <code>$classname</code>
     </MixedAssignment>
@@ -2577,9 +2564,8 @@
       <code>ensureEnabled</code>
       <code>ensureEnabled</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="2">
+    <MixedOperand occurrences="1">
       <code>$r['usernameOrEmail']</code>
-      <code>$index</code>
     </MixedOperand>
     <MixedPropertyAssignment occurrences="1">
       <code>$user</code>
@@ -2735,11 +2721,11 @@
       <code>response</code>
     </UndefinedDocblockClass>
     <UndefinedMethod occurrences="2">
-      <code>IdentitiesDAO::getStatusVerified($r['email'])</code>
-      <code>ProblemsetsDAO::insideSubmissionWindow($contest, $user-&gt;user_id)</code>
+      <code>\OmegaUp\DAO\Identities::getStatusVerified($r['email'])</code>
+      <code>\OmegaUp\DAO\Problemsets::insideSubmissionWindow($contest, $user-&gt;user_id)</code>
     </UndefinedMethod>
   </file>
-  <file src="frontend/server/libs/dao/Assignments.dao.php">
+  <file src="frontend/server/src/DAO/Assignments.php">
     <InvalidReturnStatement occurrences="1">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;Affected_Rows()</code>
     </InvalidReturnStatement>
@@ -2778,7 +2764,7 @@
       <code>Affected</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/libs/dao/Auth_Tokens.dao.php">
+  <file src="frontend/server/src/DAO/AuthTokens.php">
     <MissingParamType occurrences="4">
       <code>$auth_token</code>
       <code>$auth_token</code>
@@ -2791,7 +2777,7 @@
       <code>getByIdentityId</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Clarifications.dao.php">
+  <file src="frontend/server/src/DAO/Clarifications.php">
     <MissingParamType occurrences="10">
       <code>$problemset_id</code>
       <code>$admin</code>
@@ -2814,53 +2800,35 @@
       <code>$val[]</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/server/libs/dao/Coder_Of_The_Month.dao.php">
+  <file src="frontend/server/src/DAO/CoderOfTheMonth.php">
     <FalsableReturnStatement occurrences="1">
       <code>false</code>
     </FalsableReturnStatement>
-    <InvalidReturnStatement occurrences="3">
-      <code>$results</code>
+    <InvalidReturnStatement occurrences="2">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getAll($sql, [$date])</code>
       <code>$username == $rs['username']</code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="3">
-      <code>null|\OmegaUp\DAO\VO\Users</code>
+    <InvalidReturnType occurrences="2">
       <code>\OmegaUp\DAO\VO\Users</code>
       <code>Array</code>
     </InvalidReturnType>
-    <MissingParamType occurrences="8">
-      <code>$startTime</code>
-      <code>$endTime</code>
+    <MissingParamType occurrences="5">
       <code>$firstDay</code>
       <code>$username</code>
       <code>$time</code>
       <code>$autoselected</code>
       <code>$time</code>
-      <code>$date</code>
     </MissingParamType>
-    <MissingReturnType occurrences="3">
+    <MissingReturnType occurrences="2">
       <code>getByTimeAndSelected</code>
       <code>getByTime</code>
-      <code>calculateCoderOfMonthByGivenDate</code>
     </MissingReturnType>
-    <MixedArgument occurrences="2">
+    <MixedArgument occurrences="1">
       <code>$firstDay</code>
-      <code>$date</code>
     </MixedArgument>
   </file>
-  <file src="frontend/server/libs/dao/Contests.dao.php">
-    <ArgumentTypeCoercion occurrences="1">
-      <code>$className</code>
-    </ArgumentTypeCoercion>
-    <InvalidArgument occurrences="2">
-      <code>$activos</code>
-      <code>$recomendados</code>
-    </InvalidArgument>
-    <InvalidParamDefault occurrences="2">
-      <code>ActiveStatus</code>
-      <code>RecommendedStatus</code>
-    </InvalidParamDefault>
-    <MissingParamType occurrences="37">
+  <file src="frontend/server/src/DAO/Contests.php">
+    <MissingParamType occurrences="21">
       <code>$title</code>
       <code>$alias</code>
       <code>$problemset_id</code>
@@ -2883,15 +2851,7 @@
       <code>$page</code>
       <code>$pageSize</code>
       <code>$query</code>
-      <code>$pagina</code>
-      <code>$renglones_por_pagina</code>
-      <code>$activos</code>
-      <code>$recomendados</code>
       <code>$query</code>
-      <code>$pagina</code>
-      <code>$renglones_por_pagina</code>
-      <code>$activos</code>
-      <code>$recomendados</code>
       <code>$query</code>
       <code>$problemset_id</code>
       <code>$problemset_id</code>
@@ -2899,13 +2859,10 @@
       <code>$contestId</code>
       <code>$contestId</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="4">
-      <code>$SQL_FOR_STATUS</code>
-      <code>$SQL_FOR_STATUS</code>
-      <code>$SQL_FOR_STATUS</code>
+    <MissingPropertyType occurrences="1">
       <code>$getContestsColumns</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="17">
+    <MissingReturnType occurrences="16">
       <code>getByTitle</code>
       <code>getByAliasWithExtraInformation</code>
       <code>getByProblemset</code>
@@ -2921,26 +2878,16 @@
       <code>getAllContests</code>
       <code>getContestForProblemset</code>
       <code>getNeedsInformation</code>
-      <code>getContestantsInfo</code>
       <code>requestsUserInformation</code>
     </MissingReturnType>
-    <MixedArgument occurrences="14">
+    <MixedArgument occurrences="5">
       <code>$order</code>
-      <code>$filter['type']</code>
-      <code>$filter['type']</code>
       <code>$params</code>
-      <code>$filter['type']</code>
-      <code>$activos</code>
-      <code>$recomendados</code>
-      <code>$filter['type']</code>
       <code>$params</code>
-      <code>$activos</code>
-      <code>$recomendados</code>
-      <code>$filter['type']</code>
       <code>$params</code>
       <code>$query</code>
     </MixedArgument>
-    <MixedAssignment occurrences="40">
+    <MixedAssignment occurrences="10">
       <code>$offset</code>
       <code>$offset</code>
       <code>$columns</code>
@@ -2982,22 +2929,14 @@
       <code>$params[]</code>
       <code>$requestsUsersInfo</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>string</code>
-    </MixedInferredReturnType>
-    <MixedOperand occurrences="8">
+    <MixedOperand occurrences="5">
       <code>$page</code>
       <code>$page</code>
       <code>($page - 1) * $pageSize</code>
       <code>$page</code>
       <code>$page</code>
       <code>$page</code>
-      <code>$pagina</code>
-      <code>$pagina</code>
     </MixedOperand>
-    <MixedReturnStatement occurrences="1">
-      <code>$class::$SQL_FOR_STATUS[$status]</code>
-    </MixedReturnStatement>
     <PossiblyNullArgument occurrences="2">
       <code>$rs</code>
       <code>$alias</code>
@@ -3019,7 +2958,7 @@
       <code>$params</code>
     </PossiblyUndefinedVariable>
   </file>
-  <file src="frontend/server/libs/dao/Courses.dao.php">
+  <file src="frontend/server/src/DAO/Courses.php">
     <InvalidDocblockParamName occurrences="1">
       <code>$user_id</code>
     </InvalidDocblockParamName>
@@ -3083,7 +3022,7 @@
       <code>$page</code>
     </MixedOperand>
   </file>
-  <file src="frontend/server/libs/dao/Emails.dao.php">
+  <file src="frontend/server/src/DAO/Emails.php">
     <MissingParamType occurrences="1">
       <code>$user_id</code>
     </MissingParamType>
@@ -3091,7 +3030,7 @@
       <code>getByUserId</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Group_Roles.dao.php">
+  <file src="frontend/server/src/DAO/GroupRoles.php">
     <MissingParamType occurrences="7">
       <code>$acl_id</code>
       <code>$identity_id</code>
@@ -3114,7 +3053,7 @@
       <code>$roles[]</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/server/libs/dao/Groups.dao.php">
+  <file src="frontend/server/src/DAO/Groups.php">
     <MissingParamType occurrences="4">
       <code>$name</code>
       <code>$name</code>
@@ -3128,7 +3067,7 @@
       <code>sampleMembers</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Groups_Identities.dao.php">
+  <file src="frontend/server/src/DAO/GroupsIdentities.php">
     <MissingParamType occurrences="3">
       <code>$group_id</code>
       <code>$groupId</code>
@@ -3147,7 +3086,7 @@
       <code>$row['classname']</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/server/libs/dao/Identities.dao.php">
+  <file src="frontend/server/src/DAO/Identities.php">
     <MissingParamType occurrences="7">
       <code>$email</code>
       <code>$email</code>
@@ -3170,7 +3109,7 @@
       <code>$rs['associated']</code>
     </PossiblyNullArrayAccess>
   </file>
-  <file src="frontend/server/libs/dao/Identity_Login_Log.dao.php">
+  <file src="frontend/server/src/DAO/IdentityLoginLog.php">
     <MissingParamType occurrences="1">
       <code>$identityId</code>
     </MissingParamType>
@@ -3178,7 +3117,7 @@
       <code>getByIdentity</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Interviews.dao.php">
+  <file src="frontend/server/src/DAO/Interviews.php">
     <MissingParamType occurrences="4">
       <code>$alias</code>
       <code>$user_id</code>
@@ -3192,7 +3131,7 @@
       <code>getByProblemset</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Languages.dao.php">
+  <file src="frontend/server/src/DAO/Languages.php">
     <MissingParamType occurrences="1">
       <code>$name</code>
     </MissingParamType>
@@ -3200,12 +3139,12 @@
       <code>getByName</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Notifications.dao.php">
+  <file src="frontend/server/src/DAO/Notifications.php">
     <MissingReturnType occurrences="1">
       <code>getUnreadNotifications</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Privacy_Statement_Consent_Log.dao.php">
+  <file src="frontend/server/src/DAO/PrivacyStatementConsentLog.php">
     <MismatchingDocblockReturnType occurrences="2">
       <code>the</code>
       <code>the</code>
@@ -3222,7 +3161,7 @@
       <code>the</code>
     </MixedInferredReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Privacy_Statements.dao.php">
+  <file src="frontend/server/src/DAO/PrivacyStatements.php">
     <MissingParamType occurrences="3">
       <code>$statement_type</code>
       <code>$git_object_id</code>
@@ -3233,7 +3172,7 @@
       <code>getId</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Problem_Of_The_Week.dao.php">
+  <file src="frontend/server/src/DAO/ProblemOfTheWeek.php">
     <MissingParamType occurrences="1">
       <code>$difficulty</code>
     </MissingParamType>
@@ -3241,7 +3180,7 @@
       <code>getByDificulty</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Problem_Viewed.dao.php">
+  <file src="frontend/server/src/DAO/ProblemViewed.php">
     <MissingParamType occurrences="2">
       <code>$identity_id</code>
       <code>$problem_id</code>
@@ -3250,7 +3189,7 @@
       <code>MarkProblemViewed</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Problems.dao.php">
+  <file src="frontend/server/src/DAO/Problems.php">
     <MissingClosureReturnType occurrences="1">
       <code>function ($clause) {</code>
     </MissingClosureReturnType>
@@ -3355,7 +3294,7 @@
       <code>Quote</code>
     </UndefinedMethod>
   </file>
-  <file src="frontend/server/libs/dao/Problems_Forfeited.dao.php">
+  <file src="frontend/server/src/DAO/ProblemsForfeited.php">
     <MixedInferredReturnType occurrences="1">
       <code>int</code>
     </MixedInferredReturnType>
@@ -3363,7 +3302,7 @@
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
     </MixedReturnStatement>
   </file>
-  <file src="frontend/server/libs/dao/Problems_Languages.dao.php">
+  <file src="frontend/server/src/DAO/ProblemsLanguages.php">
     <MissingParamType occurrences="1">
       <code>$problemId</code>
     </MissingParamType>
@@ -3372,7 +3311,7 @@
       <code>getByProblemId</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Problems_Tags.dao.php">
+  <file src="frontend/server/src/DAO/ProblemsTags.php">
     <MissingParamType occurrences="3">
       <code>$public_only</code>
       <code>$includeAutogenerated</code>
@@ -3394,7 +3333,7 @@
       <code>error</code>
     </MixedMethodCall>
     <PossiblyNullPropertyFetch occurrences="1">
-      <code>TagsDAO::getByName($tag)-&gt;tag_id</code>
+      <code>\OmegaUp\DAO\Tags::getByName($tag)-&gt;tag_id</code>
     </PossiblyNullPropertyFetch>
     <UndefinedMethod occurrences="2">
       <code>self::transBegin()</code>
@@ -3404,7 +3343,7 @@
       <code>self::$log</code>
     </UndefinedPropertyFetch>
   </file>
-  <file src="frontend/server/libs/dao/Problemset_Access_Log.dao.php">
+  <file src="frontend/server/src/DAO/ProblemsetAccessLog.php">
     <MissingParamType occurrences="4">
       <code>$problemset_id</code>
       <code>$course_id</code>
@@ -3417,7 +3356,7 @@
       <code>getByProblemsetIdentityId</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Problemset_Identities.dao.php">
+  <file src="frontend/server/src/DAO/ProblemsetIdentities.php">
     <MissingParamType occurrences="2">
       <code>$problemset_id</code>
       <code>$problemset_id</code>
@@ -3439,7 +3378,7 @@
       <code>$container-&gt;window_length</code>
     </MixedOperand>
   </file>
-  <file src="frontend/server/libs/dao/Problemset_Problems.dao.php">
+  <file src="frontend/server/src/DAO/ProblemsetProblems.php">
     <InvalidReturnStatement occurrences="2">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;Affected_Rows()</code>
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;Affected_Rows()</code>
@@ -3477,7 +3416,7 @@
       <code>Affected</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/libs/dao/Problemsets.dao.php">
+  <file src="frontend/server/src/DAO/Problemsets.php">
     <MissingParamType occurrences="2">
       <code>$problemset_id</code>
       <code>$problemset_id</code>
@@ -3492,7 +3431,7 @@
       <code>$interview</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/server/libs/dao/QualityNominations.dao.php">
+  <file src="frontend/server/src/DAO/QualityNominations.php">
     <MissingClosureParamType occurrences="1">
       <code>$type</code>
     </MissingClosureParamType>
@@ -3622,7 +3561,7 @@
       <code>$problem</code>
     </PossiblyNullPropertyAssignment>
   </file>
-  <file src="frontend/server/libs/dao/Runs.dao.php">
+  <file src="frontend/server/src/DAO/Runs.php">
     <MissingParamType occurrences="5">
       <code>$contest</code>
       <code>$problemset_id</code>
@@ -3664,7 +3603,7 @@
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;GetOne($sql, $val)</code>
     </MixedReturnStatement>
   </file>
-  <file src="frontend/server/libs/dao/States.dao.php">
+  <file src="frontend/server/src/DAO/States.php">
     <MissingParamType occurrences="1">
       <code>$countryId</code>
     </MissingParamType>
@@ -3672,7 +3611,7 @@
       <code>getByCountry</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Submission_Log.dao.php">
+  <file src="frontend/server/src/DAO/SubmissionLog.php">
     <MissingParamType occurrences="2">
       <code>$problemset_id</code>
       <code>$course_id</code>
@@ -3682,7 +3621,7 @@
       <code>GetSubmissionsForCourse</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/libs/dao/Submissions.dao.php">
+  <file src="frontend/server/src/DAO/Submissions.php">
     <MixedInferredReturnType occurrences="4">
       <code>int</code>
       <code>int</code>
@@ -3696,7 +3635,7 @@
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;GetOne($sql, $val)</code>
     </MixedReturnStatement>
   </file>
-  <file src="frontend/server/libs/dao/User_Rank.dao.php">
+  <file src="frontend/server/src/DAO/UserRank.php">
     <MissingParamType occurrences="6">
       <code>$page</code>
       <code>$colsPerPage</code>
@@ -3722,7 +3661,7 @@
       <code>$page</code>
     </MixedOperand>
   </file>
-  <file src="frontend/server/libs/dao/User_Roles.dao.php">
+  <file src="frontend/server/src/DAO/UserRoles.php">
     <MissingParamType occurrences="6">
       <code>$acl_id</code>
       <code>$identity_id</code>
@@ -3746,7 +3685,7 @@
       <code>$groups[]</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/server/libs/dao/Users.dao.php">
+  <file src="frontend/server/src/DAO/Users.php">
     <MissingParamType occurrences="9">
       <code>$email</code>
       <code>$user_id</code>
@@ -3781,7 +3720,7 @@
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;GetRow($sql)['total']</code>
     </PossiblyNullArrayAccess>
   </file>
-  <file src="frontend/server/libs/dao/Users_Badges.dao.php">
+  <file src="frontend/server/src/DAO/UsersBadges.php">
     <MissingReturnType occurrences="2">
       <code>getBadgeOwnersCount</code>
       <code>getBadgeFirstAssignationTime</code>
@@ -4791,11 +4730,6 @@
     <InvalidArgument occurrences="1">
       <code>$user</code>
     </InvalidArgument>
-    <InvalidClass occurrences="3">
-      <code>GroupsIdentitiesDao</code>
-      <code>GroupsIdentitiesDao</code>
-      <code>GroupsIdentitiesDao</code>
-    </InvalidClass>
     <InvalidDocblockParamName occurrences="15">
       <code>$username</code>
       <code>$password</code>

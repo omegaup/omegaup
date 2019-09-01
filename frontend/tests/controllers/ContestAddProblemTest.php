@@ -16,11 +16,11 @@ class AddProblemToContestTest extends OmegaupTestCase {
      */
     public static function assertProblemAddedToContest($problemData, $contestData, $r) {
         // Get problem and contest from DB
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
 
         // Get problem-contest and verify it
-        $problemset_problems = ProblemsetProblemsDAO::getByPK($contest->problemset_id, $problem->problem_id);
+        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK($contest->problemset_id, $problem->problem_id);
         self::assertNotNull($problemset_problems);
         self::assertEquals($r['points'], $problemset_problems->points);
         self::assertEquals($r['order_in_contest'], $problemset_problems->order);
@@ -192,7 +192,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Ban the problem.
         $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
-        ProblemsDAO::update($problem);
+        \OmegaUp\DAO\Problems::update($problem);
 
         $directorLogin = self::login($contestData['director']);
         try {
@@ -210,7 +210,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
         // Make it private. Now it should be possible to add it.
         $problem->visibility = ProblemController::VISIBILITY_PRIVATE;
-        ProblemsDAO::update($problem);
+        \OmegaUp\DAO\Problems::update($problem);
 
         $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,

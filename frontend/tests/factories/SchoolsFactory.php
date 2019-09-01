@@ -32,14 +32,14 @@ class SchoolsFactory {
             'creator' => $user,
             'request' => $r,
             'response' => $response,
-            'school' => SchoolsDAO::findByName($r['name'])[0]
+            'school' => \OmegaUp\DAO\Schools::findByName($r['name'])[0]
         ];
     }
 
     /**
      * Add user to school
      * @param array $schoolData
-     * @param UsersDAO $user
+     * @param \OmegaUp\DAO\Users $user
      */
     public static function addUserToSchool($schoolData, $user) {
         $login = OmegaupTestCase::login($user);

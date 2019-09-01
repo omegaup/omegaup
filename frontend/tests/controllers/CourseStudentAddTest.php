@@ -12,7 +12,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testAddStudentToCourse() {
         $courseData = CoursesFactory::createCourse();
         $student = UserFactory::createUser();
-        $identity = IdentitiesDAO::getByPK($student->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($student->main_identity_id);
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
         $response = CourseController::apiAddStudent(new \OmegaUp\Request([
@@ -24,10 +24,10 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Validate student was added
-        $course = CoursesDAO::getByAlias($courseData['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsIdentitiesDAO::getByPK(
+        $studentsInGroup = \OmegaUp\DAO\GroupsIdentities::getByPK(
             $course->group_id,
             $identity->identity_id
         );
@@ -132,10 +132,10 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Validate student was removed.
-        $course = CoursesDAO::getByAlias($courseData['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsIdentitiesDAO::getByGroupId($course->group_id);
+        $studentsInGroup = \OmegaUp\DAO\GroupsIdentities::getByGroupId($course->group_id);
 
         $this->assertNotNull($studentsInGroup);
         $this->assertEquals(0, count($studentsInGroup));
@@ -181,7 +181,7 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testSelfAddStudentPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
         $student = UserFactory::createUser();
-        $identity = IdentitiesDAO::getByPK($student->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($student->main_identity_id);
 
         $login = OmegaupTestCase::login($student);
         $response = CourseController::apiAddStudent(new \OmegaUp\Request([
@@ -193,10 +193,10 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Validate student was added
-        $course = CoursesDAO::getByAlias($courseData['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = GroupsIdentitiesDAO::getByPK(
+        $studentsInGroup = \OmegaUp\DAO\GroupsIdentities::getByPK(
             $course->group_id,
             $identity->identity_id
         );

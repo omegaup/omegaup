@@ -15,11 +15,11 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @param \OmegaUp\Request $r
      */
     private function assertProblemRemovedFromContest($problemData, $contestData) {
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
 
         // Get problem-contest and verify it does not exist
-        $problemset_problems = ProblemsetProblemsDAO::getByPK(
+        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
             $contest->problemset_id,
             $problem->problem_id
         );
@@ -35,10 +35,10 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
      * @param \OmegaUp\Request $r
      */
     private function assertProblemExistsInContest($problemData, $contestData) {
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
 
-        $problemset_problems = ProblemsetProblemsDAO::getByPK(
+        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
             $contest->problemset_id,
             $problem->problem_id
         );
@@ -275,7 +275,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
         // Add the sysadmin role to the contest director
-        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
@@ -448,7 +448,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $contestData['director']->user_id,
             'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,

@@ -61,8 +61,8 @@ class UserController extends \OmegaUp\Controllers\Controller {
         }
 
         // Does user or email already exists?
-        $user = UsersDAO::FindByUsername($r['username']);
-        $userByEmail = UsersDAO::FindByEmail($r['email']);
+        $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+        $userByEmail = \OmegaUp\DAO\Users::FindByEmail($r['email']);
 
         if (!is_null($userByEmail)) {
             if (!is_null($userByEmail->password)) {
@@ -86,7 +86,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                 'password' => $hashedPassword
             ]);
             try {
-                UsersDAO::savePassword($user);
+                \OmegaUp\DAO\Users::savePassword($user);
             } catch (Exception $e) {
                 if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse', $e);
@@ -182,17 +182,17 @@ class UserController extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            UsersDAO::create($user);
+            \OmegaUp\DAO\Users::create($user);
 
             $email->user_id = $user->user_id;
-            EmailsDAO::create($email);
+            \OmegaUp\DAO\Emails::create($email);
 
             $identity->user_id = $user->user_id;
-            IdentitiesDAO::create($identity);
+            \OmegaUp\DAO\Identities::create($identity);
 
             $user->main_email_id = $email->email_id;
             $user->main_identity_id = $identity->identity_id;
-            UsersDAO::update($user);
+            \OmegaUp\DAO\Users::update($user);
 
             $r['user'] = $user;
             if ($user->verified) {
@@ -229,7 +229,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         // Get email
         try {
-            $email = EmailsDAO::getByPK($user->main_email_id);
+            $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
         } catch (Exception $e) {
             self::$log->warn('Email lookup failed: ' . $e->getMessage());
             return false;
@@ -273,7 +273,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\EmailVerificationSendException
      */
     private static function sendVerificationEmail(\OmegaUp\DAO\VO\Users $user) {
-        $email = EmailsDAO::getByPK($user->main_email_id);
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
         if (is_null($email) || is_null($email->email)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotfound');
         }
@@ -316,7 +316,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
             try {
                 $user->verification_id = \OmegaUp\SecurityTools::randomString(50);
-                UsersDAO::update($user);
+                \OmegaUp\DAO\Users::update($user);
             } catch (Exception $e) {
                 self::$log->info("Unable to save verification ID: $e");
             }
@@ -374,11 +374,11 @@ class UserController extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
-            $user = UsersDAO::FindByUsername($r['username']);
+            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
             if (is_null($user)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
-            $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+            $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
             if (isset($r['password']) && $r['password'] != '') {
                 \OmegaUp\SecurityTools::testStrongPassword($r['password']);
@@ -386,7 +386,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             }
         } else {
             /** @var int $user->main_identity_id */
-            $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+            $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
             if ($user->password != null) {
                 // Check the old password
@@ -412,9 +412,9 @@ class UserController extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            UsersDAO::update($user);
+            \OmegaUp\DAO\Users::update($user);
 
-            IdentitiesDAO::update($identity);
+            \OmegaUp\DAO\Identities::update($identity);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -455,7 +455,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             // Normal user verification path
             \OmegaUp\Validators::validateStringNonEmpty($r['id'], 'id');
 
-            $users = UsersDAO::getByVerification($r['id']);
+            $users = \OmegaUp\DAO\Users::getByVerification($r['id']);
             $user = !empty($users) ? $users[0] : null;
         }
 
@@ -464,7 +464,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         }
 
         $user->verified = 1;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         self::$log->info('User verification complete.');
 
@@ -497,7 +497,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         $usersAdded = [];
 
-        $usersMissing = UsersDAO::getVerified(
+        $usersMissing = \OmegaUp\DAO\Users::getVerified(
             true, // verified
             false // in_mailing_list
         );
@@ -507,7 +507,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
             if ($registered) {
                 $user->in_mailing_list = 1;
-                UsersDAO::update($user);
+                \OmegaUp\DAO\Users::update($user);
             }
 
             $usersAdded[$user->username] = $registered;
@@ -529,11 +529,11 @@ class UserController extends \OmegaUp\Controllers\Controller {
      */
     public static function resolveUser(?string $userOrEmail) : \OmegaUp\DAO\VO\Users {
         \OmegaUp\Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
-        $user = UsersDAO::FindByUsername($userOrEmail);
+        $user = \OmegaUp\DAO\Users::FindByUsername($userOrEmail);
         if (!is_null($user)) {
             return $user;
         }
-        $user = UsersDAO::FindByEmail($userOrEmail);
+        $user = \OmegaUp\DAO\Users::FindByEmail($userOrEmail);
         if (!is_null($user)) {
             return $user;
         }
@@ -550,7 +550,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
      * @param string $password
      */
     private static function omiPrepareUser(\OmegaUp\Request $r, $username, $password) {
-        $user = UsersDAO::FindByUsername($username);
+        $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (is_null($user)) {
             self::$log->info('Creating user: ' . $username);
             $createRequest = new \OmegaUp\Request([
@@ -1078,7 +1078,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             'hide_problem_tags' => is_null($user->hide_problem_tags) ? null : $user->hide_problem_tags,
         ];
 
-        $userDb = UsersDAO::getExtendedProfileDataByPk($user->user_id);
+        $userDb = \OmegaUp\DAO\Users::getExtendedProfileDataByPk($user->user_id);
 
         $response['userinfo']['email'] = $userDb['email'];
         $response['userinfo']['country'] = $userDb['country'];
@@ -1108,7 +1108,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Identity');
         }
-        $user = is_null($identity->user_id) ? null : UsersDAO::getByPK($identity->user_id);
+        $user = is_null($identity->user_id) ? null : \OmegaUp\DAO\Users::getByPK($identity->user_id);
         $r['user'] = $user;
         $r['identity'] = $identity;
 
@@ -1130,7 +1130,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             ];
             $response['userinfo']['is_private'] = true;
         }
-        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($identity->user_id);
+        $response['userinfo']['classname'] = \OmegaUp\DAO\Users::getRankingClassName($identity->user_id);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1150,7 +1150,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $response = IdentitiesDAO::getStatusVerified($r['email']);
+        $response = \OmegaUp\DAO\Identities::getStatusVerified($r['email']);
 
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
@@ -1179,7 +1179,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $response = IdentitiesDAO::getExtraInformation($r['email']);
+        $response = \OmegaUp\DAO\Identities::getExtraInformation($r['email']);
 
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
@@ -1207,11 +1207,11 @@ class UserController extends \OmegaUp\Controllers\Controller {
             $firstDay = date('Y-m-01', $currentTimestamp);
         }
 
-        $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($firstDay);
+        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime($firstDay);
 
         if (empty($codersOfTheMonth)) {
             // Generate the coder
-            $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($firstDay);
+            $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate($firstDay);
             if (is_null($users)) {
                 return [
                     'status' => 'ok',
@@ -1221,7 +1221,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             }
 
             // Only first place coder is saved
-            CoderOfTheMonthDAO::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+            \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $users[0]['user_id'],
                 'time' => $firstDay,
                 'rank' => 1,
@@ -1230,8 +1230,8 @@ class UserController extends \OmegaUp\Controllers\Controller {
         } else {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
         }
-        $user = UsersDAO::getByPK($coderOfTheMonthUserId);
-        $identity = IdentitiesDAO::findByUserId($coderOfTheMonthUserId);
+        $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($coderOfTheMonthUserId);
 
         // Get the profile of the coder of the month
         $response = UserController::getProfileImpl($user, $identity);
@@ -1251,9 +1251,9 @@ class UserController extends \OmegaUp\Controllers\Controller {
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateOptionalDate($r['date'], 'date');
         if (!is_null($r['date'])) {
-            $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
+            $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($r['date']);
         } else {
-            $coders = CoderOfTheMonthDAO::getCodersOfTheMonth();
+            $coders = \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth();
         }
         return [
             'status' => 'ok',
@@ -1287,13 +1287,13 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $codersOfTheMonth = CoderOfTheMonthDAO::getByTime($dateToSelect);
+        $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTime($dateToSelect);
 
         if (!empty($codersOfTheMonth)) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('coderOfTheMonthAlreadySelected');
         }
         // Generate the coder
-        $users = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate($dateToSelect);
+        $users = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate($dateToSelect);
 
         if (empty($users)) {
             throw new \OmegaUp\Exceptions\NotFoundException('noCoders');
@@ -1305,7 +1305,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             }
 
             // Save it
-            CoderOfTheMonthDAO::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
+            \OmegaUp\DAO\CoderOfTheMonth::create(new \OmegaUp\DAO\VO\CoderOfTheMonth([
                 'user_id' => $user['user_id'],
                 'time' => $dateToSelect,
                 'rank' => $index + 1,
@@ -1318,7 +1318,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
     public static function userOpenedProblemset($problemset_id, $user_id) {
         // User already started the problemset.
-        $problemsetOpened = ProblemsetIdentitiesDAO::getByPK($user_id, $problemset_id);
+        $problemsetOpened = \OmegaUp\DAO\ProblemsetIdentities::getByPK($user_id, $problemset_id);
 
         if (!is_null($problemsetOpened) && !is_null($problemsetOpened->access_time)) {
             return true;
@@ -1338,7 +1338,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['interview'], 'interview');
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
-        $contest = ContestsDAO::getByAlias($r['interview']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['interview']);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('interviewNotFound');
         }
@@ -1353,7 +1353,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         /** @var \OmegaUp\DAO\VO\Identities */
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         return [
             'status' => 'ok',
@@ -1362,7 +1362,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             'name_or_username' => is_null($identity->name) ?
                                               $identity->username : $identity->name,
             'opened_interview' => self::userOpenedProblemset($contest->problemset_id, $user->user_id),
-            'finished' => !ProblemsetsDAO::insideSubmissionWindow($contest, $user->user_id),
+            'finished' => !\OmegaUp\DAO\Problemsets::insideSubmissionWindow($contest, $user->user_id),
         ];
     }
 
@@ -1384,7 +1384,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get contests where identity had at least 1 run
-        $contestsParticipated = ContestsDAO::getContestsParticipated($identity->identity_id);
+        $contestsParticipated = \OmegaUp\DAO\Contests::getContestsParticipated($identity->identity_id);
 
         $contests = [];
 
@@ -1432,7 +1432,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $problems = ProblemsDAO::getProblemsSolved($identity->identity_id);
+        $problems = \OmegaUp\DAO\Problems::getProblemsSolved($identity->identity_id);
 
         $response = [
             'status' => 'ok',
@@ -1441,7 +1441,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         if (!is_null($problems)) {
             $relevant_columns = ['title', 'alias', 'submissions', 'accepted'];
             foreach ($problems as $problem) {
-                if (ProblemsDAO::isVisible($problem)) {
+                if (\OmegaUp\DAO\Problems::isVisible($problem)) {
                     array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
                 }
             }
@@ -1468,11 +1468,11 @@ class UserController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $problems = ProblemsDAO::getProblemsUnsolvedByIdentity($identity->identity_id);
+        $problems = \OmegaUp\DAO\Problems::getProblemsUnsolvedByIdentity($identity->identity_id);
 
         $relevant_columns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
         foreach ($problems as $problem) {
-            if (ProblemsDAO::isVisible($problem)) {
+            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
                 array_push($response['problems'], $problem->asFilteredArray($relevant_columns));
             }
         }
@@ -1499,7 +1499,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
         }
 
-        $identities = IdentitiesDAO::findByUsernameOrName($r[$param]);
+        $identities = \OmegaUp\DAO\Identities::findByUsernameOrName($r[$param]);
 
         $response = [];
         foreach ($identities as $identity) {
@@ -1526,7 +1526,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         }
         $user = null;
         if (!is_null($identity->user_id)) {
-            $user = UsersDAO::getByPK($identity->user_id);
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         }
 
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
@@ -1538,7 +1538,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'runs' => RunsDAO::countRunsOfIdentityPerDatePerVerdict((int)$identity->identity_id),
+            'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict((int)$identity->identity_id),
             'status' => 'ok'
         ];
     }
@@ -1555,7 +1555,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
         if ($r['username'] != $r->user->username) {
-            $testu = UsersDAO::FindByUsername($r['username']);
+            $testu = \OmegaUp\DAO\Users::FindByUsername($r['username']);
 
             if (!is_null($testu)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterUsernameInUse', 'username');
@@ -1575,10 +1575,10 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update username and password for user object
-            UsersDAO::update($r->user);
+            \OmegaUp\DAO\Users::update($r->user);
 
             // Update username and password for identity object
-            IdentitiesDAO::update($r->identity);
+            \OmegaUp\DAO\Identities::update($r->identity);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -1606,7 +1606,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         if (isset($r['username'])) {
             \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
-            $user = UsersDAO::FindByUsername($r['username']);
+            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
             if ($r['username'] != $r->user->username && !is_null($user)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse');
             }
@@ -1623,7 +1623,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateStringNonEmpty($r['country_id'], 'country_id');
             \OmegaUp\Validators::validateStringNonEmpty($r['state_id'], 'state_id');
 
-            $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
+            $state = \OmegaUp\DAO\States::getByPK($r['country_id'], $r['state_id']);
             if (is_null($state)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'state_id');
             }
@@ -1633,7 +1633,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($r['school_id'])) {
             if (is_numeric($r['school_id'])) {
-                $r['school'] = SchoolsDAO::getByPK($r['school_id']);
+                $r['school'] = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
                 if (is_null($r['school'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'school');
                 }
@@ -1679,7 +1679,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($r['locale'])) {
             // find language in Language
-            $language = LanguagesDAO::getByName($r['locale']);
+            $language = \OmegaUp\DAO\Languages::getByName($r['locale']);
             if (is_null($language)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('invalidLanguage', 'locale');
             }
@@ -1729,10 +1729,10 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update user object
-            UsersDAO::update($r->user);
+            \OmegaUp\DAO\Users::update($r->user);
 
             // Update identity object
-            IdentitiesDAO::update($r->identity);
+            \OmegaUp\DAO\Identities::update($r->identity);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -1764,7 +1764,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $identity = null;
         if (!is_null($r['username'])) {
             \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
-            $identity = IdentitiesDAO::findByUsername($r['username']);
+            $identity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
@@ -1803,7 +1803,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                     $response['rank'] = [];
                     $response['total'] = 0;
                     $selectedFilter = self::getSelectedFilter($r);
-                    $userRankEntries = UserRankDAO::getFilteredRank(
+                    $userRankEntries = \OmegaUp\DAO\UserRank::getFilteredRank(
                         $r['offset'],
                         $r['rowcount'],
                         'rank',
@@ -1826,7 +1826,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             if (is_null($identity->user_id)) {
                 $userRank = null;
             } else {
-                $userRank = UserRankDAO::getByPK($identity->user_id);
+                $userRank = \OmegaUp\DAO\UserRank::getByPK($identity->user_id);
             }
 
             if (!is_null($userRank)) {
@@ -1869,9 +1869,9 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update email
-            $email = EmailsDAO::getByPK($r->user->main_email_id);
+            $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
             $email->email = $r['email'];
-            EmailsDAO::update($email);
+            \OmegaUp\DAO\Emails::update($email);
 
             // Add verification_id if not there
             if ($r->user->verified == '0') {
@@ -1882,7 +1882,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
                     try {
                         $r->user->verification_id = \OmegaUp\SecurityTools::randomString(50);
-                        UsersDAO::update($r->user);
+                        \OmegaUp\DAO\Users::update($r->user);
                     } catch (Exception $e) {
                         // best effort, eat exception
                     }
@@ -2010,7 +2010,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                     if (count($tokens) != 3) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
-                    $problem = ProblemsDAO::getByAlias($tokens[2]);
+                    $problem = \OmegaUp\DAO\Problems::getByAlias($tokens[2]);
                     if (is_null($problem)) {
                         throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
                     }
@@ -2019,7 +2019,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                         $problem
                     )) {
                         $response['problem_admin'][] = $tokens[2];
-                    } elseif (!ProblemsDAO::isVisible($problem)) {
+                    } elseif (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
                     }
 
@@ -2033,7 +2033,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
     private static function validateUser(\OmegaUp\Request $r) {
         // Validate request
         \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
-        $r['user'] = UsersDAO::FindByUsername($r['username']);
+        $r['user'] = \OmegaUp\DAO\Users::FindByUsername($r['username']);
         if (is_null($r['user'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -2048,7 +2048,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         self::validateUser($r);
 
         \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
-        $role = RolesDAO::getByName($r['role']);
+        $role = \OmegaUp\DAO\Roles::getByName($r['role']);
         /** @var int $role->role_id */
         if ($role->role_id == \OmegaUp\Authorization::ADMIN_ROLE
             && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
@@ -2067,7 +2067,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         self::validateUser($r);
 
         \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
-        $group = GroupsDAO::getByName($r['group']);
+        $group = \OmegaUp\DAO\Groups::getByName($r['group']);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'group');
         }
@@ -2087,7 +2087,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveRole($r);
 
-        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $r['user']->user_id,
             'role_id' => $r['role']->role_id,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
@@ -2111,7 +2111,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveRole($r);
 
-        UserRolesDAO::delete(new \OmegaUp\DAO\VO\UserRoles([
+        \OmegaUp\DAO\UserRoles::delete(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $r['user']->user_id,
             'role_id' => $r['role']->role_id,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
@@ -2134,7 +2134,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         self::authenticateRequest($r);
         self::validateAddRemoveGroup($r);
-        GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $r->identity->identity_id,
             'group_id' => $r['group']->group_id,
         ]));
@@ -2157,7 +2157,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveGroup($r);
 
-        GroupsIdentitiesDAO::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
+        \OmegaUp\DAO\GroupsIdentities::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $r->identity->identity_id,
             'group_id' => $r['group']->group_id
         ]));
@@ -2196,7 +2196,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveExperiment($r);
 
-        UsersExperimentsDAO::create(new \OmegaUp\DAO\VO\UsersExperiments([
+        \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
             'user_id' => $r['user']->user_id,
             'experiment' => $r['experiment'],
         ]));
@@ -2219,7 +2219,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
         self::validateAddRemoveExperiment($r);
 
-        UsersExperimentsDAO::delete($r['user']->user_id, $r['experiment']);
+        \OmegaUp\DAO\UsersExperiments::delete($r['user']->user_id, $r['experiment']);
 
         return [
             'status' => 'ok',
@@ -2243,13 +2243,13 @@ class UserController extends \OmegaUp\Controllers\Controller {
         } elseif ($identity->language_id == UserController::LANGUAGE_PT) {
             $lang = 'pt';
         }
-        $latest_statement = PrivacyStatementsDAO::getLatestPublishedStatement();
+        $latest_statement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
         return [
             'status' => 'ok',
             'policy_markdown' => file_get_contents(
                 OMEGAUP_ROOT . "/privacy/privacy_policy/{$lang}.md"
             ),
-            'has_accepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+            'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
                 $latest_statement['privacystatement_id']
             ),
@@ -2298,9 +2298,9 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $identity = self::resolveTargetIdentity($r);
         return [
             'status' => 'ok',
-            'hasAccepted' => PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement(
+            'hasAccepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
-                PrivacyStatementsDAO::getLatestPublishedStatement()['privacystatement_id']
+                \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement()['privacystatement_id']
             ),
         ];
     }
@@ -2313,7 +2313,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
      */
     public static function apiAcceptPrivacyPolicy(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
-        $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
+        $privacystatement_id = \OmegaUp\DAO\PrivacyStatements::getId($r['privacy_git_object_id'], $r['statement_type']);
         if (is_null($privacystatement_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
         }
@@ -2321,7 +2321,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $identity = self::resolveTargetIdentity($r);
 
         try {
-            PrivacyStatementConsentLogDAO::saveLog(
+            \OmegaUp\DAO\PrivacyStatementConsentLog::saveLog(
                 intval($identity->identity_id),
                 $privacystatement_id
             );
@@ -2351,12 +2351,12 @@ class UserController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
         \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
 
-        $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
+        $identity = \OmegaUp\DAO\Identities::getUnassociatedIdentity($r['username']);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'username');
         }
 
-        if (IdentitiesDAO::isUserAssociatedWithIdentityOfGroup((int)$r->user->user_id, (int)$identity->identity_id)) {
+        if (\OmegaUp\DAO\Identities::isUserAssociatedWithIdentityOfGroup((int)$r->user->user_id, (int)$identity->identity_id)) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 
@@ -2371,7 +2371,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         }
 
         /** @var int $r->user->user_id */
-        IdentitiesDAO::associateIdentityWithUser($r->user->user_id, $identity->identity_id);
+        \OmegaUp\DAO\Identities::associateIdentityWithUser($r->user->user_id, $identity->identity_id);
 
         return ['status' => 'ok'];
     }
@@ -2388,7 +2388,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'identities' => IdentitiesDAO::getAssociatedIdentities($r->user->user_id)
+            'identities' => \OmegaUp\DAO\Identities::getAssociatedIdentities($r->user->user_id)
         ];
     }
 
@@ -2402,7 +2402,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $token = \OmegaUp\SecurityTools::randomHexString(40);
         /** @var \OmegaUp\DAO\VO\Users $r->user */
         $r->user->git_token = \OmegaUp\SecurityTools::hashString($token);
-        UsersDAO::update($r->user);
+        \OmegaUp\DAO\Users::update($r->user);
 
         return [
             'status' => 'ok',
@@ -2496,10 +2496,10 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'codersOfCurrentMonth' => self::processCodersList(
-                CoderOfTheMonthDAO::getCodersOfTheMonth()
+                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth()
             ),
             'codersOfPreviousMonth' => self::processCodersList(
-                CoderOfTheMonthDAO::getMonthlyList($currentDate)
+                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList($currentDate)
             ),
             'isMentor' => $isMentor,
         ];
@@ -2507,7 +2507,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         if (!$isMentor) {
             return ['payload' => $response];
         }
-        $candidates = CoderOfTheMonthDAO::calculateCoderOfMonthByGivenDate(
+        $candidates = \OmegaUp\DAO\CoderOfTheMonth::calculateCoderOfMonthByGivenDate(
             $dateToSelect
         );
         $bestCoders = [];
@@ -2523,7 +2523,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             'canChooseCoder' =>
                 \OmegaUp\Authorization::canChooseCoder($currentTimeStamp),
             'coderIsSelected' =>
-                !empty(CoderOfTheMonthDAO::getByTime($dateToSelect)),
+                !empty(\OmegaUp\DAO\CoderOfTheMonth::getByTime($dateToSelect)),
         ];
         return ['payload' => $response];
     }
@@ -2531,11 +2531,11 @@ class UserController extends \OmegaUp\Controllers\Controller {
     private static function processCodersList(array $coders) : array {
         $response = [];
         foreach ($coders as $coder) {
-            $userInfo = UsersDAO::FindByUsername($coder['username']);
+            $userInfo = \OmegaUp\DAO\Users::FindByUsername($coder['username']);
             if (is_null($userInfo)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
             }
-            $classname = UsersDAO::getRankingClassName($userInfo->user_id);
+            $classname = \OmegaUp\DAO\Users::getRankingClassName($userInfo->user_id);
             $hashEmail = md5($coder['email']);
             $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
             $response[] = [

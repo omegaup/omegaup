@@ -31,7 +31,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -49,8 +49,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEqualSets($r['languages'], $problem->languages);
 
         // Verify author username -> author id conversion
-        $acl = ACLsDAO::getByPK($problem->acl_id);
-        $user = UsersDAO::getByPK($acl->owner_id);
+        $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem settings.
@@ -102,7 +102,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -143,7 +143,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -291,7 +291,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -308,8 +308,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($r['source'], $problem->source);
 
         // Verify author username -> author id conversion
-        $acl = ACLsDAO::getByPK($problem->acl_id);
-        $user = UsersDAO::getByPK($acl->owner_id);
+        $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied
@@ -350,7 +350,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Get problem info from DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
         $this->assertEquals(1, count($problems));
         $problem = $problems[0];
 
@@ -448,7 +448,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -627,7 +627,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($r['title']);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -644,8 +644,8 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertEquals($r['source'], $problem->source);
 
         // Verify author username -> author id conversion
-        $acl = ACLsDAO::getByPK($problem->acl_id);
-        $user = UsersDAO::getByPK($acl->owner_id);
+        $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
         $this->assertEquals($user->username, $r['author_username']);
 
         // Verify problem contents were copied

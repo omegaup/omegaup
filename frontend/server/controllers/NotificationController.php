@@ -18,7 +18,7 @@ class NotificationController extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
             'notifications' => is_null($r->user) ?
                 [] :
-                NotificationsDAO::getUnreadNotifications($r->user),
+                \OmegaUp\DAO\Notifications::getUnreadNotifications($r->user),
         ];
     }
 
@@ -34,7 +34,7 @@ class NotificationController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('notificationIdsNotProvided');
         }
         foreach ($r['notifications'] as $id) {
-            $notification = NotificationsDAO::getByPK($id);
+            $notification = \OmegaUp\DAO\Notifications::getByPK($id);
             if (is_null($notification)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('notificationDoesntExist');
             }
@@ -42,7 +42,7 @@ class NotificationController extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
             }
             $notification->read = 1;
-            NotificationsDAO::update($notification);
+            \OmegaUp\DAO\Notifications::update($notification);
         }
         return [
             'status' => 'ok',

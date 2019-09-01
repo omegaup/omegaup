@@ -410,7 +410,7 @@ class ContestListTest extends OmegaupTestCase {
         $login = self::login($contestant);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'active' => ActiveStatus::ACTIVE,
+            'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
         ]);
 
         $response = ContestController::apiList($r);

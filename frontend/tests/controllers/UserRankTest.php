@@ -7,7 +7,7 @@ class UserRankTest extends OmegaupTestCase {
     public function testFullRankByProblemSolved() {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
-        $contestantIdentity = IdentitiesDAO::getByPK(
+        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
             $contestant->main_identity_id
         );
         $problemData = ProblemsFactory::createProblem();
@@ -67,7 +67,7 @@ class UserRankTest extends OmegaupTestCase {
     public function testFullRankByProblemSolvedNoPrivateProblems() {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
-        $contestantIdentity = IdentitiesDAO::getByPK(
+        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
             $contestant->main_identity_id
         );
         $problemData = ProblemsFactory::createProblem();
@@ -111,7 +111,7 @@ class UserRankTest extends OmegaupTestCase {
     public function testUserRankByProblemsSolved() {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
-        $contestantIdentity = IdentitiesDAO::getByPK(
+        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
             $contestant->main_identity_id
         );
         $problemData = ProblemsFactory::createProblem();
@@ -136,7 +136,7 @@ class UserRankTest extends OmegaupTestCase {
     public function testUserRankByProblemsSolvedWith0Runs() {
         // Create a user with no runs
         $contestant = UserFactory::createUser();
-        $contestantIdentity = IdentitiesDAO::getByPK(
+        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
             $contestant->main_identity_id
         );
 
@@ -169,7 +169,7 @@ class UserRankTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
         $login = self::login($contestant);
 
-        $states = StatesDAO::getByCountry('MX');
+        $states = \OmegaUp\DAO\States::getByCountry('MX');
         UserController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'country_id' => 'MX',

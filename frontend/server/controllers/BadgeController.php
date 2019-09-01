@@ -42,7 +42,7 @@ class BadgeController extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
             'badges' => is_null($r->user) ?
                 [] :
-                UsersBadgesDAO::getUserOwnedBadges($r->user),
+                \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($r->user),
         ];
     }
 
@@ -53,13 +53,13 @@ class BadgeController extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUserList(\OmegaUp\Request $r) {
-        $user = UsersDAO::FindByUsername($r['target_username']);
+        $user = \OmegaUp\DAO\Users::FindByUsername($r['target_username']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return [
             'status' => 'ok',
-            'badges' => UsersBadgesDAO::getUserOwnedBadges($user),
+            'badges' => \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($user),
         ];
     }
 
@@ -78,7 +78,7 @@ class BadgeController extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
             'assignation_time' => is_null($r->user) ?
                 null :
-                UsersBadgesDAO::getUserBadgeAssignationTime($r->user, $r['badge_alias']),
+                \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime($r->user, $r['badge_alias']),
         ];
     }
 
@@ -92,9 +92,9 @@ class BadgeController extends \OmegaUp\Controllers\Controller {
     public static function apiBadgeDetails(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
         \OmegaUp\Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
-        $totalUsers = max(UsersDAO::getUsersCount(), 1);
-        $ownersCount = UsersBadgesDAO::getBadgeOwnersCount($r['badge_alias']);
-        $firstAssignation = UsersBadgesDAO::getBadgeFirstAssignationTime($r['badge_alias']);
+        $totalUsers = max(\OmegaUp\DAO\Users::getUsersCount(), 1);
+        $ownersCount = \OmegaUp\DAO\UsersBadges::getBadgeOwnersCount($r['badge_alias']);
+        $firstAssignation = \OmegaUp\DAO\UsersBadges::getBadgeFirstAssignationTime($r['badge_alias']);
         return [
             'status' => 'ok',
             'first_assignation' => $firstAssignation,

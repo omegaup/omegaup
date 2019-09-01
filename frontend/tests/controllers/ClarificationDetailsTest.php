@@ -15,7 +15,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
      */
     private function assertClarification($clarification_id, $response) {
         // Get the actual clarification from DB to compare it with what we got
-        $clarification = ClarificationsDAO::getByPK($clarification_id);
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK($clarification_id);
 
         // Assert status of clarification
         $this->assertEquals($clarification->message, $response['message']);
@@ -171,9 +171,9 @@ class DetailsClarificationTest extends OmegaupTestCase {
         );
 
         // Manually set the just created clarification to PUBLIC
-        $clarification = ClarificationsDAO::getByPK($clarificationData['response']['clarification_id']);
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK($clarificationData['response']['clarification_id']);
         $clarification->public = '1';
-        ClarificationsDAO::update($clarification);
+        \OmegaUp\DAO\Clarifications::update($clarification);
 
         // Prepare the request object
         $r = new \OmegaUp\Request();

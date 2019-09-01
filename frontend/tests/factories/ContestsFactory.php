@@ -167,7 +167,7 @@ class ContestsFactory {
             $r['admission_mode'] = 'public';
         }
 
-        $contest = ContestsDAO::getByAlias($r['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['alias']);
 
         return [
             'director' => $contestData['director'],
@@ -324,15 +324,15 @@ class ContestsFactory {
         array $contestData,
         ?int $lastUpdated = null
     ) {
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
         $contest->admission_mode = 'public';
         $contest->last_updated = $lastUpdated;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
         $contest->scoreboard = $percentage;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
     }
 }

@@ -146,31 +146,23 @@ require_once('libs/third_party/log4php/src/main/php/Logger.php');
     ],
 ]);
 
-// Load DAOs and controllers lazily.
+// Load controllers lazily.
 spl_autoload_register(function (string $classname) : void {
     $controllerSuffix = 'Controller';
-    $daoSuffix = 'DAO';
-    if ($classname == 'QualitynominationController') {
-        // TODO: Figure out a better way of dealing with this.
-        $filename = __DIR__ . '/controllers/QualityNominationController.php';
-    } elseif (substr_compare(
+    if (substr_compare(
         $classname,
         $controllerSuffix,
         strlen($classname) - strlen($controllerSuffix)
-    ) === 0
+    ) !== 0
     ) {
-        $filename = __DIR__ . "/controllers/{$classname}.php";
+        return;
+    }
+
+    if ($classname == 'QualitynominationController') {
+        // TODO: Figure out a better way of dealing with this.
+        $filename = __DIR__ . '/controllers/QualityNominationController.php';
     } else {
-        if (substr_compare(
-            $classname,
-            $daoSuffix,
-            strlen($classname) - strlen($daoSuffix)
-        ) === 0
-        ) {
-            $classname = substr($classname, 0, strlen($classname) - strlen($daoSuffix));
-        }
-        $classname = preg_replace('/([a-z])([A-Z])/', '$1_$2', $classname);
-        $filename = __DIR__ . "/libs/dao/{$classname}.dao.php";
+        $filename = __DIR__ . "/controllers/{$classname}.php";
     }
 
     if (file_exists($filename)) {

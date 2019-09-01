@@ -77,9 +77,9 @@ class ResetUpdateTest extends OmegaupTestCase {
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
             \OmegaUp\Time::get() - PASSWORD_RESET_TIMEOUT - 1
         );
-        $user = UsersDAO::FindByEmail($user_data['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         try {
             $r = new \OmegaUp\Request($user_data);
@@ -102,7 +102,7 @@ class ResetUpdateTest extends OmegaupTestCase {
         $user_data['password_confirmation'] = $new_password;
         $r = new \OmegaUp\Request($user_data);
 
-        $user = UsersDAO::FindByEmail($user_data['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($user_data['email']);
         ResetController::apiUpdate($r);
         $user->password = $new_password;
         self::login($user);

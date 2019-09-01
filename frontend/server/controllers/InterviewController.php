@@ -6,7 +6,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
 
         // Only site-admins and interviewers can create interviews for now
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
-            !UsersDAO::IsUserInterviewer($r->user->user_id)) {
+            !\OmegaUp\DAO\Users::IsUserInterviewer($r->user->user_id)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -38,7 +38,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            ACLsDAO::create($acl);
+            \OmegaUp\DAO\ACLs::create($acl);
             $interview->acl_id = $acl->acl_id;
 
             $problemset = new \OmegaUp\DAO\VO\Problemsets([
@@ -47,13 +47,13 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
                 'scoreboard_url' => \OmegaUp\SecurityTools::randomString(30),
                 'scoreboard_url_admin' => \OmegaUp\SecurityTools::randomString(30),
             ]);
-            ProblemsetsDAO::create($problemset);
+            \OmegaUp\DAO\Problemsets::create($problemset);
             $interview->problemset_id = $problemset->problemset_id;
-            InterviewsDAO::create($interview);
+            \OmegaUp\DAO\Interviews::create($interview);
 
             // Update interview_id in problemset object
             $problemset->interview_id = $interview->interview_id;
-            ProblemsetsDAO::update($problemset);
+            \OmegaUp\DAO\Problemsets::update($problemset);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -99,7 +99,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
 
         // Does the interview exist ?
-        $r['interview'] = InterviewsDAO::getByAlias($r['interview_alias']);
+        $r['interview'] = \OmegaUp\DAO\Interviews::getByAlias($r['interview_alias']);
         if (is_null($r['interview'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('interviewNotFound');
         }
@@ -164,14 +164,14 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
         }
 
         // add the user to the interview
-        ProblemsetIdentitiesDAO::create(new \OmegaUp\DAO\VO\ProblemsetIdentities([
+        \OmegaUp\DAO\ProblemsetIdentities::create(new \OmegaUp\DAO\VO\ProblemsetIdentities([
             'problemset_id' => $r['interview']->problemset_id,
             'identity_id' => $r['user']->main_identity_id,
             'access_time' => null,
             'score' => '0',
             'time' => '0',
         ]));
-        $email = EmailsDAO::getByPK($r['user']->main_email_id);
+        $email = \OmegaUp\DAO\Emails::getByPK($r['user']->main_email_id);
         if (is_null($email) || is_null($email->email)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
         }
@@ -185,7 +185,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
     public static function apiDetails(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        $interview = InterviewsDAO::getByAlias($r['interview_alias']);
+        $interview = \OmegaUp\DAO\Interviews::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
             return [
                 'exists' => false,
@@ -198,7 +198,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $problemsetIdentities = ProblemsetIdentitiesDAO::getIdentitiesByProblemset($interview->problemset_id);
+        $problemsetIdentities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset($interview->problemset_id);
 
         $users = [];
 
@@ -231,7 +231,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'result' => InterviewsDAO::getMyInterviews($r->user->user_id),
+            'result' => \OmegaUp\DAO\Interviews::getMyInterviews($r->user->user_id),
         ];
     }
 

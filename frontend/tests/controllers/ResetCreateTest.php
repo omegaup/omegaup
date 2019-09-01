@@ -45,9 +45,9 @@ class ResetCreateTest extends OmegaupTestCase {
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
             \OmegaUp\Time::get() - PASSWORD_RESET_MIN_WAIT - 1
         );
-        $user = UsersDAO::FindByEmail($user_data['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         ResetController::apiCreate($r);
     }

@@ -20,7 +20,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         }
 
         $problemForfeited = ProblemsFactory::createProblem();
-        ProblemsForfeitedDAO::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
+        \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
             'user_id' => $user->user_id,
             'problem_id' => $problemForfeited['problem']->problem_id,
         ]));
@@ -64,9 +64,9 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         ]));
         $this->assertContains('`long long`', $response['solution']['markdown']);
         $this->assertTrue(
-            ProblemsForfeitedDAO::isProblemForfeited(
+            \OmegaUp\DAO\ProblemsForfeited::isProblemForfeited(
                 $extraProblem['problem'],
-                IdentitiesDAO::findByUsername($user->username)
+                \OmegaUp\DAO\Identities::findByUsername($user->username)
             )
         );
     }

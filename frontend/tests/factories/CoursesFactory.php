@@ -12,13 +12,13 @@ class CoursesFactory {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
-        $identity = IdentitiesDAO::getByPK($admin->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($admin->main_identity_id);
         if ($public != false) {
-            $curatorGroup = GroupsDAO::findByAlias(
+            $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
             );
 
-            GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+            \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
                 'identity_id' => $identity->identity_id,
             ]));
@@ -66,7 +66,7 @@ class CoursesFactory {
 
         // Create the assignment
         $assignmentAlias = Utils::CreateRandomString();
-        $course = CoursesDAO::getByAlias($courseAlias);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
 
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -80,7 +80,7 @@ class CoursesFactory {
             'course' => $course,
         ]);
         $assignmentResult = CourseController::apiCreateAssignment($r);
-        $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse($assignmentAlias, $course->course_id);
         return [
             'course' => $course,
             'course_alias' => $courseAlias,
@@ -140,8 +140,8 @@ class CoursesFactory {
             $student = UserFactory::createUser();
         }
 
-        $course = CoursesDAO::getByAlias($courseData['course_alias']);
-        $group = GroupsDAO::getByPK($course->group_id);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
+        $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
         if (is_null($login)) {
             $login = OmegaupTestCase::login($courseData['admin']);
         }
@@ -175,7 +175,7 @@ class CoursesFactory {
         array $assignmentAliases,
         array $problemAssignmentsMap
     ) {
-        $course = CoursesDAO::getByAlias($courseData['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         $expectedScores = [];
         for ($s = 0; $s < count($students); $s++) {
             $studentUsername = $students[$s]->username;
@@ -185,7 +185,7 @@ class CoursesFactory {
             // Loop through all problems inside assignments created
             $p = 0;
             foreach ($assignmentAliases as $assignmentAlias) {
-                $assignment = AssignmentsDAO::getByAliasAndCourse(
+                $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
                     $assignmentAlias,
                     $course->course_id
                 );

@@ -1,8 +1,5 @@
 <?php
 
-require_once('libs/dao/Problemsets.dao.php');
-require_once('libs/dao/Problemset_Problems.dao.php');
-
 class ProblemsetController extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -12,7 +9,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
             $problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
         }
-        if (!ProblemsDAO::isVisible($problem)
+        if (!\OmegaUp\DAO\Problems::isVisible($problem)
             && !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
@@ -68,11 +65,11 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
             return;
         }
         if ($oldProblemsetProblem->version != $updatedProblemsetProblem->version) {
-            ProblemsetProblemsDAO::updateProblemsetProblemSubmissions(
+            \OmegaUp\DAO\ProblemsetProblems::updateProblemsetProblemSubmissions(
                 $updatedProblemsetProblem
             );
         }
-        RunsDAO::recalculateScore(
+        \OmegaUp\DAO\Runs::recalculateScore(
             $updatedProblemsetProblem->problemset_id,
             $updatedProblemsetProblem->problem_id,
             $updatedProblemsetProblem->points,
@@ -184,7 +181,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
     public static function wrapRequest(\OmegaUp\Request $r) {
         $r->ensureInt('problemset_id');
 
-        $r['problemset'] = ProblemsetsDAO::getWithTypeByPK($r['problemset_id']);
+        $r['problemset'] = \OmegaUp\DAO\Problemsets::getWithTypeByPK($r['problemset_id']);
         if (is_null($r['problemset'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
@@ -216,7 +213,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
      * @param $zip ZipStream The object that represents the .zip file.
      */
     public static function downloadRuns(int $problemsetId, ZipStream $zip): void {
-        $runs = RunsDAO::getByProblemset($problemsetId);
+        $runs = \OmegaUp\DAO\Runs::getByProblemset($problemsetId);
 
         $table = ['guid,user,problem,verdict,points'];
         foreach ($runs as $run) {

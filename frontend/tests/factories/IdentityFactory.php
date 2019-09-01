@@ -59,10 +59,10 @@ class IdentityFactory {
         ]));
 
         [$unassociatedIdentity, $associatedIdentity] = $response['identities'];
-        $unassociatedIdentity = IdentitiesDAO::FindByUsername(
+        $unassociatedIdentity = \OmegaUp\DAO\Identities::FindByUsername(
             $unassociatedIdentity['username']
         );
-        $associatedIdentity = IdentitiesDAO::FindByUsername(
+        $associatedIdentity = \OmegaUp\DAO\Identities::FindByUsername(
             $associatedIdentity['username']
         );
 

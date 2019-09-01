@@ -12,7 +12,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testIdentityHasContestOrganizerRole() {
         $creator = UserFactory::createGroupIdentityCreator();
-        $creatorIdentity = IdentitiesDAO::getByPK($creator->main_identity_id);
+        $creatorIdentity = \OmegaUp\DAO\Identities::getByPK($creator->main_identity_id);
         [, $mentorIdentity] = UserFactory::createMentorIdentity();
 
         $isCreatorMember = \OmegaUp\Authorization::isGroupIdentityCreator($creatorIdentity);
@@ -254,17 +254,17 @@ class IdentityCreateTest extends OmegaupTestCase {
             'group_alias' => $group['group']->alias,
         ]));
 
-        $user = UsersDAO::FindByUsername("{$group['group']->alias}:{$identityName}");
+        $user = \OmegaUp\DAO\Users::FindByUsername("{$group['group']->alias}:{$identityName}");
         $this->assertNull($user);
-        $user = UsersDAO::FindByUsername($identityName);
+        $user = \OmegaUp\DAO\Users::FindByUsername($identityName);
         $this->assertNull($user);
 
-        $identity = IdentitiesDAO::findByUsername("{$group['group']->alias}:{$identityName}");
+        $identity = \OmegaUp\DAO\Identities::findByUsername("{$group['group']->alias}:{$identityName}");
 
         $this->assertEquals($identityName, $identity->name);
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
+        $this->assertEquals(0, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
 
         // Call the API
         $loginResponse = UserController::apiLogin(new \OmegaUp\Request([
@@ -276,7 +276,7 @@ class IdentityCreateTest extends OmegaupTestCase {
         $this->assertLogin($identity, $loginResponse['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
+        $this->assertEquals(1, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
 
         $profileResponse = UserController::apiProfile(new \OmegaUp\Request([
             'auth_token' => $loginResponse['auth_token'],

@@ -20,13 +20,13 @@ class ScoreboardController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $contest = ContestsDAO::getByAlias($r['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['alias']);
         if (is_null($contest)) {
-            $course = CoursesDAO::getByAlias($r['course_alias']);
+            $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
             if (is_null($course)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
             }
-            $assignment = AssignmentsDAO::getByAliasAndCourse($r['alias'], $course->course_id);
+            $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse($r['alias'], $course->course_id);
             if (is_null($assignment)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
             }

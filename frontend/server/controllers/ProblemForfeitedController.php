@@ -20,9 +20,9 @@ class ProblemForfeitedController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
         return [
             'status' => 'ok',
-            'allowed' => intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
+            'allowed' => intval(\OmegaUp\DAO\Problems::getProblemsSolvedCount($r->identity) /
                                 static::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION),
-            'seen' => ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user),
+            'seen' => \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCount($r->user),
         ];
     }
 }

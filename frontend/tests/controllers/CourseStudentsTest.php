@@ -83,7 +83,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         ]));
 
         // Get Group object
-        $associatedGroup = GroupsDAO::findByAlias($courseData['course_alias']);
+        $associatedGroup = \OmegaUp\DAO\Groups::findByAlias($courseData['course_alias']);
 
         // Create identities for a group
         $password = Utils::CreateRandomString();

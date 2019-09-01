@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \UsersExperimentsDAO;
-
 /**
  * Allows for runtime inclusion/exclusion of certain experiments.
  *
@@ -136,7 +134,7 @@ class Experiments {
         if (is_null($user->user_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
-        foreach (UsersExperimentsDAO::getByUserId($user->user_id) as $ue) {
+        foreach (\OmegaUp\DAO\UsersExperiments::getByUserId($user->user_id) as $ue) {
             if (in_array($ue->experiment, $knownExperiments) &&
                 !is_null($ue->experiment) &&
                 !$this->isEnabled($ue->experiment)

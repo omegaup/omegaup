@@ -9,7 +9,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         // Verify I started with nothing
-        $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
+        $interviews = \OmegaUp\DAO\Interviews::getMyInterviews($interviewer->user_id);
         $this->assertEquals(0, count($interviews));
 
         $login = self::login($interviewer);
@@ -22,7 +22,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
+        $interviews = \OmegaUp\DAO\Interviews::getMyInterviews($interviewer->user_id);
 
         // Must have 1 interview
         $this->assertEquals(1, count($interviews));
@@ -40,7 +40,7 @@ class InterviewCreateTest extends OmegaupTestCase {
             'duration' => 60,
         ]));
 
-        $interview = InterviewsDAO::getMyInterviews($interviewer->user_id);
+        $interview = \OmegaUp\DAO\Interviews::getMyInterviews($interviewer->user_id);
     }
 
     public function testAddUsersToInterview() {
@@ -69,8 +69,8 @@ class InterviewCreateTest extends OmegaupTestCase {
         ]));
         $this->assertEquals('ok', $response['status']);
 
-        $this->assertNotNull($createdUser1 = UsersDAO::FindByEmail($email1), 'user should have been created by adding email to interview');
-        $this->assertNotNull(UsersDAO::FindByEmail($email2), 'user should have been created by adding email to interview');
+        $this->assertNotNull($createdUser1 = \OmegaUp\DAO\Users::FindByEmail($email1), 'user should have been created by adding email to interview');
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByEmail($email2), 'user should have been created by adding email to interview');
 
         $this->assertEquals($createdUser1->verified, 0, 'new created users should not be email-validated');
 

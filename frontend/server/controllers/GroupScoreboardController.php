@@ -18,7 +18,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
         GroupController::validateGroup($groupAlias, $identity);
 
         \OmegaUp\Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
-        $scoreboard = GroupsScoreboardsDAO::getByAlias($scoreboardAlias);
+        $scoreboard = \OmegaUp\DAO\GroupsScoreboards::getByAlias($scoreboardAlias);
         if (is_null($scoreboard)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Scoreboard');
         }
@@ -42,7 +42,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
         );
 
         \OmegaUp\Validators::validateValidAlias($contestAlias, 'contest_alias');
-        $contest = ContestsDAO::getByAlias($contestAlias);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Contest');
         }
@@ -74,7 +74,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
         $r->ensureBool('only_ac');
         $r->ensureFloat('weight');
 
-        GroupsScoreboardsProblemsetsDAO::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
+        \OmegaUp\DAO\GroupsScoreboardsProblemsets::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
             'problemset_id' => $contestScoreboard['contest']->problemset_id,
             'only_ac' => $r['only_ac'],
@@ -104,7 +104,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
             $r['contest_alias']
         );
 
-        $gscs = GroupsScoreboardsProblemsetsDAO::getByPK(
+        $gscs = \OmegaUp\DAO\GroupsScoreboardsProblemsets::getByPK(
             $contestScoreboard['scoreboard']->group_scoreboard_id,
             $contestScoreboard['contest']->problemset_id
         );
@@ -112,7 +112,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Contest');
         }
 
-        GroupsScoreboardsProblemsetsDAO::delete($gscs);
+        \OmegaUp\DAO\GroupsScoreboardsProblemsets::delete($gscs);
 
         self::$log->info('Contest ' . $r['contest_alias'] . 'removed from group ' . $r['group_alias']);
 
@@ -140,14 +140,14 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
         $contests = [];
         $response['ranking'] = [];
         /** @var int $scoreboard->group_scoreboard_id */
-        $gscs = GroupsScoreboardsProblemsetsDAO::getByGroupScoreboard(
+        $gscs = \OmegaUp\DAO\GroupsScoreboardsProblemsets::getByGroupScoreboard(
             $scoreboard->group_scoreboard_id
         );
         $i = 0;
         /** @var array<string, array{only_ac: bool, weight: float}> */
         $contestParams = [];
         foreach ($gscs as $gsc) {
-            $contest = ContestsDAO::getByProblemset($gsc->problemset_id);
+            $contest = \OmegaUp\DAO\Contests::getByProblemset($gsc->problemset_id);
             if (empty($contest)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
@@ -178,7 +178,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
                 $contestAliases[] = $contest['alias'];
             }
 
-            $usernames = GroupsIdentitiesDAO::getUsernamesByGroupId($scoreboard->group_id);
+            $usernames = \OmegaUp\DAO\GroupsIdentities::getUsernamesByGroupId($scoreboard->group_id);
 
             $response['ranking'] = ContestController::getMergedScoreboard(
                 $contestAliases,
@@ -207,7 +207,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
 
         $scoreboards = [];
         /** @var int $group->group_id */
-        $groupScoreboards = GroupsScoreboardsDAO::getByGroup($group->group_id);
+        $groupScoreboards = \OmegaUp\DAO\GroupsScoreboards::getByGroup($group->group_id);
         foreach ($groupScoreboards as $scoreboard) {
             $scoreboards[] = $scoreboard->asArray();
         }
