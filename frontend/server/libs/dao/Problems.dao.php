@@ -350,7 +350,9 @@ class ProblemsDAO extends \OmegaUp\DAO\Base\Problems {
         return $problems;
     }
 
-    final public static function getByAlias($alias) {
+    final public static function getByAlias(
+        string $alias
+    ) : ?\OmegaUp\DAO\VO\Problems {
         $sql = 'SELECT * FROM Problems WHERE (alias = ? ) LIMIT 1;';
         $params = [$alias];
 

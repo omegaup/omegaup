@@ -28,9 +28,8 @@ class ClarificationController extends Controller {
     private static function validateCreate(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
-        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username', false);
-        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
-        \OmegaUp\Validators::validateStringOfLengthInRange($r['message'], 'message', null, 200);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['username'], 'username');
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['message'], 'message', 1, 200);
 
         $r['contest'] = ContestsDAO::getByAlias($r['contest_alias']);
         $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
@@ -143,8 +142,8 @@ class ClarificationController extends Controller {
     private static function validateUpdate(\OmegaUp\Request $r) {
         $r->ensureInt('clarification_id');
         $r->ensureBool('public', false /* not required */);
-        \OmegaUp\Validators::validateStringNonEmpty($r['answer'], 'answer', false /* not required */);
-        \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message', false /* not required */);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['answer'], 'answer');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['message'], 'message');
 
         // Check that clarification exists
         $r['clarification'] = ClarificationsDAO::GetByPK($r['clarification_id']);

@@ -9,9 +9,9 @@
 class StatusBase {
     /**
      * @param mixed $status Numeric or named constant.
-     * @return int value on success, null otherwise.
+     * @return null|int value on success, null otherwise.
      */
-    public static function getIntValue($status) {
+    public static function getIntValue($status) : ?int {
         $cache = self::getConstCache(get_called_class());
         if (is_numeric($status)) {
             // $status may be a string, force it to an int.
@@ -24,14 +24,14 @@ class StatusBase {
                 return $cache['constants'][$status];
             }
         }
-        return;
+        return null;
     }
 
     /**
      * @param int $status
      * @return string SQL snippet.
      */
-    public static function sql($status) {
+    public static function sql(int $status) : string {
         $class = get_called_class();
         $cache = self::getConstCache($class);
         // This should've been validated before, but lets be paranoid anyway.
@@ -41,23 +41,25 @@ class StatusBase {
 
     /**
      * @param string $className The derived class name.
-     * @return array with 'constants', 'min' and 'max' fields.
+     * @return array{constants: array<string, int>, min: int, max: int}
      */
-    private static function getConstCache($className) {
-        if (!isset(self::$constCache[$className])) {
+    private static function getConstCache(string $className) : array {
+        if (!isset(self::$_constCache[$className])) {
             $reflection = new ReflectionClass($className);
+            /** @var array<string, int> */
             $constants = $reflection->getConstants();
             $values = array_values($constants);
-            self::$constCache[$className] = [
+            self::$_constCache[$className] = [
                 'constants' => $constants,
                 'min' => min($values),
                 'max' => max($values),
             ];
         }
-        return self::$constCache[$className];
+        return self::$_constCache[$className];
     }
 
-    private static $constCache = [];
+    /** @var array<string, array{constants: array<string, int>, min: int, max: int}> */
+    private static $_constCache = [];
 }
 
 class ActiveStatus extends StatusBase {

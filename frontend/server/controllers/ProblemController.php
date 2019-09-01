@@ -138,8 +138,8 @@ class ProblemController extends Controller {
             }
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
-        \OmegaUp\Validators::validateStringNonEmpty($r['source'], 'source', $is_required);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['title'], 'title', $is_required);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['source'], 'source', $is_required);
         \OmegaUp\Validators::validateInEnum(
             $r['validator'],
             'validator',
@@ -978,7 +978,7 @@ class ProblemController extends Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDetails(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias', false);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['contest_alias'], 'contest_alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Lang is optional. Default is user's preferred.
@@ -2093,7 +2093,7 @@ class ProblemController extends Controller {
             }
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['query'], 'query', false);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['query'], 'query');
     }
 
     /**

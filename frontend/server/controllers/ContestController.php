@@ -31,17 +31,17 @@ class ContestController extends Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $page_size = (isset($r['page_size']) ? intval($r['page_size']) : 20);
-        $active_contests = isset($r['active'])
+        $activeContests = isset($r['active'])
             ? ActiveStatus::getIntValue($r['active'])
             : ActiveStatus::ALL;
         // If the parameter was not set, the default should be ALL which is
         // a number and should pass this check.
-        \OmegaUp\Validators::validateNumber($active_contests, 'active', true /* required */);
+        \OmegaUp\Validators::validateNumber($activeContests, 'active');
         $recommended = isset($r['recommended'])
             ? RecommendedStatus::getIntValue($r['recommended'])
             : RecommendedStatus::ALL;
         // Same as above.
-        \OmegaUp\Validators::validateNumber($recommended, 'recommended', true /* required */);
+        \OmegaUp\Validators::validateNumber($recommended, 'recommended');
         $participating = isset($r['participating'])
             ? ParticipatingStatus::getIntValue($r['participating'])
             : ParticipatingStatus::NO;
@@ -59,17 +59,17 @@ class ContestController extends Controller {
         }
         $query = $r['query'];
         \OmegaUp\Validators::validateStringOfLengthInRange($query, 'query', null, 255, false /* not required */);
-        $cacheKey = "{$active_contests}-{$recommended}-{$page}-{$page_size}";
+        $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$page_size}";
         if (is_null($r->identity)) {
             // Get all public contests
             $contests = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::CONTESTS_LIST_PUBLIC,
                 $cacheKey,
-                function () use ($page, $page_size, $active_contests, $recommended, $query) {
+                function () use ($page, $page_size, $activeContests, $recommended, $query) {
                     return ContestsDAO::getAllPublicContests(
                         $page,
                         $page_size,
-                        $active_contests,
+                        $activeContests,
                         $recommended,
                         $query
                     );
@@ -84,13 +84,13 @@ class ContestController extends Controller {
             $contests = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN,
                 $cacheKey,
-                function () use ($page, $page_size, $active_contests, $recommended, $query) {
-                        return ContestsDAO::getAllContests($page, $page_size, $active_contests, $recommended, $query);
+                function () use ($page, $page_size, $activeContests, $recommended, $query) {
+                        return ContestsDAO::getAllContests($page, $page_size, $activeContests, $recommended, $query);
                 }
             );
         } else {
             // Get all public+private contests
-            $contests = ContestsDAO::getAllContestsForIdentity($r->identity->identity_id, $page, $page_size, $active_contests, $recommended, $query);
+            $contests = ContestsDAO::getAllContestsForIdentity($r->identity->identity_id, $page, $page_size, $activeContests, $recommended, $query);
         }
 
         // Filter returned values by these columns
@@ -293,11 +293,13 @@ class ContestController extends Controller {
     /**
      * Validate a contest with contest alias
      *
-     * @param string $contestAlias
+     * @psalm-assert string $contestAlias
      * @return \OmegaUp\DAO\VO\Contests $contest
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    public static function validateContest(string $contestAlias) : \OmegaUp\DAO\VO\Contests {
+    public static function validateContest(
+        ?string $contestAlias
+    ) : \OmegaUp\DAO\VO\Contests {
         \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
         $contest = ContestsDAO::getByAlias($contestAlias);
         if (is_null($contest)) {
@@ -541,7 +543,7 @@ class ContestController extends Controller {
         // Authenticate request
         self::authenticateRequest($r);
 
-        $contest = self::validateContest($r['contest_alias'] ?? '');
+        $contest = self::validateContest($r['contest_alias']);
 
         ProblemsetIdentityRequestDAO::create(new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
             'identity_id' => $r->identity->identity_id,
@@ -1094,8 +1096,8 @@ class ContestController extends Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateCommonCreateOrUpdate(\OmegaUp\Request $r, ?\OmegaUp\DAO\VO\Contests $contest = null, bool $isRequired = true) : void {
-        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', $isRequired);
-        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['title'], 'title', $isRequired);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt('start_time', null, null, $isRequired);
         $r->ensureInt('finish_time', null, null, $isRequired);
@@ -1326,6 +1328,7 @@ class ContestController extends Controller {
 
         self::forbiddenInVirtual($params['contest']);
 
+        /** @var int $params['contest']->problemset_id */
         $problemset = ProblemsetsDAO::getByPK($params['contest']->problemset_id);
 
         if (ProblemsetProblemsDAO::countProblemsetProblems($problemset)
@@ -1359,18 +1362,17 @@ class ContestController extends Controller {
      * Validates the request for AddToContest and returns an array with
      * the problem and contest DAOs
      *
-     * @param \OmegaUp\Request $r
-     * @param string $contestAlias
-     * @param string $problemAlias
-     * @return Array
+     * @psalm-assert string $contestAlias
+     * @psalm-assert string $problemAlias
+     * @return array{contest: \OmegaUp\DAO\VO\Contests, problem: \OmegaUp\DAO\VO\Problems}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateAddToContestRequest(
         \OmegaUp\Request $r,
-        string $contestAlias,
+        ?string $contestAlias,
         ?string $problemAlias
-    ) : Array {
+    ) : array {
         \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         // Only director is allowed to create problems in contest
@@ -1445,18 +1447,17 @@ class ContestController extends Controller {
      * Validates the request for RemoveFromContest and returns an array with
      * the problem and contest DAOs
      *
-     * @param string $contestAlias
-     * @param string $problemAlias
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     * @return Array
+     * @psalm-assert string $contestAlias
+     * @psalm-assert string $problemAlias
+     * @return array{contest: \OmegaUp\DAO\VO\Contests, problem: \OmegaUp\DAO\VO\Problems}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRemoveFromContestRequest(
-        string $contestAlias,
+        ?string $contestAlias,
         ?string $problemAlias,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : Array {
+    ) : array {
         \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
         $contest = ContestsDAO::getByAlias($contestAlias);
@@ -1539,18 +1540,17 @@ class ContestController extends Controller {
     /**
      * Validates add/remove user request
      *
-     * @param string $contestAlias
-     * @param string $usernameOrEmail
-     * @param \OmegaUp\DAO\VO\Identities $identity
-     * @return Array
+     * @psalm-assert string $contestAlias
+     * @psalm-assert string $usernameOrEmail
+     * @return array{0: \OmegaUp\DAO\VO\Identities, 1: \OmegaUp\DAO\VO\Contests}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateAddRemoveUser(
-        string $contestAlias,
-        string $usernameOrEmail,
+        ?string $contestAlias,
+        ?string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : Array {
+    ) : array {
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
@@ -1864,19 +1864,48 @@ class ContestController extends Controller {
         self::authenticateRequest($r);
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_aliases'], 'contest_aliases');
-        $contest_aliases = explode(',', $r['contest_aliases']);
+        $contestAliases = explode(',', $r['contest_aliases']);
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['usernames_filter'], 'usernames_filter', false);
-
-        $usernames_filter = [];
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['usernames_filter'], 'usernames_filter');
+        /** @var string[] */
+        $usernamesFilter = [];
         if (isset($r['usernames_filter'])) {
-            $usernames_filter = explode(',', $r['usernames_filter']);
+            $usernamesFilter = explode(',', $r['usernames_filter']);
         }
 
+        if (isset($r['contest_params']) && is_array($r['contest_params'])) {
+            /** @var array<string, array{only_ac: bool, weight: float}> */
+            $contestParams = $r['contest_params'];
+        } else {
+            /** @var array<string, array{only_ac: bool, weight: float}> */
+            $contestParams = [];
+        }
+
+        return [
+            'status' => 'ok',
+            'ranking' => self::getMergedScoreboard(
+                $contestAliases,
+                $usernamesFilter,
+                $contestParams
+            ),
+        ];
+    }
+
+    /**
+     * @param string[] $contestAliases
+     * @param string[] $usernamesFilter
+     * @param array<string, array{only_ac: bool, weight: float}> $contestParams
+     * @return array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}[]
+     */
+    public static function getMergedScoreboard(
+        array $contestAliases,
+        array $usernamesFilter,
+        array $contestParams
+    ) : array {
         // Validate all contest alias
         $contests = [];
-        foreach ($contest_aliases as $contest_alias) {
-            $contest = ContestsDAO::getByAlias($contest_alias);
+        foreach ($contestAliases as $contestAlias) {
+            $contest = ContestsDAO::getByAlias($contestAlias);
             if (is_null($contest)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
@@ -1888,96 +1917,99 @@ class ContestController extends Controller {
         $scoreboards = [];
         foreach ($contests as $contest) {
             // Set defaults for contests params
-            if (!isset($r['contest_params'][$contest->alias]['only_ac'])) {
-                // Hay que hacer esto para evitar "Indirect modification of overloaded element of Request has no effect"
-                // http://stackoverflow.com/questions/20053269/indirect-modification-of-overloaded-element-of-splfixedarray-has-no-effect
-                $cp = $r['contest_params'];
-                $cp[$contest->alias]['only_ac'] = false;
-                $r['contest_params'] = $cp;
+            if (!isset($contestParams[$contest->alias])) {
+                $contestParams[$contest->alias] = [
+                    'only_ac' => false,
+                    'weight' => 1.0,
+                ];
             }
-
-            if (!isset($r['contest_params'][$contest->alias]['weight'])) {
-                // Ditto indirect modification.
-                $cp = $r['contest_params'];
-                $cp[$contest->alias]['weight'] = 1;
-                $r['contest_params'] = $cp;
-            }
-
             $params = \OmegaUp\ScoreboardParams::fromContest($contest);
-            $params->only_ac = $r['contest_params'][$contest->alias]['only_ac'];
+            $params->only_ac = $contestParams[$contest->alias]['only_ac'];
             $s = new \OmegaUp\Scoreboard($params);
 
             $scoreboards[$contest->alias] = $s->generate();
         }
 
-        $merged_scoreboard = [];
+        /** @var array<string, array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
+        $mergedScoreboard = [];
 
         // Merge
-        foreach ($scoreboards as $contest_alias => $scoreboard) {
-            foreach ($scoreboard['ranking'] as $user_results) {
-                // If user haven't been added to the merged scoredboard, add him
-                if (!isset($merged_scoreboard[$user_results['username']])) {
-                    $merged_scoreboard[$user_results['username']] = [];
-                    $merged_scoreboard[$user_results['username']]['name'] = $user_results['name'];
-                    $merged_scoreboard[$user_results['username']]['username'] = $user_results['username'];
-                    $merged_scoreboard[$user_results['username']]['total']['points'] = 0;
-                    $merged_scoreboard[$user_results['username']]['total']['penalty'] = 0;
+        /** @var string $contestAlias */
+        foreach ($scoreboards as $contestAlias => $scoreboard) {
+            foreach ($scoreboard['ranking'] as $userResults) {
+                /** @var string */
+                $username = $userResults['username'];
+                // If user haven't been added to the merged scoredboard, add them.
+                if (!isset($mergedScoreboard[$username])) {
+                    $mergedScoreboard[$username] = [
+                        'name' => $userResults['name'],
+                        'username' => $username,
+                        'contests' => [],
+                        'total' => [
+                            'points' => 0.0,
+                            'penalty' => 0.0,
+                        ],
+                    ];
                 }
 
-                $merged_scoreboard[$user_results['username']]['contests'][$contest_alias]['points'] = ($user_results['total']['points'] * $r['contest_params'][$contest_alias]['weight']);
-                $merged_scoreboard[$user_results['username']]['contests'][$contest_alias]['penalty'] = $user_results['total']['penalty'];
+                $mergedScoreboard[$username]['contests'][$contestAlias] = [
+                    'points' => ($userResults['total']['points'] * $contestParams[$contestAlias]['weight']),
+                    'penalty' => $userResults['total']['penalty'],
+                ];
 
-                $merged_scoreboard[$user_results['username']]['total']['points'] += ($user_results['total']['points'] * $r['contest_params'][$contest_alias]['weight']);
-                $merged_scoreboard[$user_results['username']]['total']['penalty'] += $user_results['total']['penalty'];
+                $mergedScoreboard[$username]['total']['points'] += (
+                    $userResults['total']['points'] * $contestParams[$contestAlias]['weight']
+                );
+                $mergedScoreboard[$username]['total']['penalty'] += (
+                    $userResults['total']['penalty']
+                );
             }
         }
 
         // Remove users not in filter
-        if (isset($r['usernames_filter'])) {
-            foreach ($merged_scoreboard as $username => $entry) {
-                if (array_search($username, $usernames_filter) === false) {
-                    unset($merged_scoreboard[$username]);
+        if (!empty($usernamesFilter)) {
+            foreach ($mergedScoreboard as $username => $entry) {
+                if (array_search($username, $usernamesFilter) === false) {
+                    unset($mergedScoreboard[$username]);
                 }
             }
         }
 
         // Normalize user["contests"] entries so all contain the same contests
-        foreach ($merged_scoreboard as $username => $entry) {
+        foreach ($mergedScoreboard as $username => $entry) {
             foreach ($contests as $contest) {
-                if (!isset($entry['contests'][$contest->alias]['points'])) {
-                    $merged_scoreboard[$username]['contests'][$contest->alias]['points'] = 0;
-                    $merged_scoreboard[$username]['contests'][$contest->alias]['penalty'] = 0;
+                if (isset($entry['contests'][$contest->alias]['points'])) {
+                    continue;
                 }
+                /** @var string $contest->alias */
+                $mergedScoreboard[$username]['contests'][$contest->alias] = [
+                    'points' => 0.0,
+                    'penalty' => 0.0,
+                ];
             }
         }
 
-        // Sort merged_scoreboard
-        usort($merged_scoreboard, ['self', 'compareUserScores']);
+        // Sort mergedScoreboard
+        usort(
+            $mergedScoreboard,
+            /**
+             * @param array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $a
+             * @param array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $b
+             */
+            function ($a, $b) : int {
+                if ($a['total']['points'] == $b['total']['points']) {
+                    if ($a['total']['penalty'] == $b['total']['penalty']) {
+                        return 0;
+                    }
 
-        $response = [];
-        $response['ranking'] = $merged_scoreboard;
-        $response['status'] = 'ok';
+                    return ($a['total']['penalty'] > $b['total']['penalty']) ? 1 : -1;
+                }
 
-        return $response;
-    }
-
-    /**
-     * Compares results of 2 contestants to sort them in the scoreboard
-     *
-     * @param type $a
-     * @param type $b
-     * @return int
-     */
-    private static function compareUserScores($a, $b) {
-        if ($a['total']['points'] == $b['total']['points']) {
-            if ($a['total']['penalty'] == $b['total']['penalty']) {
-                return 0;
+                return ($a['total']['points'] < $b['total']['points']) ? 1 : -1;
             }
+        );
 
-            return ($a['total']['penalty'] > $b['total']['penalty']) ? 1 : -1;
-        }
-
-        return ($a['total']['points'] < $b['total']['points']) ? 1 : -1;
+        return $mergedScoreboard;
     }
 
     public static function apiRequests(\OmegaUp\Request $r) {
@@ -2416,7 +2448,7 @@ class ContestController extends Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateStats(
-        string $contestAlias,
+        ?string $contestAlias,
         \OmegaUp\DAO\VO\Identities $identity
     ) : \OmegaUp\DAO\VO\Contests {
         \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
@@ -2516,12 +2548,12 @@ class ContestController extends Controller {
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
         // Check the filter if we have one
-        \OmegaUp\Validators::validateStringNonEmpty($r['filterBy'], 'filterBy', false /* not required */);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['filterBy'], 'filterBy');
 
         return $scoreboard->generate(
             true, // with run details for reporting
             true, // sort contestants by name,
-            (isset($r['filterBy']) ? null : $r['filterBy'])
+            $r['filterBy']
         );
     }
 

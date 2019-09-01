@@ -39,7 +39,6 @@ class PrivacyStatement {
      * @param 'accept_teacher'|'privacy_policy' $type
      */
     public static function getForConsent(?int $languageId, string $type) : string {
-        \OmegaUp\Validators::validateStringNonEmpty($type, 'type', true);
         $language = self::getLanguage($languageId);
 
         return file_get_contents(

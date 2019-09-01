@@ -12,7 +12,7 @@
  * @package docs
  */
 class RolesDAO extends \OmegaUp\DAO\Base\Roles {
-    final public static function getByName($name) {
+    final public static function getByName(string $name) : \OmegaUp\DAO\VO\Roles {
         $sql = 'SELECT
                     *
                 FROM
@@ -22,9 +22,8 @@ class RolesDAO extends \OmegaUp\DAO\Base\Roles {
 
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
-            return null;
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'role');
         }
-
         return new \OmegaUp\DAO\VO\Roles($row);
     }
 }
