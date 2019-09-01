@@ -6,7 +6,8 @@ require_once 'autoload.php';
 // Set default time
 date_default_timezone_set('UTC');
 
-if (!(defined('IS_TEST') && IS_TEST === true)) {
+/** @psalm-suppress RedundantCondition IS_TEST may be defined as true in tests. */
+if (!defined('IS_TEST') || IS_TEST !== true) {
     if (!is_file(__DIR__ . '/config.php')) { ?>
 <!doctype html>
 <HTML>
@@ -25,10 +26,9 @@ if (!(defined('IS_TEST') && IS_TEST === true)) {
 </html>
         <?php
         exit;
-    } else {
-        require_once(__DIR__ . '/config.php');
-        require_once(__DIR__ . '/config.default.php');
     }
+    require_once(__DIR__ . '/config.php');
+    require_once(__DIR__ . '/config.default.php');
 }
 
 define(
@@ -36,7 +36,7 @@ define(
     isset(
         $_SERVER['HTTP_HOST']
     ) && strpos(
-        $_SERVER['HTTP_HOST'],
+        strval($_SERVER['HTTP_HOST']),
         OMEGAUP_LOCKDOWN_DOMAIN
     ) === 0
 );
@@ -81,41 +81,7 @@ header('Content-Security-Policy: ' . implode('; ', array_map(
 header('X-Frame-Options: DENY');
 
 require_once('libs/third_party/log4php/src/main/php/Logger.php');
-
-// Load DAOs and controllers lazily.
-require_once('controllers/Controller.php');
-spl_autoload_register(function (string $classname) : void {
-    $controllerSuffix = 'Controller';
-    $daoSuffix = 'DAO';
-    if ($classname == 'QualitynominationController') {
-        // TODO: Figure out a better way of dealing with this.
-        $filename = __DIR__ . '/controllers/QualityNominationController.php';
-    } elseif (substr_compare(
-        $classname,
-        $controllerSuffix,
-        strlen($classname) - strlen($controllerSuffix)
-    ) === 0
-    ) {
-        $filename = __DIR__ . "/controllers/{$classname}.php";
-    } else {
-        if (substr_compare(
-            $classname,
-            $daoSuffix,
-            strlen($classname) - strlen($daoSuffix)
-        ) === 0
-        ) {
-            $classname = substr($classname, 0, strlen($classname) - strlen($daoSuffix));
-        }
-        $classname = preg_replace('/([a-z])([A-Z])/', '$1_$2', $classname);
-        $filename = __DIR__ . "/libs/dao/{$classname}.dao.php";
-    }
-
-    if (file_exists($filename)) {
-        include_once $filename;
-    }
-});
-
-Logger::configure([
+\Logger::configure([
     'rootLogger' => [
         'appenders' => ['default'],
         'level' => OMEGAUP_LOG_LEVEL,
@@ -176,10 +142,42 @@ Logger::configure([
         ],
     ],
 ]);
-$log = Logger::getLogger('bootstrap');
+
+// Load DAOs and controllers lazily.
+require_once('controllers/Controller.php');
+spl_autoload_register(function (string $classname) : void {
+    $controllerSuffix = 'Controller';
+    $daoSuffix = 'DAO';
+    if ($classname == 'QualitynominationController') {
+        // TODO: Figure out a better way of dealing with this.
+        $filename = __DIR__ . '/controllers/QualityNominationController.php';
+    } elseif (substr_compare(
+        $classname,
+        $controllerSuffix,
+        strlen($classname) - strlen($controllerSuffix)
+    ) === 0
+    ) {
+        $filename = __DIR__ . "/controllers/{$classname}.php";
+    } else {
+        if (substr_compare(
+            $classname,
+            $daoSuffix,
+            strlen($classname) - strlen($daoSuffix)
+        ) === 0
+        ) {
+            $classname = substr($classname, 0, strlen($classname) - strlen($daoSuffix));
+        }
+        $classname = preg_replace('/([a-z])([A-Z])/', '$1_$2', $classname);
+        $filename = __DIR__ . "/libs/dao/{$classname}.dao.php";
+    }
+
+    if (file_exists($filename)) {
+        include_once $filename;
+    }
+});
 
 $session = SessionController::apiCurrentSession(new \OmegaUp\Request($_REQUEST))['session'];
 $experiments = new \OmegaUp\Experiments(
     $_REQUEST,
-    array_key_exists('user', $session) ? $session['user'] : null
+    !is_null($session) ? $session['user'] : null
 );
