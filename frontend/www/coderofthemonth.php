@@ -11,7 +11,7 @@ try {
         $session['identity']
     );
 } catch (Exception  $e) {
-    ApiCaller::handleException($e);
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
 foreach ($smartyProperties as $key => $value) {

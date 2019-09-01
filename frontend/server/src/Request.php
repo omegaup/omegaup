@@ -52,9 +52,9 @@ class Request extends \ArrayObject {
     /**
      * Executes the user-provided function and returns its result.
      *
-     * @return mixed
+     * @return array<int, mixed>|array<string, mixed>
      */
-    public function execute() {
+    public function execute() : array {
         if (is_null($this->method)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -65,7 +65,13 @@ class Request extends \ArrayObject {
         if ($response === false) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
+        if (is_null($response) || !is_array($response)) {
+            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                new \Exception('API did not return an array.')
+            );
+        }
 
+        /** @var array<int, mixed>|array<string, mixed> */
         return $response;
     }
 

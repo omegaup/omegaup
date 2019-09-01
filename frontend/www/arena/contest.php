@@ -14,7 +14,7 @@ try {
         $shouldShowIntro
     );
 } catch (Exception $e) {
-    ApiCaller::handleException($e);
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
 foreach ($result as $key => $value) {
