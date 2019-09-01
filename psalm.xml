@@ -6,13 +6,18 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    errorBaseline="psalm.baseline.xml"
 >
     <projectFiles>
         <directory name="frontend" />
         <ignoreFiles>
             <directory name="vendor" />
             <directory name="frontend/server/libs/third_party" />
-            <directory name="frontend/www" />
+            <directory name="frontend/www/docs" />
+            <directory name="frontend/www/karel.js" />
+            <directory name="frontend/www/phpminiadmin" />
+            <directory name="frontend/www/preguntas" />
+            <directory name="frontend/www/third_party" />
         </ignoreFiles>
     </projectFiles>
 

@@ -18,6 +18,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     $smarty->assign('LOGGED_IN', '0');
     \OmegaUp\UITools::$isLoggedIn = false;
 
+    /** @psalm-suppress RedundantCondition OMEGAUP_GA_TRACK may be defined differently. */
     if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
         $smarty->assign('OMEGAUP_GA_TRACK', 1);
         $smarty->assign('OMEGAUP_GA_ID', OMEGAUP_GA_ID);
@@ -62,6 +63,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 
     $lang = IdentityController::getPreferredLanguage($identityRequest);
 
+    /** @psalm-suppress TypeDoesNotContainType OMEGAUP_ENVIRONMENT is a configurable value. */
     if (defined('OMEGAUP_ENVIRONMENT') && OMEGAUP_ENVIRONMENT === 'development') {
         $smarty->force_compile = true;
     } else {

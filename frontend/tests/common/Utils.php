@@ -16,7 +16,7 @@ class Utils {
         }
     }
 
-    public static function CreateRandomString() {
+    public static function CreateRandomString() : string {
         return md5(uniqid(rand(), true));
     }
 

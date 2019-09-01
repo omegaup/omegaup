@@ -58,12 +58,12 @@ class SchoolController extends Controller {
 
     /**
      * Create new school
-     * @param $name
-     * @param $state
-     * @return $school_id
+     * @param string $name
+     * @param null|\OmegaUp\DAO\VO\States $state
+     * @return int the school ID
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function createSchool($name, $state) {
+    public static function createSchool(string $name, ?\OmegaUp\DAO\VO\States $state) : int {
         // Create school object
         $school = new \OmegaUp\DAO\VO\Schools([
             'name' => $name,
@@ -74,10 +74,11 @@ class SchoolController extends Controller {
         $school_id = 0;
         $existing = SchoolsDAO::findByName($name);
         if (!empty($existing)) {
+            /** @var int $existing[0]->school_id */
             return $existing[0]->school_id;
         }
-        // Save in db
         SchoolsDAO::create($school);
+        /** @var int $school->school_id */
         return $school->school_id;
     }
 
@@ -214,12 +215,10 @@ class SchoolController extends Controller {
         return $schoolsRank;
     }
 
-    /**
-     * @param $countryId
-     * @param $stateId
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     */
-    public static function getStateIdFromCountryAndState($countryId, $stateId) {
+    public static function getStateIdFromCountryAndState(
+        ?string $countryId,
+        ?string $stateId
+    ) : ?\OmegaUp\DAO\VO\States {
         if (is_null($countryId) || is_null($stateId)) {
             // Both state and country must be specified together.
             return null;

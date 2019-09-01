@@ -66,8 +66,8 @@ class IdentityController extends Controller {
                 $r['username'],
                 $r['name'],
                 $r['password'],
-                $r['country_id'],
-                $r['state_id'],
+                is_null($r['country_id']) ? null : strval($r['country_id']),
+                is_null($r['state_id']) ? null : strval($r['state_id']),
                 $r['gender'],
                 $r['school_name'],
                 $r['group_alias']
@@ -100,14 +100,15 @@ class IdentityController extends Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
+            /** @var array<string, string> $identity */
             foreach ($r['identities'] as $identity) {
                 // Prepare DAOs
                 $identity = self::createIdentity(
                     $identity['username'],
                     $identity['name'],
                     $identity['password'],
-                    $identity['country_id'],
-                    $identity['state_id'],
+                    empty($identity['country_id']) ? null : strval($identity['country_id']),
+                    empty($identity['state_id']) ? null : strval($identity['state_id']),
                     $identity['gender'],
                     $identity['school_name'],
                     $r['group_alias']
@@ -142,8 +143,8 @@ class IdentityController extends Controller {
     private static function updateIdentity(
         $username,
         $name,
-        $countryId,
-        $stateId,
+        ?string $countryId,
+        ?string $stateId,
         $gender,
         $school,
         $aliasGroup,
@@ -206,8 +207,8 @@ class IdentityController extends Controller {
         $identity = self::updateIdentity(
             $r['username'],
             $r['name'],
-            $r['country_id'],
-            $r['state_id'],
+            is_null($r['country_id']) ? null : strval($r['country_id']),
+            is_null($r['state_id']) ? null : strval($r['state_id']),
             $r['gender'],
             $r['school_name'],
             $r['group_alias'],
@@ -301,8 +302,8 @@ class IdentityController extends Controller {
         $username,
         $name,
         $password,
-        $countryId,
-        $stateId,
+        ?string $countryId,
+        ?string $stateId,
         $gender,
         $school,
         $aliasGroup
