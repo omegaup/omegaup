@@ -270,7 +270,7 @@ class ContestController extends Controller {
      * Validate the basics of a contest request.
      *
      * @param string $contestAlias
-     * @return [Contests, Problemsets]
+     * @return array{0: \OmegaUp\DAO\VO\Contests, 1: \OmegaUp\DAO\VO\Problemsets}
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateBasicDetails(?string $contestAlias) : array {
@@ -440,7 +440,7 @@ class ContestController extends Controller {
      * Validate request of a details contest
      *
      * @param \OmegaUp\Request $r
-     * @return [$contest, $contestAdmin]
+     * @return array{contest: \OmegaUp\DAO\VO\Contests, contest_admin: bool, contest_alias: string}
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\PreconditionFailedException
      */
@@ -467,6 +467,7 @@ class ContestController extends Controller {
         } else {
             if ($r['token'] === $problemset->scoreboard_url_admin) {
                 $contestAdmin = true;
+                /** @var string */
                 $contestAlias = $contest->alias;
             } elseif ($r['token'] !== $problemset->scoreboard_url) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('invalidScoreboardUrl');

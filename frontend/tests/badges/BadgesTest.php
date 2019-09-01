@@ -1,7 +1,5 @@
 <?php
 
-require_once OMEGAUP_ROOT . '/server/bootstrap.php';
-
 /**
  * Test to ensure that all the badges are in the correct format.
  *
