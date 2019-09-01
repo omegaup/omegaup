@@ -34,7 +34,7 @@ class GroupsDAO extends \OmegaUp\DAO\Base\Groups {
         return $ar;
     }
 
-    public static function getByName($name) {
+    public static function getByName(string $name) : ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);

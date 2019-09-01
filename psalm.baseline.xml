@@ -62,24 +62,15 @@
     </MissingReturnType>
     <MixedArgument occurrences="2">
       <code>$r['username']</code>
-      <code>$problem</code>
     </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$problem</code>
-    </MixedAssignment>
     <PossiblyNullArgument occurrences="1">
       <code>$resolvedIdentity-&gt;identity_id</code>
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/controllers/BadgeController.php">
-    <MixedArgument occurrences="7">
+    <MixedArgument occurrences="2">
       <code>static::OMEGAUP_BADGES_ROOT</code>
       <code>$user</code>
-      <code>$r['badge_alias']</code>
-      <code>$r['badge_alias']</code>
-      <code>$r['badge_alias']</code>
-      <code>$r['badge_alias']</code>
-      <code>$r['badge_alias']</code>
     </MixedArgument>
     <MixedAssignment occurrences="4">
       <code>$user</code>
@@ -102,10 +93,7 @@
       <code>validateDetails</code>
       <code>validateUpdate</code>
     </MissingReturnType>
-    <MixedArgument occurrences="16">
-      <code>$r['contest_alias']</code>
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
-      <code>$r['username']</code>
+    <MixedArgument occurrences="13">
       <code>$r['contest']-&gt;problemset_id</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['clarification']</code>
@@ -120,8 +108,7 @@
       <code>$r['user']</code>
       <code>$r['contest']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="5">
-      <code>$r['problem']</code>
+    <MixedAssignment occurrences="4">
       <code>$receiverId</code>
       <code>$response</code>
       <code>$clarification</code>
@@ -159,14 +146,11 @@
     </PossiblyNullReference>
   </file>
   <file src="frontend/server/controllers/ContestController.php">
-    <DocblockTypeContradiction occurrences="2">
-      <code>is_null($participating)</code>
+    <DocblockTypeContradiction occurrences="1">
       <code>$req-&gt;accepted === '0'</code>
     </DocblockTypeContradiction>
     <InvalidArgument occurrences="3">
-      <code>$active_contests</code>
       <code>$recommended</code>
-      <code>['self', 'compareUserScores']</code>
     </InvalidArgument>
     <InvalidReturnStatement occurrences="1">
       <code>['status' =&gt; 'ok']</code>
@@ -181,8 +165,6 @@
       <code>$value</code>
     </MissingClosureParamType>
     <MissingClosureReturnType occurrences="6">
-      <code>function () use ($page, $page_size, $active_contests, $recommended, $query) {</code>
-      <code>function () use ($page, $page_size, $active_contests, $recommended, $query) {</code>
       <code>function ($value) {</code>
       <code>function ($value) {</code>
       <code>function ($value) {</code>
@@ -208,8 +190,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="111">
-      <code>$query</code>
+    <MixedArgument occurrences="82">
       <code>$callback_user_function</code>
       <code>$contest['start_time']</code>
       <code>$contest['finish_time']</code>
@@ -220,7 +201,6 @@
       <code>$r['contest']-&gt;problemset_id</code>
       <code>$result['start_time']</code>
       <code>$result['finish_time']</code>
-      <code>$r['contest_alias'] ?? ''</code>
       <code>$r['share_user_information'] ?: false</code>
       <code>$privacyStatementId</code>
       <code>$result['start_time']</code>
@@ -246,33 +226,22 @@
       <code>$r['submissions_gap']/60</code>
       <code>$contest_length / 60</code>
       <code>$r['problems']</code>
-      <code>$problem</code>
       <code>RunController::$kSupportedLanguages</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['problem_alias']</code>
-      <code>$params['contest']</code>
-      <code>$params['contest']-&gt;problemset_id</code>
-      <code>$params['problem']</code>
       <code>$r['commit']</code>
-      <code>$params['problem']</code>
       <code>$masterCommit</code>
       <code>$currentVersion</code>
       <code>$r['points']</code>
       <code>$r['order_in_contest'] ?: 1</code>
       <code>$r['contest_alias']</code>
-      <code>$params['contest']</code>
       <code>$r['contest_alias']</code>
-      <code>$problem</code>
       <code>$r['contest_alias']</code>
       <code>$r['problem_alias']</code>
-      <code>$params['contest']</code>
       <code>$r['contest_alias']</code>
-      <code>$params['contest']</code>
       <code>$r['contest_alias']</code>
-      <code>$problem</code>
-      <code>$r['version']</code>
       <code>$r['contest_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['contest_alias']</code>
@@ -287,8 +256,6 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
-      <code>$r['contest_aliases']</code>
-      <code>$r['usernames_filter']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['username']</code>
@@ -321,7 +288,7 @@
       <code>$r['contest']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="48">
+    <MixedArrayAccess occurrences="43">
       <code>$contestInfo['window_length']</code>
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['start_time']</code>
@@ -342,11 +309,6 @@
       <code>$problemsetProblem['order']</code>
       <code>$problem['problem_id']</code>
       <code>$clar['time']</code>
-      <code>$cp[$contest-&gt;alias]</code>
-      <code>$cp[$contest-&gt;alias]</code>
-      <code>$r['contest_params'][$contest-&gt;alias]</code>
-      <code>$r['contest_params'][$contest_alias]</code>
-      <code>$r['contest_params'][$contest_alias]</code>
       <code>$run['time']</code>
       <code>$run['score']</code>
       <code>$run['contest_score']</code>
@@ -375,7 +337,7 @@
       <code>$problemStats[$problem_alias]</code>
       <code>$problemStats[$entry['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="75">
+    <MixedAssignment occurrences="64">
       <code>$query</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -414,12 +376,6 @@
       <code>$clarifications</code>
       <code>$clar</code>
       <code>$response['clarifications']</code>
-      <code>$cp</code>
-      <code>$r['contest_params']</code>
-      <code>$cp</code>
-      <code>$r['contest_params']</code>
-      <code>$params-&gt;only_ac</code>
-      <code>$merged_scoreboard[$user_results['username']]['contests'][$contest_alias]['points']</code>
       <code>$request-&gt;extra_note</code>
       <code>$contest-&gt;admission_mode</code>
       <code>$problem</code>
@@ -449,15 +405,14 @@
       <code>$escapedRow[]</code>
       <code>$contestants</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="3">
+    <MixedInferredReturnType occurrences="2">
       <code>bool</code>
       <code>array</code>
-      <code>int</code>
     </MixedInferredReturnType>
     <MixedMethodCall occurrences="1">
       <code>asFilteredArray</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="19">
+    <MixedOperand occurrences="16">
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['window_length']</code>
       <code>$idx</code>
@@ -469,9 +424,6 @@
       <code>$contest_length</code>
       <code>$r['submissions_gap']</code>
       <code>$contest_length</code>
-      <code>$r['contest_params'][$contest_alias]['weight']</code>
-      <code>$r['contest_params'][$contest_alias]['weight']</code>
-      <code>$merged_scoreboard[$user_results['username']]['total']['points']</code>
       <code>$r['contest_alias']</code>
       <code>$totalPoints</code>
       <code>$results['total']['points']</code>
@@ -481,16 +433,11 @@
     <MixedPropertyAssignment occurrences="1">
       <code>$r['contest']</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="18">
+    <MixedPropertyFetch occurrences="6">
       <code>$r['contest']-&gt;problemset_id</code>
       <code>$requestProblem-&gt;problem</code>
       <code>$requestProblem-&gt;problem</code>
       <code>$requestProblem-&gt;points</code>
-      <code>$params['contest']-&gt;problemset_id</code>
-      <code>$params['contest']-&gt;problemset_id</code>
-      <code>$problem-&gt;visibility</code>
-      <code>$params['contest']-&gt;problemset_id</code>
-      <code>$params['problem']-&gt;problem_id</code>
       <code>$problem-&gt;problem_id</code>
       <code>$problem-&gt;problem_id</code>
       <code>$contest-&gt;problemset_id</code>
@@ -579,17 +526,8 @@
       <code>$session['identity']</code>
       <code>$session['identity']</code>
     </PossiblyNullArrayAccess>
-    <PossiblyNullArrayOffset occurrences="10">
-      <code>$cp</code>
-      <code>$cp</code>
-      <code>$r['contest_params']</code>
+    <PossiblyNullArrayOffset occurrences="3">
       <code>$scoreboards</code>
-      <code>$r['contest_params']</code>
-      <code>$merged_scoreboard[$user_results['username']]['contests']</code>
-      <code>$merged_scoreboard[$user_results['username']]['contests']</code>
-      <code>$r['contest_params']</code>
-      <code>$merged_scoreboard[$username]['contests']</code>
-      <code>$merged_scoreboard[$username]['contests']</code>
     </PossiblyNullArrayOffset>
     <PossiblyNullIterator occurrences="1">
       <code>$resultAdmins</code>
@@ -630,15 +568,11 @@
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$targetIdentity-&gt;username</code>
     </PossiblyNullPropertyFetch>
-    <PossiblyUndefinedArrayOffset occurrences="2">
-      <code>$merged_scoreboard[$user_results['username']]['total']</code>
-      <code>$merged_scoreboard[$user_results['username']]['total']</code>
-    </PossiblyUndefinedArrayOffset>
     <TypeDoesNotContainNull occurrences="1">
       <code>is_null($identity)</code>
     </TypeDoesNotContainNull>
     <TypeDoesNotContainType occurrences="1"/>
-    <UndefinedDocblockClass occurrences="3">
+    <UndefinedDocblockClass occurrences="1">
       <code>type</code>
       <code>type</code>
       <code>type</code>
@@ -656,9 +590,6 @@
       <code>authenticateRequest</code>
       <code>authenticateOrAllowUnauthenticatedRequest</code>
     </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$r['username']</code>
-    </MixedArgument>
     <MixedArrayAccess occurrences="5">
       <code>$info[0]</code>
       <code>$info[2]</code>
@@ -741,7 +672,6 @@
       <code>$r['course_alias']</code>
       <code>$r['start_time']</code>
       <code>$problem['problem_alias']</code>
-      <code>$problem</code>
       <code>$masterCommit</code>
       <code>$currentVersion</code>
       <code>$r['course_alias']</code>
@@ -759,7 +689,6 @@
       <code>$r['course_alias']</code>
       <code>$r['course_alias']</code>
       <code>$problemSet-&gt;problemset_id</code>
-      <code>$problem-&gt;problem_id</code>
       <code>$r['assignment_alias']</code>
       <code>$r['course_alias']</code>
       <code>$r['group']</code>
@@ -815,7 +744,6 @@
       <code>$r['offset']</code>
       <code>$r['rowcount']</code>
       <code>$r['course_alias']</code>
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
       <code>RunController::$kSupportedLanguages</code>
       <code>$r['username']</code>
       <code>$r['alias']</code>
@@ -876,7 +804,7 @@
       <code>$userProblems[$problem['username']]</code>
       <code>$userProblems[$problem['username']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="62">
+    <MixedAssignment occurrences="57">
       <code>$assignment</code>
       <code>$course</code>
       <code>$assignmentProblems</code>
@@ -890,7 +818,6 @@
       <code>$problemSet</code>
       <code>$problems</code>
       <code>$problem</code>
-      <code>$currentProblem</code>
       <code>$assignment</code>
       <code>$currentAssignment</code>
       <code>$problem</code>
@@ -932,7 +859,6 @@
       <code>$problem['letter']</code>
       <code>$run</code>
       <code>$r['assignment']</code>
-      <code>$r['problem']</code>
       <code>$solvedProblems</code>
       <code>$problem</code>
       <code>$userProblems[$problem['username']][]</code>
@@ -952,7 +878,7 @@
       <code>$assignmentProblems['finish_time']</code>
       <code>$r['course_alias']</code>
     </MixedOperand>
-    <MixedPropertyFetch occurrences="38">
+    <MixedPropertyFetch occurrences="35">
       <code>$group-&gt;group_id</code>
       <code>$group-&gt;group_id</code>
       <code>$assignment-&gt;start_time</code>
@@ -961,11 +887,8 @@
       <code>$assignment-&gt;problemset_id</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$problemSet-&gt;problemset_id</code>
-      <code>$currentProblem-&gt;problem_id</code>
       <code>$currentAssignment-&gt;assignment_id</code>
-      <code>$problem-&gt;problem_id</code>
       <code>$problemSet-&gt;problemset_id</code>
-      <code>$problem-&gt;problem_id</code>
       <code>$r['assignment']-&gt;problemset_id</code>
       <code>$r['assignment']-&gt;problemset_id</code>
       <code>$course-&gt;course_id</code>
@@ -1054,12 +977,9 @@
       <code>UsersDAO::getByPK($acl-&gt;owner_id)-&gt;username</code>
       <code>$r-&gt;identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
-    <RedundantCondition occurrences="3"/>
-    <TypeDoesNotContainNull occurrences="4">
-      <code>is_null($r-&gt;identity)</code>
+    <RedundantCondition occurrences="1"/>
+    <TypeDoesNotContainNull occurrences="1">
       <code>is_null($markdown)</code>
-      <code>is_null($r-&gt;identity)</code>
-      <code>is_null($r-&gt;identity)</code>
     </TypeDoesNotContainNull>
     <UndefinedDocblockClass occurrences="2">
       <code>Assignment</code>
@@ -1081,11 +1001,9 @@
       <code>$description</code>
       <code>$owner_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="11">
+    <MissingReturnType occurrences="9">
       <code>createGroup</code>
       <code>apiCreate</code>
-      <code>validateGroup</code>
-      <code>validateGroupAndOwner</code>
       <code>apiAddUser</code>
       <code>apiRemoveUser</code>
       <code>apiMyList</code>
@@ -1094,20 +1012,17 @@
       <code>apiMembers</code>
       <code>apiCreateScoreboard</code>
     </MissingReturnType>
-    <MixedArgument occurrences="11">
+    <MixedArgument occurrences="8">
       <code>$r['group_alias']</code>
       <code>$r['usernameOrEmail']</code>
-      <code>$group-&gt;group_id</code>
       <code>$r['group_alias']</code>
       <code>$r['usernameOrEmail']</code>
-      <code>$group-&gt;group_id</code>
       <code>$r['query']</code>
       <code>$r['group_alias']</code>
       <code>$r['group_alias']</code>
-      <code>$group</code>
       <code>$r['group_alias']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="13">
+    <MixedAssignment occurrences="5">
       <code>$group</code>
       <code>$group</code>
       <code>$groups</code>
@@ -1116,24 +1031,17 @@
       <code>$groups</code>
       <code>$group</code>
       <code>$group</code>
-      <code>$scoreboards</code>
-      <code>$scoreboard</code>
-      <code>$response['scoreboards'][]</code>
       <code>$group</code>
       <code>$group</code>
     </MixedAssignment>
-    <MixedMethodCall occurrences="3">
+    <MixedMethodCall occurrences="1">
       <code>asArray</code>
       <code>asArray</code>
       <code>asArray</code>
     </MixedMethodCall>
-    <MixedPropertyFetch occurrences="6">
-      <code>$group-&gt;group_id</code>
-      <code>$group-&gt;group_id</code>
+    <MixedPropertyFetch occurrences="2">
       <code>$group-&gt;name</code>
       <code>$group-&gt;alias</code>
-      <code>$group-&gt;group_id</code>
-      <code>$group-&gt;group_id</code>
     </MixedPropertyFetch>
     <PossiblyNullArgument occurrences="5">
       <code>$r-&gt;identity</code>
@@ -1149,91 +1057,37 @@
     </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/server/controllers/GroupScoreboardController.php">
-    <MissingReturnType occurrences="6">
-      <code>validateGroupScoreboard</code>
-      <code>validateGroupScoreboardAndContest</code>
+    <MissingReturnType occurrences="4">
       <code>apiAddContest</code>
       <code>apiRemoveContest</code>
       <code>apiDetails</code>
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="12">
+    <MixedArgument occurrences="10">
       <code>$r['group_alias']</code>
       <code>$r['scoreboard_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['group_alias']</code>
       <code>$r['scoreboard_alias']</code>
       <code>$r['contest_alias']</code>
-      <code>$contestScoreboard['scoreboard']-&gt;group_scoreboard_id</code>
-      <code>$contestScoreboard['contest']-&gt;problemset_id</code>
       <code>$r['group_alias']</code>
       <code>$r['scoreboard_alias']</code>
-      <code>$usernames</code>
       <code>$r['group_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="6">
-      <code>$contestScoreboard['scoreboard']</code>
-      <code>$contestScoreboard['contest']</code>
-      <code>$contestScoreboard['scoreboard']</code>
-      <code>$contestScoreboard['contest']</code>
-      <code>$contest['alias']</code>
-      <code>$mergedScoreboardResponse['ranking']</code>
-    </MixedArrayAccess>
-    <MixedArrayAssignment occurrences="2">
-      <code>$response['contests'][$i]['only_ac']</code>
-      <code>$response['contests'][$i]['weight']</code>
-    </MixedArrayAssignment>
-    <MixedArrayOffset occurrences="1">
-      <code>$contest_params[$contest-&gt;alias]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="20">
-      <code>$scoreboard</code>
-      <code>$scoreboard</code>
-      <code>$contestScoreboard</code>
-      <code>$contestScoreboard</code>
-      <code>$scoreboard</code>
-      <code>$gscs</code>
-      <code>$gsc</code>
+    <MixedArrayAssignment occurrences="2"/>
+    <MixedAssignment occurrences="3">
       <code>$contest</code>
-      <code>$response['contests'][$i]</code>
-      <code>$response['contests'][$i]['only_ac']</code>
-      <code>$response['contests'][$i]['weight']</code>
-      <code>$response['scoreboard']</code>
       <code>$contest</code>
-      <code>$usernames</code>
-      <code>$mergedScoreboardResponse</code>
-      <code>$response['ranking']</code>
-      <code>$group</code>
-      <code>$scoreboards</code>
-      <code>$scoreboard</code>
-      <code>$response['scoreboards'][]</code>
     </MixedAssignment>
-    <MixedMethodCall occurrences="3">
+    <MixedMethodCall occurrences="1">
       <code>asArray</code>
       <code>asArray</code>
       <code>asArray</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="4">
+    <MixedOperand occurrences="2">
       <code>$r['contest_alias']</code>
       <code>$r['group_alias']</code>
-      <code>$contest['alias']</code>
-      <code>$r['contest_aliases']</code>
     </MixedOperand>
-    <MixedPropertyFetch occurrences="13">
-      <code>$contestScoreboard['scoreboard']-&gt;group_scoreboard_id</code>
-      <code>$contestScoreboard['contest']-&gt;problemset_id</code>
-      <code>$contestScoreboard['scoreboard']-&gt;group_scoreboard_id</code>
-      <code>$contestScoreboard['contest']-&gt;problemset_id</code>
-      <code>$scoreboard-&gt;group_scoreboard_id</code>
-      <code>$gsc-&gt;problemset_id</code>
-      <code>$gsc-&gt;only_ac</code>
-      <code>$gsc-&gt;weight</code>
-      <code>$gsc-&gt;only_ac</code>
-      <code>$gsc-&gt;weight</code>
-      <code>$contest-&gt;alias</code>
-      <code>$scoreboard-&gt;group_id</code>
-      <code>$group-&gt;group_id</code>
-    </MixedPropertyFetch>
     <PossiblyNullArgument occurrences="4">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
@@ -1277,7 +1131,7 @@
       <code>createIdentity</code>
       <code>convertToSupportedLanguage</code>
     </MissingReturnType>
-    <MixedArgument occurrences="21">
+    <MixedArgument occurrences="20">
       <code>$identity</code>
       <code>$identity</code>
       <code>$r['group_alias']</code>
@@ -1309,7 +1163,7 @@
       <code>$extendedProfile['school']</code>
       <code>$extendedProfile['locale']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="10">
+    <MixedAssignment occurrences="9">
       <code>$identity</code>
       <code>$group</code>
       <code>$identity</code>
@@ -1351,8 +1205,7 @@
       <code>self::convertToSupportedLanguage($_GET['lang'])</code>
       <code>IdentityController::convertToSupportedLanguage($result-&gt;name)</code>
     </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="4">
-      <code>$userOrEmail</code>
+    <PossiblyNullArgument occurrences="3">
       <code>$r-&gt;identity</code>
       <code>$identity-&gt;username</code>
       <code>$r-&gt;identity</code>
@@ -1382,9 +1235,7 @@
       <code>apiList</code>
       <code>showIntro</code>
     </MissingReturnType>
-    <MixedArgument occurrences="9">
-      <code>$r['usernameOrEmailsCSV']</code>
-      <code>$r['usernameOrEmail']</code>
+    <MixedArgument occurrences="7">
       <code>$r</code>
       <code>UserController::makeUsernameFromEmail($r['usernameOrEmail'])</code>
       <code>$r-&gt;identity</code>
@@ -1393,7 +1244,7 @@
       <code>$interview</code>
       <code>$r['contest_alias'] ?? ''</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="25">
+    <MixedArrayAccess occurrences="20">
       <code>$r['interview_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['interview_alias']</code>
@@ -1420,18 +1271,16 @@
       <code>$identity['access_time']</code>
       <code>$identity['country_id']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="7">
+    <MixedAssignment occurrences="6">
       <code>$r['interview']</code>
-      <code>$newUserRequest['email']</code>
       <code>$newUserRequest['username']</code>
       <code>$r['user']</code>
       <code>$interview</code>
       <code>$problemsetIdentities</code>
       <code>$identity</code>
     </MixedAssignment>
-    <MixedOperand occurrences="11">
+    <MixedOperand occurrences="10">
       <code>$r['alias']</code>
-      <code>$r['usernameOrEmail']</code>
       <code>$newUserRequest['user']-&gt;verification_id</code>
       <code>$r['interview']-&gt;alias</code>
       <code>$newUserRequest['user']-&gt;verification_id</code>
@@ -1554,8 +1403,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="102">
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
+    <MixedArgument occurrences="77">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -1563,20 +1411,17 @@
       <code>$r['problem_alias']</code>
       <code>$tagName</code>
       <code>$tag-&gt;public</code>
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
       <code>$r['problem']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$problem</code>
       <code>$r['group']</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$r['name']</code>
       <code>$tagName</code>
       <code>$r['usernameOrEmail']</code>
       <code>$problem</code>
       <code>$r['group']</code>
       <code>$problem</code>
-      <code>$r['name']</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problem</code>
@@ -1587,16 +1432,13 @@
       <code>$problem-&gt;commit</code>
       <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$problem-&gt;alias</code>
-      <code>$r['message']</code>
       <code>$updatePublished</code>
       <code>$run-&gt;run_id</code>
       <code>$r['problem_alias']</code>
       <code>$updatePublished</code>
       <code>$r['problem']</code>
-      <code>$r['statement']</code>
       <code>$r['problem']</code>
       <code>$r['problem']</code>
-      <code>$r['solution']</code>
       <code>$r['problem']</code>
       <code>$problem</code>
       <code>$problemset['problemset']</code>
@@ -1626,14 +1468,11 @@
       <code>$r['lang']</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$r['commit']</code>
       <code>$problem-&gt;commit</code>
       <code>((new \OmegaUp\ProblemArtifacts($problem-&gt;alias, 'published'))-&gt;commit())['commit']</code>
       <code>$updatePublished</code>
       <code>$run-&gt;run_id</code>
       <code>$problem</code>
-      <code>$r['version']</code>
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
       <code>$r['problem']</code>
       <code>$r['username']</code>
       <code>$r['status']</code>
@@ -1693,13 +1532,11 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case-&gt;name]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="79">
-      <code>$r['problem']</code>
+    <MixedAssignment occurrences="62">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
       <code>$tagName</code>
-      <code>$r['problem']</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problem</code>
@@ -1738,7 +1575,6 @@
       <code>$problemSettings</code>
       <code>$run</code>
       <code>$problem</code>
-      <code>$r['problem']</code>
       <code>$run</code>
       <code>$run</code>
       <code>$run['alias']</code>
@@ -2006,15 +1842,11 @@
     <MissingReturnType occurrences="1">
       <code>extractAliasFromArgument</code>
     </MissingReturnType>
-    <MixedArgument occurrences="9">
-      <code>$r['contents']</code>
-      <code>$problem</code>
+    <MixedArgument occurrences="8">
       <code>$r['qualitynomination_id']</code>
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
       <code>$problemUrl</code>
       <code>$contents</code>
       <code>$contents</code>
-      <code>$problem</code>
       <code>$language</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="8">
@@ -2027,25 +1859,20 @@
       <code>$response['original_contents']</code>
       <code>$response['status']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="21">
+    <MixedAssignment occurrences="16">
       <code>$contents</code>
-      <code>$problem</code>
       <code>$tag</code>
       <code>$tag</code>
       <code>$tag</code>
       <code>$tag</code>
       <code>$statement</code>
-      <code>$original</code>
       <code>$contents['original']</code>
-      <code>$original</code>
       <code>$reviewer</code>
-      <code>$r['problem']</code>
       <code>$newProblemVisibility</code>
       <code>$r['visibility']</code>
       <code>$qualitynomination-&gt;status</code>
       <code>$types</code>
       <code>$response</code>
-      <code>$problem</code>
       <code>$response['original_contents']['tags']</code>
       <code>$_</code>
       <code>$response['nomination_status']</code>
@@ -2053,15 +1880,13 @@
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="8">
-      <code>$problem-&gt;problem_id</code>
+    <MixedPropertyFetch occurrences="6">
       <code>$reviewer-&gt;user_id</code>
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
-      <code>$problem-&gt;source</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1">
       <code>$response</code>
@@ -2199,12 +2024,10 @@
       <code>getGraderResourcePassthru</code>
       <code>validateList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="51">
+    <MixedArgument occurrences="46">
       <code>RunController::$kSupportedLanguages</code>
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
       <code>$r['problem']-&gt;languages</code>
       <code>ProblemsetsDAO::getProblemsetContainer($problemset_id)</code>
-      <code>$r['contest_alias']</code>
       <code>$r['contest']-&gt;languages</code>
       <code>$r['problem']</code>
       <code>$r['problem']</code>
@@ -2222,7 +2045,6 @@
       <code>$r['source']</code>
       <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$r['problem']</code>
-      <code>$r['run_alias']</code>
       <code>$r['submission']-&gt;current_run_id</code>
       <code>$r['submission']</code>
       <code>$r['submission']</code>
@@ -2240,8 +2062,6 @@
       <code>$r['submission']</code>
       <code>$r['submission']</code>
       <code>$r['run']</code>
-      <code>$r['run_alias']</code>
-      <code>ProblemsDAO::getByAlias($r['problem_alias'])</code>
       <code>RunController::$kSupportedLanguages</code>
       <code>$r['username']</code>
       <code>$r['status']</code>
@@ -2268,8 +2088,7 @@
       <code>$run['contest_score']</code>
       <code>$run['contest_score']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="19">
-      <code>$r['problem']</code>
+    <MixedAssignment occurrences="17">
       <code>$r['container']</code>
       <code>$problemset_id</code>
       <code>$r['container']</code>
@@ -2286,7 +2105,6 @@
       <code>$details</code>
       <code>$response['compile_error']</code>
       <code>$response['details']</code>
-      <code>$r['problem']</code>
       <code>$run</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="3">
@@ -2379,7 +2197,7 @@
     <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="9">
+    <MixedArgument occurrences="8">
       <code>$r[$param]</code>
       <code>$offset</code>
       <code>$rowCount</code>
@@ -2451,13 +2269,11 @@
       <code>LoginViaLinkedIn</code>
       <code>ThirdPartyLogin</code>
     </MissingReturnType>
-    <MixedArgument occurrences="12">
+    <MixedArgument occurrences="10">
       <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$s_Email</code>
       <code>$s_Email</code>
       <code>$r['usernameOrEmail']</code>
-      <code>$r['password']</code>
-      <code>$r['password']</code>
       <code>isset($_GET['redirect']) ? $_GET['redirect'] : null</code>
       <code>$_GET['code']</code>
       <code>$_GET['state']</code>
@@ -2611,7 +2427,7 @@
       <code>$redirectOnVerify</code>
       <code>$permissionKey</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="32">
+    <MissingReturnType occurrences="31">
       <code>registerToSendy</code>
       <code>sendVerificationEmail</code>
       <code>checkEmailVerification</code>
@@ -2629,7 +2445,6 @@
       <code>apiValidateFilter</code>
       <code>validateUser</code>
       <code>validateAddRemoveRole</code>
-      <code>validateAddRemoveGroup</code>
       <code>apiAddRole</code>
       <code>apiRemoveRole</code>
       <code>apiAddGroup</code>
@@ -2645,8 +2460,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="60">
-      <code>$r['username']</code>
+    <MixedArgument occurrences="41">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -2655,48 +2469,33 @@
       <code>$user-&gt;main_identity_id</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
-      <code>$r['old_password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$user</code>
-      <code>$r['usernameOrEmail']</code>
       <code>$user</code>
       <code>$r['redirecttointerview']</code>
       <code>$user</code>
       <code>$response['userinfo']['email']</code>
       <code>$r['identity']</code>
       <code>$r['user']</code>
-      <code>$r['date']</code>
       <code>$coderOfTheMonthUserId</code>
       <code>$user_id</code>
       <code>$problemset_id</code>
-      <code>$r['interview']</code>
       <code>$item</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$r[$param]</code>
       <code>$identity-&gt;user_id</code>
-      <code>$r['username']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
-      <code>$r['username']</code>
-      <code>$r['country_id']</code>
-      <code>$r['state_id']</code>
-      <code>$r['graduation_date']</code>
-      <code>$r['birth_date']</code>
       <code>$value</code>
       <code>$value</code>
-      <code>$r['username']</code>
       <code>$r['user']</code>
       <code>$email</code>
       <code>$email</code>
-      <code>$r['filter']</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$r['username']</code>
       <code>UsersDAO::FindByUsername($r['username'])</code>
-      <code>RolesDAO::getByName($r['role'])</code>
-      <code>GroupsDAO::getByName($r['group'])</code>
       <code>$experiments-&gt;getAllKnownExperiments()</code>
       <code>$r['user']-&gt;user_id</code>
       <code>$r['experiment']</code>
@@ -2764,7 +2563,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="79">
+    <MixedAssignment occurrences="76">
       <code>$user</code>
       <code>$userByEmail</code>
       <code>$userData['is_private']</code>
@@ -2834,8 +2633,6 @@
       <code>$response['contest_admin'][]</code>
       <code>$problem</code>
       <code>$r['user']</code>
-      <code>$r['role']</code>
-      <code>$r['group']</code>
       <code>$latest_statement</code>
       <code>$filteredBy</code>
       <code>$privacystatement_id</code>
@@ -2865,7 +2662,7 @@
       <code>$user</code>
       <code>$user</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="30">
+    <MixedPropertyFetch occurrences="29">
       <code>$userByEmail-&gt;password</code>
       <code>$user-&gt;user_id</code>
       <code>$userByEmail-&gt;user_id</code>
@@ -3210,8 +3007,7 @@
       <code>$contestId</code>
       <code>$contestId</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="5">
-      <code>$constCache</code>
+    <MissingPropertyType occurrences="4">
       <code>$SQL_FOR_STATUS</code>
       <code>$SQL_FOR_STATUS</code>
       <code>$SQL_FOR_STATUS</code>
@@ -3236,8 +3032,7 @@
       <code>getContestantsInfo</code>
       <code>requestsUserInformation</code>
     </MissingReturnType>
-    <MixedArgument occurrences="15">
-      <code>$cache['constants']</code>
+    <MixedArgument occurrences="14">
       <code>$order</code>
       <code>$filter['type']</code>
       <code>$filter['type']</code>
@@ -3253,12 +3048,7 @@
       <code>$params</code>
       <code>$query</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="2">
-      <code>$cache['constants'][$status]</code>
-      <code>self::$constCache[$className]</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="41">
-      <code>$status</code>
+    <MixedAssignment occurrences="40">
       <code>$offset</code>
       <code>$offset</code>
       <code>$columns</code>
@@ -3300,10 +3090,8 @@
       <code>$params[]</code>
       <code>$requestsUsersInfo</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="3">
-      <code>int</code>
+    <MixedInferredReturnType occurrences="1">
       <code>string</code>
-      <code>array</code>
     </MixedInferredReturnType>
     <MixedOperand occurrences="8">
       <code>$page</code>
@@ -3315,10 +3103,8 @@
       <code>$pagina</code>
       <code>$pagina</code>
     </MixedOperand>
-    <MixedReturnStatement occurrences="3">
-      <code>$cache['constants'][$status]</code>
+    <MixedReturnStatement occurrences="1">
       <code>$class::$SQL_FOR_STATUS[$status]</code>
-      <code>self::$constCache[$className]</code>
     </MixedReturnStatement>
     <PossiblyNullArgument occurrences="2">
       <code>$rs</code>
@@ -3437,16 +3223,15 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/libs/dao/Groups.dao.php">
-    <MissingParamType occurrences="5">
+    <MissingParamType occurrences="4">
       <code>$name</code>
       <code>$name</code>
       <code>$user_id</code>
       <code>$identity_id</code>
       <code>$n</code>
     </MissingParamType>
-    <MissingReturnType occurrences="4">
+    <MissingReturnType occurrences="3">
       <code>SearchByName</code>
-      <code>getByName</code>
       <code>getAllGroupsAdminedByUser</code>
       <code>sampleMembers</code>
     </MissingReturnType>
@@ -3469,24 +3254,6 @@
     <MixedAssignment occurrences="1">
       <code>$row['classname']</code>
     </MixedAssignment>
-  </file>
-  <file src="frontend/server/libs/dao/Groups_Scoreboards.dao.php">
-    <MissingParamType occurrences="2">
-      <code>$group_id</code>
-      <code>$alias</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>getByGroup</code>
-      <code>getByAlias</code>
-    </MissingReturnType>
-  </file>
-  <file src="frontend/server/libs/dao/Groups_Scoreboards_Problemsets.dao.php">
-    <MissingParamType occurrences="1">
-      <code>$group_scoreboard_id</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="1">
-      <code>getByGroupScoreboard</code>
-    </MissingReturnType>
   </file>
   <file src="frontend/server/libs/dao/Identities.dao.php">
     <MissingParamType occurrences="8">
@@ -3597,7 +3364,7 @@
     <MissingClosureReturnType occurrences="1">
       <code>function ($clause) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="28">
+    <MissingParamType occurrences="27">
       <code>$tag</code>
       <code>$tag</code>
       <code>$programmingLanguages</code>
@@ -3627,9 +3394,8 @@
       <code>$contest_id</code>
       <code>$title</code>
     </MissingParamType>
-    <MissingReturnType occurrences="18">
+    <MissingReturnType occurrences="17">
       <code>byIdentityType</code>
-      <code>getByAlias</code>
       <code>searchByAlias</code>
       <code>getTagsForProblem</code>
       <code>getPracticeDeadline</code>
@@ -3965,14 +3731,6 @@
       <code>$problem</code>
       <code>$problem</code>
     </PossiblyNullPropertyAssignment>
-  </file>
-  <file src="frontend/server/libs/dao/Roles.dao.php">
-    <MissingParamType occurrences="1">
-      <code>$name</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="1">
-      <code>getByName</code>
-    </MissingReturnType>
   </file>
   <file src="frontend/server/libs/dao/Runs.dao.php">
     <MissingParamType occurrences="5">

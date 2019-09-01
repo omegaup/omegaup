@@ -10,10 +10,16 @@
  * @access public
  */
 class GroupsScoreboardsProblemsetsDAO extends \OmegaUp\DAO\Base\GroupsScoreboardsProblemsets {
-    public static function getByGroupScoreboard($group_scoreboard_id) {
+    /**
+     * @return \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets[]
+     */
+    public static function getByGroupScoreboard(
+        int $groupScoreboardId
+    ) : array {
         $sql = 'SELECT * FROM Groups_Scoreboards_Problemsets WHERE group_scoreboard_id = ?;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_scoreboard_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$groupScoreboardId]);
 
+        /** @var \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets[] */
         $groupsScoreboardsProblemsets = [];
         foreach ($rs as $row) {
             array_push($groupsScoreboardsProblemsets, new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets($row));

@@ -228,7 +228,7 @@ class QualityNominationController extends Controller {
         }
 
         \OmegaUp\Validators::validateInEnum($r['status'], 'status', ['open', 'approved', 'denied'], true /*is_required*/);
-        \OmegaUp\Validators::validateStringNonEmpty($r['rationale'], 'rationale', true /*is_required*/);
+        \OmegaUp\Validators::validateStringNonEmpty($r['rationale'], 'rationale');
 
         // Validate request
         self::authenticateRequest($r);

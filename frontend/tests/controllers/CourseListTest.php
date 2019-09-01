@@ -38,8 +38,7 @@ class CourseListTest extends OmegaupTestCase {
         $course_array = $response['admin'][0];
         \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],
-            'finish_time',
-            true /* required */
+            'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
         $this->assertEquals(2, $course_array['counts']['test']);
@@ -59,8 +58,7 @@ class CourseListTest extends OmegaupTestCase {
         $course_array = $response['student'][0];
         \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],
-            'finish_time',
-            true /* required */
+            'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
         $this->assertEquals(2, $course_array['counts']['test']);

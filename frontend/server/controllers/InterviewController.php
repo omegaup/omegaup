@@ -10,8 +10,8 @@ class InterviewController extends Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', $is_required);
-        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', false);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['title'], 'title', $is_required);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['description'], 'description');
         $r->ensureInt('duration', 60, 60 * 5, false);
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', $is_required);
     }
@@ -79,7 +79,7 @@ class InterviewController extends Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV');
         $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
 
         foreach ($usersToAdd as $addThisUser) {

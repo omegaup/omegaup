@@ -1193,7 +1193,7 @@ class UserController extends Controller {
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
         $currentTimestamp = \OmegaUp\Time::get();
         if (!empty($r['date'])) {
-            \OmegaUp\Validators::validateDate($r['date'], 'date', false);
+            \OmegaUp\Validators::validateDate($r['date'], 'date');
             $firstDay = date('Y-m-01', strtotime($r['date']));
         } else {
             // Get first day of the current month
@@ -1242,7 +1242,7 @@ class UserController extends Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateDate($r['date'], 'date', false);
+        \OmegaUp\Validators::validateOptionalDate($r['date'], 'date');
         if (!is_null($r['date'])) {
             $coders = CoderOfTheMonthDAO::getMonthlyList($r['date']);
         } else {
@@ -1581,7 +1581,7 @@ class UserController extends Controller {
     public static function apiUpdate(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        if (!is_null($r['username'])) {
+        if (isset($r['username'])) {
             \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
             $user = UsersDAO::FindByUsername($r['username']);
             if ($r['username'] != $r->user->username && !is_null($user)) {
@@ -1597,8 +1597,8 @@ class UserController extends Controller {
         $state = null;
         if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
             // Both state and country must be specified together.
-            \OmegaUp\Validators::validateStringNonEmpty($r['country_id'], 'country_id', true);
-            \OmegaUp\Validators::validateStringNonEmpty($r['state_id'], 'state_id', true);
+            \OmegaUp\Validators::validateStringNonEmpty($r['country_id'], 'country_id');
+            \OmegaUp\Validators::validateStringNonEmpty($r['state_id'], 'state_id');
 
             $state = StatesDAO::getByPK($r['country_id'], $r['state_id']);
             if (is_null($state)) {
@@ -1629,27 +1629,29 @@ class UserController extends Controller {
             }
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['scholar_degree'], 'scholar_degree', false);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['scholar_degree'], 'scholar_degree');
 
         if (!is_null($r['graduation_date'])) {
             if (is_numeric($r['graduation_date'])) {
-                $r['graduation_date'] = (int)$r['graduation_date'];
+                $graduationDate = intval($r['graduation_date']);
             } else {
-                \OmegaUp\Validators::validateDate($r['graduation_date'], 'graduation_date', false);
-                $r['graduation_date'] = strtotime($r['graduation_date']);
+                \OmegaUp\Validators::validateDate($r['graduation_date'], 'graduation_date');
+                $graduationDate = strtotime($r['graduation_date']);
             }
+            $r['graduation_date'] = $graduationDate;
         }
         if (!is_null($r['birth_date'])) {
             if (is_numeric($r['birth_date'])) {
-                $r['birth_date'] = (int)$r['birth_date'];
+                $birthDate = intval($r['birth_date']);
             } else {
-                \OmegaUp\Validators::validateDate($r['birth_date'], 'birth_date', false);
-                $r['birth_date'] = strtotime($r['birth_date']);
+                \OmegaUp\Validators::validateDate($r['birth_date'], 'birth_date');
+                $birthDate = strtotime($r['birth_date']);
             }
 
-            if ($r['birth_date'] >= strtotime('-5 year', \OmegaUp\Time::get())) {
+            if ($birthDate >= strtotime('-5 year', \OmegaUp\Time::get())) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('birthdayInTheFuture', 'birth_date');
             }
+            $r['birth_date'] = $birthDate;
         }
 
         if (!is_null($r['locale'])) {
@@ -2020,18 +2022,18 @@ class UserController extends Controller {
         self::validateUser($r);
 
         \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
-        $r['role'] = RolesDAO::getByName($r['role']);
-        if (is_null($r['role'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'role');
-        }
-
-        if ($r['role']->role_id == \OmegaUp\Authorization::ADMIN_ROLE && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+        $role = RolesDAO::getByName($r['role']);
+        /** @var int $role->role_id */
+        if ($role->role_id == \OmegaUp\Authorization::ADMIN_ROLE
+            && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
+        ) {
             // System-admin role cannot be added/removed from the UI, only when OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
+        $r['role'] = $role;
     }
 
-    private static function validateAddRemoveGroup(\OmegaUp\Request $r) {
+    private static function validateAddRemoveGroup(\OmegaUp\Request $r) : void {
         if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
@@ -2039,10 +2041,11 @@ class UserController extends Controller {
         self::validateUser($r);
 
         \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
-        $r['group'] = GroupsDAO::getByName($r['group']);
-        if (is_null($r['group'])) {
+        $group = GroupsDAO::getByName($r['group']);
+        if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'group');
         }
+        $r['group'] = $group;
     }
 
     /**

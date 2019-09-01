@@ -39,8 +39,8 @@ class CourseController extends Controller {
         $courseStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->start_time);
         $courseFinishTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp($course->finish_time);
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
-        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['name'], 'name', $isRequired);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt(
             'start_time',
@@ -67,7 +67,7 @@ class CourseController extends Controller {
      * Validates clone Courses
      */
     private static function validateClone(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         $r->ensureInt('start_time', null, null, true);
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
     }
@@ -132,8 +132,8 @@ class CourseController extends Controller {
     private static function validateBasicCreateOrUpdate(\OmegaUp\Request $r, bool $isUpdate = false) : void {
         $isRequired = true;
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name', $isRequired);
-        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', $isRequired);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['name'], 'name', $isRequired);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['description'], 'description', $isRequired);
 
         $r->ensureInt('start_time', null, null, !$isUpdate);
         $r->ensureInt('finish_time', null, null, !$isUpdate);
@@ -178,7 +178,7 @@ class CourseController extends Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCourseExists(string $courseAlias) : \OmegaUp\DAO\VO\Courses {
-        \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course_alias', true /*is_required*/);
+        \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course_alias');
         $course = CoursesDAO::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
@@ -630,7 +630,7 @@ class CourseController extends Controller {
         $problems = $r['problems'];
         foreach ($problems as $problem) {
             $currentProblem = ProblemsDAO::getByAlias($problem['alias']);
-            if (is_null($problem)) {
+            if (is_null($currentProblem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
             }
 
@@ -1426,7 +1426,7 @@ class CourseController extends Controller {
             && $requestUserInformation != 'no'
         )) {
             $needsBasicInformation = $courseDetails['basic_information_required']
-                && !is_null($r->identity) && (!is_null($r->identity->country_id)
+                && (!is_null($r->identity->country_id)
                 || !is_null($r->identity->state_id) || !is_null($r->identity->school_id));
 
             // Privacy Statement Information
@@ -1487,12 +1487,11 @@ class CourseController extends Controller {
             $template = 'arena.course.intro.tpl';
         } elseif ($showAssignment) {
             $smartyProperties = [
-                'showRanking' => !is_null($r->identity) &&
-                    CourseController::shouldShowScoreboard(
-                        $r->identity,
-                        $course,
-                        $group
-                    ),
+                'showRanking' => CourseController::shouldShowScoreboard(
+                    $r->identity,
+                    $course,
+                    $group
+                ),
                 'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
                     !is_null($r->user) &&
                     !UserController::isMainIdentity(
@@ -1507,8 +1506,7 @@ class CourseController extends Controller {
             $template = 'arena.contest.course.tpl';
         } else {
             $smartyProperties = [
-                'showRanking' => !is_null($r->identity) &&
-                    \OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
+                'showRanking' => \OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
             ];
             $template = 'course.details.tpl';
         }
@@ -1694,12 +1692,12 @@ class CourseController extends Controller {
      * @return array
      */
     private static function validateAssignmentDetails(
-        string $courseAlias,
-        string $assignmentAlias,
+        ?string $courseAlias,
+        ?string $assignmentAlias,
         \OmegaUp\DAO\VO\Identities $identity
     ) : array {
-        \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course', true /* is_required */);
-        \OmegaUp\Validators::validateStringNonEmpty($assignmentAlias, 'assignment', true /* is_required */);
+        \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course');
+        \OmegaUp\Validators::validateStringNonEmpty($assignmentAlias, 'assignment');
         $course = CoursesDAO::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');

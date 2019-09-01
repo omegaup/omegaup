@@ -285,9 +285,9 @@ class IdentityController extends Controller {
         \OmegaUp\Validators::validateValidUsernameIdentity($username, 'username');
 
         if (!is_null($name)) {
+            /** @var null|string $name */
             $name = trim($name);
-            \OmegaUp\Validators::validateStringNonEmpty($name, 'name', true);
-            \OmegaUp\Validators::validateStringOfLengthInRange($name, 'name', null, 50);
+            \OmegaUp\Validators::validateStringOfLengthInRange($name, 'name', 1, 50);
         }
 
         if (!is_null($gender)) {

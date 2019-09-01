@@ -9,16 +9,12 @@
 class GroupScoreboardController extends Controller {
     /**
      * Validate group scoreboard request
-     *
-     * @param $groupAlias
-     * @param $identityId
-     * @param $scoreboardAlias
      */
     private static function validateGroupScoreboard(
         string $groupAlias,
         \OmegaUp\DAO\VO\Identities $identity,
-        string $scoreboardAlias
-    ) {
+        ?string $scoreboardAlias
+    ) : \OmegaUp\DAO\VO\GroupsScoreboards {
         GroupController::validateGroup($groupAlias, $identity);
 
         \OmegaUp\Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
@@ -31,19 +27,14 @@ class GroupScoreboardController extends Controller {
 
     /**
      * Validates that group alias and contest alias do exist
-     *
-     * @param $groupAlias
-     * @param $identityId
-     * @param $scoreboardAlias
-     * @param $contestAlias
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @return array{contest: \OmegaUp\DAO\VO\Contests, scoreboard: \OmegaUp\DAO\VO\GroupsScoreboards}
      */
     private static function validateGroupScoreboardAndContest(
         string $groupAlias,
         \OmegaUp\DAO\VO\Identities $identity,
         string $scoreboardAlias,
-        string $contestAlias
-    ) {
+        ?string $contestAlias
+    ) : array {
         $scoreboard = self::validateGroupScoreboard(
             $groupAlias,
             $identity,
@@ -145,74 +136,85 @@ class GroupScoreboardController extends Controller {
         $response = [];
 
         // Fill contests
-        $response['contests'] = [];
+        /** @var array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}[] */
+        $contests = [];
         $response['ranking'] = [];
+        /** @var int $scoreboard->group_scoreboard_id */
         $gscs = GroupsScoreboardsProblemsetsDAO::getByGroupScoreboard(
             $scoreboard->group_scoreboard_id
         );
         $i = 0;
-        $contest_params = [];
+        /** @var array<string, array{only_ac: bool, weight: float}> */
+        $contestParams = [];
         foreach ($gscs as $gsc) {
             $contest = ContestsDAO::getByProblemset($gsc->problemset_id);
             if (empty($contest)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
-            $response['contests'][$i] = $contest->asArray();
-            $response['contests'][$i]['only_ac'] = $gsc->only_ac;
-            $response['contests'][$i]['weight'] = $gsc->weight;
+            $contests[$i] = $contest->asArray();
+            $contests[$i]['only_ac'] = $gsc->only_ac;
+            $contests[$i]['weight'] = $gsc->weight;
 
             // Fill contest params to pass to scoreboardMerge
-            $contest_params[$contest->alias] = [
-                'only_ac' => ($gsc->only_ac == 0) ? false : true,
-                'weight' => $gsc->weight
+            /** @var string $contest->alias */
+            $contestParams[$contest->alias] = [
+                'only_ac' => boolval($gsc->only_ac),
+                'weight' => floatval($gsc->weight),
             ];
 
             $i++;
         }
 
-        $r['contest_params'] = $contest_params;
-
         // Fill details of this scoreboard
         $response['scoreboard'] = $scoreboard->asArray();
 
         // If we have contests, calculate merged&filtered scoreboard
-        if (!empty($response['contests'])) {
+        if (!empty($contests)) {
             // Get merged scoreboard
-            $r['contest_aliases'] = '';
-            foreach ($response['contests'] as $contest) {
-                $r['contest_aliases'] .= $contest['alias'] . ',';
+            /** @var string[] */
+            $contestAliases = [];
+            /** @var array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float} $contest */
+            foreach ($contests as $contest) {
+                $contestAliases[] = $contest['alias'];
             }
 
-            $r['contest_aliases'] = rtrim($r['contest_aliases'], ',');
-
             $usernames = GroupsIdentitiesDAO::getUsernamesByGroupId($scoreboard->group_id);
-            $r['usernames_filter'] = implode(',', $usernames);
 
-            $mergedScoreboardResponse = ContestController::apiScoreboardMerge($r);
-            $response['ranking'] = $mergedScoreboardResponse['ranking'];
+            $response['ranking'] = ContestController::getMergedScoreboard(
+                $contestAliases,
+                $usernames,
+                $contestParams
+            );
         }
 
         $response['status'] = 'ok';
+        $response['contests'] = $contests;
         return $response;
     }
 
     /**
      * Details of a scoreboard
-     *
-     * @param \OmegaUp\Request $r
      */
     public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
         $group = GroupController::validateGroup($r['group_alias'], $r->identity);
-
-        $response = [];
-        $response['scoreboards'] = [];
-        $scoreboards = GroupsScoreboardsDAO::getByGroup($group->group_id);
-        foreach ($scoreboards as $scoreboard) {
-            $response['scoreboards'][] = $scoreboard->asArray();
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'group_alias'
+            );
         }
 
-        $response['status'] = 'ok';
-        return $response;
+        $scoreboards = [];
+        /** @var int $group->group_id */
+        $groupScoreboards = GroupsScoreboardsDAO::getByGroup($group->group_id);
+        foreach ($groupScoreboards as $scoreboard) {
+            $scoreboards[] = $scoreboard->asArray();
+        }
+
+        return [
+            'status' => 'ok',
+            'scoreboards' => $scoreboards,
+        ];
     }
 }

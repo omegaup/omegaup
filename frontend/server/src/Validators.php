@@ -13,14 +13,13 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
-     * @param bool $required If $required is TRUE and the parameter is not present, check fails.
+     * @psalm-assert string $parameter
      */
     public static function validateEmail(
         $parameter,
-        string $parameterName,
-        bool $required = true
+        string $parameterName
     ) : void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
         if (!filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
@@ -33,14 +32,13 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
-     * @param bool $required If $required is TRUE and the parameter is not present, check fails.
+     * @psalm-assert string $parameter
      */
     public static function validateStringNonEmpty(
         $parameter,
-        string $parameterName,
-        bool $required = true
+        string $parameterName
     ) : void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
 
@@ -51,11 +49,31 @@ class Validators {
     }
 
     /**
+     * Check if a parameter is present, it is a non-empty string.
+     *
+     * @param mixed $parameter
+     * @param string $parameterName Name of parameter that will appear en error message
+     * @param bool $required If $required is TRUE and the parameter is not present, check fails.
+     * @psalm-assert null|string $parameter
+     */
+    public static function validateOptionalStringNonEmpty(
+        $parameter,
+        string $parameterName,
+        bool $required = false
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        self::validateStringNonEmpty($parameter, $parameterName);
+    }
+
+    /**
      * @param mixed  $parameter
      * @param string $parameterName
      * @param ?int   $minLength
      * @param ?int   $maxLength
      * @param bool   $required
+     * @psalm-assert string $parameter
      */
     public static function validateStringOfLengthInRange(
         $parameter,
@@ -88,10 +106,10 @@ class Validators {
     }
 
     /**
-     *
      * @param mixed $parameter
      * @param string $parameterName
      * @param bool $required
+     * @psalm-assert string $parameter
      */
     public static function validateValidAlias(
         $parameter,
@@ -140,20 +158,19 @@ class Validators {
     /**
      * Enforces username requirements
      *
-     * @param string $parameter
+     * @param mixed $parameter
      * @param string $parameterName
-     * @param bool $required
+     * @psalm-assert string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsername(
         $parameter,
-        string $parameterName,
-        bool $required = true
+        string $parameterName
     ) : void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
-        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, $required);
+        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, /*required=*/true);
 
         if (preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
@@ -163,20 +180,20 @@ class Validators {
     /**
      * Enforces username identity requirements
      *
-     * @param string $parameter
+     * @param mixed $parameter
      * @param string $parameterName
      * @param bool $required
+     * @psalm-assert string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsernameIdentity(
         $parameter,
-        string $parameterName,
-        bool $required = true
+        string $parameterName
     ) : void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
-        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, $required);
+        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, /*required=*/true);
 
         if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
@@ -184,18 +201,16 @@ class Validators {
     }
 
     /**
-     *
      * @param mixed $parameter
      * @param string $parameterName
-     * @param bool $required
+     * @psalm-assert string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateDate(
         $parameter,
-        string $parameterName,
-        bool $required = true
+        string $parameterName
     ) : void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
 
@@ -204,6 +219,24 @@ class Validators {
         if (!is_string($parameter) || strtotime($parameter) === false) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
         }
+    }
+
+    /**
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @param bool $required
+     * @psalm-assert null|string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateOptionalDate(
+        $parameter,
+        string $parameterName,
+        bool $required = false
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        self::validateDate($parameter, $parameterName);
     }
 
     /**
@@ -250,15 +283,14 @@ class Validators {
      *
      * @param mixed  $parameter
      * @param string $parameterName
-     * @param bool   $required
+     * @psalm-assert int $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateNumber(
         $parameter,
-        string $parameterName,
-        bool $required = true
+        string $parameterName
     ) : void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
         if (!is_numeric($parameter)) {
@@ -341,6 +373,7 @@ class Validators {
      * @param mixed $parameter
      * @param string $parameterName
      * @param bool $required
+     * @psalm-assert-if-true !null $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function isPresent(
