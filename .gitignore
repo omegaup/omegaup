@@ -59,6 +59,7 @@ omegaup_test.log
 
 # Ignore runtime and test stuff
 test-env
+psalm.baseline.xml
 templates_c
 /omegaup/
 bin/grader.sh

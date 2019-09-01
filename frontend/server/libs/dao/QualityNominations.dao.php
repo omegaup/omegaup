@@ -40,6 +40,8 @@ class QualityNominationsDAO extends \OmegaUp\DAO\Base\QualityNominations {
                     qnn.nomination = 'suggestion'
                 ORDER BY
                     qnn.qualitynomination_id DESC";
+
+        /** @var array<string, string>|null $suggestion */
         $suggestion = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
         if ($suggestion !== null) {
             $response['nominated'] = true;
@@ -64,6 +66,8 @@ class QualityNominationsDAO extends \OmegaUp\DAO\Base\QualityNominations {
                     qnn.nomination = 'dismissal'
                 ORDER BY
                     qnn.qualitynomination_id DESC";
+
+        /** @var array<string, string>|null $dismissal */
         $dismissal = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
         if ($dismissal !== null) {
             $response['dismissed'] = true;

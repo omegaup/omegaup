@@ -2533,6 +2533,8 @@ class ProblemController extends Controller {
 
         $nominationStatus['tried'] = false;
         $nominationStatus['solved'] = false;
+
+        /** @var array<string, int|string|float> */
         foreach ($details['runs'] as $run) {
             if ($run['verdict'] === 'AC') {
                 $nominationStatus['solved'] = true;

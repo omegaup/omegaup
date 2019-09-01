@@ -79,6 +79,8 @@ class QualityNominationController extends Controller {
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
         }
+
+        /** @var \OmegaUp\DAO\VO\Problems|null */
         $problem = ProblemsDAO::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -92,11 +94,11 @@ class QualityNominationController extends Controller {
             ) {
                 // Before AC suggestions or dismissals are only allowed
                 // for users who didn't solve a problem, but tried to.
-                if (ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
+                if (!is_null($r->identity) && ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustNotHaveSolvedProblem');
                 }
 
-                if (!ProblemsDAO::hasTriedToSolveProblem($problem, (int)
+                if (!is_null($r->identity) && !ProblemsDAO::hasTriedToSolveProblem($problem, (int)
                 $r->identity->identity_id)) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveTriedToSolveProblem');
                 }
@@ -104,7 +106,7 @@ class QualityNominationController extends Controller {
                 // All nominations types, except demotions and before AC
                 // suggestions/demotions,are only allowed for users who
                 // have already solved the problem.
-                if (!ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
+                if (!is_null($r->identity) && !ProblemsDAO::isProblemSolved($problem, (int)$r->identity->identity_id)) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveSolvedProblem');
                 }
             }
@@ -493,7 +495,7 @@ class QualityNominationController extends Controller {
      * nominator or a member of the reviewer group.
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string, nominator: array{username: string}, problem: array{alias: string}, contents: array{statements: array<string, string>}}
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDetails(\OmegaUp\Request $r) {
@@ -505,6 +507,8 @@ class QualityNominationController extends Controller {
         self::authenticateRequest($r);
 
         $r->ensureInt('qualitynomination_id');
+
+        /** @var null|array{status: string, nominator: array{username: string}, problem: array{alias: string}, contents: array{statements: array<string, string>}} */
         $response = QualityNominationsDAO::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\NotFoundException('qualityNominationNotFound');
@@ -518,7 +522,10 @@ class QualityNominationController extends Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
-        // Get information from the original problem.
+        /**
+         * Get information from the original problem.
+         * @var OmegaUp\DAO\VO\Problems|null $problem
+         */
         $problem = ProblemsDAO::getByAlias($response['problem']['alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -538,7 +545,11 @@ class QualityNominationController extends Controller {
                 $response['original_contents']['tags'] = ProblemsDAO::getTagsForProblem($problem, false /* public */);
             }
 
-            // Pull original problem statements in every language the nominator is trying to override.
+            /**
+             * Pull original problem statements in every language the nominator is trying to override.
+             * @var string $language
+             * @var string $_
+            */
             foreach ($response['contents']['statements'] as $language => $_) {
                 $response['original_contents']['statements'][$language] = ProblemController::getProblemStatement(
                     $problem,
