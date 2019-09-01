@@ -6,7 +6,7 @@ try {
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
-    ApiCaller::handleException($e);
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
 // It doesn´t require information for smarty, so we  only show the proper page

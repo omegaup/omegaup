@@ -1,6 +1,5 @@
 <?php
 require_once('../server/bootstrap_smarty.php');
-require_once('api/ApiCaller.php');
 
 $triedToLogin = false;
 $emailVerified = true;
@@ -12,8 +11,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     $r = new \OmegaUp\Request();
     $r['usernameOrEmail'] = $_POST['user'];
     $r['password'] = $_POST['pass'];
-    $r->method = 'UserController::apiLogin';
-    $response = ApiCaller::call($r);
+    $response = UserController::apiLogin($r);
 
     if ($response['status'] === 'error') {
         if ($response['errorcode'] === 600 || $response['errorcode'] === 601) {

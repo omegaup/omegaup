@@ -1,6 +1,6 @@
 <?php
 
-require_once OMEGAUP_ROOT . '/www/api/ApiCaller.php';
+require_once OMEGAUP_ROOT . '/server/bootstrap.php';
 
 /**
  * Test to ensure that all the badges are in the correct format.
@@ -39,7 +39,7 @@ class BadgesTest extends BadgesTestCase {
             }
             $r = new \OmegaUp\Request($params);
             $r->method = $req['api'];
-            $fullResponse = ApiCaller::call($r);
+            $fullResponse = \OmegaUp\ApiCaller::call($r);
             if ($fullResponse['status'] !== 'ok') {
                 throw new Exception($fullResponse['error']);
             }

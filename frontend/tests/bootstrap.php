@@ -11,8 +11,8 @@ namespace {
     @include_once(OMEGAUP_ROOT . '/tests/test_config.php');
     require_once(OMEGAUP_ROOT . '/tests/test_config.default.php');
     require_once(OMEGAUP_ROOT . '/server/config.default.php');
+    require_once(OMEGAUP_ROOT . '/server/bootstrap.php');
     // Load api caller
-    require_once(OMEGAUP_ROOT . '/www/api/ApiCaller.php');
     require_once(OMEGAUP_ROOT . '/tests/controllers/ApiCallerMock.php');
     // Load test utils
     require_once(OMEGAUP_ROOT . '/tests/controllers/OmegaupTestCase.php');

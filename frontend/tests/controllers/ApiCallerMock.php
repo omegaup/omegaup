@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class ApiCallerMock extends ApiCaller {
+class ApiCallerMock extends \OmegaUp\ApiCaller {
     /**
      * headers() is not phpunit-safe. This is a no-op for test
      *
