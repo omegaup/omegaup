@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class GroupScoreboardController extends Controller {
+class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
     /**
      * Validate group scoreboard request
      */

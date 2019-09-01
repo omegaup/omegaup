@@ -20,7 +20,9 @@ class UsersDAO extends \OmegaUp\DAO\Base\Users {
         return new \OmegaUp\DAO\VO\Users($rs);
     }
 
-    public static function FindByUsername($username) {
+    public static function FindByUsername(
+        string $username
+    ) : ?\OmegaUp\DAO\VO\Users {
         $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$username]);
         if (empty($rs)) {

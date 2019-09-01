@@ -3,7 +3,7 @@
 /**
  * AuthorizationController
  */
-class AuthorizationController extends Controller {
+class AuthorizationController extends \OmegaUp\Controllers\Controller {
     public static function apiProblem(\OmegaUp\Request $r) {
         // This is not supposed to be called by end-users, but by the
         // gitserver. Regular sessions cannot be used since they

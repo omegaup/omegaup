@@ -8,7 +8,7 @@
  * @author lhchavez
  * @author joemmanuel
  */
-class CourseController extends Controller {
+class CourseController extends \OmegaUp\Controllers\Controller {
     /**
      * Validate assignment_alias existis into the course and
      * return Assignments object

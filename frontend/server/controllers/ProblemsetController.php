@@ -3,7 +3,7 @@
 require_once('libs/dao/Problemsets.dao.php');
 require_once('libs/dao/Problemset_Problems.dao.php');
 
-class ProblemsetController extends Controller {
+class ProblemsetController extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity

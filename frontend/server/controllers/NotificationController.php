@@ -5,7 +5,7 @@
  *
  * @author carlosabcs
  */
-class NotificationController extends Controller {
+class NotificationController extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of unread notifications for user
      *

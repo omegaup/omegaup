@@ -70,10 +70,8 @@
   <file src="frontend/server/controllers/BadgeController.php">
     <MixedArgument occurrences="2">
       <code>static::OMEGAUP_BADGES_ROOT</code>
-      <code>$user</code>
     </MixedArgument>
-    <MixedAssignment occurrences="4">
-      <code>$user</code>
+    <MixedAssignment occurrences="3">
       <code>$totalUsers</code>
       <code>$ownersCount</code>
       <code>$firstAssignation</code>
@@ -578,57 +576,6 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/controllers/Controller.php">
-    <InvalidReturnStatement occurrences="2">
-      <code>$identity</code>
-      <code>$identity</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>Identity</code>
-    </InvalidReturnType>
-    <MissingReturnType occurrences="2">
-      <code>authenticateRequest</code>
-      <code>authenticateOrAllowUnauthenticatedRequest</code>
-    </MissingReturnType>
-    <MixedArrayAccess occurrences="5">
-      <code>$info[0]</code>
-      <code>$info[2]</code>
-      <code>$info['transform']</code>
-      <code>$info[1]</code>
-      <code>$info['important']</code>
-    </MixedArrayAccess>
-    <MixedArrayOffset occurrences="2">
-      <code>$request[$source]</code>
-      <code>$request[$source]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="9">
-      <code>$user</code>
-      <code>$info</code>
-      <code>$source</code>
-      <code>$field_name</code>
-      <code>$field_name</code>
-      <code>$value</code>
-      <code>$transform</code>
-      <code>$value</code>
-      <code>$important</code>
-    </MixedAssignment>
-    <MixedFunctionCall occurrences="1">
-      <code>$transform($value)</code>
-    </MixedFunctionCall>
-    <MixedInferredReturnType occurrences="1">
-      <code>\OmegaUp\DAO\VO\Users</code>
-    </MixedInferredReturnType>
-    <MixedReturnStatement occurrences="1">
-      <code>$user</code>
-    </MixedReturnStatement>
-    <PossiblyNullArrayAccess occurrences="2">
-      <code>$session['identity']</code>
-      <code>$session['user']</code>
-    </PossiblyNullArrayAccess>
-    <UndefinedDocblockClass occurrences="1">
-      <code>Identity</code>
-    </UndefinedDocblockClass>
-  </file>
   <file src="frontend/server/controllers/CourseController.php">
     <ArgumentTypeCoercion occurrences="1">
       <code>$assignment</code>
@@ -1096,9 +1043,6 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/controllers/IdentityController.php">
-    <DocblockTypeContradiction occurrences="1">
-      <code>is_null($identity)</code>
-    </DocblockTypeContradiction>
     <MismatchingDocblockReturnType occurrences="1">
       <code>type</code>
     </MismatchingDocblockReturnType>
@@ -1131,7 +1075,7 @@
       <code>createIdentity</code>
       <code>convertToSupportedLanguage</code>
     </MissingReturnType>
-    <MixedArgument occurrences="20">
+    <MixedArgument occurrences="19">
       <code>$identity</code>
       <code>$identity</code>
       <code>$r['group_alias']</code>
@@ -1148,7 +1092,6 @@
       <code>$gender</code>
       <code>$school</code>
       <code>$password</code>
-      <code>$identity-&gt;language_id</code>
       <code>$_SERVER['HTTP_ACCEPT_LANGUAGE']</code>
       <code>$lang_parse[1]</code>
       <code>$lang_parse[1]</code>
@@ -1210,13 +1153,6 @@
       <code>$identity-&gt;username</code>
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
-    <RedundantConditionGivenDocblockType occurrences="2">
-      <code>is_null($identity)</code>
-      <code>!is_null($identity) &amp;&amp; !is_null($identity-&gt;language_id)</code>
-    </RedundantConditionGivenDocblockType>
-    <UndefinedDocblockClass occurrences="1">
-      <code>$identity-&gt;language_id</code>
-    </UndefinedDocblockClass>
   </file>
   <file src="frontend/server/controllers/InterviewController.php">
     <InvalidArgument occurrences="1">
@@ -1350,9 +1286,8 @@
       <code>is_null($problemset)</code>
       <code>is_null($problem)</code>
     </DocblockTypeContradiction>
-    <InvalidArgument occurrences="2">
+    <InvalidArgument occurrences="1">
       <code>$r</code>
-      <code>$identity</code>
     </InvalidArgument>
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
@@ -2281,11 +2216,10 @@
       <code>$res['username']</code>
       <code>$identity</code>
     </MixedArgument>
-    <MixedAssignment occurrences="13">
+    <MixedAssignment occurrences="12">
       <code>self::$_facebook</code>
       <code>$facebook</code>
       <code>$helper</code>
-      <code>$userexists</code>
       <code>$client</code>
       <code>$loginTicket</code>
       <code>$facebook</code>
@@ -2460,13 +2394,11 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="41">
+    <MixedArgument occurrences="34">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
-      <code>$user-&gt;password</code>
       <code>$resultAsJson</code>
-      <code>$user-&gt;main_identity_id</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -2476,7 +2408,6 @@
       <code>$r['redirecttointerview']</code>
       <code>$user</code>
       <code>$response['userinfo']['email']</code>
-      <code>$r['identity']</code>
       <code>$r['user']</code>
       <code>$coderOfTheMonthUserId</code>
       <code>$user_id</code>
@@ -2485,7 +2416,6 @@
       <code>$problem</code>
       <code>$problem</code>
       <code>$r[$param]</code>
-      <code>$identity-&gt;user_id</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$value</code>
@@ -2495,15 +2425,12 @@
       <code>$email</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>UsersDAO::FindByUsername($r['username'])</code>
       <code>$experiments-&gt;getAllKnownExperiments()</code>
       <code>$r['user']-&gt;user_id</code>
       <code>$r['experiment']</code>
       <code>$r</code>
-      <code>$identity-&gt;identity_id</code>
       <code>$privacystatement_id</code>
       <code>$r['password']</code>
-      <code>$identity-&gt;password</code>
       <code>$coder['email']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
@@ -2563,7 +2490,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="76">
+    <MixedAssignment occurrences="66">
       <code>$user</code>
       <code>$userByEmail</code>
       <code>$userData['is_private']</code>
@@ -2595,7 +2522,6 @@
       <code>$response['userinfo']['school_id']</code>
       <code>$response['userinfo']['locale']</code>
       <code>$v</code>
-      <code>$response['userinfo']['username']</code>
       <code>$response['userinfo']['classname']</code>
       <code>$response</code>
       <code>$response</code>
@@ -2617,7 +2543,6 @@
       <code>$problems</code>
       <code>$problem</code>
       <code>$identity</code>
-      <code>$testu</code>
       <code>$user</code>
       <code>$r['school_id']</code>
       <code>$language</code>
@@ -2632,7 +2557,6 @@
       <code>$r2</code>
       <code>$response['contest_admin'][]</code>
       <code>$problem</code>
-      <code>$r['user']</code>
       <code>$latest_statement</code>
       <code>$filteredBy</code>
       <code>$privacystatement_id</code>
@@ -2640,7 +2564,6 @@
       <code>$candidates</code>
       <code>$candidate</code>
       <code>$coder</code>
-      <code>$userInfo</code>
       <code>$classname</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="4">
@@ -2658,23 +2581,14 @@
       <code>$r['usernameOrEmail']</code>
       <code>$index</code>
     </MixedOperand>
-    <MixedPropertyAssignment occurrences="2">
+    <MixedPropertyAssignment occurrences="1">
       <code>$user</code>
       <code>$user</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="29">
+    <MixedPropertyFetch occurrences="16">
       <code>$userByEmail-&gt;password</code>
-      <code>$user-&gt;user_id</code>
       <code>$userByEmail-&gt;user_id</code>
-      <code>$user-&gt;password</code>
-      <code>$user-&gt;username</code>
       <code>$userByEmail-&gt;user_id</code>
-      <code>$user-&gt;main_identity_id</code>
-      <code>$user-&gt;verified</code>
-      <code>$r['identity']-&gt;username</code>
-      <code>$r['user']-&gt;is_private</code>
-      <code>$r['identity']-&gt;username</code>
-      <code>$r['identity']-&gt;user_id</code>
       <code>$codersOfTheMonth[0]-&gt;user_id</code>
       <code>$identity-&gt;username</code>
       <code>$identity-&gt;username</code>
@@ -2689,12 +2603,8 @@
       <code>$r['group']-&gt;group_id</code>
       <code>$r['user']-&gt;user_id</code>
       <code>$r['user']-&gt;user_id</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$identity-&gt;password</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$userInfo-&gt;user_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="4">
+    <MixedReturnStatement occurrences="3">
       <code>$user</code>
       <code>$user</code>
       <code>$response</code>
@@ -2706,7 +2616,7 @@
     <PossiblyInvalidArgument occurrences="1">
       <code>$coders</code>
     </PossiblyInvalidArgument>
-    <PossiblyNullArgument occurrences="27">
+    <PossiblyNullArgument occurrences="26">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -2750,7 +2660,7 @@
       <code>$user-&gt;username</code>
       <code>$user-&gt;username</code>
     </PossiblyNullOperand>
-    <PossiblyNullPropertyAssignment occurrences="15">
+    <PossiblyNullPropertyAssignment occurrences="14">
       <code>$identity</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;identity</code>
@@ -2767,11 +2677,8 @@
       <code>$r-&gt;user</code>
       <code>$r-&gt;user</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="45">
+    <PossiblyNullPropertyFetch occurrences="41">
       <code>$email-&gt;email</code>
-      <code>$user-&gt;username</code>
-      <code>$user-&gt;main_identity_id</code>
-      <code>$user-&gt;password</code>
       <code>$r-&gt;user-&gt;username</code>
       <code>$r-&gt;user-&gt;username</code>
       <code>$r-&gt;user-&gt;username</code>
@@ -2804,7 +2711,6 @@
       <code>$r-&gt;user-&gt;verified</code>
       <code>$r-&gt;user-&gt;verification_id</code>
       <code>$r-&gt;user-&gt;username</code>
-      <code>$identity-&gt;username</code>
       <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$identity-&gt;country_id</code>
@@ -2815,7 +2721,7 @@
       <code>$r-&gt;user-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
     <RedundantConditionGivenDocblockType occurrences="1"/>
-    <UndefinedDocblockClass occurrences="25">
+    <UndefinedDocblockClass occurrences="11">
       <code>type</code>
       <code>$response</code>
       <code>$response</code>
@@ -2827,20 +2733,6 @@
       <code>$response</code>
       <code>response</code>
       <code>response</code>
-      <code>$identity-&gt;name</code>
-      <code>$identity-&gt;username</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$identity-&gt;username</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$identity-&gt;user_id</code>
-      <code>$identity-&gt;username</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$identity-&gt;language_id</code>
-      <code>$identity-&gt;language_id</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$identity-&gt;identity_id</code>
-      <code>$identity-&gt;identity_id</code>
     </UndefinedDocblockClass>
     <UndefinedMethod occurrences="2">
       <code>IdentitiesDAO::getStatusVerified($r['email'])</code>
@@ -3256,23 +3148,21 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/libs/dao/Identities.dao.php">
-    <MissingParamType occurrences="8">
+    <MissingParamType occurrences="7">
       <code>$email</code>
       <code>$email</code>
       <code>$identity_id</code>
       <code>$identity_id</code>
-      <code>$username</code>
       <code>$userId</code>
       <code>$userId</code>
       <code>$identity_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="8">
+    <MissingReturnType occurrences="7">
       <code>FindByEmail</code>
       <code>getExtraInformation</code>
       <code>isVerified</code>
       <code>getExtendedProfileDataByPk</code>
       <code>isUserAssociatedWithIdentityOfGroup</code>
-      <code>getUnassociatedIdentity</code>
       <code>getAssociatedIdentities</code>
       <code>associateIdentityWithUser</code>
     </MissingReturnType>
@@ -3857,9 +3747,8 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/libs/dao/Users.dao.php">
-    <MissingParamType occurrences="10">
+    <MissingParamType occurrences="9">
       <code>$email</code>
-      <code>$username</code>
       <code>$user_id</code>
       <code>$email</code>
       <code>$user_id</code>
@@ -3869,9 +3758,8 @@
       <code>$verified</code>
       <code>$in_mailing_list</code>
     </MissingParamType>
-    <MissingReturnType occurrences="11">
+    <MissingReturnType occurrences="10">
       <code>FindByEmail</code>
-      <code>FindByUsername</code>
       <code>IsUserInterviewer</code>
       <code>FindResetInfoByEmail</code>
       <code>savePassword</code>
@@ -4954,10 +4842,8 @@
       <code>addSupportRole</code>
       <code>addGroupIdentityCreator</code>
     </MissingReturnType>
-    <MixedArgument occurrences="3">
+    <MixedArgument occurrences="2">
       <code>$response['status']</code>
-      <code>$user</code>
-      <code>$user</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="2">
       <code>$this-&gt;params[$offset]</code>
@@ -4969,23 +4855,15 @@
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="3">
+    <MixedAssignment occurrences="2">
       <code>$array[$parameter]</code>
-      <code>$user</code>
       <code>$user-&gt;password</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="4">
-      <code>type</code>
+    <MixedInferredReturnType occurrences="3">
       <code>Identity</code>
       <code>User</code>
       <code>User</code>
     </MixedInferredReturnType>
-    <MixedPropertyAssignment occurrences="1">
-      <code>$user</code>
-    </MixedPropertyAssignment>
-    <MixedReturnStatement occurrences="1">
-      <code>UsersDAO::FindByUsername($user-&gt;username)</code>
-    </MixedReturnStatement>
     <PossiblyInvalidArgument occurrences="1">
       <code>$this-&gt;params</code>
     </PossiblyInvalidArgument>
@@ -4994,13 +4872,9 @@
       <code>$support_group-&gt;group_id</code>
       <code>$groupIdentityCreator-&gt;group_id</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedClass occurrences="1">
-      <code>$user-&gt;password</code>
-    </UndefinedClass>
-    <UndefinedDocblockClass occurrences="5">
+    <UndefinedDocblockClass occurrences="4">
       <code>user</code>
       <code>user</code>
-      <code>type</code>
       <code>User</code>
       <code>Boolean</code>
     </UndefinedDocblockClass>

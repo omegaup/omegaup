@@ -1,6 +1,6 @@
 <?php
 
-class InterviewController extends Controller {
+class InterviewController extends \OmegaUp\Controllers\Controller {
     private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
         $is_required = !$is_update;
 

@@ -7,7 +7,7 @@
  *
  * @author joemmanuel
  */
-class TimeController extends Controller {
+class TimeController extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for /time API
      *

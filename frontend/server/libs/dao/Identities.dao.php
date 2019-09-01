@@ -223,7 +223,9 @@ class IdentitiesDAO extends \OmegaUp\DAO\Base\Identities {
         return $rs['associated'] == '1';
     }
 
-    public static function getUnassociatedIdentity($username) {
+    public static function getUnassociatedIdentity(
+        string $username
+    ) : ?\OmegaUp\DAO\VO\Identities {
         $sql = '
             SELECT
                 i.*

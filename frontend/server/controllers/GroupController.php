@@ -6,7 +6,7 @@
  * @author joemmanuel
  */
 
-class GroupController extends Controller {
+class GroupController extends \OmegaUp\Controllers\Controller {
     /**
      * Utility function to create a new group.
      */

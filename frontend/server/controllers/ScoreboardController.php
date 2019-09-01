@@ -4,7 +4,7 @@
  * ScoreboardController
  *
  */
-class ScoreboardController extends Controller {
+class ScoreboardController extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests
      *

@@ -6,7 +6,7 @@ require_once 'libs/dao/Contests.dao.php';
  * ContestController
  *
  */
-class ContestController extends Controller {
+class ContestController extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
     const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
 

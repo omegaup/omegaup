@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class ClarificationController extends Controller {
+class ClarificationController extends \OmegaUp\Controllers\Controller {
     /** @var null|\OmegaUp\Broadcaster */
     public static $broadcaster = null;
 
