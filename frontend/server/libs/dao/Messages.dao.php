@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Messages.dao.base.php');
-
 /**
  * Messages Data Access Object (DAO).
  *
@@ -13,5 +11,5 @@ require_once('base/Messages.dao.base.php');
  * @access public
  * @package docs
  */
-class MessagesDAO extends MessagesDAOBase {
+class MessagesDAO extends \OmegaUp\DAO\Base\Messages {
 }

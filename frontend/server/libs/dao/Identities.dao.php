@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Identities.dao.base.php');
-
 /**
  * Identities Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/Identities.dao.base.php');
  *
  * @access public
  */
-class IdentitiesDAO extends IdentitiesDAOBase {
+class IdentitiesDAO extends \OmegaUp\DAO\Base\Identities {
     public static function FindByEmail($email) {
         $sql = 'SELECT
                   i.*

@@ -1,8 +1,5 @@
 <?php
 
-require_once 'libs/ActivityReport.php';
-require_once 'libs/PrivacyStatement.php';
-
 /**
  *  CourseController
  *
@@ -1433,7 +1430,7 @@ class CourseController extends Controller {
                 || !is_null($r->identity->state_id) || !is_null($r->identity->school_id));
 
             // Privacy Statement Information
-            $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
+            $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(
                 $r->identity->language_id,
                 'course',
                 $requestUserInformation
@@ -1453,7 +1450,7 @@ class CourseController extends Controller {
                 $privacyStatement['statementType'] = $statementType;
             }
 
-            $markdown = PrivacyStatement::getForConsent(
+            $markdown = \OmegaUp\PrivacyStatement::getForConsent(
                 $r->identity->language_id,
                 'accept_teacher'
             );
@@ -1620,7 +1617,10 @@ class CourseController extends Controller {
         $accesses = ProblemsetAccessLogDAO::GetAccessForCourse($course->course_id);
         $submissions = SubmissionLogDAO::GetSubmissionsForCourse($course->course_id);
 
-        return ActivityReport::getActivityReport($accesses, $submissions);
+        return [
+            'status' => 'ok',
+            'events' => \OmegaUp\ActivityReport::getActivityReport($accesses, $submissions),
+        ];
     }
 
     /**

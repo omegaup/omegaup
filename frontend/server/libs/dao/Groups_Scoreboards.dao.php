@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Groups_Scoreboards.dao.base.php');
-
 /**
  * GroupsScoreboards Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Groups_Scoreboards.dao.base.php');
  * @access public
  * @package docs
  */
-class GroupsScoreboardsDAO extends GroupsScoreboardsDAOBase {
+class GroupsScoreboardsDAO extends \OmegaUp\DAO\Base\GroupsScoreboards {
     public static function getByGroup($group_id) {
         $sql = 'SELECT * FROM Groups_Scoreboards WHERE group_id = ?;';
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_id]);

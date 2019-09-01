@@ -1,7 +1,5 @@
 <?php
 
-include('base/Assignments.dao.base.php');
-
 /**
  * Assignments Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Assignments.dao.base.php');
  *
  * @access public
  */
-class AssignmentsDAO extends AssignmentsDAOBase {
+class AssignmentsDAO extends \OmegaUp\DAO\Base\Assignments {
     public static function getProblemset($courseId, $assignmentAlias = null) {
         $sql = 'SELECT
                     p.*

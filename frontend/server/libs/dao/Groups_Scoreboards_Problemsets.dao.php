@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Groups_Scoreboards_Problemsets.dao.base.php');
-
 /**
  * GroupsScoreboardsProblemsets Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/Groups_Scoreboards_Problemsets.dao.base.php');
  *
  * @access public
  */
-class GroupsScoreboardsProblemsetsDAO extends GroupsScoreboardsProblemsetsDAOBase {
+class GroupsScoreboardsProblemsetsDAO extends \OmegaUp\DAO\Base\GroupsScoreboardsProblemsets {
     public static function getByGroupScoreboard($group_scoreboard_id) {
         $sql = 'SELECT * FROM Groups_Scoreboards_Problemsets WHERE group_scoreboard_id = ?;';
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_scoreboard_id]);

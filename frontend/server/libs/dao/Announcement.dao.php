@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Announcement.dao.base.php');
-
 /**
  * Announcement Data Access Object (DAO).
  *
@@ -13,5 +11,5 @@ require_once('base/Announcement.dao.base.php');
  * @access public
  * @package docs
  */
-class AnnouncementDAO extends AnnouncementDAOBase {
+class AnnouncementDAO extends \OmegaUp\DAO\Base\Announcement {
 }

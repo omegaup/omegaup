@@ -21,7 +21,7 @@ try {
     }
     $smarty->assign('payload', $payload);
     $smarty->display($template);
-} catch (APIException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('qualitynomination')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');
     die();

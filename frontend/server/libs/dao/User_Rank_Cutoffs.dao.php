@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/User_Rank_Cutoffs.dao.base.php');
-
 /**
  * UserRankCutoffs Data Access Object (DAO).
  *
@@ -11,5 +9,5 @@ include_once('base/User_Rank_Cutoffs.dao.base.php');
  *
  * @access public
  */
-class UserRankCutoffsDAO extends UserRankCutoffsDAOBase {
+class UserRankCutoffsDAO extends \OmegaUp\DAO\Base\UserRankCutoffs {
 }

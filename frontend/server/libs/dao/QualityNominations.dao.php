@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/QualityNominations.dao.base.php');
-
 /**
  * QualityNominations Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/QualityNominations.dao.base.php');
  *
  * @access public
  */
-class QualityNominationsDAO extends QualityNominationsDAOBase {
+class QualityNominationsDAO extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * If a problem has more than this number of problems, none will be assigned.
      */

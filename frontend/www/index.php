@@ -16,7 +16,7 @@ try {
         /*$isIndex=*/true
     );
 } catch (Exception $e) {
-     ApiCaller::handleException($e);
+     \OmegaUp\ApiCaller::handleException($e);
 }
 foreach ($smartyProperties as $key => $value) {
     $smarty->assign($key, $value);

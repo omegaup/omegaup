@@ -1,7 +1,7 @@
 <?php
 
 require_once('../server/bootstrap_smarty.php');
-UITools::redirectToLoginIfNotLoggedIn();
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 try {
     $payload = [
@@ -11,7 +11,7 @@ try {
     ];
     $smarty->assign('payload', $payload);
     $smarty->display('../templates/quality.nomination.list.tpl');
-} catch (APIException $e) {
+} catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('qualitynomination')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('404.html'));

@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Tags.dao.base.php');
-
 /**
  * Tags Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Tags.dao.base.php');
  * @access public
  * @package docs
  */
-class TagsDAO extends TagsDAOBase {
+class TagsDAO extends \OmegaUp\DAO\Base\Tags {
     final public static function getByName(string $name) : ?\OmegaUp\DAO\VO\Tags {
         $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
 

@@ -418,6 +418,7 @@
 	"loginFederated": "Conta em outros sites",
 	"loginFederatedFailed": "Entrar usando o site externo falhou.",
 	"loginHeader": "Entrar em omegaUp",
+	"loginLinkedInEmptyEmailError": "Um endere\u00e7o de e-mail \u00e9 necess\u00e1rio para utilizar omegaUp. Por favor, proporcione acesso ao e-mail de LinkedIn para continuar",
 	"loginLogIn": "Entrar",
 	"loginNative": "Conta omegaUp",
 	"loginPassword": "Senha",

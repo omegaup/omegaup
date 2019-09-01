@@ -1,7 +1,5 @@
 <?php
 
-include('base/Group_Roles.dao.base.php');
-
 /**
  * GroupRoles Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Group_Roles.dao.base.php');
  *
  * @access public
  */
-class GroupRolesDAO extends GroupRolesDAOBase {
+class GroupRolesDAO extends \OmegaUp\DAO\Base\GroupRoles {
     public static function getAdmins($acl_id) {
         $sql = '
             SELECT

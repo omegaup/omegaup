@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Problemset_Identity_Request_History.dao.base.php');
-
 /**
  * ProblemsetIdentityRequestHistory Data Access Object (DAO).
  *
@@ -11,5 +9,5 @@ include_once('base/Problemset_Identity_Request_History.dao.base.php');
  *
  * @access public
  */
-class ProblemsetIdentityRequestHistoryDAO extends ProblemsetIdentityRequestHistoryDAOBase {
+class ProblemsetIdentityRequestHistoryDAO extends \OmegaUp\DAO\Base\ProblemsetIdentityRequestHistory {
 }

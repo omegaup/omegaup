@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Groups.dao.base.php');
-
 /**
  * Groups Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Groups.dao.base.php');
  * @access public
  * @package docs
  */
-class GroupsDAO extends GroupsDAOBase {
+class GroupsDAO extends \OmegaUp\DAO\Base\Groups {
     public static function findByAlias(string $alias) : ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];

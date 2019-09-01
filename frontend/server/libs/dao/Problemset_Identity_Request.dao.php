@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Problemset_Identity_Request.dao.base.php');
-
 /**
  * ProblemsetIdentityRequest Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include_once('base/Problemset_Identity_Request.dao.base.php');
  *
  * @access public
  */
-class ProblemsetIdentityRequestDAO extends ProblemsetIdentityRequestDAOBase {
+class ProblemsetIdentityRequestDAO extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
     ) : ?array {

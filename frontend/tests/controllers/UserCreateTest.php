@@ -326,7 +326,9 @@ class CreateUserTest extends OmegaupTestCase {
     public function testMailingtListBackfill() {
         $userUnregistered = UserFactory::createUser();
 
-        $urlHelperMock = $this->getMockBuilder('UrlHelper')->getMock();
+        $urlHelperMock = $this
+            ->getMockBuilder('\\OmegaUp\\UrlHelper')
+            ->getMock();
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
             ->will($this->returnValue(UserController::SENDY_SUCCESS));
@@ -348,7 +350,9 @@ class CreateUserTest extends OmegaupTestCase {
     public function testMailingListBackfillOnlyVerified() {
         $userNotVerified = UserFactory::createUser(new UserParams(['verify' => false]));
 
-        $urlHelperMock = $this->getMockBuilder('UrlHelper')->getMock();
+        $urlHelperMock = $this
+            ->getMockBuilder('\\OmegaUp\\UrlHelper')
+            ->getMock();
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
             ->will($this->returnValue(UserController::SENDY_SUCCESS));

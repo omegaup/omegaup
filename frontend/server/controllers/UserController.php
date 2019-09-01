@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/UrlHelper.php';
-
 /**
  *  UserController
  *
@@ -11,7 +9,10 @@ class UserController extends Controller {
     public static $sendEmailOnVerify = true;
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
-    public static $urlHelper = null;
+
+    /** @var \OmegaUp\UrlHelper */
+    public static $urlHelper;
+
     const ALLOWED_SCHOLAR_DEGREES = [
         'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
         'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
@@ -1096,7 +1097,7 @@ class UserController extends Controller {
      * Get general user info
      *
      * @param \OmegaUp\Request $r
-     * @return response array with user info
+     * @return array{status: 'ok'} with user info
      */
     public static function apiProfile(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -2509,4 +2510,4 @@ class UserController extends Controller {
     }
 }
 
-UserController::$urlHelper = new UrlHelper();
+UserController::$urlHelper = new \OmegaUp\UrlHelper();

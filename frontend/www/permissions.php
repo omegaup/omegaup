@@ -7,7 +7,7 @@ if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
     die();
 }
 
-UITools::redirectToLoginIfNotLoggedIn();
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 $r = new \OmegaUp\Request($_REQUEST);
 $session = SessionController::apiCurrentSession($r)['session'];

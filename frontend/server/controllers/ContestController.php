@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/ActivityReport.php';
-require_once 'libs/PrivacyStatement.php';
 require_once 'libs/dao/Contests.dao.php';
 
 /**
@@ -377,7 +375,7 @@ class ContestController extends Controller {
         );
 
         // Privacy Statement Information
-        $privacyStatementMarkdown = PrivacyStatement::getForProblemset(
+        $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(
             $identity->language_id,
             'contest',
             $result['requestsUserInformation']
@@ -804,7 +802,10 @@ class ContestController extends Controller {
         $accesses = ProblemsetAccessLogDAO::GetAccessForProblemset($response['contest']->problemset_id);
         $submissions = SubmissionLogDAO::GetSubmissionsForProblemset($response['contest']->problemset_id);
 
-        return ActivityReport::getActivityReport($accesses, $submissions);
+        return [
+            'status' => 'ok',
+            'events' => \OmegaUp\ActivityReport::getActivityReport($accesses, $submissions),
+        ];
     }
 
     /**

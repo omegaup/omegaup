@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/States.dao.base.php');
-
 /**
  * States Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/States.dao.base.php');
  * @access public
  * @package docs
  */
-class StatesDAO extends StatesDAOBase {
+class StatesDAO extends \OmegaUp\DAO\Base\States {
     final public static function getByCountry($countryId) {
         $sql = 'SELECT
                     *

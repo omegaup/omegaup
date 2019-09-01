@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Contests.dao.base.php');
-
 /**
  * Base class for the ActiveStatus and RecommendedStatus enums below.
  *
@@ -121,7 +119,7 @@ class PublicStatus extends StatusBase {
  * @access public
  * @package docs
   */
-class ContestsDAO extends ContestsDAOBase {
+class ContestsDAO extends \OmegaUp\DAO\Base\Contests {
     private static $getContestsColumns = '
                                 Contests.contest_id,
                                 Contests.problemset_id,

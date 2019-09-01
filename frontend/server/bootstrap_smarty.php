@@ -2,11 +2,11 @@
 
 require_once __DIR__ . '/bootstrap.php';
 require_once 'libs/third_party/smarty/libs/Smarty.class.php';
-require_once 'libs/UITools.php';
 
 $smarty = new Smarty();
 $smarty->setTemplateDir(__DIR__ . '/../templates/');
 
+/** @psalm-suppress RedundantCondition IS_TEST may be defined as true in tests. */
 if (!defined('IS_TEST') || IS_TEST !== true) {
     $smarty->assign('CURRENT_USER_IS_ADMIN', 0);
     if (defined('SMARTY_CACHE_DIR')) {
@@ -16,7 +16,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     $smarty->assign('GOOGLECLIENTID', OMEGAUP_GOOGLE_CLIENTID);
 
     $smarty->assign('LOGGED_IN', '0');
-    UITools::$IsLoggedIn = false;
+    \OmegaUp\UITools::$isLoggedIn = false;
 
     if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
         $smarty->assign('OMEGAUP_GA_TRACK', 1);
@@ -29,7 +29,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     $session = SessionController::apiCurrentSession($identityRequest)['session'];
     if ($session['valid']) {
         $smarty->assign('LOGGED_IN', '1');
-        UITools::$IsLoggedIn = true;
+        \OmegaUp\UITools::$isLoggedIn = true;
 
         $smarty->assign('CURRENT_USER_USERNAME', $session['identity']->username);
         $smarty->assign('CURRENT_USER_EMAIL', $session['email']);
@@ -52,7 +52,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
             ]
         );
 
-        UITools::$IsAdmin = $session['is_admin'];
+        \OmegaUp\UITools::$isAdmin = $session['is_admin'];
         $identityRequest['username'] = $session['identity']->username;
     } else {
         $identityRequest['username'] = null;
@@ -73,7 +73,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     $session = ['valid' => false];
 }
 
-$smarty->configLoad(__DIR__ . '/../templates/'. $lang . '.lang');
+$smarty->configLoad(__DIR__ . "/../templates/{$lang}.lang");
 $smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 
 $smarty->assign('ENABLED_EXPERIMENTS', $experiments->getEnabledExperiments());

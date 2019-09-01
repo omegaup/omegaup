@@ -58,9 +58,7 @@ abstract class ApiException extends \Exception {
     /**
      * Returns exception info intended for public error msgs in http responses
      *
-     * @return array
-     *
-     * @psalm-return array<string, mixed>
+     * @return array<string, mixed>
      */
     final public function asResponseArray() : array {
         return array_merge(

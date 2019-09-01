@@ -417,6 +417,7 @@ loginFacebookEmptyEmailError = "Um endereço de e-mail é necessário para utili
 loginFederated = "Conta em outros sites"
 loginFederatedFailed = "Entrar usando o site externo falhou."
 loginHeader = "Entrar em omegaUp"
+loginLinkedInEmptyEmailError = "Um endereço de e-mail é necessário para utilizar omegaUp. Por favor, proporcione acesso ao e-mail de LinkedIn para continuar"
 loginLogIn = "Entrar"
 loginNative = "Conta omegaUp"
 loginPassword = "Senha"

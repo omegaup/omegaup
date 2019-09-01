@@ -1,7 +1,5 @@
 <?php
 
-include('base/Problemsets.dao.base.php');
-
 /**
  * Problemsets Data Access Object (DAO).
  *
@@ -11,7 +9,7 @@ include('base/Problemsets.dao.base.php');
  *
  * @access public
  */
-class ProblemsetsDAO extends ProblemsetsDAOBase {
+class ProblemsetsDAO extends \OmegaUp\DAO\Base\Problemsets {
     public static function getProblemsetContainer($problemset_id) {
         if (is_null($problemset_id)) {
             return null;

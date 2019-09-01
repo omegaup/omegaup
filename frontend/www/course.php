@@ -1,7 +1,7 @@
 <?php
 require_once('../server/bootstrap_smarty.php');
 
-UITools::redirectToLoginIfNotLoggedIn();
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 try {
     [
@@ -11,7 +11,7 @@ try {
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
-    ApiCaller::handleException($e);
+    \OmegaUp\ApiCaller::handleException($e);
 }
 
 foreach ($smartyProperties as $key => $value) {

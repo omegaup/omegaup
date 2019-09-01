@@ -1,7 +1,5 @@
 <?php
 
-require_once('base/Runs.dao.base.php');
-
 /**
  * Runs Data Access Object (DAO).
  *
@@ -13,7 +11,7 @@ require_once('base/Runs.dao.base.php');
  * @access public
  * @package docs
  */
-class RunsDAO extends RunsDAOBase {
+class RunsDAO extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets an array of the guids of the pending runs
      */

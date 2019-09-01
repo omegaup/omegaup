@@ -419,6 +419,7 @@ const translations = {
 	loginFederated: "(L0gin u5ing 7h353 5i735)",
 	loginFederatedFailed: "(L0gin u5ing 7h3 3x73rna1 par7y fai13d. Did y0u r3j3c7 acc355?)",
 	loginHeader: "(L0gin 70 0m3gaUp)",
+	loginLinkedInEmptyEmailError: "(An 3mai1 addr355 i5 n33d3d 70 u53 0m3gaUp. P13a53 gran7 acc355 70 Link3dIn'5 3mai1 70 c0n7inu3)",
 	loginLogIn: "(L0g in)",
 	loginNative: "(0m3gaUp acc0un7)",
 	loginPassword: "(Pa55w0rd)",

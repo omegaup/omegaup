@@ -1,7 +1,5 @@
 <?php
 
-include_once('base/Contest_Log.dao.base.php');
-
 /**
  * ContestLog Data Access Object (DAO).
  *
@@ -11,5 +9,5 @@ include_once('base/Contest_Log.dao.base.php');
  *
  * @access public
  */
-class ContestLogDAO extends ContestLogDAOBase {
+class ContestLogDAO extends \OmegaUp\DAO\Base\ContestLog {
 }
