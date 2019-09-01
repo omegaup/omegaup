@@ -6,6 +6,7 @@
  * @author joemmanuel
  */
 class Controller {
+    /** @var \Logger */
     public static $log;
 
     /**
@@ -182,4 +183,4 @@ class Controller {
     }
 }
 
-Controller::$log = Logger::getLogger('controller');
+Controller::$log = \Logger::getLogger('controller');

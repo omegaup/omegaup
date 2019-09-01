@@ -734,7 +734,7 @@ class RunController extends Controller {
      * @return ?string              The contents of the resource (or an empty string) if successful. null otherwise.
      */
     private static function downloadResourceFromS3(string $resourcePath, bool $passthru) : ?string {
-        if (is_null(AWS_CLI_SECRET_ACCESS_KEY)) {
+        if (!defined('AWS_CLI_SECRET_ACCESS_KEY') || empty(AWS_CLI_SECRET_ACCESS_KEY)) {
             return null;
         }
 
@@ -756,7 +756,11 @@ class RunController extends Controller {
 
         if (!is_resource($proc)) {
             $errors = error_get_last();
-            self::$log->error("Getting {$resourcePath} failed: {$errors['type']} {$errors['message']}");
+            if (is_null($errors)) {
+                self::$log->error("Getting {$resourcePath} failed");
+            } else {
+                self::$log->error("Getting {$resourcePath} failed: {$errors['type']} {$errors['message']}");
+            }
             return null;
         }
 

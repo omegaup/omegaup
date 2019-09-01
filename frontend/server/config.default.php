@@ -1,20 +1,9 @@
 <?php
-if (!function_exists('try_define')) {
-    /**
-     * @param mixed $value
-     * @psalm-suppress DuplicateFunction Already checking whether it exists.
-     */
-    function try_define(string $name, $value) : void {
-        if (defined($name)) {
-            return;
-        }
-        define($name, $value);
-    }
-}
+require_once OMEGAUP_ROOT . '/server/try_define.php';
+
 # ###################################
 # GLOBAL CONFIG
 # ###################################
-try_define('OMEGAUP_ROOT', '/opt/omegaup/frontend');
 try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
 try_define('OMEGAUP_COOKIE_DOMAIN', '');
 try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
@@ -57,7 +46,8 @@ try_define('OMEGAUP_JSERROR_LOG_FILE', '/var/log/omegaup/jserror.log');
 # GRADER CONFIG
 # ####################################
 try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680');
-try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:33861');
+try_define('OMEGAUP_GITSERVER_PORT', '33861');
+try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:' . OMEGAUP_GITSERVER_PORT);
 try_define('OMEGAUP_GITSERVER_SECRET_KEY', 'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA==');
 try_define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw=');
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');

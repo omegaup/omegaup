@@ -10,25 +10,25 @@
 
 class IdentityFactory {
     /**
-     * @param $file
-     * @return $csv_data
+     * @return array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string}[]
      */
-    public static function getCsvData($file, $group_alias, $password = '') {
+    public static function getCsvData(string $file, string $group_alias, string $password = '') : array {
         $row = 0;
+        /** @var array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string}[] */
         $identities = [];
         $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
         if (($handle = fopen($path_file, 'r')) == false) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'identities');
         }
         $headers = fgetcsv($handle, 1000, ',');
-        while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+        while (($data = fgetcsv($handle, 1000, ',')) !== false && !is_null($data)) {
             array_push($identities, [
                 'username' => "{$group_alias}:{$data[0]}",
-                'name' => $data[1],
-                'country_id' => $data[2],
-                'state_id' => $data[3],
-                'gender' => $data[4],
-                'school_name' => $data[5],
+                'name' => strval($data[1]),
+                'country_id' => strval($data[2]),
+                'state_id' => strval($data[3]),
+                'gender' => strval($data[4]),
+                'school_name' => strval($data[5]),
                 'password' => $password == '' ? Utils::CreateRandomString() : $password,
             ]);
         }
@@ -46,7 +46,7 @@ class IdentityFactory {
             'auth_token' => $adminLogin->auth_token,
             'identities' => IdentityFactory::getCsvData(
                 'identities.csv',
-                $group->alias,
+                strval($group->alias),
                 $password
             ),
             'group_alias' => $group->alias,
