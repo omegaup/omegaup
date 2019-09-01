@@ -153,6 +153,7 @@ def _process_one_request(s, request, now):
                 timestamp += int(tokens[1])
             val = int(timestamp)
             request['params'][key] = val
+    logging.info('invoking one request %r', request)
     result = s.request(
         request['api'], data=request['params'],
         files=(request['files'] if 'files' in request else None))
@@ -174,6 +175,7 @@ def _run_script(path, args, now):
         script = json.load(f)
 
     for session in script:
+        logging.info('running one session...')
         with Session(args, session['username'], session['password']) as s:
             for request in session['requests']:
                 _process_one_request(s, request, now)
@@ -216,18 +218,22 @@ def main():
             else:
                 subprocess.check_call(['/usr/bin/sudo', '/bin/rm', '-rf',
                                        path])
-        logging.info('Purging database')
         db_migrate_args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
         for name, value in [('--username', args.username),
                             ('--password', args.password),
                             ('--mysql-config-file', args.mysql_config_file)]:
             if value is not None:
                 db_migrate_args.extend([name, value])
+        if args.verbose:
+            db_migrate_args.append('--verbose')
+        logging.info('Purging database...')
         subprocess.check_call(db_migrate_args + ['purge'])
+        logging.info('Migrating database...')
         subprocess.check_call(db_migrate_args
                               + ['migrate', '--development-environment'])
 
     for path in args.scripts:
+        logging.info('Running script %s...', path)
         _run_script(path, args, now)
 
 
