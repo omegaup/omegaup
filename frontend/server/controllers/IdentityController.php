@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class IdentityController extends Controller {
+class IdentityController extends \OmegaUp\Controllers\Controller {
     /**
      * Given a username or a email, returns the identity object
      *

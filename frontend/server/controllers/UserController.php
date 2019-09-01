@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class UserController extends Controller {
+class UserController extends \OmegaUp\Controllers\Controller {
     public static $sendEmailOnVerify = true;
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
@@ -70,7 +70,7 @@ class UserController extends Controller {
                 if (!is_null($user) && $user->user_id == $userByEmail->user_id
                     && \OmegaUp\SecurityTools::compareHashedStrings(
                         $r['password'],
-                        $user->password
+                        strval($user->password)
                     )) {
                     return [
                         'status' => 'ok',
@@ -362,9 +362,10 @@ class UserController extends Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         $hashedPassword = null;
+        /** @var \OmegaUp\DAO\VO\Users */
         $user = $r->user;
         if (isset($r['username']) && $r['username'] != $user->username) {
             // This is usable only in tests.
@@ -384,6 +385,7 @@ class UserController extends Controller {
                 $hashedPassword = \OmegaUp\SecurityTools::hashString($r['password']);
             }
         } else {
+            /** @var int $user->main_identity_id */
             $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
             if ($user->password != null) {
@@ -1102,19 +1104,24 @@ class UserController extends Controller {
     public static function apiProfile(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
-        $r['identity'] = self::resolveTargetIdentity($r);
-        $r['user'] = self::resolveTargetUser($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Identity');
+        }
+        $user = is_null($identity->user_id) ? null : UsersDAO::getByPK($identity->user_id);
+        $r['user'] = $user;
+        $r['identity'] = $identity;
 
-        $response = IdentityController::getProfile($r, $r['identity'], $r['user'], boolval($r['omit_rank']));
-        if ((is_null($r->identity) || $r->identity->username != $r['identity']->username)
-            && (!is_null($r['user']) && $r['user']->is_private == 1)
+        $response = IdentityController::getProfile($r, $identity, $user, boolval($r['omit_rank']));
+        if ((is_null($r->identity) || $r->identity->username != $identity->username)
+            && (!is_null($user) && $user->is_private == 1)
             && (is_null($r->identity) || !\OmegaUp\Authorization::isSystemAdmin($r->identity))
         ) {
             $response['problems'] = [];
             foreach ($response['userinfo'] as $k => $v) {
                 $response['userinfo'][$k] = null;
             }
-            $response['userinfo']['username'] = $r['identity']->username;
+            $response['userinfo']['username'] = $identity->username;
             $response['userinfo']['rankinfo'] = [
                 'name' => null,
                 'problems_solved' => null,
@@ -1123,7 +1130,7 @@ class UserController extends Controller {
             ];
             $response['userinfo']['is_private'] = true;
         }
-        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($r['identity']->user_id);
+        $response['userinfo']['classname'] = UsersDAO::getRankingClassName($identity->user_id);
         $response['status'] = 'ok';
         return $response;
     }
@@ -1342,7 +1349,11 @@ class UserController extends Controller {
         }
 
         $user = self::resolveTargetUser($r);
-        $identity = self::resolveTargetIdentity($r);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        /** @var \OmegaUp\DAO\VO\Identities */
+        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
 
         return [
             'status' => 'ok',
@@ -1368,6 +1379,9 @@ class UserController extends Controller {
         $response['contests'] = [];
 
         $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
         // Get contests where identity had at least 1 run
         $contestsParticipated = ContestsDAO::getContestsParticipated($identity->identity_id);
@@ -1415,6 +1429,9 @@ class UserController extends Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
         $problems = ProblemsDAO::getProblemsSolved($identity->identity_id);
 
         $response = [
@@ -1447,6 +1464,9 @@ class UserController extends Controller {
         ];
 
         $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
         $problems = ProblemsDAO::getProblemsUnsolvedByIdentity($identity->identity_id);
 
@@ -1501,6 +1521,9 @@ class UserController extends Controller {
     public static function apiStats(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
         $user = null;
         if (!is_null($identity->user_id)) {
             $user = UsersDAO::getByPK($identity->user_id);
@@ -1945,6 +1968,9 @@ class UserController extends Controller {
                     if (count($tokens) != 3) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
+                    if (is_null($identity)) {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
+                    }
                     if ($tokens[2] != $identity->username && !$session['is_admin']) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
                     }
@@ -2144,6 +2170,7 @@ class UserController extends Controller {
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r) {
         global $experiments;
 
+        /** @var \OmegaUp\DAO\VO\Identities $r->identity */
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2206,7 +2233,7 @@ class UserController extends Controller {
     public static function getPrivacyPolicy(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
-        $user = self::resolveTargetUser($r);
+        /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
 
         $lang = 'es';
@@ -2267,6 +2294,7 @@ class UserController extends Controller {
     public static function apiLastPrivacyPolicyAccepted(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
 
+        /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
         return [
             'status' => 'ok',
@@ -2289,11 +2317,12 @@ class UserController extends Controller {
         if (is_null($privacystatement_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
         }
+        /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
 
         try {
             PrivacyStatementConsentLogDAO::saveLog(
-                $identity->identity_id,
+                intval($identity->identity_id),
                 $privacystatement_id
             );
         } catch (Exception $e) {
@@ -2323,8 +2352,7 @@ class UserController extends Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
 
         $identity = IdentitiesDAO::getUnassociatedIdentity($r['username']);
-
-        if (empty($identity)) {
+        if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'username');
         }
 
@@ -2332,6 +2360,7 @@ class UserController extends Controller {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 
+        /** @var string $identity->password */
         $passwordCheck = \OmegaUp\SecurityTools::compareHashedStrings(
             $r['password'],
             $identity->password
@@ -2341,6 +2370,7 @@ class UserController extends Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'password');
         }
 
+        /** @var int $r->user->user_id */
         IdentitiesDAO::associateIdentityWithUser($r->user->user_id, $identity->identity_id);
 
         return ['status' => 'ok'];
@@ -2370,6 +2400,7 @@ class UserController extends Controller {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
         $token = \OmegaUp\SecurityTools::randomHexString(40);
+        /** @var \OmegaUp\DAO\VO\Users $r->user */
         $r->user->git_token = \OmegaUp\SecurityTools::hashString($token);
         UsersDAO::update($r->user);
 
@@ -2385,7 +2416,10 @@ class UserController extends Controller {
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @return bool
      */
-    public static function isMainIdentity(\OmegaUp\DAO\VO\Users $user, \OmegaUp\DAO\VO\Identities $identity) : bool {
+    public static function isMainIdentity(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) : bool {
         return $identity->identity_id == $user->main_identity_id;
     }
 
@@ -2498,6 +2532,9 @@ class UserController extends Controller {
         $response = [];
         foreach ($coders as $coder) {
             $userInfo = UsersDAO::FindByUsername($coder['username']);
+            if (is_null($userInfo)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
             $classname = UsersDAO::getRankingClassName($userInfo->user_id);
             $hashEmail = md5($coder['email']);
             $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';

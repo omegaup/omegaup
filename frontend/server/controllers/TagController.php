@@ -3,7 +3,7 @@
 /**
  * TagController
  */
-class TagController extends Controller {
+class TagController extends \OmegaUp\Controllers\Controller {
     public static function normalize($name) {
         $name = \OmegaUp\ApiUtils::removeAccents(trim($name));
         $name = preg_replace('/[^a-z0-9]/', '-', strtolower($name));

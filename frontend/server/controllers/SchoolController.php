@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class SchoolController extends Controller {
+class SchoolController extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *

@@ -1,5 +1,11 @@
 <?php
 
+namespace OmegaUp\Controllers;
+
+use \IdentitiesDAO;
+use \SessionController;
+use \UsersDAO;
+
 /**
  * Controllers parent class
  *
@@ -29,10 +35,10 @@ class Controller {
     protected static function authenticateRequest(
         \OmegaUp\Request $r,
         bool $requireMainUserIdentity = false
-    ) {
+    ) : void {
         $r->user = null;
         $session = SessionController::apiCurrentSession($r)['session'];
-        if (is_null($session['identity'])) {
+        if (is_null($session) || is_null($session['identity'])) {
             $r->user = null;
             $r->identity = null;
             throw new \OmegaUp\Exceptions\UnauthorizedException();
@@ -56,7 +62,9 @@ class Controller {
      *
      * @param \OmegaUp\Request $r
      */
-    protected static function authenticateOrAllowUnauthenticatedRequest(\OmegaUp\Request $r) {
+    protected static function authenticateOrAllowUnauthenticatedRequest(
+        \OmegaUp\Request $r
+    ) : void {
         try {
             self::authenticateRequest($r);
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -74,17 +82,16 @@ class Controller {
      *
      * Request must be authenticated before this function is called.
      *
-     * @param \OmegaUp\Request $r
-     * @return \OmegaUp\DAO\VO\Users
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    protected static function resolveTargetUser(\OmegaUp\Request $r) {
+    protected static function resolveTargetUser(
+        \OmegaUp\Request $r
+    ) : ?\OmegaUp\DAO\VO\Users {
         // By default use current user
         $user = $r->user;
 
         if (!is_null($r['username'])) {
             \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
-
             $user = UsersDAO::FindByUsername($r['username']);
             if (is_null($user)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -101,22 +108,20 @@ class Controller {
      *
      * Request must be authenticated before this function is called.
      *
-     * @param \OmegaUp\Request $r
-     * @return Identity
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    protected static function resolveTargetIdentity(\OmegaUp\Request $r) {
+    protected static function resolveTargetIdentity(
+        \OmegaUp\Request $r
+    ) : ?\OmegaUp\DAO\VO\Identities {
         // By default use current identity
         $identity = $r->identity;
 
-        if (is_null($r['username'])) {
-            return $identity;
-        }
-        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
-
-        $identity = IdentitiesDAO::findByUsername($r['username']);
-        if (is_null($identity)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        if (!is_null($r['username'])) {
+            \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
+            $identity = IdentitiesDAO::findByUsername($r['username']);
+            if (is_null($identity)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
         }
 
         return $identity;
@@ -138,7 +143,7 @@ class Controller {
      *
      * @param \OmegaUp\Request $request
      * @param object $object
-     * @param array $properties
+     * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool}> $properties
      * @return bool True if there were changes to any property marked as 'important'.
      */
     protected static function updateValueProperties(
@@ -148,39 +153,38 @@ class Controller {
     ) : bool {
         $importantChange = false;
         foreach ($properties as $source => $info) {
+            /** @var null|callable(mixed):mixed */
+            $transform = null;
+            $important = false;
             if (is_int($source)) {
-                // Simple property:
-                $source = $info;
-                $info = [$source];
+                $fieldName = $info;
+            } else {
+                $fieldName = $source;
+                if (isset($info['transform']) && is_callable($info['transform'])) {
+                    $transform = $info['transform'];
+                }
+                if (isset($info['important']) && $info['important'] === true) {
+                    $important = $info['important'];
+                }
             }
-            if (is_null($request[$source])) {
+            if (is_null($request[$fieldName])) {
                 continue;
             }
-            // Get the field name.
-            if (isset($info[0])) {
-                $field_name = $info[0];
-            } else {
-                $field_name = $source;
-            }
             // Get or calculate new value.
-            $value = $request[$source];
-            if (isset($info[2]) || isset($info['transform'])) {
-                $transform = isset($info[2]) ? $info[2] : $info['transform'];
+            /** @var mixed */
+            $value = $request[$fieldName];
+            if (!is_null($transform)) {
+                /** @var mixed */
                 $value = $transform($value);
             }
             // Important property, so check if it changes.
-            if (isset($info[1]) || isset($info['important'])) {
-                $important = isset($info[1]) ? $info[1] : $info['important'];
-                if ($important) {
-                    if ($value != $object->$field_name) {
-                        $importantChange = true;
-                    }
-                }
+            if ($important) {
+                $importantChange |= ($value != $object->$fieldName);
             }
-            $object->$field_name = $value;
+            $object->$fieldName = $value;
         }
         return $importantChange;
     }
 }
 
-Controller::$log = \Logger::getLogger('controller');
+\OmegaUp\Controllers\Controller::$log = \Logger::getLogger('controller');

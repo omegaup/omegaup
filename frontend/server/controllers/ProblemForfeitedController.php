@@ -5,7 +5,7 @@
  *
  * @author carlosabcs
  */
-class ProblemForfeitedController extends Controller {
+class ProblemForfeitedController extends \OmegaUp\Controllers\Controller {
     // For each 10 solved problems, 1 solution is granted
     const SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION = 10;
 

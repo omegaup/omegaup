@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class GraderController extends Controller {
+class GraderController extends \OmegaUp\Controllers\Controller {
     /**
      * Validate requests for grader apis
      *

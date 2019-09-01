@@ -104,12 +104,15 @@ class UserFactory {
 
         // Get user from db
         $user = UsersDAO::FindByUsername($params['username']);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
 
         if ($params['verify']) {
             UserController::$redirectOnVerify = false;
             $user = self::verifyUser($user);
         } else {
-            $user->verified = 0;
+            $user->verified = false;
             UsersDAO::update($user);
         }
 
@@ -153,17 +156,15 @@ class UserFactory {
 
     /**
      * Verifies a user and returns its DAO
-     *
-     * @param \OmegaUp\DAO\VO\Users $user
-     * @return type
      */
-    public static function verifyUser(\OmegaUp\DAO\VO\Users $user) {
+    public static function verifyUser(
+        \OmegaUp\DAO\VO\Users $user
+    ) : \OmegaUp\DAO\VO\Users {
         UserController::apiVerifyEmail(new \OmegaUp\Request([
             'id' => $user->verification_id
         ]));
-
-        // Get user from db again to pick up verification changes
-        return UsersDAO::FindByUsername($user->username);
+        $user->verified = true;
+        return $user;
     }
 
     /**

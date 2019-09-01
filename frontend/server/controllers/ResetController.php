@@ -1,6 +1,6 @@
 <?php
 
-class ResetController extends Controller {
+class ResetController extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a reset operation, the first of two steps needed to reset a
      * password. The first step consist of sending an email to the user with

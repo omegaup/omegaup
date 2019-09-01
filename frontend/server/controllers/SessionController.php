@@ -8,7 +8,7 @@
  *     Alan Gonzalez alanboy@alanboy.net
  *
  */
-class SessionController extends Controller {
+class SessionController extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
     /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
     private static $_currentSession = null;

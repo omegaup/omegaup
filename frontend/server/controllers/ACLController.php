@@ -5,7 +5,7 @@
  *
  * @author juan.pablo
  */
-class ACLController extends Controller {
+class ACLController extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a user to an ACL with the specified role.
      *

@@ -5,7 +5,7 @@
  *
  * @author joemmanuel
  */
-class RunController extends Controller {
+class RunController extends \OmegaUp\Controllers\Controller {
     public static $kSupportedLanguages = [
         'kp' => 'Karel (Pascal)',
         'kj' => 'Karel (Java)',

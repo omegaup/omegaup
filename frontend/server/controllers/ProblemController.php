@@ -5,7 +5,7 @@ require_once 'libs/dao/QualityNominations.dao.php';
 /**
  * ProblemsController
  */
-class ProblemController extends Controller {
+class ProblemController extends \OmegaUp\Controllers\Controller {
     // Constants for problem visibility.
     const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
     const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned

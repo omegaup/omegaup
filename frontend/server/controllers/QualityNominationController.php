@@ -4,7 +4,7 @@ require_once 'libs/dao/QualityNomination_Log.dao.php';
 require_once 'libs/dao/QualityNomination_Reviewers.dao.php';
 require_once 'libs/dao/QualityNominations.dao.php';
 
-class QualityNominationController extends Controller {
+class QualityNominationController extends \OmegaUp\Controllers\Controller {
     /**
      * Number of reviewers to automatically assign each nomination.
      */
