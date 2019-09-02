@@ -2243,8 +2243,8 @@
     </PossiblyNullReference>
     <UndefinedClass occurrences="4">
       <code>\Facebook\Facebook</code>
-      <code>Google_Client</code>
-      <code>Google_Auth_Exception</code>
+      <code>\Google_Client</code>
+      <code>\Google_Auth_Exception</code>
       <code>\Facebook\Exceptions\FacebookResponseException</code>
     </UndefinedClass>
   </file>
