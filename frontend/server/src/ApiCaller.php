@@ -266,19 +266,19 @@ class ApiCaller {
             // Even though this is forbidden, we pretend the resource did not
             // exist.
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(__DIR__ . '/../404.html'));
+            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
         }
         if ($apiException->getcode() == 404) {
             self::$log->info("{$apiException}");
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(__DIR__ . '/../404.html'));
+            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
         }
         self::$log->error("{$apiException}");
         if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
             newrelic_notice_error(strval($apiException));
         }
         header('HTTP/1.1 500 Internal Server Error');
-        die(file_get_contents(__DIR__ . '/../500.html'));
+        die(file_get_contents(OMEGAUP_ROOT . '/www/500.html'));
     }
 }
 
