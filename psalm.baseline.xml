@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@1f0aca00b3194b6643c92d89dcb7659f670db796">
+<files psalm-version="dev-master@da23c2e73aeb94d676365656bf35d1411f09b730">
   <file src="frontend/server/bootstrap.php">
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$_REQUEST</code>
@@ -954,23 +954,17 @@
       <code>$r['group_alias']</code>
       <code>$r['group_alias']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="5">
+    <MixedAssignment occurrences="3">
       <code>$group</code>
       <code>$group</code>
       <code>$groups</code>
       <code>$group</code>
-      <code>$response['groups'][]</code>
       <code>$groups</code>
       <code>$group</code>
       <code>$group</code>
       <code>$group</code>
       <code>$group</code>
     </MixedAssignment>
-    <MixedMethodCall occurrences="1">
-      <code>asArray</code>
-      <code>asArray</code>
-      <code>asArray</code>
-    </MixedMethodCall>
     <MixedPropertyFetch occurrences="2">
       <code>$group-&gt;name</code>
       <code>$group-&gt;alias</code>
