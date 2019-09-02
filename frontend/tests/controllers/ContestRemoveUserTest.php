@@ -23,7 +23,7 @@ class ContestRemoveUserTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
-        $response = ContestController::apiUsers($r);
+        $response = \OmegaUp\Controllers\Contest::apiUsers($r);
         $this->assertEquals(1, count($response['users']));
 
         // Remove user
@@ -32,14 +32,14 @@ class ContestRemoveUserTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'usernameOrEmail' => $user->username,
         ]);
-        ContestController::apiRemoveUser($r);
+        \OmegaUp\Controllers\Contest::apiRemoveUser($r);
 
         // Validate 0 users in contest
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
-        $response = ContestController::apiUsers($r);
+        $response = \OmegaUp\Controllers\Contest::apiUsers($r);
         $this->assertEquals(0, count($response['users']));
     }
 }

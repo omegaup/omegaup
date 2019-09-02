@@ -54,7 +54,7 @@ class QualityNominationFactory {
             'nomination' => $type,
             'contents' => $contents,
         ]);
-        $qualitynomination = QualityNominationController::apiCreate($request);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate($request);
         return $qualitynomination;
     }
 }

@@ -4,7 +4,7 @@ require_once('../server/bootstrap_smarty.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 try {
-    $result = ContestController::getContestReportDetailsForSmarty(
+    $result = \OmegaUp\Controllers\Contest::getContestReportDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {

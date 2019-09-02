@@ -21,7 +21,7 @@ class UserContestsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Contest::apiMyList($r);
 
         // Contests should come ordered by contest id desc
         $this->assertEquals(count($contestData), count($response['contests']));
@@ -67,7 +67,7 @@ class UserContestsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Contest::apiAdminList($r);
 
         // Contests should come ordered by contest id desc
         $this->assertEquals(count($contestDirectorData) + count($contestAdminData), count($response['contests']));

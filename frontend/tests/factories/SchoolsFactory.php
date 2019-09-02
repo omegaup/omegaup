@@ -26,7 +26,7 @@ class SchoolsFactory {
         ]);
 
         // Call api
-        $response = SchoolController::apiCreate($r);
+        $response = \OmegaUp\Controllers\School::apiCreate($r);
 
         return [
             'creator' => $user,
@@ -43,7 +43,7 @@ class SchoolsFactory {
      */
     public static function addUserToSchool($schoolData, $user) {
         $login = OmegaupTestCase::login($user);
-        $response = UserController::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $schoolData['school']->school_id
         ]));

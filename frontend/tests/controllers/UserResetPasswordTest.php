@@ -22,7 +22,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        UserController::apiChangePassword($r);
+        \OmegaUp\Controllers\User::apiChangePassword($r);
 
         // Try to login with old password, should fail
         try {
@@ -55,6 +55,6 @@ class UserResetPasswordTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        UserController::apiChangePassword($r);
+        \OmegaUp\Controllers\User::apiChangePassword($r);
     }
 }

@@ -18,7 +18,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $userLogin
         ]));
 
@@ -40,7 +40,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $login = self::login($problemData['author']);
 
         // Call API
-        $response = ProblemController::apiDelete(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
@@ -55,25 +55,25 @@ class ProblemDeleteTest extends OmegaupTestCase {
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $userLogin
         ]));
 
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $userLogin
         ]));
 
         $login = self::login($problemData['author']);
 
         // Call API to delete a problem
-        ProblemController::apiDelete(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $deletedProblemData['request']['problem_alias'],
         ]));
 
         // Get problems list
-        $response = ProblemController::apiList(new \OmegaUp\Request([]));
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([]));
 
         // Asserting deleted problem is not in the list
         foreach ($response['results'] as $key => $problem) {
@@ -100,24 +100,24 @@ class ProblemDeleteTest extends OmegaupTestCase {
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $userLogin
         ]));
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $userLogin
         ]));
 
         $login = self::login($problemData['author']);
 
         // Call API to delete a problem
-        ProblemController::apiDelete(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $deletedProblemData['request']['problem_alias'],
         ]));
 
         // Get problems list
-        $response = ProblemController::apiList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -137,7 +137,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $this->assertTrue($problemIsInTheList);
 
         // Get My admin problems list
-        $response = ProblemController::apiAdminList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -168,13 +168,13 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $deletedProblemData = ProblemsFactory::createProblem(
             null,
             null,
-            ProblemController::VISIBILITY_PUBLIC,
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             $userLogin
         );
         $problemData = ProblemsFactory::createProblem(
             null,
             null,
-            ProblemController::VISIBILITY_PUBLIC,
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             $userLogin
         );
 
@@ -184,13 +184,13 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $login = self::login($adminLogin);
 
         // Call API to delete a problem
-        ProblemController::apiDelete(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $deletedProblemData['request']['problem_alias'],
         ]));
 
         // Get problems list
-        $response = ProblemController::apiList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -210,7 +210,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $this->assertTrue($problemIsInTheList);
 
         // Get My admin problems list
-        $response = ProblemController::apiAdminList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 

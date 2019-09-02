@@ -1,11 +1,13 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * BadgesController
  *
  * @author carlosabcs
  */
-class NotificationController extends \OmegaUp\Controllers\Controller {
+class Notification extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of unread notifications for user
      *

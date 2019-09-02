@@ -1,11 +1,13 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  *  UserController
  *
  * @author joemmanuel
  */
-class UserController extends \OmegaUp\Controllers\Controller {
+class User extends \OmegaUp\Controllers\Controller {
     public static $sendEmailOnVerify = true;
     public static $redirectOnVerify = true;
     public static $permissionKey = null;
@@ -50,7 +52,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['scholar_degree'],
             'scholar_degree',
-            UserController::ALLOWED_SCHOLAR_DEGREES
+            \OmegaUp\Controllers\User::ALLOWED_SCHOLAR_DEGREES
         );
 
         // Check password
@@ -87,7 +89,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             ]);
             try {
                 \OmegaUp\DAO\Users::savePassword($user);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse', $e);
                 }
@@ -204,7 +206,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             }
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -230,7 +232,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         // Get email
         try {
             $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::$log->warn('Email lookup failed: ' . $e->getMessage());
             return false;
         }
@@ -256,7 +258,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         //check result and redirect
         self::$log->info('Sendy response: ' . $result);
-        if ($result === UserController::SENDY_SUCCESS) {
+        if ($result === \OmegaUp\Controllers\User::SENDY_SUCCESS) {
             self::$log->info('Success adding user to Sendy.');
         } else {
             self::$log->info('Failure adding user to Sendy.');
@@ -317,7 +319,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             try {
                 $user->verification_id = \OmegaUp\SecurityTools::randomString(50);
                 \OmegaUp\DAO\Users::update($user);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 self::$log->info("Unable to save verification ID: $e");
             }
 
@@ -337,16 +339,11 @@ class UserController extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiLogin(\OmegaUp\Request $r) {
-        $sessionController = new SessionController();
+        $sessionController = new \OmegaUp\Controllers\Session();
 
-        $r['returnAuthToken'] = true;
-        $auth_token = $sessionController->NativeLogin($r);
-        if ($auth_token === false) {
-            throw new \OmegaUp\Exceptions\InvalidCredentialsException();
-        }
         return [
             'status' => 'ok',
-            'auth_token' => $auth_token,
+            'auth_token' => $sessionController->nativeLogin($r),
         ];
     }
 
@@ -417,7 +414,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Identities::update($identity);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -560,7 +557,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                 'permission_key' => $r['permission_key']
             ]);
 
-            UserController::$sendEmailOnVerify = false;
+            \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
             self::apiCreate($createRequest);
             return true;
         } elseif (is_null($r['change_password']) || $r['change_password'] !== 'false') {
@@ -1044,7 +1041,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                     $addUserRequest['auth_token'] = $r['auth_token'];
                     $addUserRequest['usernameOrEmail'] = $username;
                     $addUserRequest['contest_alias'] = $r['contest_alias'];
-                    ContestController::apiAddUser($addUserRequest);
+                    \OmegaUp\Controllers\Contest::apiAddUser($addUserRequest);
                 }
             }
         }
@@ -1088,7 +1085,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $response['userinfo']['school'] = $userDb['school'];
         $response['userinfo']['school_id'] = $userDb['school_id'];
         $response['userinfo']['locale'] =
-          IdentityController::convertToSupportedLanguage($userDb['locale']);
+          \OmegaUp\Controllers\Identity::convertToSupportedLanguage($userDb['locale']);
 
         $response['userinfo']['gravatar_92'] = 'https://secure.gravatar.com/avatar/' . md5($response['userinfo']['email']) . '?s=92';
 
@@ -1112,7 +1109,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $r['user'] = $user;
         $r['identity'] = $identity;
 
-        $response = IdentityController::getProfile($r, $identity, $user, boolval($r['omit_rank']));
+        $response = \OmegaUp\Controllers\Identity::getProfile($r, $identity, $user, boolval($r['omit_rank']));
         if ((is_null($r->identity) || $r->identity->username != $identity->username)
             && (!is_null($user) && $user->is_private == 1)
             && (is_null($r->identity) || !\OmegaUp\Authorization::isSystemAdmin($r->identity))
@@ -1234,7 +1231,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::findByUserId($coderOfTheMonthUserId);
 
         // Get the profile of the coder of the month
-        $response = UserController::getProfileImpl($user, $identity);
+        $response = \OmegaUp\Controllers\User::getProfileImpl($user, $identity);
 
         // But avoid divulging the email in the response.
         unset($response['userinfo']['email']);
@@ -1283,7 +1280,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
         $currentDate = date('Y-m-d', $currentTimestamp);
-        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth = new \DateTime($currentDate);
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
@@ -1390,7 +1387,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         foreach ($contestsParticipated as $contest) {
             // Get identity ranking
-            $scoreboardResponse = ContestController::apiScoreboard(
+            $scoreboardResponse = \OmegaUp\Controllers\Contest::apiScoreboard(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'contest_alias' => $contest['alias'],
@@ -1581,15 +1578,14 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Identities::update($r->identity);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
         // Expire profile cache
         \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $r->user->username);
-        $sessionController = new SessionController();
-        $sessionController->InvalidateCache();
+        \OmegaUp\Controllers\Session::invalidateCache();
 
         return ['status' => 'ok'];
     }
@@ -1641,7 +1637,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             } elseif (empty($r['school_name'])) {
                 $r['school_id'] = null;
             } else {
-                $response = SchoolController::apiCreate(new \OmegaUp\Request([
+                $response = \OmegaUp\Controllers\School::apiCreate(new \OmegaUp\Request([
                     'name' => $r['school_name'],
                     'country_id' => $state != null ? $state->country_id : null,
                     'state_id' => $state != null ? $state->state_id : null,
@@ -1693,7 +1689,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $r['gender'],
                 'gender',
-                UserController::ALLOWED_GENDER_OPTIONS,
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS,
                 true
             );
             $r->identity->gender = $r['gender'];
@@ -1735,7 +1731,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Identities::update($r->identity);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
 
             throw $e;
@@ -1743,8 +1739,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
 
         // Expire profile cache
         \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $r->user->username);
-        $sessionController = new SessionController();
-        $sessionController->InvalidateCache();
+        \OmegaUp\Controllers\Session::invalidateCache();
 
         return ['status' => 'ok'];
     }
@@ -1883,14 +1878,14 @@ class UserController extends \OmegaUp\Controllers\Controller {
                     try {
                         $r->user->verification_id = \OmegaUp\SecurityTools::randomString(50);
                         \OmegaUp\DAO\Users::update($r->user);
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         // best effort, eat exception
                     }
                 }
             }
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('mailInUse', $e);
@@ -1942,7 +1937,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
             'problemset' => [],
         ];
 
-        $session = SessionController::apiCurrentSession($r)['session'];
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
@@ -1988,7 +1983,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                     if (count($tokens) >= 4) {
                         $r2['token'] = $tokens[3];
                     }
-                    $contestResponse = ContestController::validateDetails($r2);
+                    $contestResponse = \OmegaUp\Controllers\Contest::validateDetails($r2);
                     if ($contestResponse['contest_admin']) {
                         $response['contest_admin'][] = $contestResponse['contest_alias'];
                     }
@@ -1997,7 +1992,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
                     if (count($tokens) < 3) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'filter');
                     }
-                    $r2 = ProblemsetController::wrapRequest(new \OmegaUp\Request([
+                    $r2 = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
                         'problemset_id' => $tokens[2],
                         'auth_token' => $r['auth_token'],
                         'tokens' => $tokens
@@ -2237,10 +2232,10 @@ class UserController extends \OmegaUp\Controllers\Controller {
         $identity = self::resolveTargetIdentity($r);
 
         $lang = 'es';
-        if ($identity->language_id == UserController::LANGUAGE_EN ||
-            $identity->language_id == UserController::LANGUAGE_PSEUDO) {
+        if ($identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_EN ||
+            $identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_PSEUDO) {
             $lang = 'en';
-        } elseif ($identity->language_id == UserController::LANGUAGE_PT) {
+        } elseif ($identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_PT) {
             $lang = 'pt';
         }
         $latest_statement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
@@ -2259,7 +2254,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
     }
 
     private static function getSelectedFilter($r) {
-        $session = SessionController::apiCurrentSession($r)['session'];
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
         if (!$session['valid']) {
             return ['filteredBy' => null, 'value' => null];
         }
@@ -2325,13 +2320,13 @@ class UserController extends \OmegaUp\Controllers\Controller {
                 intval($identity->identity_id),
                 $privacystatement_id
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('userAlreadyAcceptedPrivacyPolicy', $e);
             }
             throw $e;
         }
-        (new SessionController())->InvalidateCache();
+        \OmegaUp\Controllers\Session::invalidateCache();
 
         return ['status' => 'ok'];
     }
@@ -2427,13 +2422,13 @@ class UserController extends \OmegaUp\Controllers\Controller {
      * Prepare all the properties to be sent to the rank table view via smarty
      * @param \OmegaUp\Request $r
      * @param \OmegaUp\DAO\VO\Identities $identity
-     * @param Smarty $smarty
+     * @param \Smarty $smarty
      * @return array
      */
     public static function getRankDetailsForSmarty(
         \OmegaUp\Request $r,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        Smarty $smarty
+        \Smarty $smarty
     ) : array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('length', null, null, false);
@@ -2488,7 +2483,7 @@ class UserController extends \OmegaUp\Controllers\Controller {
     ) : array {
         $currentTimeStamp = \OmegaUp\Time::get();
         $currentDate = date('Y-m-d', $currentTimeStamp);
-        $firstDayOfNextMonth = new DateTime($currentDate);
+        $firstDayOfNextMonth = new \DateTime($currentDate);
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
@@ -2550,4 +2545,4 @@ class UserController extends \OmegaUp\Controllers\Controller {
     }
 }
 
-UserController::$urlHelper = new \OmegaUp\UrlHelper();
+\OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();

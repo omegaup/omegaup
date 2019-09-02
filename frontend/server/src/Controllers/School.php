@@ -1,11 +1,13 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * Description of SchoolController
  *
  * @author joemmanuel
  */
-class SchoolController extends \OmegaUp\Controllers\Controller {
+class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of schools
      *

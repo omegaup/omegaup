@@ -34,7 +34,7 @@
       <code>$session['identity']-&gt;username</code>
     </MixedPropertyFetch>
   </file>
-  <file src="frontend/server/controllers/ACLController.php">
+  <file src="frontend/server/src/Controllers/ACL.php">
     <MissingParamType occurrences="12">
       <code>$acl_id</code>
       <code>$user_id</code>
@@ -56,7 +56,7 @@
       <code>removeGroup</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/controllers/AuthorizationController.php">
+  <file src="frontend/server/src/Controllers/Authorization.php">
     <MissingReturnType occurrences="1">
       <code>apiProblem</code>
     </MissingReturnType>
@@ -67,7 +67,7 @@
       <code>$resolvedIdentity-&gt;identity_id</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/controllers/BadgeController.php">
+  <file src="frontend/server/src/Controllers/Badge.php">
     <MixedArgument occurrences="2">
       <code>static::OMEGAUP_BADGES_ROOT</code>
     </MixedArgument>
@@ -81,7 +81,7 @@
       <code>$ownersCount</code>
     </MixedOperand>
   </file>
-  <file src="frontend/server/controllers/ClarificationController.php">
+  <file src="frontend/server/src/Controllers/Clarification.php">
     <ArgumentTypeCoercion occurrences="2">
       <code>$clarification</code>
       <code>$clarification</code>
@@ -143,7 +143,7 @@
       <code>broadcastClarification</code>
     </PossiblyNullReference>
   </file>
-  <file src="frontend/server/controllers/ContestController.php">
+  <file src="frontend/server/src/Controllers/Contest.php">
     <DocblockTypeContradiction occurrences="1">
       <code>$req-&gt;accepted === '0'</code>
     </DocblockTypeContradiction>
@@ -185,7 +185,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="82">
+    <MixedArgument occurrences="80">
       <code>$callback_user_function</code>
       <code>$contest['start_time']</code>
       <code>$contest['finish_time']</code>
@@ -221,7 +221,6 @@
       <code>$r['submissions_gap']/60</code>
       <code>$contest_length / 60</code>
       <code>$r['problems']</code>
-      <code>RunController::$kSupportedLanguages</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
@@ -260,7 +259,6 @@
       <code>$r['contest_alias']</code>
       <code>$r['username']</code>
       <code>$r['contest_alias']</code>
-      <code>RunController::$kSupportedLanguages</code>
       <code>$r['username']</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$r['status']</code>
@@ -277,7 +275,7 @@
       <code>$problemStats[$key]['cases_stats']</code>
       <code>$caseData['meta']['status']</code>
       <code>$caseData['out_diff']</code>
-      <code>ContestController::escapeCsv($csvRow)</code>
+      <code>\OmegaUp\Controllers\Contest::escapeCsv($csvRow)</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
@@ -331,7 +329,7 @@
       <code>$problemStats[$problem_alias]</code>
       <code>$problemStats[$entry['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="64">
+    <MixedAssignment occurrences="63">
       <code>$query</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -350,7 +348,6 @@
       <code>$privacyStatementId</code>
       <code>$problem</code>
       <code>$problem['letter']</code>
-      <code>$result['available_languages']</code>
       <code>$accesses</code>
       <code>$submissions</code>
       <code>$auth_token</code>
@@ -568,7 +565,7 @@
       <code>type</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/controllers/CourseController.php">
+  <file src="frontend/server/src/Controllers/Course.php">
     <ArgumentTypeCoercion occurrences="1">
       <code>$assignment</code>
     </ArgumentTypeCoercion>
@@ -584,9 +581,8 @@
       <code>\OmegaUp\DAO\VO\Problems</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
     </InvalidReturnType>
-    <MismatchingDocblockParamType occurrences="2">
+    <MismatchingDocblockParamType occurrences="1">
       <code>Assignment</code>
-      <code>Course</code>
     </MismatchingDocblockParamType>
     <MissingClosureParamType occurrences="3">
       <code>$value</code>
@@ -683,7 +679,6 @@
       <code>$r['offset']</code>
       <code>$r['rowcount']</code>
       <code>$r['course_alias']</code>
-      <code>RunController::$kSupportedLanguages</code>
       <code>$r['username']</code>
       <code>$r['alias']</code>
       <code>$r['group']</code>
@@ -703,7 +698,7 @@
       <code>$r['course_alias']</code>
       <code>$r['course_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="34">
+    <MixedArrayAccess occurrences="33">
       <code>$assignmentProblems['name']</code>
       <code>$assignmentProblems['description']</code>
       <code>$assignmentProblems['assignment_alias']</code>
@@ -739,11 +734,11 @@
       <code>$problem['username']</code>
       <code>$problem['username']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="2">
+    <MixedArrayOffset occurrences="1">
       <code>$userProblems[$problem['username']]</code>
       <code>$userProblems[$problem['username']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="57">
+    <MixedAssignment occurrences="55">
       <code>$assignment</code>
       <code>$course</code>
       <code>$assignmentProblems</code>
@@ -801,11 +796,10 @@
       <code>$solvedProblems</code>
       <code>$problem</code>
       <code>$userProblems[$problem['username']][]</code>
-      <code>$unsolvedProblems</code>
       <code>$problem</code>
       <code>$userProblems[$problem['username']][]</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="5">
+    <MixedInferredReturnType occurrences="4">
       <code>\OmegaUp\DAO\VO\Assignments</code>
       <code>\OmegaUp\DAO\VO\Courses</code>
       <code>\OmegaUp\DAO\VO\Problemsets</code>
@@ -908,7 +902,7 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess occurrences="1">
-      <code>SessionController::apiCurrentSession($r)['session']['identity']</code>
+      <code>\OmegaUp\Controllers\Session::apiCurrentSession($r)['session']['identity']</code>
     </PossiblyNullArrayAccess>
     <PossiblyNullPropertyFetch occurrences="4">
       <code>$resolvedUser-&gt;user_id</code>
@@ -920,12 +914,11 @@
     <TypeDoesNotContainNull occurrences="1">
       <code>is_null($markdown)</code>
     </TypeDoesNotContainNull>
-    <UndefinedDocblockClass occurrences="2">
+    <UndefinedDocblockClass occurrences="1">
       <code>Assignment</code>
-      <code>Course</code>
     </UndefinedDocblockClass>
   </file>
-  <file src="frontend/server/controllers/GraderController.php">
+  <file src="frontend/server/src/Controllers/Grader.php">
     <MissingReturnType occurrences="1">
       <code>validateRequest</code>
     </MissingReturnType>
@@ -933,7 +926,7 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/controllers/GroupController.php">
+  <file src="frontend/server/src/Controllers/Group.php">
     <MissingParamType occurrences="4">
       <code>$alias</code>
       <code>$name</code>
@@ -995,7 +988,7 @@
       <code>$r-&gt;identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
   </file>
-  <file src="frontend/server/controllers/GroupScoreboardController.php">
+  <file src="frontend/server/src/Controllers/GroupScoreboard.php">
     <MissingReturnType occurrences="4">
       <code>apiAddContest</code>
       <code>apiRemoveContest</code>
@@ -1034,7 +1027,7 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/controllers/IdentityController.php">
+  <file src="frontend/server/src/Controllers/Identity.php">
     <MismatchingDocblockReturnType occurrences="1">
       <code>type</code>
     </MismatchingDocblockReturnType>
@@ -1138,7 +1131,7 @@
     <MixedReturnStatement occurrences="3">
       <code>$identity</code>
       <code>self::convertToSupportedLanguage($_GET['lang'])</code>
-      <code>IdentityController::convertToSupportedLanguage($result-&gt;name)</code>
+      <code>\OmegaUp\Controllers\Identity::convertToSupportedLanguage($result-&gt;name)</code>
     </MixedReturnStatement>
     <PossiblyNullArgument occurrences="3">
       <code>$r-&gt;identity</code>
@@ -1146,7 +1139,7 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/controllers/InterviewController.php">
+  <file src="frontend/server/src/Controllers/Interview.php">
     <InvalidArgument occurrences="1">
       <code>$r</code>
     </InvalidArgument>
@@ -1165,7 +1158,7 @@
     </MissingReturnType>
     <MixedArgument occurrences="7">
       <code>$r</code>
-      <code>UserController::makeUsernameFromEmail($r['usernameOrEmail'])</code>
+      <code>\OmegaUp\Controllers\User::makeUsernameFromEmail($r['usernameOrEmail'])</code>
       <code>$r-&gt;identity</code>
       <code>$r['interview']</code>
       <code>$r['user']-&gt;main_email_id</code>
@@ -1248,7 +1241,7 @@
       <code>$r-&gt;user-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
   </file>
-  <file src="frontend/server/controllers/NotificationController.php">
+  <file src="frontend/server/src/Controllers/Notification.php">
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>1</code>
     </InvalidPropertyAssignmentValue>
@@ -1262,7 +1255,7 @@
       <code>$r-&gt;user-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
   </file>
-  <file src="frontend/server/controllers/ProblemController.php">
+  <file src="frontend/server/src/Controllers/Problem.php">
     <ArgumentTypeCoercion occurrences="9">
       <code>$problem</code>
       <code>$problem</code>
@@ -1330,11 +1323,10 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="77">
+    <MixedArgument occurrences="76">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
-      <code>RunController::$kSupportedLanguages</code>
       <code>$r['problem_alias']</code>
       <code>$tagName</code>
       <code>$tag-&gt;public</code>
@@ -1679,7 +1671,7 @@
       <code>!is_null($problemset) &amp;&amp; isset($problemset['problemset'])</code>
     </RedundantConditionGivenDocblockType>
   </file>
-  <file src="frontend/server/controllers/ProblemForfeitedController.php">
+  <file src="frontend/server/src/Controllers/ProblemForfeited.php">
     <MixedOperand occurrences="1">
       <code>static::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION</code>
     </MixedOperand>
@@ -1688,7 +1680,7 @@
       <code>$r-&gt;user</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/controllers/ProblemsetController.php">
+  <file src="frontend/server/src/Controllers/Problemset.php">
     <MissingParamType occurrences="1">
       <code>$problemset_id</code>
     </MissingParamType>
@@ -1758,7 +1750,7 @@
     </MixedInferredReturnType>
     <MixedReturnStatement occurrences="1"/>
   </file>
-  <file src="frontend/server/controllers/QualityNominationController.php">
+  <file src="frontend/server/src/Controllers/QualityNomination.php">
     <AssignmentToVoid occurrences="1">
       <code>$response</code>
     </AssignmentToVoid>
@@ -1847,7 +1839,7 @@
       <code>$statement</code>
     </UndefinedVariable>
   </file>
-  <file src="frontend/server/controllers/ResetController.php">
+  <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">
       <code>$r</code>
       <code>$r</code>
@@ -1916,7 +1908,7 @@
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
   </file>
-  <file src="frontend/server/controllers/RunController.php">
+  <file src="frontend/server/src/Controllers/Run.php">
     <InvalidReturnStatement occurrences="1">
       <code>$response</code>
     </InvalidReturnStatement>
@@ -1933,8 +1925,7 @@
     <MissingParamType occurrences="1">
       <code>$response</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="3">
-      <code>$kSupportedLanguages</code>
+    <MissingPropertyType occurrences="2">
       <code>$defaultSubmissionGap</code>
       <code>$practice</code>
     </MissingPropertyType>
@@ -1951,8 +1942,7 @@
       <code>getGraderResourcePassthru</code>
       <code>validateList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="46">
-      <code>RunController::$kSupportedLanguages</code>
+    <MixedArgument occurrences="44">
       <code>$r['problem']-&gt;languages</code>
       <code>\OmegaUp\DAO\Problemsets::getProblemsetContainer($problemset_id)</code>
       <code>$r['contest']-&gt;languages</code>
@@ -1989,7 +1979,6 @@
       <code>$r['submission']</code>
       <code>$r['submission']</code>
       <code>$r['run']</code>
-      <code>RunController::$kSupportedLanguages</code>
       <code>$r['username']</code>
       <code>$r['status']</code>
       <code>$r['verdict']</code>
@@ -2114,7 +2103,7 @@
       <code>$r-&gt;identity-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
   </file>
-  <file src="frontend/server/controllers/SchoolController.php">
+  <file src="frontend/server/src/Controllers/School.php">
     <DocblockTypeContradiction occurrences="1">
       <code>is_null($schools)</code>
     </DocblockTypeContradiction>
@@ -2145,7 +2134,7 @@
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
   </file>
-  <file src="frontend/server/controllers/ScoreboardController.php">
+  <file src="frontend/server/src/Controllers/Scoreboard.php">
     <MixedArgument occurrences="3">
       <code>$r['alias']</code>
       <code>$assignment</code>
@@ -2160,16 +2149,10 @@
       <code>$course-&gt;group_id</code>
     </MixedPropertyFetch>
   </file>
-  <file src="frontend/server/controllers/SessionController.php">
+  <file src="frontend/server/src/Controllers/Session.php">
     <InvalidNullableReturnType occurrences="1">
       <code>bool</code>
     </InvalidNullableReturnType>
-    <InvalidReturnStatement occurrences="1">
-      <code>$this-&gt;registerSession($identity, $returnAuthToken)</code>
-    </InvalidReturnStatement>
-    <InvalidReturnType occurrences="1">
-      <code>boolean</code>
-    </InvalidReturnType>
     <MissingParamType occurrences="7">
       <code>$authToken</code>
       <code>$s_Email</code>
@@ -2182,12 +2165,10 @@
     <MissingPropertyType occurrences="1">
       <code>$_facebook</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="12">
+    <MissingReturnType occurrences="10">
       <code>getFacebookInstance</code>
       <code>getFacebookLoginUrl</code>
       <code>isAuthTokenValid</code>
-      <code>InvalidateCache</code>
-      <code>InvalidateLocalCache</code>
       <code>UnRegisterSession</code>
       <code>getUniqueUsernameFromEmail</code>
       <code>apiGoogleLogin</code>
@@ -2208,7 +2189,7 @@
       <code>$res['username']</code>
       <code>$identity</code>
     </MixedArgument>
-    <MixedAssignment occurrences="12">
+    <MixedAssignment occurrences="11">
       <code>self::$_facebook</code>
       <code>$facebook</code>
       <code>$helper</code>
@@ -2217,7 +2198,6 @@
       <code>$facebook</code>
       <code>$helper</code>
       <code>$access_token</code>
-      <code>$returnAuthToken</code>
       <code>$results</code>
       <code>$identity</code>
       <code>$username</code>
@@ -2261,22 +2241,19 @@
     <PossiblyNullReference occurrences="1">
       <code>$r</code>
     </PossiblyNullReference>
-    <TooManyArguments occurrences="1">
-      <code>registerSession</code>
-    </TooManyArguments>
     <UndefinedClass occurrences="4">
-      <code>Facebook\Facebook</code>
+      <code>\Facebook\Facebook</code>
       <code>Google_Client</code>
       <code>Google_Auth_Exception</code>
-      <code>Facebook\Exceptions\FacebookResponseException</code>
+      <code>\Facebook\Exceptions\FacebookResponseException</code>
     </UndefinedClass>
   </file>
-  <file src="frontend/server/controllers/SubmissionController.php">
+  <file src="frontend/server/src/Controllers/Submission.php">
     <MissingReturnType occurrences="1">
       <code>getSource</code>
     </MissingReturnType>
   </file>
-  <file src="frontend/server/controllers/TagController.php">
+  <file src="frontend/server/src/Controllers/Tag.php">
     <MissingParamType occurrences="1">
       <code>$name</code>
     </MissingParamType>
@@ -2295,7 +2272,7 @@
       <code>$tag-&gt;name</code>
     </MixedPropertyFetch>
   </file>
-  <file src="frontend/server/controllers/UserController.php">
+  <file src="frontend/server/src/Controllers/User.php">
     <DocblockTypeContradiction occurrences="1">
       <code>is_null($r-&gt;identity)</code>
     </DocblockTypeContradiction>
@@ -2340,7 +2317,7 @@
       <code>function ($value) {</code>
     </MissingClosureReturnType>
     <MissingDependency occurrences="1">
-      <code>Smarty</code>
+      <code>\Smarty</code>
     </MissingDependency>
     <MissingParamType occurrences="4">
       <code>$problemset_id</code>
@@ -3193,7 +3170,7 @@
     <MissingClosureReturnType occurrences="1">
       <code>function ($clause) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="27">
+    <MissingParamType occurrences="26">
       <code>$tag</code>
       <code>$tag</code>
       <code>$programmingLanguages</code>
@@ -3223,7 +3200,7 @@
       <code>$contest_id</code>
       <code>$title</code>
     </MissingParamType>
-    <MissingReturnType occurrences="17">
+    <MissingReturnType occurrences="16">
       <code>byIdentityType</code>
       <code>searchByAlias</code>
       <code>getTagsForProblem</code>
@@ -3231,7 +3208,6 @@
       <code>getProblemsSolved</code>
       <code>getProblemsUnsolvedByIdentity</code>
       <code>getSolvedProblemsByUsersOfCourse</code>
-      <code>getUnsolvedProblemsByUsersOfCourse</code>
       <code>getAllProblemsAdminedByIdentity</code>
       <code>getAllProblemsOwnedByUser</code>
       <code>getAllProblems</code>
@@ -4916,9 +4892,6 @@
     </MixedAssignment>
   </file>
   <file src="frontend/www/contestedit.php">
-    <MixedArgument occurrences="1">
-      <code>RunController::$kSupportedLanguages</code>
-    </MixedArgument>
     <MixedArrayAccess occurrences="2">
       <code>$_REQUEST['ouat']</code>
       <code>$_REQUEST['contest']</code>
@@ -4932,11 +4905,6 @@
     <MixedAssignment occurrences="1">
       <code>$payload</code>
     </MixedAssignment>
-  </file>
-  <file src="frontend/www/contestnew.php">
-    <MixedArgument occurrences="1">
-      <code>RunController::$kSupportedLanguages</code>
-    </MixedArgument>
   </file>
   <file src="frontend/www/contestreport.php">
     <MixedAssignment occurrences="2">

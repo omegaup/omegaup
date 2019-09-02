@@ -84,18 +84,18 @@ class UserFactory {
         }
 
         // Populate a new Request to pass to the API
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => $params['username'],
             'name' => $params['name'],
             'password' => $params['password'],
             'email' => $params['email'],
             'is_private' => $params['is_private'],
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call the API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // If status is not OK
         if (strcasecmp($response['status'], 'ok') !== 0) {
@@ -109,7 +109,7 @@ class UserFactory {
         }
 
         if ($params['verify']) {
-            UserController::$redirectOnVerify = false;
+            \OmegaUp\Controllers\User::$redirectOnVerify = false;
             $user = self::verifyUser($user);
         } else {
             $user->verified = false;
@@ -160,7 +160,7 @@ class UserFactory {
     public static function verifyUser(
         \OmegaUp\DAO\VO\Users $user
     ) : \OmegaUp\DAO\VO\Users {
-        UserController::apiVerifyEmail(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'id' => $user->verification_id
         ]));
         $user->verified = true;

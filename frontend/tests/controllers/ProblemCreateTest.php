@@ -24,7 +24,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Validate
         // Verify response
@@ -95,7 +95,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Validate
         // Verify response
@@ -136,7 +136,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Validate
         // Verify response
@@ -177,7 +177,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Validate
         // Verify response
@@ -225,7 +225,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
             try {
                 // Call the API
-                $response = ProblemController::apiCreate($r);
+                $response = \OmegaUp\Controllers\Problem::apiCreate($r);
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // We're OK, clean up our mess and continue
                 unset($_REQUEST);
@@ -255,7 +255,7 @@ class CreateProblemTest extends OmegaupTestCase {
             $r['languages'] = $languages;
             try {
                 // Call the API
-                $response = ProblemController::apiCreate($r);
+                $response = \OmegaUp\Controllers\Problem::apiCreate($r);
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // We're OK, clean up our mess and continue
                 unset($_REQUEST);
@@ -284,7 +284,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Validate
         // Verify response
@@ -344,7 +344,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Verify response
         $this->assertEquals('ok', $response['status']);
@@ -389,7 +389,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Verify response
         $this->assertEquals('ok', $response['status']);
@@ -409,7 +409,7 @@ class CreateProblemTest extends OmegaupTestCase {
         $this->assertContains('![404](notfound.jpg)', $markdown_contents);
 
         // Check that the images are there.
-        $response = ProblemController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $r['problem_alias'],
         ]));
@@ -441,7 +441,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Validate
         // Verify response
@@ -498,9 +498,9 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        ProblemController::apiCreate($r);
+        \OmegaUp\Controllers\Problem::apiCreate($r);
 
-        $tags = ProblemController::apiTags(new \OmegaUp\Request([
+        $tags = \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]))['tags'];
@@ -540,7 +540,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
         try {
             // Call the API
-            $response = ProblemController::apiCreate($r);
+            $response = \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Exception was expected. Wrong attribute');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'parameterEmpty');
@@ -567,7 +567,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Call the API
         try {
-            ProblemController::apiCreate($r);
+            \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
             $this->assertEquals('problemDeployerNoStatements', $e->getMessage());
@@ -594,7 +594,7 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Call the API
         try {
-            ProblemController::apiCreate($r);
+            \OmegaUp\Controllers\Problem::apiCreate($r);
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
             $this->assertEquals('problemDeployerMismatchedInputFile', $e->getMessage());
@@ -620,7 +620,7 @@ class CreateProblemTest extends OmegaupTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting($this->createFileUploaderMock());
 
         // Call the API
-        $response = ProblemController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
 
         // Validate
         // Verify response

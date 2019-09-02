@@ -22,7 +22,7 @@ class CourseProblemsTest extends OmegaupTestCase {
         }
         CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, $problemData);
 
-        $problems = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
+        $problems = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias
@@ -32,14 +32,14 @@ class CourseProblemsTest extends OmegaupTestCase {
         $problems['problems'][1]['order'] = 2;
         $problems['problems'][2]['order'] = 3;
 
-        CourseController::apiUpdateProblemsOrder(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiUpdateProblemsOrder(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
             'problems' => $problems['problems'],
         ]));
 
-        $problems = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
+        $problems = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias
@@ -58,14 +58,14 @@ class CourseProblemsTest extends OmegaupTestCase {
         $problems['problems'][1]['order'] = 3;
         $problems['problems'][2]['order'] = 1;
 
-        CourseController::apiUpdateProblemsOrder(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiUpdateProblemsOrder(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
             'problems' => $problems['problems'],
         ]));
 
-        $problems = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
+        $problems = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'assignment' => $assignmentAlias,
             'course' => $courseAlias
@@ -100,7 +100,7 @@ class CourseProblemsTest extends OmegaupTestCase {
         // Send runs to problem 1 (PA) and 2 (AC).
         $login = self::login($student);
         {
-            $response = RunController::apiCreate(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problemset_id' => $assignment->problemset_id,
                 'problem_alias' => $problemData[0]['problem']->alias,
@@ -110,7 +110,7 @@ class CourseProblemsTest extends OmegaupTestCase {
             RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', null, $response['guid']);
         }
         {
-            $response = RunController::apiCreate(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problemset_id' => $assignment->problemset_id,
                 'problem_alias' => $problemData[1]['problem']->alias,
@@ -121,19 +121,19 @@ class CourseProblemsTest extends OmegaupTestCase {
         }
 
         // Ensure that the student has attempted problems 1 and 2.
-        $response = CourseController::apiGetProblemUsers(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiGetProblemUsers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[0]['problem']->alias,
         ]));
         $this->assertEquals([$student->username], $response['identities']);
-        $response = CourseController::apiGetProblemUsers(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiGetProblemUsers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[1]['problem']->alias,
         ]));
         $this->assertEquals([$student->username], $response['identities']);
-        $response = CourseController::apiGetProblemUsers(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiGetProblemUsers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $course->alias,
             'problem_alias' => $problemData[2]['problem']->alias,

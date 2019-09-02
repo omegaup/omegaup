@@ -5,10 +5,10 @@ try {
     $r = new \OmegaUp\Request($_REQUEST);
     $r->ensureBool('is_practice', false);
 
-    $contest = ContestController::validateContest($_REQUEST['contest_alias'] ?? '');
+    $contest = \OmegaUp\Controllers\Contest::validateContest($_REQUEST['contest_alias'] ?? '');
     $shouldShowIntro = (!isset($_GET['is_practice']) || $_GET['is_practice'] !== 'true')
-        && ContestController::shouldShowIntro($r, $contest);
-    $result = ContestController::getContestDetailsForSmarty(
+        && \OmegaUp\Controllers\Contest::shouldShowIntro($r, $contest);
+    $result = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
         $r,
         $contest,
         $shouldShowIntro

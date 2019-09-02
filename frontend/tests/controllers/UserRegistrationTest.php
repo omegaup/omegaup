@@ -23,7 +23,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         $this->assertNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt.'2'));
 
         // Create collision
-        $c = new SessionController();
+        $c = new \OmegaUp\Controllers\Session();
         $c->LoginViaGoogle('A'.$salt.'@isp1.com');
         $c->LoginViaGoogle('A'.$salt.'@isp2.com');
         $c->LoginViaGoogle('A'.$salt.'@isp3.com');
@@ -40,7 +40,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         $username = 'X'.\OmegaUp\Time::get();
         $password = Utils::CreateRandomString();
 
-        $c = new SessionController();
+        $c = new \OmegaUp\Controllers\Session();
         $c->LoginViaGoogle($username.'@isp.com');
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
 
@@ -48,16 +48,16 @@ class UserRegistrationTest extends OmegaupTestCase {
         $this->assertNull($user->password);
 
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => $username,
             'password' => $password,
             'email' => $username.'@isp.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
 
@@ -73,7 +73,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         $username = 'Y'.\OmegaUp\Time::get();
         $email = $username.'@isp.com';
 
-        $c = new SessionController();
+        $c = new \OmegaUp\Controllers\Session();
         $c->LoginViaGoogle($email);
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
@@ -83,16 +83,16 @@ class UserRegistrationTest extends OmegaupTestCase {
         $this->assertEquals($email, $email_user->email);
 
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => 'Z'.$username,
             'password' => Utils::CreateRandomString(),
             'email' => $email,
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         $user = \OmegaUp\DAO\Users::FindByUsername('Z'.$username);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);

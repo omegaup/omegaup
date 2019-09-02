@@ -1,5 +1,7 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * TimeController
  *
@@ -7,7 +9,7 @@
  *
  * @author joemmanuel
  */
-class TimeController extends \OmegaUp\Controllers\Controller {
+class Time extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for /time API
      *

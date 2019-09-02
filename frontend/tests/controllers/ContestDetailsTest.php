@@ -87,10 +87,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Explicitly join contest
-        ContestController::apiOpen($r);
+        \OmegaUp\Controllers\Contest::apiOpen($r);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $this->assertContestDetails($contestData, $problems, $response);
 
@@ -126,10 +126,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Explicitly join contest
-        ContestController::apiOpen($r);
+        \OmegaUp\Controllers\Contest::apiOpen($r);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $this->assertEquals(1, count($response['problems']));
         // Verify that the allowed languages for the problem are the intersection of
@@ -161,7 +161,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $this->assertContestDetails($contestData, $problems, $response);
     }
@@ -189,7 +189,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
     }
 
     /**
@@ -212,10 +212,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Explicitly join contest
-        ContestController::apiOpen($r);
+        \OmegaUp\Controllers\Contest::apiOpen($r);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // We need to grab the access time from the ContestUsers table
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
@@ -224,7 +224,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK($contestant->main_identity_id, $contest->problemset_id);
         $this->assertEquals($firstAccessTime, $problemset_identity->access_time);
@@ -248,10 +248,10 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Explicitly join contest
-        ContestController::apiOpen($r);
+        \OmegaUp\Controllers\Contest::apiOpen($r);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // We need to grab the access time from the ContestUsers table
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
@@ -259,7 +259,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK($contestant->main_identity_id, $contest->problemset_id);
         $this->assertEquals($firstAccessTime, $problemset_identity->access_time);
@@ -286,7 +286,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // We need to grab the access time from the ContestUsers table
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
@@ -294,7 +294,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK($contestant->main_identity_id, $contest->problemset_id);
         $this->assertEquals($firstAccessTime, $problemset_identity->access_time);
@@ -325,7 +325,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        $response = ContestController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
     }
 
     /**
@@ -346,7 +346,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Contest::apiMyList($r);
         unset($login);
 
         // Look for our contest from the list and save the scoreboard tokens
@@ -369,7 +369,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url,
         ]);
-        $detailsResponse = ContestController::apiDetails($r);
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails($r);
         unset($login);
 
         $this->assertContestDetails($contestData, [], $detailsResponse);
@@ -381,7 +381,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url,
         ]);
-        $detailsResponse = ContestController::apiDetails($r);
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails($r);
         unset($login);
 
         $this->assertContestDetails($contestData, [], $detailsResponse);
@@ -407,14 +407,14 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call api. This should fail.
         try {
-            ContestController::apiDetails($r);
+            \OmegaUp\Controllers\Contest::apiDetails($r);
             $this->assertTrue(false, 'User that has not opened contest was able to see its details');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
         }
 
         // Call admin api. This should succeed.
-        $detailsResponse = ContestController::apiAdminDetails($r);
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiAdminDetails($r);
         $this->assertContestDetails($contestData, [], $detailsResponse);
     }
 
@@ -437,7 +437,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'token' => 'invalid token',
         ]);
-        $detailsResponse = ContestController::apiDetails($r);
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails($r);
     }
 
     /**
@@ -453,7 +453,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Contest::apiMyList($r);
 
         // Look for our contest from the list and save the scoreboard tokens
         $scoreboard_url = null;
@@ -469,7 +469,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call details using token
-        $detailsResponse = ContestController::apiDetails(new \OmegaUp\Request([
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_url
         ]));
@@ -477,7 +477,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         $this->assertContestDetails($contestData, [], $detailsResponse);
 
         // Call details using admin token
-        $detailsResponse = ContestController::apiDetails(new \OmegaUp\Request([
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'token' => $scoreboard_admin_url
         ]));
@@ -538,7 +538,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
-        $response = ContestController::apiReport($r);
+        $response = \OmegaUp\Controllers\Contest::apiReport($r);
         unset($login);
 
         $this->assertEquals($problemData['request']['problem_alias'], $response['problems'][0]['alias']);
@@ -577,7 +577,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call api. This should fail.
         try {
-            ContestController::apiDetails($r);
+            \OmegaUp\Controllers\Contest::apiDetails($r);
             $this->assertTrue(false, 'User with no access could see the contest');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
@@ -592,7 +592,7 @@ class ContestDetailsTest extends OmegaupTestCase {
                 'problem_alias' => $problems[0]['request']['problem_alias'],
             ]);
 
-            ProblemController::apiDetails($problem_request);
+            \OmegaUp\Controllers\Problem::apiDetails($problem_request);
             $this->assertTrue(false, 'User with no access could see the problem');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
@@ -601,7 +601,7 @@ class ContestDetailsTest extends OmegaupTestCase {
 
         // Call api again. This should (still) fail.
         try {
-            ContestController::apiDetails($r);
+            \OmegaUp\Controllers\Contest::apiDetails($r);
             $this->assertTrue(false, 'User with no access could see the contest');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Pass
@@ -664,7 +664,7 @@ class ContestDetailsTest extends OmegaupTestCase {
                 $files[$path] = $contents;
             }));
 
-        ProblemsetController::downloadRuns($contestData['contest']->problemset_id, $zip);
+        \OmegaUp\Controllers\Problemset::downloadRuns($contestData['contest']->problemset_id, $zip);
 
         // Verify that the data is there.
         $summary = $files['summary.csv'];

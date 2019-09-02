@@ -16,7 +16,7 @@ class UserProfileTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = UserController::apiProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response['userinfo']);
         $this->assertEquals($user->username, $response['userinfo']['username']);
@@ -34,7 +34,7 @@ class UserProfileTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'username' => $user2->username
         ]);
-        $response = UserController::apiProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayNotHasKey('password', $response['userinfo']);
         $this->assertArrayNotHasKey('email', $response['userinfo']);
@@ -54,7 +54,7 @@ class UserProfileTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'username' => $user2->username
         ]);
-        $response = UserController::apiProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
         foreach ($response['userinfo'] as $k => $v) {
@@ -84,7 +84,7 @@ class UserProfileTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'username' => $user->username
         ]);
-        $response = UserController::apiProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response['userinfo']);
     }
@@ -101,7 +101,7 @@ class UserProfileTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'username' => $user->username
         ]);
-        $response = UserController::apiProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response['userinfo']);
         $visibleAttributes = ['email', 'gravatar_92', 'name', 'username', 'rankinfo'];
@@ -126,7 +126,7 @@ class UserProfileTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'username' => $user->username
         ]);
-        $response = UserController::apiProfile($r);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response['userinfo']);
     }
@@ -152,7 +152,7 @@ class UserProfileTest extends OmegaupTestCase {
 
         // Get ContestStats
         $login = self::login($contestant);
-        $response = UserController::apiContestStats(new \OmegaUp\Request(
+        $response = \OmegaUp\Controllers\User::apiContestStats(new \OmegaUp\Request(
             [
                     'auth_token' => $login->auth_token,
                 ]
@@ -186,7 +186,7 @@ class UserProfileTest extends OmegaupTestCase {
 
         $login = self::login($externalUser);
         // Get ContestStats
-        $response = UserController::apiContestStats(new \OmegaUp\Request(
+        $response = \OmegaUp\Controllers\User::apiContestStats(new \OmegaUp\Request(
             [
                     'auth_token' => $login->auth_token,
                     'username' => $contestant->username
@@ -230,7 +230,7 @@ class UserProfileTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
         ]);
 
-        $response = UserController::apiProblemsSolved($r);
+        $response = \OmegaUp\Controllers\User::apiProblemsSolved($r);
 
         $this->assertEquals(2, count($response['problems']));
     }
@@ -246,7 +246,7 @@ class UserProfileTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'email' => 'new@email.com'
         ]);
-        $response = UserController::apiUpdateMainEmail($r);
+        $response = \OmegaUp\Controllers\User::apiUpdateMainEmail($r);
 
         // Check email in db
         $user_in_db = \OmegaUp\DAO\Users::FindByEmail('new@email.com');
@@ -274,7 +274,7 @@ class UserProfileTest extends OmegaupTestCase {
             RunsFactory::gradeRun($run);
         }
 
-        $response = UserController::apiStats(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiStats(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         foreach (['CE', 'PA', 'AC'] as $verdict) {

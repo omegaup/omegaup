@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests of the ContestController::apiRemoveProblem
+ * Tests of the \OmegaUp\Controllers\Contest::apiRemoveProblem
  *
  * @author edhzsz
  */
@@ -88,7 +88,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             ]
         );
 
-        $response = ContestController::apiRemoveProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
     }
 
     /**
@@ -112,7 +112,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             ]
         );
 
-        $response = ContestController::apiRemoveProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
     }
 
     /**
@@ -137,7 +137,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
             ]
         );
 
-        $response = ContestController::apiRemoveProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
     }
 
     /**
@@ -155,7 +155,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
     }
 
     /**
@@ -311,7 +311,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         ]);
 
         // Add secondary admin
-        $response = ContestController::apiAddAdmin($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddAdmin($r);
 
         // Add runs to the problem created by the contest admins
         RunsFactory::createRun(

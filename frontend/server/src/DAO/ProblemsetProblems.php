@@ -2,8 +2,6 @@
 
 namespace OmegaUp\DAO;
 
-use \ProblemController;
-
 /**
  * ProblemsetProblems Data Access Object (DAO).
  *
@@ -233,7 +231,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     ) : void {
         $now = \OmegaUp\Time::get();
 
-        if ($updatePublished == ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
+        if ($updatePublished == \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
             $sql = '
                 UPDATE
                     Problemset_Problems pp
@@ -293,7 +291,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 $problem->problem_id,
                 $user->user_id,
             ]);
-        } elseif ($updatePublished == ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS) {
+        } elseif ($updatePublished == \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS) {
             $problemsets = [];
 
             $sql = '

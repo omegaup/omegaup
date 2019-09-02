@@ -10,7 +10,7 @@ try {
         'contest_alias' => $_REQUEST['alias'],
     ]);
 
-    $show_intro = InterviewController::showIntro($r);
+    $show_intro = \OmegaUp\Controllers\Interview::showIntro($r);
 } catch (Exception $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));

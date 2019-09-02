@@ -2,8 +2,6 @@
 
 namespace OmegaUp\Controllers;
 
-use \SessionController;
-
 /**
  * Controllers parent class
  *
@@ -35,7 +33,7 @@ class Controller {
         bool $requireMainUserIdentity = false
     ) : void {
         $r->user = null;
-        $session = SessionController::apiCurrentSession($r)['session'];
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
         if (is_null($session) || is_null($session['identity'])) {
             $r->user = null;
             $r->identity = null;

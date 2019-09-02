@@ -1,12 +1,14 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  *  GroupScoreboardController
  *
  * @author joemmanuel
  */
 
-class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
+class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Validate group scoreboard request
      */
@@ -15,7 +17,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         ?string $scoreboardAlias
     ) : \OmegaUp\DAO\VO\GroupsScoreboards {
-        GroupController::validateGroup($groupAlias, $identity);
+        \OmegaUp\Controllers\Group::validateGroup($groupAlias, $identity);
 
         \OmegaUp\Validators::validateValidAlias($scoreboardAlias, 'scoreboard_alias');
         $scoreboard = \OmegaUp\DAO\GroupsScoreboards::getByAlias($scoreboardAlias);
@@ -47,7 +49,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'Contest');
         }
 
-        if (!ContestController::isPublic($contest->admission_mode) &&
+        if (!\OmegaUp\Controllers\Contest::isPublic($contest->admission_mode) &&
             !\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -180,7 +182,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
 
             $usernames = \OmegaUp\DAO\GroupsIdentities::getUsernamesByGroupId($scoreboard->group_id);
 
-            $response['ranking'] = ContestController::getMergedScoreboard(
+            $response['ranking'] = \OmegaUp\Controllers\Contest::getMergedScoreboard(
                 $contestAliases,
                 $usernames,
                 $contestParams
@@ -197,7 +199,7 @@ class GroupScoreboardController extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r) {
         self::authenticateRequest($r);
-        $group = GroupController::validateGroup($r['group_alias'], $r->identity);
+        $group = \OmegaUp\Controllers\Group::validateGroup($r['group_alias'], $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',

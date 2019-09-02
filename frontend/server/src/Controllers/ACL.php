@@ -1,11 +1,15 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * ACLController.php
+
+ namespace OmegaUp\Controllers;
  *
  * @author juan.pablo
  */
-class ACLController extends \OmegaUp\Controllers\Controller {
+class ACL extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a user to an ACL with the specified role.
      *

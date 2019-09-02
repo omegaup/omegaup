@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \UserController;
-
 /**
  * @author juan.pablo
  */
@@ -52,11 +50,11 @@ class PrivacyStatement {
      * @return 'en'|'pt'|'es'
      */
     private static function getLanguage(?int $languageId) : string {
-        if ($languageId == UserController::LANGUAGE_EN
-            || $languageId == UserController::LANGUAGE_PSEUDO
+        if ($languageId == \OmegaUp\Controllers\User::LANGUAGE_EN
+            || $languageId == \OmegaUp\Controllers\User::LANGUAGE_PSEUDO
         ) {
             return 'en';
-        } elseif ($languageId == UserController::LANGUAGE_PT) {
+        } elseif ($languageId == \OmegaUp\Controllers\User::LANGUAGE_PT) {
             return 'pt';
         }
         return 'es';

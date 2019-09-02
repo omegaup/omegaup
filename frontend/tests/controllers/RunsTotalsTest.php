@@ -31,7 +31,7 @@ class RunsTotalsTest extends OmegaupTestCase {
         $run->time = date('Y-m-d H:i:s', strtotime('-72 hours'));
         \OmegaUp\DAO\Runs::update($run);
 
-        $response = RunController::apiCounts(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\Run::apiCounts(new \OmegaUp\Request());
 
         $this->assertGreaterThan(1, count($response));
     }

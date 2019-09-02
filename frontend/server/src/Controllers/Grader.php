@@ -1,11 +1,13 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * Description of GraderController
  *
  * @author joemmanuel
  */
-class GraderController extends \OmegaUp\Controllers\Controller {
+class Grader extends \OmegaUp\Controllers\Controller {
     /**
      * Validate requests for grader apis
      *

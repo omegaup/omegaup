@@ -22,7 +22,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // To validate, we update the title to the original request and send
         // the entire original request to assertContest. Any other parameter
@@ -47,7 +47,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        ContestController::apiUpdate($r);
+        \OmegaUp\Controllers\Contest::apiUpdate($r);
     }
 
     /**
@@ -68,7 +68,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
     }
 
     /**
@@ -94,7 +94,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         $contestData['request']['admission_mode'] = $r['admission_mode'];
         $this->assertContest($contestData['request']);
@@ -116,7 +116,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        ContestController::apiSetRecommended($r);
+        \OmegaUp\Controllers\Contest::apiSetRecommended($r);
 
         // Verify setting
         $contestData['request']['recommended'] = $r['value'];
@@ -126,7 +126,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['value'] = 0;
 
         // Call API again
-        ContestController::apiSetRecommended($r);
+        \OmegaUp\Controllers\Contest::apiSetRecommended($r);
 
         // Verify setting
         $contestData['request']['recommended'] = $r['value'];
@@ -151,7 +151,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        ContestController::apiSetRecommended($r);
+        \OmegaUp\Controllers\Contest::apiSetRecommended($r);
     }
 
     /**
@@ -173,7 +173,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
     }
 
     /**
@@ -208,7 +208,7 @@ class UpdateContestTest extends OmegaupTestCase {
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
-        RunController::apiCreate($r);
+        \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -232,7 +232,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
     }
 
     /**
@@ -252,7 +252,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // Check contest data from DB
         $contestData['request']['start_time'] = $r['start_time'];
@@ -280,7 +280,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // Check contest data from DB
         $contestData['request']['start_time'] = $r['start_time'];
@@ -325,7 +325,7 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // Get the original penalty, since the contest was created with the
         // 'contest_start' penalty type.
-        $response = ContestController::apiRuns(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));
@@ -334,12 +334,12 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // Update penalty type to runtime
         {
-            ContestController::apiUpdate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'runtime',
             ]));
-            $response = ContestController::apiRuns(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $directorLogin->auth_token,
             ]));
@@ -348,12 +348,12 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // Update penalty type to none
         {
-            ContestController::apiUpdate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'none',
             ]));
-            $response = ContestController::apiRuns(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $directorLogin->auth_token,
             ]));
@@ -362,12 +362,12 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // Update penalty type to problem open.
         {
-            ContestController::apiUpdate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'problem_open',
             ]));
-            $response = ContestController::apiRuns(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $directorLogin->auth_token,
             ]));
@@ -376,12 +376,12 @@ class UpdateContestTest extends OmegaupTestCase {
 
         // Update penalty type back to contest start.
         {
-            ContestController::apiUpdate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'contest_start',
             ]));
-            $response = ContestController::apiRuns(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $directorLogin->auth_token,
             ]));
@@ -418,9 +418,9 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Explicitly join contest
-        ContestController::apiOpen($r);
+        \OmegaUp\Controllers\Contest::apiOpen($r);
 
-        $contest = ContestController::apiDetails($r);
+        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // Create a run
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant2);
@@ -429,18 +429,18 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $r['window_length'] = 0;
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
-        $contest = ContestController::apiDetails($r);
+        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $this->assertNull($contest['window_length'], 'Window length is not setted, because 0 is not a valid value');
 
         $windowLength = 10;
         $r['window_length'] = $windowLength;
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
-        $contest = ContestController::apiDetails($r);
+        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $this->assertEquals($windowLength, $contest['window_length']);
 
@@ -459,9 +459,9 @@ class UpdateContestTest extends OmegaupTestCase {
         $windowLength = 40;
         $r['window_length'] = $windowLength;
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
-        $contest = ContestController::apiDetails($r);
+        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $this->assertEquals($windowLength, $contest['window_length']);
 
@@ -472,14 +472,14 @@ class UpdateContestTest extends OmegaupTestCase {
 
         try {
             // Call API
-            ContestController::apiUpdate($r);
+            \OmegaUp\Controllers\Contest::apiUpdate($r);
             $this->fail('Only numbers are allowed in window_length field');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Pass
             $this->assertEquals('parameterNotANumber', $e->getMessage());
         }
 
-        $identities = ContestController::apiUsers(new \OmegaUp\Request([
+        $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -490,14 +490,14 @@ class UpdateContestTest extends OmegaupTestCase {
         );
 
         // Extend end_time for an indentity
-        ContestController::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'username' => $contestant->username,
             'end_time' => $identities['users'][$index]['access_time'] + 60 * 60,
         ]));
 
-        $identities = ContestController::apiUsers(new \OmegaUp\Request([
+        $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -521,9 +521,9 @@ class UpdateContestTest extends OmegaupTestCase {
         // Updating window_length in the contest, to check whether user keeps the extension
         $windowLength = 20;
         $r['window_length'] = $windowLength;
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
-        $identities = ContestController::apiUsers(new \OmegaUp\Request([
+        $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -540,7 +540,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $windowLength = 140;
         $r['window_length'] = $windowLength;
         try {
-            ContestController::apiUpdate($r);
+            \OmegaUp\Controllers\Contest::apiUpdate($r);
             $this->fail('Window length can not greater than contest length');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Pass
@@ -583,7 +583,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $directorLogin = self::login($contest['director']);
 
         // Update window_length
-        $response = ContestController::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'window_length' => 30,
@@ -636,7 +636,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $directorLogin = self::login($contest['director']);
 
         // Director extends finish_time one more hour
-        $response = ContestController::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'finish_time' => $originalTime + 60 * 5 * 60,
@@ -704,13 +704,13 @@ class UpdateContestTest extends OmegaupTestCase {
 
         $directorLogin = self::login($contest['director']);
 
-        $identities = ContestController::apiUsers(new \OmegaUp\Request([
+        $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contest['request']['alias'],
         ]));
 
         // Extend end_time for the user, now should be valid create runs after contest finishes
-        ContestController::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'username' => $contestant->username,
@@ -779,7 +779,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // User tries to create run agaian, it should works fine
         $run = RunsFactory::createRun($problem, $contest, $contestant);
@@ -800,7 +800,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $r['window_length'] = 0;
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // Now user can submit run until contest finishes
         $run = RunsFactory::createRun($problem, $contest, $contestant);

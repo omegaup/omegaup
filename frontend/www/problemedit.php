@@ -9,7 +9,7 @@ $smarty->assign('LOAD_PAGEDOWN', 1);
 try {
     if (isset($_POST['request'])) {
         if ($_POST['request'] == 'submit') {
-            ProblemController::apiUpdate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                 'problem_alias' => $_POST['problem_alias'] ?? null,
                 'title' => $_POST['title'] ?? null,
@@ -28,7 +28,7 @@ try {
                 'email_clarifications' => $_POST['email_clarifications'] ?? null,
             ]));
         } elseif ($_POST['request'] == 'markdown') {
-            ProblemController::apiUpdateStatement([
+            \OmegaUp\Controllers\Problem::apiUpdateStatement([
                 'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
                 'problem_alias' => $_POST['problem_alias'] ?? null,
                 'statement' => $_POST['wmd-input-statement'] ?? null,

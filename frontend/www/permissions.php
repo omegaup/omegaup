@@ -10,7 +10,7 @@ if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 $r = new \OmegaUp\Request($_REQUEST);
-$session = SessionController::apiCurrentSession($r)['session'];
+$session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
 
 $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($session['user']->user_id);
 $roles = \OmegaUp\DAO\Roles::getAll();

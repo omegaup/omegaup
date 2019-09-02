@@ -25,7 +25,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
 
         $this->assertEquals('ok', $response['status']);
         $this->assertLogin($identity, $response['auth_token']);
@@ -49,7 +49,7 @@ class LoginTest extends OmegaupTestCase {
             'password' => $user->password
         ]);
 
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
 
         $this->assertEquals('ok', $response['status']);
         $this->assertLogin($identity, $response['auth_token']);
@@ -71,7 +71,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     /**
@@ -87,7 +87,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     /**
@@ -107,7 +107,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     /**
@@ -155,12 +155,12 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response1 = UserController::apiLogin($r);
+        $response1 = \OmegaUp\Controllers\User::apiLogin($r);
         $this->assertEquals('ok', $response1['status']);
         $this->assertLogin($identity, $response1['auth_token']);
 
         // Call the API for 2nd time
-        $response2 = UserController::apiLogin($r);
+        $response2 = \OmegaUp\Controllers\User::apiLogin($r);
         $this->assertEquals('ok', $response2['status']);
         $this->assertLogin($identity, $response2['auth_token']);
 
@@ -194,7 +194,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     public function testDeleteTokenExpired() {

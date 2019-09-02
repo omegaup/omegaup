@@ -3,7 +3,7 @@ require_once('../server/bootstrap_smarty.php');
 
 $triedToLogin = false;
 $emailVerified = true;
-$c_Session = new SessionController;
+$c_Session = new \OmegaUp\Controllers\Session();
 
 if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     // user wants to login natively
@@ -11,7 +11,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     $r = new \OmegaUp\Request();
     $r['usernameOrEmail'] = $_POST['user'];
     $r['password'] = $_POST['pass'];
-    $response = UserController::apiLogin($r);
+    $response = \OmegaUp\Controllers\User::apiLogin($r);
 
     if ($response['status'] === 'error') {
         if ($response['errorcode'] === 600 || $response['errorcode'] === 601) {
@@ -74,8 +74,8 @@ if ($c_Session->currentSessionAvailable()) {
 }
 
 // Only generate Login URLs if we actually need them.
-$smarty->assign('FB_URL', SessionController::getFacebookLoginUrl());
-$smarty->assign('LINKEDIN_URL', SessionController::getLinkedInLoginUrl());
+$smarty->assign('FB_URL', \OmegaUp\Controllers\Session::getFacebookLoginUrl());
+$smarty->assign('LINKEDIN_URL', \OmegaUp\Controllers\Session::getLinkedInLoginUrl());
 $smarty->assign('VALIDATE_RECAPTCHA', OMEGAUP_VALIDATE_CAPTCHA);
 $smarty->assign('payload', ['validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA]);
 $smarty->display('../templates/login.tpl');

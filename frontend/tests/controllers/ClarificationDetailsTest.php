@@ -59,7 +59,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = ClarificationController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Clarification::apiDetails($r);
 
         // Check the data we got
         $this->assertClarification($r['clarification_id'], $response);
@@ -99,7 +99,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = ClarificationController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Clarification::apiDetails($r);
 
         // Check the data we got
         $this->assertClarification($r['clarification_id'], $response);
@@ -143,7 +143,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API, will fail
-        ClarificationController::apiDetails($r);
+        \OmegaUp\Controllers\Clarification::apiDetails($r);
     }
 
     public function testPublicClarificationsCanBeViewed() {
@@ -184,7 +184,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = ClarificationController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Clarification::apiDetails($r);
 
         // Check the data we got
         $this->assertClarification($r['clarification_id'], $response);
