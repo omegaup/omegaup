@@ -37,7 +37,7 @@ class UserSupportTest extends OmegaupTestCase {
         // Call api using support team member
         $supportLogin = self::login($supportUser);
 
-        $response = UserController::apiExtraInformation(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
@@ -45,13 +45,13 @@ class UserSupportTest extends OmegaupTestCase {
         $this->assertEquals(0, $response['verified']);
 
         // Call apiVerifyEmail
-        UserController::apiVerifyEmail(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'usernameOrEmail' => $email,
         ]));
 
         // Get user information to pick up verification changes
-        $response = UserController::apiExtraInformation(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
@@ -75,7 +75,7 @@ class UserSupportTest extends OmegaupTestCase {
         $supportLogin = self::login($supportUser);
 
         // Support tries to generate token without a request
-        $response = UserController::apiExtraInformation(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
@@ -83,16 +83,16 @@ class UserSupportTest extends OmegaupTestCase {
         $this->assertEquals(0, $response['within_last_day']);
 
         // Now, user makes a password change request
-        ResetController::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Reset::apiCreate(new \OmegaUp\Request([
             'email' => $email
         ]));
 
         // Support can genearate token
-        UserController::apiExtraInformation(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
-        $response = ResetController::apiGenerateToken(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Reset::apiGenerateToken(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email,
         ]));
@@ -100,7 +100,7 @@ class UserSupportTest extends OmegaupTestCase {
         // Finally, users can update their password with the generated token
         $reset_token = explode('reset_token=', $response['link'])[1];
         $password = Utils::CreateRandomString();
-        $response = ResetController::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Reset::apiUpdate(new \OmegaUp\Request([
             'email' => $email,
             'reset_token' => $reset_token,
             'password' => $password,
@@ -128,12 +128,12 @@ class UserSupportTest extends OmegaupTestCase {
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
             \OmegaUp\Time::get() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24)
         );
-        $user = UsersDAO::FindByEmail($email);
+        $user = \OmegaUp\DAO\Users::FindByEmail($email);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         // Support can not genearate token because it has expired
-        $response = UserController::apiExtraInformation(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));

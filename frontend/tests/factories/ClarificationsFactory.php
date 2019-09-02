@@ -42,7 +42,7 @@ class ClarificationsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ClarificationController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Clarification::apiCreate($r);
 
         // Clean up stuff
         unset($_REQUEST);
@@ -82,6 +82,6 @@ class ClarificationsFactory {
         $r['username'] = $receiver;
 
         // Call api
-        ClarificationController::apiUpdate($r);
+        \OmegaUp\Controllers\Clarification::apiUpdate($r);
     }
 }

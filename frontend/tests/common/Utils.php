@@ -16,7 +16,7 @@ class Utils {
         }
     }
 
-    public static function CreateRandomString() {
+    public static function CreateRandomString() : string {
         return md5(uniqid(rand(), true));
     }
 
@@ -94,11 +94,11 @@ class Utils {
         ?int $submitDelay = null
     ) : void {
         if (!is_null($runId)) {
-            $run = RunsDAO::getByPK($runId);
-            $submission = SubmissionsDAO::getByPK($run->submission_id);
+            $run = \OmegaUp\DAO\Runs::getByPK($runId);
+            $submission = \OmegaUp\DAO\Submissions::getByPK($run->submission_id);
         } else {
-            $submission = SubmissionsDAO::getByGuid($runGuid);
-            $run = RunsDAO::getByPK($submission->current_run_id);
+            $submission = \OmegaUp\DAO\Submissions::getByGuid($runGuid);
+            $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
         }
 
         $run->verdict = $verdict;
@@ -109,12 +109,12 @@ class Utils {
 
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
-            SubmissionsDAO::update($submission);
+            \OmegaUp\DAO\Submissions::update($submission);
             $run->submit_delay = $submitDelay;
             $run->penalty = $submitDelay;
         }
 
-        RunsDAO::update($run);
+        \OmegaUp\DAO\Runs::update($run);
 
         \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
@@ -144,16 +144,16 @@ class Utils {
 
     public static function setUpDefaultDataConfig() {
         // Create a test default user for manual UI operations
-        UserController::$sendEmailOnVerify = false;
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
         $admin = UserFactory::createUser(new UserParams([
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));
-        ACLsDAO::create(new \OmegaUp\DAO\VO\ACLs([
+        \OmegaUp\DAO\ACLs::create(new \OmegaUp\DAO\VO\ACLs([
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
             'owner_id' => $admin->user_id,
         ]));
-        UserRolesDAO::create(new \OmegaUp\DAO\VO\UserRoles([
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $admin->user_id,
             'role_id' => \OmegaUp\Authorization::ADMIN_ROLE,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
@@ -162,10 +162,10 @@ class Utils {
             'username' => 'test',
             'password' => 'testtesttest',
         ]));
-        UserController::$sendEmailOnVerify = true;
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
 
         // Globally disable run wait gap.
-        RunController::$defaultSubmissionGap = 0;
+        \OmegaUp\Controllers\Run::$defaultSubmissionGap = 0;
     }
 
     public static function CleanupFilesAndDb() {

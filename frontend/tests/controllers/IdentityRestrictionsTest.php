@@ -23,7 +23,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = self::login($user);
 
         // Associate identity with user
-        UserController::apiAssociateIdentity(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $associatedIdentity->username,
             'password' => $associatedIdentity->password,
@@ -60,7 +60,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = self::login($user);
 
         // Associate identity with user
-        UserController::apiAssociateIdentity(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $associatedIdentity->username,
             'password' => $associatedIdentity->password,
@@ -94,7 +94,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = self::login($user);
 
         // Associate identity with user
-        UserController::apiAssociateIdentity(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $associatedIdentity->username,
             'password' => $associatedIdentity->password,
@@ -126,7 +126,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = self::login($user);
 
         // Associate identity with user
-        UserController::apiAssociateIdentity(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $associatedIdentity->username,
             'password' => $associatedIdentity->password,
@@ -176,7 +176,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($identity);
 
         try {
-            ContestController::apiMyList(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ]));
             $this->fail("{$identityStatus} identity does not have access to see apiMyList");
@@ -185,7 +185,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
 
         try {
-            ContestController::apiCreateVirtual(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiCreateVirtual(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'alias' => $contestData['contest']->alias,
             ]));
@@ -195,7 +195,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
 
         try {
-            ContestController::apiClone(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'title' => Utils::CreateRandomString(),
@@ -227,7 +227,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($identity);
 
         try {
-            CourseController::apiClone(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'name' => Utils::CreateRandomString(),
@@ -240,7 +240,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         }
 
         try {
-            CourseController::apiCreate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'name' => Utils::CreateRandomString(),
                 'alias' => Utils::CreateRandomString(),
@@ -262,7 +262,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($identity);
 
         try {
-            ProblemController::apiMyList(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ]));
             $this->fail("{$identityStatus} identity does not have access to see apiMyList");
@@ -287,7 +287,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         $login = OmegaupTestCase::login($identity);
 
         try {
-            GroupController::apiMyList(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ]));
             $this->fail("{$identityStatus} identity does not have access to see apiMyList");

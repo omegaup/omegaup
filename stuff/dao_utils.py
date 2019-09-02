@@ -38,9 +38,8 @@ class Column:
             self.php_primitive_type = 'float'
         else:
             self.php_primitive_type = 'string'
-        self.php_type = (
-            ('' if self.default or self.auto_increment else '?') +
-            self.php_primitive_type)
+        self.php_type = (('' if self.default or self.auto_increment else '?') +
+                         self.php_primitive_type)
 
     def __repr__(self):
         return 'Column<name={}, type={}>'.format(self.name, self.type)
@@ -160,15 +159,16 @@ def _listformat(value, format: Text = '', **kwargs):
 
 
 def _parse_date(value):
-    return int(datetime.datetime.strptime(
-        value,
-        '%Y-%m-%d %H:%M:%S').replace(tzinfo=datetime.timezone.utc).timestamp())
+    return int(
+        datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S').replace(
+            tzinfo=datetime.timezone.utc).timestamp())
 
 
-DaoFile = NamedTuple('DaoFile', [('filename', Text), ('contents', Text)])
+File = NamedTuple('File', [('filename', Text), ('file_type', Text),
+                           ('contents', Text)])
 
 
-def generate_dao(script: Text) -> Sequence[DaoFile]:
+def generate_dao(script: Text) -> Sequence[File]:
     '''Generate all the DAO files.'''
 
     try:
@@ -187,10 +187,10 @@ def generate_dao(script: Text) -> Sequence[DaoFile]:
     vo_template = env.get_template('vo.php')
     dao_template = env.get_template('dao.php')
     for table in tables:
-        yield DaoFile('{}.php'.format(table.class_name),
-                      vo_template.render(table=table))
-        yield DaoFile('{}.dao.base.php'.format(table.name),
-                      dao_template.render(table=table))
+        yield File('{}.php'.format(table.class_name), 'vo',
+                   vo_template.render(table=table))
+        yield File('{}.php'.format(table.class_name), 'dao',
+                   dao_template.render(table=table))
 
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

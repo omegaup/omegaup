@@ -17,7 +17,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         $adminLogin = self::login($contestAdmin);
-        ContestController::apiUpdate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
@@ -37,7 +37,7 @@ class ContestRequestsTest extends OmegaupTestCase {
     ) : void {
         $contestantLogin = self::login($contestant);
 
-        ContestController::apiRegisterForContest(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiRegisterForContest(new \OmegaUp\Request([
             'contest_alias' => $contest['alias'],
             'auth_token' => $contestantLogin->auth_token,
         ]));
@@ -104,7 +104,7 @@ class ContestRequestsTest extends OmegaupTestCase {
 
         // admin lists registrations
         $adminLogin = self::login($admin);
-        $result = ContestController::apiRequests(new \OmegaUp\Request([
+        $result = \OmegaUp\Controllers\Contest::apiRequests(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
         ]));
@@ -149,7 +149,7 @@ class ContestRequestsTest extends OmegaupTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
         ]);
-        $result = ContestController::apiRequests($contestRequest);
+        $result = \OmegaUp\Controllers\Contest::apiRequests($contestRequest);
         $this->assertEquals(count($result['users']), $numberOfContestants);
 
         for ($i = 0; $i < $numberOfContestants; $i++) {
@@ -159,23 +159,23 @@ class ContestRequestsTest extends OmegaupTestCase {
         // Main admin arbitrates some requests
         $contestRequest['username'] = $acceptedContestantByMainAdmin->username;
         $contestRequest['resolution'] = true;
-        ContestController::apiArbitrateRequest($contestRequest);
+        \OmegaUp\Controllers\Contest::apiArbitrateRequest($contestRequest);
         $arbitratedUsers[] = $contestRequest['username'];
         $acceptedUsers[] = $contestRequest['username'];
 
         $contestRequest['username'] =
             $rejectedContestantByMainAdminAndAcceptedByTheSecondOne->username;
         $contestRequest['resolution'] = false;
-        ContestController::apiArbitrateRequest($contestRequest);
+        \OmegaUp\Controllers\Contest::apiArbitrateRequest($contestRequest);
         $arbitratedUsers[] = $contestRequest['username'];
 
         $contestRequest['username'] =
             $rejectedContestantAndThenAcceptedByTheSameAdmin->username;
         $contestRequest['resolution'] = false;
-        ContestController::apiArbitrateRequest($contestRequest);
+        \OmegaUp\Controllers\Contest::apiArbitrateRequest($contestRequest);
         $arbitratedUsers[] = $contestRequest['username'];
 
-        $result = ContestController::apiRequests($contestRequest);
+        $result = \OmegaUp\Controllers\Contest::apiRequests($contestRequest);
 
         $this->assertParamsInRequest(
             $numberOfContestants,
@@ -188,13 +188,13 @@ class ContestRequestsTest extends OmegaupTestCase {
 
         // Second round of arbitrate requests
         $contestRequest['resolution'] = true;
-        ContestController::apiArbitrateRequest($contestRequest);
+        \OmegaUp\Controllers\Contest::apiArbitrateRequest($contestRequest);
         $acceptedUsers[] = $contestRequest['username'];
 
         // Now we login with the secondary admin
         $adminLogin = self::login($secondaryAdminLogin);
         $ua = $rejectedContestantByMainAdminAndAcceptedByTheSecondOne->username;
-        ContestController::apiArbitrateRequest(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiArbitrateRequest(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
             'username' => $ua,
@@ -202,7 +202,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         ]));
         $acceptedUsers[] = $ua;
 
-        $result = ContestController::apiRequests(new \OmegaUp\Request([
+        $result = \OmegaUp\Controllers\Contest::apiRequests(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
         ]));
