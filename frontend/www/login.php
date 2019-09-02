@@ -7,16 +7,21 @@ $c_Session = new \OmegaUp\Controllers\Session();
 
 if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     // user wants to login natively
-
-    $r = new \OmegaUp\Request();
-    $r['usernameOrEmail'] = $_POST['user'];
-    $r['password'] = $_POST['pass'];
-    $response = \OmegaUp\Controllers\User::apiLogin($r);
-
-    if ($response['status'] === 'error') {
-        if ($response['errorcode'] === 600 || $response['errorcode'] === 601) {
-            $emailVerified = false;
-        }
+    try {
+        $response = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
+            'usernameOrEmail' => $_POST['user'],
+            'password' => $_POST['pass'],
+        ]));
+    } catch (\OmegaUp\Exceptions\EmailNotVerifiedException $e) {
+        $emailVerified = false;
+        $response = $e->asResponseArray();
+    } catch (\OmegaUp\Exceptions\ApiException $e) {
+        $response = $e->asResponseArray();
+    } catch (\Exception $e) {
+        self::$log->error($e);
+        $apiException = new \OmegaUp\Exceptions\InternalServerErrorException($e);
+        /** @var array<string, mixed> */
+        $response = $apiException->asResponseArray();
     }
 
     $triedToLogin = true;
@@ -29,10 +34,12 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
 
 if (isset($_GET['linkedin'])) {
     if (isset($_GET['code']) && isset($_GET['state'])) {
+        /** @var array<string, mixed> */
         $response = $c_Session->LoginViaLinkedIn();
     }
     $triedToLogin = true;
 } elseif (isset($_GET['fb'])) {
+    /** @var array<string, mixed> */
     $response = $c_Session->LoginViaFacebook();
     $triedToLogin = true;
 }

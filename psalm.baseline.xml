@@ -5043,17 +5043,10 @@
     <MixedArgument occurrences="1">
       <code>$_GET['redirect']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="6">
-      <code>$_POST['user']</code>
-      <code>$_POST['pass']</code>
-      <code>$response['status']</code>
-      <code>$response['errorcode']</code>
-      <code>$response['errorcode']</code>
+    <MixedArrayAccess occurrences="1">
       <code>$response['error']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="5">
-      <code>$r['usernameOrEmail']</code>
-      <code>$r['password']</code>
+    <MixedAssignment occurrences="3">
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
