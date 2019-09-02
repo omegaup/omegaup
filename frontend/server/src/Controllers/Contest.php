@@ -847,8 +847,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Validates form
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
-        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title', true);
-        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title');
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description');
         $r->ensureInt('start_time', null, null, true);
 
         $length = $originalContest->finish_time - $originalContest->start_time;
