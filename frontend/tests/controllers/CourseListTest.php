@@ -26,7 +26,7 @@ class CourseListTest extends OmegaupTestCase {
     public function testGetCourseForAdminUser() {
         // Call the details API
         $adminLogin = self::login($this->admin_user);
-        $response = CourseController::apiListCourses(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiListCourses(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
@@ -38,8 +38,7 @@ class CourseListTest extends OmegaupTestCase {
         $course_array = $response['admin'][0];
         \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],
-            'finish_time',
-            true /* required */
+            'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
         $this->assertEquals(2, $course_array['counts']['test']);
@@ -47,7 +46,7 @@ class CourseListTest extends OmegaupTestCase {
 
     public function testGetCourseListForNormalUser() {
         $otherUserLogin = self::login($this->other_user);
-        $response = CourseController::apiListCourses(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiListCourses(new \OmegaUp\Request([
             'auth_token' => $otherUserLogin->auth_token,
         ]));
 
@@ -59,8 +58,7 @@ class CourseListTest extends OmegaupTestCase {
         $course_array = $response['student'][0];
         \OmegaUp\Validators::validateNumber(
             $course_array['finish_time'],
-            'finish_time',
-            true /* required */
+            'finish_time'
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
         $this->assertEquals(2, $course_array['counts']['test']);

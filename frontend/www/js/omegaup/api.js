@@ -538,11 +538,11 @@ export default {
   },
 
   QualityNomination: {
-    create: _call('/api/qualitynomination/create/'),
+    create: _call('/api/qualityNomination/create/'),
 
-    details: _call('/api/qualitynomination/details/'),
+    details: _call('/api/qualityNomination/details/'),
 
-    list: _call('/api/qualitynomination/list/',
+    list: _call('/api/qualityNomination/list/',
                 function(result) {
                   for (var idx in result.nominations) {
                     var nomination = result.nominations[idx];
@@ -551,7 +551,7 @@ export default {
                   return result;
                 }),
 
-    myList: _call('/api/qualitynomination/mylist/',
+    myList: _call('/api/qualityNomination/mylist/',
                   function(result) {
                     for (var idx in result.nominations) {
                       var nomination = result.nominations[idx];
@@ -560,7 +560,7 @@ export default {
                     return result;
                   }),
 
-    resolve: _call('/api/qualitynomination/resolve/'),
+    resolve: _call('/api/qualityNomination/resolve/'),
   },
 
   Reset: {

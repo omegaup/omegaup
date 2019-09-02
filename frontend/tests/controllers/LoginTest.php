@@ -13,10 +13,10 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByUserPositive() {
         // Create an user in omegaup
         $user = UserFactory::createUser();
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
+        $this->assertEquals(0, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -25,13 +25,13 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
 
         $this->assertEquals('ok', $response['status']);
         $this->assertLogin($identity, $response['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(IdentityLoginLogDAO::getByIdentity($identity->identity_id)));
+        $this->assertEquals(1, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
     }
 
     /**
@@ -41,7 +41,7 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByEmailPositive() {
         $email = Utils::CreateRandomString() . '@mail.com';
         $user = UserFactory::createUser(new UserParams(['email' => $email]));
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -49,7 +49,7 @@ class LoginTest extends OmegaupTestCase {
             'password' => $user->password
         ]);
 
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
 
         $this->assertEquals('ok', $response['status']);
         $this->assertLogin($identity, $response['auth_token']);
@@ -71,7 +71,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     /**
@@ -87,7 +87,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     /**
@@ -107,7 +107,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     /**
@@ -118,7 +118,7 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginPositiveViaHttp() {
         // Create an user
         $user = UserFactory::createUser();
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Set required context
         $_REQUEST['usernameOrEmail'] = $user->username;
@@ -146,7 +146,7 @@ class LoginTest extends OmegaupTestCase {
     public function test2ConsecutiveLogins() {
         // Create an user in omegaup
         $user = UserFactory::createUser();
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -155,12 +155,12 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response1 = UserController::apiLogin($r);
+        $response1 = \OmegaUp\Controllers\User::apiLogin($r);
         $this->assertEquals('ok', $response1['status']);
         $this->assertLogin($identity, $response1['auth_token']);
 
         // Call the API for 2nd time
-        $response2 = UserController::apiLogin($r);
+        $response2 = \OmegaUp\Controllers\User::apiLogin($r);
         $this->assertEquals('ok', $response2['status']);
         $this->assertLogin($identity, $response2['auth_token']);
 
@@ -179,10 +179,10 @@ class LoginTest extends OmegaupTestCase {
         $plainPassword = $user->password;
         // Set old password
         $user->password = md5($plainPassword);
-        UsersDAO::update($user);
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        \OmegaUp\DAO\Users::update($user);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $identity->password = $user->password;
-        IdentitiesDAO::update($identity);
+        \OmegaUp\DAO\Identities::update($identity);
 
         // Let's put back plain password
         $user->password = $plainPassword;
@@ -194,7 +194,7 @@ class LoginTest extends OmegaupTestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
     }
 
     public function testDeleteTokenExpired() {
@@ -204,13 +204,13 @@ class LoginTest extends OmegaupTestCase {
         $login = self::login($user);
 
         // Expire token manually
-        $authToken = AuthTokensDAO::getByPK($login->auth_token);
+        $authToken = \OmegaUp\DAO\AuthTokens::getByPK($login->auth_token);
         $authToken->create_time -= 9 * 3600;  // 9 hours
-        AuthTokensDAO::update($authToken);
+        \OmegaUp\DAO\AuthTokens::update($authToken);
 
         $login2 = self::login($user);
 
-        $existingTokens = AuthTokensDAO::getByPK($login->auth_token);
+        $existingTokens = \OmegaUp\DAO\AuthTokens::getByPK($login->auth_token);
         $this->assertNull($existingTokens);
     }
 
@@ -223,10 +223,10 @@ class LoginTest extends OmegaupTestCase {
 
         // Force empty password
         $user->password = '';
-        UsersDAO::update($user);
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        \OmegaUp\DAO\Users::update($user);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $identity->password = $user->password;
-        IdentitiesDAO::update($identity);
+        \OmegaUp\DAO\Identities::update($identity);
 
         try {
             $user->password = 'foo';

@@ -18,22 +18,21 @@ def _find_files(search: str) -> Iterable[str]:
     ]
 
 
-def _sed(filename: str, search: str, namespace: str) -> None:
+def _sed(filename: str, search: str, fqcn: str) -> None:
     with open(filename) as f:
         original_contents = f.read()
     contents = original_contents
-    contents = re.sub(r'(?<!\\)\b{}(?=::|\()'.format(re.escape(search)),
-                      r'\\{}\\{}'.format(namespace, search), contents)
+    contents = re.sub(r'(?<!\\)\b{}(?=::|\()'.format(re.escape(search)), fqcn,
+                      contents)
     contents = re.sub(
         r'(extends|instanceof|catch|@[a-zA-Z]+) {}\b'.format(
-            re.escape(search)),
-        r'\1 \\{}\\{}'.format(namespace, search), contents)
+            re.escape(search)), r'\1 {}'.format(fqcn), contents)
     contents = re.sub(r': *(\?)?{} {{'.format(re.escape(search)),
-                      r': \1\\{}\\{} {{'.format(namespace, search), contents)
+                      r': \1{} {{'.format(fqcn), contents)
     contents = re.sub(r'(?<!\\)\b{} \$'.format(re.escape(search)),
-                      r'\\{}\\{} $'.format(namespace, search), contents)
-    contents = re.sub(r'(?<=[?|])\b{}'.format(re.escape(search)),
-                      r'\\{}\\{}'.format(namespace, search), contents)
+                      r'{} $'.format(fqcn), contents)
+    contents = re.sub(r'(?<=[?|])\b{}'.format(re.escape(search)), fqcn,
+                      contents)
     if contents == original_contents:
         return
     with open(filename, 'w') as f:
@@ -44,10 +43,13 @@ def _main():
     parser = argparse.ArgumentParser()
     parser.add_argument('search')
     parser.add_argument('namespace')
+    parser.add_argument('--rename-class', type=str)
     args = parser.parse_args()
 
     for filename in _find_files(args.search):
-        _sed(filename, args.search, args.namespace)
+        _sed(
+            filename, args.search, r'\\{}\\{}'.format(
+                args.namespace, args.rename_class or args.search))
 
 
 if __name__ == '__main__':

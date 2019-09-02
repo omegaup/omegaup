@@ -8,7 +8,7 @@
 
 class RunsFactory {
     /**
-     * Builds and returns a request object to be used for RunController::apiCreate
+     * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate
      *
      * @param type $problemData
      * @param type $contestData
@@ -41,7 +41,7 @@ class RunsFactory {
     }
 
     /**
-     * Builds and returns a request object to be used for RunController::apiCreate
+     * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate
      *
      * @param type $problemData
      * @param type $courseAssignmentData
@@ -98,7 +98,7 @@ class RunsFactory {
         $r = self::createRequestCourseAssignmentCommon($problemData, $courseAssignmentData, $participant);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Clean up
         unset($_REQUEST);
@@ -128,7 +128,7 @@ class RunsFactory {
         $r = self::createRequestCommon($problemData, $contestData, $contestant);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Clean up
         unset($_REQUEST);
@@ -150,7 +150,7 @@ class RunsFactory {
         $r = self::createRequestCommon($problemData, null, $contestant, $login);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Clean up
         unset($_REQUEST);

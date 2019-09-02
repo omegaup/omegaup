@@ -15,7 +15,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemData = ProblemsFactory::createProblem();
 
-        CourseController::apiAddProblem(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment_alias'],
@@ -34,7 +34,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
         {
             $studentLogin = OmegaupTestCase::login($students[0]);
-            $runResponsePA = RunController::apiCreate(new \OmegaUp\Request([
+            $runResponsePA = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'problemset_id' => $courseData['assignment']->problemset_id,
                 'problem_alias' => $problem->alias,
@@ -46,7 +46,7 @@ class CourseStudentsTest extends OmegaupTestCase {
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiStudentProgress(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiStudentProgress(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment_alias'],
@@ -75,7 +75,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         // Prepare assignment. Create problems
         $problemData = ProblemsFactory::createProblem();
 
-        CourseController::apiAddProblem(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment_alias'],
@@ -83,7 +83,7 @@ class CourseStudentsTest extends OmegaupTestCase {
         ]));
 
         // Get Group object
-        $associatedGroup = GroupsDAO::findByAlias($courseData['course_alias']);
+        $associatedGroup = \OmegaUp\DAO\Groups::findByAlias($courseData['course_alias']);
 
         // Create identities for a group
         $password = Utils::CreateRandomString();

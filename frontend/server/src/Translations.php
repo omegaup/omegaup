@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \IdentityController;
-
 /**
  * Utility class to lazily load translation strings to be used in controllers
  * and other libraries.
@@ -27,7 +25,7 @@ class Translations {
      * Creates a new instance of Translations.
      */
     private function __construct() {
-        $lang = IdentityController::getPreferredLanguage(new \OmegaUp\Request());
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(new \OmegaUp\Request());
         $filename = OMEGAUP_ROOT . "/templates/{$lang}.lang";
         /** @var array<int, string> $match */
         foreach (new \RegexIterator(

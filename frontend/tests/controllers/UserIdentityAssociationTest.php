@@ -35,7 +35,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $username = "{$group['group']->alias}:{$identityName}";
         $password = Utils::CreateRandomString();
         // Call api using identity creator group member
-        IdentityController::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -51,7 +51,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        $associatedIdentities = UserController::apiListAssociatedIdentities(new \OmegaUp\Request([
+        $associatedIdentities = \OmegaUp\Controllers\User::apiListAssociatedIdentities(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -62,13 +62,13 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $associatedIdentities['identities'][0]['username']
         );
 
-        $response = UserController::apiAssociateIdentity(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'password' => $password,
         ]));
 
-        $associatedIdentities = UserController::apiListAssociatedIdentities(new \OmegaUp\Request([
+        $associatedIdentities = \OmegaUp\Controllers\User::apiListAssociatedIdentities(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -83,11 +83,11 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
             $associatedIdentities['identities']
         );
 
-        $identity = IdentityController::resolveIdentity($username);
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $identity->password = $password;
         $identityLogin = self::login($identity);
 
-        $details = UserController::apiProfile(new \OmegaUp\Request([
+        $details = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -114,7 +114,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $username = "{$group['group']->alias}:{$identityName}";
         $password = Utils::CreateRandomString();
         // Call api using identity creator group member
-        IdentityController::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -133,7 +133,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         try {
             $identityName = 'wrong_username';
             $username = "{$group['group']->alias}:{$identityName}";
-            $response = UserController::apiAssociateIdentity(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $username,
                 'password' => $password,
@@ -164,7 +164,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
         // Call api using identity creator group member
-        IdentityController::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
@@ -181,7 +181,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $login = self::login($user);
 
         try {
-            $response = UserController::apiAssociateIdentity(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $username,
                 'password' => Utils::CreateRandomString(),
@@ -212,7 +212,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $password = Utils::CreateRandomString();
 
         // Call api using identity creator group member
-        IdentityController::apiBulkCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'identities' => IdentityFactory::getCsvData(
                 'identities.csv',
@@ -223,7 +223,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ]));
 
         // Getting all identity members associated to the group
-        $membersResponse = GroupController::apiMembers(new \OmegaUp\Request([
+        $membersResponse = \OmegaUp\Controllers\Group::apiMembers(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'group_alias' => $group['group']->alias,
         ]));
@@ -233,7 +233,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         $login = self::login($user);
 
         // Trying to associate first identity to the logged user
-        $response = UserController::apiAssociateIdentity(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $membersResponse['identities'][0]['username'],
             'password' => $password,
@@ -241,7 +241,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
 
         // Trying to associate second identity to the logged user
         try {
-            $response = UserController::apiAssociateIdentity(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $membersResponse['identities'][1]['username'],
                 'password' => $password,

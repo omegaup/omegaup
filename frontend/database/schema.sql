@@ -252,7 +252,7 @@ CREATE TABLE `Groups_Identities` (
   `identity_id` int(11) NOT NULL COMMENT 'Identidad del usuario',
   `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
   `privacystatement_consent_id` int(11) DEFAULT NULL COMMENT 'Id del documento con el consentimiento de privacidad',
-  `accept_teacher` enum('yes','no') DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.',
+  `accept_teacher` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.',
   PRIMARY KEY (`identity_id`,`group_id`),
   KEY `group_id` (`group_id`),
   KEY `identity_id` (`identity_id`),

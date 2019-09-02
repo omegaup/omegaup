@@ -26,24 +26,24 @@ class SchoolsFactory {
         ]);
 
         // Call api
-        $response = SchoolController::apiCreate($r);
+        $response = \OmegaUp\Controllers\School::apiCreate($r);
 
         return [
             'creator' => $user,
             'request' => $r,
             'response' => $response,
-            'school' => SchoolsDAO::findByName($r['name'])[0]
+            'school' => \OmegaUp\DAO\Schools::findByName($r['name'])[0]
         ];
     }
 
     /**
      * Add user to school
      * @param array $schoolData
-     * @param UsersDAO $user
+     * @param \OmegaUp\DAO\Users $user
      */
     public static function addUserToSchool($schoolData, $user) {
         $login = OmegaupTestCase::login($user);
-        $response = UserController::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'school_id' => $schoolData['school']->school_id
         ]));
