@@ -41,7 +41,7 @@ class UpdateClarificationTest extends OmegaupTestCase {
         );
 
         // Get clarification from DB
-        $clarification = ClarificationsDAO::getByPK(
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK(
             $clarificationData['response']['clarification_id']
         );
 

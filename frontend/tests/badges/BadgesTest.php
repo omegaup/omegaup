@@ -10,7 +10,7 @@ class BadgesTest extends BadgesTestCase {
         $results = [];
         foreach ($expected as $username) {
             // From each username, obtaining its ID
-            $user = UsersDAO::FindByUsername($username);
+            $user = \OmegaUp\DAO\Users::FindByUsername($username);
             $results[] = $user->user_id;
         }
         asort($results);

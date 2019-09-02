@@ -11,7 +11,7 @@ try {
     // session, the first time the user visits the "My contests" page.
     $privateContestsAlert = ($session['valid'] &&
         !isset($_SESSION['private_contests_alert']) &&
-        ContestsDAO::getPrivateContestsCount($session['user']) > 0);
+        \OmegaUp\DAO\Contests::getPrivateContestsCount($session['user']) > 0);
 
     if ($privateContestsAlert) {
         $_SESSION['private_contests_alert'] = true;

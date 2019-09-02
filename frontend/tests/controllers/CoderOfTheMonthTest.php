@@ -58,7 +58,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Test coder of the month details when common user is logged, it's the
         // same that not logged user
         $user = UserFactory::createUser();
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $login = self::login($user);
         $r['auth_token'] = $login->auth_token;
         $response = UserController::getCoderOfTheMonthDetailsForSmarty($r, $identity);
@@ -130,12 +130,12 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
 
             // Force the submission to be in any date
-            $submission = SubmissionsDAO::getByGuid($runData['response']['guid']);
+            $submission = \OmegaUp\DAO\Submissions::getByGuid($runData['response']['guid']);
             $submission->time = $runCreationDate;
-            SubmissionsDAO::update($submission);
-            $run = RunsDAO::getByPK($submission->current_run_id);
+            \OmegaUp\DAO\Submissions::update($submission);
+            $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
             $run->time = $runCreationDate;
-            RunsDAO::update($run);
+            \OmegaUp\DAO\Runs::update($run);
         }
     }
 

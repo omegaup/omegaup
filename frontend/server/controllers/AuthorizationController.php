@@ -15,7 +15,7 @@ class AuthorizationController extends \OmegaUp\Controllers\Controller {
 
         $resolvedIdentity = IdentityController::resolveIdentity($r['username']);
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -24,9 +24,9 @@ class AuthorizationController extends \OmegaUp\Controllers\Controller {
         $canEdit = $isAdmin || \OmegaUp\Authorization::canEditProblem($resolvedIdentity, $problem);
         return [
             'status' => 'ok',
-            'has_solved' => ProblemsDAO::isProblemSolved($problem, $resolvedIdentity->identity_id),
+            'has_solved' => \OmegaUp\DAO\Problems::isProblemSolved($problem, $resolvedIdentity->identity_id),
             'is_admin' => $isAdmin,
-            'can_view' => $canEdit || ProblemsDAO::isVisible($problem),
+            'can_view' => $canEdit || \OmegaUp\DAO\Problems::isVisible($problem),
             'can_edit' => $canEdit,
         ];
     }

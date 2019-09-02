@@ -23,7 +23,7 @@ class SchoolController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
         }
 
-        $schools = SchoolsDAO::findByName($r[$param]);
+        $schools = \OmegaUp\DAO\Schools::findByName($r[$param]);
         if (is_null($schools)) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
@@ -72,12 +72,12 @@ class SchoolController extends \OmegaUp\Controllers\Controller {
         ]);
 
         $school_id = 0;
-        $existing = SchoolsDAO::findByName($name);
+        $existing = \OmegaUp\DAO\Schools::findByName($name);
         if (!empty($existing)) {
             /** @var int $existing[0]->school_id */
             return $existing[0]->school_id;
         }
-        SchoolsDAO::create($school);
+        \OmegaUp\DAO\Schools::create($school);
         /** @var int $school->school_id */
         return $school->school_id;
     }
@@ -162,7 +162,7 @@ class SchoolController extends \OmegaUp\Controllers\Controller {
         bool $canUseCache
     ) : array {
         $fetch = function () use ($offset, $rowCount, $startTime, $finishTime) {
-            return SchoolsDAO::getRankByUsersAndProblemsWithAC(
+            return \OmegaUp\DAO\Schools::getRankByUsersAndProblemsWithAC(
                 $startTime,
                 $finishTime,
                 $offset,
@@ -223,6 +223,6 @@ class SchoolController extends \OmegaUp\Controllers\Controller {
             // Both state and country must be specified together.
             return null;
         }
-        return StatesDAO::getByPK($countryId, $stateId);
+        return \OmegaUp\DAO\States::getByPK($countryId, $stateId);
     }
 }

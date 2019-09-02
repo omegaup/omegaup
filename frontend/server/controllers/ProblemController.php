@@ -1,7 +1,5 @@
 <?php
 
-require_once 'libs/dao/QualityNominations.dao.php';
-
 /**
  * ProblemsController
  */
@@ -71,7 +69,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             // We need to check problem_alias
             \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
             if (is_null($r['problem'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException('Problem not found');
             }
@@ -223,9 +221,9 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $problem->current_version = $problemDeployer->privateTreeHash;
 
             // Save the contest object with data sent by user to the database
-            ACLsDAO::create($acl);
+            \OmegaUp\DAO\ACLs::create($acl);
             $problem->acl_id = $acl->acl_id;
-            ProblemsDAO::create($problem);
+            \OmegaUp\DAO\Problems::create($problem);
 
             // Add tags
             if (!empty($r['selected_tags'])) {
@@ -273,7 +271,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // We need to check problem_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -309,7 +307,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         $user = UserController::resolveUser($r['usernameOrEmail']);
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -342,13 +340,13 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Check problem_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $group = GroupsDAO::findByAlias($r['group']);
+        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
 
         if ($group == null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -378,7 +376,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Authenticate logged user
         self::authenticateRequest($r);
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -405,15 +403,15 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('tagRestricted', 'name');
         }
 
-        $tag = TagsDAO::getByName($tagName);
+        $tag = \OmegaUp\DAO\Tags::getByName($tagName);
         if (is_null($tag)) {
             $tag = new \OmegaUp\DAO\VO\Tags([
                 'name' => $tagName,
             ]);
-            TagsDAO::create($tag);
+            \OmegaUp\DAO\Tags::create($tag);
         }
 
-        ProblemsTagsDAO::create(new \OmegaUp\DAO\VO\ProblemsTags([
+        \OmegaUp\DAO\ProblemsTags::create(new \OmegaUp\DAO\VO\ProblemsTags([
             'problem_id' => $problem->problem_id,
             'tag_id' => $tag->tag_id,
             'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
@@ -437,7 +435,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -471,13 +469,13 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Check problem_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $group = GroupsDAO::findByAlias($r['group']);
+        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
 
         if ($group == null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -507,12 +505,12 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problem');
         }
 
-        $tag = TagsDAO::getByName($r['name']);
+        $tag = \OmegaUp\DAO\Tags::getByName($r['name']);
         if (is_null($tag)) {
             throw new \OmegaUp\Exceptions\NotFoundException('tag');
         }
@@ -525,7 +523,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('tagRestricted', 'name');
         }
 
-        ProblemsTagsDAO::delete(new \OmegaUp\DAO\VO\ProblemsTags([
+        \OmegaUp\DAO\ProblemsTags::delete(new \OmegaUp\DAO\VO\ProblemsTags([
             'problem_id' => $problem->problem_id,
             'tag_id' => $tag->tag_id,
         ]));
@@ -547,7 +545,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Check whether problem exists
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -556,11 +554,11 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        if (ProblemsDAO::hasBeenUsedInCoursesOrContests($problem)) {
+        if (\OmegaUp\DAO\Problems::hasBeenUsedInCoursesOrContests($problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemHasBeenUsedInContestOrCourse');
         }
 
-        ProblemsDAO::deleteProblem($problem->problem_id);
+        \OmegaUp\DAO\Problems::deleteProblem($problem->problem_id);
 
         return ['status' => 'ok'];
     }
@@ -577,7 +575,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -588,8 +586,8 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'admins' => UserRolesDAO::getProblemAdmins($problem),
-            'group_admins' => GroupRolesDAO::getProblemAdmins($problem)
+            'admins' => \OmegaUp\DAO\UserRoles::getProblemAdmins($problem),
+            'group_admins' => \OmegaUp\DAO\GroupRoles::getProblemAdmins($problem)
         ];
     }
 
@@ -605,13 +603,13 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         $includeAutogenerated = ($r['include_autogenerated'] == 'true');
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $response = [];
-        $response['tags'] = ProblemsTagsDAO::getProblemTags(
+        $response['tags'] = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problem,
             !\OmegaUp\Authorization::canEditProblem($r->identity, $problem),
             $includeAutogenerated
@@ -637,7 +635,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $runs = [];
         try {
             \OmegaUp\DAO\DAO::transBegin();
-            $runs = RunsDAO::getByProblem((int)$r['problem']->problem_id);
+            $runs = \OmegaUp\DAO\Runs::getByProblem((int)$r['problem']->problem_id);
 
             foreach ($runs as $run) {
                 $run->status = 'new';
@@ -645,7 +643,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                 $run->verdict = 'JE';
                 $run->score = 0;
                 $run->contest_score = 0;
-                RunsDAO::update($run);
+                \OmegaUp\DAO\Runs::update($run);
 
                 // Expire details of the run
                 RunController::invalidateCacheOnRejudge($run);
@@ -743,10 +741,10 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             }
 
             if ($needsUpdate) {
-                RunsDAO::createRunsForVersion($problem);
-                RunsDAO::updateVersionToCurrent($problem);
+                \OmegaUp\DAO\Runs::createRunsForVersion($problem);
+                \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
                 if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
-                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                    \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
                         $r->user,
                         $updatePublished
@@ -756,7 +754,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             }
 
             // Save the contest object with data sent by user to the database
-            ProblemsDAO::update($problem);
+            \OmegaUp\DAO\Problems::update($problem);
 
             ProblemController::setRestrictedTags($problem);
 
@@ -778,7 +776,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         if ($response['rejudged'] && OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
-                $runs = RunsDAO::getNewRunsForVersion($problem);
+                $runs = \OmegaUp\DAO\Runs::getNewRunsForVersion($problem);
                 \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
                 // Expire details of the runs
@@ -803,7 +801,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
     }
 
     private static function setRestrictedTags(\OmegaUp\DAO\VO\Problems $problem) {
-        ProblemsTagsDAO::clearRestrictedTags($problem);
+        \OmegaUp\DAO\ProblemsTags::clearRestrictedTags($problem);
         $languages = explode(',', $problem->languages);
         if (in_array('cat', $languages)) {
             ProblemController::addTag('solo-salida', true, $problem, true);
@@ -863,13 +861,13 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                     $problemDeployer->publishedCommit
                 );
                 if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
-                    ProblemsetProblemsDAO::updateVersionToCurrent(
+                    \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
                         $r->user,
                         $updatePublished
                     );
                 }
-                ProblemsDAO::update($problem);
+                \OmegaUp\DAO\Problems::update($problem);
             }
             $updatedFileLanguages = $problemDeployer->getUpdatedLanguages();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -988,7 +986,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $r['lang'] = IdentityController::getPreferredLanguage($r);
         }
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             return [
                 'status' => 'ok',
@@ -1009,7 +1007,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
                     if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
-                        if (is_null(ProblemsetIdentitiesDAO::getByPK(
+                        if (is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
                             $r->identity->identity_id,
                             $problemset['problemset']->problemset_id
                         ))) {
@@ -1017,7 +1015,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                         }
                     }
                     // If the contest has not started, non-admin users should not see it
-                    if (!ContestsDAO::hasStarted($problemset['contest'])) {
+                    if (!\OmegaUp\DAO\Contests::hasStarted($problemset['contest'])) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestNotStarted');
                     }
                 } else {    // Not a contest, but we still have a problemset
@@ -1036,7 +1034,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             ) {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private
-                if (!ProblemsDAO::isVisible($problem)) {
+                if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                     throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
                 }
             }
@@ -1239,7 +1237,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
     private static function validateDownload(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1266,18 +1264,18 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $response = [];
         if (!empty($contestAlias)) {
             // Is it a valid contest_alias?
-            $response['contest'] = ContestsDAO::getByAlias($contestAlias);
+            $response['contest'] = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
             if (is_null($response['contest'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
-            $response['problemset'] = ProblemsetsDAO::getByPK($response['contest']->problemset_id);
+            $response['problemset'] = \OmegaUp\DAO\Problemsets::getByPK($response['contest']->problemset_id);
             if (is_null($response['problemset'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
             $problemNotFound = 'problemNotFoundInContest';
         } elseif (!is_null($problemsetId)) {
             // Is it a valid problemset_id?
-            $response['problemset'] = ProblemsetsDAO::getByPK($problemsetId);
+            $response['problemset'] = \OmegaUp\DAO\Problemsets::getByPK($problemsetId);
             if (is_null($response['problemset'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
             }
@@ -1288,7 +1286,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         }
 
         // Is the problem actually in the problemset?
-        if (is_null(ProblemsetProblemsDAO::getByPK(
+        if (is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK(
             $response['problemset']->problemset_id,
             $problem->problem_id
         ))
@@ -1364,7 +1362,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $commit = $problem->commit;
         $version = $problem->current_version;
         if (!empty($problemset)) {
-            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+            $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
                 $problemset->problemset_id,
                 $problem->problem_id
             );
@@ -1414,10 +1412,10 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
-        if (ProblemsDAO::isVisible($problem) ||
+        if (\OmegaUp\DAO\Problems::isVisible($problem) ||
             \OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
-            $acl = ACLsDAO::getByPK($problem->acl_id);
-            $problemsetter = IdentitiesDAO::findByUserId($acl->owner_id);
+            $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+            $problemsetter = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
                 'name' => is_null($problemsetter->name) ?
@@ -1433,7 +1431,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($r->identity)) {
             // Get all the available runs done by the current_user
-            $runsArray = RunsDAO::getForProblemDetails(
+            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
                 (int)$problem->problem_id,
                 $problemsetId,
                 (int)$r->identity->identity_id
@@ -1454,10 +1452,10 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $result['admin'] = \OmegaUp\Authorization::isAdmin($r->identity, $problemset);
             if (!$result['admin'] || $r['prevent_problemset_open'] !== 'true') {
                 // At this point, contestant_user relationship should be established.
-                $container = ProblemsetsDAO::getProblemsetContainer(
+                $container = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
                     $problemset->problemset_id
                 );
-                ProblemsetIdentitiesDAO::checkAndSaveFirstTimeAccess(
+                \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
                     $r->identity,
                     $container,
                     \OmegaUp\Authorization::canSubmitToProblemset(
@@ -1468,12 +1466,12 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             }
 
             // As last step, register the problem as opened
-            if (!ProblemsetProblemOpenedDAO::getByPK(
+            if (!\OmegaUp\DAO\ProblemsetProblemOpened::getByPK(
                 $problemsetId,
                 $problem->problem_id,
                 $r->identity->identity_id
             )) {
-                ProblemsetProblemOpenedDAO::create(new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
+                \OmegaUp\DAO\ProblemsetProblemOpened::create(new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
                     'problem_id' => $problem->problem_id,
                     'open_time' => \OmegaUp\Time::get(),
@@ -1481,13 +1479,13 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                 ]));
             }
         } elseif ($showSolvers) {
-            $response['solvers'] = RunsDAO::getBestSolvingRunsForProblem(
+            $response['solvers'] = \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
                 (int)$problem->problem_id
             );
         }
 
         if (!is_null($r->identity)) {
-            ProblemViewedDAO::MarkProblemViewed(
+            \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
                 $r->identity->identity_id,
                 $problem->problem_id
             );
@@ -1537,7 +1535,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $commit = $problem->commit;
         $version = $problem->current_version;
         if (!empty($problemset)) {
-            $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+            $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
                 $problemset->problemset_id,
                 $problem->problem_id
             );
@@ -1556,14 +1554,14 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             if ($r['forfeit_problem'] !== true) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemSolutionNotVisible');
             }
-            $seenSolutions = ProblemsForfeitedDAO::getProblemsForfeitedCount($r->user);
-            $allowedSolutions = intval(ProblemsDAO::getProblemsSolvedCount($r->identity) /
+            $seenSolutions = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCount($r->user);
+            $allowedSolutions = intval(\OmegaUp\DAO\Problems::getProblemsSolvedCount($r->identity) /
                                 ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
             // Validate that the user will not exceed the number of allowed solutions.
             if ($seenSolutions >= $allowedSolutions) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('allowedSolutionsLimitReached');
             }
-            ProblemsForfeitedDAO::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
+            \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
                 'user_id' => $r->user->user_id,
                 'problem_id' => $problem->problem_id
             ]));
@@ -1592,7 +1590,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1673,7 +1671,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $updatePublished = $r['update_published'];
         }
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1713,17 +1711,17 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                 $r->user
             );
 
-            RunsDAO::createRunsForVersion($problem);
-            RunsDAO::updateVersionToCurrent($problem);
+            \OmegaUp\DAO\Runs::createRunsForVersion($problem);
+            \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
             if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
-                ProblemsetProblemsDAO::updateVersionToCurrent(
+                \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                     $problem,
                     $r->user,
                     $updatePublished
                 );
             }
 
-            ProblemsDAO::update($problem);
+            \OmegaUp\DAO\Problems::update($problem);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -1737,7 +1735,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         if (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
             self::$log->info('Calling ProblemController::apiRejudge');
             try {
-                $runs = RunsDAO::getNewRunsForVersion($problem);
+                $runs = \OmegaUp\DAO\Runs::getNewRunsForVersion($problem);
                 \OmegaUp\Grader::getInstance()->rejudge($runs, false);
 
                 // Expire details of the runs
@@ -1776,7 +1774,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['version'], 'version');
 
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1786,7 +1784,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'diff' => RunsDAO::getRunsDiffsForVersion(
+            'diff' => \OmegaUp\DAO\Runs::getRunsDiffsForVersion(
                 $problem,
                 null,
                 $problem->current_version,
@@ -1851,7 +1849,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Is the problem valid?
-        $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+        $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($r['problem'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1878,12 +1876,12 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             }
             if (!is_null($r['username'])) {
                 try {
-                    $r['identity'] = IdentitiesDAO::findByUsername($r['username']);
+                    $r['identity'] = \OmegaUp\DAO\Identities::findByUsername($r['username']);
                 } catch (Exception $e) {
                     throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
                 }
             }
-            $runs = RunsDAO::getAllRuns(
+            $runs = \OmegaUp\DAO\Runs::getAllRuns(
                 null,
                 $r['status'],
                 $r['verdict'],
@@ -1908,7 +1906,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $response['runs'] = $result;
         } else {
             // Get all the available runs
-            $runsArray = RunsDAO::getForProblemDetails(
+            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
                 (int)$r['problem']->problem_id,
                 null,
                 (int)$r->identity->identity_id
@@ -1947,7 +1945,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $r['problem']
         );
 
-        $clarifications = ClarificationsDAO::GetProblemClarifications(
+        $clarifications = \OmegaUp\DAO\Clarifications::GetProblemClarifications(
             $r['problem']->problem_id,
             $is_problem_admin,
             $r->identity->identity_id,
@@ -1987,12 +1985,12 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         }
 
         // Array of GUIDs of pending runs
-        $pendingRunsGuids = RunsDAO::getPendingRunsOfProblem(
+        $pendingRunsGuids = \OmegaUp\DAO\Runs::getPendingRunsOfProblem(
             (int)$r['problem']->problem_id
         );
 
         // Count of pending runs (int)
-        $totalRunsCount = SubmissionsDAO::countTotalSubmissionsOfProblem(
+        $totalRunsCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblem(
             (int)$r['problem']->problem_id
         );
 
@@ -2000,7 +1998,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $verdict_counts = [];
 
         foreach (self::$verdicts as $verdict) {
-            $verdict_counts[$verdict] = RunsDAO::countTotalRunsOfProblemByVerdict(
+            $verdict_counts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemByVerdict(
                 (int)$r['problem']->problem_id,
                 $verdict
             );
@@ -2020,7 +2018,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get all runs of this problem after the last id we had
-        $runs = RunsDAO::searchWithRunIdGreaterThan(
+        $runs = \OmegaUp\DAO\Runs::searchWithRunIdGreaterThan(
             (int)$r['problem']->problem_id,
             (int)$casesStats['last_submission_id']
         );
@@ -2177,7 +2175,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         }
 
         $total = 0;
-        $response['results'] = ProblemsDAO::byIdentityType(
+        $response['results'] = \OmegaUp\DAO\Problems::byIdentityType(
             $identityType,
             $language,
             $orderBy,
@@ -2217,14 +2215,14 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            $problems = ProblemsDAO::getAll(
+            $problems = \OmegaUp\DAO\Problems::getAll(
                 $page,
                 $pageSize,
                 'problem_id',
                 'DESC'
             );
         } else {
-            $problems = ProblemsDAO::getAllProblemsAdminedByIdentity(
+            $problems = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
                 $pageSize
@@ -2233,10 +2231,10 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         $addedProblems = [];
 
-        $hiddenTags = UsersDAO::getHideTags($r->identity->identity_id);
+        $hiddenTags = \OmegaUp\DAO\Users::getHideTags($r->identity->identity_id);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
-            $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
+            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem($problem, false);
             $addedProblems[] = $problemArray;
         }
 
@@ -2261,7 +2259,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
-        $problems = ProblemsDAO::getAllProblemsOwnedByUser(
+        $problems = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
             $pageSize
@@ -2269,10 +2267,10 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         $addedProblems = [];
 
-        $hiddenTags = UsersDAO::getHideTags($r->identity->identity_id);
+        $hiddenTags = \OmegaUp\DAO\Users::getHideTags($r->identity->identity_id);
         foreach ($problems as $problem) {
             $problemArray = $problem->asArray();
-            $problemArray['tags'] = $hiddenTags ? [] : ProblemsDAO::getTagsForProblem($problem, false);
+            $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem($problem, false);
             $addedProblems[] = $problemArray;
         }
 
@@ -2335,12 +2333,12 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Add best score info
         $problemset = self::validateProblemset($problem, $problemsetId, $contestAlias);
         if (is_null($problemset['problemset'])) {
-            $score = (float)RunsDAO::getBestProblemScore(
+            $score = (float)\OmegaUp\DAO\Runs::getBestProblemScore(
                 (int)$problem->problem_id,
                 (int)$currentIdentityId
             );
         } else {
-            $score = (float)RunsDAO::getBestProblemScoreInProblemset(
+            $score = (float)\OmegaUp\DAO\Runs::getBestProblemScoreInProblemset(
                 (int)$problemset['problemset']->problemset_id,
                 (int)$problem->problem_id,
                 (int)$currentIdentityId
@@ -2361,15 +2359,15 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Removing existing data
-            $deletedLanguages = ProblemsLanguagesDAO::deleteProblemLanguages(new \OmegaUp\DAO\VO\ProblemsLanguages([
+            $deletedLanguages = \OmegaUp\DAO\ProblemsLanguages::deleteProblemLanguages(new \OmegaUp\DAO\VO\ProblemsLanguages([
                 'problem_id' => $problem->problem_id,
             ]));
 
-            foreach (LanguagesDAO::getAll() as $lang) {
+            foreach (\OmegaUp\DAO\Languages::getAll() as $lang) {
                 if (!$problemArtifacts->exists("statements/{$lang->name}.markdown")) {
                     continue;
                 }
-                ProblemsLanguagesDAO::create(new \OmegaUp\DAO\VO\ProblemsLanguages([
+                \OmegaUp\DAO\ProblemsLanguages::create(new \OmegaUp\DAO\VO\ProblemsLanguages([
                     'problem_id' => $problem->problem_id,
                     'language_id' => $lang->language_id,
                 ]));
@@ -2521,7 +2519,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         if (is_null($r->identity)) {
             return $result;
         }
-        $nominationStatus = QualityNominationsDAO::getNominationStatusForProblem(
+        $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
             $problem,
             $r->identity
         );
@@ -2543,7 +2541,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             !is_null($r->user) && !UserController::isMainIdentity(
                 $r->user,
                 $r->identity
-            ) && ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+            ) && \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
                 $r->user
             );
         $result['payload']['solution_status'] = self::getProblemSolutionStatus($problem, $r->identity);

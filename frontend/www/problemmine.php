@@ -15,7 +15,7 @@ foreach ($smartyProperties as $key => $value) {
 }
 
 $privateProblemsAlert = (!isset($_SESSION['private_problems_alert']) &&
-    ProblemsDAO::getPrivateCount($session['user']) > 0);
+    \OmegaUp\DAO\Problems::getPrivateCount($session['user']) > 0);
 if ($privateProblemsAlert) {
     $_SESSION['private_problems_alert'] = true;
 }

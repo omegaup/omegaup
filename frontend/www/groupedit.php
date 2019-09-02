@@ -13,6 +13,6 @@ $is_organizer = $experiments->isEnabled(\OmegaUp\Experiments::IDENTITIES) &&
     \OmegaUp\Authorization::canCreateGroupIdentities($session['identity']);
 $smarty->assign('IS_ORGANIZER', $is_organizer);
 $smarty->assign('payload', [
-    'countries' => CountriesDAO::getAll(null, 100, 'name'),
+    'countries' => \OmegaUp\DAO\Countries::getAll(null, 100, 'name'),
 ]);
 $smarty->display('../templates/group.edit.tpl');

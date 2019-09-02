@@ -27,7 +27,7 @@ class CreateUserTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify DB
-        $user = UsersDAO::FindByUsername($r['username']);
+        $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
         $this->assertNotNull($user);
 
         // Verify users are not in mailing list by default
@@ -196,7 +196,7 @@ class CreateUserTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Verify DB
-        $user = UsersDAO::FindByUsername($_REQUEST['username']);
+        $user = \OmegaUp\DAO\Users::FindByUsername($_REQUEST['username']);
         $this->assertNotNull($user);
     }
 
@@ -261,7 +261,7 @@ class CreateUserTest extends OmegaupTestCase {
         ]));
 
         // Get user from db again to pick up verification changes
-        $userdb = UsersDAO::FindByUsername($user->username);
+        $userdb = \OmegaUp\DAO\Users::FindByUsername($user->username);
 
         $this->assertEquals(1, $userdb->verified);
         $this->assertEquals('ok', $response['status']);

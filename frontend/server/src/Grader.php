@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \SubmissionsDAO;
-
 class Grader {
     /** @var null|\OmegaUp\Grader */
     private static $_instance = null;
@@ -36,7 +34,7 @@ class Grader {
             if (is_null($run->submission_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
             }
-            $submission = SubmissionsDAO::getByPK($run->submission_id);
+            $submission = \OmegaUp\DAO\Submissions::getByPK($run->submission_id);
             if (is_null($submission)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
             }

@@ -17,7 +17,7 @@ try {
 $ses = SessionController::apiCurrentSession()['session'];
 
 $smarty->assign('PROGRAMMING_LANGUAGES', RunController::$kSupportedLanguages);
-$smarty->assign('COUNTRIES', CountriesDAO::getAll(null, 100, 'name'));
+$smarty->assign('COUNTRIES', \OmegaUp\DAO\Countries::getAll(null, 100, 'name'));
 if (is_null($ses['user']->password)) {
     $smarty->display('../templates/user.basicedit.tpl');
 } else {

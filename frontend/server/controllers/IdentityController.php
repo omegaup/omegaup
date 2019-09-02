@@ -15,11 +15,11 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
      */
     public static function resolveIdentity(?string $userOrEmail) : \OmegaUp\DAO\VO\Identities {
         \OmegaUp\Validators::validateStringNonEmpty($userOrEmail, 'usernameOrEmail');
-        $identity = IdentitiesDAO::findByUsername($userOrEmail);
+        $identity = \OmegaUp\DAO\Identities::findByUsername($userOrEmail);
         if (!is_null($identity)) {
             return $identity;
         }
-        $identity = IdentitiesDAO::FindByEmail($userOrEmail);
+        $identity = \OmegaUp\DAO\Identities::FindByEmail($userOrEmail);
         if (!is_null($identity)) {
             return $identity;
         }
@@ -175,8 +175,8 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            IdentitiesDAO::create($identity);
-            GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+            \OmegaUp\DAO\Identities::create($identity);
+            \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $groupId,
                 'identity_id' => $identity->identity_id,
             ]));
@@ -218,7 +218,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
         $identity->identity_id = $originalIdentity->identity_id;
 
         // Save in DB
-        IdentitiesDAO::update($identity);
+        \OmegaUp\DAO\Identities::update($identity);
 
         \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $identity->username);
 
@@ -246,7 +246,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
         // Save object into DB
         try {
             // Update password
-            IdentitiesDAO::update($identity);
+            \OmegaUp\DAO\Identities::update($identity);
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             throw $e;
         }
@@ -377,7 +377,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
         // Mentors can see current coder of the month email.
         if (!is_null($r->identity)
             && \OmegaUp\Authorization::canViewEmail($r->identity)
-            && CoderOfTheMonthDAO::isLastCoderOfTheMonth($identity->username)
+            && \OmegaUp\DAO\CoderOfTheMonth::isLastCoderOfTheMonth($identity->username)
         ) {
             return $response;
         }
@@ -392,7 +392,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     private static function getProfileImpl(\OmegaUp\DAO\VO\Identities $identity) {
-        $extendedProfile = IdentitiesDAO::getExtendedProfileDataByPk($identity->identity_id);
+        $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk($identity->identity_id);
 
         return [
             'userinfo' => [
@@ -424,7 +424,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
         try {
             $identity = self::resolveTargetIdentity($r);
             if (!is_null($identity) && !is_null($identity->language_id)) {
-                $result = LanguagesDAO::getByPK($identity->language_id);
+                $result = \OmegaUp\DAO\Languages::getByPK($identity->language_id);
                 if (is_null($result)) {
                     self::$log->warn('Invalid language id for identity');
                 } else {

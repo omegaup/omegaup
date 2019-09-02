@@ -23,10 +23,10 @@ class GroupController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
-            ACLsDAO::create($groupAcl);
+            \OmegaUp\DAO\ACLs::create($groupAcl);
             $group->acl_id = $groupAcl->acl_id;
 
-            GroupsDAO::create($group);
+            \OmegaUp\DAO\Groups::create($group);
 
             self::$log->info("Group {$alias} created.");
 
@@ -75,7 +75,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity
     ) : ?\OmegaUp\DAO\VO\Groups {
         \OmegaUp\Validators::validateStringNonEmpty($groupAlias, 'group_alias');
-        $group = GroupsDAO::findByAlias($groupAlias);
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group)) {
             return null;
         }
@@ -112,7 +112,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
         }
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
-        if (!is_null(GroupsIdentitiesDAO::getByPK(
+        if (!is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
             $group->group_id,
             $resolvedIdentity->identity_id
         ))) {
@@ -121,7 +121,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        GroupsIdentitiesDAO::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $group->group_id,
             'identity_id' => $resolvedIdentity->identity_id
         ]));
@@ -146,7 +146,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
         // Check user is actually in group
-        $groupIdentities = GroupsIdentitiesDAO::getByPK(
+        $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getByPK(
             $group->group_id,
             $resolvedIdentity->identity_id
         );
@@ -154,7 +154,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'User');
         }
 
-        GroupsIdentitiesDAO::delete($groupIdentities);
+        \OmegaUp\DAO\GroupsIdentities::delete($groupIdentities);
         self::$log->info("Removed {$resolvedIdentity->username}");
 
         return ['status' => 'ok'];
@@ -168,7 +168,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
     public static function apiMyList(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
-        $groups = GroupsDAO::getAllGroupsAdminedByUser(
+        $groups = \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
             $r->user->user_id,
             $r->identity->identity_id
         );
@@ -199,7 +199,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'query');
         }
 
-        $groups = GroupsDAO::SearchByName($r['query']);
+        $groups = \OmegaUp\DAO\Groups::SearchByName($r['query']);
 
         $response = [];
         foreach ($groups as $group) {
@@ -224,7 +224,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
         }
 
         /** @var int $group->group_id */
-        $scoreboards = GroupsScoreboardsDAO::getByGroup($group->group_id);
+        $scoreboards = \OmegaUp\DAO\GroupsScoreboards::getByGroup($group->group_id);
 
         $response = [
             'status' => 'ok',
@@ -255,7 +255,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'identities' => GroupsIdentitiesDAO::GetMemberIdentities($group),
+            'identities' => \OmegaUp\DAO\GroupsIdentities::GetMemberIdentities($group),
         ];
     }
 
@@ -278,7 +278,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['description'], 'description');
 
-        GroupsScoreboardsDAO::create(new \OmegaUp\DAO\VO\GroupsScoreboards([
+        \OmegaUp\DAO\GroupsScoreboards::create(new \OmegaUp\DAO\VO\GroupsScoreboards([
             'group_id' => $group->group_id,
             'name' => $r['name'],
             'description' =>$r['description'],

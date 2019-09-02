@@ -34,9 +34,9 @@ class VirtualContestTest extends OmegaupTestCase {
         // Get generated virtual contest alias
         $virtualContestAlias = $response['alias'];
 
-        $virtualContest = ContestsDAO::getByAlias($virtualContestAlias);
+        $virtualContest = \OmegaUp\DAO\Contests::getByAlias($virtualContestAlias);
 
-        $originalContest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $originalContest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
 
         // Assert virtual contest
         $this->assertEquals($originalContest->contest_id, $virtualContest->rerun_id);
@@ -54,10 +54,10 @@ class VirtualContestTest extends OmegaupTestCase {
         $this->assertEquals($originalContest->languages, $virtualContest->languages);
 
         // Assert virtual contest problenset problems
-        $originalProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+        $originalProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $originalContest->problemset_id
         );
-        $virtualProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+        $virtualProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $virtualContest->problemset_id
         );
         // Number of problems must be equal

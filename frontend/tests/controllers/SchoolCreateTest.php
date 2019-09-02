@@ -22,7 +22,7 @@ class SchoolCreateTest extends OmegaupTestCase {
         $response = SchoolController::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, count(SchoolsDAO::findByName($r['name'])));
+        $this->assertEquals(1, count(\OmegaUp\DAO\Schools::findByName($r['name'])));
     }
 
     /**
@@ -41,12 +41,12 @@ class SchoolCreateTest extends OmegaupTestCase {
         $response = SchoolController::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, count(SchoolsDAO::findByName($r['name'])));
+        $this->assertEquals(1, count(\OmegaUp\DAO\Schools::findByName($r['name'])));
 
         // Call api again
         $response = SchoolController::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(1, count(SchoolsDAO::findByName($r['name'])));
+        $this->assertEquals(1, count(\OmegaUp\DAO\Schools::findByName($r['name'])));
     }
 }

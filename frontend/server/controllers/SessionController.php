@@ -145,7 +145,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         }
         $authToken = strval($r['auth_token']);
 
-        $currentIdentity = AuthTokensDAO::getIdentityByToken($authToken);
+        $currentIdentity = \OmegaUp\DAO\AuthTokens::getIdentityByToken($authToken);
         if (is_null($currentIdentity)) {
             // Means user has auth token, but does not exist in DB
             return [
@@ -162,12 +162,12 @@ class SessionController extends \OmegaUp\Controllers\Controller {
             $currentUser = null;
             $email = null;
         } else {
-            $currentUser = UsersDAO::getByPK($currentIdentity->user_id);
+            $currentUser = \OmegaUp\DAO\Users::getByPK($currentIdentity->user_id);
             if (is_null($currentUser)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
             }
             $email = !is_null($currentUser->main_email_id) ?
-                EmailsDAO::getByPK($currentUser->main_email_id) :
+                \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;
         }
 
@@ -208,7 +208,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         $this->InvalidateLocalCache();
 
         try {
-            AuthTokensDAO::delete($authToken);
+            \OmegaUp\DAO\AuthTokens::delete($authToken);
         } catch (Exception $e) {
             // Best effort
             self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
@@ -219,7 +219,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
 
     private function registerSession(\OmegaUp\DAO\VO\Identities $identity) : string {
         // Log the login.
-        IdentityLoginLogDAO::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
+        \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => $identity->identity_id,
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));
@@ -228,7 +228,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
 
         //erase expired tokens
         try {
-            AuthTokensDAO::expireAuthTokens($identity->identity_id);
+            \OmegaUp\DAO\AuthTokens::expireAuthTokens($identity->identity_id);
         } catch (Exception $e) {
             // Best effort
             self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
@@ -239,7 +239,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
-        AuthTokensDAO::replace(new \OmegaUp\DAO\VO\AuthTokens([
+        \OmegaUp\DAO\AuthTokens::replace(new \OmegaUp\DAO\VO\AuthTokens([
             'user_id' => $identity->user_id,
             'identity_id' => $identity->identity_id,
             'token' => $token,
@@ -270,7 +270,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         for (;;) {
             // Maybe we can bring all records from db
             // with prefix $username, beacuse this:
-            $userexists = UsersDAO::FindByUsername($username . $suffix);
+            $userexists = \OmegaUp\DAO\Users::FindByUsername($username . $suffix);
             // will query db every single time probably.
 
             if (empty($userexists)) {
@@ -417,11 +417,11 @@ class SessionController extends \OmegaUp\Controllers\Controller {
             try {
                 \OmegaUp\DAO\DAO::transBegin();
                 $identity->password = \OmegaUp\SecurityTools::hashString($r['password']);
-                IdentitiesDAO::update($identity);
+                \OmegaUp\DAO\Identities::update($identity);
                 if (!is_null($identity->user_id)) {
-                    $user = UsersDAO::getByPK($identity->user_id);
+                    $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
                     $user->password = $identity->password;
-                    UsersDAO::update($user);
+                    \OmegaUp\DAO\Users::update($user);
                 }
                 \OmegaUp\DAO\DAO::transEnd();
             } catch (Exception $e) {
@@ -433,7 +433,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         self::$log->info("Identity {$identity->username} has logged in natively.");
 
         if (!is_null($identity->user_id)) {
-            $user = UsersDAO::getByPK($identity->user_id);
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
             UserController::checkEmailVerification($user);
         }
 
@@ -486,7 +486,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
     private function ThirdPartyLogin($provider, $email, $name = null) {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
-        $results = IdentitiesDAO::FindByEmail($email);
+        $results = \OmegaUp\DAO\Identities::FindByEmail($email);
 
         if (!is_null($results)) {
             self::$log->info("User has been here before with $provider");
@@ -518,7 +518,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }
-            $identity = IdentitiesDAO::findByUsername($res['username']);
+            $identity = \OmegaUp\DAO\Identities::findByUsername($res['username']);
         }
 
         $this->registerSession($identity);

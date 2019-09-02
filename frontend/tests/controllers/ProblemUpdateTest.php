@@ -17,7 +17,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Update statement
         $login = self::login($problemData['author']);
 
-        $problemLanguages = ProblemsLanguagesDAO::getByProblemId(
+        $problemLanguages = \OmegaUp\DAO\ProblemsLanguages::getByProblemId(
             $problemData['problem']->problem_id
         );
         // This problem only has one language at this point
@@ -32,7 +32,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // The problem has two languages at this point
-        $problemLanguages = ProblemsLanguagesDAO::getByProblemId(
+        $problemLanguages = \OmegaUp\DAO\ProblemsLanguages::getByProblemId(
             $problemData['problem']->problem_id
         );
         $this->assertEquals(2, count($problemLanguages));
@@ -80,7 +80,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($newTitle);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
 
         // Check that we only retreived 1 element
         $this->assertEquals(1, count($problems));
@@ -240,7 +240,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // Verify data in DB
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
 
         // Check that we only retrieved 1 element
         $this->assertNotNull($problem);
@@ -431,7 +431,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($newTitle);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
 
         $this->assertTrue(!is_null($problems));
     }
@@ -477,7 +477,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // Verify data in DB
-        $problems = ProblemsDAO::getByTitle($newTitle);
+        $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
     }
 
     /**
@@ -647,7 +647,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Ban the problem.
         $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
-        ProblemsDAO::update($problem);
+        \OmegaUp\DAO\Problems::update($problem);
 
         ProblemController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -687,7 +687,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Promote the problem.
         $problem->visibility = ProblemController::VISIBILITY_PROMOTED;
-        ProblemsDAO::update($problem);
+        \OmegaUp\DAO\Problems::update($problem);
 
         ProblemController::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -918,8 +918,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             1.0,
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($runData['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($runData['response']['guid'])->current_run_id
             )->score
         );
 
@@ -945,8 +945,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             0.0,
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($runData['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($runData['response']['guid'])->current_run_id
             )->score
         );
 
@@ -972,8 +972,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             1.0,
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($runData['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($runData['response']['guid'])->current_run_id
             )->score
         );
     }
@@ -1075,14 +1075,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         $result = $this->updateProblemsetProblemWithRuns(ProblemController::UPDATE_PUBLISHED_NONE);
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
@@ -1094,14 +1094,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
     }
@@ -1116,14 +1116,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
@@ -1135,14 +1135,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
@@ -1173,14 +1173,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
@@ -1192,20 +1192,20 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'WA',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
         // Ensure that the version change would make a difference.
         $login = self::login($result['pastProblemData']['author']);
-        $presentProblem = ProblemsDAO::getByAlias($result['pastProblemData']['problem']->alias);
+        $presentProblem = \OmegaUp\DAO\Problems::getByAlias($result['pastProblemData']['problem']->alias);
         $diffResult = ContestController::apiRunsDiff(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $result['pastProblemData']['problem']->alias,
@@ -1232,8 +1232,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
@@ -1248,8 +1248,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
         $this->assertEquals(
             'WA',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
     }
@@ -1265,14 +1265,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
@@ -1285,14 +1285,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'WA',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
 
@@ -1304,14 +1304,14 @@ class UpdateProblemTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             'AC',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['pastRunData']['response']['guid'])->current_run_id
             )->verdict
         );
         $this->assertEquals(
             'WA',
-            RunsDAO::getByPK(
-                SubmissionsDAO::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
+            \OmegaUp\DAO\Runs::getByPK(
+                \OmegaUp\DAO\Submissions::getByGuid($result['presentRunData']['response']['guid'])->current_run_id
             )->verdict
         );
     }

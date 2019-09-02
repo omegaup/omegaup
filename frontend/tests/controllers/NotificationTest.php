@@ -9,12 +9,12 @@
 class NotificationTest extends OmegaupTestCase {
     public function testListUnreadNotifications() {
         $user = UserFactory::createUser();
-        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
+        \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'read' => true,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testRead'])
         ]));
-        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
+        \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
         ]));
@@ -32,15 +32,15 @@ class NotificationTest extends OmegaupTestCase {
 
     public function testReadNotifications() {
         $user = UserFactory::createUser();
-        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
+        \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
         ]));
-        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
+        \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread2'])
         ]));
-        NotificationsDAO::create(new \OmegaUp\DAO\VO\Notifications([
+        \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread3'])
         ]));
@@ -106,7 +106,7 @@ class NotificationTest extends OmegaupTestCase {
             'user_id' => $user->user_id,
             'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
         ]);
-        NotificationsDAO::create($notification);
+        \OmegaUp\DAO\Notifications::create($notification);
 
         $maliciousUser = UserFactory::createUser();
         $login = self::login($maliciousUser);

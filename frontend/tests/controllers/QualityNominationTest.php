@@ -16,7 +16,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        $nominations = QualityNominationsDAO::getNominations(null, null);
+        $nominations = \OmegaUp\DAO\QualityNominations::getNominations(null, null);
         self::assertArrayHasKey('author', $nominations[0]);
         self::assertArrayHasKey('nominator', $nominations[0]);
     }
@@ -36,7 +36,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        $nomination = QualityNominationsDAO::getById($result['qualitynomination_id']);
+        $nomination = \OmegaUp\DAO\QualityNominations::getById($result['qualitynomination_id']);
         self::assertArrayHasKey('author', $nomination);
         self::assertArrayHasKey('nominator', $nomination);
         self::assertEquals($contestant->username, $nomination['nominator']['username']);
@@ -809,11 +809,11 @@ class QualityNominationTest extends OmegaupTestCase {
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        $problemDismissed = QualityNominationsDAO::getByUserAndProblem(
+        $problemDismissed = \OmegaUp\DAO\QualityNominations::getByUserAndProblem(
             $r->user->user_id,
             $problem->problem_id,
             $r['nomination'],
@@ -828,7 +828,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         try {
             QualityNominationController::apiCreate($r);
-            $pd = QualityNominationsDAO::getByUserAndProblem(
+            $pd = \OmegaUp\DAO\QualityNominations::getByUserAndProblem(
                 $r->user->user_id,
                 $problem->problem_id,
                 $r['nomination'],
@@ -846,8 +846,8 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        $globalContents = QualityNominationsDAO::getAllNominations();
-        $actualGlobals = QualityNominationsDAO::calculateGlobalDifficultyAndQuality($globalContents);
+        $globalContents = \OmegaUp\DAO\QualityNominations::getAllNominations();
+        $actualGlobals = \OmegaUp\DAO\QualityNominations::calculateGlobalDifficultyAndQuality($globalContents);
         $expectedGlobals = [23/13 /*quality*/, 54/16 /*difficulty*/];
 
         $this->assertEquals($expectedGlobals, $actualGlobals);
@@ -857,10 +857,10 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
-        $contents[0] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[0]['problem']->problem_id);
-        $actualResult[0] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[0]);
-        $contents[1] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[1]['problem']->problem_id);
-        $actualResult[1] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[1]);
+        $contents[0] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem($problemData[0]['problem']->problem_id);
+        $actualResult[0] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates($contents[0]);
+        $contents[1] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem($problemData[1]['problem']->problem_id);
+        $actualResult[1] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates($contents[1]);
 
         $expectedResult[0] = [
             'quality_sum' => 13,
@@ -912,23 +912,23 @@ class QualityNominationTest extends OmegaupTestCase {
 
         Utils::RunAggregateFeedback();
 
-        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
+        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.971428571, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
         $this->assertEquals(2.2, $newProblem[0]->quality, 'Wrong quality.', 0.001);
         $this->assertEquals('[0, 0, 2, 2, 1]', $newProblem[0]->difficulty_histogram, 'Wrong difficulty histogram');
         $this->assertEquals('[1, 1, 0, 1, 2]', $newProblem[0]->quality_histogram, 'Wrong quality histogram');
 
-        $newProblem[2] = ProblemsDAO::getByAlias($problemData[2]['request']['problem_alias']);
+        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias($problemData[2]['request']['problem_alias']);
         $this->assertEquals(0, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
         $this->assertEquals(0, $newProblem[2]->quality, 'Wrong quality', 0.001);
 
-        $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
+        $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
             false /* public_only */,
             true /* includeAutogenerated */
         );
 
-        $tagArrayForProblem3 = ProblemsTagsDAO::getProblemTags(
+        $tagArrayForProblem3 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[2],
             false /* public_only */,
             true /* includeAutogenerated */
@@ -947,25 +947,25 @@ class QualityNominationTest extends OmegaupTestCase {
         Utils::RunUpdateUserRank();
         Utils::RunAggregateFeedback();
 
-        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
+        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias($problemData[0]['request']['problem_alias']);
         $this->assertEquals(2.895384615, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
         $this->assertEquals(2.538378378, $newProblem[0]->quality, 'Wrong quality.', 0.001);
 
-        $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['problem_alias']);
+        $newProblem[1] = \OmegaUp\DAO\Problems::getByAlias($problemData[1]['request']['problem_alias']);
         $this->assertEquals(3.446886447, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
         $this->assertEquals(0, $newProblem[1]->quality, 'Wrong quality.', 0.001);
 
-        $newProblem[2] = ProblemsDAO::getByAlias($problemData[2]['request']['problem_alias']);
+        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias($problemData[2]['request']['problem_alias']);
         $this->assertEquals(2.684981685, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
         $this->assertEquals(1.736164736, $newProblem[2]->quality, 'Wrong quality', 0.001);
 
-        $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
+        $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
             false /* public_only */,
             true /* includeAutogenerated */
         );
 
-        $tagArrayForProblem3 = ProblemsTagsDAO::getProblemTags(
+        $tagArrayForProblem3 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[2],
             false /* public_only */,
             true /* includeAutogenerated */
@@ -1123,7 +1123,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
         Utils::RunAggregateFeedback();
 
-        $problemOfTheWeek = ProblemOfTheWeekDAO::getByDificulty('easy');
+        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDificulty('easy');
         $this->assertEquals(count($problemOfTheWeek), 1);
         $this->assertEquals(
             $problemOfTheWeek[0]->problem_id,
@@ -1194,7 +1194,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ProblemsFactory::addTag($problemData[0], 'dp', 1 /* public */);
         $tags = array_map(function ($tag) {
             return $tag['name'];
-        }, ProblemsTagsDAO::getProblemTags(
+        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problemData[0]['problem'],
             false /* public_only */,
             true /* includeAutogenerated */
@@ -1205,7 +1205,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
         $tags = array_map(function ($tag) {
             return $tag['name'];
-        }, ProblemsTagsDAO::getProblemTags(
+        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $problemData[0]['problem'],
             false /* public_only */,
             true /* includeAutogenerated */
@@ -1380,27 +1380,27 @@ class QualityNominationTest extends OmegaupTestCase {
         ];
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.25),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.25),
             ['DP', 'Graph', 'Binary Search']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.5),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.5),
             ['DP', 'Graph']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.9),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
             ['DP']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.9),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
             ['DP']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.01),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.01),
             ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']
         );
 
@@ -1410,7 +1410,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ];
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tagsWithLittleVotes, 0.25),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tagsWithLittleVotes, 0.25),
             [],
             'There must be at least 5 votes.'
         );
@@ -1420,7 +1420,7 @@ class QualityNominationTest extends OmegaupTestCase {
             'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
             [],
             'There must be a maximum number of tags to be assigned.'
         );

@@ -31,7 +31,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'role' => 'Mentor'
         ]));
 
-        $systemRoles = UserRolesDAO::getSystemRoles($user->user_id);
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
         $this->assertContains('Admin', $systemRoles);
         $this->assertContains('Reviewer', $systemRoles);
         $this->assertContains('Mentor', $systemRoles);
@@ -42,7 +42,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'username' => $username,
             'role' => 'Mentor'
         ]));
-        $systemRoles = UserRolesDAO::getSystemRoles($user->user_id);
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
         $this->assertNotContains('Mentor', $systemRoles);
     }
 
@@ -52,7 +52,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
         $user = UserFactory::createUser(new UserParams(['username' => $username]));
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         $login = self::login($user);
         // Call to API Add Group
@@ -72,7 +72,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'group' => 'omegaup:mentor'
         ]));
 
-        $systemGroups = UserRolesDAO::getSystemGroups($identity->identity_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($identity->identity_id);
         $this->assertContains('omegaup:quality-reviewer', $systemGroups);
         $this->assertContains('omegaup:course-curator', $systemGroups);
         $this->assertContains('omegaup:mentor', $systemGroups);
@@ -83,7 +83,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
-        $systemGroups = UserRolesDAO::getSystemGroups($user->user_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($user->user_id);
         $this->assertNotContains('omegaup:mentor', $systemGroups);
     }
 }

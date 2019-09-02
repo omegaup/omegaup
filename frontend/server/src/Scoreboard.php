@@ -2,9 +2,6 @@
 
 namespace OmegaUp;
 
-use \ProblemsetProblemsDAO;
-use \ProblemsetsDAO;
-use \RunsDAO;
 use \RunController;
 
 /**
@@ -70,7 +67,7 @@ class Scoreboard {
         }
 
         // Get all distinct contestants participating in the given contest
-        $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
+        $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
             $this->params->acl_id,
             true /* show all runs */,
@@ -80,14 +77,14 @@ class Scoreboard {
         );
 
         // Get all problems given problemset
-        $problemset = ProblemsetsDAO::getByPK($this->params->problemset_id);
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK($this->params->problemset_id);
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
         $rawProblemsetProblems =
-            ProblemsetProblemsDAO::getRelevantProblems($problemset);
+            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems($problemset);
 
-        $contestRuns = RunsDAO::getProblemsetRuns(
+        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
             $problemset,
             $this->params->only_ac
         );
@@ -166,7 +163,7 @@ class Scoreboard {
         }
 
         // Get all distinct contestants participating in the given contest
-        $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
+        $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
             $this->params->acl_id,
             $this->params->admin,
@@ -176,14 +173,14 @@ class Scoreboard {
         );
 
         // Get all problems given problemset
-        $problemset = ProblemsetsDAO::getByPK($this->params->problemset_id);
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK($this->params->problemset_id);
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
         $rawProblemsetProblems =
-            ProblemsetProblemsDAO::getRelevantProblems($problemset);
+            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems($problemset);
 
-        $contestRuns = RunsDAO::getProblemsetRuns($problemset);
+        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns($problemset);
 
         $problemMapping = [];
 
@@ -249,14 +246,14 @@ class Scoreboard {
      * Force refresh of Scoreboard caches
      */
     public static function refreshScoreboardCache(\OmegaUp\ScoreboardParams $params) : void {
-        $problemset = ProblemsetsDAO::getByPK($params->problemset_id);
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK($params->problemset_id);
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
         }
-        $contestRuns = RunsDAO::getProblemsetRuns($problemset);
+        $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns($problemset);
 
         // Get all distinct contestants participating in the contest
-        $rawContestIdentities = RunsDAO::getAllRelevantIdentities(
+        $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $params->problemset_id,
             $params->acl_id,
             true /* show all runs */,
@@ -267,7 +264,7 @@ class Scoreboard {
 
         // Get all problems given problemset
         $rawProblemsetProblems =
-            ProblemsetProblemsDAO::getRelevantProblems($problemset);
+            \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems($problemset);
 
         $problemMapping = [];
 
@@ -525,7 +522,7 @@ class Scoreboard {
 
             if (!array_key_exists($identityId, $testOnly)) {
                 // Hay un usuario en la lista de Runs,
-                // que no fue regresado por RunsDAO::getAllRelevantIdentities()
+                // que no fue regresado por \OmegaUp\DAO\Runs::getAllRelevantIdentities()
                 continue;
             }
 

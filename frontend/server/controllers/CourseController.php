@@ -19,7 +19,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCourseAssignmentAlias(\OmegaUp\DAO\VO\Courses $course, string $assignmentAlias) : \OmegaUp\DAO\VO\Assignments {
-        $assignment = CoursesDAO::getAssignmentByAlias($course, $assignmentAlias);
+        $assignment = \OmegaUp\DAO\Courses::getAssignmentByAlias($course, $assignmentAlias);
         if (is_null($assignment)) {
             throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
@@ -156,7 +156,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         if (is_null($r['school_id'])) {
             $school = null;
         } else {
-            $school = SchoolsDAO::getByPK($r['school_id']);
+            $school = \OmegaUp\DAO\Schools::getByPK($r['school_id']);
             if (is_null($school)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('schoolNotFound');
             }
@@ -179,7 +179,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
      */
     private static function validateCourseExists(string $courseAlias) : \OmegaUp\DAO\VO\Courses {
         \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course_alias');
-        $course = CoursesDAO::getByAlias($courseAlias);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -198,7 +198,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             return $group;
         }
 
-        $group = GroupsDAO::getByPK($course->group_id);
+        $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
@@ -240,7 +240,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
                 'requests_user_information' => $originalCourse->requests_user_information
             ]), $r->user);
 
-            $assignmentsProblems = ProblemsetProblemsDAO::getProblemsAssignmentByCourseAlias($originalCourse);
+            $assignmentsProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsAssignmentByCourseAlias($originalCourse);
 
             foreach ($assignmentsProblems as $assignment => $assignmentProblems) {
                 // Create and assign homeworks and tests to new course
@@ -319,7 +319,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Users $creator
     ) : \OmegaUp\DAO\VO\Courses {
-        if (!is_null(CoursesDAO::getByAlias($course->alias))) {
+        if (!is_null(\OmegaUp\DAO\Courses::getByAlias($course->alias))) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse');
         }
 
@@ -334,9 +334,9 @@ class CourseController extends \OmegaUp\Controllers\Controller {
 
         try {
             $acl = new \OmegaUp\DAO\VO\ACLs(['owner_id' => $creator->user_id]);
-            ACLsDAO::create($acl);
+            \OmegaUp\DAO\ACLs::create($acl);
 
-            GroupRolesDAO::create(new \OmegaUp\DAO\VO\GroupRoles([
+            \OmegaUp\DAO\GroupRoles::create(new \OmegaUp\DAO\VO\GroupRoles([
                 'group_id' => $group->group_id,
                 'acl_id' => $acl->acl_id,
                 'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
@@ -345,7 +345,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             $course->group_id = $group->group_id;
             $course->acl_id = $acl->acl_id;
 
-            CoursesDAO::create($course);
+            \OmegaUp\DAO\Courses::create($course);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -380,14 +380,14 @@ class CourseController extends \OmegaUp\Controllers\Controller {
                 'scoreboard_url_admin' => \OmegaUp\SecurityTools::randomString(30),
             ]);
 
-            ProblemsetsDAO::create($problemset);
+            \OmegaUp\DAO\Problemsets::create($problemset);
             $assignment->problemset_id = $problemset->problemset_id;
 
-            AssignmentsDAO::create($assignment);
+            \OmegaUp\DAO\Assignments::create($assignment);
 
             // Update assignment_id in problemset object
             $problemset->assignment_id = $assignment->assignment_id;
-            ProblemsetsDAO::update($problemset);
+            \OmegaUp\DAO\Problemsets::update($problemset);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -421,7 +421,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         ?int $order = 1
     ) : void {
         // Get this problem
-        $problem = ProblemsDAO::getByAlias($problemAlias);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -527,7 +527,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         if ($r['start_time'] != $assignment->start_time) {
             $runCount = 0;
 
-            $runCount = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+            $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
                 (int)$assignment->problemset_id
             );
 
@@ -545,7 +545,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         ];
         self::updateValueProperties($r, $assignment, $valueProperties);
 
-        AssignmentsDAO::update($assignment);
+        \OmegaUp\DAO\Assignments::update($assignment);
 
         return ['status' => 'ok'];
     }
@@ -569,7 +569,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemset = AssignmentsDAO::getProblemset(
+        $problemset = \OmegaUp\DAO\Assignments::getProblemset(
             $course->course_id,
             $r['assignment_alias']
         );
@@ -591,7 +591,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             $r['commit']
         );
 
-        CoursesDAO::updateAssignmentMaxPoints(
+        \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
             $course,
             $r['assignment_alias']
         );
@@ -618,7 +618,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = AssignmentsDAO::getProblemset(
+        $problemSet = \OmegaUp\DAO\Assignments::getProblemset(
             $course->course_id,
             $r['assignment_alias']
         );
@@ -629,7 +629,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         // Update problems order
         $problems = $r['problems'];
         foreach ($problems as $problem) {
-            $currentProblem = ProblemsDAO::getByAlias($problem['alias']);
+            $currentProblem = \OmegaUp\DAO\Problems::getByAlias($problem['alias']);
             if (is_null($currentProblem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
             }
@@ -638,7 +638,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             if (is_numeric($r['order'])) {
                 $order = (int)$r['order'];
             }
-            ProblemsetProblemsDAO::updateProblemsOrder(
+            \OmegaUp\DAO\ProblemsetProblems::updateProblemsOrder(
                 $problemSet->problemset_id,
                 $currentProblem->problem_id,
                 $problem['order']
@@ -668,13 +668,13 @@ class CourseController extends \OmegaUp\Controllers\Controller {
 
         // Update assignments order
         foreach ($r['assignments'] as $assignment) {
-            $currentAssignment = AssignmentsDAO::getByAliasAndCourse($assignment['alias'], $course->course_id);
+            $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse($assignment['alias'], $course->course_id);
 
             if (empty($currentAssignment)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
             }
 
-            AssignmentsDAO::updateAssignmentsOrder(
+            \OmegaUp\DAO\Assignments::updateAssignmentsOrder(
                 $currentAssignment->assignment_id,
                 (int)$assignment['order']
             );
@@ -696,12 +696,12 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get this problem
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $identities = ProblemsDAO::getIdentitiesInGroupWhoAttemptedProblem(
+        $identities = \OmegaUp\DAO\Problems::getIdentitiesInGroupWhoAttemptedProblem(
             $course->group_id,
             $problem->problem_id
         );
@@ -728,7 +728,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = AssignmentsDAO::getProblemset(
+        $problemSet = \OmegaUp\DAO\Assignments::getProblemset(
             $course->course_id,
             $r['assignment_alias']
         );
@@ -737,29 +737,29 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get this problem
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Delete the entry from the database.
-        $problemsetProblem = ProblemsetProblemsDAO::getByPK(
+        $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
             $problemSet->problemset_id,
             $problem->problem_id
         );
         if (is_null($problemsetProblem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotPartOfAssignment');
         }
-        if (SubmissionsDAO::countTotalRunsOfProblemInProblemset(
+        if (\OmegaUp\DAO\Submissions::countTotalRunsOfProblemInProblemset(
             (int)$problem->problem_id,
             (int)$problemSet->problemset_id
         ) > 0 &&
             !\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
         }
-        ProblemsetProblemsDAO::delete($problemsetProblem);
+        \OmegaUp\DAO\ProblemsetProblems::delete($problemsetProblem);
 
-        CoursesDAO::updateAssignmentMaxPoints(
+        \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
             $course,
             $r['assignment_alias']
         );
@@ -790,7 +790,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $assignments = AssignmentsDAO::getSortedCourseAssignments(
+        $assignments = \OmegaUp\DAO\Assignments::getSortedCourseAssignments(
             $course->course_id
         );
 
@@ -800,7 +800,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         ];
         $time = \OmegaUp\Time::get();
         foreach ($assignments as $assignment) {
-            $assignment['has_runs'] = SubmissionsDAO::countTotalSubmissionsOfProblemset(
+            $assignment['has_runs'] = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
                 (int)$assignment['problemset_id']
             ) > 0;
             unset($assignment['problemset_id']);
@@ -836,7 +836,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = AssignmentsDAO::getProblemset(
+        $problemSet = \OmegaUp\DAO\Assignments::getProblemset(
             $$course->course_id,
             $r['assignment_alias']
         );
@@ -856,7 +856,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         $relevant_columns = ['alias', 'name', 'start_time', 'finish_time'];
         $arr = $course->asFilteredArray($relevant_columns);
 
-        $arr['counts'] = AssignmentsDAO::getAssignmentCountsForCourse(
+        $arr['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
             $course->course_id
         );
         return $arr;
@@ -887,14 +887,14 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         // Courses the user is an admin for.
         $admin_courses = [];
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            $admin_courses = CoursesDAO::getAll(
+            $admin_courses = \OmegaUp\DAO\Courses::getAll(
                 $page,
                 $pageSize,
                 'course_id',
                 'DESC'
             );
         } else {
-            $admin_courses = CoursesDAO::getAllCoursesAdminedByIdentity(
+            $admin_courses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
                 $pageSize
@@ -902,7 +902,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         // Courses the user is a student in.
-        $student_courses = CoursesDAO::getCoursesForStudent($r->identity->identity_id);
+        $student_courses = \OmegaUp\DAO\Courses::getCoursesForStudent($r->identity->identity_id);
 
         $response = [
             'admin' => [],
@@ -936,7 +936,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             return false;
         }
 
-        if (!empty(CoursesDAO::getCoursesForStudent($identity->identity_id))) {
+        if (!empty(\OmegaUp\DAO\Courses::getCoursesForStudent($identity->identity_id))) {
             return true;
         }
 
@@ -944,12 +944,12 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         $page = 1;
         $pageSize = 1;
         if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
-            $result = CoursesDAO::getAll($page, $pageSize, 'course_id', 'DESC');
+            $result = \OmegaUp\DAO\Courses::getAll($page, $pageSize, 'course_id', 'DESC');
             if (!empty($result)) {
                 return true;
             }
         }
-        $result = CoursesDAO::getAllCoursesAdminedByIdentity(
+        $result = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
             $identity->identity_id,
             $page,
             $pageSize
@@ -975,7 +975,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $students = CoursesDAO::getStudentsInCourseWithProgressPerAssignment(
+        $students = \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
             $course->course_id,
             $course->group_id
         );
@@ -999,7 +999,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
-        if (is_null(GroupsIdentitiesDAO::getByPK(
+        if (is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
             $course->group_id,
             $resolvedIdentity->identity_id
         ))) {
@@ -1008,7 +1008,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
+        $r['assignment'] = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $r['assignment_alias'],
             $course->course_id
         );
@@ -1016,12 +1016,12 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
-        $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
+        $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $r['assignment']->problemset_id
         );
         $letter = 0;
         foreach ($problems as &$problem) {
-            $runsArray = RunsDAO::getForProblemDetails(
+            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
                 (int)$problem['problem_id'],
                 (int)$r['assignment']->problemset_id,
                 (int)$resolvedIdentity->identity_id
@@ -1070,7 +1070,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $assignments = CoursesDAO::getAssignmentsProgress(
+        $assignments = \OmegaUp\DAO\Courses::getAssignmentsProgress(
             $course->course_id,
             $r->identity->identity_id
         );
@@ -1120,29 +1120,29 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             // Only users adding themselves are saved in consent log
             if ($resolvedIdentity->identity_id === $r->identity->identity_id
                  && $course->requests_user_information != 'no') {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['privacy_git_object_id'], $r['statement_type']);
-                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($resolvedIdentity->identity_id, $privacystatement_id)) {
-                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::saveLog(
+                $privacystatement_id = \OmegaUp\DAO\PrivacyStatements::getId($r['privacy_git_object_id'], $r['statement_type']);
+                if (!\OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement($resolvedIdentity->identity_id, $privacystatement_id)) {
+                    $privacystatement_consent_id = \OmegaUp\DAO\PrivacyStatementConsentLog::saveLog(
                         $resolvedIdentity->identity_id,
                         $privacystatement_id
                     );
                 } else {
-                    $privacystatement_consent_id = PrivacyStatementConsentLogDAO::getId($resolvedIdentity->identity_id, $privacystatement_id);
+                    $privacystatement_consent_id = \OmegaUp\DAO\PrivacyStatementConsentLog::getId($resolvedIdentity->identity_id, $privacystatement_id);
                 }
 
                 $groupIdentity->privacystatement_consent_id = $privacystatement_consent_id;
             }
             if ($resolvedIdentity->identity_id === $r->identity->identity_id
                  && !empty($r['accept_teacher'])) {
-                $privacystatement_id = PrivacyStatementsDAO::getId($r['accept_teacher_git_object_id'], 'accept_teacher');
-                if (!PrivacyStatementConsentLogDAO::hasAcceptedPrivacyStatement($resolvedIdentity->identity_id, $privacystatement_id)) {
-                    PrivacyStatementConsentLogDAO::saveLog(
+                $privacystatement_id = \OmegaUp\DAO\PrivacyStatements::getId($r['accept_teacher_git_object_id'], 'accept_teacher');
+                if (!\OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement($resolvedIdentity->identity_id, $privacystatement_id)) {
+                    \OmegaUp\DAO\PrivacyStatementConsentLog::saveLog(
                         $resolvedIdentity->identity_id,
                         $privacystatement_id
                     );
                 }
             }
-            GroupsIdentitiesDAO::replace($groupIdentity);
+            \OmegaUp\DAO\GroupsIdentities::replace($groupIdentity);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (Exception $e) {
@@ -1173,14 +1173,14 @@ class CourseController extends \OmegaUp\Controllers\Controller {
 
         $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
 
-        if (is_null(GroupsIdentitiesDAO::getByPK(
+        if (is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
             $course->group_id,
             $resolvedIdentity->identity_id
         ))) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseStudentNotInCourse');
         }
 
-        GroupsIdentitiesDAO::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
+        \OmegaUp\DAO\GroupsIdentities::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $course->group_id,
             'identity_id' => $resolvedIdentity->identity_id,
         ]));
@@ -1200,7 +1200,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        $course = CoursesDAO::getByAlias($r['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -1211,8 +1211,8 @@ class CourseController extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'admins' => UserRolesDAO::getCourseAdmins($course),
-            'group_admins' => GroupRolesDAO::getCourseAdmins($course)
+            'admins' => \OmegaUp\DAO\UserRoles::getCourseAdmins($course),
+            'group_admins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins($course)
         ];
     }
 
@@ -1236,7 +1236,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
 
         $resolvedUser = UserController::resolveUser($r['usernameOrEmail']);
 
-        $course = CoursesDAO::getByAlias($r['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -1270,9 +1270,9 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             // Unassociated identities can't be course admins
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        $resolvedUser = UsersDAO::getByPK($resolvedIdentity->user_id);
+        $resolvedUser = \OmegaUp\DAO\Users::getByPK($resolvedIdentity->user_id);
 
-        $course = CoursesDAO::getByAlias($r['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -1310,13 +1310,13 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         // Check course_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        $group = GroupsDAO::findByAlias($r['group']);
+        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
 
         if ($group == null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
-        $course = CoursesDAO::getByAlias($r['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -1345,13 +1345,13 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         // Check course_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
 
-        $group = GroupsDAO::findByAlias($r['group']);
+        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
 
         if ($group == null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
         }
 
-        $course = CoursesDAO::getByAlias($r['course_alias']);
+        $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -1402,7 +1402,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         $isFirstTimeAccess = false;
         $shouldShowAcceptTeacher = false;
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
-            $sharingInformation = CoursesDAO::getSharingInformation(
+            $sharingInformation = \OmegaUp\DAO\Courses::getSharingInformation(
                 $r->identity->identity_id,
                 $course,
                 $group
@@ -1444,7 +1444,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             if (!is_null($privacyStatementMarkdown)) {
                 $statementType = "course_{$requestUserInformation}_consent";
                 $privacyStatement['gitObjectId'] =
-                    PrivacyStatementsDAO::getLatestPublishedStatement(
+                    \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
                         $statementType
                     )['git_object_id'];
                 $privacyStatement['statementType'] = $statementType;
@@ -1459,7 +1459,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             }
             $acceptTeacherStatement = [
                 'gitObjectId' =>
-                    PrivacyStatementsDAO::getLatestPublishedStatement(
+                    \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
                         'accept_teacher'
                     )['git_object_id'],
                 'markdown' => $markdown,
@@ -1498,7 +1498,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
                         $r->user,
                         $r->identity
                     ) &&
-                    ProblemsetsDAO::shouldShowFirstAssociatedIdentityRunWarning(
+                    \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
                         $r->user
                     ),
                 ],
@@ -1543,7 +1543,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         } else {
             $result = [
                 'status' => 'ok',
-                'assignments' => CoursesDAO::getAllAssignments($course->alias, $isAdmin),
+                'assignments' => \OmegaUp\DAO\Courses::getAllAssignments($course->alias, $isAdmin),
                 'name' => $course->name,
                 'description' => $course->description,
                 'alias' => $course->alias,
@@ -1558,16 +1558,16 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             ];
 
             if ($isAdmin) {
-                $group = GroupsDAO::getByPK($course->group_id);
+                $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
                 if (is_null($group)) {
                     throw new \OmegaUp\Exceptions\NotFoundException('courseGroupNotFound');
                 }
-                $result['student_count'] = GroupsIdentitiesDAO::GetMemberCountById(
+                $result['student_count'] = \OmegaUp\DAO\GroupsIdentities::GetMemberCountById(
                     $group->group_id
                 );
             }
             if (!is_null($course->school_id)) {
-                $school = SchoolsDAO::getByPK($course->school_id);
+                $school = \OmegaUp\DAO\Schools::getByPK($course->school_id);
                 if ($school != null) {
                     $result['school_name'] = $school->name;
                     $result['school_id'] = $school->school_id;
@@ -1612,8 +1612,8 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $accesses = ProblemsetAccessLogDAO::GetAccessForCourse($course->course_id);
-        $submissions = SubmissionLogDAO::GetSubmissionsForCourse($course->course_id);
+        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::GetAccessForCourse($course->course_id);
+        $submissions = \OmegaUp\DAO\SubmissionLog::GetSubmissionsForCourse($course->course_id);
 
         return [
             'status' => 'ok',
@@ -1664,7 +1664,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         $course = self::validateCourseExists($courseAlias);
         $assignment = self::validateCourseAssignmentAlias($course, $assignmentAlias);
 
-        $assignmentProblemset = AssignmentsDAO::getByIdWithScoreboardUrls($assignment->assignment_id);
+        $assignmentProblemset = \OmegaUp\DAO\Assignments::getByIdWithScoreboardUrls($assignment->assignment_id);
         if (is_null($assignmentProblemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
@@ -1698,11 +1698,11 @@ class CourseController extends \OmegaUp\Controllers\Controller {
     ) : array {
         \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course');
         \OmegaUp\Validators::validateStringNonEmpty($assignmentAlias, 'assignment');
-        $course = CoursesDAO::getByAlias($courseAlias);
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
-        $assignment = AssignmentsDAO::getByAliasAndCourse($assignmentAlias, $course->course_id);
+        $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse($assignmentAlias, $course->course_id);
         if (is_null($assignment)) {
             throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
@@ -1713,7 +1713,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         if ($assignment->start_time > \OmegaUp\Time::get() ||
-            !GroupRolesDAO::isContestant($identity->identity_id, $assignment->acl_id)
+            !\OmegaUp\DAO\GroupRoles::isContestant($identity->identity_id, $assignment->acl_id)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -1737,7 +1737,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             $r
         );
 
-        $problems = ProblemsetProblemsDAO::getProblemsByProblemset(
+        $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $tokenAuthenticationResult['assignment']->problemset_id
         );
         $letter = 0;
@@ -1747,12 +1747,12 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         }
 
         $director = null;
-        $acl = ACLsDAO::getByPK($tokenAuthenticationResult['course']->acl_id);
-        $director = UsersDAO::getByPK($acl->owner_id)->username;
+        $acl = \OmegaUp\DAO\ACLs::getByPK($tokenAuthenticationResult['course']->acl_id);
+        $director = \OmegaUp\DAO\Users::getByPK($acl->owner_id)->username;
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
-            ProblemsetAccessLogDAO::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
+            \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
                 'ip' => ip2long($_SERVER['REMOTE_ADDR']),
@@ -1787,7 +1787,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         self::validateRuns($r);
 
         // Get our runs
-        $runs = RunsDAO::getAllRuns(
+        $runs = \OmegaUp\DAO\Runs::getAllRuns(
             $r['assignment']->problemset_id,
             $r['status'],
             $r['verdict'],
@@ -1833,7 +1833,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
 
         $course = self::validateCourseExists($r['course_alias']);
 
-        $r['assignment'] = AssignmentsDAO::getByAliasAndCourse(
+        $r['assignment'] = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $r['assignment_alias'],
             $course->course_id
         );
@@ -1854,7 +1854,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['problem_alias'])) {
             \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
 
-            $r['problem'] = ProblemsDAO::getByAlias($r['problem_alias']);
+            $r['problem'] = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
 
             if (is_null($r['problem'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -1933,7 +1933,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         self::updateValueProperties($r, $originalCourse, $valueProperties);
 
         // Push changes
-        CoursesDAO::update($originalCourse);
+        \OmegaUp\DAO\Courses::update($originalCourse);
 
         // TODO: Expire cache
 
@@ -2026,7 +2026,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
-        $solvedProblems = ProblemsDAO::getSolvedProblemsByUsersOfCourse($r['course_alias']);
+        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse($r['course_alias']);
         $userProblems = [];
         foreach ($solvedProblems as $problem) {
             $userProblems[$problem['username']][] = $problem;
@@ -2048,7 +2048,7 @@ class CourseController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
-        $unsolvedProblems = ProblemsDAO::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
+        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
         $userProblems = [];
         foreach ($unsolvedProblems as $problem) {
             $userProblems[$problem['username']][] = $problem;

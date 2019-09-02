@@ -16,7 +16,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         // Get a user to be the author
         $authorUser = UserFactory::createUser();
-        $authorIdentity = IdentitiesDAO::getByPK($authorUser->main_identity_id);
+        $authorIdentity = \OmegaUp\DAO\Identities::getByPK($authorUser->main_identity_id);
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -43,9 +43,9 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $response = ProblemController::apiDetails($r);
 
         // Get problem and contest from DB to check it
-        $problemDAO = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contestDAO = ContestsDAO::getByAlias($contestData['request']['alias']);
-        $contestantDAO = UsersDAO::FindByUsername($contestant->username);
+        $problemDAO = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
+        $contestDAO = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
+        $contestantDAO = \OmegaUp\DAO\Users::FindByUsername($contestant->username);
 
         // Assert data
         $this->assertEquals($response['title'], $problemDAO->title);
@@ -74,7 +74,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $this->assertEquals(0, count($response['runs']));
 
         // Verify that problem was marked as Opened
-        $problemOpened = ProblemsetProblemOpenedDAO::getByPK(
+        $problemOpened = \OmegaUp\DAO\ProblemsetProblemOpened::getByPK(
             $contestDAO->problemset_id,
             $problemDAO->problem_id,
             $contestantDAO->main_identity_id

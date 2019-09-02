@@ -2,9 +2,7 @@
 
 namespace OmegaUp\Controllers;
 
-use \IdentitiesDAO;
 use \SessionController;
-use \UsersDAO;
 
 /**
  * Controllers parent class
@@ -92,7 +90,7 @@ class Controller {
 
         if (!is_null($r['username'])) {
             \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
-            $user = UsersDAO::FindByUsername($r['username']);
+            $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
             if (is_null($user)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
@@ -118,7 +116,7 @@ class Controller {
 
         if (!is_null($r['username'])) {
             \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
-            $identity = IdentitiesDAO::findByUsername($r['username']);
+            $identity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
