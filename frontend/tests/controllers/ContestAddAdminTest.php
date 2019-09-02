@@ -22,7 +22,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        $response = ContestController::apiAddAdmin($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddAdmin($r);
 
         // Get the role
         $contest = $contestData['contest'];
@@ -47,7 +47,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        ContestController::apiAddAdmin($r);
+        \OmegaUp\Controllers\Contest::apiAddAdmin($r);
         unset($login);
 
         // Prepare request for an update
@@ -62,7 +62,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $r['title'] = Utils::CreateRandomString();
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // To validate, we update the title to the original request and send
         // the entire original request to assertContest. Any other parameter
@@ -95,7 +95,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        ContestController::apiRemoveAdmin($r);
+        \OmegaUp\Controllers\Contest::apiRemoveAdmin($r);
 
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
         $this->AssertFalse(\OmegaUp\Authorization::isContestAdmin($identity, $contest));
@@ -122,7 +122,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        $response = ContestController::apiAddGroupAdmin($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddGroupAdmin($r);
 
         // Get the role
         $ur = \OmegaUp\DAO\GroupRoles::getByPK($groupData['group']->group_id, \OmegaUp\Authorization::ADMIN_ROLE, $contestData['contest']->acl_id);
@@ -150,7 +150,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        ContestController::apiAddGroupAdmin($r);
+        \OmegaUp\Controllers\Contest::apiAddGroupAdmin($r);
         unset($login);
 
         // Prepare request for an update
@@ -165,7 +165,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $r['title'] = Utils::CreateRandomString();
 
         // Call API
-        $response = ContestController::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // To validate, we update the title to the original request and send
         // the entire original request to assertContest. Any other parameter
@@ -201,7 +201,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        ContestController::apiAddGroupAdmin($r);
+        \OmegaUp\Controllers\Contest::apiAddGroupAdmin($r);
         unset($login);
 
         $contest = $contestData['contest'];
@@ -217,7 +217,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        ContestController::apiRemoveGroupAdmin($r);
+        \OmegaUp\Controllers\Contest::apiRemoveGroupAdmin($r);
 
         $this->AssertFalse(\OmegaUp\Authorization::isContestAdmin($identity, $contest));
         $this->AssertFalse(\OmegaUp\Authorization::isContestAdmin($identity2, $contest));

@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \RunController;
-
 /**
  *  Scoreboard
  *
@@ -556,7 +554,7 @@ class Scoreboard {
                         'run_alias' => $run['guid'],
                         'auth_token' => $authToken,
                     ]);
-                    $runDetails = RunController::apiDetails($runDetailsRequest);
+                    $runDetails = \OmegaUp\Controllers\Run::apiDetails($runDetailsRequest);
                     unset($runDetails['source']);
                     $problem['run_details'] = $runDetails;
                 }

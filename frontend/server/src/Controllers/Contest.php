@@ -1,10 +1,12 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * ContestController
  *
  */
-class ContestController extends \OmegaUp\Controllers\Controller {
+class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
     const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
 
@@ -339,12 +341,12 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         bool $shouldShowIntro
     ) : array {
         // Half-authenticate, in case there is no session in place.
-        $session = SessionController::apiCurrentSession($r)['session'];
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
         if (!$shouldShowIntro) {
             return ['payload' => [
                 'shouldShowFirstAssociatedIdentityRunWarning' =>
                     !is_null($session['user']) &&
-                    !UserController::isMainIdentity(
+                    !\OmegaUp\Controllers\User::isMainIdentity(
                         $session['user'],
                         $session['identity']
                     )
@@ -408,20 +410,20 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest
     ) : bool {
         try {
-            $session = SessionController::apiCurrentSession($r)['session'];
+            $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
             if (is_null($session['identity'])) {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);
             }
             self::canAccessContest($contest, $session['identity']);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
             if (!self::isInvitedToContest($contest, $session['identity'])) {
                 throw $e;
             }
             self::$log->error('Exception while trying to verify access: ' . $e);
-            return ContestController::SHOW_INTRO;
+            return \OmegaUp\Controllers\Contest::SHOW_INTRO;
         }
 
         // You already started the contest.
@@ -431,9 +433,9 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
             self::$log->debug('No intro because you already started the contest');
-            return !ContestController::SHOW_INTRO;
+            return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
         }
-        return ContestController::SHOW_INTRO;
+        return \OmegaUp\Controllers\Contest::SHOW_INTRO;
     }
 
     /**
@@ -513,7 +515,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             'admission_mode',
         ]);
 
-        $current_ses = SessionController::getCurrentSession($r);
+        $current_ses = \OmegaUp\Controllers\Session::getCurrentSession($r);
 
         if ($current_ses['valid'] && $result['admission_mode'] == 'registration') {
             $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK($current_ses['identity']->identity_id, $r['contest']->problemset_id);
@@ -564,7 +566,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             'needsBasicInformation' => $needsInformation,
             'requestsUserInformation' => $requestsUserInformation
         ] = \OmegaUp\DAO\Contests::getNeedsInformation($response['contest']->problemset_id);
-        $session = SessionController::apiCurrentSession($r)['session'];
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
 
         if ($needsInformation && !is_null($session['identity']) &&
               (!$session['identity']->country_id || !$session['identity']->state_id
@@ -611,7 +613,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             }
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -683,7 +685,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
 
                 foreach ($problemsInContest as $problem) {
                     // Add the 'points' value that is stored in the ContestProblem relationship
-                    $problem['letter'] = ContestController::columnName($letter++);
+                    $problem['letter'] = \OmegaUp\Controllers\Contest::columnName($letter++);
                     if (!empty($result['languages'])) {
                         $problem['languages'] = join(',', array_intersect(
                             explode(',', $result['languages']),
@@ -711,7 +713,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a Contest. Requesting the details of a contest will
      * not start the current user into that contest. In order to participate
-     * in the contest, ContestController::apiOpen() must be used.
+     * in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
      *
      * @param \OmegaUp\Request $r
      * @return array
@@ -782,7 +784,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             (int)$r->identity->identity_id,
             (int)$response['contest']->problemset_id
         );
-        $result['available_languages'] = RunController::$kSupportedLanguages;
+        $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
         $result['status'] = 'ok';
         $result['admin'] = true;
         return $result;
@@ -883,7 +885,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
                     'alias' => $problemsetProblem['alias'],
                     'visibility' => $problemsetProblem['visibility'],
                 ]);
-                ProblemsetController::addProblem(
+                \OmegaUp\Controllers\Problemset::addProblem(
                     $contest->problemset_id,
                     $problem,
                     $problemsetProblem['commit'],
@@ -894,7 +896,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
                 );
             }
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -1016,7 +1018,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
 
             // End transaction transaction
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
@@ -1115,7 +1117,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         $contest_length = $finish_time - $start_time;
 
         // Validate max contest length
-        if ($contest_length > ContestController::MAX_CONTEST_LENGTH_SECONDS) {
+        if ($contest_length > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('contestLengthTooLong');
         }
 
@@ -1167,7 +1169,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
                 if (is_null($problem)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problems');
                 }
-                ProblemsetController::validateAddProblemToProblemset(
+                \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                     $problem,
                     $r->identity
                 );
@@ -1187,7 +1189,12 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         // languages is always optional
         if (!empty($r['languages'])) {
             foreach ($r['languages'] as $language) {
-                \OmegaUp\Validators::validateInEnum($language, 'languages', array_keys(RunController::$kSupportedLanguages), false);
+                \OmegaUp\Validators::validateInEnum(
+                    $language,
+                    'languages',
+                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
+                    false
+                );
             }
         }
     }
@@ -1335,12 +1342,12 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\PreconditionFailedException('contestAddproblemTooManyProblems');
         }
 
-        [$masterCommit, $currentVersion] = ProblemController::resolveCommit(
+        [$masterCommit, $currentVersion] = \OmegaUp\Controllers\Problem::resolveCommit(
             $params['problem'],
             $r['commit']
         );
 
-        ProblemsetController::addProblem(
+        \OmegaUp\Controllers\Problemset::addProblem(
             $params['contest']->problemset_id,
             $params['problem'],
             $masterCommit,
@@ -1391,8 +1398,8 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problem_alias');
         }
 
-        if ($problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
-            || $problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
+        if ($problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+            || $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
         }
         if (!\OmegaUp\DAO\Problems::isVisible($problem) && !\OmegaUp\Authorization::isProblemAdmin(
@@ -1553,7 +1560,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
 
-        $identityToRemove = IdentityController::resolveIdentity($usernameOrEmail);
+        $identityToRemove = \OmegaUp\Controllers\Identity::resolveIdentity($usernameOrEmail);
         $contest = self::validateContestAdmin($contestAlias, $identity);
         return [$identityToRemove, $contest];
     }
@@ -1635,11 +1642,11 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $user = UserController::resolveUser($r['usernameOrEmail']);
+        $user = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
-        ACLController::addUser($contest->acl_id, $user->user_id);
+        \OmegaUp\Controllers\ACL::addUser($contest->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1658,7 +1665,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
-        $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['usernameOrEmail']);
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
@@ -1667,7 +1674,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
-        ACLController::removeUser($contest->acl_id, $identity->user_id);
+        \OmegaUp\Controllers\ACL::removeUser($contest->acl_id, $identity->user_id);
 
         return ['status' => 'ok'];
     }
@@ -1698,7 +1705,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
-        ACLController::addGroup($contest->acl_id, $group->group_id);
+        \OmegaUp\Controllers\ACL::addGroup($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -1725,7 +1732,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
 
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
 
-        ACLController::removeGroup($contest->acl_id, $group->group_id);
+        \OmegaUp\Controllers\ACL::removeGroup($contest->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -2245,7 +2252,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
 
             // End transaction
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
 
@@ -2293,7 +2300,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
         $r->ensureInt('end_time');
 
-        $identity = IdentityController::resolveIdentity($r['username']);
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['username']);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -2387,12 +2394,17 @@ class ContestController extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateInEnum($r['language'], 'language', array_keys(RunController::$kSupportedLanguages), false);
+        \OmegaUp\Validators::validateInEnum(
+            $r['language'],
+            'language',
+            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
+            false
+        );
 
         // Get user if we have something in username
         $identity = null;
         if (!is_null($r['username'])) {
-            $identity = IdentityController::resolveIdentity($r['username']);
+            $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['username']);
         }
         return [$contest, $problem, $identity];
     }
@@ -2620,7 +2632,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
                         'auth_token' => $r['auth_token'],
                     ]);
 
-            $problemStats[$i] = ProblemController::apiStats($problemStatsRequest);
+            $problemStats[$i] = \OmegaUp\Controllers\Problem::apiStats($problemStatsRequest);
             $problemStats[$problem_alias] = $problemStats[$i];
 
             $i++;
@@ -2692,7 +2704,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         // http://contextis.co.uk/blog/comma-separated-vulnerabilities/
         $out = fopen('php://output', 'w');
         foreach ($csvData as $csvRow) {
-            fputcsv($out, ContestController::escapeCsv($csvRow));
+            fputcsv($out, \OmegaUp\Controllers\Contest::escapeCsv($csvRow));
         }
         fclose($out);
 
@@ -2718,8 +2730,8 @@ class ContestController extends \OmegaUp\Controllers\Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         include_once 'libs/third_party/ZipStream.php';
-        $zip = new ZipStream("{$r['contest_alias']}.zip");
-        ProblemsetController::downloadRuns($contest->problemset_id, $zip);
+        $zip = new \ZipStream("{$r['contest_alias']}.zip");
+        \OmegaUp\Controllers\Problemset::downloadRuns($contest->problemset_id, $zip);
         $zip->finish();
 
         die();
@@ -2750,7 +2762,7 @@ class ContestController extends \OmegaUp\Controllers\Controller {
                 'status' => 'ok',
                 'admin' => $response['contest_admin']
             ];
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::$log->error('Error getting role: ' . $e);
 
             return [

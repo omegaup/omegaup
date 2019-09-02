@@ -2,10 +2,10 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $session = SessionController::apiCurrentSession(
+    $session = \OmegaUp\Controllers\Session::apiCurrentSession(
         new \OmegaUp\Request($_REQUEST)
     )['session'];
-    $smartyProperties = ProblemController::getProblemDetailsForSmarty(
+    $smartyProperties = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {

@@ -1,11 +1,13 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  *  IdentityController
  *
  * @author juan.pablo
  */
-class IdentityController extends \OmegaUp\Controllers\Controller {
+class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Given a username or a email, returns the identity object
      *
@@ -133,7 +135,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
-        $group = GroupController::validateGroup($r['group_alias'], $r->identity);
+        $group = \OmegaUp\Controllers\Group::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -152,8 +154,8 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
     ) {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
 
-        $state = SchoolController::getStateIdFromCountryAndState($countryId, $stateId);
-        $schoolId = SchoolController::createSchool(trim($school), $state);
+        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState($countryId, $stateId);
+        $schoolId = \OmegaUp\Controllers\School::createSchool(trim($school), $state);
 
         return new \OmegaUp\DAO\VO\Identities([
             'username' => $username,
@@ -182,7 +184,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
             ]));
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse', $e);
@@ -265,7 +267,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
-        GroupController::validateGroup($r['group_alias'], $r->identity);
+        \OmegaUp\Controllers\Group::validateGroup($r['group_alias'], $r->identity);
         if (!is_array($r['identities']) && (!isset($r['username']) && !isset($r['name']) && !isset($r['group_alias']))) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'identities');
         }
@@ -294,7 +296,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
             $gender = trim($gender);
         }
         if (!empty($gender)) {
-            \OmegaUp\Validators::validateInEnum($gender, 'gender', UserController::ALLOWED_GENDER_OPTIONS, false);
+            \OmegaUp\Validators::validateInEnum($gender, 'gender', \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS, false);
         }
     }
 
@@ -310,8 +312,8 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
     ) {
         self::validateIdentity($username, $name, $gender, $aliasGroup);
 
-        $state = SchoolController::getStateIdFromCountryAndState($countryId, $stateId);
-        $schoolId = SchoolController::createSchool(trim($school), $state);
+        $state = \OmegaUp\Controllers\School::getStateIdFromCountryAndState($countryId, $stateId);
+        $schoolId = \OmegaUp\Controllers\School::createSchool(trim($school), $state);
 
         // Check password
         \OmegaUp\SecurityTools::testStrongPassword($password);
@@ -352,9 +354,9 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
             $identity->username,
             function () use ($identity, $user) {
                 if (!is_null($user)) {
-                    return UserController::getProfileImpl($user, $identity);
+                    return \OmegaUp\Controllers\User::getProfileImpl($user, $identity);
                 }
-                return IdentityController::getProfileImpl($identity);
+                return \OmegaUp\Controllers\Identity::getProfileImpl($identity);
             }
         );
 
@@ -362,7 +364,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
             $response['userinfo']['rankinfo'] = [];
         } else {
             $response['userinfo']['rankinfo'] =
-                UserController::getRankByProblemsSolved($r, $identity);
+                \OmegaUp\Controllers\User::getRankByProblemsSolved($r, $identity);
         }
 
         // Do not leak plain emails in case the request is for a profile other than
@@ -406,7 +408,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
                 'school' => $extendedProfile['school'],
                 'school_id' => $identity->school_id,
                 'is_private' => true,
-                'locale' => IdentityController::convertToSupportedLanguage($extendedProfile['locale']),
+                'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage($extendedProfile['locale']),
             ]
         ];
     }
@@ -428,7 +430,7 @@ class IdentityController extends \OmegaUp\Controllers\Controller {
                 if (is_null($result)) {
                     self::$log->warn('Invalid language id for identity');
                 } else {
-                    return IdentityController::convertToSupportedLanguage($result->name);
+                    return \OmegaUp\Controllers\Identity::convertToSupportedLanguage($result->name);
                 }
             }
         } catch (\OmegaUp\Exceptions\NotFoundException $ex) {

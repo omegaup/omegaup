@@ -7,7 +7,7 @@ try {
     [
         'smartyProperties' => $smartyProperties,
         'template' => $template
-    ] = CourseController::getCourseDetailsForSmarty(
+    ] = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {

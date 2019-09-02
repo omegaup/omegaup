@@ -1,10 +1,12 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * ScoreboardController
  *
  */
-class ScoreboardController extends \OmegaUp\Controllers\Controller {
+class Scoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests
      *

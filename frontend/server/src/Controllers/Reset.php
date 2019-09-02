@@ -1,6 +1,8 @@
 <?php
 
-class ResetController extends \OmegaUp\Controllers\Controller {
+ namespace OmegaUp\Controllers;
+
+class Reset extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a reset operation, the first of two steps needed to reset a
      * password. The first step consist of sending an email to the user with
@@ -35,7 +37,7 @@ class ResetController extends \OmegaUp\Controllers\Controller {
 
         try {
             \OmegaUp\Email::sendEmail([$email], $subject, $body);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::$log->error('Failed to send reset password email ' . $e->getMessage());
             $user->reset_digest = null;
             $user->reset_sent_at = null;
@@ -118,7 +120,7 @@ class ResetController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Users::update($user);
             \OmegaUp\DAO\Identities::update($identity);
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to reset password', $e);
             throw $e;

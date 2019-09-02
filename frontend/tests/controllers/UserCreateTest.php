@@ -12,16 +12,16 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testCreateUserPositive() {
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
         $this->assertEquals('ok', $response['status']);
@@ -39,26 +39,26 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testCreateUserIdempotent() {
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API twice.
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($r['username'], $response['username']);
 
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($r['username'], $response['username']);
 
         $r['password'] = 'a wrong password';
         try {
-            UserController::apiCreate($r);
+            \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail('User creation should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('mailInUse', $e->getMessage());
@@ -71,24 +71,24 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicatedUsernames() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Randomize email again
         $r['email'] = Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com';
 
         // Call api
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
     }
 
     /**
@@ -97,24 +97,24 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicatedEmails() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Randomize email again
         $r['username'] = Utils::CreateRandomString();
 
         // Call api
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
     }
 
     /**
@@ -123,17 +123,17 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoPassword() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
     }
 
     /**
@@ -142,17 +142,17 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoEmail() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
     }
 
     /**
@@ -161,30 +161,30 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNoUser() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Inflate request
         $r = new \OmegaUp\Request([
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        UserController::apiCreate($r);
+        \OmegaUp\Controllers\User::apiCreate($r);
     }
 
     /**
      * Tests Create User API happy path excercising the httpEntryPoint
      */
     public function testCreateUserPositiveViahttpEntryPoint() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Set context
         $_REQUEST['username'] = Utils::CreateRandomString();
         $_REQUEST['password'] = Utils::CreateRandomString();
         $_REQUEST['email'] = Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com';
-        $_REQUEST['permission_key'] = UserController::$permissionKey;
+        $_REQUEST['permission_key'] = \OmegaUp\Controllers\User::$permissionKey;
 
         // Override session_start, phpunit doesn't like it, but we still validate that it is called once
         $this->mockSessionManager();
@@ -206,18 +206,18 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testUsernameWithInvalidChars() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => 'ínvalid username',
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
     }
 
     /**
@@ -225,15 +225,15 @@ class CreateUserTest extends OmegaupTestCase {
      *
      */
     public function testUsernameWithInvalidChar() {
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
         // Call API
         try {
-            $response = UserController::apiCreate(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => 'invalid:username',
                 'password' => Utils::CreateRandomString(),
                 'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-                'permission_key' => UserController::$permissionKey,
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             ]));
 
             $this->fail('Expected because of the invalid group name');
@@ -255,7 +255,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $adminLogin = self::login($admin);
-        $response = UserController::apiVerifyEmail(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $user->username,
         ]));
@@ -279,7 +279,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $adminLogin = self::login($admin);
-        $response = UserController::apiVerifyEmail(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => Utils::CreateRandomString(),
         ]));
@@ -299,7 +299,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         // Call api using admin
         $login = self::login($user2);
-        $response = UserController::apiVerifyEmail(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
         ]));
@@ -314,7 +314,7 @@ class CreateUserTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $login = self::login($user);
-        $response = UserController::apiMailingListBackfill(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
     }
@@ -331,12 +331,12 @@ class CreateUserTest extends OmegaupTestCase {
             ->getMock();
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
-            ->will($this->returnValue(UserController::SENDY_SUCCESS));
+            ->will($this->returnValue(\OmegaUp\Controllers\User::SENDY_SUCCESS));
 
-        UserController::$urlHelper = $urlHelperMock;
+        \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
 
         $adminLogin = self::login(UserFactory::createAdminUser());
-        $response = UserController::apiMailingListBackfill(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
@@ -355,12 +355,12 @@ class CreateUserTest extends OmegaupTestCase {
             ->getMock();
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
-            ->will($this->returnValue(UserController::SENDY_SUCCESS));
+            ->will($this->returnValue(\OmegaUp\Controllers\User::SENDY_SUCCESS));
 
-        UserController::$urlHelper = $urlHelperMock;
+        \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
 
         $adminLogin = self::login(UserFactory::createAdminUser());
-        $response = UserController::apiMailingListBackfill(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 

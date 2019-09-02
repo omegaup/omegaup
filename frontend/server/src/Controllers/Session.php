@@ -1,5 +1,7 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * Description:
  *     Session controller handles sessions.
@@ -8,7 +10,7 @@
  *     Alan Gonzalez alanboy@alanboy.net
  *
  */
-class SessionController extends \OmegaUp\Controllers\Controller {
+class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
     /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
     private static $_currentSession = null;
@@ -25,14 +27,11 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         return self::$_sessionManager;
     }
 
-    /**
-     * @param string nombre Este es el nombre del dude
-     *
-     * */
     private static function getFacebookInstance() {
         if (is_null(self::$_facebook)) {
             require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
-            self::$_facebook = new Facebook\Facebook([
+
+            self::$_facebook = new \Facebook\Facebook([
                 'app_id' => OMEGAUP_FB_APPID,
                 'app_secret' => OMEGAUP_FB_SECRET,
                 'default_graph_version' => 'v2.5',
@@ -81,7 +80,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
             $r = new \OmegaUp\Request();
         }
         if (is_null($r['auth_token'])) {
-            $authToken = SessionController::getAuthToken($r);
+            $authToken = self::getAuthToken($r);
             $r['auth_token'] = $authToken;
         } else {
             $authToken = strval($r['auth_token']);
@@ -95,12 +94,12 @@ class SessionController extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
                 function () use ($r) {
-                    return SessionController::getCurrentSession($r);
+                    return self::getCurrentSession($r);
                 },
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
         } else {
-            self::$_currentSession = SessionController::getCurrentSession($r);
+            self::$_currentSession = self::getCurrentSession($r);
         }
         return [
             'status' => 'ok',
@@ -184,7 +183,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
     /**
      * Invalidates the current user's session cache.
      */
-    public function InvalidateCache() {
+    public static function invalidateCache() : void {
         $currentSession = self::apiCurrentSession()['session'];
         if (is_null($currentSession['auth_token'])) {
             return;
@@ -195,21 +194,21 @@ class SessionController extends \OmegaUp\Controllers\Controller {
     /**
      * Invalidates the current request's session cache.
      */
-    public function InvalidateLocalCache() {
+    public static function invalidateLocalCache() : void {
         self::$_currentSession = null;
     }
 
     public function UnRegisterSession() {
-        $this->InvalidateCache();
+        self::invalidateCache();
 
         $currentSession = self::apiCurrentSession()['session'];
         $authToken = new \OmegaUp\DAO\VO\AuthTokens(['token' => $currentSession['auth_token']]);
 
-        $this->InvalidateLocalCache();
+        self::invalidateLocalCache();
 
         try {
             \OmegaUp\DAO\AuthTokens::delete($authToken);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Best effort
             self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
         }
@@ -224,18 +223,18 @@ class SessionController extends \OmegaUp\Controllers\Controller {
             'ip' => ip2long($_SERVER['REMOTE_ADDR']),
         ]));
 
-        $this->InvalidateLocalCache();
+        self::invalidateLocalCache();
 
         //erase expired tokens
         try {
             \OmegaUp\DAO\AuthTokens::expireAuthTokens($identity->identity_id);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Best effort
             self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
         }
 
         // Create the new token
-        $entropy = bin2hex(random_bytes(SessionController::AUTH_TOKEN_ENTROPY_SIZE));
+        $entropy = bin2hex(random_bytes(self::AUTH_TOKEN_ENTROPY_SIZE));
         $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
@@ -312,7 +311,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
         //    [locale] => en
 
-        $controller = new SessionController();
+        $controller = new \OmegaUp\Controllers\Session();
         $controller->LoginViaGoogle(
             $payload['email'],
             (isset($payload['name']) ? $payload['name'] : null)
@@ -340,9 +339,9 @@ class SessionController extends \OmegaUp\Controllers\Controller {
         $helper = $facebook->getRedirectLoginHelper();
         try {
             $access_token = $helper->getAccessToken();
-        } catch (Facebook\Exceptions\FacebookResponseException $e) {
+        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
             return ['status' => 'error', 'error' => $e->getMessage()];
-        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
             return ['status' => 'error', 'error' => $e->getMessage()];
         }
 
@@ -355,9 +354,9 @@ class SessionController extends \OmegaUp\Controllers\Controller {
 
         try {
             $fb_response = $facebook->get('/me?fields=name,email', $access_token);
-        } catch (Facebook\Exceptions\FacebookResponseException $e) {
+        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
             return ['status' => 'error', 'error' => $e->getMessage()];
-        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
             return ['status' => 'error', 'error' => $e->getMessage()];
         }
 
@@ -385,31 +384,20 @@ class SessionController extends \OmegaUp\Controllers\Controller {
      * Expects in request:
      * usernameOrEmail
      * password
-     *
-     * @param \OmegaUp\Request $r
-     * @return boolean
      */
-    public function NativeLogin(\OmegaUp\Request $r) {
-        $identity = null;
-
+    public function nativeLogin(\OmegaUp\Request $r) : string {
         \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
 
-        if (null != $r['returnAuthToken']) {
-            $returnAuthToken = $r['returnAuthToken'];
-        } else {
-            $returnAuthToken = false;
-        }
-
         try {
-            $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+            $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['usernameOrEmail']);
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
-            return false;
+            throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
 
-        if (!IdentityController::testPassword($identity, $r['password'])) {
+        if (!\OmegaUp\Controllers\Identity::testPassword($identity, $r['password'])) {
             self::$log->warn("Identity {$identity->username} has introduced invalid credentials.");
-            return false;
+            throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
         if (\OmegaUp\SecurityTools::isOldHash($identity->password)) {
             // Update the password using the new Argon2i algorithm.
@@ -424,7 +412,7 @@ class SessionController extends \OmegaUp\Controllers\Controller {
                     \OmegaUp\DAO\Users::update($user);
                 }
                 \OmegaUp\DAO\DAO::transEnd();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \OmegaUp\DAO\DAO::transRollback();
                 throw $e;
             }
@@ -434,15 +422,14 @@ class SessionController extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($identity->user_id)) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-            UserController::checkEmailVerification($user);
+            \OmegaUp\Controllers\User::checkEmailVerification($user);
         }
 
         try {
-            return $this->registerSession($identity, $returnAuthToken);
-        } catch (Exception $e) {
+            return $this->registerSession($identity);
+        } catch (\Exception $e) {
             self::$log->error($e);
-            return false;
-            //@TODO actuar en base a la exception
+            throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
     }
 
@@ -501,19 +488,19 @@ class SessionController extends \OmegaUp\Controllers\Controller {
             // just go ahead and assume its ok to share with the world
             // maybe we could do:
             // $username = str_replace(" ", "_", $fb_user_profile["name"] ),
-            UserController::$permissionKey = uniqid();
+            \OmegaUp\Controllers\User::$permissionKey = uniqid();
 
             $r = new \OmegaUp\Request([
                 'name' => (!is_null($name) ? $name : $username),
                 'username' => $username,
                 'email' => $email,
                 'password' => null,
-                'permission_key' => UserController::$permissionKey,
+                'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
                 'ignore_password' => true
             ]);
 
             try {
-                $res = UserController::apiCreate($r);
+                $res = \OmegaUp\Controllers\User::apiCreate($r);
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();

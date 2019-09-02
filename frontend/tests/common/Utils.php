@@ -144,7 +144,7 @@ class Utils {
 
     public static function setUpDefaultDataConfig() {
         // Create a test default user for manual UI operations
-        UserController::$sendEmailOnVerify = false;
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
         $admin = UserFactory::createUser(new UserParams([
             'username' => 'admintest',
             'password' => 'testtesttest',
@@ -162,10 +162,10 @@ class Utils {
             'username' => 'test',
             'password' => 'testtesttest',
         ]));
-        UserController::$sendEmailOnVerify = true;
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
 
         // Globally disable run wait gap.
-        RunController::$defaultSubmissionGap = 0;
+        \OmegaUp\Controllers\Run::$defaultSubmissionGap = 0;
     }
 
     public static function CleanupFilesAndDb() {

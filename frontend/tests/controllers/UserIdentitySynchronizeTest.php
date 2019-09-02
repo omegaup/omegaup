@@ -11,16 +11,16 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testCreateUserPositive() {
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
         $this->assertEquals('ok', $response['status']);
@@ -48,7 +48,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        UserController::apiChangePassword($r);
+        \OmegaUp\Controllers\User::apiChangePassword($r);
 
         // Try to login with old password, should fail
         try {
@@ -89,7 +89,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'locale' => $locale->name,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
 
         // Check user/identity from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
@@ -118,7 +118,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'locale' => $locale->name,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
@@ -134,7 +134,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Double check language update with the appropiate API
         $this->assertEquals(
             $locale->name,
-            IdentityController::getPreferredLanguage(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Identity::getPreferredLanguage(new \OmegaUp\Request([
                 'username' => $identityDb->username
             ]))
         );
@@ -160,7 +160,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'password' => $newPassword,
         ]);
 
-        UserController::apiUpdateBasicInfo($r);
+        \OmegaUp\Controllers\User::apiUpdateBasicInfo($r);
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);

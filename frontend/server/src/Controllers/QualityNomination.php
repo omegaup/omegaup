@@ -1,6 +1,8 @@
 <?php
 
-class QualityNominationController extends \OmegaUp\Controllers\Controller {
+ namespace OmegaUp\Controllers;
+
+class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Number of reviewers to automatically assign each nomination.
      */
@@ -116,7 +118,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
                     if (!is_string($tag)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                     }
-                    $tag = TagController::normalize($tag);
+                    $tag = \OmegaUp\Controllers\Tag::normalize($tag);
                 }
                 if (self::hasDuplicates($contents['tags'])) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
@@ -134,7 +136,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
                 if (!is_string($tag)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
                 }
-                $tag = TagController::normalize($tag);
+                $tag = \OmegaUp\Controllers\Tag::normalize($tag);
             }
             if (self::hasDuplicates($contents['tags'])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
@@ -249,19 +251,19 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         $newProblemVisibility = $r['problem']->visibility;
         switch ($r['status']) {
             case 'approved':
-                if ($r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE) {
-                    $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE_BANNED;
-                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC) {
-                    $newProblemVisibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
+                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE) {
+                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED;
+                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC) {
+                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
                 }
                 break;
             case 'denied':
-                if ($r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
                     // If banning is reverted, problem will become private.
-                    $newProblemVisibility = ProblemController::VISIBILITY_PRIVATE;
-                } elseif ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED) {
+                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
+                } elseif ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED) {
                     // If banning is reverted, problem will become public.
-                    $newProblemVisibility = ProblemController::VISIBILITY_PUBLIC;
+                    $newProblemVisibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC;
                 }
                 break;
             case 'open':
@@ -285,15 +287,15 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\DAO::transBegin();
         try {
             $response = [];
-            ProblemController::apiUpdate($r);
+            \OmegaUp\Controllers\Problem::apiUpdate($r);
             \OmegaUp\DAO\QualityNominations::update($qualitynomination);
             \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
             \OmegaUp\DAO\DAO::transEnd();
-            if ($newProblemVisibility == ProblemController::VISIBILITY_PUBLIC_BANNED  ||
-              $newProblemVisibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+            if ($newProblemVisibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED  ||
+              $newProblemVisibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
                 $response = self::sendDemotionEmail($r, $qualitynomination, $qualitynominationlog->rationale);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to resolve demotion request', $e);
             throw $e;
@@ -516,7 +518,7 @@ class QualityNominationController extends \OmegaUp\Controllers\Controller {
 
             // Pull original problem statements in every language the nominator is trying to override.
             foreach ($response['contents']['statements'] as $language => $_) {
-                $response['original_contents']['statements'][$language] = ProblemController::getProblemStatement(
+                $response['original_contents']['statements'][$language] = \OmegaUp\Controllers\Problem::getProblemStatement(
                     $problem,
                     'published',
                     $language

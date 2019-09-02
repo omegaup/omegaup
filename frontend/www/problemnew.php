@@ -20,7 +20,7 @@ $smarty->assign('SELECTED_TAGS', '');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     try {
-        ProblemController::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([
             'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
             'title' => $_POST['title'],
             'problem_alias' => $_POST['alias'],

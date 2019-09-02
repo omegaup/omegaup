@@ -9,7 +9,7 @@
           "password": "testtesttest",
           "requests": [
             {
-              "api": "ProblemController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
                 "visibility": 1,
                 "title": "Sumas",
@@ -31,7 +31,7 @@
               }
             },
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_0",
                 "email": "user_0@domain.com",
@@ -39,7 +39,7 @@
               }
             },
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_1",
                 "email": "user_1@domain.com",
@@ -53,7 +53,7 @@
           "password": "test_user_0",
           "requests": [
             {
-              "api": "RunController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
               "params": {
                 "problem_alias": "fp_problem",
                 "language": "py",
@@ -64,7 +64,7 @@
               }
             },
             {
-              "api": "QualityNominationController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\QualityNomination::apiCreate",
               "params": {
                 "problem_alias": "fp_problem",
                 "nomination": "suggestion",

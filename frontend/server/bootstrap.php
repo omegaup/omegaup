@@ -146,31 +146,7 @@ require_once('libs/third_party/log4php/src/main/php/Logger.php');
     ],
 ]);
 
-// Load controllers lazily.
-spl_autoload_register(function (string $classname) : void {
-    $controllerSuffix = 'Controller';
-    if (substr_compare(
-        $classname,
-        $controllerSuffix,
-        strlen($classname) - strlen($controllerSuffix)
-    ) !== 0
-    ) {
-        return;
-    }
-
-    if ($classname == 'QualitynominationController') {
-        // TODO: Figure out a better way of dealing with this.
-        $filename = __DIR__ . '/controllers/QualityNominationController.php';
-    } else {
-        $filename = __DIR__ . "/controllers/{$classname}.php";
-    }
-
-    if (file_exists($filename)) {
-        include_once $filename;
-    }
-});
-
-$session = SessionController::apiCurrentSession(new \OmegaUp\Request($_REQUEST))['session'];
+$session = \OmegaUp\Controllers\Session::apiCurrentSession(new \OmegaUp\Request($_REQUEST))['session'];
 $experiments = new \OmegaUp\Experiments(
     $_REQUEST,
     !is_null($session) ? $session['user'] : null

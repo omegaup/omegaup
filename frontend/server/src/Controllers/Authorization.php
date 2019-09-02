@@ -1,9 +1,11 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * AuthorizationController
  */
-class AuthorizationController extends \OmegaUp\Controllers\Controller {
+class Authorization extends \OmegaUp\Controllers\Controller {
     public static function apiProblem(\OmegaUp\Request $r) {
         // This is not supposed to be called by end-users, but by the
         // gitserver. Regular sessions cannot be used since they
@@ -13,7 +15,7 @@ class AuthorizationController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $resolvedIdentity = IdentityController::resolveIdentity($r['username']);
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity($r['username']);
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {

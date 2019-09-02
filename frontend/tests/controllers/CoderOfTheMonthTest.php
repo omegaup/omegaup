@@ -15,13 +15,13 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         $this->createRuns($user, $runCreationDate, 10 /*numRuns*/);
 
-        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(new \OmegaUp\Request());
 
         $this->assertEquals($user->username, $response['userinfo']['username']);
         $this->assertFalse(array_key_exists('email', $response['userinfo']));
 
         // Calling API again to verify response is the same that in first time
-        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(new \OmegaUp\Request());
 
         $this->assertEquals($user->username, $response['userinfo']['username']);
     }
@@ -34,21 +34,21 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             'auth_token' => $auth_token
         ]);
 
-        $response = UserController::apiCoderOfTheMonthList($r);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList($r);
 
         $this->assertCount(0, $response['coders']);
 
         // Adding parameter date should return the same value, it helps
         // to test getMonthlyList function, which never was tested
         $r['date'] = date('Y-m-d', \OmegaUp\Time::get());
-        $response = UserController::apiCoderOfTheMonthList($r);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList($r);
         $this->assertCount(0, $response['coders']);
     }
 
     public function testCoderOfTheMonthDetailsForSmarty() {
         // Test coder of the month details when user is not logged
         $r = new \OmegaUp\Request();
-        $response = UserController::getCoderOfTheMonthDetailsForSmarty($r, null);
+        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty($r, null);
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
         $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
@@ -61,7 +61,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $login = self::login($user);
         $r['auth_token'] = $login->auth_token;
-        $response = UserController::getCoderOfTheMonthDetailsForSmarty($r, $identity);
+        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty($r, $identity);
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
         $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
@@ -72,7 +72,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         [$mentorUser, $mentorIdentity] = UserFactory::createMentorIdentity();
         $login = self::login($mentorUser);
         $r['auth_token'] = $login->auth_token;
-        $response = UserController::getCoderOfTheMonthDetailsForSmarty(
+        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
             $r,
             $mentorIdentity
         );
@@ -145,7 +145,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $reviewDate = date_format($reviewDate, 'Y-m-01');
 
         \OmegaUp\Time::setTimeForTesting(strtotime($reviewDate) + (60 * 60 * 24));
-        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request([]));
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(new \OmegaUp\Request([]));
         return $response;
     }
 
@@ -156,7 +156,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         [$mentorUser,] = UserFactory::createMentorIdentity();
 
         $login = self::login($mentorUser);
-        $response = UserController::apiCoderOfTheMonthList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
 
@@ -167,7 +167,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $coders = array_unique($coders);
 
         foreach ($coders as $index => $coder) {
-            $profile = UserController::apiProfile(new \OmegaUp\Request([
+            $profile = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $coder
             ]));
@@ -184,7 +184,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $user_login = self::login($user);
 
         foreach ($coders as $index => $coder) {
-            $profile = UserController::apiProfile(new \OmegaUp\Request([
+            $profile = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
                 'auth_token' => $user_login->auth_token,
                 'username' => $coder
             ]));
@@ -227,7 +227,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         // Call api. This should fail.
         try {
-            UserController::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
+            \OmegaUp\Controllers\User::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $user3->username,
             ]));
@@ -241,7 +241,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(strtotime($runCreationDate->format('Y-m-t')));
 
         // Call api again.
-        UserController::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiSelectCoderOfTheMonth(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user3->username,
         ]));
@@ -249,10 +249,10 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Set date to first day of next month
         \OmegaUp\Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
 
-        $response = UserController::apiCoderOfTheMonth(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(new \OmegaUp\Request());
         $this->assertNotNull($response['userinfo'], 'A user has been selected by a mentor');
         $this->assertEquals($response['userinfo']['username'], $user3->username);
-        $response = UserController::apiCoderOfTheMonthList(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request());
 
         $this->assertEquals($firstDayOfNextMonth->format('Y-m-d'), $response['coders'][0]['date']);
     }

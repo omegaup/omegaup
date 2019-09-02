@@ -1,12 +1,14 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * RunController
  *
  * @author joemmanuel
  */
-class RunController extends \OmegaUp\Controllers\Controller {
-    public static $kSupportedLanguages = [
+class Run extends \OmegaUp\Controllers\Controller {
+    public const SUPPORTED_LANGUAGES = [
         'kp' => 'Karel (Pascal)',
         'kj' => 'Karel (Java)',
         'c' => 'C',
@@ -41,7 +43,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $allowedLanguages = array_keys(RunController::$kSupportedLanguages);
+        $allowedLanguages = array_keys(self::SUPPORTED_LANGUAGES);
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
         // Check that problem exists
@@ -51,7 +53,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\PreconditionFailedException('problemDeprecated');
         }
         // check that problem is not publicly or privately banned.
-        if ($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+        if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED || $r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotfound');
         }
 
@@ -195,7 +197,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array
-     * @throws Exception
+     * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiCreate(\OmegaUp\Request $r) {
@@ -308,7 +310,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
             $submission->current_run_id = $run->run_id;
             \OmegaUp\DAO\Submissions::update($submission);
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -316,7 +318,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
         // Call Grader
         try {
             \OmegaUp\Grader::getInstance()->grade($run, trim($r['source']));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Welp, it failed. We cannot make this a real transaction
             // because the Run row would not be visible from the Grader
             // process, so we attempt to roll it back by hand.
@@ -367,7 +369,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
         $response['status'] = 'ok';
 
         // Expire rank cache
-        UserController::deleteProblemsSolvedRankCacheList();
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
         return $response;
     }
@@ -460,14 +462,14 @@ class RunController extends \OmegaUp\Controllers\Controller {
             $r['run']->status = 'new';
             \OmegaUp\DAO\Runs::update($r['run']);
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
 
         try {
             \OmegaUp\Grader::getInstance()->rejudge([$r['run']], $r['debug'] || false);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::$log->error('Call to \OmegaUp\Grader::rejudge() failed', $e);
         }
 
@@ -477,7 +479,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
         self::invalidateCacheOnRejudge($r['run']);
 
         // Expire ranks
-        UserController::deleteProblemsSolvedRankCacheList();
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
         return $response;
     }
@@ -500,7 +502,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\Submissions::disqualify($r['submission']->guid);
 
         // Expire ranks
-        UserController::deleteProblemsSolvedRankCacheList();
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
         return [
             'status' => 'ok'
         ];
@@ -528,7 +530,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
                 // Invalidar cache stats
                 \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::PROBLEM_STATS, $problem->alias);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // We did our best effort to invalidate the cache...
             self::$log->warn('Failed to invalidate cache on Rejudge, skipping: ');
             self::$log->warn($e);
@@ -569,7 +571,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Problems::isProblemSolved($r['problem'], (int)$r->identity->identity_id);
 
         // Get the details, compile error, logs, etc.
-        RunController::populateRunDetails($r['submission'], $r['run'], $showDetails, $response);
+        self::populateRunDetails($r['submission'], $r['run'], $showDetails, $response);
         if (!OMEGAUP_LOCKDOWN && $response['admin']) {
             $gzippedLogs = self::getGraderResource($r['run'], 'logs.txt.gz');
             if (is_string($gzippedLogs)) {
@@ -603,7 +605,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
         $response = [
             'status' => 'ok',
         ];
-        RunController::populateRunDetails($r['submission'], $r['run'], false, $response);
+        self::populateRunDetails($r['submission'], $r['run'], false, $response);
         return $response;
     }
 
@@ -616,7 +618,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
-            $response['source'] = SubmissionController::getSource($submission->guid);
+            $response['source'] = \OmegaUp\Controllers\Submission::getSource($submission->guid);
         }
         if (!$showDetails && $run->verdict != 'CE') {
             return;
@@ -648,7 +650,7 @@ class RunController extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
 
         \OmegaUp\Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
-        if (!RunController::downloadSubmission(
+        if (!self::downloadSubmission(
             $r['run_alias'],
             $r->identity,
             /*passthru=*/true
@@ -849,14 +851,14 @@ class RunController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['language'],
             'language',
-            array_keys(RunController::$kSupportedLanguages),
+            array_keys(self::SUPPORTED_LANGUAGES),
             false
         );
 
         // Get user if we have something in username
         if (!is_null($r['username'])) {
             try {
-                $r['identity'] = IdentityController::resolveIdentity($r['username']);
+                $r['identity'] = \OmegaUp\Controllers\Identity::resolveIdentity($r['username']);
             } catch (\OmegaUp\Exceptions\NotFoundException $e) {
                 // If not found, simply ignore it
                 $r['username'] = null;

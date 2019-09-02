@@ -11,7 +11,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
-        CourseController::apiCreateAssignment(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => Utils::CreateRandomString(),
@@ -23,7 +23,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         ]));
 
         // Call the details API
-        $response = CourseController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
@@ -57,7 +57,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
         $assignmentAlias = Utils::CreateRandomString();
-        CourseController::apiCreateAssignment(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -72,7 +72,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $userLogin = self::login($user);
 
         // Call the details API
-        $response = CourseController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
@@ -100,7 +100,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $userLogin = self::login($user);
 
-        $response = CourseController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
@@ -115,7 +115,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $userLogin = self::login($user);
-        $response = CourseController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
@@ -126,7 +126,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
 
         $userLogin = self::login($user);
-        $response = CourseController::apiIntroDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -141,7 +141,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $user = CoursesFactory::addStudentToCourse($courseData);
         $userLogin = self::login($user);
 
-        $response = CourseController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
@@ -156,7 +156,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         // Add assignment that hasn't started yet.
         $adminLogin = self::login($courseData['admin']);
         $assignmentAlias = Utils::CreateRandomString();
-        CourseController::apiCreateAssignment(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => Utils::CreateRandomString(),
             'alias' => $assignmentAlias,
@@ -172,7 +172,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         // Try to get details before being added to the course;
         try {
-            $response = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'course' => $courseData['course_alias'],
                 'assignment' => $courseData['assignment_alias'],
@@ -185,7 +185,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         CoursesFactory::addStudentToCourse($courseData, $user);
 
         // Call the details API for the assignment that's already started.
-        $response = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course' => $courseData['course_alias'],
             'assignment' => $courseData['assignment_alias'],
@@ -194,7 +194,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         // Call the detail API for the assignment that has not started.
         try {
-            $response = CourseController::apiAssignmentDetails(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'course' => $courseData['course_alias'],
                 'assignment' => $assignmentAlias,

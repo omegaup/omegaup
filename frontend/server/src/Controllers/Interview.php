@@ -1,6 +1,8 @@
 <?php
 
-class InterviewController extends \OmegaUp\Controllers\Controller {
+ namespace OmegaUp\Controllers;
+
+class Interview extends \OmegaUp\Controllers\Controller {
     private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
         $is_required = !$is_update;
 
@@ -56,7 +58,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Problemsets::update($problemset);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
 
@@ -107,7 +109,7 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
         // Does the user exist ?
         try {
             $r['user'] = null;
-            $r['user'] = UserController::resolveUser($r['usernameOrEmail']);
+            $r['user'] = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             // this is fine, we'll create an account for this user
         }
@@ -121,10 +123,10 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
 
             $newUserRequest = new \OmegaUp\Request($r);
             $newUserRequest['email'] = $r['usernameOrEmail'];
-            $newUserRequest['username'] = UserController::makeUsernameFromEmail($r['usernameOrEmail']);
+            $newUserRequest['username'] = \OmegaUp\Controllers\User::makeUsernameFromEmail($r['usernameOrEmail']);
             $newUserRequest['password'] = \OmegaUp\SecurityTools::randomString(8);
 
-            UserController::apiCreate($newUserRequest);
+            \OmegaUp\Controllers\User::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
             $body = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
@@ -236,9 +238,9 @@ class InterviewController extends \OmegaUp\Controllers\Controller {
     }
 
     public static function showIntro(\OmegaUp\Request $r) {
-        $contest = ContestController::validateContest($r['contest_alias'] ?? '');
+        $contest = \OmegaUp\Controllers\Contest::validateContest($r['contest_alias'] ?? '');
         // TODO: Arreglar esto para que Problemsets se encargue de obtener
         //       la info correcta
-        return ContestController::shouldShowIntro($r, $contest);
+        return \OmegaUp\Controllers\Contest::shouldShowIntro($r, $contest);
     }
 }

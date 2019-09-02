@@ -4,7 +4,7 @@ require_once('../server/bootstrap_smarty.php');
 
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 try {
-    $response = UserController::apiProfile(new \OmegaUp\Request([
+    $response = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
         'username' => array_key_exists('username', $_REQUEST) ? $_REQUEST['username'] : null,
     ]));
     $response['userinfo']['graduation_date'] = empty($response['userinfo']['graduation_date']) ?
@@ -14,7 +14,7 @@ try {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 
-$currentSession = SessionController::apiCurrentSession()['session'];
+$currentSession = \OmegaUp\Controllers\Session::apiCurrentSession()['session'];
 $smarty->assign('payload', [
     'email' => $currentSession['email'],
 ]);

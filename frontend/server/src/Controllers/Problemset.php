@@ -1,12 +1,14 @@
 <?php
 
-class ProblemsetController extends \OmegaUp\Controllers\Controller {
+ namespace OmegaUp\Controllers;
+
+class Problemset extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
     ) {
-        if ($problem->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
-            $problem->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED) {
+        if ($problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED ||
+            $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
         }
         if (!\OmegaUp\DAO\Problems::isVisible($problem)
@@ -27,7 +29,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
         bool $validateVisibility = true
     ) {
         if ($validateVisibility) {
-            ProblemsetController::validateAddProblemToProblemset(
+            \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                 $problem,
                 $identity
             );
@@ -85,14 +87,14 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
-            return ContestController::apiDetails(
+            return \OmegaUp\Controllers\Contest::apiDetails(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'contest_alias' => $r['problemset']['contest_alias']
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
-            return CourseController::apiAssignmentDetails(
+            return \OmegaUp\Controllers\Course::apiAssignmentDetails(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'course' => $r['problemset']['course'],
@@ -100,7 +102,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Interview') {
-            return InterviewController::apiDetails(
+            return \OmegaUp\Controllers\Interview::apiDetails(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'interview_alias' => $r['problemset']['interview_alias'],
@@ -118,7 +120,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
-            return ContestController::apiScoreboard(
+            return \OmegaUp\Controllers\Contest::apiScoreboard(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
@@ -126,7 +128,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
-            return CourseController::apiAssignmentScoreboard(
+            return \OmegaUp\Controllers\Course::apiAssignmentScoreboard(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'token' => $r['token'],
@@ -150,14 +152,14 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
         $r = self::wrapRequest($r);
 
         if ($r['problemset']['type'] == 'Contest') {
-            return ContestController::apiScoreboardEvents(
+            return \OmegaUp\Controllers\Contest::apiScoreboardEvents(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'contest_alias' => $r['problemset']['contest_alias'],
                 ])
             );
         } elseif ($r['problemset']['type'] == 'Assignment') {
-            return CourseController::apiAssignmentScoreboardEvents(
+            return \OmegaUp\Controllers\Course::apiAssignmentScoreboardEvents(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
                     'course' => $r['problemset']['course'],
@@ -197,7 +199,7 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
             if (isset($r['tokens']) && count($r['tokens']) >= 4) {
                 $request['token'] = $r['tokens'][3];
             }
-            $response = ContestController::validateDetails($request);
+            $response = \OmegaUp\Controllers\Contest::validateDetails($request);
             $request['problemset'] = $r['problemset'];
             $request['contest_alias'] = $response['contest_alias'];
             $request['contest_admin'] = $response['contest_admin'];
@@ -209,17 +211,17 @@ class ProblemsetController extends \OmegaUp\Controllers\Controller {
     /**
      * Downloads all the runs of the problemset.
      *
-     * @param $problemsetId integer The problemset ID.
-     * @param $zip ZipStream The object that represents the .zip file.
+     * @param int $problemsetId The problemset ID.
+     * @param \ZipStream $zip The object that represents the .zip file.
      */
-    public static function downloadRuns(int $problemsetId, ZipStream $zip): void {
+    public static function downloadRuns(int $problemsetId, \ZipStream $zip): void {
         $runs = \OmegaUp\DAO\Runs::getByProblemset($problemsetId);
 
         $table = ['guid,user,problem,verdict,points'];
         foreach ($runs as $run) {
             $zip->add_file(
                 "runs/{$run['guid']}.{$run['language']}",
-                SubmissionController::getSource($run['guid'])
+                \OmegaUp\Controllers\Submission::getSource($run['guid'])
             );
             $table[] = "{$run['guid']},{$run['username']},{$run['alias']},{$run['verdict']},{$run['contest_score']}";
         }

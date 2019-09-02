@@ -1,12 +1,14 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  *  GroupController
  *
  * @author joemmanuel
  */
 
-class GroupController extends \OmegaUp\Controllers\Controller {
+class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Utility function to create a new group.
      */
@@ -31,7 +33,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
             self::$log->info("Group {$alias} created.");
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse', $e);
@@ -110,7 +112,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
                 'group_alias'
             );
         }
-        $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity($r['usernameOrEmail']);
 
         if (!is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
             $group->group_id,
@@ -143,7 +145,7 @@ class GroupController extends \OmegaUp\Controllers\Controller {
                 'group_alias'
             );
         }
-        $resolvedIdentity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity($r['usernameOrEmail']);
 
         // Check user is actually in group
         $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getByPK(

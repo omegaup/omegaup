@@ -2,7 +2,7 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $hasActivityInCourses = CourseController::userHasActivityInCourses(
+    $hasActivityInCourses = \OmegaUp\Controllers\Course::userHasActivityInCourses(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {

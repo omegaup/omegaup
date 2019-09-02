@@ -3,7 +3,7 @@
 require_once('../server/bootstrap_smarty.php');
 
 try {
-    $payload = GroupController::apiMyList(new \OmegaUp\Request([]));
+    $payload = \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([]));
     $smarty->assign('payload', $payload);
     $smarty->display('../templates/group.list.tpl');
 } catch (\OmegaUp\Exceptions\ApiException $e) {

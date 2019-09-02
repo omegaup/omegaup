@@ -2,8 +2,6 @@
 
 namespace OmegaUp\DAO;
 
-use \ProblemController;
-
 /**
  * ProblemsTags Data Access Object (DAO).
  *
@@ -70,9 +68,9 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
     public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem) {
         $placeholders = join(
             ',',
-            array_fill(0, count(ProblemController::RESTRICTED_TAG_NAMES), '?')
+            array_fill(0, count(\OmegaUp\Controllers\Problem::RESTRICTED_TAG_NAMES), '?')
         );
-        $params = array_merge(ProblemController::RESTRICTED_TAG_NAMES, [$problem->problem_id]);
+        $params = array_merge(\OmegaUp\Controllers\Problem::RESTRICTED_TAG_NAMES, [$problem->problem_id]);
         $sql = "
             DELETE FROM
                 `Problems_Tags`

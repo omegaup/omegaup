@@ -1,11 +1,13 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * BadgesController
  *
  * @author carlosabcs
  */
-class BadgeController extends \OmegaUp\Controllers\Controller {
+class Badge extends \OmegaUp\Controllers\Controller {
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
 
     public static function getAllBadges(): array {

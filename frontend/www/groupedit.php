@@ -3,7 +3,7 @@
 require_once('../server/bootstrap_smarty.php');
 
 $r = new \OmegaUp\Request($_REQUEST);
-$session = SessionController::apiCurrentSession($r)['session'];
+$session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
 if (is_null($session['identity'])) {
     header('HTTP/1.1 404 Not Found');
     die();

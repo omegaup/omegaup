@@ -2,8 +2,6 @@
 
 namespace OmegaUp\DAO;
 
-use \RunController;
-
 /**
  * Runs Data Access Object (DAO).
  *
@@ -587,7 +585,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             return true;
         }
 
-        $submissionGap = RunController::$defaultSubmissionGap;
+        $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
             $submissionGap = max(
@@ -603,7 +601,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * Returns the time of the next submission to the current problem
      */
     final public static function nextSubmissionTimestamp($contest) {
-        $submission_gap = RunController::$defaultSubmissionGap;
+        $submission_gap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
             $submission_gap = max(

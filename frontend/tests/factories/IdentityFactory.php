@@ -42,7 +42,7 @@ class IdentityFactory {
         string $password
     ) : array {
         // Call api using identity creator group member
-        IdentityController::apiBulkCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'identities' => IdentityFactory::getCsvData(
                 'identities.csv',
@@ -53,7 +53,7 @@ class IdentityFactory {
         ]));
 
         // Getting the identities members list
-        $response = GroupController::apiMembers(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Group::apiMembers(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'group_alias' => $group->alias,
         ]));

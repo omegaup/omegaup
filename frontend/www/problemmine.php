@@ -3,7 +3,7 @@
 require_once('../server/bootstrap_smarty.php');
 
 try {
-    $smartyProperties = ProblemController::getProblemsMineInfoForSmarty(
+    $smartyProperties = \OmegaUp\Controllers\Problem::getProblemsMineInfoForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {

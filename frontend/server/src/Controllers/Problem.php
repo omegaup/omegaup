@@ -1,9 +1,11 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * ProblemsController
  */
-class ProblemController extends \OmegaUp\Controllers\Controller {
+class Problem extends \OmegaUp\Controllers\Controller {
     // Constants for problem visibility.
     const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
     const VISIBILITY_PRIVATE_BANNED = -2; // Problem that was private before it was banned
@@ -80,8 +82,8 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             }
 
             // Only reviewers can revert bans.
-            if (($r['problem']->visibility == ProblemController::VISIBILITY_PUBLIC_BANNED ||
-                  $r['problem']->visibility == ProblemController::VISIBILITY_PRIVATE_BANNED)
+            if (($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED ||
+                  $r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED)
                     && array_key_exists('visibility', $r)
                     && $r['problem']->visibility != $r['visibility']
                     && !\OmegaUp\Authorization::isQualityReviewer($r->identity)) {
@@ -93,17 +95,17 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             }
 
             if (!is_null($r['visibility']) && $r['problem']->visibility != $r['visibility']) {
-                if ($r['problem']->visibility == ProblemController::VISIBILITY_PROMOTED) {
+                if ($r['problem']->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('qualityNominationProblemHasBeenPromoted', 'visibility');
                 } else {
                     \OmegaUp\Validators::validateInEnum(
                         $r['visibility'],
                         'visibility',
                         [
-                            ProblemController::VISIBILITY_PRIVATE,
-                            ProblemController::VISIBILITY_PUBLIC,
-                            ProblemController::VISIBILITY_PUBLIC_BANNED,
-                            ProblemController::VISIBILITY_PRIVATE_BANNED
+                            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+                            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+                            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+                            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
                         ]
                     );
                 }
@@ -112,10 +114,10 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                 $r['update_published'],
                 'update_published',
                 [
-                    ProblemController::UPDATE_PUBLISHED_NONE,
-                    ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
-                    ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
-                    ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
+                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                    \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
                 ],
                 false
             );
@@ -124,7 +126,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateInEnum(
                 $r['visibility'],
                 'visibility',
-                [ProblemController::VISIBILITY_PRIVATE, ProblemController::VISIBILITY_PUBLIC]
+                [\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE, \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC]
             );
             $r['selected_tags'] = json_decode($r['selected_tags']);
             if (!empty($r['selected_tags'])) {
@@ -162,7 +164,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateValidSubset(
             $r['languages'],
             'languages',
-            array_keys(RunController::$kSupportedLanguages),
+            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
             $is_required
         );
     }
@@ -228,21 +230,21 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             // Add tags
             if (!empty($r['selected_tags'])) {
                 foreach ($r['selected_tags'] as $tag) {
-                    $tagName = TagController::normalize($tag->tagname);
+                    $tagName = \OmegaUp\Controllers\Tag::normalize($tag->tagname);
                     if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
                         continue;
                     }
                     self::addTag($tagName, $tag->public, $problem);
                 }
             }
-            ProblemController::setRestrictedTags($problem);
+            \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             // Operation failed in something we know it could fail, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
 
             throw $e;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::$log->error("Failed to upload problem {$problem->alias}", $e);
 
             // Operation failed unexpectedly, rollback transaction
@@ -305,7 +307,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Check problem_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $user = UserController::resolveUser($r['usernameOrEmail']);
+        $user = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -317,7 +319,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        ACLController::addUser($problem->acl_id, $user->user_id);
+        \OmegaUp\Controllers\ACL::addUser($problem->acl_id, $user->user_id);
 
         return ['status' => 'ok'];
     }
@@ -356,7 +358,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        ACLController::addGroup($problem->acl_id, $group->group_id);
+        \OmegaUp\Controllers\ACL::addGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -397,7 +399,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         bool $allowRestricted = false
     ) : void {
         // Normalize name.
-        $tagName = TagController::normalize($tagName);
+        $tagName = \OmegaUp\Controllers\Tag::normalize($tagName);
 
         if (!$allowRestricted && in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('tagRestricted', 'name');
@@ -433,7 +435,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Check problem_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
 
-        $identity = IdentityController::resolveIdentity($r['usernameOrEmail']);
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['usernameOrEmail']);
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -450,7 +452,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
-        ACLController::removeUser($problem->acl_id, $identity->user_id);
+        \OmegaUp\Controllers\ACL::removeUser($problem->acl_id, $identity->user_id);
 
         return ['status' => 'ok'];
     }
@@ -485,7 +487,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        ACLController::removeGroup($problem->acl_id, $group->group_id);
+        \OmegaUp\Controllers\ACL::removeGroup($problem->acl_id, $group->group_id);
 
         return ['status' => 'ok'];
     }
@@ -646,10 +648,10 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\DAO\Runs::update($run);
 
                 // Expire details of the run
-                RunController::invalidateCacheOnRejudge($run);
+                \OmegaUp\Controllers\Run::invalidateCacheOnRejudge($run);
             }
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -699,7 +701,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         unset($problemSettings['slow']);
         self::updateProblemSettings($problemSettings, $r);
         $acceptsSubmissions = $problem->languages !== '';
-        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $updatePublished = \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
             $updatePublished = $r['update_published'];
         }
@@ -718,7 +720,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $problemDeployer = new \OmegaUp\ProblemDeployer(
                 $problem->alias,
                 $acceptsSubmissions,
-                $updatePublished != ProblemController::UPDATE_PUBLISHED_NONE
+                $updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE
             );
             $problemDeployer->commit(
                 $r['message'],
@@ -732,7 +734,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             if (!is_null($problemDeployer->publishedCommit)) {
                 $oldCommit = $problem->commit;
                 $oldVersion = $problem->current_version;
-                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+                [$problem->commit, $problem->current_version] = \OmegaUp\Controllers\Problem::resolveCommit(
                     $problem,
                     $problemDeployer->publishedCommit
                 );
@@ -743,7 +745,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             if ($needsUpdate) {
                 \OmegaUp\DAO\Runs::createRunsForVersion($problem);
                 \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                     \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
                         $r->user,
@@ -756,7 +758,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             // Save the contest object with data sent by user to the database
             \OmegaUp\DAO\Problems::update($problem);
 
-            ProblemController::setRestrictedTags($problem);
+            \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -764,7 +766,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
 
             throw $e;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to update problem');
@@ -774,7 +776,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         }
 
         if ($response['rejudged'] && OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
-            self::$log->info('Calling ProblemController::apiRejudge');
+            self::$log->info('Calling \OmegaUp\Controllers\Problem::apiRejudge');
             try {
                 $runs = \OmegaUp\DAO\Runs::getNewRunsForVersion($problem);
                 \OmegaUp\Grader::getInstance()->rejudge($runs, false);
@@ -784,8 +786,8 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                     \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::RUN_ADMIN_DETAILS, $run->run_id);
                 }
                 \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::PROBLEM_STATS, $problem->alias);
-            } catch (Exception $e) {
-                self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
+            } catch (\Exception $e) {
+                self::$log->error('Best effort \OmegaUp\Controllers\Problem::apiRejudge failed', $e);
             }
         }
 
@@ -804,11 +806,11 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\ProblemsTags::clearRestrictedTags($problem);
         $languages = explode(',', $problem->languages);
         if (in_array('cat', $languages)) {
-            ProblemController::addTag('solo-salida', true, $problem, true);
+            \OmegaUp\Controllers\Problem::addTag('solo-salida', true, $problem, true);
         } elseif (!empty(array_intersect(['kp', 'kj'], $languages))) {
-            ProblemController::addTag('karel', true, $problem, true);
+            \OmegaUp\Controllers\Problem::addTag('karel', true, $problem, true);
         } else {
-            ProblemController::addTag('lenguaje', true, $problem, true);
+            \OmegaUp\Controllers\Problem::addTag('lenguaje', true, $problem, true);
         }
 
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -817,7 +819,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             JSON_OBJECT_AS_ARRAY
         );
         if (!empty($distribSettings['interactive'])) {
-            ProblemController::addTag('interactive', true, $problem, true);
+            \OmegaUp\Controllers\Problem::addTag('interactive', true, $problem, true);
         }
     }
 
@@ -836,11 +838,11 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
     ): array {
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         // Check that lang is in the ISO 639-1 code list, default is "es".
-        \OmegaUp\Validators::validateInEnum($r['lang'], 'lang', ProblemController::ISO639_1, false /* is_required */);
+        \OmegaUp\Validators::validateInEnum($r['lang'], 'lang', \OmegaUp\Controllers\Problem::ISO639_1, false /* is_required */);
         if (is_null($r['lang'])) {
-            $r['lang'] = IdentityController::getPreferredLanguage($r);
+            $r['lang'] = \OmegaUp\Controllers\Identity::getPreferredLanguage($r);
         }
-        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $updatePublished = \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
             $updatePublished = $r['update_published'];
         }
@@ -855,12 +857,12 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                     "{$directory}/{$r['lang']}.markdown" => $contents,
                 ]
             );
-            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NONE) {
-                [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+            if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE) {
+                [$problem->commit, $problem->current_version] = \OmegaUp\Controllers\Problem::resolveCommit(
                     $problem,
                     $problemDeployer->publishedCommit
                 );
-                if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                     \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                         $problem,
                         $r->user,
@@ -983,7 +985,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['lang'])) {
             \OmegaUp\Validators::validateStringOfLengthInRange($r['lang'], 'lang', 2, 2);
         } else {
-            $r['lang'] = IdentityController::getPreferredLanguage($r);
+            $r['lang'] = \OmegaUp\Controllers\Identity::getPreferredLanguage($r);
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
@@ -1006,7 +1008,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             if (!\OmegaUp\Authorization::isAdmin($r->identity, $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
                 if (!empty($problemset['contest'])) {
-                    if (!ContestController::isPublic($problemset['contest']->admission_mode)) {
+                    if (!\OmegaUp\Controllers\Contest::isPublic($problemset['contest']->admission_mode)) {
                         if (is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
                             $r->identity->identity_id,
                             $problemset['problemset']->problemset_id
@@ -1073,7 +1075,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         ];
         try {
             $result['markdown'] = mb_convert_encoding($problemArtifacts->get($sourcePath), 'utf-8');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException('statementNotFound');
         }
 
@@ -1123,7 +1125,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
             function () use ($problem, $commit, $language) {
-                return ProblemController::getProblemResourceImpl([
+                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'statements',
                     'alias' => $problem->alias,
                     'commit' => $commit,
@@ -1154,7 +1156,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
             function () use ($problem, $commit, $language) {
-                return ProblemController::getProblemResourceImpl([
+                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'solutions',
                     'alias' => $problem->alias,
                     'commit' => $commit,
@@ -1180,7 +1182,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
             function () use ($problem) {
-                return ProblemController::getProblemSettingsDistribImpl([
+                return \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
                     'alias' => $problem->alias,
                     'commit' => $problem->commit,
                 ]);
@@ -1376,12 +1378,12 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $version = $problemsetProblem->version;
         }
 
-        $response['statement'] = ProblemController::getProblemStatement(
+        $response['statement'] = \OmegaUp\Controllers\Problem::getProblemStatement(
             $problem,
             $commit,
             $r['lang']
         );
-        $response['settings'] = ProblemController::getProblemSettingsDistrib(
+        $response['settings'] = \OmegaUp\Controllers\Problem::getProblemSettingsDistrib(
             $problem,
             $commit
         );
@@ -1393,7 +1395,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Cache::USER_PROFILE,
                 $r->identity->username,
                 function () use ($r) {
-                    return UserController::apiProfile($r);
+                    return \OmegaUp\Controllers\User::apiProfile($r);
                 }
             );
             if (!empty($userData)) {
@@ -1556,7 +1558,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             }
             $seenSolutions = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCount($r->user);
             $allowedSolutions = intval(\OmegaUp\DAO\Problems::getProblemsSolvedCount($r->identity) /
-                                ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
+                                \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION);
             // Validate that the user will not exceed the number of allowed solutions.
             if ($seenSolutions >= $allowedSolutions) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('allowedSolutionsLimitReached');
@@ -1570,7 +1572,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'exists' => true,
-            'solution' => ProblemController::getProblemSolution(
+            'solution' => \OmegaUp\Controllers\Problem::getProblemSolution(
                 $problem,
                 $commit,
                 $r['lang']
@@ -1653,20 +1655,20 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['commit'], 'commit');
-        // ProblemController::UPDATE_PUBLISHED_NONE is not allowed here because
+        // \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE is not allowed here because
         // it would not make any sense!
         \OmegaUp\Validators::validateInEnum(
             $r['update_published'],
             'update_published',
             [
-                ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET,
-                ProblemController::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
-                ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
+                \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
+                \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
+                \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             ],
             false
         );
 
-        $updatePublished = ProblemController::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $updatePublished = \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         if (!is_null($r['update_published'])) {
             $updatePublished = $r['update_published'];
         }
@@ -1682,7 +1684,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $oldVersion = $problem->current_version;
         $oldCommit = $problem->commit;
 
-        [$problem->commit, $problem->current_version] = ProblemController::resolveCommit(
+        [$problem->commit, $problem->current_version] = \OmegaUp\Controllers\Problem::resolveCommit(
             $problem,
             $r['commit']
         );
@@ -1713,7 +1715,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Runs::createRunsForVersion($problem);
             \OmegaUp\DAO\Runs::updateVersionToCurrent($problem);
-            if ($updatePublished != ProblemController::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+            if ($updatePublished != \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET) {
                 \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
                     $problem,
                     $r->user,
@@ -1724,7 +1726,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Problems::update($problem);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to update problem: ', $e);
@@ -1733,7 +1735,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         }
 
         if (OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE) {
-            self::$log->info('Calling ProblemController::apiRejudge');
+            self::$log->info('Calling \OmegaUp\Controllers\Problem::apiRejudge');
             try {
                 $runs = \OmegaUp\DAO\Runs::getNewRunsForVersion($problem);
                 \OmegaUp\Grader::getInstance()->rejudge($runs, false);
@@ -1743,8 +1745,8 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
                     \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::RUN_ADMIN_DETAILS, $run->run_id);
                 }
                 \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::PROBLEM_STATS, $problem->alias);
-            } catch (Exception $e) {
-                self::$log->error('Best effort ProblemController::apiRejudge failed', $e);
+            } catch (\Exception $e) {
+                self::$log->error('Best effort \OmegaUp\Controllers\Problem::apiRejudge failed', $e);
             }
         }
         $updatedStatementLanguages = [];
@@ -1757,7 +1759,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         }
         self::invalidateCache(
             $problem,
-            array_merge($updatedStatementLanguages, ProblemController::VALID_LANGUAGES)
+            array_merge($updatedStatementLanguages, \OmegaUp\Controllers\Problem::VALID_LANGUAGES)
         );
 
         return [
@@ -1877,7 +1879,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             if (!is_null($r['username'])) {
                 try {
                     $r['identity'] = \OmegaUp\DAO\Identities::findByUsername($r['username']);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
                 }
             }
@@ -2112,7 +2114,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         // Filter results
         $language = null; // Filter by language, all by default.
         // "language" may be one of the allowed options, otherwise the default filter will be used.
-        if (!is_null($r['language']) && in_array($r['language'], ProblemController::VALID_LANGUAGES)) {
+        if (!is_null($r['language']) && in_array($r['language'], \OmegaUp\Controllers\Problem::VALID_LANGUAGES)) {
             $language = $r['language'];
         }
 
@@ -2186,7 +2188,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             $authorIdentityId,
             $authorUserId,
             $r['tag'],
-            is_null($r['min_visibility']) ? ProblemController::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
+            is_null($r['min_visibility']) ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
             is_null($r['require_all_tags']) ? true : !!$r['require_all_tags'],
             $r['programming_languages'],
             $r['difficulty_range'],
@@ -2538,7 +2540,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
         $result['problem_admin'] = $isProblemAdmin;
         $result['payload']['user'] = $user;
         $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
-            !is_null($r->user) && !UserController::isMainIdentity(
+            !is_null($r->user) && !\OmegaUp\Controllers\User::isMainIdentity(
                 $r->user,
                 $r->identity
             ) && \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
@@ -2581,7 +2583,7 @@ class ProblemController extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
             function () use ($problem) {
-                return ProblemController::getProblemSolutionExistenceImpl(
+                return \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
                     $problem
                 );
             },

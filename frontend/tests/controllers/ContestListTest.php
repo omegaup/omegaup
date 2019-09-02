@@ -46,7 +46,7 @@ class ContestListTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'page_size' => 50
         ]);
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         // Assert our contest is there.
         foreach ($response['results'] as $contest) {
@@ -64,7 +64,7 @@ class ContestListTest extends OmegaupTestCase {
         // Create new PUBLIC contest
         $contestData = ContestsFactory::createContest();
 
-        $response = ContestController::apiList(new \OmegaUp\Request(['page_size' => 50]));
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request(['page_size' => 50]));
 
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
@@ -91,7 +91,7 @@ class ContestListTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
@@ -118,7 +118,7 @@ class ContestListTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         // Assert our contest is not there
         $this->assertArrayNotContainsInKey(
@@ -140,7 +140,7 @@ class ContestListTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'page_size' => 100
         ]);
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         // Assert our contest is there
         $this->assertArrayContainsInKeyExactlyOnce(
@@ -168,7 +168,7 @@ class ContestListTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         // Assert our contest is there
         $this->assertArrayContainsInKeyExactlyOnce(
@@ -196,13 +196,13 @@ class ContestListTest extends OmegaupTestCase {
         ]);
 
         // Assert our contest is not there.
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
         $this->assertArrayNotContainsInKey(
             $response['results'],
             'title',
             $title
         );
-        $response = ContestController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Contest::apiAdminList($r);
         $this->assertArrayNotContainsInKey(
             $response['contests'],
             'title',
@@ -216,14 +216,14 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addGroupAdmin($contestData, $group['group']);
 
         // Assert our contest is there
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
             $title
         );
-        $response = ContestController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Contest::apiAdminList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['contests'],
             'title',
@@ -255,13 +255,13 @@ class ContestListTest extends OmegaupTestCase {
         ]);
 
         // Assert our contest is there, but just once.
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
             $title
         );
-        $response = ContestController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Contest::apiAdminList($r);
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['contests'],
             'title',
@@ -293,7 +293,7 @@ class ContestListTest extends OmegaupTestCase {
             'contest_alias' => $recommendedContestData['request']['alias'],
             'value' => 1,
         ]);
-        ContestController::apiSetRecommended($r);
+        \OmegaUp\Controllers\Contest::apiSetRecommended($r);
         unset($login);
 
         // Get list of contests
@@ -301,7 +301,7 @@ class ContestListTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         // Check that recommended contest is earlier in list han not-recommended
         $recommendedPosition = 0;
@@ -339,7 +339,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Get list of contests
         $login = self::login($contestant);
-        $response = ContestController::apiList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -359,7 +359,7 @@ class ContestListTest extends OmegaupTestCase {
         if (true) {
             $login = self::login(UserFactory::createAdminUser());
             for ($i = 0; $i < 2; $i++) {
-                ContestController::apiSetRecommended(new \OmegaUp\Request([
+                \OmegaUp\Controllers\Contest::apiSetRecommended(new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'contest_alias' => $recommendedContest[$i]['request']['alias'],
                     'value' => 1,
@@ -369,7 +369,7 @@ class ContestListTest extends OmegaupTestCase {
 
         // Get list of contests
         $login = self::login($contestant);
-        $response = ContestController::apiList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -413,7 +413,7 @@ class ContestListTest extends OmegaupTestCase {
             'active' => \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
         ]);
 
-        $response = ContestController::apiList($r);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
         $this->assertArrayContainsInKey(
             $response['results'],
@@ -447,7 +447,7 @@ class ContestListTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiListParticipating($r);
+        $response = \OmegaUp\Controllers\Contest::apiListParticipating($r);
 
         $this->assertEquals($numberOfPrivateContests, count($response['contests']));
     }
@@ -488,7 +488,7 @@ class ContestListTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $loginContestant = self::login($contestant);
-        $response = ContestController::apiList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $loginContestant->auth_token,
             'page_size' => 50,
             'admission_mode' => 'public'
@@ -507,7 +507,7 @@ class ContestListTest extends OmegaupTestCase {
 
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 5);
         // set contests[1] to private
-        $response = ContestController::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contests[1]['request']['alias'],
             'admission_mode' => 'private',
@@ -515,7 +515,7 @@ class ContestListTest extends OmegaupTestCase {
 
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 10);
         // set contests[1] to public
-        $response = ContestController::apiUpdate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contests[1]['request']['alias'],
             'admission_mode' => 'public',
@@ -529,7 +529,7 @@ class ContestListTest extends OmegaupTestCase {
         ];
 
         $loginNewContestant = self::login($contestant);
-        $response = ContestController::apiList(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $loginNewContestant->auth_token,
             'page_size' => 50,
             'admission_mode' => 'public'

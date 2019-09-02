@@ -1,11 +1,13 @@
 <?php
 
+ namespace OmegaUp\Controllers;
+
 /**
  * Description of ClarificationController
  *
  * @author joemmanuel
  */
-class ClarificationController extends \OmegaUp\Controllers\Controller {
+class Clarification extends \OmegaUp\Controllers\Controller {
     /** @var null|\OmegaUp\Broadcaster */
     public static $broadcaster = null;
 
@@ -209,7 +211,7 @@ class ClarificationController extends \OmegaUp\Controllers\Controller {
             if (is_null($r['user'])) {
                 $r['user'] = \OmegaUp\DAO\Identities::GetByPK($clarification->author_id);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             self::$log->error('Failed to broadcast clarification', $e);
             return;
         }

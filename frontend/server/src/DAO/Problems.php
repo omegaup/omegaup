@@ -2,8 +2,6 @@
 
 namespace OmegaUp\DAO;
 
-use \ProblemController;
-
 /**
  * Problems Data Access Object (DAO).
  *
@@ -190,7 +188,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $clauses,
                 [
                     'p.visibility > ?',
-                    [ProblemController::VISIBILITY_DELETED],
+                    [\OmegaUp\Controllers\Problem::VISIBILITY_DELETED],
                 ]
             );
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
@@ -249,7 +247,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [
                     '(p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL)',
                     [
-                        max(ProblemController::VISIBILITY_PUBLIC, $minVisibility),
+                        max(\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $minVisibility),
                         $identityId,
                     ],
                 ]
@@ -258,7 +256,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $clauses,
                 [
                     'p.visibility > ?',
-                    [ProblemController::VISIBILITY_DELETED],
+                    [\OmegaUp\Controllers\Problem::VISIBILITY_DELETED],
                 ]
             );
         } elseif ($identityType === IDENTITY_ANONYMOUS) {
@@ -276,7 +274,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $clauses,
                 [
                     'p.visibility >= ?',
-                    [max(ProblemController::VISIBILITY_PUBLIC, $minVisibility)],
+                    [max(\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $minVisibility)],
                 ]
             );
         }
@@ -546,10 +544,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 i.username ASC,
                 rp.problem_id DESC;";
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $course_alias]);
     }
 
-    final public static function getUnsolvedProblemsByUsersOfCourse($course_alias) {
+    /**
+     * @return array{alias: string, title: string, username: string}[]
+     */
+    final public static function getUnsolvedProblemsByUsersOfCourse(
+        string $courseAlias
+    ) {
         $sql = '
             SELECT
                 rp.alias,
@@ -603,7 +606,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 i.username ASC,
                 rp.problem_id DESC;';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_PUBLIC, $course_alias]);
+        /** @var array{alias: string, title: string, username: string}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $courseAlias]
+        );
     }
 
     final public static function isProblemSolved(
@@ -770,7 +777,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $identity_id,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            ProblemController::VISIBILITY_DELETED,
+            \OmegaUp\Controllers\Problem::VISIBILITY_DELETED,
             (int)$offset,
             (int)$pageSize,
         ];
@@ -809,7 +816,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ?, ?';
         $params = [
             $user_id,
-            ProblemController::VISIBILITY_DELETED,
+            \OmegaUp\Controllers\Problem::VISIBILITY_DELETED,
             (int)$offset,
             (int)$pageSize,
         ];
@@ -834,7 +841,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!is_null($page)) {
             $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
         }
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [ProblemController::VISIBILITY_DELETED]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [\OmegaUp\Controllers\Problem::VISIBILITY_DELETED]);
         $allData = [];
         foreach ($rs as $row) {
             $allData[] = new \OmegaUp\DAO\VO\Problems($row);
@@ -889,7 +896,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 WHERE
                     `problem_id` = ?;';
         $params = [
-            ProblemController::VISIBILITY_DELETED,
+            \OmegaUp\Controllers\Problem::VISIBILITY_DELETED,
             $problem_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

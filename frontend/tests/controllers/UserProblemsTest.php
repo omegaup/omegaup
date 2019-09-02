@@ -18,7 +18,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ProblemController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Problem::apiMyList($r);
 
         $this->assertEquals(count($problemData), count($response['problems']));
         $this->assertEquals($problemData[2]['request']['problem_alias'], $response['problems'][0]['alias']);
@@ -34,7 +34,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ProblemController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Problem::apiMyList($r);
 
         $this->assertEquals(0, count($response['problems']));
     }
@@ -73,7 +73,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ProblemController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Problem::apiAdminList($r);
 
         // Problems should come ordered by problem id desc
         $this->assertEquals(count($problemAuthorData) + count($problemAdminData), count($response['problems']));

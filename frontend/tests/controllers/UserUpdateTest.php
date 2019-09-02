@@ -26,7 +26,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'locale' => $locale->name,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
@@ -53,7 +53,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'locale' => $locale->name,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
@@ -70,7 +70,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'username' => $user->username
         ]);
-        $this->assertEquals($locale->name, IdentityController::getPreferredLanguage(
+        $this->assertEquals($locale->name, \OmegaUp\Controllers\Identity::getPreferredLanguage(
             $r
         ));
     }
@@ -90,7 +90,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'state_id' => -1,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
     }
 
     /**
@@ -105,7 +105,7 @@ class UserUpdateTest extends OmegaupTestCase {
             //new username
             'username' => $new_username
         ]);
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
         $user_db = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
 
         $this->assertEquals($user_db->username, $new_username);
@@ -124,7 +124,7 @@ class UserUpdateTest extends OmegaupTestCase {
             //update username with existed username
             'username' => $old_user->username
         ]);
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
     }
 
      /**
@@ -142,7 +142,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'country_id' => 'MX',
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
     }
 
     /**
@@ -159,7 +159,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'name' => '',
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
     }
 
     /**
@@ -175,7 +175,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'birth_date' => strtotime('2088-01-01'),
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
     }
 
     /**
@@ -195,7 +195,7 @@ class UserUpdateTest extends OmegaupTestCase {
         ]);
 
         try {
-            UserController::apiUpdate($r);
+            \OmegaUp\Controllers\User::apiUpdate($r);
             $this->fail('All countries now have state information, so it must be provided.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK!
@@ -218,7 +218,7 @@ class UserUpdateTest extends OmegaupTestCase {
         ]);
 
         try {
-            UserController::apiUpdate($r);
+            \OmegaUp\Controllers\User::apiUpdate($r);
             $this->fail('Please select a valid gender option');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK!
@@ -239,7 +239,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'gender' => 'female',
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
     }
 
     /**
@@ -256,7 +256,7 @@ class UserUpdateTest extends OmegaupTestCase {
             'gender' => null,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
     }
 
     /**
@@ -275,7 +275,7 @@ class UserUpdateTest extends OmegaupTestCase {
         ]);
 
         try {
-            UserController::apiUpdate($r);
+            \OmegaUp\Controllers\User::apiUpdate($r);
             $this->fail('Please select a valid gender option');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK!
@@ -289,7 +289,7 @@ class UserUpdateTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $this->assertNull($user->git_token);
         $login = self::login($user);
-        $response = UserController::apiGenerateGitToken(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiGenerateGitToken(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $this->assertNotEquals($response['token'], '');

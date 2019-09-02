@@ -47,7 +47,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -77,7 +77,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
     }
 
     /**
@@ -103,7 +103,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
     }
 
     /**
@@ -132,7 +132,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
     }
 
     /**
@@ -155,7 +155,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
                 'points' => 100,
                 'order_in_contest' => $i + 1,
             ]);
-            $response = ContestController::apiAddProblem($r);
+            $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
             $this->assertEquals('ok', $response['status']);
             self::assertProblemAddedToContest($problemData, $contestData, $r);
         }
@@ -166,7 +166,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
             $login
         );
         try {
-            $response = ContestController::apiAddProblem(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -185,18 +185,18 @@ class AddProblemToContestTest extends OmegaupTestCase {
     public function testAddBannedProblemToContest() {
         $contestData = ContestsFactory::createContest();
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $contestData['director']
         ]));
         $problem = $problemData['problem'];
 
         // Ban the problem.
-        $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
+        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED;
         \OmegaUp\DAO\Problems::update($problem);
 
         $directorLogin = self::login($contestData['director']);
         try {
-            ContestController::apiAddProblem(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -209,7 +209,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         }
 
         // Make it private. Now it should be possible to add it.
-        $problem->visibility = ProblemController::VISIBILITY_PRIVATE;
+        $problem->visibility = \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
         \OmegaUp\DAO\Problems::update($problem);
 
         $r = new \OmegaUp\Request([
@@ -219,7 +219,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
             'points' => 100,
             'order_in_contest' => 1,
         ]);
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
         $this->assertEquals('ok', $response['status']);
         self::assertProblemAddedToContest($problemData, $contestData, $r);
     }
