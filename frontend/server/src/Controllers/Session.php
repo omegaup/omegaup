@@ -292,13 +292,13 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         require_once 'libs/third_party/google-api-php-client/src/Google/autoload.php';
 
-        $client = new Google_Client();
+        $client = new \Google_Client();
         $client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
         $client->setClientSecret(OMEGAUP_GOOGLE_SECRET);
 
         try {
             $loginTicket = $client->verifyIdToken($r['storeToken']);
-        } catch (Google_Auth_Exception $ge) {
+        } catch (\Google_Auth_Exception $ge) {
             throw new \OmegaUp\Exceptions\UnauthorizedException('loginRequired', $ge);
         }
 

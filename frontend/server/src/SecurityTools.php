@@ -2,9 +2,6 @@
 
 namespace OmegaUp;
 
-use \Validators;
-use \InternalServerErrorException;
-
 /**
  * Password and token functions.
  */
