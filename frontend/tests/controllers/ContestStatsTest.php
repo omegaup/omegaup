@@ -63,7 +63,7 @@ class ContestStatsTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiStats($r);
+        $response = \OmegaUp\Controllers\Contest::apiStats($r);
 
         // Check number of pending runs
         $this->assertEquals(count($pendingRunsData) + 1 /* max wait run */, count($response['pending_runs']));
@@ -110,7 +110,7 @@ class ContestStatsTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiStats($r);
+        $response = \OmegaUp\Controllers\Contest::apiStats($r);
 
         // Check number of pending runs
         $this->assertEquals($ACRunsCount, $response['total_runs']);

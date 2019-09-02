@@ -37,7 +37,7 @@ class ContestRunsTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiRuns($r);
+        $response = \OmegaUp\Controllers\Contest::apiRuns($r);
 
         // Assert
         $this->assertEquals(1, count($response['runs']));
@@ -46,14 +46,14 @@ class ContestRunsTest extends OmegaupTestCase {
         $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Contest admin should be able to view run, even if not problem admin.
-        $directorIdentity = IdentityController::resolveIdentity(
+        $directorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $contestData['director']->username
         );
         $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $directorIdentity,
             $problemData['problem']
         ));
-        $response = RunController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'problemset_id' => $contestData['contest']->problemset_id,
             'run_alias' => $response['runs'][0]['guid'],
             'auth_token' => $login->auth_token,
@@ -89,7 +89,7 @@ class ContestRunsTest extends OmegaupTestCase {
         $directorLogin = self::login($contestData['director']);
 
         // Call API
-        $response = ContestController::apiRuns(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));
@@ -105,10 +105,10 @@ class ContestRunsTest extends OmegaupTestCase {
         ]);
 
         // Call API with different points value
-        ContestController::apiAddProblem($r);
+        \OmegaUp\Controllers\Contest::apiAddProblem($r);
 
         // Call API
-        $response = ContestController::apiRuns(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));

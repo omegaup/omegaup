@@ -24,6 +24,7 @@ automatically.
 from __future__ import print_function
 
 import argparse
+import logging
 import os.path
 import sys
 
@@ -104,20 +105,22 @@ def migrate(args, auth, update_metadata=True):
             break
         if args.noop:
             sys.stderr.write('Installing %s\n' % path)
+            continue
+        logging.info('Running script for revision %d...', revision)
+        comment = "migrate"
+        if name.startswith('test_') and not args.development_environment:
+            comment = "skipped"
         else:
-            comment = "migrate"
-            if name.startswith('test_') and not args.development_environment:
-                comment = "skipped"
-            else:
-                for dbname in args.databases.split(','):
-                    database_utils.mysql('source %s;' %
-                                         database_utils.quote(path),
-                                         dbname=dbname, auth=auth)
-            if update_metadata:
-                database_utils.mysql(
-                    ('INSERT INTO `Revision` '
-                     'VALUES(%d, CURRENT_TIMESTAMP, "%s");') %
-                    (revision, comment), dbname='_omegaup_metadata', auth=auth)
+            for dbname in args.databases.split(','):
+                database_utils.mysql('source %s;' %
+                                     database_utils.quote(path),
+                                     dbname=dbname, auth=auth)
+        if update_metadata:
+            database_utils.mysql(
+                ('INSERT INTO `Revision` '
+                 'VALUES(%d, CURRENT_TIMESTAMP, "%s");') %
+                (revision, comment), dbname='_omegaup_metadata', auth=auth)
+        logging.info('Done running script for revision %d', revision)
 
 
 def validate(args, auth):  # pylint: disable=unused-argument
@@ -182,10 +185,13 @@ def purge(args, auth):
     not re-apply the schema.
     '''
     for dbname in args.databases.split(','):
+        logging.info('Dropping database %s', dbname)
         database_utils.mysql('DROP DATABASE IF EXISTS `%s`;' % dbname,
                              auth=auth)
+        logging.info('Creating database %s', dbname)
         database_utils.mysql('CREATE DATABASE `%s` CHARACTER SET UTF8 COLLATE '
                              'utf8_general_ci;' % dbname, auth=auth)
+        logging.info('Done creating database %s', dbname)
 
 
 def schema(args, auth):
@@ -217,6 +223,7 @@ def main():
     parser.add_argument('--username', default='root',
                         help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
+    parser.add_argument('--verbose', action='store_true')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
 
@@ -280,6 +287,10 @@ def main():
     parser_schema.set_defaults(func=schema)
 
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.getLogger().setLevel('DEBUG')
+
     auth = database_utils.authentication(config_file=args.mysql_config_file,
                                          username=args.username,
                                          password=args.password)

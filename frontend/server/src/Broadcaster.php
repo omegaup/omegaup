@@ -2,9 +2,6 @@
 
 namespace OmegaUp;
 
-use \Email;
-use \ProblemsDAO;
-
 class Broadcaster {
     /** @var \Logger */
     private $log;
@@ -66,7 +63,7 @@ class Broadcaster {
             return;
         }
         try {
-            $emails = ProblemsDAO::getExplicitAdminEmails($problem);
+            $emails = \OmegaUp\DAO\Problems::getExplicitAdminEmails($problem);
 
             $emailParams = [
                 'clarification_id' => strval($clarification->clarification_id),

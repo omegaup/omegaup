@@ -59,17 +59,17 @@ class ContestProblemsListTest extends OmegaupTestCase {
         $adminLogin = self::login($testData['contestAdmin']);
 
         // Create API
-        $scoreboardResponse = ProblemsetController::apiScoreboard(new \OmegaUp\Request([
+        $scoreboardResponse = \OmegaUp\Controllers\Problemset::apiScoreboard(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]));
 
-        $detailsResponse = ContestController::apiDetails(new \OmegaUp\Request([
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $testData['contestData']['contest']->alias,
         ]));
 
-        $problemsResponse = ContestController::apiProblems(new \OmegaUp\Request([
+        $problemsResponse = \OmegaUp\Controllers\Contest::apiProblems(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'contest_alias' => $testData['contestData']['contest']->alias,
         ]));

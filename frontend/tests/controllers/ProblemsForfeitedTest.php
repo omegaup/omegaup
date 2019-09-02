@@ -12,7 +12,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $login = self::login($user);
 
         for ($i = 0;
-             $i < ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
+             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
              $i++) {
             $problem = ProblemsFactory::createProblem();
             $run = RunsFactory::createRunToProblem($problem, $user, $login);
@@ -20,12 +20,12 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         }
 
         $problemForfeited = ProblemsFactory::createProblem();
-        ProblemsForfeitedDAO::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
+        \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
             'user_id' => $user->user_id,
             'problem_id' => $problemForfeited['problem']->problem_id,
         ]));
 
-        $results = ProblemForfeitedController::apiGetCounts(new \OmegaUp\Request([
+        $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
 
@@ -38,7 +38,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $login = self::login($user);
         $problems = [];
         for ($i = 0;
-             $i < ProblemForfeitedController::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
+             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
              $i++) {
             $problems[] = ProblemsFactory::createProblem();
             $run = RunsFactory::createRunToProblem($problems[$i], $user, $login);
@@ -48,7 +48,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $extraProblem = ProblemsFactory::createProblem();
 
         try {
-            ProblemController::apiSolution(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $extraProblem['problem']->alias,
             ]));
@@ -57,16 +57,16 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
             $this->assertEquals($e->getMessage(), 'problemSolutionNotVisible');
         }
 
-        $response = ProblemController::apiSolution(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $extraProblem['problem']->alias,
             'forfeit_problem' => true,
         ]));
         $this->assertContains('`long long`', $response['solution']['markdown']);
         $this->assertTrue(
-            ProblemsForfeitedDAO::isProblemForfeited(
+            \OmegaUp\DAO\ProblemsForfeited::isProblemForfeited(
                 $extraProblem['problem'],
-                IdentitiesDAO::findByUsername($user->username)
+                \OmegaUp\DAO\Identities::findByUsername($user->username)
             )
         );
     }
@@ -76,7 +76,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $login = self::login($user);
         $problem = ProblemsFactory::createProblem()['problem'];
         try {
-            ProblemController::apiSolution(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problem->alias,
                 'forfeit_problem' => true,

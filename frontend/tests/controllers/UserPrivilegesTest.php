@@ -15,34 +15,34 @@ class UserPrivilegesTest extends OmegaupTestCase {
 
         $login = self::login($user);
         // Call to API Add Role
-        $response = UserController::apiAddRole(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Admin'
         ]));
-        $response = UserController::apiAddRole(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Reviewer'
         ]));
-        $response = UserController::apiAddRole(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Mentor'
         ]));
 
-        $systemRoles = UserRolesDAO::getSystemRoles($user->user_id);
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
         $this->assertContains('Admin', $systemRoles);
         $this->assertContains('Reviewer', $systemRoles);
         $this->assertContains('Mentor', $systemRoles);
 
         // Call to API Remove Role
-        $response = UserController::apiRemoveRole(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiRemoveRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Mentor'
         ]));
-        $systemRoles = UserRolesDAO::getSystemRoles($user->user_id);
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
         $this->assertNotContains('Mentor', $systemRoles);
     }
 
@@ -52,38 +52,38 @@ class UserPrivilegesTest extends OmegaupTestCase {
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
         $user = UserFactory::createUser(new UserParams(['username' => $username]));
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         $login = self::login($user);
         // Call to API Add Group
-        $response = UserController::apiAddGroup(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:quality-reviewer'
         ]));
-        $response = UserController::apiAddGroup(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:course-curator'
         ]));
-        $response = UserController::apiAddGroup(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
 
-        $systemGroups = UserRolesDAO::getSystemGroups($identity->identity_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($identity->identity_id);
         $this->assertContains('omegaup:quality-reviewer', $systemGroups);
         $this->assertContains('omegaup:course-curator', $systemGroups);
         $this->assertContains('omegaup:mentor', $systemGroups);
 
         // Call to API Remove Group
-        $response = UserController::apiRemoveGroup(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\User::apiRemoveGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
-        $systemGroups = UserRolesDAO::getSystemGroups($user->user_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($user->user_id);
         $this->assertNotContains('omegaup:mentor', $systemGroups);
     }
 }

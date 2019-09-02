@@ -18,19 +18,19 @@ class UserRegistrationTest extends OmegaupTestCase {
         $salt = \OmegaUp\Time::get();
 
         // Test users should not exist
-        $this->assertNull(UsersDAO::FindByUsername('A'.$salt));
-        $this->assertNull(UsersDAO::FindByUsername('A'.$salt.'1'));
-        $this->assertNull(UsersDAO::FindByUsername('A'.$salt.'2'));
+        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt));
+        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt.'1'));
+        $this->assertNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt.'2'));
 
         // Create collision
-        $c = new SessionController();
+        $c = new \OmegaUp\Controllers\Session();
         $c->LoginViaGoogle('A'.$salt.'@isp1.com');
         $c->LoginViaGoogle('A'.$salt.'@isp2.com');
         $c->LoginViaGoogle('A'.$salt.'@isp3.com');
 
-        $this->assertNotNull(UsersDAO::FindByUsername('A'.$salt));
-        $this->assertNotNull(UsersDAO::FindByUsername('A'.$salt.'1'));
-        $this->assertNotNull(UsersDAO::FindByUsername('A'.$salt.'2'));
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt));
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt.'1'));
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt.'2'));
     }
 
     /**
@@ -40,26 +40,26 @@ class UserRegistrationTest extends OmegaupTestCase {
         $username = 'X'.\OmegaUp\Time::get();
         $password = Utils::CreateRandomString();
 
-        $c = new SessionController();
+        $c = new \OmegaUp\Controllers\Session();
         $c->LoginViaGoogle($username.'@isp.com');
-        $user = UsersDAO::FindByUsername($username);
+        $user = \OmegaUp\DAO\Users::FindByUsername($username);
 
         // Users logged via google, facebook, linkedin does not have password
         $this->assertNull($user->password);
 
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => $username,
             'password' => $password,
             'email' => $username.'@isp.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
-        $user = UsersDAO::FindByUsername($username);
+        $user = \OmegaUp\DAO\Users::FindByUsername($username);
 
         // Users logged in native mode must have password
         $this->assertNotNull($user->password);
@@ -73,29 +73,29 @@ class UserRegistrationTest extends OmegaupTestCase {
         $username = 'Y'.\OmegaUp\Time::get();
         $email = $username.'@isp.com';
 
-        $c = new SessionController();
+        $c = new \OmegaUp\Controllers\Session();
         $c->LoginViaGoogle($email);
-        $user = UsersDAO::FindByUsername($username);
-        $email_user = EmailsDAO::getByPK($user->main_email_id);
+        $user = \OmegaUp\DAO\Users::FindByUsername($username);
+        $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has the initial username and email
         $this->assertEquals($user->username, $username);
         $this->assertEquals($email, $email_user->email);
 
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => 'Z'.$username,
             'password' => Utils::CreateRandomString(),
             'email' => $email,
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
-        $user = UsersDAO::FindByUsername('Z'.$username);
-        $email_user = EmailsDAO::getByPK($user->main_email_id);
+        $user = \OmegaUp\DAO\Users::FindByUsername('Z'.$username);
+        $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has different username but the same email
         $this->assertNotEquals($user->username, $username);

@@ -15,7 +15,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
      */
     private function assertClarification($clarification_id, $response) {
         // Get the actual clarification from DB to compare it with what we got
-        $clarification = ClarificationsDAO::getByPK($clarification_id);
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK($clarification_id);
 
         // Assert status of clarification
         $this->assertEquals($clarification->message, $response['message']);
@@ -59,7 +59,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = ClarificationController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Clarification::apiDetails($r);
 
         // Check the data we got
         $this->assertClarification($r['clarification_id'], $response);
@@ -99,7 +99,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = ClarificationController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Clarification::apiDetails($r);
 
         // Check the data we got
         $this->assertClarification($r['clarification_id'], $response);
@@ -143,7 +143,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API, will fail
-        ClarificationController::apiDetails($r);
+        \OmegaUp\Controllers\Clarification::apiDetails($r);
     }
 
     public function testPublicClarificationsCanBeViewed() {
@@ -171,9 +171,9 @@ class DetailsClarificationTest extends OmegaupTestCase {
         );
 
         // Manually set the just created clarification to PUBLIC
-        $clarification = ClarificationsDAO::getByPK($clarificationData['response']['clarification_id']);
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK($clarificationData['response']['clarification_id']);
         $clarification->public = '1';
-        ClarificationsDAO::update($clarification);
+        \OmegaUp\DAO\Clarifications::update($clarification);
 
         // Prepare the request object
         $r = new \OmegaUp\Request();
@@ -184,7 +184,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = ClarificationController::apiDetails($r);
+        $response = \OmegaUp\Controllers\Clarification::apiDetails($r);
 
         // Check the data we got
         $this->assertClarification($r['clarification_id'], $response);

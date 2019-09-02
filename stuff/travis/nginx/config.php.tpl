@@ -1,6 +1,4 @@
 <?php
-define('OMEGAUP_ROOT', '${OMEGAUP_ROOT}/frontend');
-
 define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
 define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
 define('OMEGAUP_DB_HOST', 'localhost');

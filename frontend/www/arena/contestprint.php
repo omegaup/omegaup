@@ -8,10 +8,10 @@ try {
         ]);
 
     // Open the contest for the current user
-    $contest = ContestController::apiOpen($r);
+    $contest = \OmegaUp\Controllers\Contest::apiOpen($r);
 
     // with the contest opened, request the contest details
-    $contest = ContestController::apiDetails($r);
+    $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 } catch (Exception $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
@@ -19,7 +19,7 @@ try {
 
 $problems = $contest['problems'];
 foreach ($problems as &$problem) {
-    $problem['payload'] = ProblemController::apiDetails(new \OmegaUp\Request([
+    $problem['payload'] = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
         'contest_alias' => $_REQUEST['alias'],
         'problem_alias' => $problem['alias'],
         'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),

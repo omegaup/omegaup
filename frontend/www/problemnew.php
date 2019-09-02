@@ -1,7 +1,6 @@
 <?php
 
 require_once('../server/bootstrap_smarty.php');
-require_once('api/ApiCaller.php');
 
 $smarty->assign('TITLE', '');
 $smarty->assign('ALIAS', '');
@@ -20,29 +19,29 @@ $smarty->assign('LANGUAGES', 'c,cpp,cpp11,cs,hs,java,lua,pas,py,rb');
 $smarty->assign('SELECTED_TAGS', '');
 
 if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
-    $r = new \OmegaUp\Request([
-                'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
-                'title' => $_POST['title'],
-                'problem_alias' => $_POST['alias'],
-                'validator' => $_POST['validator'],
-                'time_limit' => $_POST['time_limit'],
-                'validator_time_limit' => $_POST['validator_time_limit'],
-                'overall_wall_time_limit' => $_POST['overall_wall_time_limit'],
-                'extra_wall_time' => $_POST['extra_wall_time'],
-                'memory_limit' => $_POST['memory_limit'],
-                'output_limit' => $_POST['output_limit'],
-                'input_limit' => $_POST['input_limit'],
-                'source' => $_POST['source'],
-                'visibility' => $_POST['visibility'],
-                'languages' => $_POST['languages'],
-                'email_clarifications' => $_POST['email_clarifications'],
-                'selected_tags' => $_POST['selected_tags'],
-            ]);
-    $r->method = 'ProblemController::apiCreate';
-
-    $response = ApiCaller::call($r);
-
-    if ($response['status'] == 'error') {
+    try {
+        \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+            'title' => $_POST['title'],
+            'problem_alias' => $_POST['alias'],
+            'validator' => $_POST['validator'],
+            'time_limit' => $_POST['time_limit'],
+            'validator_time_limit' => $_POST['validator_time_limit'],
+            'overall_wall_time_limit' => $_POST['overall_wall_time_limit'],
+            'extra_wall_time' => $_POST['extra_wall_time'],
+            'memory_limit' => $_POST['memory_limit'],
+            'output_limit' => $_POST['output_limit'],
+            'input_limit' => $_POST['input_limit'],
+            'source' => $_POST['source'],
+            'visibility' => $_POST['visibility'],
+            'languages' => $_POST['languages'],
+            'email_clarifications' => $_POST['email_clarifications'],
+            'selected_tags' => $_POST['selected_tags'],
+        ]));
+        header("Location: /problem/{$_POST['alias']}/edit/");
+        die();
+    } catch (\OmegaUp\Exceptions\ApiException $e) {
+        $response = $e->asResponseArray();
         if (empty($response['error'])) {
             $smarty->assign('STATUS_ERROR', '{error}');
         } else {
@@ -63,9 +62,6 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('EMAIL_CLARIFICATIONS', $_POST['email_clarifications']);
         $smarty->assign('VISIBILITY', $_POST['visibility']);
         $smarty->assign('SELECTED_TAGS', $_POST['selected_tags']);
-    } elseif ($response['status'] == 'ok') {
-        header("Location: /problem/{$_POST['alias']}/edit/");
-        die();
     }
 }
 

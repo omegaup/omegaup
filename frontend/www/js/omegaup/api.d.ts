@@ -1,4 +1,21 @@
 declare namespace omegaup {
+  export class Selectable<T> {
+    value: T;
+    selected: boolean;
+  }
+
+  enum AdmissionMode {
+    Private = 'private',
+    Registration = 'registration',
+    Public = 'public',
+  }
+
+  enum RequestsUserInformation {
+    No = 'no',
+    Optional = 'optional',
+    Required = 'required',
+  }
+
   export interface Assignment {
     alias: string;
     assignment_type: string,
@@ -66,7 +83,7 @@ declare namespace omegaup {
     window_length?: number;
     start_time?: Date;
     finish_time?: Date;
-    admission_mode?: string;
+    admission_mode?: omegaup.AdmissionMode;
     contestant_must_register?: boolean;
     admin?: boolean;
     available_languages?: omegaup.Languages;
@@ -85,7 +102,7 @@ declare namespace omegaup {
     points_decay_factor?: number;
     problems?: omegaup.Problem[];
     problemset_id?: number;
-    requests_user_information?: string;
+    requests_user_information?: omegaup.RequestsUserInformation;
     rerun_id?: number;
     scoreboard?: number;
     scoreboard_url?: string;
@@ -102,9 +119,9 @@ declare namespace omegaup {
   }
 
   export interface ContestGroupAdmin {
-    role: string;
-    name: string;
-    alias: string;
+    role?: string;
+    name?: string;
+    alias?: string;
   }
 
   interface ContestResult {
@@ -122,7 +139,7 @@ declare namespace omegaup {
     is_admin: boolean;
     name: string;
     public: boolean;
-    requests_user_information: string;
+    requests_user_information: omegaup.RequestsUserInformation;
     school_id?: number;
     school_name: string;
     show_scoreboard: boolean;
@@ -180,16 +197,32 @@ declare namespace omegaup {
     group: omegaup.DetailsGroup[];
   }
 
+  export interface Experiment {
+    config: boolean;
+    hash: string;
+    name: string;
+  }
+
+  export interface Group {
+    name: string;
+  }
+
   export interface Identity extends User {
+    name: string;
+    username: string;
     school: string;
+    school_name?: string;
+    gender?: string;
+    password?: string;
     school_id: number;
     country_id: string;
     state_id: string;
+    classname: string;
   }
 
   export interface IdentityContest {
     username: string;
-    end_time: Date;
+    end_time?: Date;
     access_time?: Date;
     country_id?: string;
   }
@@ -256,18 +289,28 @@ declare namespace omegaup {
   export interface Problem {
     accepted?: number;
     alias: string;
+    commit?: string;
     difficulty?: number;
+    languages?: string;
+    letter?: string;
+    order?: number;
     penalty?: number;
     percent?: number;
     points?: number;
     quality?: number;
     ratio?: number;
     run_details?: omegaup.RunDetails;
+    runs?: CourseProblemRun[];
     score?: number;
+    source?: string;
+    statement?: Statement;
     submissions?: number;
+    templates?: string;
     tags?: Tag[];
     title: string;
+    version?: string;
     visibility?: number;
+    visits?: number;
   }
 
   export interface QueryParameters {
@@ -294,6 +337,32 @@ declare namespace omegaup {
     totalPoints: number;
   }
 
+  export interface ScoreboardUser extends User {
+    country?: string;
+    is_invited: boolean;
+    place: number;
+    problems: ScoreboardUserProblem[];
+    total: {
+      penalty: number;
+      points: number;
+    }
+  }
+
+  export interface ScoreboardUserProblem {
+    alias: string;
+    penalty: number;
+    pending?: boolean;
+    percent: number;
+    points: number;
+    runs: number;
+  }
+
+  interface Statement {
+    images: string[];
+    language: string;
+    markdown: string;
+  }
+
   export interface Report {
     classname: string;
     event: {
@@ -305,13 +374,24 @@ declare namespace omegaup {
     username: string;
   }
 
+  export interface Role {
+    name: string;
+  }
+
   interface RunDetails {
-    admin: boolean;
-    details: omegaup.Details;
+    admin?: boolean;
+    compile_error?: string;
+    details?: Details;
+    groups?: DetailsGroup[];
     guid: string;
     judged_by: string;
     language: string;
     logs: string;
+    problem_admin?: boolean;
+    source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
   }
 
   export interface SchoolsRank {

@@ -91,7 +91,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
         // After adding the user-experiment relationship to the database, the
         // experiment should be enabled.
-        UsersExperimentsDAO::create(new \OmegaUp\DAO\VO\UsersExperiments([
+        \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
             'user_id' => $user->user_id,
             'experiment' => self::TEST,
         ]));

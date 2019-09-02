@@ -278,7 +278,7 @@ export default class NewForm extends Vue {
   }
 
   onSubmit() {
-    this.$parent.$emit('update-contest', this);
+    this.$emit('emit-update-contest', this);
   }
 }
 

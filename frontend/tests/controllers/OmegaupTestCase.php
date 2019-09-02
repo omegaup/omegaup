@@ -41,8 +41,10 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function setUp() {
         parent::setUp();
-        UserController::$sendEmailOnVerify = false;
-        SessionController::setCookieOnRegisterSessionForTesting(false);
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
+        \OmegaUp\Controllers\Session::setCookieOnRegisterSessionForTesting(false);
+        \OmegaUp\Controllers\Session::invalidateCache();
+        \OmegaUp\Controllers\Session::invalidateLocalCache();
 
         // Mock time
         $currentTime = time();
@@ -62,9 +64,9 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     public static function logout() {
-        $session = new SessionController();
+        $session = new \OmegaUp\Controllers\Session();
         if ($session->currentSessionAvailable()) {
-            $session->InvalidateCache();
+            $session->invalidateCache();
         }
         if (isset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
             unset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
@@ -72,7 +74,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
             unset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
         }
-        $session->InvalidateLocalCache();
+        $session->invalidateLocalCache();
     }
 
     /**
@@ -83,7 +85,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
             $this->getMockBuilder('\\OmegaUp\\SessionManager')->getMock();
         $sessionManagerMock->expects($this->once())
                 ->method('sessionStart');
-        SessionController::setSessionManagerForTesting($sessionManagerMock);
+        \OmegaUp\Controllers\Session::setSessionManagerForTesting($sessionManagerMock);
     }
 
     /**
@@ -94,7 +96,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function assertLogin(\OmegaUp\DAO\VO\Identities $identity, $auth_token = null) {
         // Check auth token
-        $auth_tokens_bd = AuthTokensDAO::getByIdentityId($identity->identity_id);
+        $auth_tokens_bd = \OmegaUp\DAO\AuthTokens::getByIdentityId($identity->identity_id);
 
         // Validar que el token se guardó en la BDD
         if (!is_null($auth_token)) {
@@ -122,10 +124,10 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      * @return string auth_token
      */
     public static function login($identity) : ScopedLoginToken {
-        UserController::$sendEmailOnVerify = false;
+        \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting
-        $oldCookieSetting = SessionController::setCookieOnRegisterSessionForTesting(false);
+        $oldCookieSetting = \OmegaUp\Controllers\Session::setCookieOnRegisterSessionForTesting(false);
 
         // Inflate request with identity data
         $r = new \OmegaUp\Request([
@@ -134,7 +136,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         ]);
 
         // Call the API
-        $response = UserController::apiLogin($r);
+        $response = \OmegaUp\Controllers\User::apiLogin($r);
 
         // Sanity check
         self::assertEquals('ok', $response['status']);
@@ -143,7 +145,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         unset($_REQUEST);
 
         // Set cookie setting as it was before the login
-        SessionController::setCookieOnRegisterSessionForTesting($oldCookieSetting);
+        \OmegaUp\Controllers\Session::setCookieOnRegisterSessionForTesting($oldCookieSetting);
 
         return new ScopedLoginToken($response['auth_token']);
     }
@@ -155,7 +157,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function assertContest(\OmegaUp\Request $r) {
         // Validate that data was written to DB by getting the contest by title
-        $contests = ContestsDAO::getByTitle($r['title']);
+        $contests = \OmegaUp\DAO\Contests::getByTitle($r['title']);
         $contest = $contests[0];
 
         // Assert that we found our contest
@@ -356,7 +358,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         $broadcasterMock
             ->expects($times)
             ->method('broadcastClarification');
-        ClarificationController::$broadcaster = $broadcasterMock;
+        \OmegaUp\Controllers\Clarification::$broadcaster = $broadcasterMock;
     }
 
     /**
@@ -399,11 +401,11 @@ class ScopedLoginToken {
  */
 class ScopedScoreboardTestRun {
     public function __construct() {
-        Scoreboard::setIsTestRunForTesting(true);
+        \OmegaUp\Scoreboard::setIsTestRunForTesting(true);
     }
 
     public function __destruct() {
-        Scoreboard::setIsTestRunForTesting(false);
+        \OmegaUp\Scoreboard::setIsTestRunForTesting(false);
     }
 }
 

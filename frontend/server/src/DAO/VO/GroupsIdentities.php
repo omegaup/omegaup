@@ -44,7 +44,7 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
             $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
         }
         if (isset($data['accept_teacher'])) {
-            $this->accept_teacher = strval($data['accept_teacher']);
+            $this->accept_teacher = boolval($data['accept_teacher']);
         }
     }
 
@@ -81,7 +81,7 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
     /**
      * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
      *
-     * @var string|null
+     * @var bool|null
      */
     public $accept_teacher = null;
 }

@@ -18,7 +18,7 @@ OmegaUp.on('ready', function() {
                 startTime: detail.start_time,
                 finishTime: detail.finish_time,
                 scoreboard: detail.scoreboard,
-                submissionGap: detail.submission_gap
+                submissionsGap: detail.submissions_gap
               },
               on: {
                 submit: function(ev) {

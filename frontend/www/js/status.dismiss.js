@@ -1,4 +1,4 @@
-$('#alert-close').on('click', function() { $('#status').slideUp(); });
+$('#alert-close').on('click', omegaup.UI.dismissNotifications);
 
 $('#email-verification-alert-close')
     .on('click', function() { $('#email-verification-alert')

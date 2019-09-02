@@ -5,14 +5,14 @@ namespace {
     date_default_timezone_set('UTC');
     // Set remote address to localhost.
     $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-    define('OMEGAUP_ROOT', __DIR__ . '/..');
+    define('OMEGAUP_ROOT', dirname(__DIR__));
     // Load test specific config globals
     // Do not panic if the test-specific override file is not present.
     @include_once(OMEGAUP_ROOT . '/tests/test_config.php');
     require_once(OMEGAUP_ROOT . '/tests/test_config.default.php');
     require_once(OMEGAUP_ROOT . '/server/config.default.php');
+    require_once(OMEGAUP_ROOT . '/server/bootstrap.php');
     // Load api caller
-    require_once(OMEGAUP_ROOT . '/www/api/ApiCaller.php');
     require_once(OMEGAUP_ROOT . '/tests/controllers/ApiCallerMock.php');
     // Load test utils
     require_once(OMEGAUP_ROOT . '/tests/controllers/OmegaupTestCase.php');

@@ -1,5 +1,5 @@
 <?php
 
-require_once('ApiCaller.php');
+require_once(__DIR__.'/../../server/bootstrap.php');
 
-echo ApiCaller::httpEntryPoint();
+echo \OmegaUp\ApiCaller::httpEntryPoint();

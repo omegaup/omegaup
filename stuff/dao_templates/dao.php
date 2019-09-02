@@ -7,6 +7,8 @@
   *                                                                                 *
   * ******************************************************************************* */
 
+namespace OmegaUp\DAO\Base;
+
 /** {{ table.class_name }} Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
@@ -15,7 +17,7 @@
  * @access public
  * @abstract
  */
-abstract class {{ table.class_name }}DAOBase {
+abstract class {{ table.class_name }} {
 {%- if table.columns|selectattr('primary_key')|list and table.columns|rejectattr('primary_key')|list and not table.columns|selectattr('auto_increment')|list %}
     /**
      * Guardar registros.
@@ -26,7 +28,8 @@ abstract class {{ table.class_name }}DAOBase {
      * llaves primarias que describen una fila que no se encuentra en la base de
      * datos, entonces replace() creará una nueva fila.
      *
-     * @throws Exception si la operacion falló.
+     * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
+     * llave primaria están vacías.
      *
      * @param \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }} El
      * objeto de tipo {@link \OmegaUp\DAO\VO\{{ table.class_name }}}.
