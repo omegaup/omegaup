@@ -2534,7 +2534,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $nominationStatus['tried'] = false;
         $nominationStatus['solved'] = false;
 
-        /** @var array<string, int|string|float> */
+        /** @var array{verdict: string} $run */
         foreach ($details['runs'] as $run) {
             if ($run['verdict'] === 'AC') {
                 $nominationStatus['solved'] = true;

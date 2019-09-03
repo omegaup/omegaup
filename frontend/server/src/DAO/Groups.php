@@ -88,8 +88,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
 
     /**
      * Gets a random sample (of up to size $n) of group members.
+     *
+     * @return \OmegaUp\DAO\VO\Identities[] $identities
      */
-    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, $n) {
+    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, int $n): array {
         $sql = '
             SELECT
                 i.*

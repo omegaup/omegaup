@@ -45,9 +45,10 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         /** @var array<string, string>|null $suggestion */
         $suggestion = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
-        if ($suggestion !== null) {
+        if (!is_null($suggestion)) {
             $response['nominated'] = true;
-            $suggestionContents = (array) json_decode($suggestion['contents']);
+            /** @var array $suggestionContents */
+            $suggestionContents = json_decode($suggestion['contents'], true);
             if (isset($suggestionContents['before_ac']) && $suggestionContents['before_ac']) {
                 $response['nominated'] = false;
                 $response['nominatedBeforeAC'] = true;
@@ -71,9 +72,10 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         /** @var array<string, string>|null $dismissal */
         $dismissal = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problem->problem_id, $identity->user_id]);
-        if ($dismissal !== null) {
+        if (!is_null($dismissal)) {
             $response['dismissed'] = true;
-            $dismissalContents = (array) json_decode($dismissal['contents']);
+            /** @var array $dismissalContents */
+            $dismissalContents = json_decode($dismissal['contents'], true /*assoc*/);
             if (isset($dismissalContents['before_ac']) && $dismissalContents['before_ac']) {
                 $response['dismissed'] = false;
                 $response['dismissedBeforeAC'] = true;

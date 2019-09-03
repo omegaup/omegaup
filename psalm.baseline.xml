@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@1f0aca00b3194b6643c92d89dcb7659f670db796">
+<files psalm-version="dev-master@6ad5d31132be2a37d4c9c46763b58ee193723ca2">
   <file src="frontend/server/bootstrap.php">
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$_REQUEST</code>
@@ -1323,12 +1323,11 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="76">
+    <MixedArgument occurrences="75">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
       <code>$r['problem_alias']</code>
-      <code>$tagName</code>
       <code>$tag-&gt;public</code>
       <code>$r['problem']</code>
       <code>$r['usernameOrEmail']</code>
@@ -1336,7 +1335,6 @@
       <code>$r['group']</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$tagName</code>
       <code>$r['usernameOrEmail']</code>
       <code>$problem</code>
       <code>$r['group']</code>
@@ -1436,7 +1434,6 @@
       <code>$details['settings']['limits']</code>
       <code>$details['settings']['limits']</code>
       <code>$details['settings']['limits']</code>
-      <code>$details['statement']['language']</code>
     </MixedArrayAccess>
     <MixedArrayAssignment occurrences="8">
       <code>$problemSettings['limits']['ExtraWallTime']</code>
@@ -1451,15 +1448,13 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case-&gt;name]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="62">
+    <MixedAssignment occurrences="60">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
-      <code>$tagName</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$tagName</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problem</code>
@@ -1526,8 +1521,6 @@
       <code>$deletedLanguages</code>
       <code>$problemSettings['validator']['name']</code>
       <code>$result['sample_input']</code>
-      <code>$nominationStatus['problem_alias']</code>
-      <code>$nominationStatus['language']</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="7">
       <code>array</code>
@@ -1536,7 +1529,6 @@
       <code>array</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
       <code>the</code>
-      <code>bool</code>
     </MixedInferredReturnType>
     <MixedMethodCall occurrences="2">
       <code>asArray</code>
@@ -1761,83 +1753,46 @@
     <MissingReturnType occurrences="1">
       <code>extractAliasFromArgument</code>
     </MissingReturnType>
-    <MixedArgument occurrences="8">
+    <MixedArgument occurrences="6">
       <code>$r['qualitynomination_id']</code>
       <code>$problemUrl</code>
       <code>$contents</code>
       <code>$contents</code>
-      <code>$language</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="8">
-      <code>$response['nominator']</code>
-      <code>$response['problem']</code>
-      <code>$response['nomination']</code>
-      <code>$response['original_contents']</code>
-      <code>$response['contents']</code>
-      <code>$response['original_contents']</code>
-      <code>$response['original_contents']</code>
-      <code>$response['status']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="16">
-      <code>$contents</code>
-      <code>$tag</code>
-      <code>$tag</code>
-      <code>$tag</code>
-      <code>$tag</code>
-      <code>$statement</code>
-      <code>$contents['original']</code>
-      <code>$reviewer</code>
+    <MixedAssignment occurrences="6">
       <code>$newProblemVisibility</code>
       <code>$r['visibility']</code>
       <code>$qualitynomination-&gt;status</code>
       <code>$types</code>
-      <code>$response</code>
       <code>$response['original_contents']['tags']</code>
-      <code>$_</code>
-      <code>$response['nomination_status']</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="6">
-      <code>$reviewer-&gt;user_id</code>
+    <MixedPropertyFetch occurrences="5">
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;visibility</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="1">
-      <code>$response</code>
-    </MixedReturnStatement>
     <NullArgument occurrences="4">
       <code>null</code>
       <code>null</code>
       <code>null</code>
       <code>null</code>
     </NullArgument>
-    <PossiblyNullArgument occurrences="6">
-      <code>$qualityReviewerGroup</code>
+    <PossiblyNullArgument occurrences="5">
       <code>$qualitynominationlog-&gt;rationale</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="6">
+    <PossiblyNullPropertyFetch occurrences="5">
       <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;username</code>
     </PossiblyNullPropertyFetch>
-    <RedundantCondition occurrences="1">
-      <code>is_array($contents['tags'])</code>
-    </RedundantCondition>
-    <UndefinedVariable occurrences="1">
-      <code>$statement</code>
-    </UndefinedVariable>
   </file>
   <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">
@@ -2254,15 +2209,10 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/Controllers/Tag.php">
-    <MissingParamType occurrences="1">
-      <code>$name</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>normalize</code>
+    <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="2">
-      <code>$name</code>
+    <MixedArgument occurrences="1">
       <code>$r[$param]</code>
     </MixedArgument>
     <MixedAssignment occurrences="1">
@@ -3031,17 +2981,15 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/DAO/Groups.php">
-    <MissingParamType occurrences="4">
+    <MissingParamType occurrences="3">
       <code>$name</code>
       <code>$name</code>
       <code>$user_id</code>
       <code>$identity_id</code>
-      <code>$n</code>
     </MissingParamType>
-    <MissingReturnType occurrences="3">
+    <MissingReturnType occurrences="2">
       <code>SearchByName</code>
       <code>getAllGroupsAdminedByUser</code>
-      <code>sampleMembers</code>
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/GroupsIdentities.php">
@@ -3527,11 +3475,6 @@
       <code>$problem</code>
       <code>$problem</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="3">
-      <code>$result['solved']</code>
-      <code>$result['nominated']</code>
-      <code>$result['dismissed']</code>
-    </PossiblyNullArrayAccess>
     <PossiblyNullPropertyAssignment occurrences="2">
       <code>$problem</code>
       <code>$problem</code>

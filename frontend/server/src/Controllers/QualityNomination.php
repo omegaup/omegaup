@@ -73,6 +73,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         \OmegaUp\Validators::validateInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+        /**
+         * @var null|array{tags: null|int|float|string|array} $contents
+         */
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
@@ -94,7 +97,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustNotHaveSolvedProblem');
                 }
 
-                if (!is_null($r->identity) && !ProblemsDAO::hasTriedToSolveProblem($problem, (int)
+                if (!\OmegaUp\DAO\Problems::hasTriedToSolveProblem($problem, (int)
                 $r->identity->identity_id)) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException('qualityNominationMustHaveTriedToSolveProblem');
                 }
@@ -135,6 +138,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
             // Tags must be strings.
             if (isset($contents['tags']) && is_array($contents['tags'])) {
+                /** @var string|array|int|float $tag */
                 foreach ($contents['tags'] as &$tag) {
                     if (!is_string($tag)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
@@ -153,6 +157,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
+            /** @var string|array|int|float $tag */
             foreach ($contents['tags'] as &$tag) {
                 if (!is_string($tag)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
@@ -162,7 +167,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if (self::hasDuplicates($contents['tags'])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInArrayException('duplicateTagsNotAllowed');
             }
-            // Statements must be a dictionary of language => { 'markdown': string }.
+
+            /**
+             * Statements must be a dictionary of language => { 'markdown': string }.
+             * @var string $language
+             * @var null|array{markdown: null|int|float|array|string} $statement
+             */
             foreach ($contents['statements'] as $language => $statement) {
                 if (!is_array($statement) || empty($language)
                     || (!isset($statement['markdown']) || !is_string($statement['markdown']) || empty($statement['markdown']))
@@ -196,8 +206,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($r['nomination'] === 'dismissal') {
             if (isset($contents['origin']) || isset($contents['difficulty']) || isset($contents['source'])
-                || isset($contents['tags']) || isset($contents['statements']) || isset($statement['markdown'])
-                || isset($contents['reason'])
+                || isset($contents['tags']) || isset($contents['statements']) || isset($contents['reason'])
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
@@ -217,6 +226,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
                 \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
             );
+            if (is_null($qualityReviewerGroup)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
+            }
             foreach (\OmegaUp\DAO\Groups::sampleMembers(
                 $qualityReviewerGroup,
                 self::REVIEWERS_PER_NOMINATION
@@ -483,7 +495,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
-
+        if (is_null($r->user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
         return self::getListImpl($r, $r->user->user_id, null /* assignee */);
     }
 
@@ -504,9 +518,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         self::authenticateRequest($r);
 
         $r->ensureInt('qualitynomination_id');
+        /** @var null|array{status: string, nominator: array{username: string}, problem: array{alias: string}, contents: array{statements: array<string, string>}} $response */
         $response = \OmegaUp\DAO\QualityNominations::getByID($r['qualitynomination_id']);
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\NotFoundException('qualityNominationNotFound');
+        }
+        if (is_null($r->user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         // The nominator can see the nomination, as well as all the members of

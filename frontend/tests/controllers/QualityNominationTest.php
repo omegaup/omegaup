@@ -526,7 +526,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $login = self::login($user);
 
         try {
-            QualityNominationController::apiCreate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'suggestion',
@@ -548,7 +548,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $runData = RunsFactory::createRunToProblem($problemData, $user);
         RunsFactory::gradeRun($runData, 0, 'WA', 60);
         $login = self::login($user);
-        $result = QualityNominationController::apiCreate(new \OmegaUp\Request([
+        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'suggestion',
@@ -561,7 +561,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals($result['status'], 'ok');
 
         // Dismissals could be sent before AC also
-        $result = QualityNominationController::apiCreate(new \OmegaUp\Request([
+        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'dismissal',
@@ -577,7 +577,7 @@ class QualityNominationTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runData);
         $login = self::login($user);
         try {
-            QualityNominationController::apiCreate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'suggestion',
