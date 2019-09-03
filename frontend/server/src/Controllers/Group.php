@@ -166,10 +166,12 @@ class Group extends \OmegaUp\Controllers\Controller {
      * Returns a list of groups by owner
      *
      * @param \OmegaUp\Request $r
+     * @return array{status: string, groups: array{alias: string, create_time: int, description: string, name: string}[]}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         self::authenticateRequest($r, true /* requireMainUserIdentity */);
 
+        /** @var array{alias: string, create_time: int, description: string, name: string}[] */
         $groups = \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
             $r->user->user_id,
             $r->identity->identity_id

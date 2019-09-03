@@ -48,8 +48,15 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
 
     /**
      * Returns all groups that a user can manage.
+     * @param int $userId
+     * @param int $identityId
+     * @return array<int, array<string, mixed>>
      */
-    final public static function getAllGroupsAdminedByUser($user_id, $identity_id) {
+    final public static function getAllGroupsAdminedByUser(
+        int $userId,
+        int $identityId
+    ) : ?array {
+        /** @var string */
         $sql = '
             SELECT
                 DISTINCT g.alias,
@@ -76,11 +83,11 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
                 g.group_id DESC;';
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
-                $user_id,
+                $userId,
                 \OmegaUp\Authorization::ADMIN_ROLE,
-                $user_id,
+                $userId,
                 \OmegaUp\Authorization::ADMIN_ROLE,
-                $identity_id,
+                $identityId,
             ]);
 
         foreach ($rs as &$row) {

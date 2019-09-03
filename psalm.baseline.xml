@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="dev-master@da23c2e73aeb94d676365656bf35d1411f09b730">
+<files psalm-version="dev-master@1f0aca00b3194b6643c92d89dcb7659f670db796">
   <file src="frontend/server/bootstrap.php">
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$_REQUEST</code>
@@ -933,12 +933,11 @@
       <code>$description</code>
       <code>$owner_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="9">
+    <MissingReturnType occurrences="8">
       <code>createGroup</code>
       <code>apiCreate</code>
       <code>apiAddUser</code>
       <code>apiRemoveUser</code>
-      <code>apiMyList</code>
       <code>apiList</code>
       <code>apiDetails</code>
       <code>apiMembers</code>
@@ -954,7 +953,7 @@
       <code>$r['group_alias']</code>
       <code>$r['group_alias']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="3">
+    <MixedAssignment occurrences="2">
       <code>$group</code>
       <code>$group</code>
       <code>$groups</code>
@@ -3025,16 +3024,13 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/DAO/Groups.php">
-    <MissingParamType occurrences="4">
+    <MissingParamType occurrences="2">
       <code>$name</code>
       <code>$name</code>
-      <code>$user_id</code>
-      <code>$identity_id</code>
       <code>$n</code>
     </MissingParamType>
-    <MissingReturnType occurrences="3">
+    <MissingReturnType occurrences="2">
       <code>SearchByName</code>
-      <code>getAllGroupsAdminedByUser</code>
       <code>sampleMembers</code>
     </MissingReturnType>
   </file>
