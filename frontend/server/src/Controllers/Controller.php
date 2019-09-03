@@ -19,38 +19,6 @@ class Controller {
     public static $verdicts = ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'];
 
     /**
-     * Given the request, returns what user is performing the request by
-     * looking at the auth_token, when requireMainUserIdentity flag is true, we
-     * need to ensure that the request is made by the main identity of the
-     * logged user
-     *
-     * @param \OmegaUp\Request $r
-     * @param bool $requireMainUserIdentity
-     * @throws \OmegaUp\Exceptions\UnauthorizedException
-     */
-    protected static function authenticateRequest(
-        \OmegaUp\Request $r,
-        bool $requireMainUserIdentity = false
-    ) : void {
-        $r->user = null;
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
-        if (is_null($session) || is_null($session['identity'])) {
-            $r->user = null;
-            $r->identity = null;
-            throw new \OmegaUp\Exceptions\UnauthorizedException();
-        }
-        if (!is_null($session['user'])) {
-            $r->user = $session['user'];
-        }
-        $r->identity = $session['identity'];
-        if ($requireMainUserIdentity && (is_null($r->user) ||
-            $r->user->main_identity_id != $r->identity->identity_id)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-    }
-
-    /**
      * Calls authenticateRequest and throws only if authentication fails AND
      * there's no target username in Request.
      * This is to allow unauthenticated access to APIs that work for both
@@ -62,7 +30,7 @@ class Controller {
         \OmegaUp\Request $r
     ) : void {
         try {
-            self::authenticateRequest($r);
+            $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // allow unauthenticated only if it has $r["username"]
             if (is_null($r['username'])) {

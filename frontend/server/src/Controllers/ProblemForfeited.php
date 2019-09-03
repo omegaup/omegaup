@@ -19,7 +19,7 @@ class ProblemForfeited extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiGetCounts(\OmegaUp\Request $r) {
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
         return [
             'status' => 'ok',
             'allowed' => intval(\OmegaUp\DAO\Problems::getProblemsSolvedCount($r->identity) /

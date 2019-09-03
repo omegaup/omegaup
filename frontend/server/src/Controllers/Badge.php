@@ -39,7 +39,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiMyList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         return [
             'status' => 'ok',
             'badges' => is_null($r->user) ?
@@ -73,7 +73,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         \OmegaUp\Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
         \OmegaUp\Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
         return [
