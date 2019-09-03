@@ -49,7 +49,16 @@
       <div class="tab-pane active problems"
            v-if="showTab === 'problems'">
         <omegaup-contest-add-problem v-bind:contest-alias="contest.alias"
-             v-bind:data="problems"></omegaup-contest-add-problem>
+             v-bind:data="problems"
+             v-on:emit-add-problem=
+             "addProblemComponent =&gt; $emit('add-problem', addProblemComponent)"
+             v-on:emit-change-alias=
+             "(addProblemComponent, newProblemAlias) =&gt; $emit('get-versions', newProblemAlias, addProblemComponent)"
+             v-on:emit-remove-problem=
+             "addProblemComponent =&gt; $emit('remove-problem', addProblemComponent)"
+             v-on:emit-runs-diff=
+             "(addProblemComponent, versions, selectedCommit) =&gt; $emit('runs-diff', addProblemComponent, versions, selectedCommit)">
+        </omegaup-contest-add-problem>
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'publish'">
@@ -74,8 +83,11 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'admins'">
-        <omegaup-contest-admins v-bind:data="admins"></omegaup-contest-admins>
-        <omegaup-contest-group-admins v-bind:data="groupAdmins"
+        <omegaup-contest-admins v-bind:data="admins"
+             v-on:emit-add-admin="addAdminComponent =&gt; $emit('add-admin', addAdminComponent)"
+             v-on:emit-remove-admin=
+             "addAdminComponent =&gt; $emit('remove-admin', addAdminComponent)"></omegaup-contest-admins>
+             <omegaup-contest-group-admins v-bind:data="groupAdmins"
              v-on:emit-add-group-admin=
              "groupAdminsComponent =&gt; $emit('add-group-admin', groupAdminsComponent)"
              v-on:emit-remove-group-admin=
@@ -87,7 +99,8 @@
       </div>
       <div class="tab-pane active"
            v-if="showTab === 'clone'">
-        <omegaup-contest-clone></omegaup-contest-clone>
+        <omegaup-contest-clone v-on:emit-clone=
+        "cloneComponent =&gt; $emit('clone-contest', cloneComponent)"></omegaup-contest-clone>
       </div>
     </div>
   </div>
