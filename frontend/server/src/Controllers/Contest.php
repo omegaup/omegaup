@@ -845,6 +845,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
+        // Validates form
+        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
+        \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title');
+        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description');
+        $r->ensureInt('start_time', null, null, true);
+
         $length = $originalContest->finish_time - $originalContest->start_time;
 
         $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
