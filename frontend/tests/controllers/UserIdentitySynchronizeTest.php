@@ -11,23 +11,23 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testCreateUserPositive() {
         // Inflate request
-        UserController::$permissionKey = uniqid();
+        \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
             'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
-            'permission_key' => UserController::$permissionKey
+            'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
         // Call API
-        $response = UserController::apiCreate($r);
+        $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Check response
         $this->assertEquals('ok', $response['status']);
 
         // Verify DB
-        $user = UsersDAO::FindByUsername($r['username']);
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $this->assertNotNull($user);
         $this->assertEquals($identity->password, $user->password);
     }
@@ -48,7 +48,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         ]);
 
         // Call api
-        UserController::apiChangePassword($r);
+        \OmegaUp\Controllers\User::apiChangePassword($r);
 
         // Try to login with old password, should fail
         try {
@@ -62,8 +62,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $user->password = $r['password'];
         self::login($user);
 
-        $user = UsersDAO::FindByUsername($user->username);
-        $identity = IdentitiesDAO::getByPK($user->main_identity_id);
+        $user = \OmegaUp\DAO\Users::FindByUsername($user->username);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $this->assertEquals($identity->password, $user->password);
     }
 
@@ -75,8 +75,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $login = self::login($user);
 
-        $locale = LanguagesDAO::getByName('pt');
-        $states = StatesDAO::getByCountry('MX');
+        $locale = \OmegaUp\DAO\Languages::getByName('pt');
+        $states = \OmegaUp\DAO\States::getByCountry('MX');
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => 'new_username',
@@ -89,11 +89,11 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'locale' => $locale->name,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
 
         // Check user/identity from db
-        $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
 
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
@@ -104,8 +104,8 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Edit all fields again with diff values
-        $locale = LanguagesDAO::getByName('pseudo');
-        $states = StatesDAO::getByCountry('US');
+        $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
+        $states = \OmegaUp\DAO\States::getByCountry('US');
         $newName = Utils::CreateRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -118,11 +118,11 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'locale' => $locale->name,
         ]);
 
-        UserController::apiUpdate($r);
+        \OmegaUp\Controllers\User::apiUpdate($r);
 
         // Check user from db
-        $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
         $this->assertEquals($r['state_id'], $identityDb->state_id);
@@ -134,12 +134,12 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         // Double check language update with the appropiate API
         $this->assertEquals(
             $locale->name,
-            IdentityController::getPreferredLanguage(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Identity::getPreferredLanguage(new \OmegaUp\Request([
                 'username' => $identityDb->username
             ]))
         );
 
-        $identity = IdentitiesDAO::getByPK($userDb->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);
         $this->assertEquals($identity->username, $identityDb->username);
         $this->assertEquals($identity->password, $identityDb->password);
     }
@@ -160,14 +160,14 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
             'password' => $newPassword,
         ]);
 
-        UserController::apiUpdateBasicInfo($r);
+        \OmegaUp\Controllers\User::apiUpdateBasicInfo($r);
 
         // Check user from db
-        $userDb = AuthTokensDAO::getUserByToken($r['auth_token']);
-        $identityDb = AuthTokensDAO::getIdentityByToken($r['auth_token']);
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
 
         // Getting identity data from db
-        $identity = IdentitiesDAO::getByPK($userDb->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);
         $this->assertEquals($identity->username, $identityDb->username);
         $this->assertEquals($identity->password, $identityDb->password);
     }

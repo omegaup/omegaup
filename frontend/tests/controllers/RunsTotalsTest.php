@@ -24,14 +24,14 @@ class RunsTotalsTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runDataOld = RunsFactory::createRun($problemData, $contestData, $contestant);
 
-        $submission = SubmissionsDAO::getByGuid($runDataOld['response']['guid']);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($runDataOld['response']['guid']);
         $submission->time = date('Y-m-d H:i:s', strtotime('-72 hours'));
-        SubmissionsDAO::update($submission);
-        $run = RunsDAO::getByPK($submission->current_run_id);
+        \OmegaUp\DAO\Submissions::update($submission);
+        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
         $run->time = date('Y-m-d H:i:s', strtotime('-72 hours'));
-        RunsDAO::update($run);
+        \OmegaUp\DAO\Runs::update($run);
 
-        $response = RunController::apiCounts(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\Run::apiCounts(new \OmegaUp\Request());
 
         $this->assertGreaterThan(1, count($response));
     }

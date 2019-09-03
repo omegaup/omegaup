@@ -27,7 +27,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     }
 
     $identityRequest = new \OmegaUp\Request($_REQUEST);
-    $session = SessionController::apiCurrentSession($identityRequest)['session'];
+    $session = \OmegaUp\Controllers\Session::apiCurrentSession($identityRequest)['session'];
     if ($session['valid']) {
         $smarty->assign('LOGGED_IN', '1');
         \OmegaUp\UITools::$isLoggedIn = true;
@@ -61,7 +61,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="/media/avatar_16.png">');
     }
 
-    $lang = IdentityController::getPreferredLanguage($identityRequest);
+    $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage($identityRequest);
 
     /** @psalm-suppress TypeDoesNotContainType OMEGAUP_ENVIRONMENT is a configurable value. */
     if (defined('OMEGAUP_ENVIRONMENT') && OMEGAUP_ENVIRONMENT === 'development') {

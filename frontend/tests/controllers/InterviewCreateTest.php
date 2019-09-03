@@ -9,11 +9,11 @@ class InterviewCreateTest extends OmegaupTestCase {
         UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         // Verify I started with nothing
-        $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
+        $interviews = \OmegaUp\DAO\Interviews::getMyInterviews($interviewer->user_id);
         $this->assertEquals(0, count($interviews));
 
         $login = self::login($interviewer);
-        $response = InterviewController::apiCreate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My first interview',
             'alias' => 'my-first-interview',
@@ -22,7 +22,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
 
-        $interviews = InterviewsDAO::getMyInterviews($interviewer->user_id);
+        $interviews = \OmegaUp\DAO\Interviews::getMyInterviews($interviewer->user_id);
 
         // Must have 1 interview
         $this->assertEquals(1, count($interviews));
@@ -33,14 +33,14 @@ class InterviewCreateTest extends OmegaupTestCase {
         UserFactory::addSystemRole($interviewer, \OmegaUp\Authorization::INTERVIEWER_ROLE);
 
         $login = self::login($interviewer);
-        $response = InterviewController::apiCreate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My second interview',
             'alias' => 'my-second-interview',
             'duration' => 60,
         ]));
 
-        $interview = InterviewsDAO::getMyInterviews($interviewer->user_id);
+        $interview = \OmegaUp\DAO\Interviews::getMyInterviews($interviewer->user_id);
     }
 
     public function testAddUsersToInterview() {
@@ -49,7 +49,7 @@ class InterviewCreateTest extends OmegaupTestCase {
 
         $login = self::login($interviewer);
         $interviewAlias = 'my-third-interview';
-        $response = InterviewController::apiCreate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My third interview',
             'alias' => $interviewAlias,
@@ -62,15 +62,15 @@ class InterviewCreateTest extends OmegaupTestCase {
         $email1 = Utils::CreateRandomString() . 'a@foobar.net';
         $email2 = Utils::CreateRandomString() . 'b@foobar.net';
 
-        $response = InterviewController::apiAddUsers(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Interview::apiAddUsers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'interview_alias' => $interviewAlias,
             'usernameOrEmailsCSV' => $email1 . ',' . $email2,
         ]));
         $this->assertEquals('ok', $response['status']);
 
-        $this->assertNotNull($createdUser1 = UsersDAO::FindByEmail($email1), 'user should have been created by adding email to interview');
-        $this->assertNotNull(UsersDAO::FindByEmail($email2), 'user should have been created by adding email to interview');
+        $this->assertNotNull($createdUser1 = \OmegaUp\DAO\Users::FindByEmail($email1), 'user should have been created by adding email to interview');
+        $this->assertNotNull(\OmegaUp\DAO\Users::FindByEmail($email2), 'user should have been created by adding email to interview');
 
         $this->assertEquals($createdUser1->verified, 0, 'new created users should not be email-validated');
 
@@ -81,7 +81,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $emailFor2 = Utils::CreateRandomString().'@mail.com';
         $interviewee2 = UserFactory::createUser(new UserParams(['email' => $emailFor2]));
 
-        $response = InterviewController::apiAddUsers(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Interview::apiAddUsers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'interview_alias' => $interviewAlias,
             'usernameOrEmailsCSV' => $emailFor1 . ',' . $emailFor2,
@@ -92,7 +92,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $interviewee3 = UserFactory::createUser();
         $interviewee4 = UserFactory::createUser();
 
-        $response = InterviewController::apiAddUsers(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Interview::apiAddUsers(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'interview_alias' => $interviewAlias,
             'usernameOrEmailsCSV' => $interviewee3->username . ',' . $interviewee4->username,
@@ -113,7 +113,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         $interviewer = UserFactory::createUser();
 
         $login = self::login($interviewer);
-        $response = InterviewController::apiCreate(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My fourth interview',
             'alias' => 'my-fourth-interview',

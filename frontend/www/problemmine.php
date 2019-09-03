@@ -3,7 +3,7 @@
 require_once('../server/bootstrap_smarty.php');
 
 try {
-    $smartyProperties = ProblemController::getProblemsMineInfoForSmarty(
+    $smartyProperties = \OmegaUp\Controllers\Problem::getProblemsMineInfoForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (Exception $e) {
@@ -15,7 +15,7 @@ foreach ($smartyProperties as $key => $value) {
 }
 
 $privateProblemsAlert = (!isset($_SESSION['private_problems_alert']) &&
-    ProblemsDAO::getPrivateCount($session['user']) > 0);
+    \OmegaUp\DAO\Problems::getPrivateCount($session['user']) > 0);
 if ($privateProblemsAlert) {
     $_SESSION['private_problems_alert'] = true;
 }

@@ -31,7 +31,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = RunController::apiDisqualify($r);
+        $response = \OmegaUp\Controllers\Run::apiDisqualify($r);
 
         $this->assertEquals('ok', $response['status']);
     }
@@ -63,14 +63,14 @@ class RunDisqualifyTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
             'run_alias' => $runData1['response']['guid']
         ]);
-        RunController::apiDisqualify($r);
+        \OmegaUp\Controllers\Run::apiDisqualify($r);
 
         // Check scoreboard
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
-        $response = ContestController::apiScoreboard($r);
+        $response = \OmegaUp\Controllers\Contest::apiScoreboard($r);
 
         // Contestant 2 should not be changed
         $this->assertEquals($contestant2->username, $response['ranking'][0]['username']);

@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \SessionController;
-
 /**
  * Encapsulates calls to the API and provides initialization and
  * error handling (try catch) logic for logging and alerting
@@ -184,7 +182,7 @@ class ApiCaller {
         $controllerName = str_replace(chr(0), '', $controllerName);
         $methodName = str_replace(chr(0), '', $args[3]);
 
-        $controllerName = "{$controllerName}Controller";
+        $controllerName = "\\OmegaUp\\Controllers\\{$controllerName}";
 
         if (!class_exists($controllerName)) {
             self::$log->error("Controller name was not found: {$controllerName}");
@@ -195,7 +193,7 @@ class ApiCaller {
         $request = new \OmegaUp\Request($_REQUEST);
 
         // Prepend api
-        $methodName = 'api'.$methodName;
+        $methodName = "api{$methodName}";
 
         // Check the method
         if (!method_exists($controllerName, $methodName)) {
@@ -204,7 +202,7 @@ class ApiCaller {
         }
 
         // Get the auth_token and user data from cookies
-        $cs = SessionController::apiCurrentSession()['session'];
+        $cs = \OmegaUp\Controllers\Session::apiCurrentSession()['session'];
 
         // If we got an auth_token from cookies, replace it
         if (!empty($cs['auth_token'])) {
@@ -215,7 +213,7 @@ class ApiCaller {
             $request[$args[$i]] = urldecode($args[$i+1]);
         }
 
-        $request->method = $controllerName . '::' . $methodName;
+        $request->method = "{$controllerName}::{$methodName}";
 
         return $request;
     }
@@ -268,19 +266,19 @@ class ApiCaller {
             // Even though this is forbidden, we pretend the resource did not
             // exist.
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(__DIR__ . '/../404.html'));
+            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
         }
         if ($apiException->getcode() == 404) {
             self::$log->info("{$apiException}");
             header('HTTP/1.1 404 Not Found');
-            die(file_get_contents(__DIR__ . '/../404.html'));
+            die(file_get_contents(OMEGAUP_ROOT . '/www/404.html'));
         }
         self::$log->error("{$apiException}");
         if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
             newrelic_notice_error(strval($apiException));
         }
         header('HTTP/1.1 500 Internal Server Error');
-        die(file_get_contents(__DIR__ . '/../500.html'));
+        die(file_get_contents(OMEGAUP_ROOT . '/www/500.html'));
     }
 }
 

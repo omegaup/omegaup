@@ -76,8 +76,8 @@ class RunCreateTest extends OmegaupTestCase {
         $this->non_student = UserFactory::createUser();
 
         // Get the actual DB entries for later
-        $this->course = CoursesDAO::getByAlias($this->courseData['course_alias']);
-        $this->assignment = AssignmentsDAO::getByAliasAndCourse(
+        $this->course = \OmegaUp\DAO\Courses::getByAlias($this->courseData['course_alias']);
+        $this->assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $this->courseData['assignment_alias'],
             $this->course->course_id
         );
@@ -85,7 +85,7 @@ class RunCreateTest extends OmegaupTestCase {
         $adminLogin = self::login($this->courseData['admin']);
 
         // Add the problem to the contest
-        CourseController::apiAddProblem(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $this->courseData['course_alias'],
             'assignment_alias' => $this->assignment->alias,
@@ -115,22 +115,22 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertArrayHasKey('guid', $response);
 
         // Get submissionn from DB
-        $submission = SubmissionsDAO::getByGuid($response['guid']);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($response['guid']);
         $this->assertNotNull($submission);
 
         // Get contest from DB to check times with respect to contest start
-        $contest = ContestsDAO::getByAlias($r['contest_alias'] ?? '');
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias'] ?? '');
 
         // Validate data
         $this->assertEquals($r['language'], $submission->language);
         $this->assertNotNull($submission->guid);
 
         // Validate file created
-        $fileContent = SubmissionController::getSource($submission->guid);
+        $fileContent = \OmegaUp\Controllers\Submission::getSource($submission->guid);
         $this->assertEquals($r['source'], $fileContent);
 
         // Validate defaults
-        $run = RunsDAO::getByPK($submission->current_run_id);
+        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
         $this->assertEquals('new', $run->status);
         $this->assertEquals(0, $run->runtime);
         $this->assertEquals(0, $run->memory);
@@ -138,10 +138,10 @@ class RunCreateTest extends OmegaupTestCase {
         $this->assertEquals(0, $run->contest_score);
 
         // Validate next submission timestamp
-        $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : RunController::$defaultSubmissionGap;
+        $submission_gap = isset($contest->submissions_gap) ? $contest->submissions_gap : \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         $this->assertEquals(\OmegaUp\Time::get() + $submission_gap, $response['nextSubmissionTimestamp']);
 
-        $log = SubmissionLogDAO::getByPK($submission->submission_id);
+        $log = \OmegaUp\DAO\SubmissionLog::getByPK($submission->submission_id);
 
         $this->assertNotNull($log);
         $this->assertEquals(ip2long('127.0.0.1'), $log->ip);
@@ -166,12 +166,12 @@ class RunCreateTest extends OmegaupTestCase {
         $detourGrader = new ScopedGraderDetour();
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         $this->assertRun($r, $response);
 
         // Check problem submissions (1)
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $this->assertEquals(1, $problem->submissions);
     }
 
@@ -190,7 +190,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         try {
             // Call API
-            RunController::apiCreate($r);
+            \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('api should have not created run, because contest has expired.');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -207,7 +207,7 @@ class RunCreateTest extends OmegaupTestCase {
         $detourGrader = new ScopedGraderDetour();
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -232,7 +232,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        RunController::apiCreate($r);
+        \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -250,7 +250,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         try {
             // Call API
-            RunController::apiCreate($r);
+            \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('api should have not created run, because contest has not started yet.');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -269,18 +269,18 @@ class RunCreateTest extends OmegaupTestCase {
         $detourGrader = new ScopedGraderDetour();
 
         // Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate the run
         $this->assertRun($r, $response);
 
         // Send a second run. This one should fail
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -298,19 +298,19 @@ class RunCreateTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData2, $this->contestData);
 
         // Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API, send a run for the first problem
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
         $this->assertRun($r, $response);
 
         // Set the second problem as the target
         $r['problem_alias'] = $problemData2['request']['problem_alias'];
 
         // Send a run to the 2nd problem
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
         $this->assertRun($r, $response);
     }
 
@@ -331,7 +331,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r2['problem_alias'] = $r1['problem_alias'];
 
         // Call API
-        $response = RunController::apiCreate($r2);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r2);
     }
 
     /**
@@ -358,7 +358,7 @@ class RunCreateTest extends OmegaupTestCase {
 
             try {
                 // Call API
-                $response = RunController::apiCreate($r);
+                $response = \OmegaUp\Controllers\Run::apiCreate($r);
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // The API should throw this exception, in this case
                 // we continue
@@ -378,7 +378,7 @@ class RunCreateTest extends OmegaupTestCase {
         $detourGrader = new ScopedGraderDetour();
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         $this->assertRun($r, $response);
     }
@@ -396,7 +396,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         try {
             // Call API
-            RunController::apiCreate($r);
+            \OmegaUp\Controllers\Run::apiCreate($r);
             $this->fail('Contestant should not submitted a run because windows length has expired');
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             $this->assertEquals('runNotInsideContest', $e->getMessage());
@@ -416,12 +416,12 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Manually set the contest start 10 mins in the future
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->start_time = Utils::GetTimeFromUnixTimestamp(\OmegaUp\Time::get() + 10);
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         $this->assertRun($r, $response);
     }
@@ -446,7 +446,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         $this->assertRun($r, $response);
     }
@@ -465,18 +465,18 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Set submissions gap of 20 seconds
-        $contest = ContestsDAO::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         $contest->submissions_gap = 20;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate the run
         $this->assertRun($r, $response);
 
         // Send a second run. This one should not fail
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate the run
         $this->assertRun($r, $response);
@@ -511,7 +511,7 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Call API
         $detourGrader = new ScopedGraderDetour();
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate the run
         $this->assertRun($r, $response);
@@ -542,7 +542,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -578,7 +578,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -613,7 +613,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -622,8 +622,8 @@ class RunCreateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\NotAllowedToSubmitException
      */
     public function testRunsToPublicProblemInsideSubmissionGap() {
-        $originalGap = RunController::$defaultSubmissionGap;
-        RunController::$defaultSubmissionGap = 60;
+        $originalGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
+        \OmegaUp\Controllers\Run::$defaultSubmissionGap = 60;
         try {
             // Create public problem
             $problemData = ProblemsFactory::createProblem();
@@ -645,15 +645,15 @@ class RunCreateTest extends OmegaupTestCase {
 
             // Call API
             $detourGrader = new ScopedGraderDetour();
-            $response = RunController::apiCreate($r);
+            $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
             // Validate the run
             $this->assertRun($r, $response);
 
             // Call API
-            $response = RunController::apiCreate($r);
+            $response = \OmegaUp\Controllers\Run::apiCreate($r);
         } finally {
-            RunController::$defaultSubmissionGap = $originalGap;
+            \OmegaUp\Controllers\Run::$defaultSubmissionGap = $originalGap;
         }
     }
 
@@ -663,12 +663,12 @@ class RunCreateTest extends OmegaupTestCase {
         unset($r['contest_alias']);
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         $this->assertRun($r, $response);
 
         // Check problem submissions (1)
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $this->assertEquals(1, $problem->submissions);
     }
 
@@ -682,7 +682,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r['problemset_id'] = $this->contestData['contest']->problemset_id;
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -694,7 +694,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -708,7 +708,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -723,7 +723,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -735,7 +735,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r = $this->setUpAssignment();
 
         $adminLogin = self::login($this->courseData['admin']);
-        CourseController::apiUpdate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => $this->courseData['request']['course']->name,
             'alias' => $this->courseData['request']['course']->alias,
@@ -751,7 +751,7 @@ class RunCreateTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = RunController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -764,15 +764,15 @@ class RunCreateTest extends OmegaupTestCase {
         $problem = $problemData['problem'];
 
         // Change the visibility to public banned.
-        ProblemController::apiUpdate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'visibility' => ProblemController::VISIBILITY_PUBLIC_BANNED,
+             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
              'message' => 'public_banned',
         ]));
 
         // Call API
-        RunController::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
              'language' => 'c',
@@ -790,15 +790,15 @@ class RunCreateTest extends OmegaupTestCase {
         $problem = $problemData['problem'];
 
         // Change the visibility to private banned.
-        ProblemController::apiUpdate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'visibility' => ProblemController::VISIBILITY_PRIVATE_BANNED,
+             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED,
              'message' => 'private_banned',
         ]));
 
         // Call API
-        RunController::apiCreate(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
              'language' => 'c',
@@ -821,14 +821,14 @@ class RunCreateTest extends OmegaupTestCase {
         RunsFactory::gradeRun($waRunData, 0, 'WA', 60);
 
         // Contestant should be able to view run (but not the run details).
-        $contestantIdentity = IdentityController::resolveIdentity(
+        $contestantIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $contestant->username
         );
         $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $contestantIdentity,
             $problemData['problem']
         ));
-        $response = RunController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'run_alias' => $waRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
@@ -838,12 +838,12 @@ class RunCreateTest extends OmegaupTestCase {
         RunsFactory::gradeRun($acRunData, 1, 'AC', 65);
 
         // Contestant should be able to view run and details after solving it.
-        $response = RunController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'run_alias' => $acRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
         $this->assertTrue(array_key_exists('details', $response));
-        $response = RunController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'run_alias' => $waRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
@@ -857,7 +857,7 @@ class RunCreateTest extends OmegaupTestCase {
         $runData = RunsFactory::createRunToProblem($problemData, $contestant2, $login2);
         RunsFactory::gradeRun($runData, 1, 'AC', 30);
         try {
-            RunController::apiDetails(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
                 'run_alias' => $runData['response']['guid'],
                 'auth_token' => $login->auth_token,
             ]));

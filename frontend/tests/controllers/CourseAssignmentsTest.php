@@ -7,7 +7,7 @@ class CourseAssignmentsTest extends OmegaupTestCase {
 
         // Login admin and getting assignments list
         $adminLogin = self::login($courseData['admin']);
-        $assignments = CourseController::apiListAssignments(new \OmegaUp\Request([
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -17,14 +17,14 @@ class CourseAssignmentsTest extends OmegaupTestCase {
         foreach ($assignments['assignments'] as $index => $assignment) {
             $assignments['assignments'][$index]['order'] = $i++;
         }
-        CourseController::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignments' => $assignments['assignments'],
         ]));
 
         // Getting one more time assignments list with original order
-        $assignments = CourseController::apiListAssignments(new \OmegaUp\Request([
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
@@ -52,12 +52,12 @@ class CourseAssignmentsTest extends OmegaupTestCase {
         $assignments['assignments'][2]['order'] = 1;
         $assignments['assignments'][3]['order'] = 2;
         $assignments['assignments'][4]['order'] = 4;
-        CourseController::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignments' => $assignments['assignments'],
         ]));
-        $assignments = CourseController::apiListAssignments(new \OmegaUp\Request([
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));

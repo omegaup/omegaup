@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \ContestsDAO;
-
 /**
  * ScoreboardParams
  *
@@ -126,7 +124,7 @@ class ScoreboardParams {
             'finish_time' => $contest->finish_time,
             'acl_id' => $contest->acl_id,
             'penalty' => $contest->penalty,
-            'virtual' => ContestsDAO::isVirtual($contest),
+            'virtual' => \OmegaUp\DAO\Contests::isVirtual($contest),
             'penalty_calc_policy' => $contest->penalty_calc_policy,
             'show_scoreboard_after' => $contest->show_scoreboard_after,
             'scoreboard_pct' => $contest->scoreboard

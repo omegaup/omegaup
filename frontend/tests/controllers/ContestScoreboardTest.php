@@ -119,7 +119,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         // Create API
-        $response = ProblemsetController::apiScoreboard($r);
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
         unset($login);
 
         // Validate that we have ranking
@@ -151,7 +151,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         // Create API
-        $response = ProblemsetController::apiScoreboard($r);
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
 
         // Validate that we have ranking
         $this->assertEquals(3, count($response['ranking']));
@@ -209,7 +209,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         // Create API
-        $response = ProblemsetController::apiScoreboard($r);
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
 
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
@@ -253,7 +253,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         // Create API
-        $response = ProblemsetController::apiScoreboard($r);
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
 
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
@@ -303,7 +303,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         // Create API
-        $response = ProblemsetController::apiScoreboard($r);
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
 
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
@@ -357,7 +357,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiScoreboardMerge($r);
+        $response = \OmegaUp\Controllers\Contest::apiScoreboardMerge($r);
 
         $this->assertEquals(200, $response['ranking'][0]['total']['points']);
         $this->assertEquals(100, $response['ranking'][1]['total']['points']);
@@ -392,7 +392,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Contest::apiMyList($r);
         unset($login);
 
         // Look for our contest from the list and save the scoreboard tokens
@@ -415,7 +415,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
             'problemset_id' =>  $contestData['contest']->problemset_id,
             'token' => $scoreboard_url,
         ]);
-        $scoreboardResponse = ProblemsetController::apiScoreboard($r);
+        $scoreboardResponse = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
 
         $this->assertEquals('0', $scoreboardResponse['ranking'][0]['total']['points']);
 
@@ -425,7 +425,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
             'problemset_id' => $contestData['contest']->problemset_id,
             'token' => $scoreboard_admin_url,
         ]);
-        $scoreboardResponse = ProblemsetController::apiScoreboard($r);
+        $scoreboardResponse = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
 
         $this->assertEquals('100', $scoreboardResponse['ranking'][0]['total']['points']);
     }
@@ -449,7 +449,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
             'problemset_id' =>  $contestData['contest']->problemset_id,
             'token' => 'invalid token',
         ]);
-        $scoreboardResponse = ProblemsetController::apiScoreboard($r);
+        $scoreboardResponse = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
     }
 
     /**
@@ -477,7 +477,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Contest::apiAdminList($r);
         unset($login);
 
         // Look for our contest from the list and save the scoreboard tokens
@@ -494,7 +494,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertNotNull($scoreboard_admin_url);
 
         // Call scoreboard api from the user
-        $scoreboardResponse = ProblemsetController::apiScoreboard(new \OmegaUp\Request([
+        $scoreboardResponse = \OmegaUp\Controllers\Problemset::apiScoreboard(new \OmegaUp\Request([
             'problemset_id' =>  $contestData['contest']->problemset_id,
             'token' => $scoreboard_url
         ]));
@@ -502,7 +502,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         $this->assertEquals('0', $scoreboardResponse['ranking'][0]['total']['points']);
 
         // Call scoreboard api from the user with admin token
-        $scoreboardResponse = ProblemsetController::apiScoreboard(new \OmegaUp\Request([
+        $scoreboardResponse = \OmegaUp\Controllers\Problemset::apiScoreboard(new \OmegaUp\Request([
             'problemset_id' => $contestData['contest']->problemset_id,
             'token' => $scoreboard_admin_url
         ]));
@@ -566,7 +566,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]);
 
-        $response = ProblemsetController::apiScoreboardEvents($r);
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboardEvents($r);
 
         // From the map above, there are 4 meaningful combinations for events
         $this->assertEquals(4, count($response['events']));
@@ -669,23 +669,23 @@ class ContestScoreboardTest extends OmegaupTestCase {
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]);
 
-        $response1 = ProblemsetController::$testApi($r);
+        $response1 = \OmegaUp\Controllers\Problemset::$testApi($r);
         $this->assertEquals(false, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
 
-        $response2 = ProblemsetController::$testApi($r);
+        $response2 = \OmegaUp\Controllers\Problemset::$testApi($r);
         $this->assertEquals(true, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
 
         $this->assertEquals($response1, $response2);
 
         // Invalidate previously cached scoreboard
         \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($testData['contestData']['contest']));
-        $response3 = ProblemsetController::$testApi($r);
+        $response3 = \OmegaUp\Controllers\Problemset::$testApi($r);
         $this->assertEquals(false, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
 
         // Single invalidation works, now invalidate again and check force referesh API
         \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($testData['contestData']['contest']));
         \OmegaUp\Scoreboard::refreshScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($testData['contestData']['contest']));
-        $response4 = ProblemsetController::$testApi($r);
+        $response4 = \OmegaUp\Controllers\Problemset::$testApi($r);
         $this->assertEquals(true, \OmegaUp\Scoreboard::getIsLastRunFromCacheForTesting());
         $this->assertEquals($response3, $response4);
     }
@@ -720,14 +720,14 @@ class ContestScoreboardTest extends OmegaupTestCase {
             \OmegaUp\Authorization::ADMIN_ROLE
         );
         $login = self::login($testData['contestData']['director']);
-        ContestController::apiRemoveProblem(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $testData['contestData']['contest']->alias,
             'problem_alias' => $testData['problemData'][1]['problem']->alias,
         ]));
 
         // Now the scoreboard should be available with a single problem.
-        $response = ProblemsetController::apiScoreboard(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problemset_id' => $testData['contestData']['contest']->problemset_id,
         ]));

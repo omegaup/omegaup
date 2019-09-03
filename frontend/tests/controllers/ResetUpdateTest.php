@@ -3,7 +3,7 @@ class ResetUpdateTest extends OmegaupTestCase {
     public function testShouldRequireAllParameters() {
         try {
             $r = new \OmegaUp\Request();
-            ResetController::apiUpdate($r);
+            \OmegaUp\Controllers\Reset::apiUpdate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             // Verify that the cause of the exception was the expected.
             $message = $expected->getMessage();
@@ -17,7 +17,7 @@ class ResetUpdateTest extends OmegaupTestCase {
             $user_data['password_confirmation'] = $user_data['password'];
             $user_data['reset_token'] = 'abcde';
             $r = new \OmegaUp\Request($user_data);
-            ResetController::apiUpdate($r);
+            \OmegaUp\Controllers\Reset::apiUpdate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
@@ -28,11 +28,11 @@ class ResetUpdateTest extends OmegaupTestCase {
         try {
             $user_data = UserFactory::generateUser();
             $r = new \OmegaUp\Request(['email' => $user_data['email']]);
-            $response = ResetController::apiCreate($r);
+            $response = \OmegaUp\Controllers\Reset::apiCreate($r);
             $user_data['reset_token'] = $response['token'];
             $user_data['password_confirmation'] = 'abcde';
             $r = new \OmegaUp\Request($user_data);
-            ResetController::apiUpdate($r);
+            \OmegaUp\Controllers\Reset::apiUpdate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
@@ -42,14 +42,14 @@ class ResetUpdateTest extends OmegaupTestCase {
     public function testShouldRefuseInvalidPassword() {
         $user_data = UserFactory::generateUser();
         $r = new \OmegaUp\Request(['email' => $user_data['email']]);
-        $response = ResetController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Reset::apiCreate($r);
         $user_data['reset_token'] = $response['token'];
 
         $user_data['password'] = 'abcde';
         $user_data['password_confirmation'] = 'abcde';
         $r = new \OmegaUp\Request($user_data);
         try {
-            ResetController::apiUpdate($r);
+            \OmegaUp\Controllers\Reset::apiUpdate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
@@ -59,7 +59,7 @@ class ResetUpdateTest extends OmegaupTestCase {
         $user_data['password_confirmation'] = str_pad('', 73, 'a');
         $r = new \OmegaUp\Request($user_data);
         try {
-            ResetController::apiUpdate($r);
+            \OmegaUp\Controllers\Reset::apiUpdate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
@@ -69,7 +69,7 @@ class ResetUpdateTest extends OmegaupTestCase {
     public function testShouldRefuseExpiredReset() {
         $user_data = UserFactory::generateUser();
         $r = new \OmegaUp\Request(['email' => $user_data['email']]);
-        $response = ResetController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Reset::apiCreate($r);
         $user_data['password_confirmation'] = $user_data['password'];
         $user_data['reset_token'] = $response['token'];
 
@@ -77,13 +77,13 @@ class ResetUpdateTest extends OmegaupTestCase {
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
             \OmegaUp\Time::get() - PASSWORD_RESET_TIMEOUT - 1
         );
-        $user = UsersDAO::FindByEmail($user_data['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         try {
             $r = new \OmegaUp\Request($user_data);
-            $response = ResetController::apiUpdate($r);
+            $response = \OmegaUp\Controllers\Reset::apiUpdate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
@@ -93,7 +93,7 @@ class ResetUpdateTest extends OmegaupTestCase {
     public function testShouldLogInWithNewPassword() {
         $user_data = UserFactory::generateUser();
         $r = new \OmegaUp\Request(['email' => $user_data['email']]);
-        $create_response = ResetController::apiCreate($r);
+        $create_response = \OmegaUp\Controllers\Reset::apiCreate($r);
         $reset_token = $create_response['token'];
         $user_data['reset_token'] = $reset_token;
 
@@ -102,8 +102,8 @@ class ResetUpdateTest extends OmegaupTestCase {
         $user_data['password_confirmation'] = $new_password;
         $r = new \OmegaUp\Request($user_data);
 
-        $user = UsersDAO::FindByEmail($user_data['email']);
-        ResetController::apiUpdate($r);
+        $user = \OmegaUp\DAO\Users::FindByEmail($user_data['email']);
+        \OmegaUp\Controllers\Reset::apiUpdate($r);
         $user->password = $new_password;
         self::login($user);
     }

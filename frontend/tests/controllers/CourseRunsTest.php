@@ -41,7 +41,7 @@ class CourseRunsTest extends OmegaupTestCase {
         $login = self::login($courseData['admin']);
 
         // Call API
-        $response = CourseController::apiRuns(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Course::apiRuns(new \OmegaUp\Request([
             'course_alias' => $courseData['request']['course_alias'],
             'assignment_alias' => $courseData['request']['alias'],
             'auth_token' => $login->auth_token,
@@ -54,14 +54,14 @@ class CourseRunsTest extends OmegaupTestCase {
         $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Course admin should be able to view run, even if not problem admin.
-        $adminIdentity = IdentityController::resolveIdentity(
+        $adminIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $courseData['admin']->username
         );
         $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $adminIdentity,
             $problemData['problem']
         ));
-        $response = RunController::apiDetails(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'problemset_id' => $courseData['assignment']->problemset_id,
             'run_alias' => $response['runs'][0]['guid'],
             'auth_token' => $login->auth_token,

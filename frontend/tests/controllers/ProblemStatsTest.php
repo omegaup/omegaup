@@ -59,7 +59,7 @@ class ProblemStatsTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ProblemController::apiStats($r);
+        $response = \OmegaUp\Controllers\Problem::apiStats($r);
 
         // Check number of pending runs
         $this->assertEquals(count($pendingRunsData), count($response['pending_runs']));

@@ -21,7 +21,7 @@ class UserContestsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Contest::apiMyList($r);
 
         // Contests should come ordered by contest id desc
         $this->assertEquals(count($contestData), count($response['contests']));
@@ -67,7 +67,7 @@ class UserContestsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ContestController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Contest::apiAdminList($r);
 
         // Contests should come ordered by contest id desc
         $this->assertEquals(count($contestDirectorData) + count($contestAdminData), count($response['contests']));
@@ -78,7 +78,7 @@ class UserContestsTest extends OmegaupTestCase {
     }
 
     /**
-     * Test ContestsDAO::getPrivateContestsCount when there's 1 private contest
+     * Test \OmegaUp\DAO\Contests::getPrivateContestsCount when there's 1 private contest
      * count
      */
     public function testPrivateContestsCount() {
@@ -86,27 +86,27 @@ class UserContestsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
         $user = $contestData['director'];
 
-        $this->assertEquals(1, ContestsDAO::getPrivateContestsCount($user));
+        $this->assertEquals(1, \OmegaUp\DAO\Contests::getPrivateContestsCount($user));
     }
 
     /**
-     * Test ContestsDAO::getPrivateContestsCount when there's 1 public contest
+     * Test \OmegaUp\DAO\Contests::getPrivateContestsCount when there's 1 public contest
      */
     public function testPrivateContestsCountWithPublicContest() {
         // Create private contest
         $contestData = ContestsFactory::createContest();
         $user = $contestData['director'];
 
-        $this->assertEquals(0, ContestsDAO::getPrivateContestsCount($user));
+        $this->assertEquals(0, \OmegaUp\DAO\Contests::getPrivateContestsCount($user));
     }
 
     /**
-     * Test ContestsDAO::getPrivateContestsCount when there's 0 contests
+     * Test \OmegaUp\DAO\Contests::getPrivateContestsCount when there's 0 contests
      * created
      */
     public function testPrivateContestsCountWithNoContests() {
         $user = UserFactory::createUser();
 
-        $this->assertEquals(0, ContestsDAO::getPrivateContestsCount($user));
+        $this->assertEquals(0, \OmegaUp\DAO\Contests::getPrivateContestsCount($user));
     }
 }

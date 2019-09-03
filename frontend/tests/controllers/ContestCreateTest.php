@@ -24,7 +24,7 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
 
         // Assert status of new contest
         $this->assertEquals('ok', $response['status']);
@@ -69,7 +69,7 @@ class CreateContestTest extends OmegaupTestCase {
 
             try {
                 // Call the API
-                $response = ContestController::apiCreate($r);
+                $response = \OmegaUp\Controllers\Contest::apiCreate($r);
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 // This exception is expected
                 unset($_REQUEST);
@@ -98,11 +98,11 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
         $this->assertEquals('ok', $response['status']);
 
         // Call the API for the 2nd time with same alias
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
     }
 
     /**
@@ -126,7 +126,7 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
     }
 
     /**
@@ -148,7 +148,7 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
         $this->assertEquals('ok', $response['status']);
     }
 
@@ -178,7 +178,7 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
     }
 
     /**
@@ -208,7 +208,7 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
     }
 
     /**

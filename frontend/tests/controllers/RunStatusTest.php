@@ -24,7 +24,7 @@ class RunStatusTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
 
         $login = self::login($contestant);
-        $response = RunController::apiStatus(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData['response']['guid'],
         ]));
@@ -40,15 +40,15 @@ class RunStatusTest extends OmegaupTestCase {
     public function testDownload() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
-        $contestantIdentity = IdentityController::resolveIdentity($user->username);
-        $authorIdentity = IdentityController::resolveIdentity(
+        $contestantIdentity = \OmegaUp\Controllers\Identity::resolveIdentity($user->username);
+        $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $problemData['author']->username
         );
         $runData = RunsFactory::createRunToProblem($problemData, $user);
         RunsFactory::gradeRun($runData);
 
         try {
-            RunController::downloadSubmission(
+            \OmegaUp\Controllers\Run::downloadSubmission(
                 $runData['response']['guid'],
                 $contestantIdentity,
                 false
@@ -58,7 +58,7 @@ class RunStatusTest extends OmegaupTestCase {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 
-        $submissionZip = RunController::downloadSubmission(
+        $submissionZip = \OmegaUp\Controllers\Run::downloadSubmission(
             $runData['response']['guid'],
             $authorIdentity,
             false

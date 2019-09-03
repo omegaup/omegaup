@@ -49,7 +49,7 @@ if (!empty($_GET['query']) && strlen($_GET['query']) > 0) {
     $keyword = substr($_GET['query'], 0, 256);
     $r['query'] = $keyword;
 }
-$response = ProblemController::apiList($r);
+$response = \OmegaUp\Controllers\Problem::apiList($r);
 
 $params = ['query' => $keyword, 'language' => $language, 'order_by' => $order_by, 'mode' => $mode, 'tag' => $tags];
 

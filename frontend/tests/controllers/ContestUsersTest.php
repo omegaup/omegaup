@@ -36,7 +36,7 @@ class ContestUsersTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiUsers($r);
+        $response = \OmegaUp\Controllers\Contest::apiUsers($r);
 
         // Check that we have n+1 users
         $this->assertEquals($n+1, count($response['users']));
@@ -50,14 +50,14 @@ class ContestUsersTest extends OmegaupTestCase {
         ContestsFactory::openContest($contestData, $user);
 
         $userLogin = self::login($user);
-        ContestController::apiDetails(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
 
         // Call API
         $directorLogin = self::login($contestData['director']);
-        $response = ContestController::apiActivityReport(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiActivityReport(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
@@ -88,18 +88,18 @@ class ContestUsersTest extends OmegaupTestCase {
             'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
-        $shoulShowIntro = ContestController::shouldShowIntro(
+        $shoulShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
             $r,
             $contestData['contest']
         );
-        $contestDetails = ContestController::getContestDetailsForSmarty(
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
             $r,
             $contestData['contest'],
             $shoulShowIntro
         );
 
         // Explicitly join contest
-        ContestController::apiOpen(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
@@ -117,7 +117,7 @@ class ContestUsersTest extends OmegaupTestCase {
             'auth_token' => $directorLogin->auth_token
         ]);
 
-        $response = ContestController::apiContestants($r);
+        $response = \OmegaUp\Controllers\Contest::apiContestants($r);
 
         // There are three participants in the current contest
         $this->assertEquals(3, count($response['contestants']));
@@ -130,7 +130,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $userLogin = self::login($user[1]);
 
         // Explicitly join contest
-        ContestController::apiOpen(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
@@ -140,7 +140,7 @@ class ContestUsersTest extends OmegaupTestCase {
             'share_user_information' => 0,
         ]));
 
-        $response = ContestController::apiContestants($r);
+        $response = \OmegaUp\Controllers\Contest::apiContestants($r);
 
         // The number of participants sharing their information still remains the same
         $this->assertEquals(1, self::numberOfUsersSharingBasicInformation(
@@ -150,7 +150,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $userLogin = self::login($user[2]);
 
         // Explicitly join contest
-        ContestController::apiOpen(new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $userLogin->auth_token,
             'privacy_git_object_id' =>
@@ -160,7 +160,7 @@ class ContestUsersTest extends OmegaupTestCase {
             'share_user_information' => 1,
         ]));
 
-        $response = ContestController::apiContestants($r);
+        $response = \OmegaUp\Controllers\Contest::apiContestants($r);
 
         // Now there are two participants sharing their information
         $this->assertEquals(2, self::numberOfUsersSharingBasicInformation(
@@ -173,7 +173,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         $shouldShowIntro =
-            ContestController::shouldShowIntro(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
                 new \OmegaUp\Request([
                     'contest_alias' => $contestData['request']['alias'],
                 ]),
@@ -199,14 +199,14 @@ class ContestUsersTest extends OmegaupTestCase {
         ]);
 
         // Contest intro can be shown by the user
-        $shouldShowIntro = ContestController::shouldShowIntro(
+        $shouldShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
             $r,
             $contestData['contest']
         );
         $this->assertTrue($shouldShowIntro);
 
         // Contest needs basic information for the user
-        $contestDetails = ContestController::getContestDetailsForSmarty(
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
             $r,
             $contestData['contest'],
             $shouldShowIntro
