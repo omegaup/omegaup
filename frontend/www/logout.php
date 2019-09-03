@@ -2,7 +2,7 @@
 
 require_once('../server/bootstrap_smarty.php');
 
-$c_Session = new SessionController;
+$c_Session = new \OmegaUp\Controllers\Session();
 
 if ($c_Session->currentSessionAvailable()) {
     $c_Session->UnRegisterSession();

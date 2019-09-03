@@ -2,19 +2,19 @@
 
 require_once('../../server/bootstrap_smarty.php');
 
-UITools::redirectToLoginIfNotLoggedIn();
-UITools::redirectIfNoAdmin();
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
+\OmegaUp\UITools::redirectIfNoAdmin();
 
-$user = UsersDAO::FindByUsername($_REQUEST['username']);
+$user = \OmegaUp\DAO\Users::FindByUsername($_REQUEST['username']);
 if (is_null($user)) {
     header('HTTP/1.1 404 Not found');
     die();
 }
-$emails = EmailsDAO::getByUserId($user->user_id);
-$userExperiments = UsersExperimentsDAO::getByUserId($user->user_id);
+$emails = \OmegaUp\DAO\Emails::getByUserId($user->user_id);
+$userExperiments = \OmegaUp\DAO\UsersExperiments::getByUserId($user->user_id);
 // TODO: Also support GroupRoles.
-$systemRoles = UserRolesDAO::getSystemRoles($user->user_id);
-$roles = RolesDAO::getAll();
+$systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
+$roles = \OmegaUp\DAO\Roles::getAll();
 $systemExperiments = [];
 $defines = get_defined_constants(true)['user'];
 foreach ($experiments->getAllKnownExperiments() as $experiment) {
@@ -34,7 +34,7 @@ $payload = [
     }, $userExperiments),
     'systemExperiments' => $systemExperiments,
     'roleNames' => array_map(function ($role) {
-        return $role->name;
+        return ['name' => $role->name];
     }, $roles),
     'systemRoles' => $systemRoles,
     'username' => $user->username,

@@ -51,7 +51,7 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         // Verify that clarification was inserted in the database
         $clarification =
-            ClarificationsDAO::getByPK($clarificationData['response']['clarification_id']);
+            \OmegaUp\DAO\Clarifications::getByPK($clarificationData['response']['clarification_id']);
 
         // Verify our retreived clarificatoin
         $this->assertNotNull($clarification);
@@ -62,8 +62,8 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         // We need to verify that the contest and problem IDs where properly saved
         // Extractiing the contest and problem from DB to check IDs
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemData['request']['problem_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
 
         $this->assertEquals($contest->problemset_id, $clarification->problemset_id);
         $this->assertEquals($problem->problem_id, $clarification->problem_id);
@@ -101,7 +101,7 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         // Setup contest is required to submit a clarification
         $this->setupContest($problemData, $contestData, $contestant, false /*isGraderExpectedToBeCalled*/);
-        $directorIdentity = IdentitiesDAO::getByPK($contestData['director']->main_identity_id);
+        $directorIdentity = \OmegaUp\DAO\Identities::getByPK($contestData['director']->main_identity_id);
         // Create 5 users
         $n = 5;
         $users = [];
@@ -139,7 +139,7 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         $login = self::login($contestant);
         // Call API
-        $response = ContestController::apiClarifications(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiClarifications(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]));
@@ -150,7 +150,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         for ($i = 0; $i < $n; $i++) {
             $logins[$i] = self::login($users[$i]);
 
-            $response = ContestController::apiClarifications(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiClarifications(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $logins[$i]->auth_token,
             ]));
@@ -169,7 +169,7 @@ class CreateClarificationTest extends OmegaupTestCase {
         );
 
         for ($i = 0; $i < $n; $i++) {
-            $response = ContestController::apiClarifications(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiClarifications(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $logins[$i]->auth_token,
             ]));

@@ -18,7 +18,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ProblemController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Problem::apiMyList($r);
 
         $this->assertEquals(count($problemData), count($response['problems']));
         $this->assertEquals($problemData[2]['request']['problem_alias'], $response['problems'][0]['alias']);
@@ -34,7 +34,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ProblemController::apiMyList($r);
+        $response = \OmegaUp\Controllers\Problem::apiMyList($r);
 
         $this->assertEquals(0, count($response['problems']));
     }
@@ -73,7 +73,7 @@ class UserProblemsTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
-        $response = ProblemController::apiAdminList($r);
+        $response = \OmegaUp\Controllers\Problem::apiAdminList($r);
 
         // Problems should come ordered by problem id desc
         $this->assertEquals(count($problemAuthorData) + count($problemAdminData), count($response['problems']));
@@ -84,7 +84,7 @@ class UserProblemsTest extends OmegaupTestCase {
     }
 
     /**
-     * Test ProblemsDAO::getPrivateCount when there's 1 private problem
+     * Test \OmegaUp\DAO\Problems::getPrivateCount when there's 1 private problem
      */
     public function testPrivateProblemsCount() {
         // Create private problem
@@ -93,11 +93,11 @@ class UserProblemsTest extends OmegaupTestCase {
         ]));
         $user = $problemData['author'];
 
-        $this->assertEquals(1, ProblemsDAO::getPrivateCount($user));
+        $this->assertEquals(1, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
 
     /**
-     * Test ProblemsDAO::getPrivateCount when there's 1 public problem
+     * Test \OmegaUp\DAO\Problems::getPrivateCount when there's 1 public problem
      */
     public function testPrivateProblemsCountWithPublicProblem() {
         // Create public problem
@@ -106,15 +106,15 @@ class UserProblemsTest extends OmegaupTestCase {
         ]));
         $user = $problemData['author'];
 
-        $this->assertEquals(0, ProblemsDAO::getPrivateCount($user));
+        $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
 
     /**
-     * Test ProblemsDAO::getPrivateCount when there's 0 problems
+     * Test \OmegaUp\DAO\Problems::getPrivateCount when there's 0 problems
      */
     public function testPrivateProblemsCountWithNoProblems() {
         $user = UserFactory::createUser();
 
-        $this->assertEquals(0, ProblemsDAO::getPrivateCount($user));
+        $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
 }

@@ -54,6 +54,20 @@ def add_students(driver, users, *, tab_xpath,
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '%s//a[text()="%s"]' % (container_xpath, user))))
+        dismiss_status(driver)
+
+
+def dismiss_status(driver):
+    '''Closes the status bar and waits for it to disappear.'''
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#status:not(.animating)')))
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             '#status:not(.animating) button.close'))).click()
+    driver.wait.until(
+        EC.invisibility_of_element_located((By.CSS_SELECTOR, '#status')))
 
 
 def create_run(driver, problem_alias, filename):

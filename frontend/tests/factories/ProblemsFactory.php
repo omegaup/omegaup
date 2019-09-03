@@ -18,7 +18,7 @@ class ProblemParams implements ArrayAccess {
 
         ProblemParams::validateParameter('zipName', $this->params, false, OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
         ProblemParams::validateParameter('title', $this->params, false, Utils::CreateRandomString());
-        ProblemParams::validateParameter('visibility', $this->params, false, ProblemController::VISIBILITY_PUBLIC);
+        ProblemParams::validateParameter('visibility', $this->params, false, \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC);
         ProblemParams::validateParameter('author', $this->params, false, UserFactory::createUser());
         ProblemParams::validateParameter('languages', $this->params, false, 'c,cpp,py');
     }
@@ -139,7 +139,7 @@ class ProblemsFactory {
 
     public static function createProblemWithAuthor(\OmegaUp\DAO\VO\Users $author, ScopedLoginToken $login = null) {
         return self::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+            'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $author,
         ]), $login);
     }
@@ -152,15 +152,15 @@ class ProblemsFactory {
             $params = new ProblemParams($params);
         }
 
-        $params['visibility'] = $params['visibility'] >= ProblemController::VISIBILITY_PUBLIC
-            ? ProblemController::VISIBILITY_PUBLIC
-            : ProblemController::VISIBILITY_PRIVATE;
+        $params['visibility'] = $params['visibility'] >= \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
+            ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
+            : \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE;
 
         // Get a user
         $problemData = self::getRequest($params);
         $r = $problemData['request'];
         $problemAuthorUser = $problemData['author'];
-        $problemAuthorIdentity = IdentitiesDAO::getByPK(
+        $problemAuthorIdentity = \OmegaUp\DAO\Identities::getByPK(
             $problemData['author']->main_identity_id
         );
 
@@ -174,16 +174,16 @@ class ProblemsFactory {
         \OmegaUp\FileHandler::setFileUploaderForTesting(new FileUploaderMock());
 
         // Call the API
-        ProblemController::apiCreate($r);
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        \OmegaUp\Controllers\Problem::apiCreate($r);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $visibility = $params['visibility'];
 
-        if ($visibility == ProblemController::VISIBILITY_PUBLIC_BANNED
-            || $visibility == ProblemController::VISIBILITY_PRIVATE_BANNED
-            || $visibility == ProblemController::VISIBILITY_PROMOTED
+        if ($visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
+            || $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+            || $visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
         ) {
             $problem->visibility = $visibility;
-            ProblemsDAO::update($problem);
+            \OmegaUp\DAO\Problems::update($problem);
         }
 
         // Clean up our mess
@@ -208,7 +208,7 @@ class ProblemsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ProblemController::apiAddAdmin($r);
+        \OmegaUp\Controllers\Problem::apiAddAdmin($r);
 
         unset($_REQUEST);
     }
@@ -225,7 +225,7 @@ class ProblemsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ProblemController::apiAddGroupAdmin($r);
+        \OmegaUp\Controllers\Problem::apiAddGroupAdmin($r);
     }
 
     public static function addTag($problemData, $tag, $public) {
@@ -241,6 +241,6 @@ class ProblemsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ProblemController::apiAddTag($r);
+        \OmegaUp\Controllers\Problem::apiAddTag($r);
     }
 }

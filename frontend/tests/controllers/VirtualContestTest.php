@@ -29,14 +29,14 @@ class VirtualContestTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]);
 
-        $response = ContestController::apiCreateVirtual($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
 
         // Get generated virtual contest alias
         $virtualContestAlias = $response['alias'];
 
-        $virtualContest = ContestsDAO::getByAlias($virtualContestAlias);
+        $virtualContest = \OmegaUp\DAO\Contests::getByAlias($virtualContestAlias);
 
-        $originalContest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $originalContest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
 
         // Assert virtual contest
         $this->assertEquals($originalContest->contest_id, $virtualContest->rerun_id);
@@ -54,10 +54,10 @@ class VirtualContestTest extends OmegaupTestCase {
         $this->assertEquals($originalContest->languages, $virtualContest->languages);
 
         // Assert virtual contest problenset problems
-        $originalProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+        $originalProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $originalContest->problemset_id
         );
-        $virtualProblems = ProblemsetProblemsDAO::getProblemsByProblemset(
+        $virtualProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $virtualContest->problemset_id
         );
         // Number of problems must be equal
@@ -83,7 +83,7 @@ class VirtualContestTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() - 100);
 
         try {
-            $response = ContestController::apiCreateVirtual($r);
+            $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'originalContestHasNotEnded');
@@ -109,11 +109,11 @@ class VirtualContestTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]);
 
-        $response = ContestController::apiCreateVirtual($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiAddProblem(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'problem_alias' => $problemData['problem']->alias,
                 'points' => 100,
@@ -147,11 +147,11 @@ class VirtualContestTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]);
 
-        $response = ContestController::apiCreateVirtual($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiRemoveProblem(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'problem_alias' => $problemData['problem']->alias,
                 'auth_token' => $login->auth_token
@@ -178,11 +178,11 @@ class VirtualContestTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]);
 
-        $response = ContestController::apiCreateVirtual($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
         $virtualContestAlias = $response['alias'];
 
         try {
-            ContestController::apiUpdate(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'title' => 'testtest',
                 'auth_token' => $login->auth_token

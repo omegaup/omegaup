@@ -2,12 +2,12 @@
 require_once('../../server/bootstrap_smarty.php');
 
 $r = new \OmegaUp\Request($_REQUEST);
-$session = SessionController::apiCurrentSession($r)['session'];
+$session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
 $r['statement_type'] = 'markdown';
 $r['show_solvers'] = true;
 try {
-    $result = ProblemController::apiDetails($r);
-    $problem = ProblemsDAO::GetByAlias($result['alias']);
+    $result = \OmegaUp\Controllers\Problem::apiDetails($r);
+    $problem = \OmegaUp\DAO\Problems::GetByAlias($result['alias']);
 } catch (\OmegaUp\Exceptions\ApiException $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));

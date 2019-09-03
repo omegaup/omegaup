@@ -161,13 +161,13 @@ class ContestsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
         if ($params['admission_mode'] === 'public') {
             self::forcePublic($contestData, $params['last_updated']);
             $r['admission_mode'] = 'public';
         }
 
-        $contest = ContestsDAO::getByAlias($r['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r['alias']);
 
         return [
             'director' => $contestData['director'],
@@ -191,7 +191,7 @@ class ContestsFactory {
         $r['order_in_contest'] = 1;
 
         // Call API
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
 
         // Clean up
         unset($_REQUEST);
@@ -210,7 +210,7 @@ class ContestsFactory {
         );
 
         // Call API
-        $response = ContestController::apiRemoveProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiRemoveProblem($r);
 
         // Clean up
         unset($_REQUEST);
@@ -230,7 +230,7 @@ class ContestsFactory {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Call api
-        ContestController::apiOpen($r);
+        \OmegaUp\Controllers\Contest::apiOpen($r);
 
         unset($_REQUEST);
     }
@@ -246,7 +246,7 @@ class ContestsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ProblemController::apiDetails($r);
+        \OmegaUp\Controllers\Problem::apiDetails($r);
 
         unset($_REQUEST);
     }
@@ -265,7 +265,7 @@ class ContestsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ContestController::apiAddUser($r);
+        \OmegaUp\Controllers\Contest::apiAddUser($r);
 
         unset($_REQUEST);
     }
@@ -284,7 +284,7 @@ class ContestsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ContestController::apiAddUser($r);
+        \OmegaUp\Controllers\Contest::apiAddUser($r);
 
         unset($_REQUEST);
     }
@@ -300,7 +300,7 @@ class ContestsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ContestController::apiAddAdmin($r);
+        \OmegaUp\Controllers\Contest::apiAddAdmin($r);
 
         unset($_REQUEST);
     }
@@ -317,22 +317,22 @@ class ContestsFactory {
         $r['auth_token'] = $login->auth_token;
 
         // Call api
-        ContestController::apiAddGroupAdmin($r);
+        \OmegaUp\Controllers\Contest::apiAddGroupAdmin($r);
     }
 
     public static function forcePublic(
         array $contestData,
         ?int $lastUpdated = null
     ) {
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
         $contest->admission_mode = 'public';
         $contest->last_updated = $lastUpdated;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
     }
 
     public static function setScoreboardPercentage($contestData, $percentage) {
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
         $contest->scoreboard = $percentage;
-        ContestsDAO::update($contest);
+        \OmegaUp\DAO\Contests::update($contest);
     }
 }

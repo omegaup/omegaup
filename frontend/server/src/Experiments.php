@@ -2,8 +2,6 @@
 
 namespace OmegaUp;
 
-use \UsersExperimentsDAO;
-
 /**
  * Allows for runtime inclusion/exclusion of certain experiments.
  *
@@ -34,7 +32,7 @@ use \UsersExperimentsDAO;
  *       hash_hmac('sha1', ${NAME}, OMEGAUP_EXPERIMENT_SECRET).
  *
  *   This is done to avoid users from unintentionally enabling experiments that
- *   are not quite ready. frontend/server/libs/ExperimentHashCmd.php is a
+ *   are not quite ready. frontend/server/cmd/ExperimentHashCmd.php is a
  *   command-line script that can calculate these hashes for you.
  * * By adding a row to the Users_Experiments table.
  * * TODO(lhchavez): Add support (and guidelines) for randomized trials.
@@ -136,7 +134,7 @@ class Experiments {
         if (is_null($user->user_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
-        foreach (UsersExperimentsDAO::getByUserId($user->user_id) as $ue) {
+        foreach (\OmegaUp\DAO\UsersExperiments::getByUserId($user->user_id) as $ue) {
             if (in_array($ue->experiment, $knownExperiments) &&
                 !is_null($ue->experiment) &&
                 !$this->isEnabled($ue->experiment)

@@ -39,7 +39,7 @@ export default class Publish extends Vue {
   admissionMode = this.data.admission_mode;
 
   onSubmit(): void {
-    this.$parent.$emit('update-admission-mode', this);
+    this.$emit('emit-update-admission-mode', this);
   }
 }
 

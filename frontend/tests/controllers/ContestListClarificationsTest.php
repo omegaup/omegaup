@@ -64,7 +64,7 @@ class ListClarificationsContest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiClarifications($r);
+        $response = \OmegaUp\Controllers\Contest::apiClarifications($r);
 
         // Check that we got all clarifications
         $this->assertEquals(count($clarificationData1), count($response['clarifications']));

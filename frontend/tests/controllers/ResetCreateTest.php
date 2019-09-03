@@ -5,7 +5,7 @@ class ResetCreateTest extends OmegaupTestCase {
      */
     public function testShouldRequireEmailParameter() {
         $r = new \OmegaUp\Request();
-        $response = ResetController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Reset::apiCreate($r);
     }
 
     /**
@@ -14,7 +14,7 @@ class ResetCreateTest extends OmegaupTestCase {
     public function testShouldRefuseNotRegisteredEmailAddresses() {
         $email = Utils::CreateRandomString() . '@mail.com';
         $r = new \OmegaUp\Request();
-        $response = ResetController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Reset::apiCreate($r);
     }
 
     public function testShouldRefuseUnverifiedUser() {
@@ -22,7 +22,7 @@ class ResetCreateTest extends OmegaupTestCase {
         try {
             $user_data = UserFactory::generateUser(false);
             $r = new \OmegaUp\Request($user_data);
-            ResetController::apiCreate($r);
+            \OmegaUp\Controllers\Reset::apiCreate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
@@ -32,10 +32,10 @@ class ResetCreateTest extends OmegaupTestCase {
     public function testShouldRefuseMultipleRequestsInShortInterval() {
         $user_data = UserFactory::generateUser();
         $r = new \OmegaUp\Request(['email' => $user_data['email']]);
-        $response = ResetController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Reset::apiCreate($r);
 
         try {
-            ResetController::apiCreate($r);
+            \OmegaUp\Controllers\Reset::apiCreate($r);
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
             $message = $expected->getMessage();
         }
@@ -45,10 +45,10 @@ class ResetCreateTest extends OmegaupTestCase {
         $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
             \OmegaUp\Time::get() - PASSWORD_RESET_MIN_WAIT - 1
         );
-        $user = UsersDAO::FindByEmail($user_data['email']);
+        $user = \OmegaUp\DAO\Users::FindByEmail($user_data['email']);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
-        ResetController::apiCreate($r);
+        \OmegaUp\Controllers\Reset::apiCreate($r);
     }
 }
