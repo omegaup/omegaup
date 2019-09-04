@@ -92,6 +92,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return $result;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     final public static function getAllRuns(
         ?int $problemset_id,
         ?string $status,

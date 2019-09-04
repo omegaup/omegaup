@@ -12,6 +12,9 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
+    /**
+     * @return array<mixed, array{name: mixed, description: mixed, start_time: mixed, finish_time: mixed, order: mixed, max_points: mixed, assignment_alias: mixed, assignment_type: mixed, publish_time_delay: mixed, problems: array<empty, empty>}>
+     */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
     ) : array {
