@@ -50,12 +50,12 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * Returns all groups that a user can manage.
      * @param int $userId
      * @param int $identityId
-     * @return array<int, array<string, mixed>>
+     * @return array{alias: string, create_time: int, description: string, name: string}[]
      */
     final public static function getAllGroupsAdminedByUser(
         int $userId,
         int $identityId
-    ) : ?array {
+    ) : array {
         /** @var string */
         $sql = '
             SELECT
