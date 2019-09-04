@@ -184,11 +184,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $progress = [];
         foreach ($rs as $row) {
-            $progress[$row['assignment']] =
-                intval($row['max_score']) === 0 ? '--.--' : number_format(
-                    (floatval($row['score']) / floatval($row['max_score']) * 100),
-                    2
-                );
+            $assignment = $row['assignment'];
+            $progress[$assignment] = [
+                'score' => floatval($row['score']),
+                'max_score' => floatval($row['max_score']),
+            ];
         }
 
         return $progress;

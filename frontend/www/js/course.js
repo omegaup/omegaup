@@ -33,8 +33,11 @@ omegaup.OmegaUp.on('ready', function() {
           course.assignments[i].finishTime = omegaup.UI.formatDateTime(
               new Date(1000 * course.assignments[i].finish_time));
 
-          course.assignments[i].progress =
-              score.assignments[course.assignments[i].alias] + '%';
+          var iScore = score.assignments[course.assignments[i].alias];
+          var percent = iScore.score / iScore.max_score * 100;
+          var percentText =
+              iScore.max_score === 0 ? '--.--' : percent.toFixed(2);
+          course.assignments[i].progress = percentText + '%';
         }
 
         // Put assignment lists back in a separate field per type.

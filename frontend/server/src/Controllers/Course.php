@@ -223,6 +223,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         self::validateClone($r);
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
+        /** @var int $offset */
         $offset = round($r['start_time']) - $originalCourse->start_time;
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -244,6 +245,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             $assignmentsProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsAssignmentByCourseAlias($originalCourse);
 
+            /** @var array{name: string, description: string, asssignment_alias: string, publish_time_delay: string, assignment_type: string, start_time: int, finish_time: int, order: int, max_points: int, problems: array{problem_id: int, problem_alias: string}[]}[] $assignmentProblems */
             foreach ($assignmentsProblems as $assignment => $assignmentProblems) {
                 // Create and assign homeworks and tests to new course
                 $problemset = self::createAssignment($originalCourse, new \OmegaUp\DAO\VO\Assignments([
@@ -254,12 +256,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'alias' => $assignmentProblems['assignment_alias'],
                     'publish_time_delay' => $assignmentProblems['publish_time_delay'],
                     'assignment_type' => $assignmentProblems['assignment_type'],
-                    'start_time' => $assignmentProblems['start_time'] + $offset,
-                    'finish_time' => $assignmentProblems['finish_time'] + $offset,
+                    'start_time' => (int)$assignmentProblems['start_time'] + $offset,
+                    'finish_time' => (int)$assignmentProblems['finish_time'] + $offset,
                     'order' => $assignmentProblems['order'],
                     'max_points' => $assignmentProblems['max_points'],
                 ]));
 
+                /** @var array{problem_id: int, problem_alias: string}[] $problem */
                 foreach ($assignmentProblems['problems'] as $problem) {
                     // Create and assign problems to new course
                     self::addProblemToAssignment(
@@ -366,7 +369,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Function to create a new assignment
      *
      * @param \OmegaUp\DAO\VO\Courses $course
-     * @param Assignment $assignment
+     * @param \OmegaUp\DAO\VO\Assignments $assignment
      * @return \OmegaUp\DAO\VO\Problemsets
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
@@ -1803,6 +1806,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $result = [];
 
+        /** @var array{time:int,score:float,contest_score:float}[] $run */
         foreach ($runs as $run) {
             $run['time'] = (int)$run['time'];
             $run['score'] = (float)$run['score'];
@@ -2036,6 +2040,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
         $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse($r['course_alias']);
         $userProblems = [];
+        /** @var array{alias:string,title:string,username:string}[] $problem */
         foreach ($solvedProblems as $problem) {
             $userProblems[$problem['username']][] = $problem;
         }

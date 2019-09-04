@@ -569,7 +569,7 @@
     <ArgumentTypeCoercion occurrences="1">
       <code>$assignment</code>
     </ArgumentTypeCoercion>
-    <InvalidArgument occurrences="2"/>
+    <InvalidArgument occurrences="1"/>
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>$privacystatement_consent_id</code>
     </InvalidPropertyAssignmentValue>
@@ -581,9 +581,6 @@
       <code>\OmegaUp\DAO\VO\Problems</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
     </InvalidReturnType>
-    <MismatchingDocblockParamType occurrences="1">
-      <code>Assignment</code>
-    </MismatchingDocblockParamType>
     <MissingClosureParamType occurrences="3">
       <code>$value</code>
       <code>$value</code>
@@ -602,11 +599,10 @@
       <code>apiListCourses</code>
       <code>apiStudentProgress</code>
     </MissingReturnType>
-    <MixedArgument occurrences="100">
+    <MixedArgument occurrences="99">
       <code>$r['school_id']</code>
       <code>$r['course_alias']</code>
       <code>$r['start_time']</code>
-      <code>$problem['problem_alias']</code>
       <code>$masterCommit</code>
       <code>$currentVersion</code>
       <code>$r['course_alias']</code>
@@ -698,16 +694,7 @@
       <code>$r['course_alias']</code>
       <code>$r['course_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="33">
-      <code>$assignmentProblems['name']</code>
-      <code>$assignmentProblems['description']</code>
-      <code>$assignmentProblems['assignment_alias']</code>
-      <code>$assignmentProblems['publish_time_delay']</code>
-      <code>$assignmentProblems['assignment_type']</code>
-      <code>$assignmentProblems['start_time']</code>
-      <code>$assignmentProblems['finish_time']</code>
-      <code>$assignmentProblems['problems']</code>
-      <code>$problem['problem_alias']</code>
+    <MixedArrayAccess occurrences="20">
       <code>$problem['alias']</code>
       <code>$problem['order']</code>
       <code>$assignment['alias']</code>
@@ -729,19 +716,11 @@
       <code>$assignmentProblemset['scoreboard_url']</code>
       <code>$problem['problem_id']</code>
       <code>$run['time']</code>
-      <code>$run['score']</code>
       <code>$run['contest_score']</code>
-      <code>$problem['username']</code>
-      <code>$problem['username']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="1">
-      <code>$userProblems[$problem['username']]</code>
-      <code>$userProblems[$problem['username']]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="55">
+    <MixedAssignment occurrences="50">
       <code>$assignment</code>
       <code>$course</code>
-      <code>$assignmentProblems</code>
       <code>$problem</code>
       <code>$group</code>
       <code>$course-&gt;group_id</code>
@@ -795,20 +774,15 @@
       <code>$r['assignment']</code>
       <code>$solvedProblems</code>
       <code>$problem</code>
-      <code>$userProblems[$problem['username']][]</code>
       <code>$problem</code>
-      <code>$userProblems[$problem['username']][]</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="4">
+    <MixedInferredReturnType occurrences="3">
       <code>\OmegaUp\DAO\VO\Assignments</code>
       <code>\OmegaUp\DAO\VO\Courses</code>
-      <code>\OmegaUp\DAO\VO\Problemsets</code>
       <code>array</code>
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedOperand occurrences="3">
-      <code>$assignmentProblems['start_time']</code>
-      <code>$assignmentProblems['finish_time']</code>
+    <MixedOperand occurrences="1">
       <code>$r['course_alias']</code>
     </MixedOperand>
     <MixedPropertyFetch occurrences="35">
@@ -914,9 +888,6 @@
     <TypeDoesNotContainNull occurrences="1">
       <code>is_null($markdown)</code>
     </TypeDoesNotContainNull>
-    <UndefinedDocblockClass occurrences="1">
-      <code>Assignment</code>
-    </UndefinedDocblockClass>
   </file>
   <file src="frontend/server/src/Controllers/Grader.php">
     <MissingReturnType occurrences="1">
