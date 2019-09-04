@@ -1865,7 +1865,8 @@ export class Arena {
   updateProblemScore(alias, maxScore, previousScore) {
     let self = this;
     // It only works for contests
-    if (self.options.contestAlias != null) {
+    if (self.options.contestAlias != null &&
+        typeof(self.elements.rankingTable) !== 'undefined') {
       self.elements.rankingTable.ranking =
           self.elements.rankingTable.ranking.map(rank => {
             let ranking = rank;
