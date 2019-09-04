@@ -256,6 +256,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'assignment_type' => $assignmentProblems['assignment_type'],
                     'start_time' => $assignmentProblems['start_time'] + $offset,
                     'finish_time' => $assignmentProblems['finish_time'] + $offset,
+                    'order' => $assignmentProblems['order'],
+                    'max_points' => $assignmentProblems['max_points'],
                 ]));
 
                 foreach ($assignmentProblems['problems'] as $problem) {

@@ -18,11 +18,17 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         // Build SQL statement
         $sql = '
             SELECT
-                a.name, a.alias AS assignment_alias,a.description,
+                a.name,
+                a.alias AS assignment_alias,
+                a.description,
                 UNIX_TIMESTAMP(a.start_time) AS start_time,
                 UNIX_TIMESTAMP(a.finish_time) AS finish_time,
-                a.assignment_type, p.alias AS problem_alias,
-                a.publish_time_delay, p.problem_id
+                a.assignment_type,
+                a.order,
+                a.max_points,
+                p.alias AS problem_alias,
+                a.publish_time_delay,
+                p.problem_id
             FROM
                 Problems p
             INNER JOIN
@@ -50,6 +56,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     'description' => $assignment['description'],
                     'start_time' => $assignment['start_time'],
                     'finish_time' => $assignment['finish_time'],
+                    'order' => $assignment['order'],
+                    'max_points' => $assignment['max_points'],
                     'assignment_alias' => $assignment['assignment_alias'],
                     'assignment_type' => $assignment['assignment_type'],
                     'publish_time_delay' => $assignment['publish_time_delay'],
