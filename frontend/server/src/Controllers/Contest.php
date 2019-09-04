@@ -20,7 +20,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Check who is visiting, but a not logged user can still view
         // the list of contests
         try {
-            self::authenticateRequest($r);
+            $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing.
         }
@@ -132,7 +132,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiAdminList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
@@ -212,7 +212,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiMyList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
         return self::getContestListInternal($r, '\OmegaUp\DAO\Contests::getAllContestsOwnedByUser');
     }
 
@@ -223,7 +223,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiListParticipating(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         return self::getContestListInternal($r, '\OmegaUp\DAO\Contests::getContestsParticipating');
     }
 
@@ -456,7 +456,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // admin or has a token.
         if (is_null($r['token'])) {
             // Crack the request to get the current user
-            self::authenticateRequest($r);
+            $r->ensureIdentity();
             self::canAccessContest($contest, $r->identity);
 
             $contestAdmin = \OmegaUp\Authorization::isContestAdmin($r->identity, $contest);
@@ -541,7 +541,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     public static function apiRegisterForContest(\OmegaUp\Request $r) {
         // Authenticate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $contest = self::validateContest($r['contest_alias']);
 
@@ -838,7 +838,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
 
         $originalContest = self::validateContestAdmin(
             $r['contest_alias'],
@@ -917,7 +917,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
 
         $originalContest = \OmegaUp\DAO\Contests::getByAlias($r['alias']);
         if (is_null($originalContest)) {
@@ -1053,7 +1053,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
 
         // Validate request
         self::validateCreate($r);
@@ -1295,7 +1295,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiProblems(\OmegaUp\Request $r) {
         // Authenticate user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
@@ -1329,7 +1329,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateAddToContestRequest(
@@ -1432,7 +1432,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiRemoveProblem(\OmegaUp\Request $r) {
         // Authenticate user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateRemoveFromContestRequest(
@@ -1517,7 +1517,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Return a report of which runs would change due to a version change.
      */
     public static function apiRunsDiff(\OmegaUp\Request $r) : array {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1586,7 +1586,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate logged user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         [$identity, $contest] = self::validateAddRemoveUser(
             $r['contest_alias'],
             $r['usernameOrEmail'],
@@ -1615,7 +1615,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiRemoveUser(\OmegaUp\Request $r) {
         // Authenticate logged user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         [$identity, $contest] = self::validateAddRemoveUser(
             $r['contest_alias'],
             $r['usernameOrEmail'],
@@ -1643,7 +1643,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate logged user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1666,7 +1666,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiRemoveAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1698,7 +1698,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate logged user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1725,7 +1725,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r) {
         // Authenticate logged user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Check contest_alias
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
@@ -1772,7 +1772,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiClarifications(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $contest = self::validateClarifications($r);
 
         $isContestDirector = \OmegaUp\Authorization::isContestAdmin(
@@ -1841,7 +1841,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         if (is_null($r['token'])) {
             // Get the current user
-            self::authenticateRequest($r);
+            $r->ensureIdentity();
 
             self::canAccessContest($contest, $r->identity);
 
@@ -1873,7 +1873,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiScoreboardMerge(\OmegaUp\Request $r) {
         // Get the current user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_aliases'], 'contest_aliases');
         $contestAliases = explode(',', $r['contest_aliases']);
@@ -2026,7 +2026,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     public static function apiRequests(\OmegaUp\Request $r) {
         // Authenticate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
@@ -2074,7 +2074,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiArbitrateRequest(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
@@ -2127,7 +2127,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUsers(\OmegaUp\Request $r) {
         // Authenticate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
         $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
@@ -2148,7 +2148,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiAdmins(\OmegaUp\Request $r) {
         // Authenticate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
 
@@ -2187,7 +2187,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate request
         $contest = self::validateUpdate($r);
@@ -2297,7 +2297,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $contest = self::validateContestAdmin(
             $r['contest_alias'],
             $r->identity
@@ -2423,7 +2423,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiRuns(\OmegaUp\Request $r) {
         // Authenticate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate request
         [$contest, $problem, $identity] = self::validateRuns($r);
@@ -2482,7 +2482,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiStats(\OmegaUp\Request $r) {
         // Get user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
@@ -2556,7 +2556,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     private static function getContestReportDetails(\OmegaUp\Request $r) : array {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         $params = \OmegaUp\ScoreboardParams::fromContest($contest);
@@ -2617,7 +2617,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiCsvReport(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
@@ -2731,7 +2731,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiDownload(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
@@ -2753,7 +2753,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiRole(\OmegaUp\Request $r) {
         try {
             if ($r['contest_alias'] == 'all-events') {
-                self::authenticateRequest($r);
+                $r->ensureIdentity();
                 if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
                     return [
                         'status' => 'ok',
@@ -2786,7 +2786,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiSetRecommended(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
@@ -2818,7 +2818,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiContestants(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
         $contest = self::validateStats($r['contest_alias'], $r->identity);

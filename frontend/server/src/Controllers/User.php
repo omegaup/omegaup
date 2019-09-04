@@ -359,7 +359,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
 
         $hashedPassword = null;
         /** @var \OmegaUp\DAO\VO\Users */
@@ -435,7 +435,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Admin can override verification by sending username
         if (isset($r['usernameOrEmail'])) {
-            self::authenticateRequest($r);
+            $r->ensureIdentity();
 
             if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -486,7 +486,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiMailingListBackfill(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -588,7 +588,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiGenerateOmiUsers(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $response = [];
 
@@ -1141,7 +1141,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiStatusVerified(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -1170,7 +1170,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiExtraInformation(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -1268,7 +1268,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiSelectCoderOfTheMonth(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $currentTimestamp = \OmegaUp\Time::get();
 
         if (!\OmegaUp\Authorization::isMentor($r->identity)) {
@@ -1485,7 +1485,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $param = '';
         if (!is_null($r['term'])) {
@@ -1548,7 +1548,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiUpdateBasicInfo(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
         if ($r['username'] != $r->user->username) {
@@ -1598,7 +1598,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         if (isset($r['username'])) {
             \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
@@ -1856,7 +1856,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiUpdateMainEmail(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateEmail($r['email'], 'email');
 
@@ -2079,7 +2079,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateAddRemoveRole($r);
 
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
@@ -2103,7 +2103,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateAddRemoveRole($r);
 
         \OmegaUp\DAO\UserRoles::delete(new \OmegaUp\DAO\VO\UserRoles([
@@ -2127,7 +2127,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateAddRemoveGroup($r);
         \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => $r->identity->identity_id,
@@ -2149,7 +2149,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateAddRemoveGroup($r);
 
         \OmegaUp\DAO\GroupsIdentities::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
@@ -2188,7 +2188,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateAddRemoveExperiment($r);
 
         \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
@@ -2211,7 +2211,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateAddRemoveExperiment($r);
 
         \OmegaUp\DAO\UsersExperiments::delete($r['user']->user_id, $r['experiment']);
@@ -2226,7 +2226,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function getPrivacyPolicy(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
@@ -2287,7 +2287,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiLastPrivacyPolicyAccepted(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
@@ -2307,7 +2307,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiAcceptPrivacyPolicy(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $privacystatement_id = \OmegaUp\DAO\PrivacyStatements::getId($r['privacy_git_object_id'], $r['statement_type']);
         if (is_null($privacystatement_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
@@ -2341,7 +2341,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiAssociateIdentity(\OmegaUp\Request $r) {
         global $experiments;
         $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
         \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
@@ -2379,7 +2379,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiListAssociatedIdentities(\OmegaUp\Request $r) {
         global $experiments;
         $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         return [
             'status' => 'ok',
@@ -2392,7 +2392,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * against the gitserver.
      */
     public static function apiGenerateGitToken(\OmegaUp\Request $r) {
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
 
         $token = \OmegaUp\SecurityTools::randomHexString(40);
         /** @var \OmegaUp\DAO\VO\Users $r->user */

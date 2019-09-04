@@ -15,7 +15,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiMyList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         return [
             'status' => 'ok',
             'notifications' => is_null($r->user) ?
@@ -31,7 +31,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiReadNotifications(\OmegaUp\Request $r) {
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
         if (empty($r['notifications'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('notificationIdsNotProvided');
         }
