@@ -14,7 +14,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $param = '';
         if (!is_null($r['term'])) {
@@ -46,7 +46,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
 
@@ -97,7 +97,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('finish_time', null, null, false);
 
         try {
-            self::authenticateRequest($r);
+            $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             if (!is_null($r['start_time'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('paramterInvalid', 'start_time');

@@ -149,6 +149,42 @@ class Request extends \ArrayObject {
         \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
         $this[$key] = floatval($val);
     }
+
+    /**
+     * Ensures that an identity is logged in.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @psalm-assert !null $this->identity
+     */
+    public function ensureIdentity() : void {
+        $this->user = null;
+        $this->identity = null;
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession($this)['session'];
+        if (is_null($session) || is_null($session['identity'])) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException();
+        }
+        $this->identity = $session['identity'];
+        if (!is_null($session['user'])) {
+            $this->user = $session['user'];
+        }
+    }
+
+    /**
+     * Ensures that an identity is logged in, and it is the main identity of
+     * its associated user.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->user
+     */
+    public function ensureMainUserIdentity() : void {
+        $this->ensureIdentity();
+        if (is_null($this->user)
+            || $this->user->main_identity_id != $this->identity->identity_id
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+    }
 }
 
 \OmegaUp\Request::$_requestId = str_replace('.', '', uniqid('', true));
