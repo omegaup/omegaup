@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  * BadgesController
@@ -55,6 +55,10 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUserList(\OmegaUp\Request $r) {
+        \OmegaUp\Validators::validateValidUsername(
+            $r['target_username'],
+            'target_username'
+        );
         $user = \OmegaUp\DAO\Users::FindByUsername($r['target_username']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');

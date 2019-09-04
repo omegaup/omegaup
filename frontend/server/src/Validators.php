@@ -167,9 +167,6 @@ class Validators {
         $parameter,
         string $parameterName
     ) : void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
-            return;
-        }
         self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, /*required=*/true);
 
         if (preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
