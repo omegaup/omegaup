@@ -1810,7 +1810,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?string $commit
     ) : array {
         $masterCommit = null;
-        if (is_null($commit)) {
+        if (empty($commit)) {
             $masterCommit = (new \OmegaUp\ProblemArtifacts($problem->alias, 'published'))->commit();
         } else {
             foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
