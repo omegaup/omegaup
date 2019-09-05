@@ -94,6 +94,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
             unset($row['group_id']);
         }
 
+        /** @var array{alias: string, create_time: int, description: string, name: string}[] $rs */
         return $rs;
     }
 
