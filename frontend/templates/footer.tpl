@@ -42,6 +42,7 @@
 		<!-- #content -->
 	</div>
 </div>
+<script async defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 {include file='common.analytics.tpl'}
 <!-- #root -->
 </body>
