@@ -68,7 +68,7 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Badge.php">
-    <MixedArgument occurrences="2">
+    <MixedArgument occurrences="1">
       <code>static::OMEGAUP_BADGES_ROOT</code>
     </MixedArgument>
     <MixedAssignment occurrences="3">

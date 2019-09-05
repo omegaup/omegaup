@@ -65,7 +65,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiAddContest(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $contestScoreboard = self::validateGroupScoreboardAndContest(
             $r['group_alias'],
             $r->identity,
@@ -98,7 +98,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiRemoveContest(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $contestScoreboard = self::validateGroupScoreboardAndContest(
             $r['group_alias'],
             $r->identity,
@@ -128,7 +128,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiDetails(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $scoreboard = self::validateGroupScoreboard(
             $r['group_alias'],
             $r->identity,
@@ -198,7 +198,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * Details of a scoreboard
      */
     public static function apiList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $group = \OmegaUp\Controllers\Group::validateGroup($r['group_alias'], $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(

@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  * BadgesController
@@ -39,7 +39,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiMyList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         return [
             'status' => 'ok',
             'badges' => is_null($r->user) ?
@@ -55,6 +55,10 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUserList(\OmegaUp\Request $r) {
+        \OmegaUp\Validators::validateValidUsername(
+            $r['target_username'],
+            'target_username'
+        );
         $user = \OmegaUp\DAO\Users::FindByUsername($r['target_username']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -73,7 +77,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         \OmegaUp\Validators::validateValidAlias($r['badge_alias'], 'badge_alias');
         \OmegaUp\Validators::validateBadgeExists($r['badge_alias'], self::getAllBadges());
         return [
