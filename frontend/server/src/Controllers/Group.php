@@ -167,7 +167,6 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      * @return array{status: string, groups: array{alias: string, create_time: int, description: string, name: string}[]}
-     * @psalm-suppress PossiblyNullArgument
      */
     public static function apiMyList(\OmegaUp\Request $r) : array {
         $r->ensureMainUserIdentity();
