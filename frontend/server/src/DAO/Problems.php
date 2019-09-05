@@ -497,7 +497,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array{alias: string, title: string, username: string}[]
      */
     final public static function getSolvedProblemsByUsersOfCourse(
         string $courseAlias
@@ -549,6 +549,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 i.username ASC,
                 rp.problem_id DESC;";
 
+        /** @var array{alias: string, title: string, username: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $courseAlias]
@@ -556,7 +557,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array{alias: string, title: string, username: string}[]
      */
     final public static function getUnsolvedProblemsByUsersOfCourse(
         string $courseAlias
@@ -614,6 +615,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 i.username ASC,
                 rp.problem_id DESC;';
 
+        /** @var array{alias: string, title: string, username: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $courseAlias]

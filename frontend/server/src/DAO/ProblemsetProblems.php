@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
-     * @return array<mixed, array{name: mixed, description: mixed, start_time: mixed, finish_time: mixed, order: mixed, max_points: mixed, assignment_alias: mixed, assignment_type: mixed, publish_time_delay: mixed, problems: array<empty, empty>}>
+     * @return array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problems: array{problem_alias: string, problem_id: int}[]}[]
      */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
@@ -73,6 +73,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             ]);
         }
 
+        /** @var array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problems: array{problem_alias: string, problem_id: int}[]}[] $result */
         return $result;
     }
 

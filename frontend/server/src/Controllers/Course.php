@@ -2031,15 +2031,17 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     public static function apiListSolvedProblems(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
         $course = self::validateCourseExists($r['course_alias']);
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
-        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse($r['course_alias']);
+        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+            $r['course_alias']
+        );
         $userProblems = [];
         foreach ($solvedProblems as $problem) {
-            /** @var string $problem['username'] */
             $userProblems[$problem['username']][] = $problem;
         }
         return ['status' => 'ok', 'user_problems' => $userProblems];
@@ -2049,24 +2051,22 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Get Problems unsolved by users of a course
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, user_problems: array<mixed, array<int, array<string, mixed>>>}
+     * @return array{status: string, user_problems: array<array-key, array{alias: string, title: string, username: string}>[]}
      */
     public static function apiListUnsolvedProblems(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();
-        /** @var string $courseAlias */
-        $courseAlias = $r['course_alias'];
-        $course = self::validateCourseExists($courseAlias);
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
+        $course = self::validateCourseExists($r['course_alias']);
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
         $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
-            $courseAlias
+            $r['course_alias']
         );
         $userProblems = [];
         foreach ($unsolvedProblems as $problem) {
-            /** @var string $problem['username'] */
             $userProblems[$problem['username']][] = $problem;
         }
         return ['status' => 'ok', 'user_problems' => $userProblems];
