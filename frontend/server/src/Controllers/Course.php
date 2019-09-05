@@ -584,6 +584,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $points = (int)$r['points'];
         }
 
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
         self::addProblemToAssignment(
             $r['problem_alias'],
             $problemset->problemset_id,

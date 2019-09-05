@@ -1348,6 +1348,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\PreconditionFailedException('contestAddproblemTooManyProblems');
         }
 
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
         [$masterCommit, $currentVersion] = \OmegaUp\Controllers\Problem::resolveCommit(
             $params['problem'],
             $r['commit']

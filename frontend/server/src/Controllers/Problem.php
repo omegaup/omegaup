@@ -1654,7 +1654,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-        \OmegaUp\Validators::validateStringNonEmpty($r['commit'], 'commit');
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
         // \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE is not allowed here because
         // it would not make any sense!
         \OmegaUp\Validators::validateInEnum(
@@ -1810,7 +1810,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?string $commit
     ) : array {
         $masterCommit = null;
-        if (empty($commit)) {
+        if (is_null($commit)) {
             $masterCommit = (new \OmegaUp\ProblemArtifacts($problem->alias, 'published'))->commit();
         } else {
             foreach ((new \OmegaUp\ProblemArtifacts($problem->alias, 'master'))->log() as $logEntry) {
