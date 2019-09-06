@@ -12,14 +12,18 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class UserRank extends \OmegaUp\DAO\Base\UserRank {
+    /**
+     * @param null|string|int $value
+     * @return array{rank: array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[], total: int}
+     */
     public static function getFilteredRank(
-        $page = null,
-        $colsPerPage = null,
-        $order = null,
-        $orderType = 'ASC',
-        $filteredBy = null,
+        int $page,
+        int $colsPerPage,
+        ?string $order = null,
+        string $orderType = 'ASC',
+        ?string $filteredBy = null,
         $value = null
-    ) {
+    ) : array {
         $sql = '
               SELECT
                 `ur`.`user_id`,
@@ -46,7 +50,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $sql_from = '
               FROM
                 `User_Rank` `ur`';
-        if ($filteredBy == 'state') {
+        if ($filteredBy == 'state' && is_string($value)) {
             $values = explode('-', $value);
             $params[] = $values[0];
             $params[] = $values[1];
@@ -58,23 +62,23 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         if (!is_null($order)) {
             $sql_from .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape($order) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
-        $sql_limit = '';
-        $params_limit = [];
-        if (!is_null($page)) {
-            $params_limit[] = (($page - 1) * $colsPerPage); // Offset
-            $params_limit[] = (int)$colsPerPage;
-            $sql_limit = ' LIMIT ?, ?';
-        }
+        $paramsLimit = [
+            (($page - 1) * intval($colsPerPage)), // Offset
+            intval($colsPerPage),
+        ];
+        $sqlLimit = ' LIMIT ?, ?';
         // Get total rows
-        $total_rows = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql_count . $sql_from, $params);
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql_count . $sql_from, $params) ?? 0;
 
-        $params = array_merge($params, $params_limit);
+        $params = array_merge($params, $paramsLimit);
 
         // Get rows
-        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql . $sql_from . $sql_limit, $params);
+        /** @var array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[] */
+        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql . $sql_from . $sqlLimit, $params);
         return [
-            'rows' => $allData,
-            'total' => $total_rows
+            'rank' => $allData,
+            'total' => $totalRows
         ];
     }
 }

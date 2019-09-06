@@ -364,7 +364,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $response['userinfo']['rankinfo'] = [];
         } else {
             $response['userinfo']['rankinfo'] =
-                \OmegaUp\Controllers\User::getRankByProblemsSolved($r, $identity);
+                \OmegaUp\Controllers\User::getRankByProblemsSolved(
+                    $r,
+                    '',
+                    1,
+                    100,
+                    $identity
+                );
         }
 
         // Do not leak plain emails in case the request is for a profile other than

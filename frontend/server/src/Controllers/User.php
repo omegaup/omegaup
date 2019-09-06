@@ -1766,52 +1766,49 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         \OmegaUp\Validators::validateInEnum($r['filter'], 'filter', ['', 'country', 'state', 'school'], false);
 
-        // Defaults for offset and rowcount
-        if (null == $r['offset']) {
-            $r['offset'] = 1;
-        }
-        if (null == $r['rowcount']) {
-            $r['rowcount'] = 100;
-        }
-
-        return self::getRankByProblemsSolved($r, $identity);
+        return self::getRankByProblemsSolved(
+            $r,
+            $r['filter'] ?? '',
+            $r['offset'] ?? 1,
+            $r['rowcount'] ?? 100,
+            $identity
+        );
     }
 
     /**
      * Get rank by problems solved logic. It has its own func so
      * it can be accesed internally without authentication
-     *
-     * @param \OmegaUp\Request $r
      */
     public static function getRankByProblemsSolved(
         \OmegaUp\Request $r,
+        string $filteredBy,
+        int $offset,
+        int $rowCount,
         ?\OmegaUp\DAO\VO\Identities $identity
     ) : array {
         if (is_null($identity)) {
-            $selectedFilter = self::getSelectedFilter($r);
-            $rankCacheName = "{$r['offset']}-{$r['rowcount']}-{$r['filter']}-{$selectedFilter['value']}";
+            $selectedFilter = self::getSelectedFilter($r, $filteredBy);
+            $rankCacheName = "{$offset}-{$rowCount}-{$filteredBy}-{$selectedFilter['value']}";
             $response = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::PROBLEMS_SOLVED_RANK,
                 $rankCacheName,
-                function () use ($r) {
-                    $response = [];
-                    $response['rank'] = [];
-                    $response['total'] = 0;
-                    $selectedFilter = self::getSelectedFilter($r);
-                    $userRankEntries = \OmegaUp\DAO\UserRank::getFilteredRank(
-                        $r['offset'],
-                        $r['rowcount'],
+                /**
+                 * @return array{rank: array{user_id: int, rank: int, problems_solved: int, score: float, username: string, name: ?string, country_id: ?string, classname: string}[], total: int}
+                 */
+                function () use ($r, $filteredBy, $offset, $rowCount) : array {
+                    $response = [
+                        'rank' => [],
+                        'total' => 0,
+                    ];
+                    $selectedFilter = self::getSelectedFilter($r, $filteredBy);
+                    return \OmegaUp\DAO\UserRank::getFilteredRank(
+                        $offset,
+                        $rowCount,
                         'rank',
                         'ASC',
                         $selectedFilter['filteredBy'],
                         $selectedFilter['value']
                     );
-
-                    if (!is_null($userRankEntries)) {
-                        $response['rank'] = $userRankEntries['rows'];
-                        $response['total'] = $userRankEntries['total'];
-                    }
-                    return $response;
                 },
                 APC_USER_CACHE_USER_RANK_TIMEOUT
             );
@@ -2253,13 +2250,18 @@ class User extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    private static function getSelectedFilter($r) {
+    /**
+     * @return array{filteredBy: ?string, value: null|string|int}
+     */
+    private static function getSelectedFilter(
+        \OmegaUp\Request $r,
+        string $filteredBy
+    ) : array {
         $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
         if (!$session['valid']) {
             return ['filteredBy' => null, 'value' => null];
         }
         $identity = $session['identity'];
-        $filteredBy = $r['filter'];
         if ($filteredBy == 'country') {
             return [
                 'filteredBy' => $filteredBy,
@@ -2523,8 +2525,13 @@ class User extends \OmegaUp\Controllers\Controller {
         return ['payload' => $response];
     }
 
+    /*
+     * @param array{time: string, username: string, country_id: string, email: string}[] $coders
+     * @return array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}[]
+     */
     private static function processCodersList(array $coders) : array {
         $response = [];
+        /** @var array{time: string, username: string, country_id: string, email: string} $coder */
         foreach ($coders as $coder) {
             $userInfo = \OmegaUp\DAO\Users::FindByUsername($coder['username']);
             if (is_null($userInfo)) {
