@@ -135,7 +135,10 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
-    public static function getRankingClassName($user_id) {
+    public static function getRankingClassName(?int $userId) : string {
+        if (is_null($userId)) {
+            return 'user-rank-unranked';
+        }
         $sql = 'SELECT
                     `urc`.`classname`
                 FROM
@@ -153,7 +156,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     `urc`.percentile ASC
                 LIMIT
                     1;';
-        $params = [$user_id];
+        $params = [$userId];
+        /** @var string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) ?? 'user-rank-unranked';
     }
 
