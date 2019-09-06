@@ -23,6 +23,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing.
+            /** @var null $r->identity */
         }
 
         $contests = [];

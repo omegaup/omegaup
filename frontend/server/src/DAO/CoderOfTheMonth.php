@@ -98,11 +98,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all first coders of the month
-     *
-     * @static
-     * @return Array
+     * @return array{time: string, username: string, country_id: string, email: string}[]
      */
-    final public static function getCodersOfTheMonth() {
+    final public static function getCodersOfTheMonth() : array {
         $sql = '
           SELECT
             cm.time, u.username, COALESCE(i.country_id, "xx") AS country_id, e.email
@@ -120,21 +118,15 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.time DESC
         ';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
-        $allData = [];
-        foreach ($rs as $row) {
-            $allData[] = $row;
-        }
-        return $allData;
+        /** @var array{time: string, username: string, country_id: string, email: string}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
     /**
      * Get all coder of the months based on month
-     *
-     * @params string (date) $firstDay
-     * @return \OmegaUp\DAO\VO\Users
+     * @return array{time: string, username: string, country_id: string, email: string}[]
      */
-    final public static function getMonthlyList($firstDay) {
+    final public static function getMonthlyList(string $firstDay) : array {
         $date = date('Y-m-01', strtotime($firstDay));
         $sql = '
           SELECT
@@ -157,6 +149,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.time DESC
           LIMIT 100
         ';
+        /** @var array{time: string, username: string, country_id: string, email: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->getAll($sql, [$date]);
     }
 
