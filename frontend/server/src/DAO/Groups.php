@@ -56,7 +56,6 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         int $userId,
         int $identityId
     ) : array {
-        /** @var string */
         $sql = '
             SELECT
                 DISTINCT g.alias,

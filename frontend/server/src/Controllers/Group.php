@@ -171,6 +171,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     public static function apiMyList(\OmegaUp\Request $r) : array {
         $r->ensureMainUserIdentity();
 
+        /** @psalm-suppress PossiblyNullArgument */
         $groups = \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
             $r->user->user_id,
             $r->identity->identity_id
