@@ -93,6 +93,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDetails(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists

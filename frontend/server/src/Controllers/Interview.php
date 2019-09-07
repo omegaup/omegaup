@@ -4,6 +4,7 @@
 
 class Interview extends \OmegaUp\Controllers\Controller {
     private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
+        $r->ensureMainUserIdentity();
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
@@ -23,7 +24,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         self::validateCreateOrUpdate($r, false);
 
@@ -227,7 +228,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiList(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $interviews = null;
 

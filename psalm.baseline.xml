@@ -130,9 +130,7 @@
     <MixedReturnStatement occurrences="1">
       <code>$response</code>
     </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="4">
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
+    <PossiblyNullArgument occurrences="3">
       <code>$clarification-&gt;problem_id</code>
       <code>$clarification-&gt;author_id</code>
     </PossiblyNullArgument>
@@ -439,62 +437,26 @@
       <code>$result['requestsUserInformation']</code>
     </PossiblyFalseArgument>
     <PossiblyNullArgument occurrences="28">
-      <code>$r-&gt;identity</code>
       <code>$session['identity']</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$contest-&gt;acl_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>$contest-&gt;problemset_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$originalContest-&gt;problemset_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$problemset</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$problemset</code>
-      <code>$r-&gt;identity</code>
       <code>$problemsetProblem-&gt;version</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$problemset</code>
       <code>$contest-&gt;contest_id</code>
       <code>$originalContest</code>
-      <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$problemset</code>
-      <code>$r-&gt;identity</code>
       <code>$problemsetIdentity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$contest-&gt;problemset_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess occurrences="7">
       <code>$session['user']</code>
@@ -525,26 +487,19 @@
       <code>$problemsetIdentity</code>
     </PossiblyNullPropertyAssignment>
     <PossiblyNullPropertyFetch occurrences="17">
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
       <code>$identity-&gt;country_id</code>
       <code>$identity-&gt;state_id</code>
       <code>$identity-&gt;school_id</code>
       <code>$identity-&gt;language_id</code>
       <code>$current_ses['identity']-&gt;identity_id</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$original_contest-&gt;alias</code>
       <code>$original_contest-&gt;problemset_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>\OmegaUp\DAO\Users::getByPK($acl-&gt;owner_id)-&gt;username</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
       <code>$contest-&gt;start_time</code>
       <code>$contest-&gt;finish_time</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$targetIdentity-&gt;identity_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
       <code>$targetIdentity-&gt;username</code>
     </PossiblyNullPropertyFetch>
     <TypeDoesNotContainNull occurrences="1">
@@ -846,47 +801,15 @@
       <code>$result</code>
     </MixedReturnStatement>
     <PossiblyNullArgument occurrences="12">
-      <code>$r-&gt;identity</code>
       <code>$course-&gt;group_id</code>
       <code>$problemset-&gt;problemset_id</code>
-      <code>$r-&gt;identity</code>
       <code>$points</code>
       <code>$order</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$course-&gt;course_id</code>
       <code>$course-&gt;group_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$course-&gt;course_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$course-&gt;group_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$acl-&gt;owner_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess occurrences="1">
       <code>\OmegaUp\Controllers\Session::apiCurrentSession($r)['session']['identity']</code>
@@ -895,7 +818,6 @@
       <code>$resolvedUser-&gt;user_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>\OmegaUp\DAO\Users::getByPK($acl-&gt;owner_id)-&gt;username</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
     <RedundantCondition occurrences="1"/>
     <TypeDoesNotContainNull occurrences="1">
@@ -1116,7 +1038,6 @@
     <MixedArgument occurrences="7">
       <code>$r</code>
       <code>\OmegaUp\Controllers\User::makeUsernameFromEmail($r['usernameOrEmail'])</code>
-      <code>$r-&gt;identity</code>
       <code>$r['interview']</code>
       <code>$r['user']-&gt;main_email_id</code>
       <code>$interview</code>
@@ -1176,15 +1097,10 @@
       <code>$r['interview']-&gt;alias</code>
       <code>$r['interview']-&gt;alias</code>
       <code>$r['interview']-&gt;alias</code>
-      <code>$r-&gt;identity</code>
       <code>$r['interview']-&gt;problemset_id</code>
       <code>$r['user']-&gt;main_identity_id</code>
       <code>$r['user']-&gt;main_email_id</code>
     </MixedPropertyFetch>
-    <PossiblyNullArgument occurrences="1">
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-    </PossiblyNullArgument>
     <PossiblyNullOperand occurrences="5">
       <code>\OmegaUp\Translations::getInstance()-&gt;get('interviewInvitationEmailBodyIntro')</code>
       <code>\OmegaUp\Translations::getInstance()-&gt;get('interviewEmailDraft')</code>
@@ -1192,11 +1108,6 @@
       <code>\OmegaUp\Translations::getInstance()-&gt;get('loginPassword')</code>
       <code>\OmegaUp\Translations::getInstance()-&gt;get('interviewInvitationEmailBodyIntro')</code>
     </PossiblyNullOperand>
-    <PossiblyNullPropertyFetch occurrences="3">
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-    </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/server/src/Controllers/Notification.php">
     <InvalidPropertyAssignmentValue occurrences="1">
@@ -1554,47 +1465,15 @@
       <code>null</code>
     </NullableReturnStatement>
     <PossiblyNullArgument occurrences="22">
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
       <code>$problem-&gt;alias</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$response['contest']-&gt;problemset_id</code>
-      <code>$r-&gt;identity-&gt;username</code>
-      <code>$r-&gt;identity</code>
       <code>$problem-&gt;acl_id</code>
       <code>$acl-&gt;owner_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
       <code>$problem-&gt;alias</code>
-      <code>$r-&gt;identity</code>
       <code>$problem-&gt;alias</code>
       <code>((new \OmegaUp\ProblemArtifacts($problem-&gt;alias, 'published'))-&gt;commit())['commit']</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
       <code>$problem-&gt;current_version</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$problem-&gt;alias</code>
-      <code>$r-&gt;identity</code>
       <code>$problem-&gt;alias</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess occurrences="2">
@@ -1605,7 +1484,6 @@
       <code>$problemDeployer-&gt;publishedCommit</code>
     </PossiblyNullPropertyAssignmentValue>
     <PossiblyNullPropertyFetch occurrences="4">
-      <code>$r-&gt;user-&gt;username</code>
       <code>$acl-&gt;owner_id</code>
       <code>$problemsetter-&gt;username</code>
       <code>$problemsetter-&gt;name</code>
@@ -1763,18 +1641,8 @@
     <PossiblyNullArgument occurrences="4">
       <code>$qualityReviewerGroup</code>
       <code>$qualitynominationlog-&gt;rationale</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="4">
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;username</code>
-    </PossiblyNullPropertyFetch>
+    <PossiblyNullPropertyFetch occurrences="4"/>
     <RedundantCondition occurrences="1">
       <code>is_array($contents['tags'])</code>
     </RedundantCondition>
@@ -1798,7 +1666,6 @@
       <code>$r['password']</code>
       <code>$user-&gt;main_identity_id</code>
       <code>$user</code>
-      <code>$r-&gt;identity</code>
       <code>$reset_token</code>
       <code>$password</code>
     </MixedArgument>
@@ -1842,7 +1709,6 @@
       <code>$user-&gt;main_identity_id</code>
       <code>$user-&gt;password</code>
       <code>$user-&gt;verified</code>
-      <code>$r-&gt;identity</code>
       <code>$user-&gt;reset_sent_at</code>
       <code>$user-&gt;reset_digest</code>
       <code>$user-&gt;reset_sent_at</code>
@@ -2015,32 +1881,14 @@
       <code>$filtered</code>
       <code>$response</code>
     </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="10">
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
+    <PossiblyNullArgument occurrences="7">
       <code>$run-&gt;submission_id</code>
       <code>$submission-&gt;problem_id</code>
       <code>$problem-&gt;alias</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$submission-&gt;guid</code>
-      <code>$r-&gt;identity</code>
       <code>$submission-&gt;current_run_id</code>
       <code>$submission-&gt;problem_id</code>
-      <code>$r-&gt;identity</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="3">
-      <code>$r-&gt;identity-&gt;username</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
-    </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/server/src/Controllers/School.php">
     <DocblockTypeContradiction occurrences="1">
@@ -2212,12 +2060,6 @@
     </MixedPropertyFetch>
   </file>
   <file src="frontend/server/src/Controllers/User.php">
-    <DocblockTypeContradiction occurrences="1">
-      <code>is_null($r-&gt;identity)</code>
-    </DocblockTypeContradiction>
-    <InvalidArgument occurrences="1">
-      <code>$r-&gt;identity-&gt;identity_id</code>
-    </InvalidArgument>
     <InvalidNullableReturnType occurrences="1">
       <code>Array</code>
     </InvalidNullableReturnType>
@@ -2496,28 +2338,10 @@
       <code>$user-&gt;main_identity_id</code>
       <code>$user</code>
       <code>$identity</code>
-      <code>$r-&gt;identity</code>
       <code>$user-&gt;username</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
       <code>$user</code>
       <code>$identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;main_email_id</code>
       <code>$email</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity</code>
-      <code>$r-&gt;user</code>
     </PossiblyNullArgument>
     <PossiblyNullArrayAccess occurrences="6">
       <code>$session['identity']</code>
@@ -2536,56 +2360,15 @@
     </PossiblyNullOperand>
     <PossiblyNullPropertyAssignment occurrences="5">
       <code>$identity</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;user</code>
       <code>$email</code>
-      <code>$r-&gt;user</code>
-      <code>$r-&gt;user</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="39">
+    <PossiblyNullPropertyFetch occurrences="37">
       <code>$email-&gt;email</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;user-&gt;main_email_id</code>
-      <code>$r-&gt;user-&gt;verified</code>
-      <code>$r-&gt;user-&gt;verification_id</code>
-      <code>$r-&gt;user-&gt;username</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$identity-&gt;country_id</code>
       <code>$identity-&gt;country_id</code>
       <code>$identity-&gt;state_id</code>
       <code>$identity-&gt;school_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
-    <RedundantConditionGivenDocblockType occurrences="1"/>
     <UndefinedDocblockClass occurrences="11">
       <code>type</code>
       <code>$response</code>
