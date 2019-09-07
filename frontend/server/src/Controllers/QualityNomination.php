@@ -74,7 +74,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         /**
-         * @var null|array{tags: null|int|float|string|array} $contents
+         * @var null|array{tags: mixed} $contents
          */
         $contents = json_decode($r['contents'], true /*assoc*/);
         if (!is_array($contents)) {
@@ -138,7 +138,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
             // Tags must be strings.
             if (isset($contents['tags']) && is_array($contents['tags'])) {
-                /** @var string|array|int|float $tag */
+                /** @var mixed $tag */
                 foreach ($contents['tags'] as &$tag) {
                     if (!is_string($tag)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
@@ -157,7 +157,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
-            /** @var string|array|int|float $tag */
+            /** @var mixed $tag */
             foreach ($contents['tags'] as &$tag) {
                 if (!is_string($tag)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
@@ -171,7 +171,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             /**
              * Statements must be a dictionary of language => { 'markdown': string }.
              * @var string $language
-             * @var null|array{markdown: null|int|float|array|string} $statement
+             * @var null|array{markdown: null|mixed} $statement
              */
             foreach ($contents['statements'] as $language => $statement) {
                 if (!is_array($statement) || empty($language)
