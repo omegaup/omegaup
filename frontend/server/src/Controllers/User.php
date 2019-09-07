@@ -362,7 +362,6 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
 
         $hashedPassword = null;
-        /** @var \OmegaUp\DAO\VO\Users */
         $user = $r->user;
         if (isset($r['username']) && $r['username'] != $user->username) {
             // This is usable only in tests.
@@ -1330,7 +1329,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiInterviewStats(\OmegaUp\Request $r) {
-        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['interview'], 'interview');
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
@@ -1341,7 +1340,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         // Only admins can view interview details
-        if (!\OmegaUp\Authorization::isContestAdmin($r->identity->identity_id, $contest)) {
+        if (!\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -1526,9 +1525,9 @@ class User extends \OmegaUp\Controllers\Controller {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         }
 
-        if ((is_null($r->identity) || $r->identity->username != $identity->username)
-            && (is_null($r->identity) || (!is_null($r->identity) &&
-                !\OmegaUp\Authorization::isSystemAdmin($r->identity)))
+        if ((is_null($r->identity)
+             || ($r->identity->username != $identity->username
+                 && !\OmegaUp\Authorization::isSystemAdmin($r->identity)))
             && (!is_null($user) && $user->is_private == 1)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userProfileIsPrivate');
@@ -2343,7 +2342,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiAssociateIdentity(\OmegaUp\Request $r) {
         global $experiments;
         $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
         \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
@@ -2367,7 +2366,6 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'password');
         }
 
-        /** @var int $r->user->user_id */
         \OmegaUp\DAO\Identities::associateIdentityWithUser($r->user->user_id, $identity->identity_id);
 
         return ['status' => 'ok'];
@@ -2397,7 +2395,6 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
 
         $token = \OmegaUp\SecurityTools::randomHexString(40);
-        /** @var \OmegaUp\DAO\VO\Users $r->user */
         $r->user->git_token = \OmegaUp\SecurityTools::hashString($token);
         \OmegaUp\DAO\Users::update($r->user);
 

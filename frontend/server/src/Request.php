@@ -156,8 +156,12 @@ class Request extends \ArrayObject {
      * @throws \OmegaUp\Exceptions\UnauthorizedException
      * @psalm-assert !null $this->identity
      * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->username
      */
     public function ensureIdentity() : void {
+        if (!is_null($this->user) || !is_null($this->identity)) {
+            return;
+        }
         $this->user = null;
         $this->identity = null;
         $session = \OmegaUp\Controllers\Session::apiCurrentSession($this)['session'];
@@ -178,11 +182,16 @@ class Request extends \ArrayObject {
      * @psalm-assert !null $this->identity
      * @psalm-assert !null $this->identity->identity_id
      * @psalm-assert !null $this->identity->user_id
+     * @psalm-assert !null $this->identity->username
      * @psalm-assert !null $this->user
-     * @psalm-assert !null $this->user->user_id
      * @psalm-assert !null $this->user->main_identity_id
+     * @psalm-assert !null $this->user->user_id
+     * @psalm-assert !null $this->user->username
      */
     public function ensureMainUserIdentity() : void {
+        if (!is_null($this->user) && !is_null($this->identity)) {
+            return;
+        }
         $this->ensureIdentity();
         if (is_null($this->user)
             || $this->user->main_identity_id != $this->identity->identity_id
