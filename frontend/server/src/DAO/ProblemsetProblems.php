@@ -48,10 +48,11 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         $val = [$course->alias];
 
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
-
+        /** @var array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int}[] $result */
         $result = [];
 
         foreach ($problemsAssignments as $assignment) {
+            /** @var string $assignment['assignment_alias'] */
             $assignmentAlias = $assignment['assignment_alias'];
             if (!isset($result[$assignmentAlias])) {
                 $result[$assignmentAlias] = [
@@ -67,13 +68,12 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     'problems' => [],
                 ];
             }
-            array_push($result[$assignmentAlias]['problems'], [
+            $result[$assignmentAlias]['problems'][] = [
                 'problem_alias' => $assignment['problem_alias'],
                 'problem_id' => $assignment['problem_id'],
-            ]);
+            ];
         }
 
-        /** @var array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problems: array{problem_alias: string, problem_id: int}[]}[] $result */
         return $result;
     }
 

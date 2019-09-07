@@ -223,8 +223,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         self::validateClone($r);
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
-        /** @var int $offset */
-        $offset = round($r['start_time']) - $originalCourse->start_time;
+        $offset = intval(round($r['start_time']) - $originalCourse->start_time);
 
         \OmegaUp\DAO\DAO::transBegin();
 
@@ -2051,7 +2050,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Get Problems unsolved by users of a course
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, user_problems: array<array-key, array{alias: string, title: string, username: string}>[]}
+     * @return array{status: string, user_problems: array<string, array<int, array{alias: string, title: string, username: string}>>}
      */
     public static function apiListUnsolvedProblems(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();

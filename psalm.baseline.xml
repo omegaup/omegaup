@@ -3246,13 +3246,6 @@
       <code>getByProblemset</code>
       <code>getMaxPointsByProblemset</code>
     </MissingReturnType>
-    <MixedArrayOffset occurrences="2">
-      <code>$result[$assignmentAlias]</code>
-      <code>$result[$assignmentAlias]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="1">
-      <code>$assignmentAlias</code>
-    </MixedAssignment>
     <PossiblyNullArgument occurrences="2">
       <code>$user-&gt;main_identity_id</code>
       <code>$identity</code>
