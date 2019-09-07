@@ -155,6 +155,7 @@ class Request extends \ArrayObject {
      *
      * @throws \OmegaUp\Exceptions\UnauthorizedException
      * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
      */
     public function ensureIdentity() : void {
         $this->user = null;
@@ -175,7 +176,11 @@ class Request extends \ArrayObject {
      *
      * @throws \OmegaUp\Exceptions\UnauthorizedException
      * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->user_id
      * @psalm-assert !null $this->user
+     * @psalm-assert !null $this->user->user_id
+     * @psalm-assert !null $this->user->main_identity_id
      */
     public function ensureMainUserIdentity() : void {
         $this->ensureIdentity();

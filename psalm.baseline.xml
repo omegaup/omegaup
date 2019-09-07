@@ -438,23 +438,18 @@
     <PossiblyFalseArgument occurrences="1">
       <code>$result['requestsUserInformation']</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="33">
-      <code>$r-&gt;identity-&gt;identity_id</code>
+    <PossiblyNullArgument occurrences="28">
       <code>$r-&gt;identity</code>
       <code>$session['identity']</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$contest-&gt;acl_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>$contest-&gt;problemset_id</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
-      <code>$r-&gt;user-&gt;user_id</code>
       <code>$originalContest-&gt;problemset_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
@@ -850,7 +845,7 @@
       <code>$course</code>
       <code>$result</code>
     </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="15">
+    <PossiblyNullArgument occurrences="12">
       <code>$r-&gt;identity</code>
       <code>$course-&gt;group_id</code>
       <code>$problemset-&gt;problemset_id</code>
@@ -874,9 +869,6 @@
       <code>$r-&gt;identity</code>
       <code>$course-&gt;course_id</code>
       <code>$r-&gt;identity</code>
-      <code>$resolvedIdentity-&gt;identity_id</code>
-      <code>$resolvedIdentity-&gt;identity_id</code>
-      <code>$resolvedIdentity-&gt;identity_id</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
       <code>$r-&gt;identity</code>
@@ -960,10 +952,6 @@
       <code>$group-&gt;name</code>
       <code>$group-&gt;alias</code>
     </MixedPropertyFetch>
-    <PossiblyNullPropertyFetch occurrences="1">
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-    </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/server/src/Controllers/GroupScoreboard.php">
     <MissingReturnType occurrences="4">
@@ -1565,7 +1553,7 @@
     <NullableReturnStatement occurrences="1">
       <code>null</code>
     </NullableReturnStatement>
-    <PossiblyNullArgument occurrences="23">
+    <PossiblyNullArgument occurrences="22">
       <code>$r-&gt;identity</code>
       <code>$r-&gt;user</code>
       <code>$r-&gt;identity</code>
@@ -1772,7 +1760,7 @@
       <code>null</code>
       <code>null</code>
     </NullArgument>
-    <PossiblyNullArgument occurrences="5">
+    <PossiblyNullArgument occurrences="4">
       <code>$qualityReviewerGroup</code>
       <code>$qualitynominationlog-&gt;rationale</code>
       <code>$r-&gt;identity</code>
