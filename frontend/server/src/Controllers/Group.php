@@ -50,7 +50,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
@@ -171,7 +171,6 @@ class Group extends \OmegaUp\Controllers\Controller {
     public static function apiMyList(\OmegaUp\Request $r) : array {
         $r->ensureMainUserIdentity();
 
-        /** @psalm-suppress PossiblyNullArgument */
         $groups = \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
             $r->user->user_id,
             $r->identity->identity_id
