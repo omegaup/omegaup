@@ -254,8 +254,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'alias' => $assignmentProblems['assignment_alias'],
                     'publish_time_delay' => $assignmentProblems['publish_time_delay'],
                     'assignment_type' => $assignmentProblems['assignment_type'],
-                    'start_time' => (int)$assignmentProblems['start_time'] + $offset,
-                    'finish_time' => (int)$assignmentProblems['finish_time'] + $offset,
+                    'start_time' => intval($assignmentProblems['start_time']) + $offset,
+                    'finish_time' => intval($assignmentProblems['finish_time']) + $offset,
                     'order' => $assignmentProblems['order'],
                     'max_points' => $assignmentProblems['max_points'],
                 ]));
