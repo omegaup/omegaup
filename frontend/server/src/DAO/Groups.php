@@ -56,14 +56,15 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         int $userId,
         int $identityId
     ) : array {
+        // group_id is only necessary to make ORDER BY work, because
+        // ONLY_FULL_GROUP_BY mode is enabled.
         $sql = '
             SELECT
                 DISTINCT g.alias,
                 g.create_time,
                 g.description,
                 g.name,
-                g.group_id # This column is only necesary to make ORDER BY works
-                           # because ONLY_FULL_GROUP_BY mode is enabled
+                g.group_id
             FROM
                 Groups g
             INNER JOIN
