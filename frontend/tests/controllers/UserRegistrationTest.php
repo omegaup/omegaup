@@ -23,10 +23,9 @@ class UserRegistrationTest extends OmegaupTestCase {
         $this->assertNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt.'2'));
 
         // Create collision
-        $c = new \OmegaUp\Controllers\Session();
-        $c->LoginViaGoogle('A'.$salt.'@isp1.com');
-        $c->LoginViaGoogle('A'.$salt.'@isp2.com');
-        $c->LoginViaGoogle('A'.$salt.'@isp3.com');
+        \OmegaUp\Controllers\Session::LoginViaGoogle('A'.$salt.'@isp1.com');
+        \OmegaUp\Controllers\Session::LoginViaGoogle('A'.$salt.'@isp2.com');
+        \OmegaUp\Controllers\Session::LoginViaGoogle('A'.$salt.'@isp3.com');
 
         $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt));
         $this->assertNotNull(\OmegaUp\DAO\Users::FindByUsername('A'.$salt.'1'));
@@ -40,8 +39,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         $username = 'X'.\OmegaUp\Time::get();
         $password = Utils::CreateRandomString();
 
-        $c = new \OmegaUp\Controllers\Session();
-        $c->LoginViaGoogle($username.'@isp.com');
+        \OmegaUp\Controllers\Session::LoginViaGoogle($username.'@isp.com');
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
 
         // Users logged via google, facebook, linkedin does not have password
@@ -73,8 +71,7 @@ class UserRegistrationTest extends OmegaupTestCase {
         $username = 'Y'.\OmegaUp\Time::get();
         $email = $username.'@isp.com';
 
-        $c = new \OmegaUp\Controllers\Session();
-        $c->LoginViaGoogle($email);
+        \OmegaUp\Controllers\Session::LoginViaGoogle($email);
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 

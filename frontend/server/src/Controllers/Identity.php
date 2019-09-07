@@ -21,7 +21,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        $identity = \OmegaUp\DAO\Identities::FindByEmail($userOrEmail);
+        $identity = \OmegaUp\DAO\Identities::findByEmail($userOrEmail);
         if (!is_null($identity)) {
             return $identity;
         }

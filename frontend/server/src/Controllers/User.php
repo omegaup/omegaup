@@ -35,11 +35,10 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Create a User API
      *
-     * @param \OmegaUp\Request $r
-     * @return array
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
+     * @return array{status: string, username: string}
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) : array {
         // Validate request
         \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
 
@@ -64,7 +63,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Does user or email already exists?
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
-        $userByEmail = \OmegaUp\DAO\Users::FindByEmail($r['email']);
+        $userByEmail = \OmegaUp\DAO\Users::findByEmail($r['email']);
 
         if (!is_null($userByEmail)) {
             if (!is_null($userByEmail->password)) {
@@ -76,7 +75,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     )) {
                     return [
                         'status' => 'ok',
-                        'username' => $user->username,
+                        'username' => strval($user->username),
                     ];
                 }
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('mailInUse');
@@ -98,7 +97,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
             return [
                 'status' => 'ok',
-                'username' => $user->username,
+                'username' => strval($user->username),
             ];
         }
 
@@ -213,7 +212,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'username' => $identity->username,
+            'username' => strval($identity->username),
         ];
     }
 
@@ -339,11 +338,9 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiLogin(\OmegaUp\Request $r) {
-        $sessionController = new \OmegaUp\Controllers\Session();
-
         return [
             'status' => 'ok',
-            'auth_token' => $sessionController->nativeLogin($r),
+            'auth_token' => \OmegaUp\Controllers\Session::nativeLogin($r),
         ];
     }
 
@@ -529,7 +526,7 @@ class User extends \OmegaUp\Controllers\Controller {
         if (!is_null($user)) {
             return $user;
         }
-        $user = \OmegaUp\DAO\Users::FindByEmail($userOrEmail);
+        $user = \OmegaUp\DAO\Users::findByEmail($userOrEmail);
         if (!is_null($user)) {
             return $user;
         }
@@ -2255,7 +2252,7 @@ class User extends \OmegaUp\Controllers\Controller {
         string $filteredBy
     ) : array {
         $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
-        if (!$session['valid']) {
+        if (is_null($session['identity'])) {
             return ['filteredBy' => null, 'value' => null];
         }
         $identity = $session['identity'];

@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Users extends \OmegaUp\DAO\Base\Users {
-    public static function FindByEmail($email) {
+    public static function findByEmail(string $email) : ?\OmegaUp\DAO\VO\Users {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -45,16 +45,18 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) > 0;
     }
 
-    public static function FindResetInfoByEmail($email) {
-        $user = self::FindByEmail($email);
+    /**
+     * @return null|array{reset_digest: ?string, reset_sent_at: ?int}
+     */
+    public static function FindResetInfoByEmail(string $email) : ?array {
+        $user = self::findByEmail($email);
         if (is_null($user)) {
             return null;
-        } else {
-            return [
-                'reset_digest'  => $user->reset_digest,
-                'reset_sent_at'     => $user->reset_sent_at
-            ];
         }
+        return [
+            'reset_digest' => $user->reset_digest,
+            'reset_sent_at' => $user->reset_sent_at
+        ];
     }
 
     public static function savePassword(\OmegaUp\DAO\VO\Users $Users) {
