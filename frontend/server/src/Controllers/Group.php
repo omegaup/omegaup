@@ -166,23 +166,21 @@ class Group extends \OmegaUp\Controllers\Controller {
      * Returns a list of groups by owner
      *
      * @param \OmegaUp\Request $r
+     * @return array{status: string, groups: array{alias: string, create_time: int, description: string, name: string}[]}
      */
-    public static function apiMyList(\OmegaUp\Request $r) {
+    public static function apiMyList(\OmegaUp\Request $r) : array {
         $r->ensureMainUserIdentity();
 
+        /** @psalm-suppress PossiblyNullArgument */
         $groups = \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
             $r->user->user_id,
             $r->identity->identity_id
         );
 
-        $response = [
+        return [
             'status' => 'ok',
-            'groups' => [],
+            'groups' => $groups,
         ];
-        foreach ($groups as $group) {
-            $response['groups'][] = $group->asArray();
-        }
-        return $response;
     }
 
     /**
