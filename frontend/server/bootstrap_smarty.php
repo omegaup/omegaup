@@ -28,7 +28,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 
     $identityRequest = new \OmegaUp\Request($_REQUEST);
     $session = \OmegaUp\Controllers\Session::apiCurrentSession($identityRequest)['session'];
-    if ($session['valid']) {
+    if (!is_null($session['identity'])) {
         $smarty->assign('LOGGED_IN', '1');
         \OmegaUp\UITools::$isLoggedIn = true;
 

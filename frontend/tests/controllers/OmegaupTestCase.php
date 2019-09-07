@@ -64,9 +64,8 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
     }
 
     public static function logout() {
-        $session = new \OmegaUp\Controllers\Session();
-        if ($session->currentSessionAvailable()) {
-            $session->invalidateCache();
+        if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
+            \OmegaUp\Controllers\Session::invalidateCache();
         }
         if (isset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
             unset($_COOKIE[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
@@ -74,7 +73,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
         if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])) {
             unset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
         }
-        $session->invalidateLocalCache();
+        \OmegaUp\Controllers\Session::invalidateLocalCache();
     }
 
     /**
