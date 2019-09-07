@@ -145,9 +145,3 @@ require_once('libs/third_party/log4php/src/main/php/Logger.php');
         ],
     ],
 ]);
-
-$session = \OmegaUp\Controllers\Session::apiCurrentSession(new \OmegaUp\Request($_REQUEST))['session'];
-$experiments = new \OmegaUp\Experiments(
-    $_REQUEST,
-    !is_null($session) ? $session['user'] : null
-);

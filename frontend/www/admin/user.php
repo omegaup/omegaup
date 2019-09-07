@@ -17,11 +17,11 @@ $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
 $roles = \OmegaUp\DAO\Roles::getAll();
 $systemExperiments = [];
 $defines = get_defined_constants(true)['user'];
-foreach ($experiments->getAllKnownExperiments() as $experiment) {
+foreach (\OmegaUp\Experiments::getInstance()->getAllKnownExperiments() as $experiment) {
     $systemExperiments[] = [
         'name' => $experiment,
         'hash' => \OmegaUp\Experiments::getExperimentHash($experiment),
-        'config' => $experiments->isEnabledByConfig($experiment, $defines),
+        'config' => \OmegaUp\Experiments::getInstance()->isEnabledByConfig($experiment, $defines),
     ];
 }
 

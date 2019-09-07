@@ -55,8 +55,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) : array {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -94,8 +93,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * Entry point for Create bulk Identities API
      */
     public static function apiBulkCreate(\OmegaUp\Request $r) : array {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -200,8 +198,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
 
@@ -237,8 +234,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiChangePassword(\OmegaUp\Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
 

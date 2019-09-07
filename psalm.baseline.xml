@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="dev-master@ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b">
-  <file src="frontend/server/bootstrap.php">
-    <MixedArgumentTypeCoercion occurrences="1">
-      <code>$_REQUEST</code>
-    </MixedArgumentTypeCoercion>
-  </file>
   <file src="frontend/server/bootstrap_smarty.php">
     <MixedArrayAccess occurrences="13">
       <code>$session['valid']</code>
@@ -990,12 +985,6 @@
       <code>type</code>
       <code>string</code>
     </MixedInferredReturnType>
-    <MixedMethodCall occurrences="4">
-      <code>ensureEnabled</code>
-      <code>ensureEnabled</code>
-      <code>ensureEnabled</code>
-      <code>ensureEnabled</code>
-    </MixedMethodCall>
     <MixedPropertyAssignment occurrences="1">
       <code>$identity</code>
     </MixedPropertyAssignment>
@@ -2140,7 +2129,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="34">
+    <MixedArgument occurrences="33">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -2171,7 +2160,6 @@
       <code>$email</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$experiments-&gt;getAllKnownExperiments()</code>
       <code>$r['user']-&gt;user_id</code>
       <code>$r['experiment']</code>
       <code>$privacystatement_id</code>
@@ -2292,11 +2280,6 @@
       <code>array</code>
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedMethodCall occurrences="3">
-      <code>getAllKnownExperiments</code>
-      <code>ensureEnabled</code>
-      <code>ensureEnabled</code>
-    </MixedMethodCall>
     <MixedOperand occurrences="1">
       <code>$r['usernameOrEmail']</code>
     </MixedOperand>
