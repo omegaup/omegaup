@@ -2159,8 +2159,6 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r) {
-        global $experiments;
-
         /** @var \OmegaUp\DAO\VO\Identities $r->identity */
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -2169,7 +2167,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::validateUser($r);
 
         \OmegaUp\Validators::validateStringNonEmpty($r['experiment'], 'experiment');
-        if (!in_array($r['experiment'], $experiments->getAllKnownExperiments())) {
+        if (!in_array($r['experiment'], \OmegaUp\Experiments::getInstance()->getAllKnownExperiments())) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'experiment');
         }
     }
@@ -2340,8 +2338,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiAssociateIdentity(\OmegaUp\Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
@@ -2377,8 +2374,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiListAssociatedIdentities(\OmegaUp\Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $r->ensureIdentity();
 
         return [

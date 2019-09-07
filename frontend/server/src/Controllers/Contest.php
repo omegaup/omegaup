@@ -912,7 +912,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiCreateVirtual(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
