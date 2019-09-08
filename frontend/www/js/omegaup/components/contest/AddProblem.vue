@@ -29,7 +29,7 @@
       <div class="form-group">
         <button class="btn btn-primary add-problem"
              type="submit"
-             v-on:click="onAddProblem"
+             v-on:click.prevent="onAddProblem"
              v-show="selectedRevision.commit !== ''">{{addProblemButtonLabel}}</button>
       </div>
     </div>
