@@ -44,7 +44,7 @@
         <omegaup-contest-new-form v-bind:data="contest"
              v-bind:update="true"
              v-on:emit-update-contest=
-             "$emit('update-contest', newFormComponent)"></omegaup-contest-new-form>
+             "newFormComponent =&gt; $emit('update-contest', newFormComponent)"></omegaup-contest-new-form>
       </div>
       <div class="tab-pane active problems"
            v-if="showTab === 'problems'">
