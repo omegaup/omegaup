@@ -9,7 +9,7 @@ omegaup.OmegaUp.on('ready', function() {
       'RECOMMENDED',
       'NO',
       'NO',
-      omegaup.T.arenaRecommendedCurrentContests
+      omegaup.T.arenaRecommendedCurrentContests,
     ],
     [
       '#current-contests',
@@ -17,7 +17,7 @@ omegaup.OmegaUp.on('ready', function() {
       'NOT_RECOMMENDED',
       'NO',
       'NO',
-      omegaup.T.arenaCurrentContests
+      omegaup.T.arenaCurrentContests,
     ],
     [
       '#list-current-public-contest',
@@ -25,7 +25,7 @@ omegaup.OmegaUp.on('ready', function() {
       'NOT_RECOMMENDED',
       'NO',
       'YES',
-      omegaup.T.arenaCurrentPublicContests
+      omegaup.T.arenaCurrentPublicContests,
     ],
     [
       '#future-contests',
@@ -33,7 +33,7 @@ omegaup.OmegaUp.on('ready', function() {
       'NOT_RECOMMENDED',
       'NO',
       'NO',
-      omegaup.T.arenaFutureContests
+      omegaup.T.arenaFutureContests,
     ],
     [
       '#recommended-past-contests',
@@ -41,7 +41,7 @@ omegaup.OmegaUp.on('ready', function() {
       'RECOMMENDED',
       'NO',
       'NO',
-      omegaup.T.arenaRecommendedOldContests
+      omegaup.T.arenaRecommendedOldContests,
     ],
     [
       '#past-contests',
@@ -49,7 +49,7 @@ omegaup.OmegaUp.on('ready', function() {
       'NOT_RECOMMENDED',
       'NO',
       'NO',
-      omegaup.T.arenaOldContests
+      omegaup.T.arenaOldContests,
     ],
     [
       '#participating-current-contests',
@@ -57,21 +57,23 @@ omegaup.OmegaUp.on('ready', function() {
       'NOT_RECOMMENDED',
       'YES',
       'NO',
-      omegaup.T.arenaMyActiveContests
+      omegaup.T.arenaMyActiveContests,
     ],
   ];
 
   var requests = [];
   var contestLists = [];
+  var query = document.querySelector('input[name=query]').value;
+
   for (var i = 0, len = contestListConfigs.length; i < len; i++) {
     var config = contestListConfigs[i];
     var contestList = new omegaup.arena.ContestList(
-        config[0],
+        document.querySelector(config[0]),
         {
           active: config[1],
           recommended: config[2],
           participating: config[3], public: config[4],
-          query: $('input[name=query]').val()
+          query: query,
         },
         {header: config[5]});
     contestLists.push(contestList);
