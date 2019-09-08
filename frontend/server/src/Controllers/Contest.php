@@ -360,7 +360,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'needsBasicInformation' => false,
             'requestsUserInformation' => false,
         ];
-        if (!$session['valid'] || is_null($session['identity'])) {
+        if (is_null($session['identity'])) {
             // No session, show the intro if public, so that they can login.
             return $result;
         }
@@ -516,10 +516,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode',
         ]);
 
-        $current_ses = \OmegaUp\Controllers\Session::getCurrentSession($r);
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
 
-        if ($current_ses['valid'] && $result['admission_mode'] == 'registration') {
-            $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK($current_ses['identity']->identity_id, $r['contest']->problemset_id);
+        if (!is_null($session['identity']) && $result['admission_mode'] == 'registration') {
+            $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
+                $session['identity']->identity_id,
+                $r['contest']->problemset_id
+            );
 
             $result['user_registration_requested'] = !is_null($registration);
 
@@ -912,7 +915,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiCreateVirtual(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }

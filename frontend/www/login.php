@@ -3,7 +3,6 @@ require_once('../server/bootstrap_smarty.php');
 
 $triedToLogin = false;
 $emailVerified = true;
-$c_Session = new \OmegaUp\Controllers\Session();
 
 if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     // user wants to login natively
@@ -35,12 +34,12 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
 if (isset($_GET['linkedin'])) {
     if (isset($_GET['code']) && isset($_GET['state'])) {
         /** @var array<string, mixed> */
-        $response = $c_Session->LoginViaLinkedIn();
+        $response = \OmegaUp\Controllers\Session::LoginViaLinkedIn();
     }
     $triedToLogin = true;
 } elseif (isset($_GET['fb'])) {
     /** @var array<string, mixed> */
-    $response = $c_Session->LoginViaFacebook();
+    $response = \OmegaUp\Controllers\Session::LoginViaFacebook();
     $triedToLogin = true;
 }
 
@@ -65,7 +64,7 @@ function shouldRedirect($url) {
     return $redirect_url == OMEGAUP_URL;
 }
 
-if ($c_Session->currentSessionAvailable()) {
+if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
     if (!empty($_GET['redirect']) && shouldRedirect($_GET['redirect'])) {
         die(header('Location: ' . $_GET['redirect']));
     }
