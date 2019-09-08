@@ -1,10 +1,9 @@
 omegaup.arena = omegaup.arena || {};
 
 // TODO: This really should be a Knockout component.
-omegaup.arena.ContestList = function(element, apiParams, uiParams) {
+omegaup.arena.ContestList = function(domElement, apiParams, uiParams) {
   var self = this;
-  self.jQueryElement = $(element);
-  self.domElement = self.jQueryElement[0];
+  self.domElement = domElement;
 
   var actualApiParams = $.extend(
       {
@@ -23,7 +22,7 @@ omegaup.arena.ContestList = function(element, apiParams, uiParams) {
                     actualApiParams.active == 'FUTURE'),
         showPractice: (actualApiParams.active == 'PAST'),
         showVirtual: (actualApiParams.active == 'PAST'),
-        showPublicUpdated: actualApiParams.public == 'YES'
+        showPublicUpdated: actualApiParams.public == 'YES',
       },
       uiParams);
 
