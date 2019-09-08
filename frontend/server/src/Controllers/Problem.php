@@ -2107,6 +2107,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing, we allow unauthenticated users to use this API
+            /** @var null $r->identity */
         }
 
         self::validateList($r);

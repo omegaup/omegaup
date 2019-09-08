@@ -7,14 +7,12 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
         self::TEST,
     ];
 
-    private static function getRequestForExperiments(array $experiments) {
+    private static function getRequestForExperiments(array $experiments) : string {
         $kvp = [];
         foreach ($experiments as $name) {
             $kvp[] = $name . '=' . \OmegaUp\Experiments::getExperimentHash($name);
         }
-        return [
-            \OmegaUp\Experiments::EXPERIMENT_REQUEST_NAME => implode(',', $kvp),
-        ];
+        return implode(',', $kvp);
     }
 
     public function testConfigExperiments() {
@@ -22,7 +20,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
             \OmegaUp\Experiments::EXPERIMENT_PREFIX . strtoupper(self::TEST) => true,
         ];
         $experiments = new
-            \OmegaUp\Experiments([], null, $defines, self::$kKnownExperiments);
+            \OmegaUp\Experiments(null, null, $defines, self::$kKnownExperiments);
 
         $this->assertEquals(
             self::$kKnownExperiments,
@@ -63,10 +61,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     public function testRequestInvalidExperiments() {
         $experiments = new
             \OmegaUp\Experiments(
-                [
-                    \OmegaUp\Experiments::EXPERIMENT_REQUEST_NAME =>
-                        self::TEST . '=invalid_hash',
-                ],
+                self::TEST . '=invalid_hash',
                 null,
                 [],
                 self::$kKnownExperiments
@@ -80,7 +75,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
         $user = UserFactory::createUser();
         $experiments = new
             \OmegaUp\Experiments(
-                [],
+                null,
                 $user,
                 [],
                 self::$kKnownExperiments
@@ -98,7 +93,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
 
         $experiments = new
             \OmegaUp\Experiments(
-                [],
+                null,
                 $user,
                 [],
                 self::$kKnownExperiments

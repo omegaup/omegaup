@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "751978956075704cfb3bb0c502471465",
+    "content-hash": "91f634a36840a1be60853ff214cfe860",
     "packages": [],
     "packages-dev": [
         {
@@ -367,16 +367,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.2.3",
+            "version": "v4.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "e612609022e935f3d0337c1295176505b41188c8"
+                "reference": "97e59c7a16464196a8b9c77c47df68e4a39a45c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/e612609022e935f3d0337c1295176505b41188c8",
-                "reference": "e612609022e935f3d0337c1295176505b41188c8",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/97e59c7a16464196a8b9c77c47df68e4a39a45c4",
+                "reference": "97e59c7a16464196a8b9c77c47df68e4a39a45c4",
                 "shasum": ""
             },
             "require": {
@@ -414,7 +414,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2019-08-12T20:17:41+00:00"
+            "time": "2019-09-01T07:51:21+00:00"
         },
         {
             "name": "ocramius/package-versions",
@@ -1133,12 +1133,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "1f0aca00b3194b6643c92d89dcb7659f670db796"
+                "reference": "ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/1f0aca00b3194b6643c92d89dcb7659f670db796",
-                "reference": "1f0aca00b3194b6643c92d89dcb7659f670db796",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b",
+                "reference": "ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b",
                 "shasum": ""
             },
             "require": {
@@ -1237,7 +1237,7 @@
                 "source": "https://github.com/vimeo/psalm/tree/master",
                 "issues": "https://github.com/vimeo/psalm/issues"
             },
-            "time": "2019-08-28T03:19:09+00:00"
+            "time": "2019-09-06T01:00:02+00:00"
         },
         {
             "name": "webmozart/assert",

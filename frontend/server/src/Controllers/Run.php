@@ -38,6 +38,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateCreateRequest(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->identity->username == 'omi') {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();

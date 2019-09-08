@@ -204,6 +204,9 @@ declare namespace omegaup {
   }
 
   export interface Group {
+    alias: string;
+    create_time: Date;
+    description: string;
     name: string;
   }
 

@@ -64,19 +64,27 @@ class ContestListTest extends OmegaupTestCase {
         // Create new PUBLIC contest
         $contestData = ContestsFactory::createContest();
 
-        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request(['page_size' => 50]));
-
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'page_size' => 50,
+        ]));
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
             $contestData['request']['title']
         );
         $this->assertDurationIsCorrect($response, $contestData);
+
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'page_size' => 50,
+            'query' => 'thiscontestdoesnotexist',
+        ]));
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
     }
 
-    /**
-     *
-     */
     public function testPrivateContestForInvitedUser() {
         // Create new private contest
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -88,22 +96,28 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addUser($contestData, $contestant);
 
         $login = self::login($contestant);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
             $contestData['request']['title']
         );
         $this->assertDurationIsCorrect($response, $contestData);
+
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => 'thiscontestdoesnotexist',
+        ]));
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
     }
 
-    /**
-     *
-     */
     public function testPrivateContestForNonInvitedUser() {
         // Create new private contest
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
@@ -115,12 +129,10 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addUser($contestData, $contestant);
 
         $login = self::login(UserFactory::createUser());
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
-        // Assert our contest is not there
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
         $this->assertArrayNotContainsInKey(
             $response['results'],
             'title',
@@ -128,27 +140,33 @@ class ContestListTest extends OmegaupTestCase {
         );
     }
 
-    /**
-     *
-     */
     public function testPrivateContestForSystemAdmin() {
         // Create new private contest
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
 
         $login = self::login(UserFactory::createAdminUser());
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'page_size' => 100
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
-        // Assert our contest is there
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'page_size' => 100,
+        ]));
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
             $contestData['request']['title']
         );
         $this->assertDurationIsCorrect($response, $contestData);
+
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'page_size' => 100,
+            'query' => 'thiscontestdoesnotexist',
+        ]));
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
     }
 
     /**
@@ -165,18 +183,26 @@ class ContestListTest extends OmegaupTestCase {
         ContestsFactory::addAdminUser($contestData, $contestant);
 
         $login = self::login($contestant);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiList($r);
 
-        // Assert our contest is there
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
         $this->assertArrayContainsInKeyExactlyOnce(
             $response['results'],
             'title',
             $contestData['request']['title']
         );
         $this->assertDurationIsCorrect($response, $contestData);
+
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => 'thiscontestdoesnotexist',
+        ]));
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'title',
+            $contestData['request']['title']
+        );
     }
 
     /**
@@ -279,7 +305,7 @@ class ContestListTest extends OmegaupTestCase {
         $recommendedContestData = ContestsFactory::createContest();
         $notRecommendedContestData = ContestsFactory::createContest(new ContestParams(
             [
-                'finish_time' => $recommendedContestData['request']['finish_time'] + 1
+                'finish_time' => $recommendedContestData['request']['finish_time'] + 1,
             ]
         ));
 

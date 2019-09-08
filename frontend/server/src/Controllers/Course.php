@@ -608,7 +608,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -657,7 +656,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
