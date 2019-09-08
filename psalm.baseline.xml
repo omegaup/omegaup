@@ -174,7 +174,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="80">
+    <MixedArgument occurrences="79">
       <code>$callback_user_function</code>
       <code>$contest['start_time']</code>
       <code>$contest['finish_time']</code>
@@ -214,7 +214,6 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['problem_alias']</code>
-      <code>$r['commit']</code>
       <code>$masterCommit</code>
       <code>$currentVersion</code>
       <code>$r['points']</code>
@@ -537,7 +536,7 @@
       <code>apiListCourses</code>
       <code>apiStudentProgress</code>
     </MissingReturnType>
-    <MixedArgument occurrences="100">
+    <MixedArgument occurrences="99">
       <code>$r['school_id']</code>
       <code>$r['course_alias']</code>
       <code>$r['start_time']</code>
@@ -552,7 +551,6 @@
       <code>$r['course_alias']</code>
       <code>$r['problem_alias']</code>
       <code>$problemset-&gt;problemset_id</code>
-      <code>$r['commit']</code>
       <code>$r['assignment_alias']</code>
       <code>$r['course_alias']</code>
       <code>$r['course_alias']</code>
