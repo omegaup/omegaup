@@ -4,6 +4,7 @@
 
 class Interview extends \OmegaUp\Controllers\Controller {
     private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
+        $r->ensureMainUserIdentity();
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
@@ -23,7 +24,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        self::authenticateRequest($r);
+        $r->ensureMainUserIdentity();
 
         self::validateCreateOrUpdate($r, false);
 
@@ -79,7 +80,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
         }
 
         // Authenticate logged user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV');
         $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
@@ -185,7 +186,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiDetails(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $interview = \OmegaUp\DAO\Interviews::getByAlias($r['interview_alias']);
         if (is_null($interview)) {
@@ -227,7 +228,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureMainUserIdentity();
 
         $interviews = null;
 

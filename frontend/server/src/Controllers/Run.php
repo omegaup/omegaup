@@ -38,6 +38,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateCreateRequest(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->identity->username == 'omi') {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -204,7 +205,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         self::$practice = false;
 
         // Authenticate user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate request
         self::validateCreateRequest($r);
@@ -405,7 +406,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      */
     public static function apiStatus(\OmegaUp\Request $r) {
         // Get the user who is calling this API
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         self::validateDetailsRequest($r);
 
@@ -446,7 +447,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         self::$practice = false;
 
         // Get the user who is calling this API
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         self::validateDetailsRequest($r);
 
@@ -491,7 +492,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDisqualify(\OmegaUp\Request $r) {
         // Get the user who is calling this API
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         self::validateDetailsRequest($r);
 
@@ -546,7 +547,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r) : array {
         // Get the user who is calling this API
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         self::validateDetailsRequest($r);
 
@@ -594,7 +595,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      */
     public static function apiSource(\OmegaUp\Request $r) {
         // Get the user who is calling this API
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         self::validateDetailsRequest($r);
 
@@ -647,7 +648,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
         // Get the user who is calling this API
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['run_alias'], 'run_alias');
         if (!self::downloadSubmission(
@@ -875,7 +876,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateList($r);
 
         $runs = \OmegaUp\DAO\Runs::getAllRuns(

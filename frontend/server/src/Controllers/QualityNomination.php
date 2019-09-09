@@ -66,7 +66,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem_alias');
         \OmegaUp\Validators::validateInEnum($r['nomination'], 'nomination', ['suggestion', 'promotion', 'demotion', 'dismissal']);
@@ -229,7 +229,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['rationale'], 'rationale');
 
         // Validate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateMemberOfReviewerGroup($r);
 
         $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK($r['qualitynomination_id']);
@@ -422,7 +422,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateMemberOfReviewerGroup($r);
 
         return self::getListImpl($r, null /* nominator */, null /* assignee */);
@@ -441,7 +441,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         self::validateMemberOfReviewerGroup($r);
 
         return self::getListImpl($r, null /* nominator */, $r->user->user_id);
@@ -461,7 +461,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate request
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+        $r->ensureMainUserIdentity();
 
         return self::getListImpl($r, $r->user->user_id, null /* assignee */);
     }
@@ -480,7 +480,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate request
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         $r->ensureInt('qualitynomination_id');
         $response = \OmegaUp\DAO\QualityNominations::getByID($r['qualitynomination_id']);

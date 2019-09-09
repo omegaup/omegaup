@@ -29,6 +29,8 @@
        <!-- For PASSWORD_ARGON2ID -->
        <file name="vendor/jetbrains/phpstorm-stubs/standard/password.php" />
 
+       <file name="frontend/server/libs/third_party/stubs/facebook.php" />
+       <file name="frontend/server/libs/third_party/stubs/google.php" />
        <file name="frontend/server/libs/third_party/stubs/paragonie_sodium_compat.php" />
     </stubs>
 </psalm>

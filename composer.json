@@ -6,7 +6,7 @@
       }
     ],
     "require-dev": {
-        "vimeo/psalm": "dev-master#1f0aca00b3194b6643c92d89dcb7659f670db796",
+        "vimeo/psalm": "dev-master#ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b",
         "jetbrains/phpstorm-stubs": "^2019.2"
     }
 }

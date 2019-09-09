@@ -43,7 +43,8 @@
         <div class="panel-heading">
           <button class="btn btn-primary"
                name="create-identities"
-               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
+               v-on:click.prevent="$emit('bulk-identities', identities)">{{ T.groupCreateIdentities
+               }}</button>
         </div>
         <div>
           {{ T.groupsIdentityWarning }}
@@ -53,70 +54,31 @@
   </div>
 </template>
 
-<script>
-import {T, UI} from '../../omegaup.js';
-import * as CSV from '../../../../third_party/js/csv.js/csv.js';
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { T } from '../../omegaup.js';
+import UI from '../../ui.js';
+import omegaup from '../../api.js';
 
-export default {
-  props: {groupAlias: String},
-  data: function() { return {T: T, identities: []};},
-  methods: {
-    readCsv: function() {
-      let self = this;
-      let fileUpload = self.$el.querySelector('input[type=file]');
-      let regex = /.*\.(?:csv|txt)$/;
-      if (!regex.test(fileUpload.value.toLowerCase())) {
-        UI.error(T.groupsInvalidCsv);
-        return;
-      }
-      self.identities = [];
-      CSV.fetch({
-           file: fileUpload.files[0],
-         })
-          .done(function(dataset) {
-            if (dataset.fields.length != 6) {
-              UI.error(T.groupsInvalidCsv);
-              return;
-            }
-            for (let cells of dataset.records) {
-              self.identities.push({
-                username: self.groupAlias + ':' + cells[0],
-                name: cells[1],
-                password: self.generatePassword(),
-                country_id: cells[2],
-                state_id: cells[3],
-                gender: cells[4],
-                school_name: cells[5],
-              });
-            }
-          });
-    },
-    bulkIdentities: function() {
-      self = this;
-      self.$emit('bulk-identities', self.identities);
-    },
-    generatePassword: function() {
-      const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
-      const len = 8;
-      // Browser supports window.crypto
-      if (typeof window.crypto == 'object') {
-        let arr = new Uint8Array(2 * len);
-        window.crypto.getRandomValues(arr);
-        return Array.from(arr.filter(value => value <=
-                                              (255 - 255 % validChars.length)),
-                          value => validChars[value % validChars.length])
-            .join('')
-            .substr(0, len);
-      }
+@Component
+export default class Identities extends Vue {
+  @Prop() groupAlias!: string;
 
-      // Browser does not support window.crypto
-      let password = '';
-      for (var i = 0; i < len; i++) {
-        password +=
-            validChars.charAt(Math.floor(Math.random() * validChars.length));
-      }
-      return password;
-    },
-  },
-};
+  T = T;
+  identities: omegaup.Identity[] = [];
+
+  readCsv(): void {
+    const fileUpload = <HTMLInputElement>(
+      this.$el.querySelector('input[type=file]')
+    );
+    const regex = /.*\.(?:csv|txt)$/;
+
+    if (!regex.test(fileUpload.value.toLowerCase())) {
+      UI.error(T.groupsInvalidCsv);
+      return;
+    }
+    this.$emit('read-csv', this, fileUpload);
+  }
+}
+
 </script>

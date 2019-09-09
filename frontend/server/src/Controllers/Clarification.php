@@ -60,7 +60,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         // Authenticate user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate request
         self::validateCreate($r);
@@ -93,6 +93,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateDetails(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         $r->ensureInt('clarification_id');
 
         // Check that the clarification actually exists
@@ -120,7 +121,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         // Authenticate the user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate request
         self::validateDetails($r);
@@ -169,7 +170,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         // Authenticate user
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         // Validate request
         self::validateUpdate($r);

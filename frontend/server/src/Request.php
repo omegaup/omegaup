@@ -149,6 +149,56 @@ class Request extends \ArrayObject {
         \OmegaUp\Validators::validateNumberInRange($val, $key, $lowerBound, $upperBound);
         $this[$key] = floatval($val);
     }
+
+    /**
+     * Ensures that an identity is logged in.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->username
+     */
+    public function ensureIdentity() : void {
+        if (!is_null($this->user) || !is_null($this->identity)) {
+            return;
+        }
+        $this->user = null;
+        $this->identity = null;
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession($this)['session'];
+        if (is_null($session) || is_null($session['identity'])) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException();
+        }
+        $this->identity = $session['identity'];
+        if (!is_null($session['user'])) {
+            $this->user = $session['user'];
+        }
+    }
+
+    /**
+     * Ensures that an identity is logged in, and it is the main identity of
+     * its associated user.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException
+     * @psalm-assert !null $this->identity
+     * @psalm-assert !null $this->identity->identity_id
+     * @psalm-assert !null $this->identity->user_id
+     * @psalm-assert !null $this->identity->username
+     * @psalm-assert !null $this->user
+     * @psalm-assert !null $this->user->main_identity_id
+     * @psalm-assert !null $this->user->user_id
+     * @psalm-assert !null $this->user->username
+     */
+    public function ensureMainUserIdentity() : void {
+        if (!is_null($this->user) && !is_null($this->identity)) {
+            return;
+        }
+        $this->ensureIdentity();
+        if (is_null($this->user)
+            || $this->user->main_identity_id != $this->identity->identity_id
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+    }
 }
 
 \OmegaUp\Request::$_requestId = str_replace('.', '', uniqid('', true));

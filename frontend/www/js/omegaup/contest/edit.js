@@ -108,6 +108,43 @@ OmegaUp.on('ready', function() {
                       })
                       .fail(UI.apiError);
                 },
+                'runs-diff': (ev, versions, selectedCommit) => {
+                  API.Contest.runsDiff({
+                               problem_alias: ev.alias,
+                               contest_alias: ev.contestAlias,
+                               version: selectedCommit.version,
+                             })
+                      .then(function(response) {
+                        versions.$set(versions.runsDiff, selectedCommit.version,
+                                      response.diff);
+                      })
+                      .fail(UI.apiError);
+                },
+                'get-versions': (problemAlias, problemComponent) => {
+                  API.Problem.versions({problem_alias: problemAlias})
+                      .then(function(result) {
+                        problemComponent.versionLog = result.log;
+                        let currentProblem = null;
+                        for (const problem of problemComponent.problems) {
+                          if (problem.alias === problemAlias) {
+                            currentProblem = problem;
+                            break;
+                          }
+                        }
+                        let publishedCommitHash = result.published;
+                        if (currentProblem != null) {
+                          publishedCommitHash = currentProblem.commit;
+                        }
+                        for (const revision of result.log) {
+                          if (publishedCommitHash === revision.commit) {
+                            problemComponent.selectedRevision =
+                                problemComponent.publishedRevision = revision;
+                            break;
+                          }
+                        }
+                      })
+                      .fail(UI.apiError);
+                },
                 'update-admission-mode': function(ev) {
                   API.Contest.update({
                                contest_alias: contestAlias,

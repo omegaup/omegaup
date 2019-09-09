@@ -50,7 +50,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
@@ -104,7 +104,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiAddUser(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -137,7 +137,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiRemoveUser(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -166,23 +166,20 @@ class Group extends \OmegaUp\Controllers\Controller {
      * Returns a list of groups by owner
      *
      * @param \OmegaUp\Request $r
+     * @return array{status: string, groups: array{alias: string, create_time: int, description: string, name: string}[]}
      */
-    public static function apiMyList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r, true /* requireMainUserIdentity */);
+    public static function apiMyList(\OmegaUp\Request $r) : array {
+        $r->ensureMainUserIdentity();
 
         $groups = \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
             $r->user->user_id,
             $r->identity->identity_id
         );
 
-        $response = [
+        return [
             'status' => 'ok',
-            'groups' => [],
+            'groups' => $groups,
         ];
-        foreach ($groups as $group) {
-            $response['groups'][] = $group->asArray();
-        }
-        return $response;
     }
 
     /**
@@ -192,7 +189,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiList(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
 
         if (is_null($r['query'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
@@ -216,7 +213,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiDetails(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         if (is_null($group)) {
             return [
@@ -246,7 +243,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiMembers(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -267,7 +264,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         $group = self::validateGroup($r['group_alias'], $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(

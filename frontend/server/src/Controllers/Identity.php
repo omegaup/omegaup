@@ -21,7 +21,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!is_null($identity)) {
             return $identity;
         }
-        $identity = \OmegaUp\DAO\Identities::FindByEmail($userOrEmail);
+        $identity = \OmegaUp\DAO\Identities::findByEmail($userOrEmail);
         if (!is_null($identity)) {
             return $identity;
         }
@@ -55,8 +55,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiCreate(\OmegaUp\Request $r) : array {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -94,8 +93,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * Entry point for Create bulk Identities API
      */
     public static function apiBulkCreate(\OmegaUp\Request $r) : array {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         $group = self::validateGroupOwnership($r);
 
         // Save objects into DB
@@ -131,7 +129,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     private static function validateGroupOwnership(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
@@ -200,8 +198,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $originalIdentity = self::resolveIdentity($r['original_username']);
 
@@ -237,8 +234,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public static function apiChangePassword(\OmegaUp\Request $r) {
-        global $experiments;
-        $experiments->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::IDENTITIES);
         self::validateUpdateRequest($r);
         $identity = self::resolveIdentity($r['username']);
 
@@ -263,7 +259,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateUpdateRequest(\OmegaUp\Request $r) {
-        self::authenticateRequest($r);
+        $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
@@ -364,7 +360,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $response['userinfo']['rankinfo'] = [];
         } else {
             $response['userinfo']['rankinfo'] =
-                \OmegaUp\Controllers\User::getRankByProblemsSolved($r, $identity);
+                \OmegaUp\Controllers\User::getRankByProblemsSolved(
+                    $r,
+                    '',
+                    1,
+                    100,
+                    $identity
+                );
         }
 
         // Do not leak plain emails in case the request is for a profile other than

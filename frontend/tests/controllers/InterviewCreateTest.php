@@ -69,8 +69,8 @@ class InterviewCreateTest extends OmegaupTestCase {
         ]));
         $this->assertEquals('ok', $response['status']);
 
-        $this->assertNotNull($createdUser1 = \OmegaUp\DAO\Users::FindByEmail($email1), 'user should have been created by adding email to interview');
-        $this->assertNotNull(\OmegaUp\DAO\Users::FindByEmail($email2), 'user should have been created by adding email to interview');
+        $this->assertNotNull($createdUser1 = \OmegaUp\DAO\Users::findByEmail($email1), 'user should have been created by adding email to interview');
+        $this->assertNotNull(\OmegaUp\DAO\Users::findByEmail($email2), 'user should have been created by adding email to interview');
 
         $this->assertEquals($createdUser1->verified, 0, 'new created users should not be email-validated');
 
