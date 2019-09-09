@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91f634a36840a1be60853ff214cfe860",
+    "content-hash": "cb7dc163e84af4eac42fa9b755d296f8",
     "packages": [],
     "packages-dev": [
         {
@@ -1129,16 +1129,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "dev-master",
+            "version": "3.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b"
+                "reference": "f8b8f35c031e2fad6754a961a9fad2708649d8da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b",
-                "reference": "ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/f8b8f35c031e2fad6754a961a9fad2708649d8da",
+                "reference": "f8b8f35c031e2fad6754a961a9fad2708649d8da",
                 "shasum": ""
             },
             "require": {
@@ -1197,28 +1197,7 @@
                     "src/functions.php"
                 ]
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Psalm\\Tests\\": "tests"
-                }
-            },
-            "scripts": {
-                "psalm": [
-                    "./psalm --find-dead-code"
-                ],
-                "standards": [
-                    "phpcs"
-                ],
-                "tests": [
-                    "phpcs",
-                    "phpunit"
-                ],
-                "all-tests": [
-                    "phpcs",
-                    "./psalm --find-dead-code",
-                    "phpunit"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1233,11 +1212,7 @@
                 "inspection",
                 "php"
             ],
-            "support": {
-                "source": "https://github.com/vimeo/psalm/tree/master",
-                "issues": "https://github.com/vimeo/psalm/issues"
-            },
-            "time": "2019-09-06T01:00:02+00:00"
+            "time": "2019-09-08T19:25:12+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -1385,9 +1360,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "vimeo/psalm": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
