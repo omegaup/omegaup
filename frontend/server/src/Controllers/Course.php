@@ -587,6 +587,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $points = (int)$r['points'];
         }
 
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
         self::addProblemToAssignment(
             $r['problem_alias'],
             $problemset->problemset_id,
@@ -610,7 +611,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -659,7 +659,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -2050,7 +2049,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Get Problems unsolved by users of a course
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, user_problems: array<string, array<int, array{alias: string, title: string, username: string}>>}
+     * @return array{status: string, user_problems: array<string, array{alias: string, title: string, username: string}[]>}
      */
     public static function apiListUnsolvedProblems(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();

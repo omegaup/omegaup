@@ -28,7 +28,7 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 
     $identityRequest = new \OmegaUp\Request($_REQUEST);
     $session = \OmegaUp\Controllers\Session::apiCurrentSession($identityRequest)['session'];
-    if ($session['valid']) {
+    if (!is_null($session['identity'])) {
         $smarty->assign('LOGGED_IN', '1');
         \OmegaUp\UITools::$isLoggedIn = true;
 
@@ -72,10 +72,17 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 } else {
     // During testing We need smarty to load strings from *.lang files
     $lang = 'pseudo';
-    $session = ['valid' => false];
+    $session = [
+        'valid' => false,
+        'email' => null,
+        'user' => null,
+        'identity' => null,
+        'auth_token' => null,
+        'is_admin' => false,
+    ];
 }
 
 $smarty->configLoad(__DIR__ . "/../templates/{$lang}.lang");
 $smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 
-$smarty->assign('ENABLED_EXPERIMENTS', $experiments->getEnabledExperiments());
+$smarty->assign('ENABLED_EXPERIMENTS', \OmegaUp\Experiments::getInstance()->getEnabledExperiments());

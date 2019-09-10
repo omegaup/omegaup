@@ -25,11 +25,13 @@
               v-bind:show-footer="false"
               v-model="selectedRevision"
               v-on:runs-diff="onRunsDiff"></omegaup-problem-versions>
-        <div class="form-group">
-          <button class="btn btn-primary add-problem"
-               type="submit">{{addProblemButtonLabel}}</button>
-        </div>
       </form>
+      <div class="form-group">
+        <button class="btn btn-primary add-problem"
+             type="submit"
+             v-on:click.prevent="onAddProblem"
+             v-show="selectedRevision.commit !== ''">{{addProblemButtonLabel}}</button>
+      </div>
     </div>
     <table class="table table-striped">
       <thead>
@@ -101,6 +103,10 @@ export default class AddProblem extends Vue {
   selectedRevision = emptyCommit;
 
   onSubmit(): void {
+    this.$emit('emit-change-alias', this, this.alias);
+  }
+
+  onAddProblem(): void {
     this.$emit('emit-add-problem', this);
   }
 

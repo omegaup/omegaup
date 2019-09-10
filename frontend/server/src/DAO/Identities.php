@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class Identities extends \OmegaUp\DAO\Base\Identities {
-    public static function FindByEmail($email) {
+    public static function findByEmail(string $email) : ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                   i.*
                 FROM

@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
-     * @return array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problems: array{problem_alias: string, problem_id: int}[]}[]
+     * @return array<string, array{name: string|mixed, description: string|mixed, start_time: int|mixed, finish_time: int|mixed, order: int|mixed, max_points: float|mixed, assignment_alias: string|mixed, assignment_type: string|mixed, publish_time_delay: int|mixed, problems: array{problem_alias: string|mixed, problem_id: int|mixed}[]}>
      */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
@@ -48,12 +48,11 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         $val = [$course->alias];
 
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
-        /** @var array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int}[] $result */
+        /** @var array<string, array{name: string|mixed, description: string|mixed, start_time: int|mixed, finish_time: int|mixed, order: int|mixed, max_points: float|mixed, assignment_alias: string|mixed, assignment_type: string|mixed, publish_time_delay: int|mixed, problems: array{problem_alias: string|mixed, problem_id: int|mixed}[]}> $result */
         $result = [];
 
         foreach ($problemsAssignments as $assignment) {
-            /** @var string $assignment['assignment_alias'] */
-            $assignmentAlias = $assignment['assignment_alias'];
+            $assignmentAlias = strval($assignment['assignment_alias']);
             if (!isset($result[$assignmentAlias])) {
                 $result[$assignmentAlias] = [
                     'name' => $assignment['name'],

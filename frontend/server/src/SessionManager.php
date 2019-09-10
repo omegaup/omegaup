@@ -46,6 +46,6 @@ class SessionManager {
         if (session_status() == PHP_SESSION_ACTIVE) {
             return;
         }
-        session_start();
+        @session_start();
     }
 }
