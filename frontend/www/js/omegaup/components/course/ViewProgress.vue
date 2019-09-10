@@ -92,11 +92,12 @@ function toOds(courseName: string, table: string[][]): string {
     result += '<table:table-row>\n';
     for (let cell of row) {
       if (typeof cell === 'number') {
+        let num: number = cell;
         result +=
           '<table:table-cell office:value-type="float" office:value="' +
           cell +
           '"><text:p>' +
-          cell.toPrecision(2) +
+          num.toPrecision(2) +
           '</text:p></table:table-cell>';
       } else {
         result +=
@@ -122,12 +123,12 @@ export default class CourseViewProgress extends Vue {
   score(
     student: omegaup.CourseStudent,
     assignment: omegaup.Assignment,
-  ): string {
-    let score = student.progress[assignment.alias] || '0';
-    return parseFloat(score);
+  ): number {
+    let score = student.progress[assignment.alias] || 0;
+    return parseFloat(String(score));
   }
 
-  studentProgressUrl(student: omegaup.CourseStudent) {
+  studentProgressUrl(student: omegaup.CourseStudent): string {
     return `/course/${this.course.alias}/student/${student.username}/`;
   }
 
@@ -136,16 +137,16 @@ export default class CourseViewProgress extends Vue {
   }
 
   get progressTable(): string[][] {
-    let table = [];
+    let table: string[][] = [];
     let header = [this.T.profileUsername, this.T.wordsName];
     for (let assignment of this.assignments) {
       header.push(assignment.name);
     }
     table.push(header);
     for (let student of this.students) {
-      let row = [student.username, student.name];
+      let row: string[] = [student.username, student.name];
       for (let assignment of this.assignments) {
-        row.push(this.score(student, assignment));
+        row.push(String(this.score(student, assignment)));
       }
       table.push(row);
     }
@@ -166,7 +167,7 @@ export default class CourseViewProgress extends Vue {
     return `${this.course.alias}.ods`;
   }
 
-  async get odsDataUrl() {
+  async odsDataUrl(): Promise<string> {
     let zip = new JSZip();
     zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
       compression: 'STORE',

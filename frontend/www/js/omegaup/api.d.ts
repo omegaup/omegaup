@@ -180,7 +180,7 @@ declare namespace omegaup {
   }
 
   export interface CourseStudent {
-    name?: string;
+    name: string;
     username: string;
     progress: CourseProgress;
   }
