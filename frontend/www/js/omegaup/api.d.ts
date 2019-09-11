@@ -381,6 +381,21 @@ declare namespace omegaup {
     name: string;
   }
 
+  export interface Run {
+    [period: string]: string,
+  }
+
+  export interface RunCounts {
+    categories: string[];
+    cumulative: omegaup.RunData[];
+    delta: omegaup.RunData[];
+  }
+
+  interface RunData {
+    data: number[];
+    name: string;
+  }
+
   interface RunDetails {
     admin?: boolean;
     compile_error?: string;
