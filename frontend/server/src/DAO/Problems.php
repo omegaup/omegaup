@@ -496,7 +496,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return $problems;
     }
 
-    final public static function getSolvedProblemsByUsersOfCourse($course_alias) {
+    /**
+     * @return array{alias: string, title: string, username: string}[]
+     */
+    final public static function getSolvedProblemsByUsersOfCourse(
+        string $courseAlias
+    ) : array {
         $sql = "
             SELECT
                 rp.alias,
@@ -544,7 +549,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 i.username ASC,
                 rp.problem_id DESC;";
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $course_alias]);
+        /** @var array{alias: string, title: string, username: string}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $courseAlias]
+        );
     }
 
     /**
@@ -552,7 +561,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getUnsolvedProblemsByUsersOfCourse(
         string $courseAlias
-    ) {
+    ) : array {
         $sql = '
             SELECT
                 rp.alias,

@@ -92,6 +92,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return $result;
     }
 
+    /**
+     * @return array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}[]
+     */
     final public static function getAllRuns(
         ?int $problemset_id,
         ?string $status,
@@ -161,6 +164,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val[] = (int) $rowcount;
         }
 
+        /** @var array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
