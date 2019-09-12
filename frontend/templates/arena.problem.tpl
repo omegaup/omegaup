@@ -5,8 +5,8 @@
     {if $payload['user']['logged_in']}
       <li><a href="#solution">{#wordsSolution#}</a></li>
     {/if}
-    {if $problem_admin}<li><a href="#runs">{#wordsRuns#}</a></li>{/if}
     {if $problem_admin}
+      <li><a href="#runs">{#wordsRuns#}</a></li>
       <li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
     {/if}
   </ul>
