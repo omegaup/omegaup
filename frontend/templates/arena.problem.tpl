@@ -6,7 +6,7 @@
       <li><a href="#solution">{#wordsSolution#}</a></li>
     {/if}
     {if $problem_admin}<li><a href="#runs">{#wordsRuns#}</a></li>{/if}
-    {if $only_problem_clarifications_enabled}
+    {if $problem_admin}
       <li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
     {/if}
   </ul>
