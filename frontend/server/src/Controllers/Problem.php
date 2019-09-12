@@ -2490,6 +2490,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'memory_limit' => "{$memoryLimit} MiB",
             'input_limit' => ($details['input_limit'] / 1024) . ' KiB',
             'solvers' => $details['solvers'],
+            'only_problem_clarifications_enabled' => false,
             'quality_payload' => [
                 'solved' => false,
                 'nominated' => false,
