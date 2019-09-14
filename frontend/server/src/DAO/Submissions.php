@@ -135,4 +135,20 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
 
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
+
+    public static function countAcceptedSubmissions(int $startTimestamp, int $endTimestamp) : int {
+        $sql = '
+            SELECT
+                COUNT(s.submission_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            WHERE
+                r.verdict = "AC"
+                AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
+';
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$startTimestamp, $endTimestamp]);
+    }
 }
