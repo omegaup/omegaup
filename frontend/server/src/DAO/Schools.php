@@ -93,4 +93,29 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
         return $result;
     }
+
+    public static function countActiveSchools(int $startTimestamp, int $endTimestamp) : int {
+        $sql = '
+            SELECT
+                COUNT(DISTINCT si.school_id)
+            FROM
+                (
+                    SELECT
+                        i.school_id,
+                        COUNT(DISTINCT i.identity_id) AS distinct_identities
+                    FROM
+                        Submissions s
+                    INNER JOIN
+                        Identities i ON i.identity_id = s.identity_id
+                    WHERE
+                        s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
+                    GROUP BY
+                        i.school_id
+                    HAVING
+                        distinct_identities >= 5
+                ) AS si;
+';
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$startTimestamp, $endTimestamp]);
+    }
 }
