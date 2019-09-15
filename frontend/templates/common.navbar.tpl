@@ -19,7 +19,7 @@
       {if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
           <li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
           {if $LOGGED_IN eq '1'}
-            <li class="dropdown" id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
+            <li class="dropdown" id="nav-contests">
               <a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="/contest/new/">{#contestsCreateNew#}</a></li>

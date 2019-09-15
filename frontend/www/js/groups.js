@@ -1,4 +1,4 @@
-$('.navbar #nav-contests').addClass('active');
+$('#nav-contests ul li a[href="/group/"]').parent().addClass('active');
 
 var formData = $('#form-data');
 var formName = formData.attr('data-name');
