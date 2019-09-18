@@ -17,7 +17,7 @@
     <div class="navbar-collapse collapse" id="collapsible-navbar" aria-expanded="false" >
       <ul class="nav navbar-nav">
       {if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
-          <li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
+          <li id="nav-arena"><a href='/arena/'>{#navArena#}</a></li>
           {if $LOGGED_IN eq '1'}
             <li class="dropdown" id="nav-contests">
               <a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsContests#}</span><span class="caret"></span></a>
@@ -28,7 +28,7 @@
                 <li><a href="/scoreboardmerge.php">{#contestsJoinScoreboards#}</a></li>
               </ul>
             </li>
-            <li class="dropdown" id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}>
+            <li class="dropdown" id="nav-problems">
               <a href='#' class="dropdown-toggle" data-toggle="dropdown"><span>{#wordsProblems#}</span><span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="/problem/new/">{#myproblemsListCreateProblem#}</a></li>
@@ -41,10 +41,10 @@
               </ul>
             </li>
           {else}
-            <li id="nav-problems"{if isset($navbarSection) && $navbarSection == "problems"} class="active"{/if}><a href='/problem/'>{#wordsProblems#}</a></li>
+            <li id="nav-problems"><a href='/problem/'>{#wordsProblems#}</a></li>
           {/if} {* LOGGED_IN *}
-          <li class="{if isset($navbarSection) && $navbarSection == "rank"} active{/if}" id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
-          <li class="{if isset($navbarSection) && $navbarSection == "schools"} active{/if}" id="nav-schools"><a href='/schools/'>{#navSchools#}</a></li>
+          <li id="nav-rank"><a href='/rank/'>{#navRanking#}</a></li>
+          <li id="nav-schools"><a href='/schools/'>{#navSchools#}</a></li>
           <li><a href='http://blog.omegaup.com/'>{#navBlog#}</a></li>
           <li><a href='https://omegaup.com/preguntas/'>{#navQuestions#}</a></li>
         </ul>
