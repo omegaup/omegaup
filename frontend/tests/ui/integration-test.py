@@ -57,9 +57,9 @@ class OmegaUpTest:
     assert username_label.text == self.username
 
   def create_problem(self):
-    nav_problems = self.driver.find_element_by_css_selector('#nav-problems')
+    nav_problems = self.driver.find_element_by_css_selector('.nav-problems')
     nav_problems.click()
-    nav_links = self.driver.find_elements_by_css_selector('#nav-problems a')
+    nav_links = self.driver.find_elements_by_css_selector('.nav-problems a')
     nav_link = None
     for link in nav_links:
       if link.get_attribute('innerText') == 'Create a problem':
@@ -94,9 +94,9 @@ class OmegaUpTest:
 
   def create_contest(self):
     # Navigate to create contest
-    nav_contests = self.driver.find_element_by_css_selector('#nav-contests')
+    nav_contests = self.driver.find_element_by_css_selector('.nav-contests')
     nav_contests.click()
-    nav_links = self.driver.find_elements_by_css_selector('#nav-contests a')
+    nav_links = self.driver.find_elements_by_css_selector('.nav-contests a')
     nav_link = None
     for link in nav_links:
       if link.get_attribute('innerText') == 'Create a new contest':

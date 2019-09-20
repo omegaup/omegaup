@@ -47,14 +47,16 @@ def test_create_contest(driver):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+                (By.XPATH, '//li[contains(concat(" ", normalize-space(@class),'
+                           ' " "), " nav-contests ")]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-contests"]'
-                      '//a[@href = "/contest/mine/"]')))).click()
+                     ('//li[contains(concat(" ", normalize-space(@class), " ")'
+                      ', " nav-contests ")]//a[@href = "/contest/mine/"]'
+                      )))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -116,13 +118,15 @@ def test_user_ranking_contest(driver):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+                (By.XPATH, '//li[contains(concat(" ", normalize-space(@class),'
+                           ' " "), " nav-contests ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-contests"]'
-                      '//a[@href = "/contest/mine/"]')))).click()
+                     ('//li[contains(concat(" ", normalize-space(@class), " ")'
+                      ', " nav-contests ")]//a[@href = "/contest/mine/"]'
+                      )))).click()
 
         url = '/arena/%s/scoreboard' % (contest_alias)
         util.check_scoreboard_events(driver, contest_alias, url,
@@ -130,13 +134,15 @@ def test_user_ranking_contest(driver):
 
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-contests'))).click()
+                (By.XPATH, '//li[contains(concat(" ", normalize-space(@class),'
+                           ' " "), " nav-contests ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[@id = "nav-contests"]'
-                      '//a[@href = "/contest/mine/"]')))).click()
+                     ('//li[contains(concat(" ", normalize-space(@class), " ")'
+                      ', " nav-contests ")]//a[@href = "/contest/mine/"]'
+                      )))).click()
         util.check_scoreboard_events(driver, contest_alias, url,
                                      num_elements=3, scoreboard='Admin')
 
@@ -346,13 +352,14 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.XPATH, '//li[contains(concat(" ", normalize-space(@class), " "'
+                       '), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/contest/new/"]')))).click()
+                 ('//li[contains(concat(" ", normalize-space(@class), " "), " '
+                  'nav-contests ")]//a[@href = "/contest/new/"]')))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(

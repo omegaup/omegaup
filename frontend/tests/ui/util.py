@@ -222,13 +222,14 @@ def create_group(driver, group_title, description):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.XPATH, '//li[contains(concat(" ", normalize-space(@class), " "'
+                       '), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/group/"]')))).click()
+                 ('//li[contains(concat(" ", normalize-space(@class), " "), " '
+                  'nav-contests ")]//a[@href = "/group/"]')))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -261,13 +262,14 @@ def add_identities_group(driver, group_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.XPATH, '//li[contains(concat(" ", normalize-space(@class), " "'
+                       '), " nav-contests ")]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/group/"]')))).click()
+                 ('//li[contains(concat(" ", normalize-space(@class), " "), " '
+                  'nav-contests ")]//a[@href = "/group/"]')))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(

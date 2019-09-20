@@ -27,4 +27,8 @@ class UITools {
             die();
         }
     }
+
+    public static function getFormattedGravatarURL(string $hashedEmail, string $size) : string {
+        return "https://secure.gravatar.com/avatar/{$hashedEmail}?s={$size}";
+    }
 }

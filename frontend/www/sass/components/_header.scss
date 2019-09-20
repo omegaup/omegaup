@@ -1,4 +1,4 @@
-#header {
+.navbar-default {
   border-color: transparent;
   margin: 0;
   border-bottom-width: 0;
@@ -29,7 +29,7 @@
     }
   }
 
-  & #user-dropdown {
+  & .user-dropdown {
     // Elimina el padding del elemento dropdown del nombre
     // del usuario para la redimesion de la imagen de perfil.
     padding: 0 12px 0 0;
@@ -87,7 +87,7 @@
       .dropdown-menu {
         li {
           a {
-            color: $header-font-secondary-color;
+            color: $header-font-secondary-color !important;
 
             &:hover {
               background-color: $header-dropdown-active-item;

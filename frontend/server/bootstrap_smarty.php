@@ -34,17 +34,32 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 
         $smarty->assign('CURRENT_USER_USERNAME', $session['identity']->username);
         $smarty->assign('CURRENT_USER_EMAIL', $session['email']);
-        $smarty->assign('CURRENT_USER_IS_EMAIL_VERIFIED', empty($session['user']) || $session['user']->verified);
+        $smarty->assign(
+            'CURRENT_USER_IS_EMAIL_VERIFIED',
+            empty($session['user']) || $session['user']->verified
+        );
         $smarty->assign('CURRENT_USER_IS_ADMIN', $session['is_admin']);
         $smarty->assign(
             'CURRENT_USER_IS_REVIEWER',
             \OmegaUp\Authorization::isQualityReviewer($session['identity'])
         );
         $smarty->assign('CURRENT_USER_AUTH_TOKEN', $session['auth_token']);
-        $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=92">');
-        $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=16">');
-        $smarty->assign('CURRENT_USER_GRAVATAR_URL_32', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=32">');
-        $smarty->assign('CURRENT_USER_GRAVATAR_URL_51', '<img src="https://secure.gravatar.com/avatar/' . md5($session['email']) . '?s=51">');
+        $smarty->assign(
+            'CURRENT_USER_GRAVATAR_URL_128',
+            \OmegaUp\UITools::getFormattedGravatarURL(md5($session['email']), '128')
+        );
+        $smarty->assign(
+            'CURRENT_USER_GRAVATAR_URL_16',
+            \OmegaUp\UITools::getFormattedGravatarURL(md5($session['email']), '16')
+        );
+        $smarty->assign(
+            'CURRENT_USER_GRAVATAR_URL_32',
+            \OmegaUp\UITools::getFormattedGravatarURL(md5($session['email']), '32')
+        );
+        $smarty->assign(
+            'CURRENT_USER_GRAVATAR_URL_51',
+            \OmegaUp\UITools::getFormattedGravatarURL(md5($session['email']), '51')
+        );
 
         $smarty->assign(
             'currentUserInfo',
@@ -57,8 +72,8 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
         $identityRequest['username'] = $session['identity']->username;
     } else {
         $identityRequest['username'] = null;
-        $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '<img src="/media/avatar_92.png">');
-        $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '<img src="/media/avatar_16.png">');
+        $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '/media/avatar_92.png');
+        $smarty->assign('CURRENT_USER_GRAVATAR_URL_16', '/media/avatar_16.png');
     }
 
     $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage($identityRequest);
