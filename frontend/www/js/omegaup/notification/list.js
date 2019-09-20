@@ -3,15 +3,6 @@ import notifications_List from '../components/notification/List.vue';
 import {OmegaUp, T, API} from '../omegaup.js';
 import UI from '../ui.js';
 
-let currentPage = window.location.pathname;
-const section = currentPage.split('/')[1];
-if (section === 'course') {
-  currentPage = '/schools/';
-} else if (section === 'arena') {
-  currentPage = '/arena/';
-}
-$('.navbar-nav li').find(`[href='${currentPage}']`).parent().addClass('active');
-
 OmegaUp.on('ready', function() {
   let notificationsList = new Vue({
     el: '#notifications-list',
