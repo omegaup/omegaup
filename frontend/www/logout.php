@@ -9,5 +9,5 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
 if (isset($_REQUEST['redirect'])) {
     die(header('Location: ' . $_REQUEST['redirect']));
 } else {
-    die(header('Location: /login'));
+    die(header('Location: /'));
 }

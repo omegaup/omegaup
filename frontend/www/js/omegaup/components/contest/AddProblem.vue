@@ -4,9 +4,14 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsProblem}}</label> <omegaup-autocomplete v-bind:init=
+          <label>{{T.wordsProblem}}</label> <span class="label label-info">{{
+          T.selectProblemToGetVersions }}</span> <omegaup-autocomplete v-bind:init=
           "el =&gt; UI.problemTypeahead(el)"
                v-model="alias"></omegaup-autocomplete>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary get-versions"
+               type="submit">{{T.wordsGetVersions}}</button>
         </div>
         <div class="form-group">
           <label>{{T.contestAddproblemProblemPoints}}</label> <input class=
@@ -44,7 +49,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="problem in problems">
+        <tr v-bind:key="problem.alias"
+            v-for="problem in problems">
           <td><button class="btn btn-default"
                   type="button"
                   v-bind:aria-label="T.wordsEdit"
