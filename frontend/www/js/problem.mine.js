@@ -1,6 +1,4 @@
 (function() {
-  $('.navbar #nav-problems').addClass('active');
-
   function fillProblemsTable() {
     var deferred = $('#show-admin-problems').prop('checked') ?
                        omegaup.API.Problem.adminList() :
