@@ -2,9 +2,13 @@
 <script type="text/json" id="payload">{$payload|json_encode}</script>
   <ul class="tabs">
     <li><a href="#problems" class="active">{#wordsProblem#}</a></li>
-    <li><a href="#solution">{#wordsSolution#}</a></li>
-    {if $problem_admin}<li><a href="#runs">{#wordsRuns#}</a></li>{/if}
-    <li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
+    {if $payload['user']['logged_in']}
+      <li><a href="#solution">{#wordsSolution#}</a></li>
+    {/if}
+    {if $problem_admin}
+      <li><a href="#runs">{#wordsRuns#}</a></li>
+      <li><a href="#clarifications">{#wordsClarifications#}<span id="clarifications-count"></span></a></li>
+    {/if}
   </ul>
   <div id="problems" class="tab">
     <div id="problem" class="main">

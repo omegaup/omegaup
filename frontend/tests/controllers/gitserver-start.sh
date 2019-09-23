@@ -30,5 +30,6 @@ cat > "${DIR}/gitserver.config.json" <<EOF
 EOF
 
 /usr/bin/nohup /usr/bin/omegaup-gitserver \
+	-insecure-skip-authorization \
 	-config="${DIR}/gitserver.config.json" >> "${DIR}/gitserver.log" 2>&1 &
 echo $! > "${DIR}/gitserver.pid"

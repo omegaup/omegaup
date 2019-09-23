@@ -35,7 +35,8 @@ omegaup.OmegaUp.on('ready', function() {
 
           var iScore = score.assignments[course.assignments[i].alias];
           var percent = iScore.score / iScore.max_score * 100;
-          var percentText = isNaN(percent) ? '--.--' : percent.toFixed(2);
+          var percentText =
+              iScore.max_score === 0 ? '--.--' : percent.toFixed(2);
           course.assignments[i].progress = percentText + '%';
         }
 
