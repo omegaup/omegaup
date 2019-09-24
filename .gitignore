@@ -54,6 +54,7 @@ frontend/tests/controllers/gitserver.pid
 frontend/tests/controllers/grade/
 frontend/tests/controllers/img/
 frontend/tests/controllers/templates/
+frontend/tests/omegaup.db
 frontend/tests/ui/results/
 omegaup_test.log
 

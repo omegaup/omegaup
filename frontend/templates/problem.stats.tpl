@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleProblemStats#}"}
+{include file='head.tpl' navbarSection='problems' htmlTitle="{#omegaupTitleProblemStats#}"}
 
 <div id="problem-stats"></div>
 

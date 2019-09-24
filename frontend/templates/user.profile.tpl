@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="{#omegaupTitleProfile#}"}
+{include file='head.tpl' navbarSection='users' htmlTitle="{#omegaupTitleProfile#}"}
 
 {if !isset($STATUS_ERROR)}
 <script type="text/json" id="payload">{['profile' => $profile.userinfo, 'logged_in' => $LOGGED_IN == "1"]|json_encode}</script>
