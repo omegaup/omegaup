@@ -16,7 +16,7 @@
     </div>
     <div class="navbar-collapse collapse" id="collapsible-navbar" aria-expanded="false" >
       <ul class="nav navbar-nav">
-      {if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
+        {if !$smarty.const.OMEGAUP_LOCKDOWN && !(isset($inContest) && $inContest)}
           <li id="nav-arena"{if isset($navbarSection) && $navbarSection == "arena"} class="active"{/if}><a href='/arena/'>{#navArena#}</a></li>
           {if $LOGGED_IN eq '1'}
             <li class="dropdown" id="nav-contests"{if isset($navbarSection) && $navbarSection == 'contests'} class="active"{/if}>
@@ -50,9 +50,6 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {if $LOGGED_IN eq '1'}
-            {if isset($inContest) && $inContest}
-              {include file='common.navbar.notifications.tpl'}
-            {/if}
             <li id="notifications-list"></li>
             <li id="nav-user" class="dropdown">
               <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">
@@ -83,6 +80,8 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {if $LOGGED_IN eq '1'}
+              {include file='common.navbar.notifications.tpl'}
+              <li id="clarification-notifications"></li>
               <li id="notifications-list"></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" id="user-dropdown" data-toggle="dropdown">{$CURRENT_USER_GRAVATAR_URL_51}<span class="username" title="{$CURRENT_USER_USERNAME}">{$CURRENT_USER_USERNAME}</span><span class="caret"></span></a>

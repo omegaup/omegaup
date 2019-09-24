@@ -2,6 +2,7 @@ import {OmegaUp, T} from '../omegaup.js';
 import API from '../api.js';
 import ArenaAdmin from './admin_arena.js';
 import Notifications from './notifications.js';
+import notification_Clarifications from '../components/notification/Clarifications.vue';
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
@@ -249,8 +250,23 @@ export class Arena {
 
     // Currently opened notifications.
     self.notifications = new Notifications();
-    OmegaUp.on('ready',
-               function() { self.notifications.attach($('#notifications')); });
+    OmegaUp.on('ready', function() {
+      self.notifications.attach($('#notifications'));
+      self.clarificationNotifications = new Vue({
+        el: '#clarification-notifications',
+        render: function(createElement) {
+          return createElement('omegaup-notifications-clarifications', {
+            props: {
+              data: this.data,
+            },
+          });
+        },
+        data: {data: null},
+        components: {
+          'omegaup-notifications-clarifications': notification_Clarifications,
+        },
+      });
+    });
 
     // Currently opened problem.
     self.currentProblem = null;
@@ -1088,8 +1104,9 @@ export class Arena {
                   $('#create-response-text', answerNode).val('');
                   if (self.problemsetAdmin) {
                     self.notifications.resolve({
-                      id: 'clarification-' + clarification.clarification_id
+                      id: `clarification-${clarification.clarification_id}`,
                     });
+                    self.clarificationNotifications.resolve(clarification);
                   }
                 })
                 .fail(function() {
@@ -1167,6 +1184,24 @@ export class Arena {
       self.updateClarification(data.clarifications[i]);
     }
 
+    if (self.problemsetAdmin) {
+      self.clarificationNotifications.data =
+          data.clarifications.filter(clarification =>
+                                         clarification.answer === null)
+              .reverse();
+    } else {
+      // Removing to the notifications list all unsolved clarifications
+      self.clarifications =
+          data.clarifications.filter(clarification =>
+                                         clarification.answer !== null)
+              .reverse();
+      // Removing to the notifications list all marked as resolved
+      // clarifications
+      self.clarificationNotifications.data = self.clarifications.filter(
+          clarification =>
+              localStorage.getItem(
+                  `clarification-${clarification.clarification_id}`) === null);
+    }
     if (self.answeredClarifications > previouslyAnswered &&
         self.activeTab != 'clarifications') {
       $('#clarifications-count').css('font-weight', 'bold');

@@ -1,6 +1,6 @@
 export default class {
   constructor() {
-    var self = this;
+    let self = this;
 
     self.notifications = ko.observableArray();
     self.notificationMapping = {};
@@ -31,14 +31,14 @@ export default class {
   }
 
   attach(element) {
-    var self = this;
+    let self = this;
 
     self.button = $('.notification-button', element);
     self.button.on('click', function() { self.unread(false); });
 
     self.onMarkAllAsRead = function() {
       self.notifications.removeAll();
-      for (var key in self.notificationMapping) {
+      for (let key in self.notificationMapping) {
         if (!self.notificationMapping.hasOwnProperty(key)) continue;
         localStorage.setItem(key, Date.now());
       }
@@ -50,12 +50,12 @@ export default class {
   }
 
   notify(data) {
-    var self = this;
+    let self = this;
 
     if (self.notificationMapping.hasOwnProperty(data.id)) {
       // Update the pre-existing notification.
-      var notification = self.notificationMapping[data.id];
-      for (var key in data) {
+      let notification = self.notificationMapping[data.id];
+      for (let key in data) {
         if (!data.hasOwnProperty(key) ||
             typeof(notification[key]) != 'function' ||
             notification[key]() == data[key]) {
@@ -64,19 +64,19 @@ export default class {
         notification[key](data[key]);
       }
       self.unread(true);
-      var audio = document.getElementById('notification-audio');
+      let audio = document.getElementById('notification-audio');
       if (audio != null) audio.play();
       return;
     }
 
-    var lastModified = parseInt((typeof(localStorage) !== 'undefined' &&
+    let lastModified = parseInt((typeof(localStorage) !== 'undefined' &&
                                  localStorage.getItem(data.id)) ||
                                     '0',
                                 10) ||
                        0;
     if (lastModified >= data.modificationTime) return;
 
-    for (var key in data) {
+    for (let key in data) {
       if (!data.hasOwnProperty(key)) continue;
       data[key] = ko.observable(data[key]);
     }
@@ -89,12 +89,12 @@ export default class {
     self.notifications.push(data);
 
     self.unread(true);
-    var audio = document.getElementById('notification-audio');
+    let audio = document.getElementById('notification-audio');
     if (audio != null) audio.play();
   }
 
   resolve(data) {
-    var self = this;
+    let self = this;
     if (!self.notificationMapping.hasOwnProperty(data.id)) {
       return;
     }
