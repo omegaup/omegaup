@@ -1,25 +1,25 @@
 body {
   padding-top: 51px; /* Espacio para el navbar */
 }
-.navbar-default {
+#root .navbar-default {
   border-bottom-width: 0;
 }
-.navbar-default .caret {
+#root .navbar-default .caret {
   border-top-color: white;
   border-bottom-color: white;
 }
-.navbar-default .active > a {
+#root .navbar-default .active > a {
   background-color: #5f87d4;
 }
-.navbar-default .user-dropdown img {
+#root .navbar-default .user-dropdown img {
   width: 51px;
   height: 51px;
   margin-right: 10px;
 }
-.navbar-default .navbar-header img {
+#root .navbar-default .navbar-header img {
   height: 20px;
 }
-.navbar-default .navbar-header .navbar-brand {
+#root .navbar-default .navbar-header .navbar-brand {
   background-color: white;
   background-image: linear-gradient(to bottom, white 0, #ddd 100%);
 }
@@ -27,13 +27,13 @@ body {
  * Elimina el padding del elemento dropdown del nombre del usuario para la
  * redimesion de la imagen de perfil.
  */
-.user-dropdown {
+#root .user-dropdown {
   padding: 0 12px 0 0;
 }
-.user-dropdown span {
+#root .user-dropdown span {
   vertical-align: middle;
 }
-.user-dropdown span.username {
+#root .user-dropdown span.username {
   display: inline-block;
   max-width: 80px;
   white-space: nowrap;
@@ -41,14 +41,14 @@ body {
   text-overflow: ellipsis;
 }
 
-.navbar-default .navbar-text,
-.navbar-default .navbar-nav > li > a {
+#root .navbar-default .navbar-text,
+#root .navbar-default .navbar-nav > li > a {
   color: #fff;
 }
 
-.navbar-default .navbar-nav > li > a:hover,
-.navbar-default .nav > li > a:hover,
-.navbar-default .nav > li > a:focus,
+#root .navbar-default .navbar-nav > li > a:hover,
+#root .navbar-default .nav > li > a:hover,
+#root .navbar-default .nav > li > a:focus,
 .nav .open > a,
 .nav .open > a:hover,
 .nav .open > a:focus {
@@ -66,17 +66,17 @@ body {
 .dropdown:hover .dropdown-menu {
   display: block;
 }
-.navbar-default .navbar-nav .dropdown:hover ul.dropdown-menu > li > a {
+#root .navbar-default .navbar-nav .dropdown:hover ul.dropdown-menu > li > a {
   color: #333;
 }
 
-.navbar-default {
+#root .navbar-default {
   background-color: #678dd7;
   border-color: transparent;
   margin: 0;
 }
 
-.navbar-default .navbar-inner {
+#root .navbar-default .navbar-inner {
   max-width: 900px;
   margin-left: auto;
   margin-right: auto;
@@ -84,15 +84,15 @@ body {
   padding-right: 0;
 }
 
-.navbar-default #grader-status > a {
+#root .navbar-default #grader-status > a {
   background-color: white;
   color: black;
 }
-.navbar-default #grader-status .caret {
+#root .navbar-default #grader-status .caret {
   border-top-color: black;
   border-bottom-color: black;
 }
-.navbar-default #grader-status > a.grader-error {
+#root .navbar-default #grader-status > a.grader-error {
   color: rgb(185, 74, 72);
   background-image: linear-gradient(
     rgb(242, 222, 222) 0px,
@@ -100,7 +100,7 @@ body {
   );
   background-color: rgb(242, 222, 222);
 }
-.navbar-default #grader-status > a.grader-ok {
+#root .navbar-default #grader-status > a.grader-ok {
   color: rgb(70, 136, 71);
   background-image: linear-gradient(
     rgb(223, 240, 216) 0px,
@@ -108,14 +108,14 @@ body {
   );
   background-color: rgb(223, 240, 216);
 }
-.navbar-default #grader-status > a.grader-warning {
+#root .navbar-default #grader-status > a.grader-warning {
   color: #c09853;
   background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
   border-color: #f5e79e;
 }
 
 @media (max-width: 991px) {
-  .navbar-default .navbar-inner {
+  #root  .navbar-default .navbar-inner {
     width: 100% !important;
   }
   .container {

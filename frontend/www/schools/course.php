@@ -1,5 +1,5 @@
 <?php
-require_once('../server/bootstrap_smarty.php');
+require_once('../../server/bootstrap_smarty.php');
 
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
@@ -18,4 +18,4 @@ foreach ($smartyProperties as $key => $value) {
     $smarty->assign($key, $value);
 }
 
-$smarty->display("../templates/{$template}");
+$smarty->display("../../templates/{$template}");

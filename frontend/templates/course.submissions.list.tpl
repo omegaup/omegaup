@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#enterCourse#}"}
+{include file='head.tpl' headerPayload=$headerPayload htmlTitle="{#enterCourse#}"}
 
 <div class="container-fluid">
 	<div id="course-submissions-list"></div>

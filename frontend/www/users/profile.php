@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap_smarty.php');
+require_once('../../server/bootstrap_smarty.php');
 
 try {
     $response = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
@@ -13,4 +13,4 @@ try {
     $smarty->assign('STATUS_ERROR', $e->getErrorMessage());
 }
 
-$smarty->display('../templates/user.profile.tpl');
+$smarty->display('../../templates/user.profile.tpl');

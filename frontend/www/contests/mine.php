@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap_smarty.php');
+require_once('../../server/bootstrap_smarty.php');
 
 try {
     $payload = \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([]));
@@ -19,7 +19,7 @@ try {
 
     $smarty->assign('privateContestsAlert', $privateContestsAlert);
     $smarty->assign('payload', $payload);
-    $smarty->display('../templates/contest.mine.tpl');
+    $smarty->display('../../templates/contest.mine.tpl');
 } catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('contestlist')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');

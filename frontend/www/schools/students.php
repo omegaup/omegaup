@@ -1,8 +1,7 @@
 <?php
-require_once('../server/bootstrap_smarty.php');
+require_once('../../server/bootstrap_smarty.php');
 
 $course_alias = $_REQUEST['course'];
-$student_username = $_REQUEST['student'];
 
 try {
     $payload = [
@@ -11,12 +10,11 @@ try {
         ])),
         'students' => \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
             'course_alias' => $course_alias,
-        ]))['students'],
-        'student' => $student_username,
+        ]))['students']
     ];
 
     $smarty->assign('payload', $payload);
-    $smarty->display('../templates/course.student.tpl');
+    $smarty->display('../../templates/course.students.tpl');
 } catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('coursestudents')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');

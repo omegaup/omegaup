@@ -1,4 +1,4 @@
-{include file='head.tpl' navbarSection='rank' htmlTitle="{#omegaupTitleRank#}"}
+{include file='head.tpl' headerPayload=$headerPayload htmlTitle="{#omegaupTitleRank#}"}
 <div class=" panel panel-default">
 		<script type="text/json" id="schools-rank-payload">{$schoolRankPayload|json_encode}</script>
 		<script type="text/javascript" src="{version_hash src="/js/dist/schools_rank.js"}"></script>

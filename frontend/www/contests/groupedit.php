@@ -1,6 +1,6 @@
 <?php
 
-require_once('../server/bootstrap_smarty.php');
+require_once('../../server/bootstrap_smarty.php');
 
 $r = new \OmegaUp\Request($_REQUEST);
 $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
@@ -15,4 +15,4 @@ $smarty->assign('IS_ORGANIZER', $isOrganizer);
 $smarty->assign('payload', [
     'countries' => \OmegaUp\DAO\Countries::getAll(null, 100, 'name'),
 ]);
-$smarty->display('../templates/group.edit.tpl');
+$smarty->display('../../templates/group.edit.tpl');

@@ -132,14 +132,16 @@ def test_create_identities_for_course(driver):
     with driver.login(username, password):
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, '//li[contains(concat(" ", normalize-space(@class),'
-                           ' " "), " nav-user ")]'))).click()
+                (By.XPATH,
+                 '//div[@id="root"]//li[contains(concat(" ", '
+                 'normalize-space(@class), " "), " nav-user ")]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH,
-                     ('//li[contains(concat(" ", normalize-space(@class), " ")'
-                      ', " nav-user ")]//a[@href = "/profile/"]')))).click()
+                     ('//div[@id="root"]//li[contains(concat(" ", '
+                      'normalize-space(@class), " "), " nav-user ")]//a[@href '
+                      '= "/profile/"]')))).click()
 
         with driver.page_transition():
             driver.wait.until(

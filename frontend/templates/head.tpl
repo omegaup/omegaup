@@ -94,7 +94,11 @@
 		{/if}
 {/if}
 		<div id="root">
-{include file='common.navbar.tpl'}
+{if isset($headerPayload)}
+{include file='common.navbar.tpl' headerPayload=$headerPayload}
+{else}
+{include file='common.navbar.tpl' headerPayload=[]}
+{/if}
 {if !isset($inArena) || !$inArena}
 {include file='mainmenu.tpl'}
 {/if}

@@ -1,4 +1,4 @@
-.navbar-default {
+#root .navbar-default {
   border-color: transparent;
   margin: 0;
   border-bottom-width: 0;
@@ -11,7 +11,7 @@
   }
 
   & .active {
-    a {
+    > a {
       background-color: $header-active-color;
     }
   }
@@ -29,7 +29,7 @@
     }
   }
 
-  & .user-dropdown {
+  & #root .user-dropdown {
     // Elimina el padding del elemento dropdown del nombre
     // del usuario para la redimesion de la imagen de perfil.
     padding: 0 12px 0 0;

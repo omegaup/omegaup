@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleGroups#}"}
+{include file='head.tpl' headerPayload=$headerPayload htmlTitle="{#omegaupTitleGroups#}"}
 
 <div id="group_list"></div>
 

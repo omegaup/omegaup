@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' navbarSection='contests' htmlTitle="{#omegaupTitleContest#}"}
+{include file='head.tpl' headerPayload=$headerPayload htmlTitle="{#omegaupTitleContest#}"}
 
 {if $privateContestsAlert eq true}
 	<div class="alert alert-info">

@@ -4,7 +4,7 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
   const headerPayload =
-      JSON.parse(document.getElementById('headerPayload').innerText);
+      JSON.parse(document.getElementById('header-payload').innerText);
   let commonNavbar = new Vue({
     el: '#common-navbar',
     render: function(createElement) {

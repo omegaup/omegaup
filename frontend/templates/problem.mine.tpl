@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleMyProblemsList#}"}
+{include file='head.tpl' headerPayload=$headerPayload htmlTitle="{#omegaupTitleMyProblemsList#}"}
 
 {if $privateProblemsAlert eq true}
 	<div class="alert alert-info">
