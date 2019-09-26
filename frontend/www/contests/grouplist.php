@@ -1,11 +1,11 @@
 <?php
 
-require_once('../../server/bootstrap_smarty.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 try {
     $payload = \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([]));
     $smarty->assign('payload', $payload);
-    $smarty->display('../../templates/group.list.tpl');
+    $smarty->display(OMEGAUP_ROOT . '/templates/group.list.tpl');
 } catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('grouplist')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');

@@ -108,7 +108,8 @@
                   v-bind:title="data.currentUsername">{{ data.currentUsername }}</span> <span class=
                   "grader-count badge"
                   v-show="data.isAdmin">…</span> <span class="caret"></span></a>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu"
+                v-if="navbarHidden">
               <li v-show="!data.omegaUpLockDown &amp;&amp; !data.inContest">
                 <a href="/profile/"><span class="glyphicon glyphicon-user"></span> {{
                 T.navViewProfile }}</a>
@@ -117,21 +118,26 @@
                 <a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> {{ T.navLogOut
                 }}</a>
               </li>
-              <hr class="dropdown-separator"
-                  v-show="navbarHidden">
-              <li class="grader-submissions"
-                  v-show="navbarHidden">
+              <hr class="dropdown-separator">
+              <li class="grader-submissions">
                 <a class="grader-submissions-link"
                     href="/arena/admin/">{{ T.wordsLatestSubmissions }}</a>
               </li>
-              <li class="grader grader-status"
-                  v-show="navbarHidden"></li>
-              <li class="grader grader-broadcaster-sockets"
-                  v-show="navbarHidden"></li>
-              <li class="grader grader-embedded-runner"
-                  v-show="navbarHidden"></li>
-              <li class="grader grader-queues"
-                  v-show="navbarHidden"></li>
+              <li class="grader grader-status"></li>
+              <li class="grader grader-broadcaster-sockets"></li>
+              <li class="grader grader-embedded-runner"></li>
+              <li class="grader grader-queues"></li>
+            </ul>
+            <ul class="dropdown-menu"
+                v-else="">
+              <li v-show="!data.omegaUpLockDown &amp;&amp; !data.inContest">
+                <a href="/profile/"><span class="glyphicon glyphicon-user"></span> {{
+                T.navViewProfile }}</a>
+              </li>
+              <li>
+                <a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> {{ T.navLogOut
+                }}</a>
+              </li>
             </ul>
           </li>
         </ul>

@@ -39,9 +39,10 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
             empty($session['user']) || $session['user']->verified
         );
         $smarty->assign('CURRENT_USER_IS_ADMIN', $session['is_admin']);
-        \OmegaUp\UITools::$isQualityReviewer =
-            \OmegaUp\Authorization::isQualityReviewer($session['identity']);
-        $smarty->assign('CURRENT_USER_IS_REVIEWER', \OmegaUp\UITools::$isQualityReviewer);
+        $smarty->assign(
+            'CURRENT_USER_IS_REVIEWER',
+            \OmegaUp\Authorization::isQualityReviewer($session['identity'])
+        );
         $smarty->assign('CURRENT_USER_AUTH_TOKEN', $session['auth_token']);
         $smarty->assign(
             'CURRENT_USER_GRAVATAR_URL_128',
@@ -55,10 +56,10 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
             'CURRENT_USER_GRAVATAR_URL_32',
             \OmegaUp\UITools::getFormattedGravatarURL(md5($session['email']), '32')
         );
-        \OmegaUp\UITools::$gravatarURL51 =
-            \OmegaUp\UITools::getFormattedGravatarURL(md5($session['email']), '51');
-        $smarty->assign('CURRENT_USER_GRAVATAR_URL_51', \OmegaUp\UITools::$gravatarURL51);
-
+        $smarty->assign(
+            'CURRENT_USER_GRAVATAR_URL_51',
+            \OmegaUp\UITools::getFormattedGravatarURL(md5($session['email']), '51')
+        );
         $smarty->assign(
             'currentUserInfo',
             [
@@ -68,7 +69,6 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
 
         \OmegaUp\UITools::$isAdmin = $session['is_admin'];
         $identityRequest['username'] = $session['identity']->username;
-        \OmegaUp\UITools::$currentUsername = $identityRequest['username'];
     } else {
         $identityRequest['username'] = null;
         $smarty->assign('CURRENT_USER_GRAVATAR_URL_128', '/media/avatar_92.png');
@@ -100,16 +100,18 @@ $smarty->configLoad(__DIR__ . "/../templates/{$lang}.lang");
 $smarty->addPluginsDir(__DIR__ . '/../smarty_plugins/');
 $path = explode('/', getcwd());
 $directory = end($path);
-$pathFile = explode('/', $_SERVER['SCRIPT_FILENAME']);
-$filename =  end($pathFile);
 $inContest = false;
-if (in_array("{$directory}/{$filename}", \OmegaUp\UITools::$contestPages)) {
-    $inContest = isset($_GET['is_practice']) ? $_GET['is_practice'] !== 'true' : true;
+$scriptRelativePath = implode(
+    '/',
+    array_slice(explode('/', $_SERVER['SCRIPT_FILENAME']), -2)
+);
+if (in_array($scriptRelativePath, \OmegaUp\UITools::$contestPages)) {
+    if (isset($_SERVER['QUERY_STRING'])) {
+        parse_str($_SERVER['QUERY_STRING'], $output);
+        $inContest = isset($output['is_practice']) ? $output['is_practice'] !== 'true' : true;
+    }
 }
 
-$smarty->assign(
-    'headerPayload',
-    \OmegaUp\UITools::getSmartyNavbarHeader($directory, $inContest)
-);
+\OmegaUp\UITools::getSmartyNavbarHeader($smarty, $session, $directory, $inContest);
 
 $smarty->assign('ENABLED_EXPERIMENTS', \OmegaUp\Experiments::getInstance()->getEnabledExperiments());

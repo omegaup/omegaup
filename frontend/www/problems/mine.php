@@ -1,6 +1,6 @@
 <?php
 
-require_once('../../server/bootstrap_smarty.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 try {
     $smartyProperties = \OmegaUp\Controllers\Problem::getProblemsMineInfoForSmarty(
@@ -21,4 +21,4 @@ if ($privateProblemsAlert) {
 }
 $smarty->assign('privateProblemsAlert', $privateProblemsAlert);
 
-$smarty->display('../../templates/problem.mine.tpl');
+$smarty->display(OMEGAUP_ROOT . '/templates/problem.mine.tpl');

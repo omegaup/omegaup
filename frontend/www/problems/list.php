@@ -27,7 +27,7 @@ function getDifficultyRange() {
     return [$minDifficulty, $maxDifficulty];
 }
 
-require_once('../../server/bootstrap_smarty.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 $r = new \OmegaUp\Request();
 $mode = isset($_GET['mode']) ? $_GET['mode'] : 'asc';
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
@@ -76,4 +76,4 @@ $smarty->assign('LANGUAGE', $language);
 $smarty->assign('problems', $response['results']);
 $smarty->assign('current_tags', $tags);
 $smarty->assign('pager_items', $pager_items);
-$smarty->display('../../templates/problems.tpl');
+$smarty->display(OMEGAUP_ROOT . '/templates/problems.tpl');

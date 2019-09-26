@@ -1,5 +1,5 @@
 <?php
 
-require_once('../../server/bootstrap_smarty.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
-$smarty->display('../../templates/course.submissions.list.tpl');
+$smarty->display(OMEGAUP_ROOT . '/templates/course.submissions.list.tpl');

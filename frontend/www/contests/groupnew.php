@@ -1,4 +1,4 @@
 <?php
 
-require_once('../../server/bootstrap_smarty.php');
-$smarty->display('../../templates/group.new.tpl');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+$smarty->display(OMEGAUP_ROOT . '/templates/group.new.tpl');

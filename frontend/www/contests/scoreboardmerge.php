@@ -1,3 +1,3 @@
 <?php
-require_once('../../server/bootstrap_smarty.php');
-$smarty->display('../../templates/scoreboardmerge.tpl');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
+$smarty->display(OMEGAUP_ROOT . '/templates/scoreboardmerge.tpl');

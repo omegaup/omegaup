@@ -1,5 +1,5 @@
 <?php
-require_once('../../server/bootstrap_smarty.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 $course_alias = $_REQUEST['course'];
 
@@ -14,7 +14,7 @@ try {
     ];
 
     $smarty->assign('payload', $payload);
-    $smarty->display('../../templates/course.students.tpl');
+    $smarty->display(OMEGAUP_ROOT . '/templates/course.students.tpl');
 } catch (\OmegaUp\Exceptions\ApiException $e) {
     Logger::getLogger('coursestudents')->error('APIException ' . $e);
     header('HTTP/1.1 404 Not Found');

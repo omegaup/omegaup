@@ -1,6 +1,6 @@
 <?php
 
-require_once('../../server/bootstrap_smarty.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 $smarty->assign('TITLE', '');
 $smarty->assign('ALIAS', '');
@@ -65,4 +65,4 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
     }
 }
 
-$smarty->display('../../templates/problem.new.tpl');
+$smarty->display(OMEGAUP_ROOT . '/templates/problem.new.tpl');
