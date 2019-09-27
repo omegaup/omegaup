@@ -951,15 +951,6 @@ class User extends \OmegaUp\Controllers\Controller {
             // Arreglo de concurso
             $keys = [
                 'CCUPITSUR-16' => 50,
-            ];
-        } elseif ($r['contest_type'] == 'CCUPTECNM') {
-            if ($r->user->username != 'blade13'
-                && !$is_system_admin
-            ) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-            }
-            // Arreglo de concurso
-            $keys = [
                 'CCUPTECNM' => 300,
             ];
         } elseif ($r['contest_type'] == 'CONALEP') {
