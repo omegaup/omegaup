@@ -944,7 +944,6 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
         } elseif ($r['contest_type'] == 'CCUPITSUR') {
             if ($r->user->username != 'licgerman-yahoo'
-                && $r->user->username != 'blade13'
                 && !$is_system_admin
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
