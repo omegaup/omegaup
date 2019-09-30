@@ -951,6 +951,7 @@ class User extends \OmegaUp\Controllers\Controller {
             // Arreglo de concurso
             $keys = [
                 'CCUPITSUR-16' => 50,
+                'CCUPTECNM' => 300,
             ];
         } elseif ($r['contest_type'] == 'CONALEP') {
             if ($r->user->username != 'reyes811'
@@ -1014,7 +1015,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE',
+                    'expected_set' => 'OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE, CCUPTECNM',
                 ]
             );
         }
