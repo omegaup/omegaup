@@ -2,7 +2,7 @@
 
 class CoursesFactory {
     public static function createCourse(
-        \OmegaUp\DAO\VO\Users $admin = null,
+        \OmegaUp\DAO\VO\Identities $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',
@@ -12,7 +12,6 @@ class CoursesFactory {
             $admin = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
-        $identity = \OmegaUp\DAO\Identities::getByPK($admin->main_identity_id);
         if ($public != false) {
             $curatorGroup = \OmegaUp\DAO\Groups::findByAlias(
                 \OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS
@@ -20,7 +19,7 @@ class CoursesFactory {
 
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $curatorGroup->group_id,
-                'identity_id' => $identity->identity_id,
+                'identity_id' => $admin->identity_id,
             ]));
         }
 
@@ -48,7 +47,7 @@ class CoursesFactory {
     }
 
     public static function createCourseWithOneAssignment(
-        \OmegaUp\DAO\VO\Users $admin = null,
+        \OmegaUp\DAO\VO\Identities $admin = null,
         ScopedLoginToken $adminLogin = null,
         $public = false,
         $requestsUserInformation = 'no',

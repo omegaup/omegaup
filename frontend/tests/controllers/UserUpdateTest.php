@@ -99,16 +99,17 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testUsernameUpdate() {
         $user = UserFactory::createUser();
         $login = self::login($user);
-        $new_username = Utils::CreateRandomString();
+        $newUsername = Utils::CreateRandomString();
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             //new username
-            'username' => $new_username
+            'username' => $newUsername
         ]);
         \OmegaUp\Controllers\User::apiUpdate($r);
-        $user_db = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($userDb->user_id);
 
-        $this->assertEquals($user_db->username, $new_username);
+        $this->assertEquals($identity->username, $newUsername);
     }
 
     /**
@@ -286,15 +287,16 @@ class UserUpdateTest extends OmegaupTestCase {
      * Tests that the user can generate a git token.
      */
     public function testGenerateGitToken() {
-        $user = UserFactory::createUser();
-        $this->assertNull($user->git_token);
-        $login = self::login($user);
+        $identity = UserFactory::createUser();
+        $dbUser = \OmegaUp\DAO\Users::FindByUsername($identity->username);
+        $this->assertNull($dbUser->git_token);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiGenerateGitToken(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $this->assertNotEquals($response['token'], '');
 
-        $dbUser = \OmegaUp\DAO\Users::FindByUsername($user->username);
+        $dbUser = \OmegaUp\DAO\Users::FindByUsername($identity->username);
         $this->assertNotNull($dbUser->git_token);
         $this->assertTrue(\OmegaUp\SecurityTools::compareHashedStrings($response['token'], $dbUser->git_token));
     }
@@ -306,12 +308,9 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testOldHashTransparentMigration() {
         // Create the user and manually set its password to the well-known
         // 'omegaup' hash.
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        $identity = UserFactory::createUser();
         $identity->password = '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a';
         \OmegaUp\DAO\Identities::update($identity);
-        $user->password = $identity->password;
-        \OmegaUp\DAO\Users::update($user);
         $this->assertTrue(\OmegaUp\SecurityTools::isOldHash($identity->password));
 
         // After logging in, the password should have been updated.

@@ -79,18 +79,16 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get users
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $user2 = UserFactory::createUser();
-        $identity2 = \OmegaUp\DAO\Identities::getByPK($user2->main_identity_id);
-        ContestsFactory::addAdminUser($contestData, $user);
-        ContestsFactory::addAdminUser($contestData, $user2);
+        $identity = UserFactory::createUser();
+        $identity2 = UserFactory::createUser();
+        ContestsFactory::addAdminUser($contestData, $identity);
+        ContestsFactory::addAdminUser($contestData, $identity2);
 
         // Prepare request for remove one admin
         $login = self::login($contestData['director']);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
@@ -106,12 +104,12 @@ class ContestAddAdminTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Get a user
-        $user = UserFactory::createUser();
+        // Get an identity
+        $identity = UserFactory::createUser();
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $user);
+        GroupsFactory::addUserToGroup($groupData, $identity);
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -134,12 +132,12 @@ class ContestAddAdminTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        // Get a user
-        $user = UserFactory::createUser();
+        // Get an identity
+        $identity = UserFactory::createUser();
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $user);
+        GroupsFactory::addUserToGroup($groupData, $identity);
 
         // Prepare request
         $login = self::login($contestData['director']);
@@ -158,7 +156,7 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $r['contest_alias'] = $contestData['request']['alias'];
 
         // Log in with contest director
-        $login = self::login($user);
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
 
         // Update title
@@ -182,15 +180,13 @@ class ContestAddAdminTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get users
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $user2 = UserFactory::createUser();
-        $identity2 = \OmegaUp\DAO\Identities::getByPK($user2->main_identity_id);
+        $identity = UserFactory::createUser();
+        $identity2 = UserFactory::createUser();
 
         // Get a group
         $groupData = GroupsFactory::createGroup();
-        GroupsFactory::addUserToGroup($groupData, $user);
-        GroupsFactory::addUserToGroup($groupData, $user2);
+        GroupsFactory::addUserToGroup($groupData, $identity);
+        GroupsFactory::addUserToGroup($groupData, $identity2);
 
         // Prepare request
         $login = self::login($contestData['director']);

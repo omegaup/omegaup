@@ -63,7 +63,7 @@ class ProblemDeployer {
 
     public function commit(
         string $message,
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity,
         int $operation,
         array $problemSettings
     ) : void {
@@ -85,7 +85,7 @@ class ProblemDeployer {
         }
         $result = $this->execute(
             $this->zipPath,
-            strval($user->username),
+            strval($identity->username),
             $message,
             $problemSettings,
             null,

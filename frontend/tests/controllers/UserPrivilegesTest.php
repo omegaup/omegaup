@@ -51,10 +51,9 @@ class UserPrivilegesTest extends OmegaupTestCase {
      */
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
-        $user = UserFactory::createUser(new UserParams(['username' => $username]));
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        $identity = UserFactory::createUser(new UserParams(['username' => $username]));
 
-        $login = self::login($user);
+        $login = self::login($identity);
         // Call to API Add Group
         $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -83,7 +82,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
-        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($user->user_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($identity->user_id);
         $this->assertNotContains('omegaup:mentor', $systemGroups);
     }
 }

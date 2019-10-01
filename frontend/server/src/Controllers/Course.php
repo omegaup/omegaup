@@ -1751,7 +1751,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $director = null;
         $acl = \OmegaUp\DAO\ACLs::getByPK($tokenAuthenticationResult['course']->acl_id);
-        $director = \OmegaUp\DAO\Users::getByPK($acl->owner_id)->username;
+        $director = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id)->username;
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {

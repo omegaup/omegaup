@@ -8,7 +8,7 @@ class UserRankTest extends OmegaupTestCase {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
         $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
+            $contestant->identity_id
         );
         $problemData = ProblemsFactory::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -68,7 +68,7 @@ class UserRankTest extends OmegaupTestCase {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
         $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
+            $contestant->identity_id
         );
         $problemData = ProblemsFactory::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -112,7 +112,7 @@ class UserRankTest extends OmegaupTestCase {
         // Create a user and sumbit a run with him
         $contestant = UserFactory::createUser();
         $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
+            $contestant->identity_id
         );
         $problemData = ProblemsFactory::createProblem();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -137,7 +137,7 @@ class UserRankTest extends OmegaupTestCase {
         // Create a user with no runs
         $contestant = UserFactory::createUser();
         $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->main_identity_id
+            $contestant->identity_id
         );
 
         // Refresh Rank

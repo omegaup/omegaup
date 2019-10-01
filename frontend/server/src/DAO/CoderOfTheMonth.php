@@ -103,7 +103,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     final public static function getCodersOfTheMonth() : array {
         $sql = '
           SELECT
-            cm.time, u.username, COALESCE(i.country_id, "xx") AS country_id, e.email
+            cm.time, i.username, COALESCE(i.country_id, "xx") AS country_id, e.email
           FROM
             Coder_Of_The_Month cm
           INNER JOIN

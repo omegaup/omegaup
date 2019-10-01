@@ -253,12 +253,12 @@ class ContestsFactory {
 
     public static function addUser(
         array $contestData,
-        \OmegaUp\DAO\VO\Users $user
+        \OmegaUp\DAO\VO\Identities $identitiy
     ) : void {
         // Prepare our request
         $r = new \OmegaUp\Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $user->username;
+        $r['usernameOrEmail'] = $identitiy->username;
 
         // Log in the contest director
         $login = OmegaupTestCase::login($contestData['director']);

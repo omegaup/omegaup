@@ -40,10 +40,10 @@ class UserRegistrationTest extends OmegaupTestCase {
         $password = Utils::CreateRandomString();
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($username.'@isp.com');
-        $user = \OmegaUp\DAO\Users::FindByUsername($username);
+        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
         // Users logged via google, facebook, linkedin does not have password
-        $this->assertNull($user->password);
+        $this->assertNull($identity->password);
 
         // Inflate request
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
@@ -57,10 +57,10 @@ class UserRegistrationTest extends OmegaupTestCase {
         // Call API
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
-        $user = \OmegaUp\DAO\Users::FindByUsername($username);
+        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
         // Users logged in native mode must have password
-        $this->assertNotNull($user->password);
+        $this->assertNotNull($identity->password);
     }
 
     /**
@@ -73,10 +73,11 @@ class UserRegistrationTest extends OmegaupTestCase {
 
         \OmegaUp\Controllers\Session::LoginViaGoogle($email);
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
+        $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has the initial username and email
-        $this->assertEquals($user->username, $username);
+        $this->assertEquals($identity->username, $username);
         $this->assertEquals($email, $email_user->email);
 
         // Inflate request
@@ -92,10 +93,11 @@ class UserRegistrationTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         $user = \OmegaUp\DAO\Users::FindByUsername('Z'.$username);
+        $identity = \OmegaUp\DAO\Identities::FindByUserId($user->user_id);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
         // Asserts that user has different username but the same email
-        $this->assertNotEquals($user->username, $username);
+        $this->assertNotEquals($identity->username, $username);
         $this->assertEquals($email, $email_user->email);
     }
 }

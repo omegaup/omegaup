@@ -102,9 +102,9 @@ class ResetUpdateTest extends OmegaupTestCase {
         $user_data['password_confirmation'] = $new_password;
         $r = new \OmegaUp\Request($user_data);
 
-        $user = \OmegaUp\DAO\Users::findByEmail($user_data['email']);
+        $identity = \OmegaUp\DAO\Identities::findByEmail($user_data['email']);
         \OmegaUp\Controllers\Reset::apiUpdate($r);
-        $user->password = $new_password;
-        self::login($user);
+        $identity->password = $new_password;
+        self::login($identity);
     }
 }

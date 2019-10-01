@@ -7,21 +7,20 @@
  */
 class LoginTest extends OmegaupTestCase {
     /**
-     * Test user login with valid credentials, username and password
+     * Test identity login with valid credentials, username and password
      *
      */
     public function testNativeLoginByUserPositive() {
-        // Create an user in omegaup
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        // Create an identity in omegaup
+        $identity = UserFactory::createUser();
 
         // Assert the log is empty.
         $this->assertEquals(0, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password
         ]);
 
         // Call the API
@@ -35,18 +34,17 @@ class LoginTest extends OmegaupTestCase {
     }
 
     /**
-     * Test user login with valid credentials, email and password
+     * Test identity login with valid credentials, email and password
      *
      */
     public function testNativeLoginByEmailPositive() {
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        $identity = UserFactory::createUser(new UserParams(['email' => $email]));
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
             'usernameOrEmail' => $email,
-            'password' => $user->password
+            'password' => $identity->password
         ]);
 
         $response = \OmegaUp\Controllers\User::apiLogin($r);
@@ -116,13 +114,12 @@ class LoginTest extends OmegaupTestCase {
      *
      */
     public function testNativeLoginPositiveViaHttp() {
-        // Create an user
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        // Create an identity
+        $identity = UserFactory::createUser();
 
         // Set required context
-        $_REQUEST['usernameOrEmail'] = $user->username;
-        $_REQUEST['password'] = $user->password;
+        $_REQUEST['usernameOrEmail'] = $identity->username;
+        $_REQUEST['password'] = $identity->password;
 
         // Turn on flag to return auth_token in response, just to validate it
         $_REQUEST['returnAuthToken'] = true;
@@ -144,14 +141,13 @@ class LoginTest extends OmegaupTestCase {
      *
      */
     public function test2ConsecutiveLogins() {
-        // Create an user in omegaup
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        // Create an identity in omegaup
+        $identity = UserFactory::createUser();
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password
         ]);
 
         // Call the API
@@ -168,29 +164,25 @@ class LoginTest extends OmegaupTestCase {
     }
 
     /**
-     * Test user login with valid credentials, username and password
+     * Test identity login with valid credentials, username and password
      *
      * @expectedException \OmegaUp\Exceptions\InvalidCredentialsException
      */
     public function testNativeLoginWithOldPassword() {
-        // Create an user in omegaup
-        $user = UserFactory::createUser();
+        // Create an identity in omegaup
+        $identity = UserFactory::createUser();
 
-        $plainPassword = $user->password;
+        $plainPassword = $identity->password;
         // Set old password
-        $user->password = md5($plainPassword);
-        \OmegaUp\DAO\Users::update($user);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $identity->password = $user->password;
         \OmegaUp\DAO\Identities::update($identity);
 
         // Let's put back plain password
-        $user->password = $plainPassword;
+        $identity->password = $plainPassword;
 
-        // Inflate request with user data
+        // Inflate request with identity data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
-            'password' => $user->password
+            'usernameOrEmail' => $identity->username,
+            'password' => $identity->password
         ]);
 
         // Call the API
@@ -219,18 +211,15 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testLoginDisabled() {
         // User to be verified
-        $user = UserFactory::createUser();
+        $identity = UserFactory::createUser();
 
         // Force empty password
-        $user->password = '';
-        \OmegaUp\DAO\Users::update($user);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $identity->password = $user->password;
+        $identity->password = '';
         \OmegaUp\DAO\Identities::update($identity);
 
         try {
-            $user->password = 'foo';
-            self::login($user);
+            $identity->password = 'foo';
+            self::login($identity);
             $this->fail('User should have not been able to log in');
         } catch (\OmegaUp\Exceptions\LoginDisabledException $e) {
             $this->assertEquals('loginDisabled', $e->getMessage());

@@ -72,7 +72,7 @@ class Experiments {
     /**
      * Creates an instance of Experiments.
      * @param null|string $requestExperiments Typically $_REQUEST['experiments'], except in tests.
-     * @param \OmegaUp\DAO\VO\Users $user The currently logged in user.
+     * @param \OmegaUp\DAO\VO\Identities $identity The currently logged in identity.
      * @param array<string, mixed> $defines Typically get_defined_constants(true)['user'],
      *                       except in tests.
      * @param string[] $knownExperiments Typically
@@ -81,7 +81,7 @@ class Experiments {
      */
     public function __construct(
         ?string $requestExperiments,
-        \OmegaUp\DAO\VO\Users $user = null,
+        \OmegaUp\DAO\VO\Identities $identity = null,
         array $defines = null,
         array $knownExperiments = null
     ) {
@@ -95,8 +95,8 @@ class Experiments {
 
         $this->loadExperimentsFromConfig($defines, $knownExperiments);
 
-        if (!is_null($user)) {
-            $this->loadExperimentsForUser($user, $knownExperiments);
+        if (!is_null($identity)) {
+            $this->loadExperimentsForUser($identity, $knownExperiments);
         }
 
         if (!is_null($requestExperiments)) {
@@ -124,18 +124,18 @@ class Experiments {
 
     /**
      * Loads experiments for a particular user.
-     * @param \OmegaUp\DAO\VO\Users $user The user.
+     * @param \OmegaUp\DAO\VO\Identities $identity The identity.
      * @param string[] $knownExperiments Typically
      * \OmegaUp\Experiments::KNOWN_EXPERIMENTS, except in tests.
      */
     private function loadExperimentsForUser(
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity,
         array $knownExperiments
     ) : void {
-        if (is_null($user->user_id)) {
+        if (is_null($identity->user_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
-        foreach (\OmegaUp\DAO\UsersExperiments::getByUserId($user->user_id) as $ue) {
+        foreach (\OmegaUp\DAO\UsersExperiments::getByUserId($identity->user_id) as $ue) {
             if (in_array($ue->experiment, $knownExperiments) &&
                 !is_null($ue->experiment) &&
                 !$this->isEnabled($ue->experiment)

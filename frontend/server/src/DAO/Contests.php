@@ -85,7 +85,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return new \OmegaUp\DAO\VO\Contests($row);
     }
 
-    public static function getPrivateContestsCount(\OmegaUp\DAO\VO\Users $user) {
+    public static function getPrivateContestsCount(\OmegaUp\DAO\VO\Identities $identity) {
         $sql = 'SELECT
            COUNT(c.contest_id) as total
         FROM
@@ -96,7 +96,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             a.acl_id = c.acl_id
         WHERE
             admission_mode = \'private\' and a.owner_id = ?;';
-        $params = [$user->user_id];
+        $params = [$identity->user_id];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
 
@@ -703,7 +703,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = '
             SELECT
                 i.name,
-                u.username,
+                i.username,
                 IF(pi.share_user_information, e.email, NULL) AS email,
                 IF(pi.share_user_information, st.name, NULL) AS state,
                 IF(pi.share_user_information, cn.name, NULL) AS country,

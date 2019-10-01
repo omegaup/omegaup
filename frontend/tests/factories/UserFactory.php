@@ -104,6 +104,7 @@ class UserFactory {
 
         // Get user from db
         $user = \OmegaUp\DAO\Users::FindByUsername($params['username']);
+        $identity = \OmegaUp\DAO\Identities::findByUsername($params['username']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -117,9 +118,9 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $user->password = $params['password'];
+        $identity->password = $params['password'];
 
-        return $user;
+        return $identity;
     }
 
     /**
@@ -176,11 +177,11 @@ class UserFactory {
      * @return User
      */
     public static function createAdminUser($params = null) {
-        $user = self::createUser($params);
+        $identity = self::createUser($params);
 
-        self::addSystemRole($user, \OmegaUp\Authorization::ADMIN_ROLE);
+        self::addSystemRole($identity, \OmegaUp\Authorization::ADMIN_ROLE);
 
-        return $user;
+        return $identity;
     }
 
     /**
@@ -189,15 +190,14 @@ class UserFactory {
      * @param string $username
      * @param string $password
      * @param string $email
-     * @return Identity
+     * @return \OmegaUp\DAO\VO\Identities
      */
-    public static function createMentorIdentity($params = null) : array {
-        $user = self::createUser($params);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+    public static function createMentorIdentity($params = null) : \OmegaUp\DAO\VO\Identities {
+        $identity = self::createUser($params);
 
         self::addMentorRole($identity);
 
-        return [$user, $identity];
+        return $identity;
     }
 
     /**
@@ -208,13 +208,12 @@ class UserFactory {
      * @param string $email
      * @return User
      */
-    public static function createSupportUser($params = null) : array {
-        $user = self::createUser($params);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+    public static function createSupportUser($params = null) : \OmegaUp\DAO\VO\Identities {
+        $identity = self::createUser($params);
 
         self::addSupportRole($identity);
 
-        return [$user, $identity];
+        return $identity;
     }
 
     /**
@@ -225,13 +224,12 @@ class UserFactory {
      * @param string $email
      * @return User
      */
-    public static function createGroupIdentityCreator($params = null) : \OmegaUp\DAO\VO\Users {
-        $user = self::createUser($params);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+    public static function createGroupIdentityCreator($params = null) : \OmegaUp\DAO\VO\Identities {
+        $identity = self::createUser($params);
 
         self::addGroupIdentityCreator($identity);
 
-        return $user;
+        return $identity;
     }
 
     /**
@@ -240,9 +238,9 @@ class UserFactory {
      * @param \OmegaUp\DAO\VO\Users $user
      * @param int $role_id
      */
-    public static function addSystemRole(\OmegaUp\DAO\VO\Users $user, $role_id) {
+    public static function addSystemRole(\OmegaUp\DAO\VO\Identities $identity, $role_id) {
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
-            'user_id' => $user->user_id,
+            'user_id' => $identity->user_id,
             'role_id' => $role_id,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));

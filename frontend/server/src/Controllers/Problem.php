@@ -60,7 +60,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
         $is_required = true;
         // https://github.com/omegaup/omegaup/issues/739
-        if ($r->user->username == 'omi') {
+        if ($r->identity->username == 'omi') {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -215,7 +215,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             $problemDeployer->commit(
                 'Initial commit',
-                $r->user,
+                $r->identity,
                 \OmegaUp\ProblemDeployer::CREATE,
                 $problemSettings
             );
@@ -724,7 +724,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             $problemDeployer->commit(
                 $r['message'],
-                $r->user,
+                $r->identity,
                 $operation,
                 $problemSettings
             );

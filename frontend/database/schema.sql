@@ -880,9 +880,7 @@ CREATE TABLE `User_Roles` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
   `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
-  `password` varchar(128) DEFAULT NULL COMMENT 'Contraseña del usuario, usando Argon2i o Blowfish',
   `git_token` varchar(128) DEFAULT NULL COMMENT 'Token de acceso para git, usando Argon2i',
   `main_email_id` int(11) DEFAULT NULL,
   `main_identity_id` int(11) DEFAULT NULL COMMENT 'Identidad principal del usuario',
@@ -898,7 +896,6 @@ CREATE TABLE `Users` (
   `is_private` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Determina si el usuario eligió no compartir su información de manera pública',
   `preferred_language` enum('c','cpp','java','py','rb','pl','cs','pas','kp','kj','cat','hs','cpp11','lua') DEFAULT NULL COMMENT 'El lenguaje de programación de preferencia de este usuario',
   PRIMARY KEY (`user_id`),
-  UNIQUE KEY `username` (`username`),
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

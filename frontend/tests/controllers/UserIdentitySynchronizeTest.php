@@ -29,7 +29,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         $this->assertNotNull($user);
-        $this->assertEquals($identity->password, $user->password);
     }
 
     /**
@@ -64,7 +63,6 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         $user = \OmegaUp\DAO\Users::FindByUsername($user->username);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $this->assertEquals($identity->password, $user->password);
     }
 
     /**

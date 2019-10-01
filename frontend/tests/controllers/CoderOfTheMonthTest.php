@@ -57,9 +57,8 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
 
         // Test coder of the month details when common user is logged, it's the
         // same that not logged user
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        $login = self::login($user);
+        $identity = UserFactory::createUser();
+        $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty($r, $identity);
         $this->assertArrayHasKey('payload', $response);
@@ -69,8 +68,8 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $this->assertArrayNotHasKey('options', $response['payload']);
 
         // Test coder of the month details when mentor user is logged
-        [$mentorUser, $mentorIdentity] = UserFactory::createMentorIdentity();
-        $login = self::login($mentorUser);
+        $mentorIdentity = UserFactory::createMentorIdentity();
+        $login = self::login($mentorIdentity);
         $r['auth_token'] = $login->auth_token;
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
             $r,
@@ -153,9 +152,9 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
      * Mentor can see the last coder of the month email
      */
     public function testMentorCanSeeLastCoderOfTheMonthEmail() {
-        [$mentorUser,] = UserFactory::createMentorIdentity();
+        $mentor = UserFactory::createMentorIdentity();
 
-        $login = self::login($mentorUser);
+        $login = self::login($mentor);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token
         ]));
@@ -199,7 +198,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
      * already has a coder of the month selected
      */
     public function testMentorSelectsUserAsCoderOfTheMonth() {
-        [$mentorUser,] = UserFactory::createMentorIdentity();
+        $mentor = UserFactory::createMentorIdentity();
 
         // Setting time to the 15th of next month.
         $runCreationDate = new DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
@@ -223,7 +222,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         \OmegaUp\Time::setTimeForTesting(strtotime($firstDayOfNextMonth->format('Y-m-d')));
 
         // Selecting one user as coder of the month
-        $login = self::login($mentorUser);
+        $login = self::login($mentor);
 
         // Call api. This should fail.
         try {
@@ -267,10 +266,10 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $this->createRuns(null, null, 3);
         $this->createRuns(null, null, 2);
 
-        [$mentorUser, $mentorIdentity] = UserFactory::createMentorIdentity();
+        $mentor = UserFactory::createMentorIdentity();
 
-        $login = self::login($mentorUser);
-        $this->assertTrue(\OmegaUp\Authorization::isMentor($mentorIdentity));
+        $login = self::login($mentor);
+        $this->assertTrue(\OmegaUp\Authorization::isMentor($mentor));
 
         // Testing with an intermediate day of the month
         $timestampTest = \OmegaUp\Time::get();

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="3.5.0@f8b8f35c031e2fad6754a961a9fad2708649d8da">
+<files psalm-version="dev-master@ae2c6715a77af8bf9ea9fb25fa4a2b291d68056b">
   <file src="frontend/server/bootstrap_smarty.php">
     <MixedArrayAccess occurrences="13">
       <code>$session['identity']</code>
@@ -478,7 +478,6 @@
       <code>$original_contest-&gt;alias</code>
       <code>$original_contest-&gt;problemset_id</code>
       <code>$acl-&gt;owner_id</code>
-      <code>\OmegaUp\DAO\Users::getByPK($acl-&gt;owner_id)-&gt;username</code>
       <code>$contest-&gt;start_time</code>
       <code>$contest-&gt;finish_time</code>
       <code>$problemset-&gt;problemset_id</code>
@@ -769,7 +768,6 @@
     <PossiblyNullPropertyFetch occurrences="4">
       <code>$resolvedUser-&gt;user_id</code>
       <code>$acl-&gt;owner_id</code>
-      <code>\OmegaUp\DAO\Users::getByPK($acl-&gt;owner_id)-&gt;username</code>
     </PossiblyNullPropertyFetch>
     <RedundantCondition occurrences="1"/>
     <TypeDoesNotContainNull occurrences="1">
@@ -1582,7 +1580,7 @@
       <code>$qualityReviewerGroup</code>
       <code>$qualitynominationlog-&gt;rationale</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="4"/>
+    <PossiblyNullPropertyFetch occurrences="3"/>
     <RedundantCondition occurrences="1">
       <code>is_array($contents['tags'])</code>
     </RedundantCondition>
@@ -1912,8 +1910,7 @@
       <code>$redirectOnVerify</code>
       <code>$permissionKey</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="30">
-      <code>registerToSendy</code>
+    <MissingReturnType occurrences="29">
       <code>sendVerificationEmail</code>
       <code>checkEmailVerification</code>
       <code>apiLogin</code>
@@ -2024,7 +2021,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="53">
+    <MixedAssignment occurrences="51">
       <code>$user</code>
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
@@ -2036,8 +2033,6 @@
       <code>$user</code>
       <code>$usersMissing</code>
       <code>$user</code>
-      <code>$registered</code>
-      <code>$usersAdded[$user-&gt;username]</code>
       <code>$user</code>
       <code>$user</code>
       <code>$user</code>
@@ -2123,13 +2118,12 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="18">
+    <PossiblyNullArgument occurrences="16">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
       <code>$user</code>
       <code>$identity</code>
-      <code>$user-&gt;username</code>
       <code>$user</code>
       <code>$identity</code>
       <code>$email</code>
@@ -2144,15 +2138,12 @@
     <PossiblyNullArrayOffset occurrences="1">
       <code>$usersAdded</code>
     </PossiblyNullArrayOffset>
-    <PossiblyNullOperand occurrences="2">
-      <code>$user-&gt;username</code>
-      <code>$user-&gt;username</code>
-    </PossiblyNullOperand>
-    <PossiblyNullPropertyAssignment occurrences="5">
+    <PossiblyNullOperand occurrences="2"/>
+    <PossiblyNullPropertyAssignment occurrences="3">
       <code>$identity</code>
       <code>$email</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="33">
+    <PossiblyNullPropertyFetch occurrences="8">
       <code>$email-&gt;email</code>
     </PossiblyNullPropertyFetch>
     <UndefinedDocblockClass occurrences="11">
@@ -2716,7 +2707,6 @@
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="2">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
-      <code>\OmegaUp\MySQLConnection::getInstance()-&gt;GetOne($sql, $params)</code>
     </MixedReturnStatement>
     <RedundantCondition occurrences="1">
       <code>is_null($result)</code>
@@ -3096,9 +3086,8 @@
       <code>$verified</code>
       <code>$in_mailing_list</code>
     </MissingParamType>
-    <MissingReturnType occurrences="7">
+    <MissingReturnType occurrences="6">
       <code>IsUserInterviewer</code>
-      <code>savePassword</code>
       <code>getExtendedProfileDataByPk</code>
       <code>getHideTags</code>
       <code>getByVerification</code>
@@ -3919,9 +3908,7 @@
       <code>$onlyAC</code>
       <code>$weight</code>
     </MissingParamType>
-    <MissingReturnType occurrences="4">
-      <code>createGroup</code>
-      <code>addUserToGroup</code>
+    <MissingReturnType occurrences="2">
       <code>createGroupScoreboard</code>
       <code>addContestToScoreboard</code>
     </MissingReturnType>
@@ -3973,7 +3960,6 @@
       <code>$params</code>
       <code>$params</code>
       <code>$problemData</code>
-      <code>$user</code>
       <code>$problemData</code>
       <code>$problemData</code>
       <code>$tag</code>
@@ -3991,7 +3977,6 @@
     </MissingReturnType>
     <MixedArgument occurrences="2">
       <code>$params['title']</code>
-      <code>$problemData['author']-&gt;main_identity_id</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="5">
       <code>$this-&gt;params[$offset]</code>
@@ -4019,8 +4004,6 @@
     </MixedAssignment>
     <MixedPropertyFetch occurrences="3">
       <code>$params['author']-&gt;username</code>
-      <code>$problemData['author']-&gt;main_identity_id</code>
-      <code>$user-&gt;username</code>
     </MixedPropertyFetch>
     <PossiblyInvalidArgument occurrences="1">
       <code>$this-&gt;params</code>
@@ -4047,9 +4030,7 @@
       <code>createSuggestion</code>
       <code>createQualityNomination</code>
     </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$reviewer-&gt;main_identity_id</code>
-    </MixedArgument>
+    <MixedArgument occurrences="1"/>
     <MixedAssignment occurrences="3">
       <code>$contents['difficulty']</code>
       <code>$contents['quality']</code>
@@ -4062,9 +4043,7 @@
       <code>$qualityReviewerGroup-&gt;group_id</code>
       <code>$identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedDocblockClass occurrences="1">
-      <code>$reviewer-&gt;main_identity_id</code>
-    </UndefinedDocblockClass>
+    <UndefinedDocblockClass occurrences="1"/>
   </file>
   <file src="frontend/tests/factories/RunsFactory.php">
     <MissingReturnType occurrences="1">
@@ -4116,9 +4095,7 @@
     </MixedInferredReturnType>
   </file>
   <file src="frontend/tests/factories/UserFactory.php">
-    <InvalidArgument occurrences="1">
-      <code>$user</code>
-    </InvalidArgument>
+    <InvalidArgument occurrences="1"/>
     <InvalidDocblockParamName occurrences="15">
       <code>$username</code>
       <code>$password</code>
@@ -4136,15 +4113,12 @@
       <code>$password</code>
       <code>$email</code>
     </InvalidDocblockParamName>
-    <InvalidReturnStatement occurrences="2">
-      <code>$user</code>
-    </InvalidReturnStatement>
+    <InvalidReturnStatement occurrences="2"/>
     <InvalidReturnType occurrences="2">
       <code>user</code>
       <code>Boolean</code>
     </InvalidReturnType>
-    <MismatchingDocblockReturnType occurrences="3">
-      <code>Identity</code>
+    <MismatchingDocblockReturnType occurrences="2">
       <code>User</code>
       <code>User</code>
     </MismatchingDocblockReturnType>
@@ -4176,12 +4150,10 @@
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="2">
+    <MixedAssignment occurrences="1">
       <code>$array[$parameter]</code>
-      <code>$user-&gt;password</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="3">
-      <code>Identity</code>
+    <MixedInferredReturnType occurrences="2">
       <code>User</code>
       <code>User</code>
     </MixedInferredReturnType>

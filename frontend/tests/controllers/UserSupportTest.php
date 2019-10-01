@@ -10,8 +10,8 @@ class UserSupportTest extends OmegaupTestCase {
      * Basic test for users with support role
      */
     public function testUserHasSupportRole() {
-        [, $supportIdentity] = UserFactory::createSupportUser();
-        [, $mentorIdentity] = UserFactory::createMentorIdentity();
+        $supportIdentity = UserFactory::createSupportUser();
+        $mentorIdentity = UserFactory::createMentorIdentity();
 
         // Asserting that user belongs to the support group
         $this->assertTrue(\OmegaUp\Authorization::isSupportTeamMember($supportIdentity));
@@ -25,7 +25,7 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testVerifyUser() {
         // Support team member will verify $user
-        [$supportUser,] = UserFactory::createSupportUser();
+        $supportUser = UserFactory::createSupportUser();
 
         // Creates a user
         $email = Utils::CreateRandomString().'@mail.com';
@@ -65,7 +65,7 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesValidToken() {
         // Support team member will verify $user
-        [$supportUser,] = UserFactory::createSupportUser();
+        $supportUser = UserFactory::createSupportUser();
 
         // Creates a user
         $email = Utils::CreateRandomString().'@mail.com';
@@ -115,7 +115,7 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesExpiredToken() {
         // Support team member will verify $user
-        [$supportUser, ] = UserFactory::createSupportUser();
+        $supportUser = UserFactory::createSupportUser();
 
         // Creates a user
         $email = Utils::CreateRandomString().'@mail.com';

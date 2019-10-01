@@ -122,7 +122,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      *
      * @return string auth_token
      */
-    public static function login($identity) : ScopedLoginToken {
+    public static function login(\OmegaUp\DAO\VO\Identities $identity) : ScopedLoginToken {
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
 
         // Deactivate cookie setting

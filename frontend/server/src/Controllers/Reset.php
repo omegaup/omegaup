@@ -111,7 +111,6 @@ class Reset extends \OmegaUp\Controllers\Controller {
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
-        $user->password = \OmegaUp\SecurityTools::hashString($r['password']);
         $user->reset_digest = null;
         $user->reset_sent_at = null;
         if (is_null($user->main_identity_id)) {
@@ -121,14 +120,10 @@ class Reset extends \OmegaUp\Controllers\Controller {
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('invalidUser');
         }
-        $identity->password = $user->password;
+        $identity->password = \OmegaUp\SecurityTools::hashString($r['password']);
         try {
-            \OmegaUp\DAO\DAO::transBegin();
-            \OmegaUp\DAO\Users::update($user);
             \OmegaUp\DAO\Identities::update($identity);
-            \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to reset password', $e);
             throw $e;
         }

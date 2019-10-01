@@ -12,7 +12,6 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testCreateGroup() {
         $owner = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($owner->main_identity_id);
         $name = Utils::CreateRandomString();
         $description = Utils::CreateRandomString();
         $alias = Utils::CreateRandomString();
@@ -30,7 +29,7 @@ class GroupsTest extends OmegaupTestCase {
         $group = \OmegaUp\DAO\Groups::getByName($name);
         $this->assertNotNull($group);
         $this->assertEquals($description, $group->description);
-        $this->assertTrue(\OmegaUp\Authorization::isGroupAdmin($identity, $group));
+        $this->assertTrue(\OmegaUp\Authorization::isGroupAdmin($owner, $group));
     }
 
     /**
@@ -54,17 +53,16 @@ class GroupsTest extends OmegaupTestCase {
     }
 
     /**
-     * Add user to group
+     * Add identity to group
      */
     public function testAddUserToGroup() {
         $group = GroupsFactory::createGroup();
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        $identity = UserFactory::createUser();
 
         $login = self::login($group['owner']);
         $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $group['group']->alias
         ]));
         $this->assertEquals('ok', $response['status']);

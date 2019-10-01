@@ -715,7 +715,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 }
 
                 $acl = \OmegaUp\DAO\ACLs::getByPK($contest->acl_id);
-                $result['director'] = \OmegaUp\DAO\Users::getByPK($acl->owner_id)->username;
+                $result['director'] = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id)->username;
 
                 $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                     $contest->problemset_id

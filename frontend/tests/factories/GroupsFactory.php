@@ -8,7 +8,13 @@ class GroupsFactory {
      * @param type $name
      * @param type $description
      */
-    public static function createGroup(\OmegaUp\DAO\VO\Users $owner = null, $name = null, $description = null, $alias = null, ScopedLoginToken $login = null) {
+    public static function createGroup(
+        \OmegaUp\DAO\VO\Identities $owner = null,
+        $name = null,
+        $description = null,
+        $alias = null,
+        ScopedLoginToken $login = null
+    ) : array {
         if (is_null($owner)) {
             $owner = UserFactory::createUser();
         }
@@ -47,18 +53,22 @@ class GroupsFactory {
     }
 
     /**
-     * Add user to group helper
+     * Add identity to group helper
      *
      * @param array $groupData
-     * @param \OmegaUp\DAO\VO\Users $user
+     * @param \OmegaUp\DAO\VO\Identities $identity
      */
-    public static function addUserToGroup(array $groupData, \OmegaUp\DAO\VO\Users $user, ScopedLoginToken $login = null) {
+    public static function addUserToGroup(
+        array $groupData,
+        \OmegaUp\DAO\VO\Identities $identity,
+        ScopedLoginToken $login = null
+    ) : void {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($groupData['owner']);
         }
         \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'group_alias' => $groupData['group']->alias
         ]));
     }

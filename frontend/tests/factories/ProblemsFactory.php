@@ -137,7 +137,7 @@ class ProblemsFactory {
         ];
     }
 
-    public static function createProblemWithAuthor(\OmegaUp\DAO\VO\Users $author, ScopedLoginToken $login = null) {
+    public static function createProblemWithAuthor(\OmegaUp\DAO\VO\Identities $author, ScopedLoginToken $login = null) {
         return self::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
             'author' => $author,
@@ -161,7 +161,7 @@ class ProblemsFactory {
         $r = $problemData['request'];
         $problemAuthorUser = $problemData['author'];
         $problemAuthorIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $problemData['author']->main_identity_id
+            $problemData['author']->identity_id
         );
 
         if ($login == null) {
@@ -197,11 +197,11 @@ class ProblemsFactory {
         ];
     }
 
-    public static function addAdminUser($problemData, $user) {
+    public static function addAdminUser($problemData, $identity) {
         // Prepare our request
         $r = new \OmegaUp\Request();
         $r['problem_alias'] = $problemData['request']['problem_alias'];
-        $r['usernameOrEmail'] = $user->username;
+        $r['usernameOrEmail'] = $identity->username;
 
         // Log in the problem author
         $login = OmegaupTestCase::login($problemData['author']);

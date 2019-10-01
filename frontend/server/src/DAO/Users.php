@@ -25,7 +25,16 @@ class Users extends \OmegaUp\DAO\Base\Users {
     public static function FindByUsername(
         string $username
     ) : ?\OmegaUp\DAO\VO\Users {
-        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
+        $sql = 'SELECT
+                    u.*
+                FROM
+                    Users u
+                INNER JOIN
+                    Identities i
+                ON
+                    i.user_id = u.user_id
+                WHERE
+                    i.username = ? LIMIT 1;';
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$username]);
         if (empty($rs)) {
             return null;
@@ -57,24 +66,6 @@ class Users extends \OmegaUp\DAO\Base\Users {
             'reset_digest' => $user->reset_digest,
             'reset_sent_at' => $user->reset_sent_at
         ];
-    }
-
-    public static function savePassword(\OmegaUp\DAO\VO\Users $Users) {
-        $sql = '
-            UPDATE
-                `Users`
-            SET
-                `password` = ?,
-                `username` = ?
-            WHERE
-                `user_id` = ?;';
-        $params = [
-            $Users->password,
-            $Users->username,
-            $Users->user_id,
-        ];
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     final public static function getExtendedProfileDataByPk($user_id) {

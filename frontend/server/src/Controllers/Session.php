@@ -429,8 +429,6 @@ class Session extends \OmegaUp\Controllers\Controller {
                     if (is_null($user)) {
                         throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
                     }
-                    $user->password = $identity->password;
-                    \OmegaUp\DAO\Users::update($user);
                 }
                 \OmegaUp\DAO\DAO::transEnd();
             } catch (\Exception $e) {
