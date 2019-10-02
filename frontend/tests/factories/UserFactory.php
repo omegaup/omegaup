@@ -105,8 +105,11 @@ class UserFactory {
 
         // Get user from db
         $user = \OmegaUp\DAO\Users::FindByUsername($params['username']);
+        if (is_null($user) || is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($user) || is_null($identity)) {
+        if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
 

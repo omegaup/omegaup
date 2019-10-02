@@ -34,11 +34,13 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
 
         $sql = '
             SELECT
-                u.username
+                i.username
             FROM
                 ACLs a
             INNER JOIN
                 Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
             WHERE
                 a.acl_id = ?;';
         $params = [$acl_id];

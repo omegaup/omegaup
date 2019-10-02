@@ -67,7 +67,7 @@ class ContestRequestsTest extends OmegaupTestCase {
         int $numberOfContestants,
         array $contestants,
         array $result,
-        \OmegaUp\DAO\VO\Users $mainAdmin,
+        \OmegaUp\DAO\VO\Identities $mainAdmin,
         array $arbitratedUsers,
         array $acceptedUsers
     ) {

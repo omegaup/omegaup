@@ -256,9 +256,13 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         user_id = util.database_utils.mysql(
             ('''
             SELECT
-                `user_id`
+                `u`.`user_id`
             FROM
-                `Users`
+                `Users` `u`
+            INNER JOIN
+                `Identities` `i`
+            ON
+                `u`.`main_identity_id` = `i`.`identity_id`
             WHERE
                 `username` = '%s';
             ''') % (user),
@@ -394,11 +398,11 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         user_id = util.database_utils.mysql(
             ('''
             INSERT INTO
-                Users(`username`, `password`, `verified`)
+                Users(`verified`)
             VALUES
-                ('%s', '%s', 1);
+                (1);
             SELECT LAST_INSERT_ID();
-            ''') % (username, password),
+            '''),
             dbname='omegaup', auth=self.mysql_auth())
 
         # Enable experiment
