@@ -106,8 +106,8 @@ class UserUpdateTest extends OmegaupTestCase {
             'username' => $newUsername
         ]);
         \OmegaUp\Controllers\User::apiUpdate($r);
-        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
-        $identity = \OmegaUp\DAO\Identities::findByUserId($userDb->user_id);
+        $user = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         $this->assertEquals($identity->username, $newUsername);
     }

@@ -421,18 +421,9 @@ class Session extends \OmegaUp\Controllers\Controller {
             // Update the password using the new Argon2i algorithm.
             self::$log->warn("Identity {$identity->username}'s password hash is being upgraded.");
             try {
-                \OmegaUp\DAO\DAO::transBegin();
                 $identity->password = \OmegaUp\SecurityTools::hashString($r['password']);
                 \OmegaUp\DAO\Identities::update($identity);
-                if (!is_null($identity->user_id)) {
-                    $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-                    if (is_null($user)) {
-                        throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-                    }
-                }
-                \OmegaUp\DAO\DAO::transEnd();
             } catch (\Exception $e) {
-                \OmegaUp\DAO\DAO::transRollback();
                 throw $e;
             }
         }
@@ -444,7 +435,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             if (is_null($user)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
-            \OmegaUp\Controllers\User::checkEmailVerification($user);
+            \OmegaUp\Controllers\User::checkEmailVerification($user, $identity);
         }
 
         try {

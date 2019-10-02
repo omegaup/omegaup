@@ -18,12 +18,13 @@ class IdentityUpdateTest extends OmegaupTestCase {
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
+        $password = Utils::CreateRandomString();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
-            'password' => Utils::CreateRandomString(),
+            'password' => $password,
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
@@ -59,6 +60,22 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $this->assertNotEquals($newIdentity->state_id, $identity->state_id);
         $this->assertNotEquals($newIdentity->gender, $identity->gender);
         $this->assertNotEquals($newIdentity->school_id, $identity->school_id);
+
+        $newIdentity->password = $password;
+        $login = self::login($newIdentity);
+        $newIdentityName = 'newname';
+        $newUsername = $newIdentityName;
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                //new username
+                'username' => $newUsername
+            ]));
+            $this->fail('User shold not be able to change username');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+        }
     }
 
     /**
@@ -103,6 +120,18 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $identity->password = $newPassword;
 
         $identityLogin = self::login($identity);
+        $newPassword = 'anypassword';
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdateBasicInfo(new \OmegaUp\Request([
+                'auth_token' => $identityLogin->auth_token,
+                'username' => $username,
+                'password' => $newPassword,
+            ]));
+            $this->fail('User shold not be able to change password');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+        }
     }
 
     /**

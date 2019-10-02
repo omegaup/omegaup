@@ -21,12 +21,15 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   `Emails` e
                 ON
                   e.user_id = i.user_id
+                INNER JOIN
+                  `Users` u
+                ON
+                  u.user_id = i.user_id AND u.main_identity_id = i.identity_id
                 WHERE
                   e.email = ?
                 LIMIT
                   0, 1';
-        $params = [ $email ];
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
         }

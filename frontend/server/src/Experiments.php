@@ -258,7 +258,7 @@ class Experiments {
             }
             self::$_instance = new Experiments(
                 $requestExperiments,
-                !is_null($session) ? $session['user'] : null
+                !is_null($session) ? $session['identity'] : null
             );
         }
         return self::$_instance;

@@ -101,7 +101,7 @@ class CreateClarificationTest extends OmegaupTestCase {
 
         // Setup contest is required to submit a clarification
         $this->setupContest($problemData, $contestData, $contestant, false /*isGraderExpectedToBeCalled*/);
-        $directorIdentity = \OmegaUp\DAO\Identities::getByPK($contestData['director']->main_identity_id);
+
         // Create 5 users
         $n = 5;
         $users = [];
@@ -118,7 +118,7 @@ class CreateClarificationTest extends OmegaupTestCase {
             $contestData,
             $contestData['director'],
             'Message to everyone',
-            $directorIdentity->username
+            $contestData['director']->username
         );
 
         $messageToSpecificUser = ClarificationsFactory::createClarification(

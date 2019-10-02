@@ -50,8 +50,8 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
-        $this->assertEquals($user->username, $r['author_username']);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertEquals($identity->username, $r['author_username']);
 
         // Verify problem settings.
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($r['problem_alias']);
@@ -309,8 +309,8 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
-        $this->assertEquals($user->username, $r['author_username']);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertEquals($identity->username, $r['author_username']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -645,8 +645,8 @@ class CreateProblemTest extends OmegaupTestCase {
 
         // Verify author username -> author id conversion
         $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-        $user = \OmegaUp\DAO\Users::getByPK($acl->owner_id);
-        $this->assertEquals($user->username, $r['author_username']);
+        $identity = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id);
+        $this->assertEquals($identity->username, $r['author_username']);
 
         // Verify problem contents were copied
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);

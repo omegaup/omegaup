@@ -58,6 +58,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
+        $r->ensureMainUserIdentity();
+
         $is_required = true;
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->identity->username == 'omi') {
@@ -852,7 +854,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemDeployer = new \OmegaUp\ProblemDeployer($r['problem_alias']);
             $problemDeployer->commitLooseFiles(
                 "{$r['lang']}.markdown: {$r['message']}",
-                $r->user,
+                $r->identity,
                 [
                     "{$directory}/{$r['lang']}.markdown" => $contents,
                 ]
@@ -1710,7 +1712,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemDeployer->updatePublished(
                 ((new \OmegaUp\ProblemArtifacts($problem->alias, 'published'))->commit())['commit'],
                 $problem->commit,
-                $r->user
+                $r->identity
             );
 
             \OmegaUp\DAO\Runs::createRunsForVersion($problem);
@@ -2561,7 +2563,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function getProblemSolutionExistenceImpl(
         \OmegaUp\DAO\VO\Problems $problem
     ): bool {
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias, $problem->commit);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(strval($problem->alias), $problem->commit);
         $existingFiles = $problemArtifacts->lsTree('solutions');
         foreach ($existingFiles as $file) {
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);

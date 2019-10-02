@@ -32,7 +32,7 @@ class ContestRequestsTest extends OmegaupTestCase {
     }
 
     private function registerUserForContest(
-        \OmegaUp\DAO\VO\Users $contestant,
+        \OmegaUp\DAO\VO\Identities $contestant,
         \OmegaUp\Request $contest
     ) : void {
         $contestantLogin = self::login($contestant);

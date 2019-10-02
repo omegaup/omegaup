@@ -195,9 +195,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $r['user'] = $user;
             if ($user->verified) {
-                self::$log->info('Identity ' . $identity->username . ' created, trusting e-mail');
+                self::$log->info("Identity {$identity->username} created, trusting e-mail");
             } else {
-                self::$log->info('Identity ' . $identity->username . ' created, sending verification mail');
+                self::$log->info("Identity {$identity->username} created, sending verification mail");
 
                 self::sendVerificationEmail($user);
             }
@@ -303,8 +303,10 @@ class User extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\EmailNotVerifiedException
      */
-    public static function checkEmailVerification(\OmegaUp\DAO\VO\Users $user) {
-        $identity = \OmegaUp\DAO\Identities::findByUserId($user->user_id);
+    public static function checkEmailVerification(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) : void {
         if ($user->verified != '0') {
             // Already verified, nothing to do.
             return;
@@ -384,7 +386,7 @@ class User extends \OmegaUp\Controllers\Controller {
             /** @var int $user->main_identity_id */
             $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-            if ($identity->password !== null) {
+            if (!is_null($identity->password)) {
                 // Check the old password
                 \OmegaUp\Validators::validateStringNonEmpty($r['old_password'], 'old_password');
 
@@ -446,7 +448,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $users = \OmegaUp\DAO\Users::getByVerification($r['id']);
             $user = !empty($users) ? $users[0] : null;
-            $identity = \OmegaUp\DAO\Identities::findByUserId($user->user_id);
+            $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
         }
 
         if (is_null($user)) {
@@ -493,7 +495,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         foreach ($usersMissing as $user) {
-            $identity = \OmegaUp\DAO\Identities::findByUserId($user->user_id);
+            $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
             $registered = self::registerToSendy($user, $identity);
 
             if ($registered) {
@@ -1223,7 +1225,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $coderOfTheMonthUserId = $codersOfTheMonth[0]->user_id;
         }
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
-        $identity = \OmegaUp\DAO\Identities::findByUserId($coderOfTheMonthUserId);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Get the profile of the coder of the month
         $response = \OmegaUp\Controllers\User::getProfileImpl($user, $identity);
@@ -1545,8 +1547,12 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiUpdateBasicInfo(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
+        if (strpos($r->identity->username, ':') !== false) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
+        }
+
         //Buscar que el nuevo username no este ocupado si es que selecciono uno nuevo
-        if ($r['username'] != $r->identity->username) {
+        if ($r['username'] !== $r->identity->username) {
             $testu = \OmegaUp\DAO\Users::FindByUsername($r['username']);
 
             if (!is_null($testu)) {
@@ -1587,9 +1593,14 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (isset($r['username'])) {
             \OmegaUp\Validators::validateValidUsername($r['username'], 'username');
+
             $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
-            if ($r['username'] != $r->identity->username && !is_null($user)) {
+            if ($r['username'] !== $r->identity->username && !is_null($user)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse');
+            }
+
+            if (strpos($r->identity->username, ':') !== false) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
             }
         }
 
@@ -2172,7 +2183,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::validateAddRemoveExperiment($r);
 
         \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
-            'user_id' => $r['user']->user_id,
+            'user_id' => $r->user->user_id,
             'experiment' => $r['experiment'],
         ]));
 
@@ -2193,8 +2204,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $r->ensureIdentity();
         self::validateAddRemoveExperiment($r);
-
-        \OmegaUp\DAO\UsersExperiments::delete($r['user']->user_id, $r['experiment']);
+        if (!is_null($r->identity->user_id)) {
+            \OmegaUp\DAO\UsersExperiments::delete($r->identity->user_id, strval($r['experiment']));
+        }
 
         return [
             'status' => 'ok',
@@ -2293,8 +2305,11 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiAcceptPrivacyPolicy(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        $privacystatement_id = \OmegaUp\DAO\PrivacyStatements::getId($r['privacy_git_object_id'], $r['statement_type']);
-        if (is_null($privacystatement_id)) {
+        $privacystatementId = \OmegaUp\DAO\PrivacyStatements::getId(
+            strval($r['privacy_git_object_id']),
+            strval($r['statement_type'])
+        );
+        if (is_null($privacystatementId)) {
             throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
         }
         /** @var \OmegaUp\DAO\VO\Identities */
@@ -2303,7 +2318,7 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\PrivacyStatementConsentLog::saveLog(
                 intval($identity->identity_id),
-                $privacystatement_id
+                $privacystatementId
             );
         } catch (\Exception $e) {
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
@@ -2365,7 +2380,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'identities' => \OmegaUp\DAO\Identities::getAssociatedIdentities($r->user->user_id)
+            'identities' => \OmegaUp\DAO\Identities::getAssociatedIdentities($r->identity->user_id)
         ];
     }
 

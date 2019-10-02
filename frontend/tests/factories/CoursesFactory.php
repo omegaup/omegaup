@@ -140,6 +140,10 @@ class CoursesFactory {
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
+
+        if (is_null($course) || is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
         $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
         if (is_null($login)) {
             $login = OmegaupTestCase::login($courseData['admin']);
@@ -168,15 +172,29 @@ class CoursesFactory {
         return $responses;
     }
 
+    /**
+     * @param array{course_alias: string} $courseData
+     * @param \OmegaUp\DAO\VO\Identities[] $students
+     * @param string[] $assignmentAliases
+     * @param array $problemAssignmentsMap
+     * @return array
+     * @psalm-return array<string|null, array<string, int>>
+     */
     public static function submitRunsToAssignmentsInCourse(
-        $courseData,
+        array $courseData,
         array $students,
         array $assignmentAliases,
         array $problemAssignmentsMap
     ) {
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         $expectedScores = [];
+        if (is_null($course) || is_null($course->course_id)) {
+            return $expectedScores;
+        }
         for ($s = 0; $s < count($students); $s++) {
+            if (is_null($students[$s]->username)) {
+                continue;
+            }
             $studentUsername = $students[$s]->username;
             $expectedScores[$studentUsername] = [];
             $studentLogin = OmegaupTestCase::login($students[$s]);

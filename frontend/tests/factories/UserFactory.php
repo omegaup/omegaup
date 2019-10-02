@@ -76,9 +76,10 @@ class UserFactory {
     * @param string $username optional
     * @param string $password optional
     * @param string $email optional
-    * @return user (DAO)
+    * @return \OmegaUp\DAO\VO\Identities
+    * @psalm-return \OmegaUp\DAO\VO\Identities
     */
-    public static function createUser($params = null) {
+    public static function createUser($params = null) : \OmegaUp\DAO\VO\Identities {
         if (!($params instanceof UserParams)) {
             $params = new UserParams($params);
         }
@@ -104,8 +105,8 @@ class UserFactory {
 
         // Get user from db
         $user = \OmegaUp\DAO\Users::FindByUsername($params['username']);
-        $identity = \OmegaUp\DAO\Identities::findByUsername($params['username']);
-        if (is_null($user)) {
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        if (is_null($user) || is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
 
@@ -118,7 +119,7 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $identity->password = $params['password'];
+        $identity->password = strval($params['password']);
 
         return $identity;
     }
@@ -174,9 +175,10 @@ class UserFactory {
      * @param string $username
      * @param string $password
      * @param string $email
-     * @return User
+     * @return \OmegaUp\DAO\VO\Identities
+     * @psalm-return \OmegaUp\DAO\VO\Identities
      */
-    public static function createAdminUser($params = null) {
+    public static function createAdminUser($params = null) : \OmegaUp\DAO\VO\Identities {
         $identity = self::createUser($params);
 
         self::addSystemRole($identity, \OmegaUp\Authorization::ADMIN_ROLE);
@@ -187,12 +189,11 @@ class UserFactory {
     /**
      * Creates a new identity with mentor role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
+     * @param UserParams|null $params
      * @return \OmegaUp\DAO\VO\Identities
+     * @psalm-return \OmegaUp\DAO\VO\Identities
      */
-    public static function createMentorIdentity($params = null) : \OmegaUp\DAO\VO\Identities {
+    public static function createMentorIdentity(UserParams $params = null) : \OmegaUp\DAO\VO\Identities {
         $identity = self::createUser($params);
 
         self::addMentorRole($identity);

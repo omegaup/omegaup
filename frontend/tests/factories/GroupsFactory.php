@@ -4,16 +4,20 @@ class GroupsFactory {
     /**
      * Create group
      *
-     * @param type $owner
-     * @param type $name
-     * @param type $description
+     * @param \OmegaUp\DAO\VO\Identities $owner
+     * @param string $name
+     * @param string $description
+     * @param string $alias
+     * @param ScopedLoginToken $login
+     * @return array
+     * @psalm-return array{request: array{auth_token: string, name: string, description: string, alias: string}, response: array{status: string}, owner: \OmegaUp\DAO\VO\Identities, group: \OmegaUp\DAO\VO\Groups}
      */
     public static function createGroup(
         \OmegaUp\DAO\VO\Identities $owner = null,
-        $name = null,
-        $description = null,
-        $alias = null,
-        ScopedLoginToken $login = null
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null,
+        ?ScopedLoginToken $login = null
     ) : array {
         if (is_null($owner)) {
             $owner = UserFactory::createUser();
@@ -34,14 +38,16 @@ class GroupsFactory {
         if (is_null($login)) {
             $login = OmegaupTestCase::login($owner);
         }
+        /** @var array{auth_token: string, name: string, description: string, alias: string} $r */
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $name,
             'description' => $description,
             'alias' => $alias
         ]);
-
+        /** @var array{status: string} $response */
         $response = \OmegaUp\Controllers\Group::apiCreate($r);
+        /** @var \OmegaUp\DAO\VO\Groups $group */
         $group = \OmegaUp\DAO\Groups::findByAlias($alias);
 
         return [

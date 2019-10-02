@@ -632,6 +632,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Update problems order
+        /** @var array{alias: string, order: int}[] $problems */
         $problems = $r['problems'];
         foreach ($problems as $problem) {
             $currentProblem = \OmegaUp\DAO\Problems::getByAlias($problem['alias']);
@@ -1560,7 +1561,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'requests_user_information' => $course->requests_user_information
             ];
 
-            if ($isAdmin) {
+            if ($isAdmin && !is_null($course->group_id)) {
                 $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
                 if (is_null($group)) {
                     throw new \OmegaUp\Exceptions\NotFoundException('courseGroupNotFound');
@@ -1751,6 +1752,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $director = null;
         $acl = \OmegaUp\DAO\ACLs::getByPK($tokenAuthenticationResult['course']->acl_id);
+        /** @var int $acl->owner_id */
         $director = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id)->username;
 
         // Log the operation only when there is not a token in request
@@ -1844,7 +1846,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (is_null($r->identity) || !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -1965,11 +1967,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         $group = self::resolveGroup($tokenAuthenticationResult['course'], $r['group']);
 
         if (!$tokenAuthenticationResult['hasToken'] &&
+            (is_null($r->identity) ||
             !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
                 $tokenAuthenticationResult['course'],
                 $group
-            )) {
+            ))) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
