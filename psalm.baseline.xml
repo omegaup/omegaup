@@ -3426,12 +3426,6 @@
     <MissingDependency occurrences="1">
       <code>OmegaUpTestCase</code>
     </MissingDependency>
-    <MissingParamType occurrences="1">
-      <code>$auth_token</code>
-    </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$auth_token</code>
-    </MissingPropertyType>
     <UndefinedClass occurrences="1">
       <code>\PHPUnit\Framework\TestCase</code>
     </UndefinedClass>
@@ -3697,8 +3691,7 @@
     <MissingPropertyType occurrences="1">
       <code>$params</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="9">
-      <code>createContest</code>
+    <MissingReturnType occurrences="8">
       <code>addProblemToContest</code>
       <code>removeProblemFromContest</code>
       <code>openContest</code>
@@ -3767,9 +3760,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
-    <InvalidPropertyFetch occurrences="1">
-      <code>$studentLogin-&gt;auth_token</code>
-    </InvalidPropertyFetch>
     <MissingDependency occurrences="8">
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
@@ -3801,9 +3791,6 @@
       <code>$problemData</code>
       <code>$user</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$login-&gt;auth_token</code>
-    </MissingPropertyType>
     <MissingReturnType occurrences="9">
       <code>createCourse</code>
       <code>createCourseWithOneAssignment</code>
@@ -3848,15 +3835,6 @@
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
     </MissingDependency>
-    <MissingParamType occurrences="3">
-      <code>$scoreboardData</code>
-      <code>$onlyAC</code>
-      <code>$weight</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>createGroupScoreboard</code>
-      <code>addContestToScoreboard</code>
-    </MissingReturnType>
     <UndefinedDocblockClass occurrences="3">
       <code>type</code>
       <code>type</code>
@@ -3867,9 +3845,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
-    <MissingPropertyType occurrences="1">
-      <code>$adminLogin-&gt;auth_token</code>
-    </MissingPropertyType>
     <MixedArgument occurrences="2">
       <code>$unassociatedIdentity['username']</code>
       <code>$associatedIdentity['username']</code>
@@ -4222,9 +4197,7 @@
     </MixedArrayAccess>
   </file>
   <file src="frontend/www/contestmine.php">
-    <MixedArrayAccess occurrences="2">
-      <code>$session['user']</code>
-    </MixedArrayAccess>
+    <MixedArrayAccess occurrences="2"/>
     <MixedAssignment occurrences="1">
       <code>$payload</code>
     </MixedAssignment>
@@ -4482,9 +4455,7 @@
     </MixedAssignment>
   </file>
   <file src="frontend/www/problemmine.php">
-    <MixedArrayAccess occurrences="1">
-      <code>$session['user']</code>
-    </MixedArrayAccess>
+    <MixedArrayAccess occurrences="1"/>
     <MixedAssignment occurrences="2">
       <code>$smartyProperties</code>
       <code>$value</code>
@@ -4540,24 +4511,17 @@
   <file src="frontend/www/qualitynomination.php">
     <MixedArrayAccess occurrences="3">
       <code>$_GET['qualitynomination_id']</code>
-      <code>$session['user']</code>
     </MixedArrayAccess>
     <MixedAssignment occurrences="3">
       <code>$qualitynomination_id</code>
       <code>$payload</code>
       <code>$payload['currentUser']</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="1">
-      <code>$session['user']-&gt;username</code>
-    </MixedPropertyFetch>
+    <MixedPropertyFetch occurrences="1"/>
   </file>
   <file src="frontend/www/qualitynomination_mine.php">
-    <MixedArrayAccess occurrences="1">
-      <code>$session['user']</code>
-    </MixedArrayAccess>
-    <MixedPropertyFetch occurrences="1">
-      <code>$session['user']-&gt;username</code>
-    </MixedPropertyFetch>
+    <MixedArrayAccess occurrences="1"/>
+    <MixedPropertyFetch occurrences="1"/>
   </file>
   <file src="frontend/www/rank.php">
     <MixedArrayAccess occurrences="1">

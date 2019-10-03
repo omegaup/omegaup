@@ -2777,12 +2777,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         $contest = self::validateStats(strval($r['contest_alias']), $r->identity);
-        if (!is_null($contest->problemset_id)) {
-            include_once 'libs/third_party/ZipStream.php';
-            $zip = new \ZipStream("{$r['contest_alias']}.zip");
-            \OmegaUp\Controllers\Problemset::downloadRuns($contest->problemset_id, $zip);
-            $zip->finish();
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
+        include_once 'libs/third_party/ZipStream.php';
+        $zip = new \ZipStream("{$r['contest_alias']}.zip");
+        \OmegaUp\Controllers\Problemset::downloadRuns($contest->problemset_id, $zip);
+        $zip->finish();
 
         die();
     }

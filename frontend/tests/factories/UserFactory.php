@@ -77,7 +77,6 @@ class UserFactory {
     * @param string $password optional
     * @param string $email optional
     * @return \OmegaUp\DAO\VO\Identities
-    * @psalm-return \OmegaUp\DAO\VO\Identities
     */
     public static function createUser($params = null) : \OmegaUp\DAO\VO\Identities {
         if (!($params instanceof UserParams)) {
@@ -124,6 +123,7 @@ class UserFactory {
         // Password came hashed from DB. Set password in plaintext
         $identity->password = strval($params['password']);
 
+        // TODO: This method should return both Users and Identities Objects
         return $identity;
     }
 
@@ -179,7 +179,6 @@ class UserFactory {
      * @param string $password
      * @param string $email
      * @return \OmegaUp\DAO\VO\Identities
-     * @psalm-return \OmegaUp\DAO\VO\Identities
      */
     public static function createAdminUser($params = null) : \OmegaUp\DAO\VO\Identities {
         $identity = self::createUser($params);
@@ -194,7 +193,6 @@ class UserFactory {
      *
      * @param UserParams|null $params
      * @return \OmegaUp\DAO\VO\Identities
-     * @psalm-return \OmegaUp\DAO\VO\Identities
      */
     public static function createMentorIdentity(UserParams $params = null) : \OmegaUp\DAO\VO\Identities {
         $identity = self::createUser($params);

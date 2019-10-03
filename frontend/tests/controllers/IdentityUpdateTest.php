@@ -18,13 +18,12 @@ class IdentityUpdateTest extends OmegaupTestCase {
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = Utils::CreateRandomString();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
-            'password' => $password,
+            'password' => Utils::CreateRandomString(),
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
@@ -60,11 +59,37 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $this->assertNotEquals($newIdentity->state_id, $identity->state_id);
         $this->assertNotEquals($newIdentity->gender, $identity->gender);
         $this->assertNotEquals($newIdentity->school_id, $identity->school_id);
+    }
 
-        $newIdentity->password = $password;
-        $login = self::login($newIdentity);
-        $newIdentityName = 'newname';
-        $newUsername = $newIdentityName;
+    /**
+     * Test for updating a no-main identity's username
+     */
+    public function testUpdateNoMainIdentityUsername() {
+        // Identity creator group member will create an identity
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+
+        $identityName = substr(Utils::CreateRandomString(), - 10);
+        $username = "{$group['group']->alias}:{$identityName}";
+        $password = Utils::CreateRandomString();
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => $identityName,
+            'password' => $password,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => Utils::CreateRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+        $identity->password = $password;
+        $login = self::login($identity);
+        $newUsername = 'newname';
 
         try {
             \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -119,6 +144,36 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $identity->password = $newPassword;
 
+        $identityLogin = self::login($identity);
+    }
+
+    /**
+     * Test for changing no-main identity password
+     */
+    public function testChangePasswordNoMainIdentity() {
+        // Identity creator group member will create an identity
+        $creator = UserFactory::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+
+        $identityName = substr(Utils::CreateRandomString(), - 10);
+        $username = "{$group['group']->alias}:{$identityName}";
+        $originalPassword = Utils::CreateRandomString();
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $username,
+            'name' => $identityName,
+            'password' => $originalPassword,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => Utils::CreateRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+        $identity->password = $originalPassword;
         $identityLogin = self::login($identity);
         $newPassword = 'anypassword';
 

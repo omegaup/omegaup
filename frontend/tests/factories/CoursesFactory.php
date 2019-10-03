@@ -189,11 +189,11 @@ class CoursesFactory {
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         $expectedScores = [];
         if (is_null($course) || is_null($course->course_id)) {
-            return $expectedScores;
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         for ($s = 0; $s < count($students); $s++) {
             if (is_null($students[$s]->username)) {
-                continue;
+                throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
             }
             $studentUsername = $students[$s]->username;
             $expectedScores[$studentUsername] = [];

@@ -133,7 +133,8 @@ class Experiments {
         array $knownExperiments
     ) : void {
         if (is_null($identity->user_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            // It means that user is trying to login with an unassociated identity
+            return;
         }
         foreach (\OmegaUp\DAO\UsersExperiments::getByUserId($identity->user_id) as $ue) {
             if (in_array($ue->experiment, $knownExperiments) &&

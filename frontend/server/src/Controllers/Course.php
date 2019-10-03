@@ -1561,7 +1561,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'requests_user_information' => $course->requests_user_information
             ];
 
-            if ($isAdmin && !is_null($course->group_id)) {
+            if ($isAdmin) {
+                if (is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+                }
                 $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
                 if (is_null($group)) {
                     throw new \OmegaUp\Exceptions\NotFoundException('courseGroupNotFound');
@@ -1752,11 +1755,12 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $director = null;
         $acl = \OmegaUp\DAO\ACLs::getByPK($tokenAuthenticationResult['course']->acl_id);
-        /** @var int $acl->owner_id */
-        $director = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id)->username;
+        $director = \OmegaUp\DAO\Identities::findByUserId(intval($acl->owner_id))->username;
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
+            // Authenticate request
+            $r->ensureIdentity();
             \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
@@ -1827,6 +1831,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRuns(\OmegaUp\Request $r) : void {
+        $r->ensureIdentity();
         // Defaults for offset and rowcount
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
@@ -1846,7 +1851,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
         }
 
-        if (is_null($r->identity) || !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -1966,14 +1971,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $group = self::resolveGroup($tokenAuthenticationResult['course'], $r['group']);
 
-        if (!$tokenAuthenticationResult['hasToken'] &&
-            (is_null($r->identity) ||
-            !\OmegaUp\Authorization::canViewCourse(
+        if (!$tokenAuthenticationResult['hasToken']) {
+            $r->ensureIdentity();
+            if (!\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
                 $tokenAuthenticationResult['course'],
                 $group
-            ))) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            )) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
         }
 
         $scoreboard = new \OmegaUp\Scoreboard(

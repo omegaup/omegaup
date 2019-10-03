@@ -1547,7 +1547,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiUpdateBasicInfo(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        if (strpos($r->identity->username, ':') !== false) {
+        if (self::isNonUserIdentity($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
@@ -1599,7 +1599,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('usernameInUse');
             }
 
-            if (strpos($r->identity->username, ':') !== false) {
+            if (self::isNonUserIdentity($r->identity)) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
             }
         }
@@ -2204,9 +2204,10 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $r->ensureIdentity();
         self::validateAddRemoveExperiment($r);
-        if (!is_null($r->identity->user_id)) {
-            \OmegaUp\DAO\UsersExperiments::delete($r->identity->user_id, strval($r['experiment']));
+        if (is_null($r->identity->user_id)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
+        \OmegaUp\DAO\UsersExperiments::delete($r->identity->user_id, strval($r['experiment']));
 
         return [
             'status' => 'ok',
@@ -2543,6 +2544,20 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
         }
         return $response;
+    }
+
+    /**
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @return bool
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     */
+    public static function isNonUserIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ) : bool {
+        if (is_null($identity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
+        return strpos($identity->username, ':') !== false;
     }
 }
 

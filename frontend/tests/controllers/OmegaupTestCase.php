@@ -120,7 +120,7 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      *
      * @param $identity to be logged in
      *
-     * @return string auth_token
+     * @return ScopedLoginToken
      */
     public static function login(\OmegaUp\DAO\VO\Identities $identity) : ScopedLoginToken {
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
@@ -382,11 +382,12 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
  * Simple RAII class that logs out as soon as it goes out of scope.
  */
 class ScopedLoginToken {
+    /** @var string|null */
     public $auth_token = null;
 
-    public function __construct($auth_token) {
+    public function __construct(string $authToken) {
         \OmegaUp\Authorization::clearCacheForTesting();
-        $this->auth_token = $auth_token;
+        $this->auth_token = $authToken;
     }
 
     public function __destruct() {
