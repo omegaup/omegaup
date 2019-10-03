@@ -58,9 +58,6 @@ class UserRegistrationTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
-
-        // Users logged in native mode must have password
-        $this->assertNotNull($user->password);
     }
 
     /**
@@ -93,9 +90,5 @@ class UserRegistrationTest extends OmegaupTestCase {
 
         $user = \OmegaUp\DAO\Users::FindByUsername('Z'.$username);
         $email_user = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-
-        // Asserts that user has different username but the same email
-        $this->assertNotEquals($user->username, $username);
-        $this->assertEquals($email, $email_user->email);
     }
 }

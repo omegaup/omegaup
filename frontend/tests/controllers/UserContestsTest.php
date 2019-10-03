@@ -85,8 +85,9 @@ class UserContestsTest extends OmegaupTestCase {
         // Create private contest
         $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
         $user = $contestData['director'];
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-        $this->assertEquals(1, \OmegaUp\DAO\Contests::getPrivateContestsCount($user));
+        $this->assertEquals(1, \OmegaUp\DAO\Contests::getPrivateContestsCount($identity));
     }
 
     /**
@@ -96,8 +97,9 @@ class UserContestsTest extends OmegaupTestCase {
         // Create private contest
         $contestData = ContestsFactory::createContest();
         $user = $contestData['director'];
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-        $this->assertEquals(0, \OmegaUp\DAO\Contests::getPrivateContestsCount($user));
+        $this->assertEquals(0, \OmegaUp\DAO\Contests::getPrivateContestsCount($identity));
     }
 
     /**
@@ -106,7 +108,8 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testPrivateContestsCountWithNoContests() {
         $user = UserFactory::createUser();
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-        $this->assertEquals(0, \OmegaUp\DAO\Contests::getPrivateContestsCount($user));
+        $this->assertEquals(0, \OmegaUp\DAO\Contests::getPrivateContestsCount($identity));
     }
 }

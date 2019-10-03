@@ -6,7 +6,7 @@ require_once('../server/bootstrap_smarty.php');
 try {
     $payload = [
     'nominations' => \OmegaUp\Controllers\QualityNomination::apiMyList(new \OmegaUp\Request([]))['nominations'],
-    'currentUser' => $session['user']->username,
+    'currentUser' => $session['identity']->username,
     'myView' => true,
     ];
     $smarty->assign('payload', $payload);
