@@ -1698,14 +1698,12 @@
       <code>$response['admin']</code>
       <code>$details['compile_error']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="16">
+    <MixedAssignment occurrences="14">
       <code>$r['container']</code>
       <code>$problemset_id</code>
       <code>$r['container']</code>
       <code>$penalty_type</code>
       <code>$start</code>
-      <code>$response['submission_deadline']</code>
-      <code>$response['nextSubmissionTimestamp']</code>
       <code>$filtered</code>
       <code>$filtered['time']</code>
       <code>$gzippedLogs</code>
@@ -2269,11 +2267,10 @@
     <MissingPropertyType occurrences="1">
       <code>$getContestsColumns</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="16">
+    <MissingReturnType occurrences="15">
       <code>getByTitle</code>
       <code>getByAliasWithExtraInformation</code>
       <code>getByProblemset</code>
-      <code>getPrivateContestsCount</code>
       <code>hasStarted</code>
       <code>hasFinished</code>
       <code>getContestsParticipated</code>
@@ -2950,16 +2947,14 @@
     </PossiblyNullPropertyAssignment>
   </file>
   <file src="frontend/server/src/DAO/Runs.php">
-    <MissingParamType occurrences="5">
-      <code>$contest</code>
+    <MissingParamType occurrences="4">
       <code>$problemset_id</code>
       <code>$problem_id</code>
       <code>$current_points</code>
       <code>$original_points</code>
     </MissingParamType>
-    <MissingReturnType occurrences="4">
+    <MissingReturnType occurrences="3">
       <code>countRunsOfIdentityPerDatePerVerdict</code>
-      <code>nextSubmissionTimestamp</code>
       <code>recalculateScore</code>
       <code>recalculatePenaltyForContest</code>
     </MissingReturnType>
@@ -2981,9 +2976,6 @@
       <code>$submissionGap</code>
       <code>$submission_gap</code>
     </MixedOperand>
-    <MixedPropertyFetch occurrences="1">
-      <code>$contest-&gt;submissions_gap</code>
-    </MixedPropertyFetch>
     <MixedReturnStatement occurrences="4">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;GetOne($sql, $val)</code>
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;GetOne($sql, $val)</code>
@@ -3822,10 +3814,7 @@
       <code>openAssignmentCourse</code>
       <code>openProblemInCourseAssignment</code>
     </MissingReturnType>
-    <MixedArgument occurrences="3">
-      <code>$runResponsePA['guid']</code>
-      <code>$runResponseAC['guid']</code>
-    </MixedArgument>
+    <MixedArgument occurrences="2"/>
     <MixedArrayAccess occurrences="6">
       <code>$courseFactoryResult['course_alias']</code>
       <code>$courseFactoryResult['admin']</code>

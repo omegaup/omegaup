@@ -642,7 +642,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
 
-    public static function getPrivateCount(\OmegaUp\DAO\VO\Identities $identity) : int {
+    public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user) : int {
+        if (is_null($user->user_id)) {
+            return 0;
+        }
         $sql = 'SELECT
             COUNT(*) as total
         FROM
@@ -653,8 +656,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             a.acl_id = p.acl_id
         WHERE
             p.visibility <= 0 and a.owner_id = ?;';
+        $params = [$user->user_id];
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$identity->user_id]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 
     /**

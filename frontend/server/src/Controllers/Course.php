@@ -632,7 +632,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Update problems order
-        /** @var array{alias: string, order: int}[] $problems */
+        /** @var array{alias: string, order: int}[] */
         $problems = $r['problems'];
         foreach ($problems as $problem) {
             $currentProblem = \OmegaUp\DAO\Problems::getByAlias($problem['alias']);
@@ -1736,6 +1736,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
+        // Authenticate request
+        $r->ensureIdentity();
 
         $tokenAuthenticationResult = self::authenticateAndValidateToken(
             $r['course'],
@@ -1759,8 +1761,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
-            // Authenticate request
-            $r->ensureIdentity();
             \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
@@ -1963,6 +1963,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiAssignmentScoreboard(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         $tokenAuthenticationResult = self::authenticateAndValidateToken(
             $r['course'],
             $r['assignment'],
@@ -1971,15 +1972,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $group = self::resolveGroup($tokenAuthenticationResult['course'], $r['group']);
 
-        if (!$tokenAuthenticationResult['hasToken']) {
-            $r->ensureIdentity();
-            if (!\OmegaUp\Authorization::canViewCourse(
+        if (!$tokenAuthenticationResult['hasToken'] &&
+            !\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
                 $tokenAuthenticationResult['course'],
                 $group
             )) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-            }
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $scoreboard = new \OmegaUp\Scoreboard(

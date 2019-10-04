@@ -26,11 +26,6 @@ class PrivacyStatements extends \OmegaUp\DAO\Base\PrivacyStatements {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$statement_type]);
     }
 
-    /**
-     * @param string $gitObjectId
-     * @param string $statementType
-     * @return null|int
-     */
     public static function getId(string $gitObjectId, string $statementType) : ?int {
         $sql = 'SELECT
                   privacystatement_id
