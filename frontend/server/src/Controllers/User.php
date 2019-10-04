@@ -963,7 +963,7 @@ class User extends \OmegaUp\Controllers\Controller {
             // Arreglo de concurso
             $keys = [
                 'CCUPITSUR-16' => 50,
-                'CCUPTECNM' => 300,
+                'CCUPTECNM' => 500,
             ];
         } elseif ($r['contest_type'] == 'CONALEP') {
             if ($r->identity->username != 'reyes811'
