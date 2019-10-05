@@ -9,7 +9,6 @@
  */
 class User extends \OmegaUp\Controllers\Controller {
     public static $sendEmailOnVerify = true;
-    public static $redirectOnVerify = true;
     public static $permissionKey = null;
 
     /** @var \OmegaUp\UrlHelper */
@@ -286,11 +285,12 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $subject = \OmegaUp\Translations::getInstance()->get('verificationEmailSubject')
             ?: 'verificationEmailSubject';
-        $body = sprintf(
+        $body = \OmegaUp\ApiUtils::formatString(
             \OmegaUp\Translations::getInstance()->get('verificationEmailBody')
                 ?: 'verificationEmailBody',
-            OMEGAUP_URL,
-            strval($user->verification_id)
+            [
+                'verification_id' => strval($user->verification_id),
+            ]
         );
 
         \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
@@ -422,55 +422,47 @@ class User extends \OmegaUp\Controllers\Controller {
      * Verifies the user given its verification id
      *
      * @param \OmegaUp\Request $r
-     * @return type
+     * @return array{status: 'ok'}
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    public static function apiVerifyEmail(\OmegaUp\Request $r) {
-        $user = null;
+    public static function apiVerifyEmail(\OmegaUp\Request $r) : array {
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
 
-        // Admin can override verification by sending username
         if (isset($r['usernameOrEmail'])) {
+            // Admin can override verification by sending username
             $r->ensureIdentity();
 
             if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            self::$log->info('Admin verifiying user...' . $r['usernameOrEmail']);
-
-            \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
-
+            self::$log->info("Admin verifying user... {$r['usernameOrEmail']}");
             $user = self::resolveUser($r['usernameOrEmail']);
-
-            self::$redirectOnVerify = false;
         } else {
             // Normal user verification path
             \OmegaUp\Validators::validateStringNonEmpty($r['id'], 'id');
-
-            $users = \OmegaUp\DAO\Users::getByVerification($r['id']);
-            $user = !empty($users) ? $users[0] : null;
+            $user = \OmegaUp\DAO\Users::getByVerification($r['id']);
         }
 
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('verificationIdInvalid');
         }
 
-        $user->verified = 1;
+        $user->verified = true;
+        $user->verification_id = null;
         \OmegaUp\DAO\Users::update($user);
 
-        self::$log->info('User verification complete.');
-
-        if (self::$redirectOnVerify) {
-            if (!is_null($r['redirecttointerview'])) {
-                die(header('Location: /login/?redirect=/interview/' . urlencode($r['redirecttointerview']) . '/arena'));
-            } else {
-                die(header('Location: /login/'));
-            }
-        }
+        self::$log->info("User verification complete for {$user->username}");
 
         // Expire profile cache
-        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::USER_PROFILE, $user->username);
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::USER_PROFILE,
+            strval($user->username)
+        );
 
         return ['status' => 'ok'];
     }
