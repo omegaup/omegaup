@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class Identities extends \OmegaUp\DAO\Base\Identities {
-    public static function FindByEmail($email) {
+    public static function findByEmail(string $email) : ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                   i.*
                 FROM
@@ -285,5 +285,34 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$userId, $identity_id]);
 
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * @return array{gender: string, users: int}[]
+     */
+    public static function countActiveUsersByGender(int $startTimestamp, int $endTimestamp) : array {
+        $sql = '
+            SELECT
+                "total" AS gender,
+                COUNT(DISTINCT ill.identity_id) AS users
+            FROM
+                Identity_Login_Log ill
+            WHERE
+                ill.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
+            UNION
+            SELECT
+                COALESCE(i.gender, "unknown") AS gender,
+                COUNT(DISTINCT ill.identity_id) AS users
+            FROM
+                Identity_Login_Log ill
+            INNER JOIN
+                Identities i ON i.identity_id = ill.identity_id
+            WHERE
+                ill.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
+            GROUP BY
+                gender;
+';
+        /** @var array{gender: string, users: int}[] */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$startTimestamp, $endTimestamp, $startTimestamp, $endTimestamp]);
     }
 }

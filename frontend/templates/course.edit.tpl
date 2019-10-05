@@ -1,5 +1,5 @@
 {include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleCourseEdit#}"}
+{include file='head.tpl' navbarSection='schools' htmlTitle="{#omegaupTitleCourseEdit#}"}
 
 <div class="panel panel-primary">
 	<div class="panel-heading">

@@ -23,6 +23,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing.
+            /** @var null $r->identity */
         }
 
         $contests = [];
@@ -57,40 +58,79 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($participating)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'participating');
         }
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['query'],
+            'query',
+            null,
+            255,
+            false /* not required */
+        );
         $query = $r['query'];
-        \OmegaUp\Validators::validateStringOfLengthInRange($query, 'query', null, 255, false /* not required */);
         $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$page_size}";
         if (is_null($r->identity)) {
             // Get all public contests
-            $contests = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::CONTESTS_LIST_PUBLIC,
-                $cacheKey,
-                function () use ($page, $page_size, $activeContests, $recommended, $query) {
-                    return \OmegaUp\DAO\Contests::getAllPublicContests(
-                        $page,
-                        $page_size,
-                        $activeContests,
-                        $recommended,
-                        $query
-                    );
-                }
-            );
+            $callback = function () use ($page, $page_size, $activeContests, $recommended, $query) {
+                return \OmegaUp\DAO\Contests::getAllPublicContests(
+                    $page,
+                    $page_size,
+                    $activeContests,
+                    $recommended,
+                    $query
+                );
+            };
+            if (empty($query)) {
+                $contests = \OmegaUp\Cache::getFromCacheOrSet(
+                    \OmegaUp\Cache::CONTESTS_LIST_PUBLIC,
+                    $cacheKey,
+                    $callback
+                );
+            } else {
+                $contests = $callback();
+            }
         } elseif ($participating == \OmegaUp\DAO\Enum\ParticipatingStatus::YES) {
-            $contests = \OmegaUp\DAO\Contests::getContestsParticipating($r->identity->identity_id, $page, $page_size, $query);
+            $contests = \OmegaUp\DAO\Contests::getContestsParticipating(
+                $r->identity->identity_id,
+                $page,
+                $page_size,
+                $query
+            );
         } elseif ($public) {
-            $contests = \OmegaUp\DAO\Contests::getRecentPublicContests($r->identity->identity_id, $page, $page_size, $query);
+            $contests = \OmegaUp\DAO\Contests::getRecentPublicContests(
+                $r->identity->identity_id,
+                $page,
+                $page_size,
+                $query
+            );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             // Get all contests
-            $contests = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN,
-                $cacheKey,
-                function () use ($page, $page_size, $activeContests, $recommended, $query) {
-                        return \OmegaUp\DAO\Contests::getAllContests($page, $page_size, $activeContests, $recommended, $query);
-                }
-            );
+            $callback = function () use ($page, $page_size, $activeContests, $recommended, $query) {
+                return \OmegaUp\DAO\Contests::getAllContests(
+                    $page,
+                    $page_size,
+                    $activeContests,
+                    $recommended,
+                    $query
+                );
+            };
+            if (empty($query)) {
+                $contests = \OmegaUp\Cache::getFromCacheOrSet(
+                    \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN,
+                    $cacheKey,
+                    $callback
+                );
+            } else {
+                $contests = $callback();
+            }
         } else {
             // Get all public+private contests
-            $contests = \OmegaUp\DAO\Contests::getAllContestsForIdentity($r->identity->identity_id, $page, $page_size, $activeContests, $recommended, $query);
+            $contests = \OmegaUp\DAO\Contests::getAllContestsForIdentity(
+                $r->identity->identity_id,
+                $page,
+                $page_size,
+                $activeContests,
+                $recommended,
+                $query
+            );
         }
 
         // Filter returned values by these columns
@@ -106,8 +146,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'window_length',
             'recommended',
             'last_updated',
-            'rerun_id'
-            ];
+            'rerun_id',
+        ];
 
         $addedContests = [];
         foreach ($contests as $contestInfo) {
@@ -120,7 +160,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         return [
             'number_of_results' => sizeof($addedContests),
-            'results' => $addedContests
+            'results' => $addedContests,
         ];
     }
 
@@ -359,7 +399,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'needsBasicInformation' => false,
             'requestsUserInformation' => false,
         ];
-        if (!$session['valid'] || is_null($session['identity'])) {
+        if (is_null($session['identity'])) {
             // No session, show the intro if public, so that they can login.
             return $result;
         }
@@ -515,10 +555,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode',
         ]);
 
-        $current_ses = \OmegaUp\Controllers\Session::getCurrentSession($r);
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
 
-        if ($current_ses['valid'] && $result['admission_mode'] == 'registration') {
-            $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK($current_ses['identity']->identity_id, $r['contest']->problemset_id);
+        if (!is_null($session['identity']) && $result['admission_mode'] == 'registration') {
+            $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
+                $session['identity']->identity_id,
+                $r['contest']->problemset_id
+            );
 
             $result['user_registration_requested'] = !is_null($registration);
 
@@ -911,7 +954,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiCreateVirtual(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -1348,6 +1390,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\PreconditionFailedException('contestAddproblemTooManyProblems');
         }
 
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
         [$masterCommit, $currentVersion] = \OmegaUp\Controllers\Problem::resolveCommit(
             $params['problem'],
             $r['commit']
@@ -2802,7 +2845,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Validate value param
         $r->ensureBool('value');
 
-        $contest->recommended = $r['value'];
+        $contest->recommended = boolval($r['value']);
         \OmegaUp\DAO\Contests::update($contest);
 
         return ['status' => 'ok'];

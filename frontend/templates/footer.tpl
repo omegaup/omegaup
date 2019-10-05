@@ -15,6 +15,7 @@
 						<div class="col-md-4">
 							<!-- Twitter follow -->
 							<a href="https://twitter.com/omegaup?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-width="300px" data-height="20" data-show-screen-name="false" data-dnt="true" data-show-count="true">Follow @omegaup</a>
+							<script async defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 						</div>
 					</div>
 				</div>

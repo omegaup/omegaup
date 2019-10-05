@@ -223,7 +223,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         self::validateClone($r);
         $originalCourse = self::validateCourseExists($r['course_alias']);
 
-        $offset = round($r['start_time']) - $originalCourse->start_time;
+        $offset = intval(round($r['start_time']) - $originalCourse->start_time);
 
         \OmegaUp\DAO\DAO::transBegin();
 
@@ -254,10 +254,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'alias' => $assignmentProblems['assignment_alias'],
                     'publish_time_delay' => $assignmentProblems['publish_time_delay'],
                     'assignment_type' => $assignmentProblems['assignment_type'],
-                    'start_time' => $assignmentProblems['start_time'] + $offset,
-                    'finish_time' => $assignmentProblems['finish_time'] + $offset,
+                    'start_time' => intval($assignmentProblems['start_time']) + $offset,
+                    'finish_time' => intval($assignmentProblems['finish_time']) + $offset,
+                    'order' => $assignmentProblems['order'],
+                    'max_points' => $assignmentProblems['max_points'],
                 ]));
 
+                /** @var array{problem_id: int, problem_alias: string}[] $problem */
                 foreach ($assignmentProblems['problems'] as $problem) {
                     // Create and assign problems to new course
                     self::addProblemToAssignment(
@@ -364,7 +367,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Function to create a new assignment
      *
      * @param \OmegaUp\DAO\VO\Courses $course
-     * @param Assignment $assignment
+     * @param \OmegaUp\DAO\VO\Assignments $assignment
      * @return \OmegaUp\DAO\VO\Problemsets
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
@@ -584,6 +587,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $points = (int)$r['points'];
         }
 
+        \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
         self::addProblemToAssignment(
             $r['problem_alias'],
             $problemset->problemset_id,
@@ -607,7 +611,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -656,7 +659,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r) {
-        global $experiments;
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
@@ -2023,16 +2025,19 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Get Problems solved by users of a course
      *
      * @param \OmegaUp\Request $r
-     * @return \OmegaUp\DAO\VO\Problems array
+     * @return array{status: string, user_problems: array{string: array{alias: string, title: string, username: string}[]}[]}
      */
-    public static function apiListSolvedProblems(\OmegaUp\Request $r) {
+    public static function apiListSolvedProblems(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
         $course = self::validateCourseExists($r['course_alias']);
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
-        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse($r['course_alias']);
+        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+            $r['course_alias']
+        );
         $userProblems = [];
         foreach ($solvedProblems as $problem) {
             $userProblems[$problem['username']][] = $problem;
@@ -2044,17 +2049,20 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Get Problems unsolved by users of a course
      *
      * @param \OmegaUp\Request $r
-     * @return \OmegaUp\DAO\VO\Problems array
+     * @return array{status: string, user_problems: array<string, array{alias: string, title: string, username: string}[]>}
      */
-    public static function apiListUnsolvedProblems(\OmegaUp\Request $r) {
+    public static function apiListUnsolvedProblems(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course_alias'], 'course_alias');
         $course = self::validateCourseExists($r['course_alias']);
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
         }
 
-        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse($r['course_alias']);
+        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
+            $r['course_alias']
+        );
         $userProblems = [];
         foreach ($unsolvedProblems as $problem) {
             $userProblems[$problem['username']][] = $problem;

@@ -249,7 +249,7 @@ class UserProfileTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiUpdateMainEmail($r);
 
         // Check email in db
-        $user_in_db = \OmegaUp\DAO\Users::FindByEmail('new@email.com');
+        $user_in_db = \OmegaUp\DAO\Users::findByEmail('new@email.com');
         $this->assertEquals($user->user_id, $user_in_db->user_id);
     }
 

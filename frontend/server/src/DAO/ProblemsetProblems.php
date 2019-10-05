@@ -12,17 +12,26 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
+    /**
+     * @return array<string, array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problems: array{problem_alias: string, problem_id: int}[]}>
+     */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
     ) : array {
         // Build SQL statement
         $sql = '
             SELECT
-                a.name, a.alias AS assignment_alias,a.description,
+                a.name,
+                a.alias AS assignment_alias,
+                a.description,
                 UNIX_TIMESTAMP(a.start_time) AS start_time,
                 UNIX_TIMESTAMP(a.finish_time) AS finish_time,
-                a.assignment_type, p.alias AS problem_alias,
-                a.publish_time_delay, p.problem_id
+                a.assignment_type,
+                a.order,
+                a.max_points,
+                p.alias AS problem_alias,
+                a.publish_time_delay,
+                p.problem_id
             FROM
                 Problems p
             INNER JOIN
@@ -37,29 +46,31 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
         ';
         $val = [$course->alias];
-
+        /** @var array{name: string, description: string, start_time: int, finish_time: int, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int, problem_alias: string, problem_id: int}[] $problemsAssignments */
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         $result = [];
 
         foreach ($problemsAssignments as $assignment) {
-            $assignmentAlias = $assignment['assignment_alias'];
+            $assignmentAlias = strval($assignment['assignment_alias']);
             if (!isset($result[$assignmentAlias])) {
                 $result[$assignmentAlias] = [
                     'name' => $assignment['name'],
                     'description' => $assignment['description'],
                     'start_time' => $assignment['start_time'],
                     'finish_time' => $assignment['finish_time'],
+                    'order' => $assignment['order'],
+                    'max_points' => $assignment['max_points'],
                     'assignment_alias' => $assignment['assignment_alias'],
                     'assignment_type' => $assignment['assignment_type'],
                     'publish_time_delay' => $assignment['publish_time_delay'],
                     'problems' => [],
                 ];
             }
-            array_push($result[$assignmentAlias]['problems'], [
+            $result[$assignmentAlias]['problems'][] = [
                 'problem_alias' => $assignment['problem_alias'],
                 'problem_id' => $assignment['problem_id'],
-            ]);
+            ];
         }
 
         return $result;

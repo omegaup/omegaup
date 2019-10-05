@@ -21,9 +21,11 @@
 						</tr>
 					</thead>
 					<tfoot>
+						{if $contest}
 						<tr>
 							<td colspan="6"><a href="#clarifications/new">{#wordsNewClarification#}</a></td>
 						</tr>
+						{/if}
 					</tfoot>
 					<tbody class="clarification-list">
 						<tr class="template">

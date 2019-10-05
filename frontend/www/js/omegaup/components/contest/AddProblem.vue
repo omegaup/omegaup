@@ -4,9 +4,14 @@
       <form class="form"
             v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{T.wordsProblem}}</label> <omegaup-autocomplete v-bind:init=
+          <label>{{T.wordsProblem}}</label> <span class="label label-info">{{
+          T.selectProblemToGetVersions }}</span> <omegaup-autocomplete v-bind:init=
           "el =&gt; UI.problemTypeahead(el)"
                v-model="alias"></omegaup-autocomplete>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary get-versions"
+               type="submit">{{T.wordsGetVersions}}</button>
         </div>
         <div class="form-group">
           <label>{{T.contestAddproblemProblemPoints}}</label> <input class=
@@ -25,11 +30,13 @@
               v-bind:show-footer="false"
               v-model="selectedRevision"
               v-on:runs-diff="onRunsDiff"></omegaup-problem-versions>
-        <div class="form-group">
-          <button class="btn btn-primary add-problem"
-               type="submit">{{addProblemButtonLabel}}</button>
-        </div>
       </form>
+      <div class="form-group">
+        <button class="btn btn-primary add-problem"
+             type="submit"
+             v-on:click.prevent="onAddProblem"
+             v-show="selectedRevision.commit !== ''">{{addProblemButtonLabel}}</button>
+      </div>
     </div>
     <table class="table table-striped">
       <thead>
@@ -42,7 +49,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="problem in problems">
+        <tr v-bind:key="problem.alias"
+            v-for="problem in problems">
           <td><button class="btn btn-default"
                   type="button"
                   v-bind:aria-label="T.wordsEdit"
@@ -101,6 +109,10 @@ export default class AddProblem extends Vue {
   selectedRevision = emptyCommit;
 
   onSubmit(): void {
+    this.$emit('emit-change-alias', this, this.alias);
+  }
+
+  onAddProblem(): void {
     this.$emit('emit-add-problem', this);
   }
 

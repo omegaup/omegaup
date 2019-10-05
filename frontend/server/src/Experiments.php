@@ -11,7 +11,7 @@ namespace OmegaUp;
  * following code at the beginning of the API function.
  *
  *     public static function apiFoo(\OmegaUp\Request $r) {
- *         $experiments->ensureEnabled(\OmegaUp\Experiments::FOO);
+ *         \OmegaUp\Experiments::getInstance()->ensureEnabled(\OmegaUp\Experiments::FOO);
  *         //...
  *     }
  *
@@ -66,9 +66,12 @@ class Experiments {
     /** @var string[] */
     private $enabledExperiments = [];
 
+    /** @var null|Experiments */
+    private static $_instance = null;
+
     /**
      * Creates an instance of Experiments.
-     * @param array<string, string> $request Typically $_REQUEST, except in tests.
+     * @param null|string $requestExperiments Typically $_REQUEST['experiments'], except in tests.
      * @param \OmegaUp\DAO\VO\Users $user The currently logged in user.
      * @param array<string, mixed> $defines Typically get_defined_constants(true)['user'],
      *                       except in tests.
@@ -77,7 +80,7 @@ class Experiments {
      *                                in tests.
      */
     public function __construct(
-        array $request,
+        ?string $requestExperiments,
         \OmegaUp\DAO\VO\Users $user = null,
         array $defines = null,
         array $knownExperiments = null
@@ -96,10 +99,8 @@ class Experiments {
             $this->loadExperimentsForUser($user, $knownExperiments);
         }
 
-        if (isset($request[self::EXPERIMENT_REQUEST_NAME]) &&
-            !empty($request[self::EXPERIMENT_REQUEST_NAME])
-        ) {
-            $this->loadExperimentsFromRequest($request, $knownExperiments);
+        if (!is_null($requestExperiments)) {
+            $this->loadExperimentsFromRequest($requestExperiments, $knownExperiments);
         }
     }
 
@@ -148,16 +149,16 @@ class Experiments {
      * Loads experiments from request parameters. To avoid users enabling
      * experiments without permission, the request must provide both the name
      * of the experiment as well as an HMAC-hashed version.
-     * @param array<string, string> $request Typically $_REQUEST, except in tests.
+     * @param string $requestExperiments Typically $_REQUEST['experiments'], except in tests.
      * @param string[] $knownExperiments Typically
      *                                \OmegaUp\Experiments::KNOWN_EXPERIMENTS, except
      *                                in tests.
      */
     private function loadExperimentsFromRequest(
-        array $request,
+        string $requestExperiments,
         array $knownExperiments
     ) : void {
-        $tokens = explode(',', $request[self::EXPERIMENT_REQUEST_NAME]);
+        $tokens = explode(',', $requestExperiments);
         foreach ($tokens as $token) {
             $kvp = explode('=', $token);
             if (count($kvp) != 2) {
@@ -230,5 +231,36 @@ class Experiments {
             self::EXPERIMENT_PREFIX . strtoupper($name),
             $defines
         );
+    }
+
+    /**
+     * Returns the global instance of Experiments.
+     */
+    public static function getInstance() : Experiments {
+        if (is_null(self::$_instance)) {
+            /** @psalm-suppress RedundantCondition This is not set on tests. */
+            if (isset($_REQUEST)) {
+                $request = $_REQUEST;
+            } else {
+                $request = [];
+            }
+
+            $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+                new \OmegaUp\Request($request)
+            )['session'];
+            if (isset($request[self::EXPERIMENT_REQUEST_NAME])
+                && !empty($request[self::EXPERIMENT_REQUEST_NAME])
+                && is_string($request[self::EXPERIMENT_REQUEST_NAME])
+            ) {
+                $requestExperiments = strval($request[self::EXPERIMENT_REQUEST_NAME]);
+            } else {
+                $requestExperiments = null;
+            }
+            self::$_instance = new Experiments(
+                $requestExperiments,
+                !is_null($session) ? $session['user'] : null
+            );
+        }
+        return self::$_instance;
     }
 }

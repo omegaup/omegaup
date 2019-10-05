@@ -14,7 +14,7 @@ try {
         'nominations' => \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([]))['nominations'],
         'myView' => false,
         ];
-        if ($session['valid']) {
+        if (!is_null($session['identity'])) {
             $payload['currentUser'] = $session['user']->username;
         }
         $template = '../templates/quality.nomination.list.tpl';

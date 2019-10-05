@@ -297,6 +297,24 @@ class Validators {
 
     /**
      *
+     * @param mixed  $parameter
+     * @param string $parameterName
+     * @psalm-assert int $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateOptionalNumber(
+        $parameter,
+        string $parameterName,
+        bool $required = false
+    ) : void {
+        if (!self::isPresent($parameter, $parameterName, $required)) {
+            return;
+        }
+        self::validateNumber($parameter, $parameterName);
+    }
+
+    /**
+     *
      * @param mixed $parameter
      * @param string $parameterName
      * @param array $enum

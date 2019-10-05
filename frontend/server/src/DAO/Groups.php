@@ -48,11 +48,23 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
 
     /**
      * Returns all groups that a user can manage.
+     * @param int $userId
+     * @param int $identityId
+     * @return array{alias: string, create_time: int, description: string, name: string}[]
      */
-    final public static function getAllGroupsAdminedByUser($user_id, $identity_id) {
+    final public static function getAllGroupsAdminedByUser(
+        int $userId,
+        int $identityId
+    ) : array {
+        // group_id is only necessary to make ORDER BY work, because
+        // ONLY_FULL_GROUP_BY mode is enabled.
         $sql = '
             SELECT
-                DISTINCT g.*
+                DISTINCT g.alias,
+                g.create_time,
+                g.description,
+                g.name,
+                g.group_id
             FROM
                 Groups g
             INNER JOIN
@@ -69,21 +81,21 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
                 (gr.role_id = ? AND gi.identity_id = ?)
             ORDER BY
                 g.group_id DESC;';
-        $params = [
-            $user_id,
-            \OmegaUp\Authorization::ADMIN_ROLE,
-            $user_id,
-            \OmegaUp\Authorization::ADMIN_ROLE,
-            $identity_id,
-        ];
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
+                $userId,
+                \OmegaUp\Authorization::ADMIN_ROLE,
+                $userId,
+                \OmegaUp\Authorization::ADMIN_ROLE,
+                $identityId,
+            ]);
 
-        $groups = [];
-        foreach ($rs as $row) {
-            array_push($groups, new \OmegaUp\DAO\VO\Groups($row));
+        foreach ($rs as &$row) {
+            unset($row['group_id']);
         }
-        return $groups;
+
+        /** @var array{alias: string, create_time: int, description: string, name: string}[] $rs */
+        return $rs;
     }
 
     /**

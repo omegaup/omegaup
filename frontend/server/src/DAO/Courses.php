@@ -359,4 +359,106 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         return $row;
     }
+
+    public static function countCourses(int $startTimestamp, int $endTimestamp) : int {
+        $sql = '
+            SELECT
+                COUNT(c.course_id)
+            FROM
+                Courses c
+            WHERE
+                c.start_time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
+';
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$startTimestamp, $endTimestamp]);
+    }
+
+    public static function countAttemptedIdentities(
+        string $courseAlias,
+        int $startTimestamp,
+        int $endTimestamp
+    ) : int {
+        $sql = '
+            SELECT
+                COUNT(DISTINCT s.identity_id)
+            FROM
+                Courses c
+            INNER JOIN
+                Assignments a ON a.course_id = c.course_id
+            INNER JOIN
+                Submissions s ON s.problemset_id = a.problemset_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            WHERE
+                c.alias = ?
+                AND r.verdict = "AC"
+                AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?);
+';
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$courseAlias, $startTimestamp, $endTimestamp]
+        );
+    }
+
+    public static function countCompletedIdentities(
+        string $courseAlias,
+        float $completionRate,
+        int $startTimestamp,
+        int $endTimestamp
+    ) : int {
+        $sql = '
+            SELECT
+                COUNT(DISTINCT ip.identity_id)
+            FROM
+                (
+                    SELECT
+                        s.identity_id,
+                        COUNT(DISTINCT s.problem_id) AS problems_solved
+                    FROM
+                        (
+                            SELECT
+                                pp.problemset_id,
+                                pp.problem_id
+                            FROM
+                                Courses c
+                            INNER JOIN
+                                Assignments a ON a.course_id = c.course_id
+                            INNER JOIN
+                                Problemset_Problems pp ON pp.problemset_id = a.problemset_id
+                            WHERE
+                                c.alias = ?
+                        ) cp
+                    LEFT JOIN
+                        Submissions s ON s.problemset_id = cp.problemset_id
+                        AND s.problem_id = cp.problem_id
+                    LEFT JOIN
+                        Runs r ON r.run_id = s.current_run_id
+                    WHERE
+                        r.verdict = "AC"
+                        AND s.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
+                    GROUP BY s.identity_id
+                    HAVING
+                        problems_solved >= (
+                            SELECT
+                                COUNT(DISTINCT pp.problem_id)
+                            FROM
+                                Courses c
+                            INNER JOIN
+                                Assignments a ON a.course_id = c.course_id
+                            INNER JOIN
+                                Problemset_Problems pp ON pp.problemset_id = a.problemset_id
+                            INNER JOIN
+                                Problems p ON p.problem_id = pp.problem_id
+                            WHERE
+                                c.alias = ? AND p.languages != ""
+                        ) * ?
+                ) AS ip;
+';
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$courseAlias, $startTimestamp, $endTimestamp, $courseAlias, $completionRate]
+        );
+    }
 }
