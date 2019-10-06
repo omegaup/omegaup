@@ -78,3 +78,5 @@ rewrite ^/rank/?$ /rank.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolsrank/?$ /schoolsrank.php last;
 rewrite ^/scoreboardmerge/?$ /scoreboardmerge.php last;
+rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/redirecttointerview/([a-zA-Z0-9_+-]+)/?$ /userverifyemail.php?id=$1&redirecttointerview=$2 last;
+rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
