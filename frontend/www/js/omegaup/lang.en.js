@@ -938,7 +938,7 @@ const translations = {
 	verdictTO: "Time limit exceeded",
 	verdictWA: "Wrong Answer",
 	verifiationIdInvalid: "Verification id is invalid.",
-	verificationEmailBody: "Welcome to omegaUp! Please click on the following link to login and verify your email: <a href=\"%1$s/api/user/verifyemail/id/%2$s\">%1$s/api/user/verifyemail/id/%2$s</a>",
+	verificationEmailBody: "Welcome to omegaUp! Please click on the following link to login and verify your email: <a href=\"https://omegaup.com/user/verifyemail/%(verification_id)/\">https://omegaup.com/user/verifyemail/%(verification_id)/</a>",
 	verificationEmailSubject: "Welcome to omegaUp!",
 	verificationIdInvalid: "The provided verification information is not valid.",
 	virtualContest: "Virtual contest",
