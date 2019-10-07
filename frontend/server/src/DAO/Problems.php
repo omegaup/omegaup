@@ -642,7 +642,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
 
-    public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user) : int {
+    public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user) : ?int {
         if (is_null($user->user_id)) {
             return 0;
         }
@@ -656,9 +656,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             a.acl_id = p.acl_id
         WHERE
             p.visibility <= 0 and a.owner_id = ?;';
-        $params = [$user->user_id];
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        /** @var null|int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$user->user_id]
+        );
     }
 
     /**

@@ -197,7 +197,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * Create a new run
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, guid: null|string, submission_deadline: int, nextSubmissionTimestamp: int}
+     * @return array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
@@ -366,12 +366,15 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        /** @var \OmegaUp\DAO\VO\Contests */
+        /** @var null|\OmegaUp\DAO\VO\Contests */
         $contest = isset($r['contest']) ? $r['contest'] : null;
 
         // Happy ending
         $response['nextSubmissionTimestamp'] =
             \OmegaUp\DAO\Runs::nextSubmissionTimestamp($contest);
+        if (is_null($submission->guid)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
         $response['guid'] = $submission->guid;
         $response['status'] = 'ok';
 

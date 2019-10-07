@@ -751,9 +751,8 @@
     <PossiblyNullArrayAccess occurrences="1">
       <code>\OmegaUp\Controllers\Session::apiCurrentSession($r)['session']['identity']</code>
     </PossiblyNullArrayAccess>
-    <PossiblyNullPropertyFetch occurrences="3">
+    <PossiblyNullPropertyFetch occurrences="2">
       <code>$resolvedUser-&gt;user_id</code>
-      <code>$acl-&gt;owner_id</code>
     </PossiblyNullPropertyFetch>
     <RedundantCondition occurrences="1"/>
     <TypeDoesNotContainNull occurrences="1">
@@ -1003,16 +1002,10 @@
       <code>$problemsetIdentities</code>
       <code>$identity</code>
     </MixedAssignment>
-    <MixedOperand occurrences="10">
+    <MixedOperand occurrences="4">
       <code>$r['alias']</code>
-      <code>$newUserRequest['user']-&gt;verification_id</code>
-      <code>$r['interview']-&gt;alias</code>
-      <code>$newUserRequest['user']-&gt;verification_id</code>
-      <code>$r['interview']-&gt;alias</code>
       <code>$newUserRequest['username']</code>
       <code>$newUserRequest['password']</code>
-      <code>$r['interview']-&gt;alias</code>
-      <code>$r['interview']-&gt;alias</code>
       <code>$r['username']</code>
     </MixedOperand>
     <MixedPropertyFetch occurrences="10">
@@ -1846,15 +1839,13 @@
     <InvalidPropertyAssignmentValue occurrences="1">
       <code>1</code>
     </InvalidPropertyAssignmentValue>
-    <InvalidReturnStatement occurrences="7">
-      <code>['status' =&gt; 'ok']</code>
+    <InvalidReturnStatement occurrences="6">
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
     </InvalidReturnStatement>
-    <InvalidReturnType occurrences="7">
-      <code>type</code>
+    <InvalidReturnType occurrences="6">
       <code>array{status: 'ok'}</code>
       <code>response</code>
       <code>\OmegaUp\DAO\VO\Contests</code>
@@ -1883,9 +1874,8 @@
       <code>$user_id</code>
       <code>$email</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="3">
+    <MissingPropertyType occurrences="2">
       <code>$sendEmailOnVerify</code>
-      <code>$redirectOnVerify</code>
       <code>$permissionKey</code>
     </MissingPropertyType>
     <MissingReturnType occurrences="28">
@@ -1918,7 +1908,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="32">
+    <MixedArgument occurrences="29">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1929,7 +1919,6 @@
       <code>$r['password']</code>
       <code>$user</code>
       <code>$user</code>
-      <code>$r['redirecttointerview']</code>
       <code>$user</code>
       <code>$response['userinfo']['email']</code>
       <code>$r['user']</code>
@@ -1952,8 +1941,7 @@
       <code>$r['password']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="25">
-      <code>$users[0]</code>
+    <MixedArrayAccess occurrences="24">
       <code>$userDb['email']</code>
       <code>$userDb['country']</code>
       <code>$userDb['country_id']</code>
@@ -1964,8 +1952,6 @@
       <code>$userDb['locale']</code>
       <code>$response['verified']</code>
       <code>$response['username']</code>
-      <code>$users[0]</code>
-      <code>$users[0]</code>
       <code>$codersOfTheMonth[0]</code>
       <code>$response['userinfo']['email']</code>
       <code>$contest['alias']</code>
@@ -1995,7 +1981,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="50">
+    <MixedAssignment occurrences="48">
       <code>$user</code>
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
@@ -2003,7 +1989,6 @@
       <code>$userData['facebook_user_id']</code>
       <code>$resultAsJson</code>
       <code>$user</code>
-      <code>$users</code>
       <code>$user</code>
       <code>$usersMissing</code>
       <code>$user</code>
@@ -2027,11 +2012,9 @@
       <code>$response</code>
       <code>$response</code>
       <code>$codersOfTheMonth</code>
-      <code>$users</code>
       <code>$coderOfTheMonthUserId</code>
       <code>$coderOfTheMonthUserId</code>
       <code>$codersOfTheMonth</code>
-      <code>$users</code>
       <code>$user</code>
       <code>$contestsParticipated</code>
       <code>$contest</code>
@@ -2061,14 +2044,7 @@
       <code>array</code>
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedOperand occurrences="1">
-      <code>$r['usernameOrEmail']</code>
-    </MixedOperand>
-    <MixedPropertyAssignment occurrences="1">
-      <code>$user</code>
-      <code>$user</code>
-    </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="13">
+    <MixedPropertyFetch occurrences="12">
       <code>$codersOfTheMonth[0]-&gt;user_id</code>
       <code>$identity-&gt;username</code>
       <code>$identity-&gt;username</code>
@@ -2118,8 +2094,7 @@
     <PossiblyNullPropertyFetch occurrences="8">
       <code>$email-&gt;email</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedDocblockClass occurrences="11">
-      <code>type</code>
+    <UndefinedDocblockClass occurrences="10">
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
@@ -2660,7 +2635,7 @@
       <code>$offset</code>
       <code>$identities[]</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="2">
+    <MixedInferredReturnType occurrences="1">
       <code>int</code>
       <code>int</code>
     </MixedInferredReturnType>
@@ -2673,7 +2648,7 @@
     <MixedPropertyFetch occurrences="1">
       <code>$problem-&gt;problem_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="2">
+    <MixedReturnStatement occurrences="1">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
     </MixedReturnStatement>
     <RedundantCondition occurrences="1">
@@ -3040,20 +3015,18 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/DAO/Users.php">
-    <MissingParamType occurrences="6">
+    <MissingParamType occurrences="5">
       <code>$user_id</code>
       <code>$user_id</code>
       <code>$identity_id</code>
       <code>$user_id</code>
-      <code>$verification_id</code>
       <code>$verified</code>
       <code>$in_mailing_list</code>
     </MissingParamType>
-    <MissingReturnType occurrences="6">
+    <MissingReturnType occurrences="5">
       <code>IsUserInterviewer</code>
       <code>getExtendedProfileDataByPk</code>
       <code>getHideTags</code>
-      <code>getByVerification</code>
       <code>getVerified</code>
       <code>getUsersCount</code>
     </MissingReturnType>
