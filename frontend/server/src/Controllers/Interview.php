@@ -131,28 +131,28 @@ class Interview extends \OmegaUp\Controllers\Controller {
 
             // Email to new OmegaUp users
             $body = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
-                           . '<br>'
-                           . ' <a href="https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '">'
-                           . ' https://omegaup.com/api/user/verifyemail/id/' . $newUserRequest['user']->verification_id . '/redirecttointerview/' . $r['interview']->alias . '</a>'
-                           . '<br>';
+               . '<br>'
+               . " <a href=\"https://omegaup.com/user/verifyemail/{$newUserRequest['user']->verification_id}/redirecttointerview/{$r['interview']->alias}/\">"
+               . " https://omegaup.com/user/verifyemail/{$newUserRequest['user']->verification_id}/redirecttointerview/{$r['interview']->alias}/</a>"
+               . '<br>';
 
             $body .= \OmegaUp\Translations::getInstance()->get('interviewEmailDraft')
-                            . '<br>'
-                            . \OmegaUp\Translations::getInstance()->get('profileUsername')
-                            . ' : '
-                            . $newUserRequest['username']
-                            . '<br>'
-                            . \OmegaUp\Translations::getInstance()->get('loginPassword')
-                            . ' : '
-                            . $newUserRequest['password']
-                            . '<br>';
+                . '<br>'
+                . \OmegaUp\Translations::getInstance()->get('profileUsername')
+                . ' : '
+                . $newUserRequest['username']
+                . '<br>'
+                . \OmegaUp\Translations::getInstance()->get('loginPassword')
+                . ' : '
+                . $newUserRequest['password']
+                . '<br>';
 
             $r['user'] = $newUserRequest['user'];
         } else {
             // Email to current OmegaUp user
             $body = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
-                           . ' <a href="https://omegaup.com/interview/' . $r['interview']->alias . '/arena">'
-                           . ' https://omegaup.com/interview/' . $r['interview']->alias . '/arena</a>';
+               . " <a href=\"https://omegaup.com/interview/{$r['interview']->alias}/arena/\">"
+               . "https://omegaup.com/interview/{$r['interview']->alias}/arena/</a>";
         }
 
         if (is_null($r['user'])) {

@@ -109,7 +109,6 @@ class UserFactory {
         }
 
         if ($params['verify']) {
-            \OmegaUp\Controllers\User::$redirectOnVerify = false;
             $user = self::verifyUser($user);
         } else {
             $user->verified = false;
