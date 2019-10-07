@@ -155,7 +155,6 @@
       <code>function ($value) {</code>
     </MissingClosureReturnType>
     <MissingParamType occurrences="4">
-      <code>$callback_user_function</code>
       <code>$idx</code>
       <code>$csvRow</code>
       <code>$admission_mode</code>
@@ -175,7 +174,6 @@
       <code>isPublic</code>
     </MissingReturnType>
     <MixedArgument occurrences="79">
-      <code>$callback_user_function</code>
       <code>$contest['start_time']</code>
       <code>$contest['finish_time']</code>
       <code>$contest['last_updated']</code>
@@ -4275,26 +4273,6 @@
       <code>$value</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/contestedit.php">
-    <MixedArrayAccess occurrences="2">
-      <code>$_REQUEST['ouat']</code>
-      <code>$_REQUEST['contest']</code>
-    </MixedArrayAccess>
-  </file>
-  <file src="frontend/www/contestmine.php">
-    <MixedArrayAccess occurrences="2">
-      <code>$session['user']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="1">
-      <code>$payload</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/contestreport.php">
-    <MixedAssignment occurrences="2">
-      <code>$result</code>
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/course.php">
     <MixedAssignment occurrences="2">
       <code>$value</code>
@@ -4321,20 +4299,6 @@
   <file src="frontend/www/cspreport.php">
     <MixedAssignment occurrences="1">
       <code>$log</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/groupedit.php">
-    <MixedArrayAccess occurrences="2">
-      <code>$session['identity']</code>
-      <code>$session['identity']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="1">
-      <code>$session</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/grouplist.php">
-    <MixedAssignment occurrences="1">
-      <code>$payload</code>
     </MixedAssignment>
   </file>
   <file src="frontend/www/index.php">
