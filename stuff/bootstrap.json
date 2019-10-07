@@ -29,6 +29,248 @@
 				"api": "/problem/create",
 				"params": {
 					"visibility": 1,
+					"title": "Sumas1",
+					"problem_alias": "sumas1",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas2",
+					"problem_alias": "sumas2",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas3",
+					"problem_alias": "sumas3",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas4",
+					"problem_alias": "sumas4",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas5",
+					"problem_alias": "sumas5",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas6",
+					"problem_alias": "sumas6",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas7",
+					"problem_alias": "sumas7",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas8",
+					"problem_alias": "sumas8",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas9",
+					"problem_alias": "sumas9",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+      },
+      {
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas10",
+					"problem_alias": "sumas10",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
+					"title": "Sumas Extra",
+					"problem_alias": "sumas-extra",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create",
+				"params": {
+					"visibility": 1,
 					"title": "Triangulos",
 					"problem_alias": "triangulos",
 					"validator": "token-numeric",
@@ -287,6 +529,96 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas1",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas2",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas3",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas4",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas5",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas6",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas7",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas8",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas9",
+					"language": "py",
+					"source": "print sum(map(int, raw_input().strip().split()))"
+				}
+      },
+      {
+				"api": "/run/create",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas10",
 					"language": "py",
 					"source": "print sum(map(int, raw_input().strip().split()))"
 				}

@@ -1253,11 +1253,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case-&gt;name]</code>
     </MixedArrayOffset>
-<<<<<<< HEAD
-    <MixedAssignment occurrences="60">
-=======
-    <MixedAssignment occurrences="61">
->>>>>>> master
+    <MixedAssignment occurrences="59">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
@@ -1545,31 +1541,10 @@
       <code>null</code>
       <code>null</code>
     </NullArgument>
-<<<<<<< HEAD
-    <PossiblyNullArgument occurrences="5">
-=======
-    <PossiblyNullArgument occurrences="4">
-      <code>$qualityReviewerGroup</code>
->>>>>>> master
+    <PossiblyNullArgument occurrences="3">
       <code>$qualitynominationlog-&gt;rationale</code>
     </PossiblyNullArgument>
-<<<<<<< HEAD
-    <PossiblyNullPropertyFetch occurrences="5">
-      <code>$r-&gt;identity-&gt;identity_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-      <code>$r-&gt;user-&gt;user_id</code>
-    </PossiblyNullPropertyFetch>
-=======
-    <PossiblyNullPropertyFetch occurrences="4"/>
-    <RedundantCondition occurrences="1">
-      <code>is_array($contents['tags'])</code>
-    </RedundantCondition>
-    <UndefinedVariable occurrences="1">
-      <code>$statement</code>
-    </UndefinedVariable>
->>>>>>> master
+    <PossiblyNullPropertyFetch occurrences="3"/>
   </file>
   <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">
@@ -2472,26 +2447,12 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/DAO/Groups.php">
-<<<<<<< HEAD
-    <MissingParamType occurrences="3">
+    <MissingParamType occurrences="1">
       <code>$name</code>
       <code>$name</code>
-      <code>$user_id</code>
-      <code>$identity_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="2">
+    <MissingReturnType occurrences="1">
       <code>SearchByName</code>
-      <code>getAllGroupsAdminedByUser</code>
-=======
-    <MissingParamType occurrences="2">
-      <code>$name</code>
-      <code>$name</code>
-      <code>$n</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>SearchByName</code>
-      <code>sampleMembers</code>
->>>>>>> master
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/GroupsIdentities.php">

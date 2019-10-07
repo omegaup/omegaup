@@ -137,7 +137,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'contents');
             }
             // Tags must be strings.
-            if (isset($contents['tags']) && is_array($contents['tags'])) {
+            if (isset($contents['tags'])) {
                 /** @var mixed $tag */
                 foreach ($contents['tags'] as &$tag) {
                     if (!is_string($tag)) {
