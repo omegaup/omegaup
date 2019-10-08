@@ -1517,12 +1517,6 @@
       <code>$qualitynominationlog-&gt;rationale</code>
     </PossiblyNullArgument>
     <PossiblyNullPropertyFetch occurrences="3"/>
-    <RedundantCondition occurrences="1">
-      <code>is_array($contents['tags'])</code>
-    </RedundantCondition>
-    <UndefinedVariable occurrences="1">
-      <code>$statement</code>
-    </UndefinedVariable>
   </file>
   <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">
