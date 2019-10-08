@@ -9,9 +9,9 @@ try {
     // suggesting to contribute to the community by releasing the material to
     // the public. This flag ensures that this alert is shown only once per
     // session, the first time the user visits the "My contests" page.
-    $privateContestsAlert = (!is_null($session['identity']) &&
+    $privateContestsAlert = (!is_null($session['user']) &&
         !isset($_SESSION['private_contests_alert']) &&
-        \OmegaUp\DAO\Contests::getPrivateContestsCount($session['identity']) > 0);
+        \OmegaUp\DAO\Contests::getPrivateContestsCount($session['user']) > 0);
 
     if ($privateContestsAlert) {
         $_SESSION['private_contests_alert'] = true;
