@@ -15,7 +15,7 @@ try {
         'myView' => false,
         ];
         if (!is_null($session['identity'])) {
-            $payload['currentUser'] = $session['user']->username;
+            $payload['currentUser'] = $session['identity']->username;
         }
         $template = '../templates/quality.nomination.list.tpl';
     }

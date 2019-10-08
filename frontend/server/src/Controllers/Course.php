@@ -632,6 +632,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Update problems order
+        /** @var array{alias: string, order: int}[] */
         $problems = $r['problems'];
         foreach ($problems as $problem) {
             $currentProblem = \OmegaUp\DAO\Problems::getByAlias($problem['alias']);
@@ -1561,6 +1562,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             ];
 
             if ($isAdmin) {
+                if (is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+                }
                 $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
                 if (is_null($group)) {
                     throw new \OmegaUp\Exceptions\NotFoundException('courseGroupNotFound');
@@ -1749,12 +1753,16 @@ class Course extends \OmegaUp\Controllers\Controller {
             unset($problem['problem_id']);
         }
 
-        $director = null;
         $acl = \OmegaUp\DAO\ACLs::getByPK($tokenAuthenticationResult['course']->acl_id);
-        $director = \OmegaUp\DAO\Users::getByPK($acl->owner_id)->username;
+        if (is_null($acl) || is_null($acl->owner_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        $director = \OmegaUp\DAO\Identities::findByUserId(intval($acl->owner_id))->username;
 
         // Log the operation only when there is not a token in request
         if (!$tokenAuthenticationResult['hasToken']) {
+            // Authenticate request
+            $r->ensureIdentity();
             \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
@@ -1825,6 +1833,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateRuns(\OmegaUp\Request $r) : void {
+        $r->ensureIdentity();
         // Defaults for offset and rowcount
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
@@ -1956,6 +1965,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiAssignmentScoreboard(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         $tokenAuthenticationResult = self::authenticateAndValidateToken(
             $r['course'],
             $r['assignment'],
@@ -1964,13 +1974,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $group = self::resolveGroup($tokenAuthenticationResult['course'], $r['group']);
 
-        if (!$tokenAuthenticationResult['hasToken'] &&
-            !\OmegaUp\Authorization::canViewCourse(
+        if (!$tokenAuthenticationResult['hasToken']) {
+            $r->ensureIdentity();
+            if (!\OmegaUp\Authorization::canViewCourse(
                 $r->identity,
                 $tokenAuthenticationResult['course'],
                 $group
             )) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
         }
 
         $scoreboard = new \OmegaUp\Scoreboard(

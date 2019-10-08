@@ -63,7 +63,7 @@ class ProblemDeployer {
 
     public function commit(
         string $message,
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity,
         int $operation,
         array $problemSettings
     ) : void {
@@ -85,7 +85,7 @@ class ProblemDeployer {
         }
         $result = $this->execute(
             $this->zipPath,
-            strval($user->username),
+            strval($identity->username),
             $message,
             $problemSettings,
             null,
@@ -213,12 +213,16 @@ class ProblemDeployer {
      * Updates loose files.
      *
      * @param string $message
-     * @param \OmegaUp\DAO\VO\Users $user
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @param array<string, string> $blobUpdate
      *
      * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
      */
-    public function commitLooseFiles(string $message, \OmegaUp\DAO\VO\Users $user, array $blobUpdate) : void {
+    public function commitLooseFiles(
+        string $message,
+        \OmegaUp\DAO\VO\Identities $identity,
+        array $blobUpdate
+    ) : void {
         $tmpfile = tmpfile();
         try {
             $zipPath = stream_get_meta_data($tmpfile)['uri'];
@@ -241,7 +245,7 @@ class ProblemDeployer {
 
             $result = $this->execute(
                 $zipPath,
-                strval($user->username),
+                strval($identity->username),
                 $message,
                 null,
                 $blobUpdate,
@@ -452,7 +456,7 @@ class ProblemDeployer {
     public function updatePublished(
         string $oldOid,
         string $newOid,
-        \OmegaUp\DAO\VO\Users $user
+        \OmegaUp\DAO\VO\Identities $identity
     ) : void {
         $curl = curl_init();
 
@@ -472,7 +476,7 @@ class ProblemDeployer {
                     CURLOPT_HTTPHEADER => [
                         \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
                             $this->alias,
-                            strval($user->username)
+                            strval($identity->username)
                         ),
                     ],
                     CURLOPT_POSTFIELDS => $payload,

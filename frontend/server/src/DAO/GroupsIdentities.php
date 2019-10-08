@@ -23,7 +23,6 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 s.state_id,
                 sc.name as school,
                 sc.school_id as school_id,
-                u.username as user_username,
                 (SELECT `urc`.classname FROM
                     `User_Rank_Cutoffs` urc
                 WHERE
