@@ -540,7 +540,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         // The nominator can see the nomination, as well as all the members of
         // the reviewer group.
-        $currentUserIsNominator = ($r->user->username == $response['nominator']['username']);
+        $currentUserIsNominator = ($r->identity->username == $response['nominator']['username']);
         $currentUserReviewer = \OmegaUp\Authorization::isQualityReviewer($r->identity);
         if (!$currentUserIsNominator && !$currentUserReviewer) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');

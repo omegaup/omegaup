@@ -604,7 +604,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Returns the time of the next submission to the current problem
      */
-    final public static function nextSubmissionTimestamp($contest) {
+    final public static function nextSubmissionTimestamp(
+        ?\OmegaUp\DAO\VO\Contests $contest
+    ) : int {
         $submission_gap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
@@ -613,7 +615,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 (int)$contest->submissions_gap
             );
         }
-        return (\OmegaUp\Time::get() + $submission_gap);
+        return intval(\OmegaUp\Time::get() + $submission_gap);
     }
 
     final public static function searchWithRunIdGreaterThan(

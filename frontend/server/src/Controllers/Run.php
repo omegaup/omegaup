@@ -197,11 +197,11 @@ class Run extends \OmegaUp\Controllers\Controller {
      * Create a new run
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string, guid: string, submission_deadline: int, nextSubmissionTimestamp: int}
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
-    public static function apiCreate(\OmegaUp\Request $r) {
+    public static function apiCreate(\OmegaUp\Request $r) : array {
         self::$practice = false;
 
         // Authenticate user
@@ -356,16 +356,25 @@ class Run extends \OmegaUp\Controllers\Controller {
             if (!is_null($problemsetIdentity) && !is_null(
                 $problemsetIdentity->end_time
             )) {
-                $response['submission_deadline'] = $problemsetIdentity->end_time;
+                $response['submission_deadline'] =
+                    intval($problemsetIdentity->end_time);
             } elseif (isset($r['container']->finish_time)) {
-                $response['submission_deadline'] = $r['container']->finish_time;
+                $response['submission_deadline'] =
+                    intval($r['container']->finish_time);
+            } else {
+                $response['submission_deadline'] = 0;
             }
         }
 
+        /** @var null|\OmegaUp\DAO\VO\Contests */
+        $contest = isset($r['contest']) ? $r['contest'] : null;
+
         // Happy ending
-        $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
-            isset($r['contest']) ? $r['contest'] : null
-        );
+        $response['nextSubmissionTimestamp'] =
+            \OmegaUp\DAO\Runs::nextSubmissionTimestamp($contest);
+        if (is_null($submission->guid)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
         $response['guid'] = $submission->guid;
         $response['status'] = 'ok';
 

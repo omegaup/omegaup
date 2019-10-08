@@ -218,11 +218,11 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             qn.nomination,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username as nominator_username,
+            nominatorIdentity.username as nominator_username,
             nominatorIdentity.name as nominator_name,
             p.alias,
             p.title,
-            author.username as author_username,
+            authorIdentity.username as author_username,
             authorIdentity.name as author_name
         FROM
             QualityNominations qn
@@ -304,11 +304,11 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             qn.contents,
             UNIX_TIMESTAMP(qn.time) as time,
             qn.status,
-            nominator.username as nominator_username,
+            nominatorIdentity.username as nominator_username,
             nominatorIdentity.name as nominator_name,
             p.alias,
             p.title,
-            author.username as author_username,
+            authorIdentity.username as author_username,
             authorIdentity.name as author_name
         FROM
             QualityNominations qn
