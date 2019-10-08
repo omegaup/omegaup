@@ -17,11 +17,11 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     private static function getAdmins($acl_id) {
         $sql = '
             SELECT
-                u.username, ur.acl_id AS acl
+                i.username, ur.acl_id AS acl
             FROM
                 User_Roles ur
             INNER JOIN
-                Users u ON u.user_id = ur.user_id
+                Identities i ON i.user_id = ur.user_id
             WHERE
                 ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
@@ -34,11 +34,13 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
 
         $sql = '
             SELECT
-                u.username
+                i.username
             FROM
                 ACLs a
             INNER JOIN
                 Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
             WHERE
                 a.acl_id = ?;';
         $params = [$acl_id];

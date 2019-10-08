@@ -766,7 +766,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 }
 
                 $acl = \OmegaUp\DAO\ACLs::getByPK($contest->acl_id);
-                $result['director'] = \OmegaUp\DAO\Users::getByPK($acl->owner_id)->username;
+                $result['director'] = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id)->username;
 
                 $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                     $contest->problemset_id
@@ -2827,8 +2827,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiDownload(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        $contest = self::validateStats($r['contest_alias'], $r->identity);
-
+        $contest = self::validateStats(strval($r['contest_alias']), $r->identity);
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
         include_once 'libs/third_party/ZipStream.php';
         $zip = new \ZipStream("{$r['contest_alias']}.zip");
         \OmegaUp\Controllers\Problemset::downloadRuns($contest->problemset_id, $zip);
