@@ -107,3 +107,6 @@ frontend/www/docs/pas
 
 # Ignore VS Code json
 .vscode/*
+
+# Ignore omegaup.db
+omegaup.db

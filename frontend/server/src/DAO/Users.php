@@ -34,7 +34,8 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 ON
                     i.user_id = u.user_id
                 WHERE
-                    i.username = ? LIMIT 1;';
+                    i.username = ?
+                LIMIT 1;';
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$username]);
         if (empty($rs)) {
             return null;
@@ -154,21 +155,25 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) ?? 'user-rank-unranked';
     }
 
-    final public static function getByVerification($verification_id) {
-        $sql = 'SELECT
-                    *
-                FROM
-                    Users
-                WHERE
-                    verification_id = ?';
+    final public static function getByVerification(
+        string $verificationId
+    ) : ?\OmegaUp\DAO\VO\Users {
+        $sql = '
+            SELECT
+                *
+            FROM
+                Users
+            WHERE
+                verification_id = ?
+            LIMIT 1;
+        ';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$verification_id]);
-
-        $users = [];
-        foreach ($rs as $row) {
-            array_push($users, new \OmegaUp\DAO\VO\Users($row));
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$verificationId]);
+        if (empty($row)) {
+            return null;
         }
-        return $users;
+
+        return new \OmegaUp\DAO\VO\Users($row);
     }
 
     final public static function getVerified($verified, $in_mailing_list) {

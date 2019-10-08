@@ -286,11 +286,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return $courses;
     }
 
-    /**
-     * @param string $alias
-     * @return \OmegaUp\DAO\VO\Courses
-     */
-    final public static function getByAlias(string $alias) : ?\OmegaUp\DAO\VO\Courses {
+    final public static function getByAlias(
+        string $alias
+    ) : ?\OmegaUp\DAO\VO\Courses {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
 
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);

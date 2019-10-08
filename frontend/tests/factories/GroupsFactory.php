@@ -128,6 +128,7 @@ class GroupsFactory {
      * @param array{response: array{status: string}, request: \OmegaUp\Request, scoreboard: \OmegaUp\DAO\VO\GroupsScoreboards} $scorebaordData
      * @param array{response: array{status: string}, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, group: \OmegaUp\DAO\VO\Groups} $groupData
      * @psalm-suppress MissingDependency
+     * @psalm-suppress MixedArrayAccess
      */
     public static function addContestToScoreboard(
         array $contestData,

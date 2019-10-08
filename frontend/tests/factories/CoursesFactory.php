@@ -187,10 +187,10 @@ class CoursesFactory {
         array $problemAssignmentsMap
     ) {
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
-        $expectedScores = [];
         if (is_null($course) || is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
+        $expectedScores = [];
         for ($s = 0; $s < count($students); $s++) {
             if (is_null($students[$s]->username)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');

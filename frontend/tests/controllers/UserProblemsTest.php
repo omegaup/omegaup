@@ -91,7 +91,8 @@ class UserProblemsTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 0
         ]));
-        $user = $problemData['author'];
+        $identity = $problemData['author'];
+        $user = \OmegaUp\DAO\Users::FindByUsername($identity->username);
 
         $this->assertEquals(1, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
@@ -104,7 +105,8 @@ class UserProblemsTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1
         ]));
-        $user = $problemData['author'];
+        $identity = $problemData['author'];
+        $user = \OmegaUp\DAO\Users::FindByUsername($identity->username);
 
         $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }
@@ -113,7 +115,8 @@ class UserProblemsTest extends OmegaupTestCase {
      * Test \OmegaUp\DAO\Problems::getPrivateCount when there's 0 problems
      */
     public function testPrivateProblemsCountWithNoProblems() {
-        $user = UserFactory::createUser();
+        $identity = UserFactory::createUser();
+        $user = \OmegaUp\DAO\Users::FindByUsername($identity->username);
 
         $this->assertEquals(0, \OmegaUp\DAO\Problems::getPrivateCount($user));
     }

@@ -632,7 +632,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Update problems order
-        /** @var array{alias: string, order: int}[] $problems */
+        /** @var array{alias: string, order: int}[] */
         $problems = $r['problems'];
         foreach ($problems as $problem) {
             $currentProblem = \OmegaUp\DAO\Problems::getByAlias($problem['alias']);
@@ -1753,8 +1753,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             unset($problem['problem_id']);
         }
 
-        $director = null;
         $acl = \OmegaUp\DAO\ACLs::getByPK($tokenAuthenticationResult['course']->acl_id);
+        if (is_null($acl) || is_null($acl->owner_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
         $director = \OmegaUp\DAO\Identities::findByUserId(intval($acl->owner_id))->username;
 
         // Log the operation only when there is not a token in request
@@ -1963,6 +1965,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array
      */
     public static function apiAssignmentScoreboard(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
         $tokenAuthenticationResult = self::authenticateAndValidateToken(
             $r['course'],
             $r['assignment'],

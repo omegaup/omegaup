@@ -18,13 +18,13 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 FROM
                   `Identities` i
                 INNER JOIN
-                  `Emails` e
-                ON
-                  e.user_id = i.user_id
-                INNER JOIN
                   `Users` u
                 ON
                   u.user_id = i.user_id AND u.main_identity_id = i.identity_id
+                INNER JOIN
+                  `Emails` e
+                ON
+                  e.user_id = u.user_id
                 WHERE
                   e.email = ?
                 LIMIT

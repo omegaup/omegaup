@@ -218,7 +218,11 @@ class ProblemDeployer {
      *
      * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
      */
-    public function commitLooseFiles(string $message, \OmegaUp\DAO\VO\Identities $identity, array $blobUpdate) : void {
+    public function commitLooseFiles(
+        string $message,
+        \OmegaUp\DAO\VO\Identities $identity,
+        array $blobUpdate
+    ) : void {
         $tmpfile = tmpfile();
         try {
             $zipPath = stream_get_meta_data($tmpfile)['uri'];
