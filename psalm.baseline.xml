@@ -4237,29 +4237,6 @@
       <code>$value</code>
     </MixedAssignment>
   </file>
-  <file src="frontend/www/course.php">
-    <MixedAssignment occurrences="2">
-      <code>$value</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/coursestudent.php">
-    <MixedArrayAccess occurrences="2">
-      <code>$_REQUEST['course']</code>
-      <code>$_REQUEST['student']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="2">
-      <code>$course_alias</code>
-      <code>$student_username</code>
-    </MixedAssignment>
-  </file>
-  <file src="frontend/www/coursestudents.php">
-    <MixedArrayAccess occurrences="1">
-      <code>$_REQUEST['course']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="1">
-      <code>$course_alias</code>
-    </MixedAssignment>
-  </file>
   <file src="frontend/www/cspreport.php">
     <MixedAssignment occurrences="1">
       <code>$log</code>

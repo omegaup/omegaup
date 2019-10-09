@@ -1,5 +1,5 @@
 <?php
-require_once('../../server/bootstrap_smarty.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 try {
     $hasActivityInCourses = \OmegaUp\Controllers\Course::userHasActivityInCourses(
@@ -14,4 +14,5 @@ if ($hasActivityInCourses) {
     die(header('Location: /course/'));
 }
 
-$smarty->display('../templates/schools.intro.tpl');
+$constant = 'constant';
+$smarty->display("{$constant('OMEGAUP_ROOT')}/templates/schools.intro.tpl");

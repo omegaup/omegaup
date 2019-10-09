@@ -1387,6 +1387,45 @@ class Course extends \OmegaUp\Controllers\Controller {
         return self::getIntroDetails($r);
     }
 
+    public static function getStudentsInformationForSmarty(
+        \OmegaUp\Request $r
+    ) : array {
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['student'], 'student');
+
+        $course = self::validateCourseExists($r['course']);
+
+        if (is_null($course->course_id) || is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $result = [
+            'payload' => [
+                'course' => self::getCommonCourseDetails(
+                    $course,
+                    $r->identity,
+                    /*onlyIntroDetails=*/false
+                ),
+                'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id
+                ),
+            ],
+        ];
+
+        if (empty($r['student'])) {
+            return $result;
+        }
+
+        $result['student'] = $r['student'];
+        return $result;
+    }
+
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      */
