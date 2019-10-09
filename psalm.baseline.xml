@@ -791,21 +791,6 @@
       <code>$r['group_alias']</code>
       <code>$r['group_alias']</code>
     </MixedArgument>
-    <MixedAssignment occurrences="2">
-      <code>$group</code>
-      <code>$group</code>
-      <code>$groups</code>
-      <code>$group</code>
-      <code>$groups</code>
-      <code>$group</code>
-      <code>$group</code>
-      <code>$group</code>
-      <code>$group</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="2">
-      <code>$group-&gt;name</code>
-      <code>$group-&gt;alias</code>
-    </MixedPropertyFetch>
   </file>
   <file src="frontend/server/src/Controllers/GroupScoreboard.php">
     <MissingReturnType occurrences="4">
@@ -1050,9 +1035,8 @@
       <code>$problem</code>
       <code>$problem</code>
     </ArgumentTypeCoercion>
-    <DocblockTypeContradiction occurrences="2">
+    <DocblockTypeContradiction occurrences="1">
       <code>is_null($problemset)</code>
-      <code>is_null($problem)</code>
     </DocblockTypeContradiction>
     <InvalidArgument occurrences="1">
       <code>$r</code>
@@ -1106,12 +1090,11 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="76">
+    <MixedArgument occurrences="73">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
       <code>$r['problem_alias']</code>
-      <code>$tagName</code>
       <code>$tag-&gt;public</code>
       <code>$r['problem']</code>
       <code>$r['usernameOrEmail']</code>
@@ -1119,7 +1102,6 @@
       <code>$r['group']</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$tagName</code>
       <code>$r['usernameOrEmail']</code>
       <code>$problem</code>
       <code>$r['group']</code>
@@ -1164,9 +1146,7 @@
       <code>$response['languages']</code>
       <code>max($response['accepted'], 1.0) + 1</code>
       <code>$problemset-&gt;problemset_id</code>
-      <code>$problem-&gt;problem_id</code>
       <code>$problem</code>
-      <code>$commit</code>
       <code>$r['lang']</code>
       <code>$problem</code>
       <code>$problem</code>
@@ -1194,7 +1174,6 @@
       <code>$language</code>
       <code>$orderBy</code>
       <code>$query</code>
-      <code>$problem['problem']</code>
       <code>$problem</code>
       <code>$problemset</code>
       <code>$details['languages']</code>
@@ -1233,15 +1212,13 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case-&gt;name]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="61">
+    <MixedAssignment occurrences="54">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
-      <code>$tagName</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problem</code>
-      <code>$tagName</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problem</code>
@@ -1267,8 +1244,6 @@
       <code>$container</code>
       <code>$problemset</code>
       <code>$problem</code>
-      <code>$commit</code>
-      <code>$version</code>
       <code>$problem</code>
       <code>$logEntry['tree'][$treeEntry['path']]</code>
       <code>$updatePublished</code>
@@ -1297,13 +1272,11 @@
       <code>$hiddenTags</code>
       <code>$problem</code>
       <code>$problemArray</code>
-      <code>$problemArray['tags']</code>
       <code>$addedProblems[]</code>
       <code>$problems</code>
       <code>$hiddenTags</code>
       <code>$problem</code>
       <code>$problemArray</code>
-      <code>$problemArray['tags']</code>
       <code>$addedProblems[]</code>
       <code>$deletedLanguages</code>
       <code>$problemSettings['validator']['name']</code>
@@ -1338,7 +1311,7 @@
       <code>$run</code>
       <code>$run</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="37">
+    <MixedPropertyFetch occurrences="34">
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;visibility</code>
@@ -1354,10 +1327,7 @@
       <code>$problemset['problemset']-&gt;problemset_id</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
-      <code>$problem-&gt;commit</code>
-      <code>$problem-&gt;current_version</code>
       <code>$problemset-&gt;problemset_id</code>
-      <code>$problem-&gt;problem_id</code>
       <code>$run-&gt;run_id</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['identity']-&gt;identity_id</code>
@@ -1517,7 +1487,7 @@
       <code>$response['original_contents']</code>
       <code>$response['status']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="16">
+    <MixedAssignment occurrences="13">
       <code>$contents</code>
       <code>$tag</code>
       <code>$tag</code>
@@ -1531,7 +1501,6 @@
       <code>$qualitynomination-&gt;status</code>
       <code>$types</code>
       <code>$response</code>
-      <code>$response['original_contents']['tags']</code>
       <code>$_</code>
       <code>$response['nomination_status']</code>
     </MixedAssignment>
@@ -1814,15 +1783,10 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/Controllers/Tag.php">
-    <MissingParamType occurrences="1">
-      <code>$name</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>normalize</code>
+    <MissingReturnType occurrences="1">
       <code>apiList</code>
     </MissingReturnType>
-    <MixedArgument occurrences="2">
-      <code>$name</code>
+    <MixedArgument occurrences="1">
       <code>$r[$param]</code>
     </MixedArgument>
     <MixedAssignment occurrences="1">
@@ -2432,13 +2396,10 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/DAO/Groups.php">
-    <MissingParamType occurrences="2">
-      <code>$name</code>
-      <code>$name</code>
+    <MissingParamType occurrences="1">
       <code>$n</code>
     </MissingParamType>
-    <MissingReturnType occurrences="2">
-      <code>SearchByName</code>
+    <MissingReturnType occurrences="1">
       <code>sampleMembers</code>
     </MissingReturnType>
   </file>
@@ -2565,15 +2526,13 @@
     <MissingClosureReturnType occurrences="1">
       <code>function ($clause) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="25">
+    <MissingParamType occurrences="23">
       <code>$tag</code>
       <code>$tag</code>
       <code>$programmingLanguages</code>
       <code>$difficultyRange</code>
       <code>$alias</code>
       <code>$alias</code>
-      <code>$problem</code>
-      <code>$public</code>
       <code>$id</code>
       <code>$identityId</code>
       <code>$identityId</code>
@@ -2593,10 +2552,9 @@
       <code>$contest_id</code>
       <code>$title</code>
     </MissingParamType>
-    <MissingReturnType occurrences="15">
+    <MissingReturnType occurrences="14">
       <code>byIdentityType</code>
       <code>searchByAlias</code>
-      <code>getTagsForProblem</code>
       <code>getPracticeDeadline</code>
       <code>getProblemsSolved</code>
       <code>getProblemsUnsolvedByIdentity</code>
@@ -2621,7 +2579,7 @@
       <code>$clause[0]</code>
       <code>$clause[1]</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="12">
+    <MixedAssignment occurrences="11">
       <code>$programmingLanguage</code>
       <code>$clause</code>
       <code>$total</code>
@@ -2629,7 +2587,6 @@
       <code>$problem['score']</code>
       <code>$problem['points']</code>
       <code>$problem['ratio']</code>
-      <code>$problem['tags']</code>
       <code>$quoted</code>
       <code>$offset</code>
       <code>$offset</code>
@@ -2645,9 +2602,6 @@
       <code>$page</code>
       <code>($page - 1) * $cols_per_page</code>
     </MixedOperand>
-    <MixedPropertyFetch occurrences="1">
-      <code>$problem-&gt;problem_id</code>
-    </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
     </MixedReturnStatement>

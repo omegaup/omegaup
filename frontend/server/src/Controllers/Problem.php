@@ -974,7 +974,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Validate problem Details API
      *
      * @param \OmegaUp\Request $r
-     * @return Array
+     * @return array{status?: string, exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: mixed|null}
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -1526,7 +1526,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $problem = self::validateDetails($r);
-        if (is_null($problem)) {
+        if (is_null($problem['problem'])) {
             return [
                 'status' => 'ok',
                 'exists' => false,
@@ -2355,10 +2355,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Save language data for a problem.
-     * @param \OmegaUp\Request $r
+     * @param \OmegaUp\DAO\VO\Problems $problem
      * @return Array
      */
     private static function updateLanguages(\OmegaUp\DAO\VO\Problems $problem) {
+        if (is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         try {
             \OmegaUp\DAO\DAO::transBegin();
