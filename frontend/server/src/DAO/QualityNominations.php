@@ -96,7 +96,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * @param int $qualitynomination_id
      * @return array{time: int, vote: int, user: array{username: string, name: string}}[] $votes
      */
-    private static function getVotesForNomination($qualitynomination_id) {
+    private static function getVotesForNomination(int $qualitynomination_id) {
         $sql = '
         SELECT
             i.username,
@@ -133,12 +133,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
 
         $votes = [];
 
-        /** @var array{time: int|string, vote: int|string, username: string, name: string} $vote */
+        /** @var array{time: int, vote: int, username: string, name: string} $vote */
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$qualitynomination_id]) as $vote) {
-            if (is_string($vote['time'])) {
-                $vote['time'] = (int)$vote['time'];
-            }
-            $vote['vote'] = (int)$vote['vote'];
             $vote['user'] = [
                 'username' => $vote['username'],
                 'name' => $vote['name'],
@@ -156,14 +152,14 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * instead of as a flat array.
      *
      * @param null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination
-     * @return null|array{qualitynomination_id: int, nomination: string, contents: null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed, origine?: mixed}, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string, votes: array{time: int, vote: int, user: array{username: string, name: string}}}
+     * @return null|array{qualitynomination_id: int, nomination: string, contents: array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}, time: int, status: string, votes: array{time: int, vote: int, user: array{username: string, name: string}}, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}}
      */
     private static function processNomination($nomination) {
         if (is_null($nomination) || empty($nomination)) {
             return null;
         }
 
-        $nomination['time'] = (int) $nomination['time'];
+        $nomination['time'] = intval($nomination['time']);
         foreach (['nominator', 'author'] as $userRole) {
             $nomination[$userRole] = [
                 'username' => $nomination[$userRole . '_username'],
@@ -183,7 +179,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         unset($nomination['title']);
 
         $nomination['votes'] = self::getVotesForNomination(
-            (int) $nomination['qualitynomination_id']
+            intval($nomination['qualitynomination_id'])
         );
 
         if (isset($nomination['contents'])) {
@@ -279,8 +275,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         }
 
         $sql .= ' LIMIT ?, ?;';
-        $params[] = (int)($page * $pageSize);
-        $params[] = (int)(($page + 1) * $pageSize);
+        $params[] = intval($page * $pageSize);
+        $params[] = intval(($page + 1) * $pageSize);
 
         $nominations = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
@@ -294,7 +290,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * Gets a single nomination by ID.
      *
      * @param int $qualitynomination_id
-     * @return null|array{qualitynomination_id: int, nomination: string, contents: null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed, origine?: mixed}, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string, votes: array{time: int, vote: int, user: array{username: string, name: string}}}
+     * @return null|array{qualitynomination_id: int, nomination: string, contents: array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}, time: int, status: string, votes: array{time: int, vote: int, user: array{username: string, name: string}}, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}}
      */
     public static function getById($qualitynomination_id) {
         $sql = '
