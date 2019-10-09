@@ -28,10 +28,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-      * Given a course alias, get all of its assignments. Hides any assignments
-      * that have not started, if not an admin.
-      **/
-    public static function getAllAssignments($alias, $isAdmin) {
+     * Given a course alias, get all of its assignments. Hides any assignments
+     * that have not started, if not an admin.
+     *
+     * @return array<int, array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     */
+    public static function getAllAssignments(string $alias, bool $isAdmin) : array {
         // Non-admins should not be able to see assignments that have not
         // started.
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
@@ -55,6 +57,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 start_time;";
 
+        /** @var array{acl_id: int, assignment_id: int, problemset_id: int, course_id: int, name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[] */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -63,8 +66,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             unset($row['assignment_id']);
             unset($row['problemset_id']);
             unset($row['course_id']);
-            $row['start_time'] =  \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['start_time']);
-            $row['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['finish_time']);
+            $row['start_time'] =  intval(
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['start_time'])
+            );
+            $row['finish_time'] = intval(
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp($row['finish_time'])
+            );
             array_push($ar, $row);
         }
 
@@ -94,7 +101,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Returns a list of students within a course
      * @param  int $course_id
      * @param  int $group_id
-     * @return Array Students data
+     * @return array<int, array{name: string, progress: array<string, int>, username: string}>
      */
     public static function getStudentsInCourseWithProgressPerAssignment($course_id, $group_id) {
         $sql = 'SELECT i.username, i.name, pr.alias as assignment_alias, pr.assignment_score
@@ -124,6 +131,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ) pr
                 ON pr.identity_id = i.identity_id';
 
+        /** @var array{username: string, name: string, assignment_alias: string, assignment_score: int|null}[] */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_id, $course_id]);
         $progress = [];
         foreach ($rs as $row) {

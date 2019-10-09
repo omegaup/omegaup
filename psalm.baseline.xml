@@ -497,13 +497,8 @@
       <code>$assignment</code>
     </ArgumentTypeCoercion>
     <InvalidArgument occurrences="1"/>
-    <InvalidPropertyAssignmentValue occurrences="1">
-      <code>$privacystatement_consent_id</code>
-    </InvalidPropertyAssignmentValue>
-    <InvalidReturnStatement occurrences="1">
-      <code>['status' =&gt; 'ok', 'user_problems' =&gt; $userProblems]</code>
-      <code>['status' =&gt; 'ok', 'user_problems' =&gt; $userProblems]</code>
-    </InvalidReturnStatement>
+    <InvalidPropertyAssignmentValue occurrences="1"/>
+    <InvalidReturnStatement occurrences="1"/>
     <InvalidReturnType occurrences="1"/>
     <MissingClosureParamType occurrences="3">
       <code>$value</code>
@@ -523,7 +518,7 @@
       <code>apiListCourses</code>
       <code>apiStudentProgress</code>
     </MissingReturnType>
-    <MixedArgument occurrences="88">
+    <MixedArgument occurrences="87">
       <code>$r['school_id']</code>
       <code>$r['course_alias']</code>
       <code>$r['start_time']</code>
@@ -572,7 +567,6 @@
       <code>$course</code>
       <code>$r['course_alias']</code>
       <code>$r['group']</code>
-      <code>$requestUserInformation</code>
       <code>$r['alias']</code>
       <code>$r['group']</code>
       <code>$r['course_alias']</code>
@@ -614,7 +608,7 @@
       <code>$r['course_alias']</code>
       <code>$r['course_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="18">
+    <MixedArrayAccess occurrences="17">
       <code>$assignment['alias']</code>
       <code>$assignment['order']</code>
       <code>$assignment['problemset_id']</code>
@@ -627,7 +621,6 @@
       <code>$run['guid']</code>
       <code>$problem['runs']</code>
       <code>$problem['problem_id']</code>
-      <code>self::getIntroDetails($r)['smartyProperties']['coursePayload']</code>
       <code>$sharingInformation['share_user_information']</code>
       <code>$sharingInformation['accept_teacher']</code>
       <code>$assignmentProblemset['scoreboard_url_admin']</code>
@@ -636,7 +629,7 @@
       <code>$run['time']</code>
       <code>$run['contest_score']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="38">
+    <MixedAssignment occurrences="35">
       <code>$assignment</code>
       <code>$course</code>
       <code>$problem</code>
@@ -675,9 +668,7 @@
       <code>$course</code>
       <code>$result</code>
       <code>$sharingInformation</code>
-      <code>$requestUserInformation</code>
       <code>$privacyStatement['gitObjectId']</code>
-      <code>$result['student_count']</code>
       <code>$accesses</code>
       <code>$submissions</code>
       <code>$assignmentProblemset</code>
@@ -690,10 +681,8 @@
       <code>$problem</code>
       <code>$problem</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="2">
+    <MixedInferredReturnType occurrences="1">
       <code>\OmegaUp\DAO\VO\Assignments</code>
-      <code>array</code>
-      <code>array</code>
     </MixedInferredReturnType>
     <MixedOperand occurrences="1">
       <code>$r['course_alias']</code>
@@ -734,11 +723,10 @@
       <code>$tokenAuthenticationResult['course']-&gt;group_id</code>
       <code>$tokenAuthenticationResult['course']-&gt;group_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="2">
+    <MixedReturnStatement occurrences="1">
       <code>$assignment</code>
-      <code>$result</code>
     </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="12">
+    <PossiblyNullArgument occurrences="9">
       <code>$course-&gt;group_id</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$points</code>
@@ -2345,10 +2333,8 @@
       <code>$a</code>
       <code>$b</code>
     </MissingClosureParamType>
-    <MissingParamType occurrences="12">
+    <MissingParamType occurrences="10">
       <code>$name</code>
-      <code>$alias</code>
-      <code>$isAdmin</code>
       <code>$identity_id</code>
       <code>$identity_id</code>
       <code>$identity_id</code>
@@ -2357,12 +2343,10 @@
       <code>$user_id</code>
       <code>$page</code>
       <code>$pageSize</code>
-      <code>$alias</code>
       <code>$identity_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="8">
+    <MissingReturnType occurrences="7">
       <code>findByName</code>
-      <code>getAllAssignments</code>
       <code>getCoursesForStudent</code>
       <code>getAllCoursesAdminedByIdentity</code>
       <code>getAllCoursesOwnedByUser</code>
@@ -2370,9 +2354,7 @@
       <code>updateAssignmentMaxPoints</code>
       <code>getSharingInformation</code>
     </MissingReturnType>
-    <MixedArgument occurrences="4">
-      <code>$row['start_time']</code>
-      <code>$row['finish_time']</code>
+    <MixedArgument occurrences="2">
       <code>!empty($a['name']) ? $a['name'] : $a['username']</code>
       <code>!empty($b['name']) ? $b['name'] : $b['username']</code>
     </MixedArgument>
@@ -2382,15 +2364,10 @@
       <code>$b['name']</code>
       <code>$b['username']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="4">
-      <code>$progress[$username]</code>
-      <code>$progress[$username]</code>
-      <code>$progress[$username]</code>
+    <MixedArrayOffset occurrences="1">
       <code>$progress[$assignment]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="5">
-      <code>$username</code>
-      <code>$progress[$username]['progress'][$row['assignment_alias']]</code>
+    <MixedAssignment occurrences="3">
       <code>$assignment</code>
       <code>$offset</code>
       <code>$offset</code>
@@ -2443,15 +2420,13 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/GroupsIdentities.php">
-    <MissingParamType occurrences="3">
+    <MissingParamType occurrences="2">
       <code>$group_id</code>
       <code>$groupId</code>
       <code>$group_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="4">
+    <MissingReturnType occurrences="2">
       <code>GetMemberIdentities</code>
-      <code>GetMemberCountById</code>
-      <code>getByGroupId</code>
       <code>getUsernamesByGroupId</code>
     </MissingReturnType>
     <MixedArgument occurrences="1">

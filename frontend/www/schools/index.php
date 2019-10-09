@@ -14,5 +14,4 @@ if ($hasActivityInCourses) {
     die(header('Location: /course/'));
 }
 
-$constant = 'constant';
-$smarty->display("{$constant('OMEGAUP_ROOT')}/templates/schools.intro.tpl");
+$smarty->display(OMEGAUP_ROOT . '/templates/schools.intro.tpl');
