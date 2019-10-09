@@ -2376,7 +2376,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         /** @var string $contestAlias */
         foreach ($scoreboards as $contestAlias => $scoreboard) {
             foreach ($scoreboard['ranking'] as $userResults) {
-                /** @var string */
                 $username = $userResults['username'];
                 // If user haven't been added to the merged scoredboard, add them.
                 if (!isset($mergedScoreboard[$username])) {
@@ -3071,7 +3070,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiReport(\OmegaUp\Request $r) {
+    public static function apiReport(\OmegaUp\Request $r): array {
         $contestReport = self::getContestReportDetails($r);
 
         $contestReport['status'] = 'ok';
@@ -3082,10 +3081,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest. Only Admins can get the report
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string, problems: array{order: int, alias: string}[], ranking: array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}[], start_time: int, finish_time: int, title: string, time: int}
      */
     private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['auth_token'],
+            'auth_token'
+        );
+
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         $params = \OmegaUp\ScoreboardParams::fromContest($contest);
@@ -3153,10 +3161,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiCsvReport(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         // Get full Report API of the contest
-        $contestReport = self::apiReport(new \OmegaUp\Request([
+        $contestReport = self::getContestReportDetails(new \OmegaUp\Request([
             'contest_alias' => $r['contest_alias'],
             'auth_token' => $r['auth_token'],
         ]));
@@ -3181,27 +3193,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Build a csv
+        /** @var string[][] */
         $csvData = [];
 
         // Build titles
-        $csvRow = [];
-        $csvRow[] = 'username';
+        $csvRow = [
+            'username',
+        ];
         foreach ($contestReport['problems'] as $entry) {
             foreach ($problemStats[$entry['alias']]['cases_stats'] as $caseName => $counts) {
-                $csvRow[] = $caseName;
+                $csvRow[] = strval($caseName);
             }
-            $csvRow[] = $entry['alias'] . ' total';
+            $csvRow[] = "{$entry['alias']} total";
         }
         $csvRow[] = 'total';
         $csvData[] = $csvRow;
 
         foreach ($contestReport['ranking'] as $userData) {
-            if ($userData === 'ok') {
-                continue;
-            }
-
-            $csvRow = [];
-            $csvRow[] = $userData['username'];
+            $csvRow = [
+                $userData['username'],
+            ];
 
             foreach ($userData['problems'] as $key => $problemData) {
                 // If the user don't have these details then he didn't submit,
@@ -3249,13 +3260,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         header('Content-Type: application/octet-stream');
         header('Content-Type: application/download');
         header(
-            'Content-Disposition: attachment;filename=' . $r['contest_alias'] . '_report.csv'
+            "Content-Disposition: attachment;filename={$contest->alias}_report.csv"
         );
         header('Content-Transfer-Encoding: binary');
 
         // Write contents to a csv raw string
-        // TODO(https://github.com/omegaup/omegaup/issues/628): Escape = to prevent applications from inadvertently executing code
-        // http://contextis.co.uk/blog/comma-separated-vulnerabilities/
         $out = fopen('php://output', 'w');
         foreach ($csvData as $csvRow) {
             fputcsv($out, \OmegaUp\Controllers\Contest::escapeCsv($csvRow));
@@ -3266,13 +3275,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
         die();
     }
 
-    private static function escapeCsv($csvRow) {
+    /**
+     * @param mixed[] $csvRow
+     * @return string[]
+     */
+    private static function escapeCsv($csvRow): array {
         $escapedRow = [];
+        /** @var mixed $field */
         foreach ($csvRow as $field) {
             if (is_string($field) && $field[0] == '=') {
                 $escapedRow[] = "'" . $field;
             } else {
-                $escapedRow[] = $field;
+                $escapedRow[] = strval($field);
             }
         }
         return $escapedRow;

@@ -128,6 +128,9 @@ class ProblemArtifacts {
         return $entries;
     }
 
+    /**
+     * @return null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}
+     */
     public function commit(): ?array {
         $browser = new GitServerBrowser(
             $this->alias,
