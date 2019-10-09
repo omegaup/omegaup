@@ -152,7 +152,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * instead of as a flat array.
      *
      * @param null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination
-     * @return null|array{qualitynomination_id: int, nomination: string, contents: array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}, time: int, status: string, votes: array{time: int, vote: int, user: array{username: string, name: string}}, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}}
+     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array<array-key, array{time: int, vote: int, user: array{username: string, name: string}}>}|null
      */
     private static function processNomination($nomination) {
         if (is_null($nomination) || empty($nomination)) {
@@ -160,14 +160,18 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         }
 
         $nomination['time'] = intval($nomination['time']);
-        foreach (['nominator', 'author'] as $userRole) {
-            $nomination[$userRole] = [
-                'username' => $nomination[$userRole . '_username'],
-                'name' => $nomination[$userRole . '_name'],
-            ];
-        }
+
+        $nomination['nominator'] = [
+            'username' => $nomination['nominator_username'],
+            'name' => $nomination['nominator_name'],
+        ];
         unset($nomination['nominator_username']);
         unset($nomination['nominator_name']);
+
+        $nomination['author'] = [
+            'username' => $nomination['author_username'],
+            'name' => $nomination['author_name'],
+        ];
         unset($nomination['author_username']);
         unset($nomination['author_name']);
 
@@ -279,6 +283,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $params[] = intval(($page + 1) * $pageSize);
 
         $nominations = [];
+        /** @var null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination */
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
             $nominations[] = self::processNomination($nomination);
         }
@@ -290,7 +295,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * Gets a single nomination by ID.
      *
      * @param int $qualitynomination_id
-     * @return null|array{qualitynomination_id: int, nomination: string, contents: array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed}, time: int, status: string, votes: array{time: int, vote: int, user: array{username: string, name: string}}, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}}
+     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array<array-key, array{time: int, vote: int, user: array{username: string, name: string}}>}|null
      */
     public static function getById($qualitynomination_id) {
         $sql = '

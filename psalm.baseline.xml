@@ -1230,7 +1230,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case-&gt;name]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="59">
+    <MixedAssignment occurrences="57">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
@@ -1292,13 +1292,11 @@
       <code>$hiddenTags</code>
       <code>$problem</code>
       <code>$problemArray</code>
-      <code>$problemArray['tags']</code>
       <code>$addedProblems[]</code>
       <code>$problems</code>
       <code>$hiddenTags</code>
       <code>$problem</code>
       <code>$problemArray</code>
-      <code>$problemArray['tags']</code>
       <code>$addedProblems[]</code>
       <code>$deletedLanguages</code>
       <code>$problemSettings['validator']['name']</code>
@@ -1493,12 +1491,11 @@
       <code>$contents</code>
       <code>$contents</code>
     </MixedArgument>
-    <MixedAssignment occurrences="5">
+    <MixedAssignment occurrences="4">
       <code>$newProblemVisibility</code>
       <code>$r['visibility']</code>
       <code>$qualitynomination-&gt;status</code>
       <code>$types</code>
-      <code>$response['original_contents']['tags']</code>
     </MixedAssignment>
     <MixedPropertyFetch occurrences="5">
       <code>$r['problem']-&gt;visibility</code>
@@ -2509,15 +2506,13 @@
     <MissingClosureReturnType occurrences="1">
       <code>function ($clause) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="25">
+    <MissingParamType occurrences="23">
       <code>$tag</code>
       <code>$tag</code>
       <code>$programmingLanguages</code>
       <code>$difficultyRange</code>
       <code>$alias</code>
       <code>$alias</code>
-      <code>$problem</code>
-      <code>$public</code>
       <code>$id</code>
       <code>$identityId</code>
       <code>$identityId</code>
@@ -2537,10 +2532,9 @@
       <code>$contest_id</code>
       <code>$title</code>
     </MissingParamType>
-    <MissingReturnType occurrences="15">
+    <MissingReturnType occurrences="14">
       <code>byIdentityType</code>
       <code>searchByAlias</code>
-      <code>getTagsForProblem</code>
       <code>getPracticeDeadline</code>
       <code>getProblemsSolved</code>
       <code>getProblemsUnsolvedByIdentity</code>
@@ -2565,7 +2559,7 @@
       <code>$clause[0]</code>
       <code>$clause[1]</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="12">
+    <MixedAssignment occurrences="11">
       <code>$programmingLanguage</code>
       <code>$clause</code>
       <code>$total</code>
@@ -2573,7 +2567,6 @@
       <code>$problem['score']</code>
       <code>$problem['points']</code>
       <code>$problem['ratio']</code>
-      <code>$problem['tags']</code>
       <code>$quoted</code>
       <code>$offset</code>
       <code>$offset</code>
@@ -2589,9 +2582,6 @@
       <code>$page</code>
       <code>($page - 1) * $cols_per_page</code>
     </MixedOperand>
-    <MixedPropertyFetch occurrences="1">
-      <code>$problem-&gt;problem_id</code>
-    </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1">
       <code>\OmegaUp\MySQLConnection::getInstance()-&gt;getOne($sql, $args)</code>
     </MixedReturnStatement>
