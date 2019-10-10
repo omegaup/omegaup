@@ -423,7 +423,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>$result['requestsUserInformation']</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="28">
+    <PossiblyNullArgument occurrences="27">
       <code>$session['identity']</code>
       <code>$contest-&gt;acl_id</code>
       <code>$acl-&gt;owner_id</code>
@@ -498,8 +498,6 @@
     </ArgumentTypeCoercion>
     <InvalidArgument occurrences="1"/>
     <InvalidPropertyAssignmentValue occurrences="1"/>
-    <InvalidReturnStatement occurrences="1"/>
-    <InvalidReturnType occurrences="1"/>
     <MissingClosureParamType occurrences="3">
       <code>$value</code>
       <code>$value</code>
@@ -629,7 +627,7 @@
       <code>$run['time']</code>
       <code>$run['contest_score']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="35">
+    <MixedAssignment occurrences="34">
       <code>$assignment</code>
       <code>$course</code>
       <code>$problem</code>
@@ -668,7 +666,6 @@
       <code>$course</code>
       <code>$result</code>
       <code>$sharingInformation</code>
-      <code>$privacyStatement['gitObjectId']</code>
       <code>$accesses</code>
       <code>$submissions</code>
       <code>$assignmentProblemset</code>
@@ -1929,7 +1926,7 @@
       <code>$r['password']</code>
     </MixedArgument>
     <MixedArgumentTypeCoercion occurrences="1"/>
-    <MixedArrayAccess occurrences="24">
+    <MixedArrayAccess occurrences="22">
       <code>$userDb['email']</code>
       <code>$userDb['country']</code>
       <code>$userDb['country_id']</code>
@@ -1952,8 +1949,6 @@
       <code>$contest['alias']</code>
       <code>$r2['contest_admin']</code>
       <code>$r2['contest_alias']</code>
-      <code>$latest_statement['privacystatement_id']</code>
-      <code>$latest_statement['git_object_id']</code>
     </MixedArrayAccess>
     <MixedArrayAssignment occurrences="5">
       <code>$response['userinfo'][$k]</code>
@@ -1969,7 +1964,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="48">
+    <MixedAssignment occurrences="47">
       <code>$user</code>
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
@@ -2024,7 +2019,6 @@
       <code>$r2</code>
       <code>$response['contest_admin'][]</code>
       <code>$problem</code>
-      <code>$latest_statement</code>
       <code>$identity</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="3">
@@ -2420,9 +2414,8 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/GroupsIdentities.php">
-    <MissingParamType occurrences="2">
+    <MissingParamType occurrences="1">
       <code>$group_id</code>
-      <code>$groupId</code>
       <code>$group_id</code>
     </MissingParamType>
     <MissingReturnType occurrences="2">
@@ -2509,15 +2502,6 @@
       <code>the</code>
       <code>the</code>
     </MixedInferredReturnType>
-  </file>
-  <file src="frontend/server/src/DAO/PrivacyStatements.php">
-    <MissingParamType occurrences="1">
-      <code>$statement_type</code>
-      <code>$statement_type</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="1">
-      <code>getLatestPublishedStatement</code>
-    </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/ProblemOfTheWeek.php">
     <MissingParamType occurrences="1">

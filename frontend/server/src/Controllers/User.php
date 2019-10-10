@@ -2248,7 +2248,10 @@ class User extends \OmegaUp\Controllers\Controller {
         } elseif ($identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_PT) {
             $lang = 'pt';
         }
-        $latest_statement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
+        $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
+        if (is_null($latestStatement)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
+        }
         return [
             'status' => 'ok',
             'policy_markdown' => file_get_contents(
@@ -2256,9 +2259,9 @@ class User extends \OmegaUp\Controllers\Controller {
             ),
             'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
-                $latest_statement['privacystatement_id']
+                $latestStatement['privacystatement_id']
             ),
-            'git_object_id' => $latest_statement['git_object_id'],
+            'git_object_id' => $latestStatement['git_object_id'],
             'statement_type' => 'privacy_policy',
         ];
     }
@@ -2306,11 +2309,15 @@ class User extends \OmegaUp\Controllers\Controller {
 
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
+        $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
+        if (is_null($latestStatement)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('privacyStatementNotFound');
+        }
         return [
             'status' => 'ok',
             'hasAccepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                 $identity->identity_id,
-                \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement()['privacystatement_id']
+                $latestStatement['privacystatement_id']
             ),
         ];
     }

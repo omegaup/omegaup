@@ -604,16 +604,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiOpen(\OmegaUp\Request $r) {
+        // Authenticate request
+        $r->ensureIdentity();
+
         $response = self::validateDetails($r);
         [
             'needsBasicInformation' => $needsInformation,
             'requestsUserInformation' => $requestsUserInformation
         ] = \OmegaUp\DAO\Contests::getNeedsInformation($response['contest']->problemset_id);
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
 
-        if ($needsInformation && !is_null($session['identity']) &&
-              (!$session['identity']->country_id || !$session['identity']->state_id
-                || !$session['identity']->school_id)
+        if ($needsInformation && (!$r->identity->country_id || !$r->identity->state_id
+            || !$r->identity->school_id)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestBasicInformationNeeded');
         }

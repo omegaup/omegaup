@@ -101,7 +101,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Returns a list of students within a course
      * @param  int $course_id
      * @param  int $group_id
-     * @return array<int, array{name: string, progress: array<string, int>, username: string}>
+     * @return array{name: string, progress: array<string, null|float>, username: string}[]
      */
     public static function getStudentsInCourseWithProgressPerAssignment($course_id, $group_id) {
         $sql = 'SELECT i.username, i.name, pr.alias as assignment_alias, pr.assignment_score
@@ -131,7 +131,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ) pr
                 ON pr.identity_id = i.identity_id';
 
-        /** @var array{username: string, name: string, assignment_alias: string, assignment_score: int|null}[] */
+        /** @var array{username: string, name: string, assignment_alias: string, assignment_score: null|float}[] */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_id, $course_id]);
         $progress = [];
         foreach ($rs as $row) {

@@ -1410,14 +1410,14 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{coursePayload?: array{name: string, description: string, alias: string, currentUsername: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, statements: array{privacy: string, acceptTeacher: string}, isFirstTimeAccess: bool, shouldShowResults: bool}, showRanking?: bool, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}, template: string}
+     * @return array{smartyProperties: array{coursePayload?: array{name: string, description: string, alias: string, currentUsername: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, statements: array{privacy: array{markdown: string|null, gitObjectId: null|string, statementType: null|string}, acceptTeacher: array{gitObjectId: string|null, markdown: string, statementType: string}}, isFirstTimeAccess: bool, shouldShowResults: bool}, showRanking?: bool, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}, template: string}
      */
     public static function getCourseDetailsForSmarty(\OmegaUp\Request $r) : array {
         return self::getIntroDetails($r);
     }
 
     /**
-     * @return array{payload: array{course: array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array<array-key, array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: null|int, school_name?: string|null}, students: array<int, array{name: string, progress: array<string, int>, username: string}>, student?: string}}
+     * @return array{payload: array{course: array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array<array-key, array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: null|int, school_name?: string|null}, students: array{name: string, progress: array<string, null|float>, username: string}[], student?: string}}
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -1461,7 +1461,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      *
-     * @return array{smartyProperties: array{coursePayload?: array{name: string, description: string, alias: string, currentUsername: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, statements: array{privacy: string, acceptTeacher: string}, isFirstTimeAccess: bool, shouldShowResults: bool}, showRanking?: bool, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}, template: string}
+     * @return array{smartyProperties: array{coursePayload?: array{name: string, description: string, alias: string, currentUsername: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, statements: array{privacy: array{markdown: string|null, gitObjectId: null|string, statementType: null|string}, acceptTeacher: array{gitObjectId: string|null, markdown: string, statementType: string}}, isFirstTimeAccess: bool, shouldShowResults: bool}, showRanking?: bool, payload?: array{shouldShowFirstAssociatedIdentityRunWarning: bool}}, template: string}
      */
     public static function getIntroDetails(\OmegaUp\Request $r) : array {
         if (OMEGAUP_LOCKDOWN) {
@@ -1520,11 +1520,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             ];
             if (!is_null($privacyStatementMarkdown)) {
                 $statementType = "course_{$requestUserInformation}_consent";
-                $privacyStatement['gitObjectId'] =
+                $statement =
                     \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
                         $statementType
-                    )['git_object_id'];
+                    );
                 $privacyStatement['statementType'] = $statementType;
+                if (!is_null($statement)) {
+                    $privacyStatement['gitObjectId'] = $statement['git_object_id'];
+                }
             }
 
             $markdown = \OmegaUp\PrivacyStatement::getForConsent(
@@ -1534,14 +1537,18 @@ class Course extends \OmegaUp\Controllers\Controller {
             if (is_null($markdown)) {
                 throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException();
             }
+            $teacherStatement =
+                \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                    'accept_teacher'
+                );
             $acceptTeacherStatement = [
-                'gitObjectId' =>
-                    \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
-                        'accept_teacher'
-                    )['git_object_id'],
                 'markdown' => $markdown,
                 'statementType' => 'accept_teacher',
+                'gitObjectId' => null,
             ];
+            if (!is_null($teacherStatement)) {
+                $acceptTeacherStatement['gitObjectId'] = $teacherStatement['git_object_id'];
+            }
 
             $smartyProperties = [
                 'coursePayload' => [
@@ -1652,7 +1659,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
-                if (is_null($group)) {
+                if (is_null($group) || is_null($group->group_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'courseGroupNotFound'
                     );

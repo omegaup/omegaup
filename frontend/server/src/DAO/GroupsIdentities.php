@@ -69,7 +69,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         return $identities;
     }
 
-    public static function GetMemberCountById($groupId) : ?int {
+    public static function GetMemberCountById(int $groupId) : ?int {
         $sql = '
             SELECT
                 COUNT(*) AS count
