@@ -1270,7 +1270,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function validateProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
         ?int $problemsetId,
-        string $contestAlias = null
+        ?string $contestAlias = null
     ) {
         $problemNotFound = null;
         $response = [];
