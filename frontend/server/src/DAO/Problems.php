@@ -622,6 +622,26 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         );
     }
 
+    final public static function hasTriedToSolveProblem(
+        \OmegaUp\DAO\VO\Problems $problem,
+        int $identityId
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(r.run_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            WHERE
+                s.problem_id = ? AND s.identity_id = ? AND
+                r.verdict NOT IN ("AC", "CE", "JE");
+        ';
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
+    }
+
     final public static function isProblemSolved(
         \OmegaUp\DAO\VO\Problems $problem,
         int $identityId
