@@ -1080,7 +1080,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="68">
+    <MixedArgument occurrences="65">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -1117,7 +1117,6 @@
       <code>$problem</code>
       <code>$params['alias']</code>
       <code>$params['commit']</code>
-      <code>$params['directory']</code>
       <code>$params['alias']</code>
       <code>$params['commit']</code>
       <code>$problem-&gt;alias</code>
@@ -1263,7 +1262,7 @@
       <code>$problemSettings['validator']['name']</code>
       <code>$result['sample_input']</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="7">
+    <MixedInferredReturnType occurrences="5">
       <code>array</code>
       <code>array</code>
       <code>array</code>
@@ -1275,9 +1274,8 @@
       <code>asArray</code>
       <code>asArray</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="5">
+    <MixedOperand occurrences="4">
       <code>$_SERVER['HTTP_REFERER']</code>
-      <code>$params['alias']</code>
       <code>max($response['accepted'], 1.0)</code>
       <code>$casesStats['counts'][$case-&gt;name]</code>
       <code>$details['input_limit']</code>
@@ -1321,7 +1319,7 @@
       <code>$case-&gt;score</code>
       <code>$runs[count($runs) - 1]-&gt;submission_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="5"/>
+    <MixedReturnStatement occurrences="3"/>
     <PossiblyNullArgument occurrences="19">
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;acl_id</code>

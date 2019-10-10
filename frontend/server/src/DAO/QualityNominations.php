@@ -295,7 +295,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * Gets a single nomination by ID.
      *
      * @param int $qualitynomination_id
-     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array<array-key, array{time: int, vote: int, user: array{username: string, name: string}}>}|null
+     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array{time: int, vote: int, user: array{username: string, name: string}}[]}|null
      */
     public static function getById($qualitynomination_id) {
         $sql = '
