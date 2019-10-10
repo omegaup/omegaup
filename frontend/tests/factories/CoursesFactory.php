@@ -177,8 +177,7 @@ class CoursesFactory {
      * @param \OmegaUp\DAO\VO\Identities[] $students
      * @param string[] $assignmentAliases
      * @param array $problemAssignmentsMap
-     * @return array
-     * @psalm-return array<string|null, array<string, int>>
+     * @return array<string|null, array<string, int>>
      */
     public static function submitRunsToAssignmentsInCourse(
         array $courseData,

@@ -119,8 +119,6 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
      * Logs in an identity and returns the auth_token
      *
      * @param $identity to be logged in
-     *
-     * @return ScopedLoginToken
      */
     public static function login(\OmegaUp\DAO\VO\Identities $identity) : ScopedLoginToken {
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;

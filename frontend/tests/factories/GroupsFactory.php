@@ -9,7 +9,6 @@ class GroupsFactory {
      * @param null|string $description
      * @param null|string $alias
      * @param null|ScopedLoginToken $login
-     * @psalm-suppress MixedInferredReturnType
      * @return array{request: \OmegaUp\Request, response: array{status: string}, owner: \OmegaUp\DAO\VO\Identities, group: \OmegaUp\DAO\VO\Groups}
      */
     public static function createGroup(
@@ -86,7 +85,6 @@ class GroupsFactory {
      * @param type $name
      * @param type $description
      * @param type $alias
-     * @psalm-suppress MixedInferredReturnType
      * @return array{response: array{status: string}, request: \OmegaUp\Request, scoreboard: \OmegaUp\DAO\VO\GroupsScoreboards}
      */
     public static function createGroupScoreboard(array $groupData, $name = null, $description = null, $alias = null) {
@@ -127,8 +125,6 @@ class GroupsFactory {
      * @param array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, contest: \OmegaUp\DAO\VO\Contests} $contestData
      * @param array{response: array{status: string}, request: \OmegaUp\Request, scoreboard: \OmegaUp\DAO\VO\GroupsScoreboards} $scorebaordData
      * @param array{response: array{status: string}, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, group: \OmegaUp\DAO\VO\Groups} $groupData
-     * @psalm-suppress MissingDependency
-     * @psalm-suppress MixedArrayAccess
      */
     public static function addContestToScoreboard(
         array $contestData,

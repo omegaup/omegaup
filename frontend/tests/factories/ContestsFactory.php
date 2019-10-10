@@ -144,10 +144,11 @@ class ContestsFactory {
     }
 
     /**
-     * @psalm-suppress MixedInferredReturnType
      * @return array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, contest: \OmegaUp\DAO\VO\Contests}
      */
-    public static function createContest($params = null) {
+    public static function createContest(
+        ContestParams $params = null
+    ) : array {
         if (!($params instanceof ContestParams)) {
             $params = new ContestParams($params);
         }

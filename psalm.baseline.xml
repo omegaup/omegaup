@@ -3063,21 +3063,6 @@
       <code>$params</code>
     </MixedArgument>
   </file>
-  <file src="frontend/tests/badges/100solvedProblemsTest.php">
-    <MissingDependency occurrences="1">
-      <code>BadgesTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/badges/BadgesTest.php">
-    <MissingDependency occurrences="1">
-      <code>BadgesTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/badges/BadgesTestCase.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
   <file src="frontend/tests/common/Utils.php">
     <ForbiddenCode occurrences="4">
       <code>var_dump($e-&gt;getMessage())</code>
@@ -3164,424 +3149,6 @@
       <code>setGraderResourceForTesting</code>
     </UndefinedMethod>
   </file>
-  <file src="frontend/tests/controllers/AssignmentProblemsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/AssignmentUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ClarificationCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ClarificationDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ClarificationUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CoderOfTheMonthTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestAddAdminTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestAddProblemTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestCloneTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestListClarificationsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestProblemsListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRemoveProblemTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRemoveUserTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRequestsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRunsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestScoreboardTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestStatsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestUsersTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseAssignmentScoreboardTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseAssignmentsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseCloneTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseProblemsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseRunsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseStudentAddTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseStudentListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseStudentsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseUsersTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/DbConfigTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaUpTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ExperimentTest.php">
-    <UndefinedClass occurrences="1">
-      <code>\PHPUnit\Framework\TestCase</code>
-    </UndefinedClass>
-  </file>
-  <file src="frontend/tests/controllers/GroupsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityContestsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityRestrictionsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/InterviewCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/LoginTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/NotificationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/OmegaupTestCase.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaUpTestCase</code>
-    </MissingDependency>
-    <UndefinedClass occurrences="1">
-      <code>\PHPUnit\Framework\TestCase</code>
-    </UndefinedClass>
-  </file>
-  <file src="frontend/tests/controllers/ProblemBestScoreTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemDeleteTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemExtraInformationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemListCourseTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemRunsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemStatsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemsForfeitedTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/QualityNominationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RegisterToContestTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ResetCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ResetUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunDisqualifyTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunRejudgeTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunStatusTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunsTotalsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/SchoolCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/SchoolRankTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/TimeTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserContestsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserFilterTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserIdentityAssociationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserIdentitySynchronizeTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserPrivacyPolicyTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserPrivilegesTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserProblemsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserProfileTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserRankTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserRegistrationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserResetPasswordTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserSupportTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/VirtualContestTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
   <file src="frontend/tests/factories/ClarificationsFactory.php">
     <InvalidParamDefault occurrences="2">
       <code>type</code>
@@ -3619,18 +3186,7 @@
     <InvalidReturnType occurrences="1">
       <code>\OmegaUp\Request</code>
     </InvalidReturnType>
-    <MissingDependency occurrences="9">
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-    <MissingParamType occurrences="18">
+    <MissingParamType occurrences="17">
       <code>$params</code>
       <code>$default</code>
       <code>$params</code>
@@ -3722,16 +3278,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
-    <MissingDependency occurrences="8">
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
     <MissingParamType occurrences="19">
       <code>$public</code>
       <code>$requestsUserInformation</code>
@@ -3790,10 +3336,6 @@
     <InvalidDocblockParamName occurrences="1">
       <code>$scorebaordData</code>
     </InvalidDocblockParamName>
-    <MissingDependency occurrences="2">
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
     <UndefinedDocblockClass occurrences="3">
       <code>type</code>
       <code>type</code>
@@ -3827,12 +3369,6 @@
       <code>$title</code>
       <code>$zipName</code>
     </InvalidDocblockParamName>
-    <MissingDependency occurrences="4">
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
     <MissingParamType occurrences="10">
       <code>$params</code>
       <code>$default</code>
@@ -3960,16 +3496,9 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/SchoolsFactory.php">
-    <MissingDependency occurrences="2">
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
     <MissingReturnType occurrences="1">
       <code>addUserToSchool</code>
     </MissingReturnType>
-    <MixedInferredReturnType occurrences="1">
-      <code>array</code>
-    </MixedInferredReturnType>
   </file>
   <file src="frontend/tests/factories/UserFactory.php">
     <InvalidDocblockParamName occurrences="12">
