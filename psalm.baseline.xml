@@ -1035,18 +1035,12 @@
       <code>$problem</code>
       <code>$problem</code>
     </ArgumentTypeCoercion>
-    <DocblockTypeContradiction occurrences="1">
-      <code>is_null($problemset)</code>
-    </DocblockTypeContradiction>
     <InvalidArgument occurrences="1">
       <code>$r</code>
     </InvalidArgument>
     <InvalidArrayOffset occurrences="1">
       <code>$result['settings']</code>
     </InvalidArrayOffset>
-    <InvalidNullableReturnType occurrences="1">
-      <code>Array</code>
-    </InvalidNullableReturnType>
     <InvalidReturnStatement occurrences="1">
       <code>$result</code>
     </InvalidReturnStatement>
@@ -1063,12 +1057,8 @@
       <code>\OmegaUp\DAO\VO\Problems</code>
       <code>the</code>
     </MismatchingDocblockReturnType>
-    <MissingParamType occurrences="5">
+    <MissingParamType occurrences="1">
       <code>$is_update</code>
-      <code>$problemsetId</code>
-      <code>$contestAlias</code>
-      <code>$problemsetId</code>
-      <code>$contestAlias</code>
     </MissingParamType>
     <MissingReturnType occurrences="18">
       <code>validateCreateOrUpdate</code>
@@ -1090,7 +1080,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="73">
+    <MixedArgument occurrences="68">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -1125,10 +1115,6 @@
       <code>$r['problem']</code>
       <code>$r['problem']</code>
       <code>$problem</code>
-      <code>$problemset['problemset']</code>
-      <code>$problemset['problemset']-&gt;problemset_id</code>
-      <code>$problemset['contest']</code>
-      <code>$problemset['problemset']</code>
       <code>$params['alias']</code>
       <code>$params['commit']</code>
       <code>$params['directory']</code>
@@ -1136,8 +1122,6 @@
       <code>$params['commit']</code>
       <code>$problem-&gt;alias</code>
       <code>$problem</code>
-      <code>$contestAlias</code>
-      <code>$problemsetId</code>
       <code>$problem</code>
       <code>$problemset</code>
       <code>$r['lang']</code>
@@ -1145,7 +1129,6 @@
       <code>$container</code>
       <code>$response['languages']</code>
       <code>max($response['accepted'], 1.0) + 1</code>
-      <code>$problemset-&gt;problemset_id</code>
       <code>$problem</code>
       <code>$r['lang']</code>
       <code>$problem</code>
@@ -1212,7 +1195,7 @@
     <MixedArrayOffset occurrences="1">
       <code>$casesStats['counts'][$case-&gt;name]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="54">
+    <MixedAssignment occurrences="53">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
@@ -1242,7 +1225,6 @@
       <code>$response['preferred_language']</code>
       <code>$run</code>
       <code>$container</code>
-      <code>$problemset</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$logEntry['tree'][$treeEntry['path']]</code>
@@ -1311,7 +1293,7 @@
       <code>$run</code>
       <code>$run</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="34">
+    <MixedPropertyFetch occurrences="30">
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;visibility</code>
@@ -1323,11 +1305,8 @@
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['problem']-&gt;current_version</code>
       <code>$run-&gt;run_id</code>
-      <code>$problemset['contest']-&gt;admission_mode</code>
-      <code>$problemset['problemset']-&gt;problemset_id</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
-      <code>$problemset-&gt;problemset_id</code>
       <code>$run-&gt;run_id</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$r['identity']-&gt;identity_id</code>
@@ -1345,15 +1324,10 @@
       <code>$case-&gt;name</code>
       <code>$case-&gt;score</code>
       <code>$runs[count($runs) - 1]-&gt;submission_id</code>
-      <code>$problemset['problemset']-&gt;problemset_id</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="5"/>
-    <NullableReturnStatement occurrences="1">
-      <code>null</code>
-    </NullableReturnStatement>
-    <PossiblyNullArgument occurrences="21">
+    <PossiblyNullArgument occurrences="19">
       <code>$problem-&gt;alias</code>
-      <code>$response['contest']-&gt;problemset_id</code>
       <code>$problem-&gt;acl_id</code>
       <code>$acl-&gt;owner_id</code>
       <code>$problem-&gt;alias</code>
@@ -1379,10 +1353,6 @@
       <code>$result</code>
       <code>$response</code>
     </PossiblyUndefinedVariable>
-    <RedundantConditionGivenDocblockType occurrences="2">
-      <code>is_null($problemset)</code>
-      <code>!is_null($problemset) &amp;&amp; isset($problemset['problemset'])</code>
-    </RedundantConditionGivenDocblockType>
   </file>
   <file src="frontend/server/src/Controllers/ProblemForfeited.php">
     <MixedOperand occurrences="1">

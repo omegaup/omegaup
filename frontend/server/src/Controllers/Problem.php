@@ -974,7 +974,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Validate problem Details API
      *
      * @param \OmegaUp\Request $r
-     * @return array{status?: string, exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: mixed|null}
+     * @return array{status?: string, exists: bool, problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -1005,7 +1005,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // If we request a problem inside a contest
-        $problemset = self::validateProblemset($problem, $r['problemset_id'], $r['contest_alias']);
+        $problemset = self::validateProblemset(
+            $problem,
+            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : $r['problemset_id'],
+            $r['contest_alias']
+        );
+
+        $response = [
+            'exists' => true,
+            'problem' => $problem,
+            'problemset' => null,
+        ];
         if (!is_null($problemset) && isset($problemset['problemset'])) {
             if (!\OmegaUp\Authorization::isAdmin($r->identity, $problemset['problemset'])) {
                 // If the contest is private, verify that our user is invited
@@ -1032,6 +1042,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     // TODO: Check start times.
                 }
             }
+            $response['problemset'] = $problemset['problemset'];
         } else {
             if (is_null($r->identity)
                 || !\OmegaUp\Authorization::canEditProblem($r->identity, $problem)
@@ -1043,11 +1054,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
-        return [
-            'exists' => true,
-            'problem' => $problem,
-            'problemset' => $problemset['problemset'],
-        ];
+        return $response;
     }
 
     /**
@@ -1256,14 +1263,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Validate problemset Details API
      *
-     * @param \OmegaUp\DAO\VO\Problems $problem
-     * @param $problemsetId
-     * @param $contestAlias
-     * @return Array
+     * @return null|array{contest?:\OmegaUp\DAO\VO\Contests, problemset: \OmegaUp\DAO\VO\Problemsets}
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateProblemset(\OmegaUp\DAO\VO\Problems $problem, $problemsetId, $contestAlias = null) {
+    private static function validateProblemset(
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?int $problemsetId,
+        string $contestAlias = null
+    ) {
         $problemNotFound = null;
         $response = [];
         if (!empty($contestAlias)) {
@@ -1272,7 +1280,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (is_null($response['contest'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
-            $response['problemset'] = \OmegaUp\DAO\Problemsets::getByPK($response['contest']->problemset_id);
+            $response['problemset'] = \OmegaUp\DAO\Problemsets::getByPK(intval($response['contest']->problemset_id));
             if (is_null($response['problemset'])) {
                 throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
             }
@@ -2300,9 +2308,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // else, we query using current_user
         $identity = self::resolveTargetIdentity($r);
 
+        if (is_null($problem['problem'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
         $response['score'] = self::bestScore(
             $problem['problem'],
-            $r['problemset_id'],
+            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : $r['problemset_id'],
             $r['contest_alias'],
             $r->identity->identity_id,
             $identity
@@ -2317,18 +2329,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * runs inside the contest.
      *
      * Authentication is expected to be performed earlier.
-     *
-     * @param \OmegaUp\DAO\VO\Problems $problem
-     * @param $problemsetId
-     * @param $contestAlias
-     * @param $currentLoggedIdentityId
-     * @param \OmegaUp\DAO\VO\Identities $identity
      * @return float
      */
     private static function bestScore(
         \OmegaUp\DAO\VO\Problems $problem,
-        $problemsetId,
-        $contestAlias,
+        ?int $problemsetId,
+        ?string $contestAlias,
         int $currentLoggedIdentityId,
         ?\OmegaUp\DAO\VO\Identities $identity = null
     ) : float {
@@ -2337,19 +2343,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $score = 0.0;
         // Add best score info
         $problemset = self::validateProblemset($problem, $problemsetId, $contestAlias);
-        if (is_null($problemset['problemset'])) {
-            $score = (float)\OmegaUp\DAO\Runs::getBestProblemScore(
-                (int)$problem->problem_id,
-                (int)$currentIdentityId
-            );
-        } else {
-            $score = (float)\OmegaUp\DAO\Runs::getBestProblemScoreInProblemset(
-                (int)$problemset['problemset']->problemset_id,
-                (int)$problem->problem_id,
-                (int)$currentIdentityId
-            );
-        }
 
+        if (is_null($problemset)) {
+            $score = floatval(\OmegaUp\DAO\Runs::getBestProblemScore(
+                intval($problem->problem_id),
+                intval($currentIdentityId)
+            ));
+        } else {
+            $score = floatval(\OmegaUp\DAO\Runs::getBestProblemScoreInProblemset(
+                intval($problemset['problemset']->problemset_id),
+                intval($problem->problem_id),
+                intval($currentIdentityId)
+            ));
+        }
         return round($score, 2);
     }
 
