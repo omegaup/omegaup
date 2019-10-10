@@ -82,7 +82,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     }
 
     /**
-     * @return array<int, \OmegaUp\DAO\VO\GroupsIdentities>
+     * @return \OmegaUp\DAO\VO\GroupsIdentities[]
      */
     final public static function getByGroupId(int $groupId) : array {
         $sql = '

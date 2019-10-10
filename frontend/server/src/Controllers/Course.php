@@ -2133,7 +2133,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Get Problems solved by users of a course
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: string, user_problems: array<string, array<int, array{alias: string, title: string, username: string}>>}
+     * @return array{status: string, user_problems: array<string, array{alias: string, title: string, username: string}[]>}
      */
     public static function apiListSolvedProblems(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();
