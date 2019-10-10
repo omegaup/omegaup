@@ -1437,32 +1437,12 @@
       <code>$contents</code>
       <code>$contents</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="8">
-      <code>$response['nominator']</code>
-      <code>$response['problem']</code>
-      <code>$response['nomination']</code>
-      <code>$response['original_contents']</code>
-      <code>$response['contents']</code>
-      <code>$response['original_contents']</code>
-      <code>$response['original_contents']</code>
-      <code>$response['status']</code>
-    </MixedArrayAccess>
-    <MixedAssignment occurrences="13">
-      <code>$contents</code>
-      <code>$tag</code>
-      <code>$tag</code>
-      <code>$tag</code>
-      <code>$tag</code>
-      <code>$statement</code>
-      <code>$contents['original']</code>
-      <code>$reviewer</code>
+    <MixedArrayAccess occurrences="1"/>
+    <MixedAssignment occurrences="4">
       <code>$newProblemVisibility</code>
       <code>$r['visibility']</code>
       <code>$qualitynomination-&gt;status</code>
       <code>$types</code>
-      <code>$response</code>
-      <code>$_</code>
-      <code>$response['nomination_status']</code>
     </MixedAssignment>
     <MixedPropertyFetch occurrences="5">
       <code>$r['problem']-&gt;visibility</code>
@@ -2340,14 +2320,6 @@
     <MixedAssignment occurrences="1">
       <code>$roles[]</code>
     </MixedAssignment>
-  </file>
-  <file src="frontend/server/src/DAO/Groups.php">
-    <MissingParamType occurrences="1">
-      <code>$n</code>
-    </MissingParamType>
-    <MissingReturnType occurrences="1">
-      <code>sampleMembers</code>
-    </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/GroupsIdentities.php">
     <MissingParamType occurrences="3">

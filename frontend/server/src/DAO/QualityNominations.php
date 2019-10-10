@@ -152,7 +152,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * instead of as a flat array.
      *
      * @param null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination
-     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array<array-key, array{time: int, vote: int, user: array{username: string, name: string}}>}|null
+     * @return array{qualitynomination_id: int, nomination: string, contents: mixed, time: int, status: string, nominator: array{username: string, name: string}, author: array{username: string, name: string}, problem: array{alias: string, title: string}, votes: array{time: int, vote: int, user: array{username: string, name: string}}[]}|null
      */
     private static function processNomination($nomination) {
         if (is_null($nomination) || empty($nomination)) {
