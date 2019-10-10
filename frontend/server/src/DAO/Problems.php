@@ -637,7 +637,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 r.run_id = s.current_run_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ? AND
-                r.verdict <> "AC" AND r.verdict <> "CE" AND r.verdict <> "JE";
+                r.verdict NOT IN ("AC", "CE", "JE");
         ';
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$problem->problem_id, $identityId]) > 0;
     }
