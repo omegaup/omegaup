@@ -283,7 +283,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $params[] = intval(($page + 1) * $pageSize);
 
         $nominations = [];
-        /** @var null|array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination */
+        /** @var array{qualitynomination_id: int, nomination: string, contents: string, time: int, status: string, nominator_username: string, nominator_name: string, alias: string, title: string, author_username: string, author_name: string} $nomination */
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $nomination) {
             $nominations[] = self::processNomination($nomination);
         }
