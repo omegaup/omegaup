@@ -24,7 +24,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
-    public static function SearchByName($name) {
+    /**
+     * @return \OmegaUp\DAO\VO\Groups[]
+     */
+    public static function SearchByName(string $name) {
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 

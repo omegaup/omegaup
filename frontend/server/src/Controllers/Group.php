@@ -198,7 +198,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'query');
         }
 
-        $groups = \OmegaUp\DAO\Groups::SearchByName($r['query']);
+        $groups = \OmegaUp\DAO\Groups::SearchByName(strval($r['query']));
 
         $response = [];
         foreach ($groups as $group) {
