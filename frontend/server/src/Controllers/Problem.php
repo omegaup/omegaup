@@ -2608,7 +2608,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem
     ): bool {
         /** @var bool */
-        $result = \OmegaUp\Cache::getFromCacheOrSet(
+        return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
             function () use ($problem) {
@@ -2618,7 +2618,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
-        return $result;
     }
 
     /**
