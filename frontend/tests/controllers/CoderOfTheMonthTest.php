@@ -69,7 +69,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $this->assertArrayNotHasKey('options', $response['payload']);
 
         // Test coder of the month details when mentor user is logged
-        [$mentorUser, $mentorIdentity] = UserFactory::createMentorIdentity();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
         $login = self::login($mentorUser);
         $r['auth_token'] = $login->auth_token;
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
@@ -153,7 +153,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
      * Mentor can see the last coder of the month email
      */
     public function testMentorCanSeeLastCoderOfTheMonthEmail() {
-        [$mentorUser,] = UserFactory::createMentorIdentity();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
         $login = self::login($mentorUser);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
@@ -199,7 +199,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
      * already has a coder of the month selected
      */
     public function testMentorSelectsUserAsCoderOfTheMonth() {
-        [$mentorUser,] = UserFactory::createMentorIdentity();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
         // Setting time to the 15th of next month.
         $runCreationDate = new DateTimeImmutable(date('Y-m-d', \OmegaUp\Time::get()));
@@ -267,7 +267,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         $this->createRuns(null, null, 3);
         $this->createRuns(null, null, 2);
 
-        [$mentorUser, $mentorIdentity] = UserFactory::createMentorIdentity();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
         $login = self::login($mentorUser);
         $this->assertTrue(\OmegaUp\Authorization::isMentor($mentorIdentity));

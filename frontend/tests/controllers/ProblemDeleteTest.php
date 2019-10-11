@@ -179,9 +179,9 @@ class ProblemDeleteTest extends OmegaupTestCase {
         );
 
         // Get admin user
-        $adminLogin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
-        $login = self::login($adminLogin);
+        $login = self::login($admin);
 
         // Call API to delete a problem
         \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([

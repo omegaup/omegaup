@@ -36,7 +36,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAllEventsWithAdmin() {
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         $login = self::login($admin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
@@ -76,7 +76,7 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testOtherUsersEventsWithAdmin() {
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
         $user = UserFactory::createUser();
 
         $login = self::login($admin);

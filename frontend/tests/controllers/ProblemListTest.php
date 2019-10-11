@@ -239,7 +239,10 @@ class ProblemList extends OmegaupTestCase {
      * Tests problem lists when searching by tag when tags are not public.
      */
     public function testProblemListWithPrivateTags() {
-        $admin = UserFactory::createAdminUser(new UserParams(['username' => 'admin']));
+        [
+            'user' => $admin,
+            'identity' => $identityAdmin
+        ] = UserFactory::createAdminUser(new UserParams(['username' => 'admin']));
         $user_a = UserFactory::createUser(new UserParams(['username' => 'user_a']));
         $user_b = UserFactory::createUser(new UserParams(['username' => 'user_b']));
         $other_user = UserFactory::createUser(new UserParams(['username' => 'other']));
@@ -386,7 +389,7 @@ class ProblemList extends OmegaupTestCase {
             'author' => $author
         ]));
 
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         $login = self::login($admin);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -657,7 +660,7 @@ class ProblemList extends OmegaupTestCase {
 
         // Expect 1 problem, admin can see private problem
         {
-            $admin = UserFactory::createAdminUser();
+            ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
             $adminLogin = self::login($admin);
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,

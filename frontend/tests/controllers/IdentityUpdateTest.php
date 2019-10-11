@@ -12,7 +12,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
      */
     public function testUpdateSingleIdentity() {
         // Identity creator group member will create an identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
@@ -66,7 +66,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
      */
     public function testChangePasswordIdentity() {
         // Identity creator group member will create an identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
@@ -110,7 +110,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
      */
     public function testChangePasswordIdentityAndLoginWithOldPassword() {
         // Identity creator group member will create an identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
@@ -159,11 +159,11 @@ class IdentityUpdateTest extends OmegaupTestCase {
      */
     public function testChangePasswordIdentityFromOtherGroup() {
         // Identity creator group member will create an identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
-        $creator2 = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator2, 'identity' => $creatorIdentity2] = UserFactory::createGroupIdentityCreator();
         $creatorLogin2 = self::login($creator2);
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
@@ -206,7 +206,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
      */
     public function testChangePasswordIdentityWithInvalidUser() {
         // Identity creator group member will create an identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 

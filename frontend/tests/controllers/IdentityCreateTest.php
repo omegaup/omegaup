@@ -11,9 +11,8 @@ class IdentityCreateTest extends OmegaupTestCase {
      * Basic test for users from identity creator group
      */
     public function testIdentityHasContestOrganizerRole() {
-        $creator = UserFactory::createGroupIdentityCreator();
-        $creatorIdentity = \OmegaUp\DAO\Identities::getByPK($creator->main_identity_id);
-        [, $mentorIdentity] = UserFactory::createMentorIdentity();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
         $isCreatorMember = \OmegaUp\Authorization::isGroupIdentityCreator($creatorIdentity);
         // Asserting that user belongs to the  identity creator group
@@ -29,7 +28,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testCreateSingleIdentity() {
         // Identity creator group member will create the identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
@@ -60,7 +59,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testCreateIdentityWithWrongGroup() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
         $wrongGroupAlias = 'wrongGroupAlias';
@@ -89,7 +88,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testCreateIdentityWithoutGroup() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
         $identityName = substr(Utils::CreateRandomString(), - 10);
@@ -117,7 +116,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testCreateIdentityWithWrongUsername() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
         $wrongIdentityName = 'username:with:wrong:char';
@@ -162,7 +161,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testUploadCsvFile() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
@@ -187,7 +186,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testUploadCsvFileWithDuplicatedUsernames() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
@@ -209,7 +208,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testUploadCsvFileWithWrongCountryId() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 
@@ -230,7 +229,7 @@ class IdentityCreateTest extends OmegaupTestCase {
      * Basic test for login an identity
      */
     public function testLoginIdentity() {
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
 

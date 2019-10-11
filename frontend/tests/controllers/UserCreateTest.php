@@ -251,7 +251,7 @@ class CreateUserTest extends OmegaupTestCase {
         $user = UserFactory::createUser(new UserParams(['verify' => false]));
 
         // Admin will verify $user
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         // Call api using admin
         $adminLogin = self::login($admin);
@@ -275,7 +275,7 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdminInvalidUsername() {
         // Admin will verify $user
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         // Call api using admin
         $adminLogin = self::login($admin);
@@ -334,8 +334,8 @@ class CreateUserTest extends OmegaupTestCase {
             ->will($this->returnValue(\OmegaUp\Controllers\User::SENDY_SUCCESS));
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
-
-        $adminLogin = self::login(UserFactory::createAdminUser());
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        $adminLogin = self::login($admin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
@@ -358,8 +358,8 @@ class CreateUserTest extends OmegaupTestCase {
             ->will($this->returnValue(\OmegaUp\Controllers\User::SENDY_SUCCESS));
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
-
-        $adminLogin = self::login(UserFactory::createAdminUser());
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        $adminLogin = self::login($admin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));

@@ -73,12 +73,9 @@ class UserFactory {
    /**
     * Creates a native user in Omegaup and returns the DAO populated
     *
-    * @param string $username optional
-    * @param string $password optional
-    * @param string $email optional
-    * @return user (DAO)
+    * @return \OmegaUp\DAO\VO\Users
     */
-    public static function createUser($params = null) {
+    public static function createUser(UserParams $params = null) {
         if (!($params instanceof UserParams)) {
             $params = new UserParams($params);
         }
@@ -167,70 +164,83 @@ class UserFactory {
     }
 
     /**
-     * Creates a new user and elevates his priviledges
+     * Creates a new user and elevates his privileges
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createAdminUser($params = null) {
+    public static function createAdminUser(UserParams $params = null) : array {
         $user = self::createUser($params);
+        if (is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         self::addSystemRole($user, \OmegaUp\Authorization::ADMIN_ROLE);
 
-        return $user;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new identity with mentor role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return Identity
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createMentorIdentity($params = null) : array {
+    public static function createMentorIdentity(UserParams $params = null) : array {
         $user = self::createUser($params);
+        if (is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         self::addMentorRole($identity);
 
-        return [$user, $identity];
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new user with support role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createSupportUser($params = null) : array {
+    public static function createSupportUser(UserParams $params = null) : array {
         $user = self::createUser($params);
+        if (is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         self::addSupportRole($identity);
 
-        return [$user, $identity];
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new user with contest organizer role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createGroupIdentityCreator($params = null) : \OmegaUp\DAO\VO\Users {
+    public static function createGroupIdentityCreator(UserParams $params = null) : array {
         $user = self::createUser($params);
+        if (is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         self::addGroupIdentityCreator($identity);
 
-        return $user;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**

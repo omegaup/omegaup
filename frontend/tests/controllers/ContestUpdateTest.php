@@ -108,7 +108,8 @@ class UpdateContestTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Update value
-        $login = self::login(UserFactory::createAdminUser());
+        ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+        $login = self::login($user);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],

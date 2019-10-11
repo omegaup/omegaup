@@ -14,6 +14,9 @@ class QualityNominationFactory {
         );
         for ($i = 0; $i < 5; $i++) {
             $reviewer = UserFactory::createUser();
+            if (is_null($reviewer->main_identity_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            }
             $identity = \OmegaUp\DAO\Identities::getByPK($reviewer->main_identity_id);
             \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => $qualityReviewerGroup->group_id,
