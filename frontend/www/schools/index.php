@@ -14,4 +14,4 @@ if ($hasActivityInCourses) {
     die(header('Location: /course/'));
 }
 
-$smarty->display(OMEGAUP_ROOT . '/templates/schools.intro.tpl');
+$smarty->display(sprintf('%s/templates/schools.intro.tpl', OMEGAUP_ROOT));

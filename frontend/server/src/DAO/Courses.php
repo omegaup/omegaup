@@ -337,9 +337,16 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    final public static function getSharingInformation($identity_id, \OmegaUp\DAO\VO\Courses $course, \OmegaUp\DAO\VO\Groups $group) {
-        if ($course->group_id != $group->group_id) {
-            return true;
+    /**
+     * @return array{share_user_information: null|int, accept_teacher: null|int}
+     */
+    final public static function getSharingInformation(
+        int $identityId,
+        \OmegaUp\DAO\VO\Courses $course,
+        \OmegaUp\DAO\VO\Groups $group
+    ) : array {
+        if ($course->group_id !== $group->group_id) {
+            return ['share_user_information' => null, 'accept_teacher' => null];
         }
         $sql = '
             SELECT
@@ -356,12 +363,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 AND gi.group_id = ?
             ';
         $params = [
-            $identity_id,
+            $identityId,
             $group->group_id,
         ];
+        /** @var null|array{share_user_information: null|int, accept_teacher: null|int} */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
-            return null;
+            return ['share_user_information' => null, 'accept_teacher' => null];
         }
 
         return $row;

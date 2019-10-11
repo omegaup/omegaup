@@ -36,7 +36,7 @@ class PrivacyStatement {
      * @param null|int $languageId
      * @param 'accept_teacher'|'privacy_policy' $type
      */
-    public static function getForConsent(?int $languageId, string $type) : string {
+    public static function getForConsent(?int $languageId, string $type) : ?string {
         $language = self::getLanguage($languageId);
 
         return file_get_contents(

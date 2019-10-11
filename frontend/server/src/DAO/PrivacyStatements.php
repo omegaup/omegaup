@@ -28,7 +28,7 @@ class PrivacyStatements extends \OmegaUp\DAO\Base\PrivacyStatements {
                 ORDER BY
                   privacystatement_id DESC
                 LIMIT 1';
-        /** @val array{privacystatement_id: int, git_object_id: string}|null */
+        /** @var array{privacystatement_id: int, git_object_id: string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$statementType]

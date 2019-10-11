@@ -195,7 +195,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return \OmegaUp\DAO\VO\Groups
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function resolveGroup(\OmegaUp\DAO\VO\Courses $course, ?\OmegaUp\DAO\VO\Groups $group) : \OmegaUp\DAO\VO\Groups {
+    private static function resolveGroup(
+        \OmegaUp\DAO\VO\Courses $course,
+        ?\OmegaUp\DAO\VO\Groups $group = null
+    ) : \OmegaUp\DAO\VO\Groups {
         if (!is_null($group)) {
             return $group;
         }
@@ -1468,8 +1471,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
         $r->ensureIdentity();
-        $course = self::validateCourseExists($r['course_alias']);
-        $group = self::resolveGroup($course, $r['group']);
+        $course = self::validateCourseExists(strval($r['course_alias']));
+        $group = self::resolveGroup($course);
         $showAssignment = !empty($r['assignment_alias']);
         $shouldShowIntro = !\OmegaUp\Authorization::canViewCourse(
             $r->identity,
@@ -1485,9 +1488,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $group
             );
             $isFirstTimeAccess =
-                $sharingInformation['share_user_information'] == null;
+                $sharingInformation['share_user_information'] === null;
             $shouldShowAcceptTeacher =
-                $sharingInformation['accept_teacher'] == null;
+                $sharingInformation['accept_teacher'] === null;
         }
         if ($shouldShowIntro && !$course->public) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();

@@ -516,7 +516,7 @@
       <code>apiListCourses</code>
       <code>apiStudentProgress</code>
     </MissingReturnType>
-    <MixedArgument occurrences="87">
+    <MixedArgument occurrences="85">
       <code>$r['school_id']</code>
       <code>$r['course_alias']</code>
       <code>$r['start_time']</code>
@@ -606,7 +606,7 @@
       <code>$r['course_alias']</code>
       <code>$r['course_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="17">
+    <MixedArrayAccess occurrences="15">
       <code>$assignment['alias']</code>
       <code>$assignment['order']</code>
       <code>$assignment['problemset_id']</code>
@@ -619,15 +619,13 @@
       <code>$run['guid']</code>
       <code>$problem['runs']</code>
       <code>$problem['problem_id']</code>
-      <code>$sharingInformation['share_user_information']</code>
-      <code>$sharingInformation['accept_teacher']</code>
       <code>$assignmentProblemset['scoreboard_url_admin']</code>
       <code>$assignmentProblemset['scoreboard_url']</code>
       <code>$problem['problem_id']</code>
       <code>$run['time']</code>
       <code>$run['contest_score']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="34">
+    <MixedAssignment occurrences="33">
       <code>$assignment</code>
       <code>$course</code>
       <code>$problem</code>
@@ -665,7 +663,6 @@
       <code>$course</code>
       <code>$course</code>
       <code>$result</code>
-      <code>$sharingInformation</code>
       <code>$accesses</code>
       <code>$submissions</code>
       <code>$assignmentProblemset</code>
@@ -740,9 +737,6 @@
       <code>$resolvedUser-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
     <RedundantCondition occurrences="1"/>
-    <TypeDoesNotContainNull occurrences="1">
-      <code>is_null($markdown)</code>
-    </TypeDoesNotContainNull>
   </file>
   <file src="frontend/server/src/Controllers/Grader.php">
     <MissingReturnType occurrences="1">
@@ -2327,7 +2321,7 @@
       <code>$a</code>
       <code>$b</code>
     </MissingClosureParamType>
-    <MissingParamType occurrences="10">
+    <MissingParamType occurrences="9">
       <code>$name</code>
       <code>$identity_id</code>
       <code>$identity_id</code>
@@ -2339,14 +2333,13 @@
       <code>$pageSize</code>
       <code>$identity_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="7">
+    <MissingReturnType occurrences="6">
       <code>findByName</code>
       <code>getCoursesForStudent</code>
       <code>getAllCoursesAdminedByIdentity</code>
       <code>getAllCoursesOwnedByUser</code>
       <code>getAssignmentByAlias</code>
       <code>updateAssignmentMaxPoints</code>
-      <code>getSharingInformation</code>
     </MissingReturnType>
     <MixedArgument occurrences="2">
       <code>!empty($a['name']) ? $a['name'] : $a['username']</code>
