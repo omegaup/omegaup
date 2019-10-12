@@ -328,7 +328,7 @@ const translations = {
 	frontPageCreateContestButton: "\u00a1Crea tu propio concurso en omegaUp!",
 	frontPageDescription: "omegaUp es un proyecto web enfocado a elevar el nivel de competitividad de desarrolladores de software en Am\u00e9rica Latina mediante la resoluci\u00f3n de problemas de algoritmos, con un enfoque competitivo y divertido a la vez.",
 	frontPageDevelopers: "Desarrolladores",
-	frontPageFooter: "incrementando el numero de ingenieros de software talentosos en Latino America.",
+	frontPageFooter: "incrementando el n\u00famero de ingenieros de software talentosos en Latino America.",
 	frontPageFooterAboutUs: "Acerca de nosotros",
 	frontPageFooterContact: "Contacto",
 	frontPageFooterDevelopers: "Desarrolladores",

@@ -2,50 +2,70 @@
   <div class="common-footer">
     <div class="footer-navigation">
       <div class="footer-brand">
-        <img class="footer-logo" src="/media/logo-main-white.svg" />
-        <div class="slogan">{{ T.frontPageFooter }}</div>
+        <img class="footer-logo"
+             src="/media/logo-main-white.svg">
+        <div class="slogan">
+          {{ T.frontPageFooter }}
+        </div>
       </div>
-
       <div class="footer-list-section">
         <h4 class="section-title">{{ T.frontPageFooterSite }}</h4>
         <ul>
-          <li><a href="/arena/">{{ T.navArena }}</a></li>
-          <li><a href="/problem/">{{ T.navProblems }}</a></li>
-          <li><a href="/rank/">{{ T.navRanking }}</a></li>
-          <li><a href="/schools/">{{ T.navSchools }}</a></li>
-          <li><a href="https://blog.omegaup.com" _target="blank">{{ T.navBlog }}</a></li>
-          <li><a href="https://omegaup.com/preguntas/" _target="blank">{{ T.navQuestions }}</a></li>
+          <li>
+            <a href="/arena/">{{ T.navArena }}</a>
+          </li>
+          <li>
+            <a href="/problem/">{{ T.navProblems }}</a>
+          </li>
+          <li>
+            <a href="/rank/">{{ T.navRanking }}</a>
+          </li>
+          <li>
+            <a href="/schools/">{{ T.navSchools }}</a>
+          </li>
+          <li>
+            <a href="https://blog.omegaup.com">{{ T.navBlog }}</a>
+          </li>
+          <li>
+            <a href="https://omegaup.com/preguntas/">{{ T.navQuestions }}</a>
+          </li>
         </ul>
       </div>
-
       <div class="footer-list-section">
         <h4 class="section-title">{{ T.frontPageFooterOrganization }}</h4>
         <ul>
-          <li><a href="https://omegaup.org/#about">{{ T.frontPageFooterAboutUs }}</a></li>
-          <li><a href="https://omegaup.org/#team">{{ T.frontPageFooterTeam }}</a></li>
+          <li>
+            <a href="https://omegaup.org/#about">{{ T.frontPageFooterAboutUs }}</a>
+          </li>
+          <li>
+            <a href="https://omegaup.org/#team">{{ T.frontPageFooterTeam }}</a>
+          </li>
         </ul>
       </div>
-
       <div class="footer-list-section">
         <h4 class="section-title">{{ T.frontPageDevelopers }}</h4>
         <ul>
-          <li><a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar" _target="blank">{{ T.frontPageFooterHelpUs }}</a></li>
-          <li><a href="https://github.com/omegaup/omegaup" _target="blank">Github</a></li>
+          <li>
+            <a href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar">{{
+            T.frontPageFooterHelpUs }}</a>
+          </li>
+          <li>
+            <a href="https://github.com/omegaup/omegaup">Github</a>
+          </li>
         </ul>
       </div>
-
       <div class="footer-list-section">
         <h4 class="section-title">{{ T.frontPageFooterContact }}</h4>
         <ul>
-          <li><a href="mailto:hello@omegaup.com">hello@omegaup.com</a></li>
+          <li>
+            <a href="mailto:hello@omegaup.com">hello@omegaup.com</a>
+          </li>
         </ul>
-
         <div class="social-icons">
           GITHUB / FACEBOOK
         </div>
       </div>
     </div>
-
     <div class="copy">
       <div class="copy-content">
         <div class="">
@@ -53,7 +73,9 @@
         </div>
         <div class="menu">
           <ul>
-            <li><a href="">{{ T.frontPageFooterPrivacyPolicy }}</a></li>
+            <li>
+              <a href="">{{ T.frontPageFooterPrivacyPolicy }}</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -62,7 +84,6 @@
 </template>
 
 <script lang="ts">
-
 import { Component, Vue } from 'vue-property-decorator';
 import { T } from '../../omegaup.js';
 
@@ -70,6 +91,7 @@ import { T } from '../../omegaup.js';
 export default class Footer extends Vue {
   T = T;
 }
+
 </script>
 
 <style lang="scss">
@@ -135,7 +157,7 @@ export default class Footer extends Vue {
         li {
           margin-top: 8px;
           padding: 0;
-          
+
           a {
             text-decoration: none;
             color: white;
@@ -155,7 +177,7 @@ export default class Footer extends Vue {
 
   .copy {
     background-color: $omegaup-primary--darkest;
-    
+
     .copy-content {
       width: 80%;
       margin: 0 auto;

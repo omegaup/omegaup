@@ -9,10 +9,10 @@ OmegaUp.on('ready', function() {
     el: '#common-footer',
     render: function(createElement) {
       return createElement('omegaup-common-footer', {
-        // props: {
-        //   data: this.data,
-        // },
-      });
+                                                        // props: {
+                                                        //   data: this.data,
+                                                        // },
+                                                    });
     },
     // data: {
     //   data: headerPayload,
