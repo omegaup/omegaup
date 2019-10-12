@@ -741,6 +741,7 @@ const translations = {
 	qualityFormDifficultyMedium: "Medium",
 	qualityFormDifficultyVeryEasy: "Very easy",
 	qualityFormDifficultyVeryHard: "Very hard",
+	qualityFormGreeting: "You can already rate this problem!",
 	qualityFormQuality: "How good would you say this problem is?",
 	qualityFormQualityBad: "Bad",
 	qualityFormQualityFair: "Fair",
