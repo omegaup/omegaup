@@ -22,7 +22,7 @@ class PrivacyStatementConsentLog extends \OmegaUp\DAO\VO\VO {
         'timestamp' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -31,13 +31,13 @@ class PrivacyStatementConsentLog extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['privacystatement_consent_id'])) {
-            $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
+            $this->privacystatement_consent_id = intval($data['privacystatement_consent_id']);
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = (int)$data['identity_id'];
+            $this->identity_id = intval($data['identity_id']);
         }
         if (isset($data['privacystatement_id'])) {
-            $this->privacystatement_id = (int)$data['privacystatement_id'];
+            $this->privacystatement_id = intval($data['privacystatement_id']);
         }
         if (isset($data['timestamp'])) {
             /**

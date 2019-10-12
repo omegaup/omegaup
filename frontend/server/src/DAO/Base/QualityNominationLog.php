@@ -28,13 +28,13 @@ abstract class QualityNominationLog {
     final public static function update(\OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log) : int {
         $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
         $params = [
-            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
+            is_null($QualityNomination_Log->qualitynomination_id) ? null : intval($QualityNomination_Log->qualitynomination_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Log->time),
-            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
+            is_null($QualityNomination_Log->user_id) ? null : intval($QualityNomination_Log->user_id),
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,
-            (int)$QualityNomination_Log->qualitynomination_log_id,
+            intval($QualityNomination_Log->qualitynomination_log_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -121,7 +121,7 @@ abstract class QualityNominationLog {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -145,9 +145,9 @@ abstract class QualityNominationLog {
     final public static function create(\OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log) : int {
         $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
+            is_null($QualityNomination_Log->qualitynomination_id) ? null : intval($QualityNomination_Log->qualitynomination_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Log->time),
-            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
+            is_null($QualityNomination_Log->user_id) ? null : intval($QualityNomination_Log->user_id),
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,

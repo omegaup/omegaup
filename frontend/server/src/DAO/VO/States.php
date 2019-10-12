@@ -21,7 +21,7 @@ class States extends \OmegaUp\DAO\VO\VO {
         'name' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }

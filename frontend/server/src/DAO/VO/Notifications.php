@@ -23,7 +23,7 @@ class Notifications extends \OmegaUp\DAO\VO\VO {
         'contents' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -32,10 +32,10 @@ class Notifications extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['notification_id'])) {
-            $this->notification_id = (int)$data['notification_id'];
+            $this->notification_id = intval($data['notification_id']);
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
         if (isset($data['timestamp'])) {
             /**

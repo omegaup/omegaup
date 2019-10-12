@@ -28,13 +28,13 @@ abstract class Interviews {
     final public static function update(\OmegaUp\DAO\VO\Interviews $Interviews) : int {
         $sql = 'UPDATE `Interviews` SET `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE `interview_id` = ?;';
         $params = [
-            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
-            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
+            is_null($Interviews->problemset_id) ? null : intval($Interviews->problemset_id),
+            is_null($Interviews->acl_id) ? null : intval($Interviews->acl_id),
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
-            (int)$Interviews->interview_id,
+            is_null($Interviews->window_length) ? null : intval($Interviews->window_length),
+            intval($Interviews->interview_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -121,7 +121,7 @@ abstract class Interviews {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -145,12 +145,12 @@ abstract class Interviews {
     final public static function create(\OmegaUp\DAO\VO\Interviews $Interviews) : int {
         $sql = 'INSERT INTO Interviews (`problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Interviews->problemset_id) ? null : (int)$Interviews->problemset_id,
-            is_null($Interviews->acl_id) ? null : (int)$Interviews->acl_id,
+            is_null($Interviews->problemset_id) ? null : intval($Interviews->problemset_id),
+            is_null($Interviews->acl_id) ? null : intval($Interviews->acl_id),
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            is_null($Interviews->window_length) ? null : (int)$Interviews->window_length,
+            is_null($Interviews->window_length) ? null : intval($Interviews->window_length),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

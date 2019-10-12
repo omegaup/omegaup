@@ -515,6 +515,88 @@ class QualityNominationTest extends OmegaupTestCase {
     }
 
     /**
+     * User who tried a problem but couldn't solve it yet (non AC, CE, JE verdicts),
+     * should be able to send a dismissal or suggestion for it adding the before_ac
+     * flag on nomination contents.
+     */
+    public function testBeforeACNomination() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    'quality' => 3,
+                    'tags' => ['ez-pz', 'ez', 'ez'],
+                    'before_ac' => true,
+                ]),
+            ]));
+            $this->fail('Must have tried to solve the problem first.');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationMustHaveTriedToSolveProblem'
+            );
+        }
+
+        // Now TRY to solve the problem
+        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        RunsFactory::gradeRun($runData, 0, 'WA', 60);
+        $login = self::login($user);
+        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'suggestion',
+            'contents' => json_encode([
+                'quality' => 3,
+                'tags' => ['ez-pz', 'ez'],
+                'before_ac' => true,
+            ]),
+        ]));
+        $this->assertEquals($result['status'], 'ok');
+
+        // Dismissals could be sent before AC also
+        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'dismissal',
+            'contents' => json_encode([
+                'before_ac' => true
+            ]),
+        ]));
+        $this->assertEquals($result['status'], 'ok');
+
+        // Now solve the problem, it must not be allowed to send a before AC
+        // nomination, as the problem is already solved
+        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        RunsFactory::gradeRun($runData);
+        $login = self::login($user);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    'quality' => 3,
+                    'tags' => ['ez-pz', 'ez'],
+                    'before_ac' => true,
+                ]),
+            ]));
+            $this->fail('Must not have solved the problem.');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationMustNotHaveSolvedProblem'
+            );
+        }
+    }
+
+    /**
      * Check that before a duplicate nomination needs to have a valid original problem.
      */
     public function testNominatingForDuplicate() {

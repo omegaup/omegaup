@@ -28,19 +28,19 @@ abstract class Assignments {
     final public static function update(\OmegaUp\DAO\VO\Assignments $Assignments) : int {
         $sql = 'UPDATE `Assignments` SET `course_id` = ?, `problemset_id` = ?, `acl_id` = ?, `name` = ?, `description` = ?, `alias` = ?, `publish_time_delay` = ?, `assignment_type` = ?, `start_time` = ?, `finish_time` = ?, `max_points` = ?, `order` = ? WHERE `assignment_id` = ?;';
         $params = [
-            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
-            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
-            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
+            is_null($Assignments->course_id) ? null : intval($Assignments->course_id),
+            is_null($Assignments->problemset_id) ? null : intval($Assignments->problemset_id),
+            is_null($Assignments->acl_id) ? null : intval($Assignments->acl_id),
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,
-            is_null($Assignments->publish_time_delay) ? null : (int)$Assignments->publish_time_delay,
+            is_null($Assignments->publish_time_delay) ? null : intval($Assignments->publish_time_delay),
             $Assignments->assignment_type,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Assignments->start_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Assignments->finish_time),
-            (float)$Assignments->max_points,
-            (int)$Assignments->order,
-            (int)$Assignments->assignment_id,
+            floatval($Assignments->max_points),
+            intval($Assignments->order),
+            intval($Assignments->assignment_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -127,7 +127,7 @@ abstract class Assignments {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -151,18 +151,18 @@ abstract class Assignments {
     final public static function create(\OmegaUp\DAO\VO\Assignments $Assignments) : int {
         $sql = 'INSERT INTO Assignments (`course_id`, `problemset_id`, `acl_id`, `name`, `description`, `alias`, `publish_time_delay`, `assignment_type`, `start_time`, `finish_time`, `max_points`, `order`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Assignments->course_id) ? null : (int)$Assignments->course_id,
-            is_null($Assignments->problemset_id) ? null : (int)$Assignments->problemset_id,
-            is_null($Assignments->acl_id) ? null : (int)$Assignments->acl_id,
+            is_null($Assignments->course_id) ? null : intval($Assignments->course_id),
+            is_null($Assignments->problemset_id) ? null : intval($Assignments->problemset_id),
+            is_null($Assignments->acl_id) ? null : intval($Assignments->acl_id),
             $Assignments->name,
             $Assignments->description,
             $Assignments->alias,
-            is_null($Assignments->publish_time_delay) ? null : (int)$Assignments->publish_time_delay,
+            is_null($Assignments->publish_time_delay) ? null : intval($Assignments->publish_time_delay),
             $Assignments->assignment_type,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Assignments->start_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Assignments->finish_time),
-            (float)$Assignments->max_points,
-            (int)$Assignments->order,
+            floatval($Assignments->max_points),
+            intval($Assignments->order),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

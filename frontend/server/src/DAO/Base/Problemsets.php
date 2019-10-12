@@ -28,18 +28,18 @@ abstract class Problemsets {
     final public static function update(\OmegaUp\DAO\VO\Problemsets $Problemsets) : int {
         $sql = 'UPDATE `Problemsets` SET `acl_id` = ?, `access_mode` = ?, `languages` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `scoreboard_url` = ?, `scoreboard_url_admin` = ?, `type` = ?, `contest_id` = ?, `assignment_id` = ?, `interview_id` = ? WHERE `problemset_id` = ?;';
         $params = [
-            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
+            is_null($Problemsets->acl_id) ? null : intval($Problemsets->acl_id),
             $Problemsets->access_mode,
             $Problemsets->languages,
-            (int)$Problemsets->needs_basic_information,
+            intval($Problemsets->needs_basic_information),
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
-            is_null($Problemsets->contest_id) ? null : (int)$Problemsets->contest_id,
-            is_null($Problemsets->assignment_id) ? null : (int)$Problemsets->assignment_id,
-            is_null($Problemsets->interview_id) ? null : (int)$Problemsets->interview_id,
-            (int)$Problemsets->problemset_id,
+            is_null($Problemsets->contest_id) ? null : intval($Problemsets->contest_id),
+            is_null($Problemsets->assignment_id) ? null : intval($Problemsets->assignment_id),
+            is_null($Problemsets->interview_id) ? null : intval($Problemsets->interview_id),
+            intval($Problemsets->problemset_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -126,7 +126,7 @@ abstract class Problemsets {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -150,17 +150,17 @@ abstract class Problemsets {
     final public static function create(\OmegaUp\DAO\VO\Problemsets $Problemsets) : int {
         $sql = 'INSERT INTO Problemsets (`acl_id`, `access_mode`, `languages`, `needs_basic_information`, `requests_user_information`, `scoreboard_url`, `scoreboard_url_admin`, `type`, `contest_id`, `assignment_id`, `interview_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemsets->acl_id) ? null : (int)$Problemsets->acl_id,
+            is_null($Problemsets->acl_id) ? null : intval($Problemsets->acl_id),
             $Problemsets->access_mode,
             $Problemsets->languages,
-            (int)$Problemsets->needs_basic_information,
+            intval($Problemsets->needs_basic_information),
             $Problemsets->requests_user_information,
             $Problemsets->scoreboard_url,
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
-            is_null($Problemsets->contest_id) ? null : (int)$Problemsets->contest_id,
-            is_null($Problemsets->assignment_id) ? null : (int)$Problemsets->assignment_id,
-            is_null($Problemsets->interview_id) ? null : (int)$Problemsets->interview_id,
+            is_null($Problemsets->contest_id) ? null : intval($Problemsets->contest_id),
+            is_null($Problemsets->assignment_id) ? null : intval($Problemsets->assignment_id),
+            is_null($Problemsets->interview_id) ? null : intval($Problemsets->interview_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

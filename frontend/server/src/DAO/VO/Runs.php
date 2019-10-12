@@ -30,7 +30,7 @@ class Runs extends \OmegaUp\DAO\VO\VO {
         'judged_by' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -39,10 +39,10 @@ class Runs extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['run_id'])) {
-            $this->run_id = (int)$data['run_id'];
+            $this->run_id = intval($data['run_id']);
         }
         if (isset($data['submission_id'])) {
-            $this->submission_id = (int)$data['submission_id'];
+            $this->submission_id = intval($data['submission_id']);
         }
         if (isset($data['version'])) {
             $this->version = strval($data['version']);
@@ -54,19 +54,19 @@ class Runs extends \OmegaUp\DAO\VO\VO {
             $this->verdict = strval($data['verdict']);
         }
         if (isset($data['runtime'])) {
-            $this->runtime = (int)$data['runtime'];
+            $this->runtime = intval($data['runtime']);
         }
         if (isset($data['penalty'])) {
-            $this->penalty = (int)$data['penalty'];
+            $this->penalty = intval($data['penalty']);
         }
         if (isset($data['memory'])) {
-            $this->memory = (int)$data['memory'];
+            $this->memory = intval($data['memory']);
         }
         if (isset($data['score'])) {
-            $this->score = (float)$data['score'];
+            $this->score = floatval($data['score']);
         }
         if (isset($data['contest_score'])) {
-            $this->contest_score = (float)$data['contest_score'];
+            $this->contest_score = floatval($data['contest_score']);
         }
         if (isset($data['time'])) {
             /**

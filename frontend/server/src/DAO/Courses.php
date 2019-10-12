@@ -236,8 +236,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $identity_id,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            (int)$offset,
-            (int)$pageSize,
+            intval($offset),
+            intval($pageSize),
         ];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -273,8 +273,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ?, ?';
         $params = [
             $user_id,
-            (int)$offset,
-            (int)$pageSize,
+            intval($offset),
+            intval($pageSize),
         ];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -286,11 +286,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return $courses;
     }
 
-    final public static function getByAlias($alias) {
+    final public static function getByAlias(string $alias) : ?\OmegaUp\DAO\VO\Courses {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
-        $params = [$alias];
 
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($row)) {
             return null;
         }

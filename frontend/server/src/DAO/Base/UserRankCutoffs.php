@@ -50,7 +50,7 @@ abstract class UserRankCutoffs {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -74,8 +74,8 @@ abstract class UserRankCutoffs {
     final public static function create(\OmegaUp\DAO\VO\UserRankCutoffs $User_Rank_Cutoffs) : int {
         $sql = 'INSERT INTO User_Rank_Cutoffs (`score`, `percentile`, `classname`) VALUES (?, ?, ?);';
         $params = [
-            is_null($User_Rank_Cutoffs->score) ? null : (float)$User_Rank_Cutoffs->score,
-            is_null($User_Rank_Cutoffs->percentile) ? null : (float)$User_Rank_Cutoffs->percentile,
+            is_null($User_Rank_Cutoffs->score) ? null : floatval($User_Rank_Cutoffs->score),
+            is_null($User_Rank_Cutoffs->percentile) ? null : floatval($User_Rank_Cutoffs->percentile),
             $User_Rank_Cutoffs->classname,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

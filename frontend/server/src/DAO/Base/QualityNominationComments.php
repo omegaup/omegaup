@@ -28,12 +28,12 @@ abstract class QualityNominationComments {
     final public static function update(\OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments) : int {
         $sql = 'UPDATE `QualityNomination_Comments` SET `qualitynomination_id` = ?, `user_id` = ?, `time` = ?, `vote` = ?, `contents` = ? WHERE `qualitynomination_comment_id` = ?;';
         $params = [
-            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
-            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
+            is_null($QualityNomination_Comments->qualitynomination_id) ? null : intval($QualityNomination_Comments->qualitynomination_id),
+            is_null($QualityNomination_Comments->user_id) ? null : intval($QualityNomination_Comments->user_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Comments->time),
-            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
+            is_null($QualityNomination_Comments->vote) ? null : intval($QualityNomination_Comments->vote),
             $QualityNomination_Comments->contents,
-            (int)$QualityNomination_Comments->qualitynomination_comment_id,
+            intval($QualityNomination_Comments->qualitynomination_comment_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -120,7 +120,7 @@ abstract class QualityNominationComments {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -144,10 +144,10 @@ abstract class QualityNominationComments {
     final public static function create(\OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments) : int {
         $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($QualityNomination_Comments->qualitynomination_id) ? null : (int)$QualityNomination_Comments->qualitynomination_id,
-            is_null($QualityNomination_Comments->user_id) ? null : (int)$QualityNomination_Comments->user_id,
+            is_null($QualityNomination_Comments->qualitynomination_id) ? null : intval($QualityNomination_Comments->qualitynomination_id),
+            is_null($QualityNomination_Comments->user_id) ? null : intval($QualityNomination_Comments->user_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Comments->time),
-            is_null($QualityNomination_Comments->vote) ? null : (int)$QualityNomination_Comments->vote,
+            is_null($QualityNomination_Comments->vote) ? null : intval($QualityNomination_Comments->vote),
             $QualityNomination_Comments->contents,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

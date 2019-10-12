@@ -9,13 +9,18 @@
 class ContestScoreboardTest extends OmegaupTestCase {
     /**
      * Sets the context for a basic scoreboard test
-     * @param  integer $nUsers
-     * @param  array  $runMap
+     * @param  int     $nUsers
+     * @param  array   $runMap
      * @param  boolean $runForAdmin
      * @param  boolean $runForDirector
      * @return array
      */
-    private function prepareContestScoreboardData($nUsers = 3, array $runMap, $runForAdmin = true, $runForDirector = true) {
+    private function prepareContestScoreboardData(
+        int $nUsers,
+        array $runMap,
+        bool $runForAdmin = true,
+        bool $runForDirector = true
+    ) {
         $problemData = [ProblemsFactory::createProblem(), ProblemsFactory::createProblem()];
         $contestData = ContestsFactory::createContest();
 

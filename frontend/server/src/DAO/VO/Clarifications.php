@@ -27,7 +27,7 @@ class Clarifications extends \OmegaUp\DAO\VO\VO {
         'public' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -36,13 +36,13 @@ class Clarifications extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['clarification_id'])) {
-            $this->clarification_id = (int)$data['clarification_id'];
+            $this->clarification_id = intval($data['clarification_id']);
         }
         if (isset($data['author_id'])) {
-            $this->author_id = (int)$data['author_id'];
+            $this->author_id = intval($data['author_id']);
         }
         if (isset($data['receiver_id'])) {
-            $this->receiver_id = (int)$data['receiver_id'];
+            $this->receiver_id = intval($data['receiver_id']);
         }
         if (isset($data['message'])) {
             $this->message = strval($data['message']);
@@ -60,10 +60,10 @@ class Clarifications extends \OmegaUp\DAO\VO\VO {
             $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval($data['problem_id']);
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval($data['problemset_id']);
         }
         if (isset($data['public'])) {
             $this->public = boolval($data['public']);

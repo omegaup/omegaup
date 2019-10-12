@@ -45,8 +45,8 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql .= 'ORDER BY c.answer IS NULL DESC, c.clarification_id DESC ';
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $val[] = (int)$offset;
-            $val[] = (int)$rowcount;
+            $val[] = intval($offset);
+            $val[] = intval($rowcount);
         }
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
@@ -77,8 +77,8 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql .= 'ORDER BY c.answer IS NULL DESC, c.clarification_id DESC ';
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $val[] = (int)$offset;
-            $val[] = (int)$rowcount;
+            $val[] = intval($offset);
+            $val[] = intval($rowcount);
         }
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);

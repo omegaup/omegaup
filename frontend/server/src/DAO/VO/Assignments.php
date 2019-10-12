@@ -31,7 +31,7 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
         'order' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -40,16 +40,16 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['assignment_id'])) {
-            $this->assignment_id = (int)$data['assignment_id'];
+            $this->assignment_id = intval($data['assignment_id']);
         }
         if (isset($data['course_id'])) {
-            $this->course_id = (int)$data['course_id'];
+            $this->course_id = intval($data['course_id']);
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval($data['problemset_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['name'])) {
             $this->name = strval($data['name']);
@@ -61,7 +61,7 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
             $this->alias = strval($data['alias']);
         }
         if (isset($data['publish_time_delay'])) {
-            $this->publish_time_delay = (int)$data['publish_time_delay'];
+            $this->publish_time_delay = intval($data['publish_time_delay']);
         }
         if (isset($data['assignment_type'])) {
             $this->assignment_type = strval($data['assignment_type']);
@@ -81,10 +81,10 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
             $this->finish_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['finish_time']);
         }
         if (isset($data['max_points'])) {
-            $this->max_points = (float)$data['max_points'];
+            $this->max_points = floatval($data['max_points']);
         }
         if (isset($data['order'])) {
-            $this->order = (int)$data['order'];
+            $this->order = intval($data['order']);
         }
     }
 

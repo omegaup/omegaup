@@ -24,7 +24,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
-    public static function SearchByName($name) {
+    /**
+     * @return \OmegaUp\DAO\VO\Groups[]
+     */
+    public static function SearchByName(string $name) {
         $sql = "SELECT g.* from Groups g where g.name LIKE CONCAT('%', ?, '%') LIMIT 10;";
         $args = [$name];
 
@@ -100,8 +103,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
 
     /**
      * Gets a random sample (of up to size $n) of group members.
+     *
+     * @return \OmegaUp\DAO\VO\Identities[] $identities
      */
-    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, $n) {
+    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, int $n): array {
         $sql = '
             SELECT
                 i.*
@@ -116,8 +121,12 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
             LIMIT
                 0, ?;';
 
+        /** @var \OmegaUp\DAO\VO\Identities[] */
         $identities = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$group->group_id, $n]
+        ) as $row) {
             $identities[] = new \OmegaUp\DAO\VO\Identities($row);
         }
         return $identities;

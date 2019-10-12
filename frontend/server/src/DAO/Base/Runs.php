@@ -28,18 +28,18 @@ abstract class Runs {
     final public static function update(\OmegaUp\DAO\VO\Runs $Runs) : int {
         $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `judged_by` = ? WHERE `run_id` = ?;';
         $params = [
-            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
+            is_null($Runs->submission_id) ? null : intval($Runs->submission_id),
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
-            (int)$Runs->runtime,
-            (int)$Runs->penalty,
-            (int)$Runs->memory,
-            (float)$Runs->score,
-            is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
+            intval($Runs->runtime),
+            intval($Runs->penalty),
+            intval($Runs->memory),
+            floatval($Runs->score),
+            is_null($Runs->contest_score) ? null : floatval($Runs->contest_score),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Runs->time),
             $Runs->judged_by,
-            (int)$Runs->run_id,
+            intval($Runs->run_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -126,7 +126,7 @@ abstract class Runs {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -150,15 +150,15 @@ abstract class Runs {
     final public static function create(\OmegaUp\DAO\VO\Runs $Runs) : int {
         $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Runs->submission_id) ? null : (int)$Runs->submission_id,
+            is_null($Runs->submission_id) ? null : intval($Runs->submission_id),
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
-            (int)$Runs->runtime,
-            (int)$Runs->penalty,
-            (int)$Runs->memory,
-            (float)$Runs->score,
-            is_null($Runs->contest_score) ? null : (float)$Runs->contest_score,
+            intval($Runs->runtime),
+            intval($Runs->penalty),
+            intval($Runs->memory),
+            floatval($Runs->score),
+            is_null($Runs->contest_score) ? null : floatval($Runs->contest_score),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Runs->time),
             $Runs->judged_by,
         ];

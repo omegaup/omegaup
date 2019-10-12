@@ -446,7 +446,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             if (is_null($user)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
-            \OmegaUp\Controllers\User::checkEmailVerification($user);
+            \OmegaUp\Controllers\User::checkEmailVerification($user, $identity);
         }
 
         try {

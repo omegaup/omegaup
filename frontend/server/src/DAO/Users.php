@@ -25,7 +25,17 @@ class Users extends \OmegaUp\DAO\Base\Users {
     public static function FindByUsername(
         string $username
     ) : ?\OmegaUp\DAO\VO\Users {
-        $sql = 'SELECT u.* FROM Users u WHERE username = ? LIMIT 1;';
+        $sql = 'SELECT
+                    u.*
+                FROM
+                    Users u
+                INNER JOIN
+                    Identities i
+                ON
+                    i.user_id = u.user_id
+                WHERE
+                    i.username = ?
+                LIMIT 1;';
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$username]);
         if (empty($rs)) {
             return null;
@@ -59,7 +69,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         ];
     }
 
-    public static function savePassword(\OmegaUp\DAO\VO\Users $Users) {
+    public static function savePassword(\OmegaUp\DAO\VO\Users $Users) : int {
         $sql = '
             UPDATE
                 `Users`
@@ -163,21 +173,25 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params) ?? 'user-rank-unranked';
     }
 
-    final public static function getByVerification($verification_id) {
-        $sql = 'SELECT
-                    *
-                FROM
-                    Users
-                WHERE
-                    verification_id = ?';
+    final public static function getByVerification(
+        string $verificationId
+    ) : ?\OmegaUp\DAO\VO\Users {
+        $sql = '
+            SELECT
+                *
+            FROM
+                Users
+            WHERE
+                verification_id = ?
+            LIMIT 1;
+        ';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$verification_id]);
-
-        $users = [];
-        foreach ($rs as $row) {
-            array_push($users, new \OmegaUp\DAO\VO\Users($row));
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$verificationId]);
+        if (empty($row)) {
+            return null;
         }
-        return $users;
+
+        return new \OmegaUp\DAO\VO\Users($row);
     }
 
     final public static function getVerified($verified, $in_mailing_list) {

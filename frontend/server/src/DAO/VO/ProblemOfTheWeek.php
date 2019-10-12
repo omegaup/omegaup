@@ -22,7 +22,7 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\VO\VO {
         'difficulty' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -31,10 +31,10 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_of_the_week_id'])) {
-            $this->problem_of_the_week_id = (int)$data['problem_of_the_week_id'];
+            $this->problem_of_the_week_id = intval($data['problem_of_the_week_id']);
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval($data['problem_id']);
         }
         if (isset($data['time'])) {
             $this->time = strval($data['time']);

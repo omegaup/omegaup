@@ -18,15 +18,18 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 FROM
                   `Identities` i
                 INNER JOIN
+                  `Users` u
+                ON
+                  u.user_id = i.user_id AND u.main_identity_id = i.identity_id
+                INNER JOIN
                   `Emails` e
                 ON
-                  e.user_id = i.user_id
+                  e.user_id = u.user_id
                 WHERE
                   e.email = ?
                 LIMIT
                   0, 1';
-        $params = [ $email ];
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
         }
@@ -97,11 +100,32 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function getExtraInformation($email) {
+    public static function savePassword(\OmegaUp\DAO\VO\Identities $identities) : int {
+        $sql = '
+            UPDATE
+                `Identities`
+            SET
+                `password` = ?,
+                `username` = ?
+            WHERE
+                `identity_id` = ?;';
+        $params = [
+            $identities->password,
+            $identities->username,
+            $identities->identity_id,
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: null|int}
+     */
+    public static function getExtraInformation(string $email) : ?array {
         $sql = 'SELECT
                   UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
                   u.verified,
-                  u.username,
+                  i.username,
                   (
                     SELECT
                       MAX(UNIX_TIMESTAMP(ill.time))
@@ -126,17 +150,16 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        $params = [ $email ];
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        /** @var null|array{reset_sent_at: int, verified: int, username: string, last_login: null|int} */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
         }
         return [
-          // Asks whether request was made on the last day
-          'within_last_day' => \OmegaUp\Time::get() - ((int)$rs['reset_sent_at']) < 60 * 60 * 24,
-          'verified' => $rs['verified'] == 1,
-          'username' => $rs['username'],
-          'last_login' => is_null($rs['last_login']) ? null : ((int)$rs['last_login']),
+            'within_last_day' => (\OmegaUp\Time::get() - intval($rs['reset_sent_at'])) < 60 * 60 * 24,
+            'verified' => $rs['verified'] == 1,
+            'username' => $rs['username'],
+            'last_login' => $rs['last_login'],
         ];
     }
 

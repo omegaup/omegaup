@@ -99,7 +99,7 @@ abstract class GroupRoles {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -123,9 +123,9 @@ abstract class GroupRoles {
     final public static function create(\OmegaUp\DAO\VO\GroupRoles $Group_Roles) : int {
         $sql = 'INSERT INTO Group_Roles (`group_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Group_Roles->group_id) ? null : (int)$Group_Roles->group_id,
-            is_null($Group_Roles->role_id) ? null : (int)$Group_Roles->role_id,
-            is_null($Group_Roles->acl_id) ? null : (int)$Group_Roles->acl_id,
+            is_null($Group_Roles->group_id) ? null : intval($Group_Roles->group_id),
+            is_null($Group_Roles->role_id) ? null : intval($Group_Roles->role_id),
+            is_null($Group_Roles->acl_id) ? null : intval($Group_Roles->acl_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
