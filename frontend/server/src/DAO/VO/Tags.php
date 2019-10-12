@@ -20,7 +20,7 @@ class Tags extends \OmegaUp\DAO\VO\VO {
         'name' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -29,7 +29,7 @@ class Tags extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['tag_id'])) {
-            $this->tag_id = (int)$data['tag_id'];
+            $this->tag_id = intval($data['tag_id']);
         }
         if (isset($data['name'])) {
             $this->name = strval($data['name']);

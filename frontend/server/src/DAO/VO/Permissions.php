@@ -21,7 +21,7 @@ class Permissions extends \OmegaUp\DAO\VO\VO {
         'description' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -30,7 +30,7 @@ class Permissions extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['permission_id'])) {
-            $this->permission_id = (int)$data['permission_id'];
+            $this->permission_id = intval($data['permission_id']);
         }
         if (isset($data['name'])) {
             $this->name = strval($data['name']);

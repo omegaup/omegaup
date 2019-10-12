@@ -28,16 +28,16 @@ abstract class Submissions {
     final public static function update(\OmegaUp\DAO\VO\Submissions $Submissions) : int {
         $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
         $params = [
-            is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
-            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
-            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
-            is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
+            is_null($Submissions->current_run_id) ? null : intval($Submissions->current_run_id),
+            is_null($Submissions->identity_id) ? null : intval($Submissions->identity_id),
+            is_null($Submissions->problem_id) ? null : intval($Submissions->problem_id),
+            is_null($Submissions->problemset_id) ? null : intval($Submissions->problemset_id),
             $Submissions->guid,
             $Submissions->language,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Submissions->time),
-            (int)$Submissions->submit_delay,
+            intval($Submissions->submit_delay),
             $Submissions->type,
-            (int)$Submissions->submission_id,
+            intval($Submissions->submission_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -124,7 +124,7 @@ abstract class Submissions {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -148,14 +148,14 @@ abstract class Submissions {
     final public static function create(\OmegaUp\DAO\VO\Submissions $Submissions) : int {
         $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Submissions->current_run_id) ? null : (int)$Submissions->current_run_id,
-            is_null($Submissions->identity_id) ? null : (int)$Submissions->identity_id,
-            is_null($Submissions->problem_id) ? null : (int)$Submissions->problem_id,
-            is_null($Submissions->problemset_id) ? null : (int)$Submissions->problemset_id,
+            is_null($Submissions->current_run_id) ? null : intval($Submissions->current_run_id),
+            is_null($Submissions->identity_id) ? null : intval($Submissions->identity_id),
+            is_null($Submissions->problem_id) ? null : intval($Submissions->problem_id),
+            is_null($Submissions->problemset_id) ? null : intval($Submissions->problemset_id),
             $Submissions->guid,
             $Submissions->language,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Submissions->time),
-            (int)$Submissions->submit_delay,
+            intval($Submissions->submit_delay),
             $Submissions->type,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

@@ -60,8 +60,8 @@ abstract class ProblemViewed {
         $sql = 'UPDATE `Problem_Viewed` SET `view_time` = ? WHERE `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problem_Viewed->view_time),
-            is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
-            is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
+            is_null($Problem_Viewed->problem_id) ? null : intval($Problem_Viewed->problem_id),
+            is_null($Problem_Viewed->identity_id) ? null : intval($Problem_Viewed->identity_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -148,7 +148,7 @@ abstract class ProblemViewed {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -172,8 +172,8 @@ abstract class ProblemViewed {
     final public static function create(\OmegaUp\DAO\VO\ProblemViewed $Problem_Viewed) : int {
         $sql = 'INSERT INTO Problem_Viewed (`problem_id`, `identity_id`, `view_time`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Problem_Viewed->problem_id) ? null : (int)$Problem_Viewed->problem_id,
-            is_null($Problem_Viewed->identity_id) ? null : (int)$Problem_Viewed->identity_id,
+            is_null($Problem_Viewed->problem_id) ? null : intval($Problem_Viewed->problem_id),
+            is_null($Problem_Viewed->identity_id) ? null : intval($Problem_Viewed->identity_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problem_Viewed->view_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

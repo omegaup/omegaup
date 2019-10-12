@@ -22,7 +22,7 @@ class UsersBadges extends \OmegaUp\DAO\VO\VO {
         'assignation_time' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -31,10 +31,10 @@ class UsersBadges extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_badge_id'])) {
-            $this->user_badge_id = (int)$data['user_badge_id'];
+            $this->user_badge_id = intval($data['user_badge_id']);
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
         if (isset($data['badge_alias'])) {
             $this->badge_alias = strval($data['badge_alias']);

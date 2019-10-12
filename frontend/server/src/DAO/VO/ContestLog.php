@@ -24,7 +24,7 @@ class ContestLog extends \OmegaUp\DAO\VO\VO {
         'time' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -33,13 +33,13 @@ class ContestLog extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['public_contest_id'])) {
-            $this->public_contest_id = (int)$data['public_contest_id'];
+            $this->public_contest_id = intval($data['public_contest_id']);
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = (int)$data['contest_id'];
+            $this->contest_id = intval($data['contest_id']);
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
         if (isset($data['from_admission_mode'])) {
             $this->from_admission_mode = strval($data['from_admission_mode']);

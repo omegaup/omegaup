@@ -21,7 +21,7 @@ class Languages extends \OmegaUp\DAO\VO\VO {
         'country_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -30,7 +30,7 @@ class Languages extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['language_id'])) {
-            $this->language_id = (int)$data['language_id'];
+            $this->language_id = intval($data['language_id']);
         }
         if (isset($data['name'])) {
             $this->name = strval($data['name']);

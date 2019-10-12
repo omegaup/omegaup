@@ -365,7 +365,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
 
             if (!empty($problemsets)) {
                 $problemsetIds = array_map(function (\OmegaUp\DAO\VO\Problemsets $p) {
-                    return (int)$p->problemset_id;
+                    return intval($p->problemset_id);
                 }, $problemsets);
                 $problemsetPlaceholders = implode(', ', array_fill(0, count($problemsetIds), '?'));
 

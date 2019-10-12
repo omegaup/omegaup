@@ -65,7 +65,7 @@ class Grader {
             self::REQUEST_MODE_JSON,
             [
                 'run_ids' => array_map(function (\OmegaUp\DAO\VO\Runs $r) {
-                    return (int)$r->run_id;
+                    return intval($r->run_id);
                 }, $runs),
                 'rejudge' => true,
                 'debug' => false, // TODO(lhchavez): Reenable with ACLs.
@@ -161,7 +161,7 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/resource/',
             self::REQUEST_MODE_RAW,
             [
-                'run_id' => (int)$run->run_id,
+                'run_id' => intval($run->run_id),
                 'filename' => $filename,
             ],
             $missingOk
@@ -181,7 +181,7 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/resource/',
             self::REQUEST_MODE_PASSTHRU,
             [
-                'run_id' => (int)$run->run_id,
+                'run_id' => intval($run->run_id),
                 'filename' => $filename,
             ],
             $missingOk

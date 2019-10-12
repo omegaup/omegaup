@@ -28,11 +28,11 @@ abstract class Notifications {
     final public static function update(\OmegaUp\DAO\VO\Notifications $Notifications) : int {
         $sql = 'UPDATE `Notifications` SET `user_id` = ?, `timestamp` = ?, `read` = ?, `contents` = ? WHERE `notification_id` = ?;';
         $params = [
-            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
+            is_null($Notifications->user_id) ? null : intval($Notifications->user_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Notifications->timestamp),
-            (int)$Notifications->read,
+            intval($Notifications->read),
             $Notifications->contents,
-            (int)$Notifications->notification_id,
+            intval($Notifications->notification_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -119,7 +119,7 @@ abstract class Notifications {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -143,9 +143,9 @@ abstract class Notifications {
     final public static function create(\OmegaUp\DAO\VO\Notifications $Notifications) : int {
         $sql = 'INSERT INTO Notifications (`user_id`, `timestamp`, `read`, `contents`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Notifications->user_id) ? null : (int)$Notifications->user_id,
+            is_null($Notifications->user_id) ? null : intval($Notifications->user_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Notifications->timestamp),
-            (int)$Notifications->read,
+            intval($Notifications->read),
             $Notifications->contents,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

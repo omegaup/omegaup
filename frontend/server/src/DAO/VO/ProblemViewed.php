@@ -21,7 +21,7 @@ class ProblemViewed extends \OmegaUp\DAO\VO\VO {
         'view_time' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -30,10 +30,10 @@ class ProblemViewed extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval($data['problem_id']);
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = (int)$data['identity_id'];
+            $this->identity_id = intval($data['identity_id']);
         }
         if (isset($data['view_time'])) {
             /**

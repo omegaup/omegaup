@@ -15,7 +15,7 @@ abstract class VO {
      *
      * @return array<string, mixed>
      */
-    function asArray() : array {
+    public function asArray() : array {
         return get_object_vars($this);
     }
 

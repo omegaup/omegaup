@@ -20,7 +20,7 @@ class ACLs extends \OmegaUp\DAO\VO\VO {
         'owner_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -29,10 +29,10 @@ class ACLs extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['owner_id'])) {
-            $this->owner_id = (int)$data['owner_id'];
+            $this->owner_id = intval($data['owner_id']);
         }
     }
 

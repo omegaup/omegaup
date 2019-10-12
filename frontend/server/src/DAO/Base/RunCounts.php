@@ -59,8 +59,8 @@ abstract class RunCounts {
     final public static function update(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : int {
         $sql = 'UPDATE `Run_Counts` SET `total` = ?, `ac_count` = ? WHERE `date` = ?;';
         $params = [
-            (int)$Run_Counts->total,
-            (int)$Run_Counts->ac_count,
+            intval($Run_Counts->total),
+            intval($Run_Counts->ac_count),
             $Run_Counts->date,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -148,7 +148,7 @@ abstract class RunCounts {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -173,8 +173,8 @@ abstract class RunCounts {
         $sql = 'INSERT INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
         $params = [
             $Run_Counts->date,
-            (int)$Run_Counts->total,
-            (int)$Run_Counts->ac_count,
+            intval($Run_Counts->total),
+            intval($Run_Counts->ac_count),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

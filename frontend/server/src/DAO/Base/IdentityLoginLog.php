@@ -50,7 +50,7 @@ abstract class IdentityLoginLog {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -74,8 +74,8 @@ abstract class IdentityLoginLog {
     final public static function create(\OmegaUp\DAO\VO\IdentityLoginLog $Identity_Login_Log) : int {
         $sql = 'INSERT INTO Identity_Login_Log (`identity_id`, `ip`, `time`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Identity_Login_Log->identity_id) ? null : (int)$Identity_Login_Log->identity_id,
-            is_null($Identity_Login_Log->ip) ? null : (int)$Identity_Login_Log->ip,
+            is_null($Identity_Login_Log->identity_id) ? null : intval($Identity_Login_Log->identity_id),
+            is_null($Identity_Login_Log->ip) ? null : intval($Identity_Login_Log->ip),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Identity_Login_Log->time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

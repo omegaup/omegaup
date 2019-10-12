@@ -39,7 +39,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         'difficulty_histogram' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -48,13 +48,13 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval($data['problem_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['visibility'])) {
-            $this->visibility = (int)$data['visibility'];
+            $this->visibility = intval($data['visibility']);
         }
         if (isset($data['title'])) {
             $this->title = strval($data['title']);
@@ -72,19 +72,19 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             $this->languages = strval($data['languages']);
         }
         if (isset($data['input_limit'])) {
-            $this->input_limit = (int)$data['input_limit'];
+            $this->input_limit = intval($data['input_limit']);
         }
         if (isset($data['visits'])) {
-            $this->visits = (int)$data['visits'];
+            $this->visits = intval($data['visits']);
         }
         if (isset($data['submissions'])) {
-            $this->submissions = (int)$data['submissions'];
+            $this->submissions = intval($data['submissions']);
         }
         if (isset($data['accepted'])) {
-            $this->accepted = (int)$data['accepted'];
+            $this->accepted = intval($data['accepted']);
         }
         if (isset($data['difficulty'])) {
-            $this->difficulty = (float)$data['difficulty'];
+            $this->difficulty = floatval($data['difficulty']);
         }
         if (isset($data['creation_date'])) {
             /**
@@ -108,7 +108,7 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             $this->email_clarifications = boolval($data['email_clarifications']);
         }
         if (isset($data['quality'])) {
-            $this->quality = (float)$data['quality'];
+            $this->quality = floatval($data['quality']);
         }
         if (isset($data['quality_histogram'])) {
             $this->quality_histogram = strval($data['quality_histogram']);

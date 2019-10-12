@@ -351,7 +351,7 @@ class Scoreboard {
             $log->debug('Sending updated scoreboards');
             \OmegaUp\Grader::getInstance()->broadcast(
                 $params->alias,
-                (int)$problemset->problemset_id,
+                intval($problemset->problemset_id),
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',
@@ -365,7 +365,7 @@ class Scoreboard {
             );
             \OmegaUp\Grader::getInstance()->broadcast(
                 $params->alias,
-                (int)$problemset->problemset_id,
+                intval($problemset->problemset_id),
                 null,
                 json_encode([
                     'message' => '/scoreboard/update/',
@@ -400,9 +400,9 @@ class Scoreboard {
         $start = $params->start_time;
         $finish = $params->finish_time;
 
-        $percentage = (double)$params->scoreboard_pct / 100.0;
+        $percentage = floatval($params->scoreboard_pct) / 100.0;
 
-        $limit = $start + (int) (($finish - $start) * $percentage);
+        $limit = $start + intval(($finish - $start) * $percentage);
 
         return $limit;
     }
@@ -738,7 +738,7 @@ class Scoreboard {
                 continue;
             }
 
-            $problemData['points'] = max($problemData['points'], round((float) $contestScore, 2));
+            $problemData['points'] = max($problemData['points'], round(floatval($contestScore), 2));
             $problemData['penalty'] = 0.0;
 
             if (!isset($contestIdentities[$identityId])) {

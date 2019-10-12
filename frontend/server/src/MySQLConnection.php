@@ -149,7 +149,7 @@ class MySQLConnection {
             } elseif (is_bool($params[$i])) {
                 $chunks[] = $params[$i] ? '1' : '0';
             } else {
-                $chunks[] = "'" . $this->_connection->real_escape_string((string) $params[$i]) . "'";
+                $chunks[] = "'" . $this->_connection->real_escape_string(strval($params[$i])) . "'";
             }
             $chunks[] = $inputChunks[$i + 1];
         }

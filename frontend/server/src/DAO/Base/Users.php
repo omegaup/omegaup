@@ -32,20 +32,20 @@ abstract class Users {
             $Users->facebook_user_id,
             $Users->password,
             $Users->git_token,
-            is_null($Users->main_email_id) ? null : (int)$Users->main_email_id,
-            is_null($Users->main_identity_id) ? null : (int)$Users->main_identity_id,
+            is_null($Users->main_email_id) ? null : intval($Users->main_email_id),
+            is_null($Users->main_identity_id) ? null : intval($Users->main_identity_id),
             $Users->scholar_degree,
             $Users->graduation_date,
             $Users->birth_date,
-            (int)$Users->verified,
+            intval($Users->verified),
             $Users->verification_id,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Users->reset_sent_at),
-            is_null($Users->hide_problem_tags) ? null : (int)$Users->hide_problem_tags,
-            (int)$Users->in_mailing_list,
-            (int)$Users->is_private,
+            is_null($Users->hide_problem_tags) ? null : intval($Users->hide_problem_tags),
+            intval($Users->in_mailing_list),
+            intval($Users->is_private),
             $Users->preferred_language,
-            (int)$Users->user_id,
+            intval($Users->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -132,7 +132,7 @@ abstract class Users {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -160,18 +160,18 @@ abstract class Users {
             $Users->facebook_user_id,
             $Users->password,
             $Users->git_token,
-            is_null($Users->main_email_id) ? null : (int)$Users->main_email_id,
-            is_null($Users->main_identity_id) ? null : (int)$Users->main_identity_id,
+            is_null($Users->main_email_id) ? null : intval($Users->main_email_id),
+            is_null($Users->main_identity_id) ? null : intval($Users->main_identity_id),
             $Users->scholar_degree,
             $Users->graduation_date,
             $Users->birth_date,
-            (int)$Users->verified,
+            intval($Users->verified),
             $Users->verification_id,
             $Users->reset_digest,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Users->reset_sent_at),
-            is_null($Users->hide_problem_tags) ? null : (int)$Users->hide_problem_tags,
-            (int)$Users->in_mailing_list,
-            (int)$Users->is_private,
+            is_null($Users->hide_problem_tags) ? null : intval($Users->hide_problem_tags),
+            intval($Users->in_mailing_list),
+            intval($Users->is_private),
             $Users->preferred_language,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

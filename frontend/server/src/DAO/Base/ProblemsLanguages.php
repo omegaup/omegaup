@@ -99,7 +99,7 @@ abstract class ProblemsLanguages {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -123,8 +123,8 @@ abstract class ProblemsLanguages {
     final public static function create(\OmegaUp\DAO\VO\ProblemsLanguages $Problems_Languages) : int {
         $sql = 'INSERT INTO Problems_Languages (`problem_id`, `language_id`) VALUES (?, ?);';
         $params = [
-            is_null($Problems_Languages->problem_id) ? null : (int)$Problems_Languages->problem_id,
-            is_null($Problems_Languages->language_id) ? null : (int)$Problems_Languages->language_id,
+            is_null($Problems_Languages->problem_id) ? null : intval($Problems_Languages->problem_id),
+            is_null($Problems_Languages->language_id) ? null : intval($Problems_Languages->language_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

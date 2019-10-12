@@ -36,7 +36,7 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'preferred_language' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -45,7 +45,7 @@ class Users extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
         if (isset($data['username'])) {
             $this->username = strval($data['username']);
@@ -60,10 +60,10 @@ class Users extends \OmegaUp\DAO\VO\VO {
             $this->git_token = strval($data['git_token']);
         }
         if (isset($data['main_email_id'])) {
-            $this->main_email_id = (int)$data['main_email_id'];
+            $this->main_email_id = intval($data['main_email_id']);
         }
         if (isset($data['main_identity_id'])) {
-            $this->main_identity_id = (int)$data['main_identity_id'];
+            $this->main_identity_id = intval($data['main_identity_id']);
         }
         if (isset($data['scholar_degree'])) {
             $this->scholar_degree = strval($data['scholar_degree']);
