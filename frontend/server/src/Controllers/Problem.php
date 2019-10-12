@@ -1060,13 +1060,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the problem resource (statement/solution) from the gitserver.
      *
-     * @param array $params The problem, commit, and language for the problem
-     *                      statement.
-     *
-     * @return array The contents of the resource, plus some metadata.
+     * @param array{directory: string, alias: string|null, commit: string, language: string} $params
+     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the resource, plus some metadata.
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function getProblemResourceImpl(array $params) : array {
+        if (is_null($params['alias'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($params['alias'], $params['commit']);
         $sourcePath = "{$params['directory']}/{$params['language']}.markdown";
 
@@ -1110,7 +1111,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ));
             }
         }
-
         return $result;
     }
 
@@ -1122,7 +1122,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param string   $language The language of the problem. Will default to
      *                           Spanish if not found.
      *
-     * @return array The contents of the file.
+     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function getProblemStatement(
@@ -1130,7 +1130,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $commit,
         string $language
     ) : array {
-        return \OmegaUp\Cache::getFromCacheOrSet(
+        /** @var array{language: string, markdown: string, images: array<string, string>}  */
+        $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
             function () use ($problem, $commit, $language) {
@@ -1143,6 +1144,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             },
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
+        return $response;
     }
 
     /**
@@ -2503,6 +2505,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'solvers' => $details['solvers'],
             'quality_payload' => [
                 'solved' => false,
+                'tried' => false,
                 'nominated' => false,
                 'dismissed' => false,
             ],
@@ -2541,6 +2544,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $problem
         );
+
+        $nominationStatus['tried'] = false;
+        $nominationStatus['solved'] = false;
+
+        /** @var array{verdict: string} $run */
+        foreach ($details['runs'] as $run) {
+            if ($run['verdict'] === 'AC') {
+                $nominationStatus['solved'] = true;
+                break;
+            } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'CE') {
+                $nominationStatus['tried'] = true;
+            }
+        }
         $nominationStatus['problem_alias'] = $details['alias'];
         $nominationStatus['language'] = $details['statement']['language'];
         $nominationStatus['can_nominate_problem'] = !is_null($r->user);
@@ -2591,6 +2607,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function getProblemSolutionExistence(
         \OmegaUp\DAO\VO\Problems $problem
     ): bool {
+        /** @var bool */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
