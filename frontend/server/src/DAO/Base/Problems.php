@@ -28,27 +28,27 @@ abstract class Problems {
     final public static function update(\OmegaUp\DAO\VO\Problems $Problems) : int {
         $sql = 'UPDATE `Problems` SET `acl_id` = ?, `visibility` = ?, `title` = ?, `alias` = ?, `commit` = ?, `current_version` = ?, `languages` = ?, `input_limit` = ?, `visits` = ?, `submissions` = ?, `accepted` = ?, `difficulty` = ?, `creation_date` = ?, `source` = ?, `order` = ?, `deprecated` = ?, `email_clarifications` = ?, `quality` = ?, `quality_histogram` = ?, `difficulty_histogram` = ? WHERE `problem_id` = ?;';
         $params = [
-            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
-            (int)$Problems->visibility,
+            is_null($Problems->acl_id) ? null : intval($Problems->acl_id),
+            intval($Problems->visibility),
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
             $Problems->current_version,
             $Problems->languages,
-            (int)$Problems->input_limit,
-            (int)$Problems->visits,
-            (int)$Problems->submissions,
-            (int)$Problems->accepted,
-            is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
+            intval($Problems->input_limit),
+            intval($Problems->visits),
+            intval($Problems->submissions),
+            intval($Problems->accepted),
+            is_null($Problems->difficulty) ? null : floatval($Problems->difficulty),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems->creation_date),
             $Problems->source,
             $Problems->order,
-            (int)$Problems->deprecated,
-            (int)$Problems->email_clarifications,
-            is_null($Problems->quality) ? null : (float)$Problems->quality,
+            intval($Problems->deprecated),
+            intval($Problems->email_clarifications),
+            is_null($Problems->quality) ? null : floatval($Problems->quality),
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
-            (int)$Problems->problem_id,
+            intval($Problems->problem_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -135,7 +135,7 @@ abstract class Problems {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -159,24 +159,24 @@ abstract class Problems {
     final public static function create(\OmegaUp\DAO\VO\Problems $Problems) : int {
         $sql = 'INSERT INTO Problems (`acl_id`, `visibility`, `title`, `alias`, `commit`, `current_version`, `languages`, `input_limit`, `visits`, `submissions`, `accepted`, `difficulty`, `creation_date`, `source`, `order`, `deprecated`, `email_clarifications`, `quality`, `quality_histogram`, `difficulty_histogram`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problems->acl_id) ? null : (int)$Problems->acl_id,
-            (int)$Problems->visibility,
+            is_null($Problems->acl_id) ? null : intval($Problems->acl_id),
+            intval($Problems->visibility),
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
             $Problems->current_version,
             $Problems->languages,
-            (int)$Problems->input_limit,
-            (int)$Problems->visits,
-            (int)$Problems->submissions,
-            (int)$Problems->accepted,
-            is_null($Problems->difficulty) ? null : (float)$Problems->difficulty,
+            intval($Problems->input_limit),
+            intval($Problems->visits),
+            intval($Problems->submissions),
+            intval($Problems->accepted),
+            is_null($Problems->difficulty) ? null : floatval($Problems->difficulty),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems->creation_date),
             $Problems->source,
             $Problems->order,
-            (int)$Problems->deprecated,
-            (int)$Problems->email_clarifications,
-            is_null($Problems->quality) ? null : (float)$Problems->quality,
+            intval($Problems->deprecated),
+            intval($Problems->email_clarifications),
+            is_null($Problems->quality) ? null : floatval($Problems->quality),
             $Problems->quality_histogram,
             $Problems->difficulty_histogram,
         ];

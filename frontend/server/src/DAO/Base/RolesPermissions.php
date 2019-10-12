@@ -99,7 +99,7 @@ abstract class RolesPermissions {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -123,8 +123,8 @@ abstract class RolesPermissions {
     final public static function create(\OmegaUp\DAO\VO\RolesPermissions $Roles_Permissions) : int {
         $sql = 'INSERT INTO Roles_Permissions (`role_id`, `permission_id`) VALUES (?, ?);';
         $params = [
-            is_null($Roles_Permissions->role_id) ? null : (int)$Roles_Permissions->role_id,
-            is_null($Roles_Permissions->permission_id) ? null : (int)$Roles_Permissions->permission_id,
+            is_null($Roles_Permissions->role_id) ? null : intval($Roles_Permissions->role_id),
+            is_null($Roles_Permissions->permission_id) ? null : intval($Roles_Permissions->permission_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

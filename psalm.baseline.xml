@@ -944,9 +944,8 @@
       <code>apiList</code>
       <code>showIntro</code>
     </MissingReturnType>
-    <MixedArgument occurrences="7">
+    <MixedArgument occurrences="6">
       <code>$r</code>
-      <code>\OmegaUp\Controllers\User::makeUsernameFromEmail($r['usernameOrEmail'])</code>
       <code>$r['interview']</code>
       <code>$r['user']-&gt;main_email_id</code>
       <code>$interview</code>
@@ -979,9 +978,8 @@
       <code>$identity['access_time']</code>
       <code>$identity['country_id']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="6">
+    <MixedAssignment occurrences="5">
       <code>$r['interview']</code>
-      <code>$newUserRequest['username']</code>
       <code>$r['user']</code>
       <code>$interview</code>
       <code>$problemsetIdentities</code>
@@ -1475,17 +1473,15 @@
       <code>$reset_token</code>
       <code>$password</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="6">
-      <code>$lastRequest['within_last_day']</code>
+    <MixedArrayAccess occurrences="5">
       <code>$r['email']</code>
       <code>$r['email']</code>
       <code>$r['reset_token']</code>
       <code>$r['password']</code>
       <code>$r['password_confirmation']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="5">
+    <MixedAssignment occurrences="4">
       <code>$email</code>
-      <code>$lastRequest</code>
       <code>$reset_token</code>
       <code>$password</code>
       <code>$password_confirmation</code>
@@ -1757,16 +1753,15 @@
     <MissingDependency occurrences="1">
       <code>\Smarty</code>
     </MissingDependency>
-    <MissingParamType occurrences="3">
+    <MissingParamType occurrences="2">
       <code>$problemset_id</code>
       <code>$user_id</code>
-      <code>$email</code>
     </MissingParamType>
     <MissingPropertyType occurrences="2">
       <code>$sendEmailOnVerify</code>
       <code>$permissionKey</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="28">
+    <MissingReturnType occurrences="27">
       <code>sendVerificationEmail</code>
       <code>apiLogin</code>
       <code>apiMailingListBackfill</code>
@@ -1778,7 +1773,6 @@
       <code>apiStats</code>
       <code>deleteProblemsSolvedRankCacheList</code>
       <code>apiUpdateMainEmail</code>
-      <code>makeUsernameFromEmail</code>
       <code>apiValidateFilter</code>
       <code>validateUser</code>
       <code>validateAddRemoveRole</code>
@@ -1796,7 +1790,7 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="29">
+    <MixedArgument occurrences="27">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1822,8 +1816,6 @@
       <code>$value</code>
       <code>$value</code>
       <code>$r['user']</code>
-      <code>$email</code>
-      <code>$email</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$r['password']</code>
@@ -1869,7 +1861,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="48">
+    <MixedAssignment occurrences="47">
       <code>$user</code>
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
@@ -1927,8 +1919,7 @@
       <code>$latest_statement</code>
       <code>$identity</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="3">
-      <code>response</code>
+    <MixedInferredReturnType occurrences="2">
       <code>array</code>
       <code>array</code>
     </MixedInferredReturnType>
@@ -1948,7 +1939,7 @@
       <code>$r['user']-&gt;user_id</code>
       <code>$r['user']-&gt;user_id</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="2">
+    <MixedReturnStatement occurrences="1">
       <code>$response</code>
       <code>$response</code>
     </MixedReturnStatement>
@@ -1982,7 +1973,7 @@
     <PossiblyNullPropertyFetch occurrences="8">
       <code>$email-&gt;email</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedDocblockClass occurrences="10">
+    <UndefinedDocblockClass occurrences="9">
       <code>$response</code>
       <code>$response</code>
       <code>$response</code>
@@ -2339,17 +2330,14 @@
     </MixedAssignment>
   </file>
   <file src="frontend/server/src/DAO/Identities.php">
-    <MissingParamType occurrences="6">
-      <code>$email</code>
-      <code>$email</code>
+    <MissingParamType occurrences="5">
       <code>$identity_id</code>
       <code>$identity_id</code>
       <code>$userId</code>
       <code>$userId</code>
       <code>$identity_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="6">
-      <code>getExtraInformation</code>
+    <MissingReturnType occurrences="5">
       <code>isVerified</code>
       <code>getExtendedProfileDataByPk</code>
       <code>isUserAssociatedWithIdentityOfGroup</code>

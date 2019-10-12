@@ -359,7 +359,7 @@ class Cache {
      */
     private static function getVersion(string $prefix) : int {
         $key = "v{$prefix}";
-        return (int) CacheAdapter::getInstance()->entry($key, 0);
+        return intval(CacheAdapter::getInstance()->entry($key, 0));
     }
 
     /**

@@ -28,10 +28,10 @@ abstract class ProblemOfTheWeek {
     final public static function update(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'UPDATE `Problem_Of_The_Week` SET `problem_id` = ?, `time` = ?, `difficulty` = ? WHERE `problem_of_the_week_id` = ?;';
         $params = [
-            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
+            is_null($Problem_Of_The_Week->problem_id) ? null : intval($Problem_Of_The_Week->problem_id),
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
-            (int)$Problem_Of_The_Week->problem_of_the_week_id,
+            intval($Problem_Of_The_Week->problem_of_the_week_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -118,7 +118,7 @@ abstract class ProblemOfTheWeek {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -142,7 +142,7 @@ abstract class ProblemOfTheWeek {
     final public static function create(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : int {
         $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
+            is_null($Problem_Of_The_Week->problem_id) ? null : intval($Problem_Of_The_Week->problem_id),
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
         ];

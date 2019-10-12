@@ -21,7 +21,7 @@ class UserRankCutoffs extends \OmegaUp\DAO\VO\VO {
         'classname' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -30,10 +30,10 @@ class UserRankCutoffs extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['score'])) {
-            $this->score = (float)$data['score'];
+            $this->score = floatval($data['score']);
         }
         if (isset($data['percentile'])) {
-            $this->percentile = (float)$data['percentile'];
+            $this->percentile = floatval($data['percentile']);
         }
         if (isset($data['classname'])) {
             $this->classname = strval($data['classname']);

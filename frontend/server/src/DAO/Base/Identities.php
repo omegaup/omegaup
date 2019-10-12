@@ -31,13 +31,13 @@ abstract class Identities {
             $Identities->username,
             $Identities->password,
             $Identities->name,
-            is_null($Identities->user_id) ? null : (int)$Identities->user_id,
-            is_null($Identities->language_id) ? null : (int)$Identities->language_id,
+            is_null($Identities->user_id) ? null : intval($Identities->user_id),
+            is_null($Identities->language_id) ? null : intval($Identities->language_id),
             $Identities->country_id,
             $Identities->state_id,
-            is_null($Identities->school_id) ? null : (int)$Identities->school_id,
+            is_null($Identities->school_id) ? null : intval($Identities->school_id),
             $Identities->gender,
-            (int)$Identities->identity_id,
+            intval($Identities->identity_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -124,7 +124,7 @@ abstract class Identities {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -151,11 +151,11 @@ abstract class Identities {
             $Identities->username,
             $Identities->password,
             $Identities->name,
-            is_null($Identities->user_id) ? null : (int)$Identities->user_id,
-            is_null($Identities->language_id) ? null : (int)$Identities->language_id,
+            is_null($Identities->user_id) ? null : intval($Identities->user_id),
+            is_null($Identities->language_id) ? null : intval($Identities->language_id),
             $Identities->country_id,
             $Identities->state_id,
-            is_null($Identities->school_id) ? null : (int)$Identities->school_id,
+            is_null($Identities->school_id) ? null : intval($Identities->school_id),
             $Identities->gender,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

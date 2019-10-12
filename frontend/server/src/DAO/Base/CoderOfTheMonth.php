@@ -28,13 +28,13 @@ abstract class CoderOfTheMonth {
     final public static function update(\OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month) : int {
         $sql = 'UPDATE `Coder_Of_The_Month` SET `user_id` = ?, `description` = ?, `time` = ?, `interview_url` = ?, `rank` = ?, `selected_by` = ? WHERE `coder_of_the_month_id` = ?;';
         $params = [
-            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
+            is_null($Coder_Of_The_Month->user_id) ? null : intval($Coder_Of_The_Month->user_id),
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
-            is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
-            (int)$Coder_Of_The_Month->coder_of_the_month_id,
+            is_null($Coder_Of_The_Month->rank) ? null : intval($Coder_Of_The_Month->rank),
+            is_null($Coder_Of_The_Month->selected_by) ? null : intval($Coder_Of_The_Month->selected_by),
+            intval($Coder_Of_The_Month->coder_of_the_month_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -121,7 +121,7 @@ abstract class CoderOfTheMonth {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -145,12 +145,12 @@ abstract class CoderOfTheMonth {
     final public static function create(\OmegaUp\DAO\VO\CoderOfTheMonth $Coder_Of_The_Month) : int {
         $sql = 'INSERT INTO Coder_Of_The_Month (`user_id`, `description`, `time`, `interview_url`, `rank`, `selected_by`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Coder_Of_The_Month->user_id) ? null : (int)$Coder_Of_The_Month->user_id,
+            is_null($Coder_Of_The_Month->user_id) ? null : intval($Coder_Of_The_Month->user_id),
             $Coder_Of_The_Month->description,
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
-            is_null($Coder_Of_The_Month->rank) ? null : (int)$Coder_Of_The_Month->rank,
-            is_null($Coder_Of_The_Month->selected_by) ? null : (int)$Coder_Of_The_Month->selected_by,
+            is_null($Coder_Of_The_Month->rank) ? null : intval($Coder_Of_The_Month->rank),
+            is_null($Coder_Of_The_Month->selected_by) ? null : intval($Coder_Of_The_Month->selected_by),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

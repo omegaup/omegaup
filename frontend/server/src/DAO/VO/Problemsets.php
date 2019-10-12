@@ -30,7 +30,7 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
         'interview_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -39,10 +39,10 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval($data['problemset_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['access_mode'])) {
             $this->access_mode = strval($data['access_mode']);
@@ -66,13 +66,13 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
             $this->type = strval($data['type']);
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = (int)$data['contest_id'];
+            $this->contest_id = intval($data['contest_id']);
         }
         if (isset($data['assignment_id'])) {
-            $this->assignment_id = (int)$data['assignment_id'];
+            $this->assignment_id = intval($data['assignment_id']);
         }
         if (isset($data['interview_id'])) {
-            $this->interview_id = (int)$data['interview_id'];
+            $this->interview_id = intval($data['interview_id']);
         }
     }
 

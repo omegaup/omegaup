@@ -99,7 +99,7 @@ abstract class UserRoles {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -123,9 +123,9 @@ abstract class UserRoles {
     final public static function create(\OmegaUp\DAO\VO\UserRoles $User_Roles) : int {
         $sql = 'INSERT INTO User_Roles (`user_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
         $params = [
-            is_null($User_Roles->user_id) ? null : (int)$User_Roles->user_id,
-            is_null($User_Roles->role_id) ? null : (int)$User_Roles->role_id,
-            is_null($User_Roles->acl_id) ? null : (int)$User_Roles->acl_id,
+            is_null($User_Roles->user_id) ? null : intval($User_Roles->user_id),
+            is_null($User_Roles->role_id) ? null : intval($User_Roles->role_id),
+            is_null($User_Roles->acl_id) ? null : intval($User_Roles->acl_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

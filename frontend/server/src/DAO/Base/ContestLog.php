@@ -28,12 +28,12 @@ abstract class ContestLog {
     final public static function update(\OmegaUp\DAO\VO\ContestLog $Contest_Log) : int {
         $sql = 'UPDATE `Contest_Log` SET `contest_id` = ?, `user_id` = ?, `from_admission_mode` = ?, `to_admission_mode` = ?, `time` = ? WHERE `public_contest_id` = ?;';
         $params = [
-            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
-            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
+            is_null($Contest_Log->contest_id) ? null : intval($Contest_Log->contest_id),
+            is_null($Contest_Log->user_id) ? null : intval($Contest_Log->user_id),
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contest_Log->time),
-            (int)$Contest_Log->public_contest_id,
+            intval($Contest_Log->public_contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -120,7 +120,7 @@ abstract class ContestLog {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -144,8 +144,8 @@ abstract class ContestLog {
     final public static function create(\OmegaUp\DAO\VO\ContestLog $Contest_Log) : int {
         $sql = 'INSERT INTO Contest_Log (`contest_id`, `user_id`, `from_admission_mode`, `to_admission_mode`, `time`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Contest_Log->contest_id) ? null : (int)$Contest_Log->contest_id,
-            is_null($Contest_Log->user_id) ? null : (int)$Contest_Log->user_id,
+            is_null($Contest_Log->contest_id) ? null : intval($Contest_Log->contest_id),
+            is_null($Contest_Log->user_id) ? null : intval($Contest_Log->user_id),
             $Contest_Log->from_admission_mode,
             $Contest_Log->to_admission_mode,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contest_Log->time),

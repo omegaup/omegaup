@@ -50,7 +50,7 @@ abstract class ProblemsetAccessLog {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -74,9 +74,9 @@ abstract class ProblemsetAccessLog {
     final public static function create(\OmegaUp\DAO\VO\ProblemsetAccessLog $Problemset_Access_Log) : int {
         $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Access_Log->problemset_id) ? null : (int)$Problemset_Access_Log->problemset_id,
-            is_null($Problemset_Access_Log->identity_id) ? null : (int)$Problemset_Access_Log->identity_id,
-            is_null($Problemset_Access_Log->ip) ? null : (int)$Problemset_Access_Log->ip,
+            is_null($Problemset_Access_Log->problemset_id) ? null : intval($Problemset_Access_Log->problemset_id),
+            is_null($Problemset_Access_Log->identity_id) ? null : intval($Problemset_Access_Log->identity_id),
+            is_null($Problemset_Access_Log->ip) ? null : intval($Problemset_Access_Log->ip),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Access_Log->time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

@@ -24,7 +24,7 @@ class Messages extends \OmegaUp\DAO\VO\VO {
         'date' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -33,16 +33,16 @@ class Messages extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['message_id'])) {
-            $this->message_id = (int)$data['message_id'];
+            $this->message_id = intval($data['message_id']);
         }
         if (isset($data['read'])) {
             $this->read = boolval($data['read']);
         }
         if (isset($data['sender_id'])) {
-            $this->sender_id = (int)$data['sender_id'];
+            $this->sender_id = intval($data['sender_id']);
         }
         if (isset($data['recipient_id'])) {
-            $this->recipient_id = (int)$data['recipient_id'];
+            $this->recipient_id = intval($data['recipient_id']);
         }
         if (isset($data['message'])) {
             $this->message = strval($data['message']);

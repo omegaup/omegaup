@@ -121,8 +121,12 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
             LIMIT
                 0, ?;';
 
+        /** @var \OmegaUp\DAO\VO\Identities[] */
         $identities = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id, (int)$n]) as $row) {
+        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$group->group_id, $n]
+        ) as $row) {
             $identities[] = new \OmegaUp\DAO\VO\Identities($row);
         }
         return $identities;

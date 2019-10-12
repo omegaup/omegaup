@@ -60,8 +60,8 @@ abstract class AuthTokens {
     final public static function update(\OmegaUp\DAO\VO\AuthTokens $Auth_Tokens) : int {
         $sql = 'UPDATE `Auth_Tokens` SET `user_id` = ?, `identity_id` = ?, `create_time` = ? WHERE `token` = ?;';
         $params = [
-            is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
-            is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
+            is_null($Auth_Tokens->user_id) ? null : intval($Auth_Tokens->user_id),
+            is_null($Auth_Tokens->identity_id) ? null : intval($Auth_Tokens->identity_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
             $Auth_Tokens->token,
         ];
@@ -150,7 +150,7 @@ abstract class AuthTokens {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -174,8 +174,8 @@ abstract class AuthTokens {
     final public static function create(\OmegaUp\DAO\VO\AuthTokens $Auth_Tokens) : int {
         $sql = 'INSERT INTO Auth_Tokens (`user_id`, `identity_id`, `token`, `create_time`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Auth_Tokens->user_id) ? null : (int)$Auth_Tokens->user_id,
-            is_null($Auth_Tokens->identity_id) ? null : (int)$Auth_Tokens->identity_id,
+            is_null($Auth_Tokens->user_id) ? null : intval($Auth_Tokens->user_id),
+            is_null($Auth_Tokens->identity_id) ? null : intval($Auth_Tokens->identity_id),
             $Auth_Tokens->token,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Auth_Tokens->create_time),
         ];

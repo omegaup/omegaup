@@ -28,12 +28,12 @@ abstract class ProblemsetIdentityRequestHistory {
     final public static function update(\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
         $sql = 'UPDATE `Problemset_Identity_Request_History` SET `identity_id` = ?, `problemset_id` = ?, `time` = ?, `accepted` = ?, `admin_id` = ? WHERE `history_id` = ?;';
         $params = [
-            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
-            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
+            is_null($Problemset_Identity_Request_History->identity_id) ? null : intval($Problemset_Identity_Request_History->identity_id),
+            is_null($Problemset_Identity_Request_History->problemset_id) ? null : intval($Problemset_Identity_Request_History->problemset_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
-            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
-            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
-            (int)$Problemset_Identity_Request_History->history_id,
+            is_null($Problemset_Identity_Request_History->accepted) ? null : intval($Problemset_Identity_Request_History->accepted),
+            is_null($Problemset_Identity_Request_History->admin_id) ? null : intval($Problemset_Identity_Request_History->admin_id),
+            intval($Problemset_Identity_Request_History->history_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -120,7 +120,7 @@ abstract class ProblemsetIdentityRequestHistory {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -144,11 +144,11 @@ abstract class ProblemsetIdentityRequestHistory {
     final public static function create(\OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory $Problemset_Identity_Request_History) : int {
         $sql = 'INSERT INTO Problemset_Identity_Request_History (`identity_id`, `problemset_id`, `time`, `accepted`, `admin_id`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Identity_Request_History->identity_id) ? null : (int)$Problemset_Identity_Request_History->identity_id,
-            is_null($Problemset_Identity_Request_History->problemset_id) ? null : (int)$Problemset_Identity_Request_History->problemset_id,
+            is_null($Problemset_Identity_Request_History->identity_id) ? null : intval($Problemset_Identity_Request_History->identity_id),
+            is_null($Problemset_Identity_Request_History->problemset_id) ? null : intval($Problemset_Identity_Request_History->problemset_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identity_Request_History->time),
-            is_null($Problemset_Identity_Request_History->accepted) ? null : (int)$Problemset_Identity_Request_History->accepted,
-            is_null($Problemset_Identity_Request_History->admin_id) ? null : (int)$Problemset_Identity_Request_History->admin_id,
+            is_null($Problemset_Identity_Request_History->accepted) ? null : intval($Problemset_Identity_Request_History->accepted),
+            is_null($Problemset_Identity_Request_History->admin_id) ? null : intval($Problemset_Identity_Request_History->admin_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

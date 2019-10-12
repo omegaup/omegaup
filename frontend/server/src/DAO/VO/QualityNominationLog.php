@@ -25,7 +25,7 @@ class QualityNominationLog extends \OmegaUp\DAO\VO\VO {
         'rationale' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -34,10 +34,10 @@ class QualityNominationLog extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['qualitynomination_log_id'])) {
-            $this->qualitynomination_log_id = (int)$data['qualitynomination_log_id'];
+            $this->qualitynomination_log_id = intval($data['qualitynomination_log_id']);
         }
         if (isset($data['qualitynomination_id'])) {
-            $this->qualitynomination_id = (int)$data['qualitynomination_id'];
+            $this->qualitynomination_id = intval($data['qualitynomination_id']);
         }
         if (isset($data['time'])) {
             /**
@@ -49,7 +49,7 @@ class QualityNominationLog extends \OmegaUp\DAO\VO\VO {
             $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
         if (isset($data['from_status'])) {
             $this->from_status = strval($data['from_status']);

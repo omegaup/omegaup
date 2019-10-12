@@ -21,7 +21,7 @@ class RunCounts extends \OmegaUp\DAO\VO\VO {
         'ac_count' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -33,10 +33,10 @@ class RunCounts extends \OmegaUp\DAO\VO\VO {
             $this->date = strval($data['date']);
         }
         if (isset($data['total'])) {
-            $this->total = (int)$data['total'];
+            $this->total = intval($data['total']);
         }
         if (isset($data['ac_count'])) {
-            $this->ac_count = (int)$data['ac_count'];
+            $this->ac_count = intval($data['ac_count']);
         }
     }
 

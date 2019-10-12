@@ -25,7 +25,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
         'selected_by' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -34,10 +34,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['coder_of_the_month_id'])) {
-            $this->coder_of_the_month_id = (int)$data['coder_of_the_month_id'];
+            $this->coder_of_the_month_id = intval($data['coder_of_the_month_id']);
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
         if (isset($data['description'])) {
             $this->description = strval($data['description']);
@@ -49,10 +49,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
             $this->interview_url = strval($data['interview_url']);
         }
         if (isset($data['rank'])) {
-            $this->rank = (int)$data['rank'];
+            $this->rank = intval($data['rank']);
         }
         if (isset($data['selected_by'])) {
-            $this->selected_by = (int)$data['selected_by'];
+            $this->selected_by = intval($data['selected_by']);
         }
     }
 

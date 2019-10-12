@@ -1171,13 +1171,13 @@ class User extends \OmegaUp\Controllers\Controller {
      * - last password change request
      * - verify status
      *
-     * @param \OmegaUp\Request $r
-     * @return response array
+     * @return array{status: 'ok', within_last_day: bool, verified: bool, username: string, last_login: null|int}
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function apiExtraInformation(\OmegaUp\Request $r) {
+    public static function apiExtraInformation(\OmegaUp\Request $r) : array {
         $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -1542,7 +1542,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict((int)$identity->identity_id),
+            'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(intval($identity->identity_id)),
             'status' => 'ok'
         ];
     }
@@ -1915,7 +1915,7 @@ class User extends \OmegaUp\Controllers\Controller {
         return ['status' => 'ok'];
     }
 
-    public static function makeUsernameFromEmail($email) {
+    public static function makeUsernameFromEmail(string $email) : string {
         $newUsername = substr($email, 0, strpos($email, '@'));
         $newUsername = str_replace('-', '_', $newUsername);
         $newUsername = str_replace('.', '_', $newUsername);
@@ -2370,7 +2370,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'username');
         }
 
-        if (\OmegaUp\DAO\Identities::isUserAssociatedWithIdentityOfGroup((int)$r->user->user_id, (int)$identity->identity_id)) {
+        if (\OmegaUp\DAO\Identities::isUserAssociatedWithIdentityOfGroup(intval($r->user->user_id), intval($identity->identity_id))) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('identityAlreadyAssociated');
         }
 

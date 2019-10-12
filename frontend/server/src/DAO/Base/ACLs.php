@@ -28,8 +28,8 @@ abstract class ACLs {
     final public static function update(\OmegaUp\DAO\VO\ACLs $ACLs) : int {
         $sql = 'UPDATE `ACLs` SET `owner_id` = ? WHERE `acl_id` = ?;';
         $params = [
-            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
-            (int)$ACLs->acl_id,
+            is_null($ACLs->owner_id) ? null : intval($ACLs->owner_id),
+            intval($ACLs->acl_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -116,7 +116,7 @@ abstract class ACLs {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -140,7 +140,7 @@ abstract class ACLs {
     final public static function create(\OmegaUp\DAO\VO\ACLs $ACLs) : int {
         $sql = 'INSERT INTO ACLs (`owner_id`) VALUES (?);';
         $params = [
-            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
+            is_null($ACLs->owner_id) ? null : intval($ACLs->owner_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

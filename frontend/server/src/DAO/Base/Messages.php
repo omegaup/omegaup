@@ -28,12 +28,12 @@ abstract class Messages {
     final public static function update(\OmegaUp\DAO\VO\Messages $Messages) : int {
         $sql = 'UPDATE `Messages` SET `read` = ?, `sender_id` = ?, `recipient_id` = ?, `message` = ?, `date` = ? WHERE `message_id` = ?;';
         $params = [
-            (int)$Messages->read,
-            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
-            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
+            intval($Messages->read),
+            is_null($Messages->sender_id) ? null : intval($Messages->sender_id),
+            is_null($Messages->recipient_id) ? null : intval($Messages->recipient_id),
             $Messages->message,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Messages->date),
-            (int)$Messages->message_id,
+            intval($Messages->message_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -120,7 +120,7 @@ abstract class Messages {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -144,9 +144,9 @@ abstract class Messages {
     final public static function create(\OmegaUp\DAO\VO\Messages $Messages) : int {
         $sql = 'INSERT INTO Messages (`read`, `sender_id`, `recipient_id`, `message`, `date`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            (int)$Messages->read,
-            is_null($Messages->sender_id) ? null : (int)$Messages->sender_id,
-            is_null($Messages->recipient_id) ? null : (int)$Messages->recipient_id,
+            intval($Messages->read),
+            is_null($Messages->sender_id) ? null : intval($Messages->sender_id),
+            is_null($Messages->recipient_id) ? null : intval($Messages->recipient_id),
             $Messages->message,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Messages->date),
         ];

@@ -67,13 +67,13 @@ abstract class ProblemsetIdentities {
         $params = [
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->access_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->end_time),
-            (int)$Problemset_Identities->score,
-            (int)$Problemset_Identities->time,
-            is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
-            is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
-            (int)$Problemset_Identities->is_invited,
-            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
-            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
+            intval($Problemset_Identities->score),
+            intval($Problemset_Identities->time),
+            is_null($Problemset_Identities->share_user_information) ? null : intval($Problemset_Identities->share_user_information),
+            is_null($Problemset_Identities->privacystatement_consent_id) ? null : intval($Problemset_Identities->privacystatement_consent_id),
+            intval($Problemset_Identities->is_invited),
+            is_null($Problemset_Identities->identity_id) ? null : intval($Problemset_Identities->identity_id),
+            is_null($Problemset_Identities->problemset_id) ? null : intval($Problemset_Identities->problemset_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -160,7 +160,7 @@ abstract class ProblemsetIdentities {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -184,15 +184,15 @@ abstract class ProblemsetIdentities {
     final public static function create(\OmegaUp\DAO\VO\ProblemsetIdentities $Problemset_Identities) : int {
         $sql = 'INSERT INTO Problemset_Identities (`identity_id`, `problemset_id`, `access_time`, `end_time`, `score`, `time`, `share_user_information`, `privacystatement_consent_id`, `is_invited`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Identities->identity_id) ? null : (int)$Problemset_Identities->identity_id,
-            is_null($Problemset_Identities->problemset_id) ? null : (int)$Problemset_Identities->problemset_id,
+            is_null($Problemset_Identities->identity_id) ? null : intval($Problemset_Identities->identity_id),
+            is_null($Problemset_Identities->problemset_id) ? null : intval($Problemset_Identities->problemset_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->access_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Identities->end_time),
-            (int)$Problemset_Identities->score,
-            (int)$Problemset_Identities->time,
-            is_null($Problemset_Identities->share_user_information) ? null : (int)$Problemset_Identities->share_user_information,
-            is_null($Problemset_Identities->privacystatement_consent_id) ? null : (int)$Problemset_Identities->privacystatement_consent_id,
-            (int)$Problemset_Identities->is_invited,
+            intval($Problemset_Identities->score),
+            intval($Problemset_Identities->time),
+            is_null($Problemset_Identities->share_user_information) ? null : intval($Problemset_Identities->share_user_information),
+            is_null($Problemset_Identities->privacystatement_consent_id) ? null : intval($Problemset_Identities->privacystatement_consent_id),
+            intval($Problemset_Identities->is_invited),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

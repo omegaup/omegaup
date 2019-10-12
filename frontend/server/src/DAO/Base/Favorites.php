@@ -99,7 +99,7 @@ abstract class Favorites {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -123,8 +123,8 @@ abstract class Favorites {
     final public static function create(\OmegaUp\DAO\VO\Favorites $Favorites) : int {
         $sql = 'INSERT INTO Favorites (`user_id`, `problem_id`) VALUES (?, ?);';
         $params = [
-            is_null($Favorites->user_id) ? null : (int)$Favorites->user_id,
-            is_null($Favorites->problem_id) ? null : (int)$Favorites->problem_id,
+            is_null($Favorites->user_id) ? null : intval($Favorites->user_id),
+            is_null($Favorites->problem_id) ? null : intval($Favorites->problem_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

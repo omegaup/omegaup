@@ -21,7 +21,7 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
 {%- endfor %}
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -39,8 +39,10 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
             $this->{{ column.name }} = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['{{ column.name }}']);
 {%- elif column.php_primitive_type == 'bool' %}
             $this->{{ column.name }} = boolval($data['{{ column.name }}']);
-{%- elif column.php_primitive_type in ('int', 'float') %}
-            $this->{{ column.name }} = ({{ column.php_primitive_type }})$data['{{ column.name }}'];
+{%- elif column.php_primitive_type == 'int' %}
+            $this->{{ column.name }} = intval($data['{{ column.name }}']);
+{%- elif column.php_primitive_type == 'float' %}
+            $this->{{ column.name }} = floatval($data['{{ column.name }}']);
 {%- else %}
             $this->{{ column.name }} = strval($data['{{ column.name }}']);
 {%- endif %}

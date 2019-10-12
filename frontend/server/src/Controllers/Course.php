@@ -533,7 +533,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $runCount = 0;
 
             $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-                (int)$assignment->problemset_id
+                intval($assignment->problemset_id)
             );
 
             if ($runCount > 0) {
@@ -584,7 +584,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $points = 100;
         if (is_numeric($r['points'])) {
-            $points = (int)$r['points'];
+            $points = intval($r['points']);
         }
 
         \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
@@ -642,7 +642,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             $order = 1;
             if (is_numeric($r['order'])) {
-                $order = (int)$r['order'];
+                $order = intval($r['order']);
             }
             \OmegaUp\DAO\ProblemsetProblems::updateProblemsOrder(
                 $problemSet->problemset_id,
@@ -681,7 +681,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Assignments::updateAssignmentsOrder(
                 $currentAssignment->assignment_id,
-                (int)$assignment['order']
+                intval($assignment['order'])
             );
         }
 
@@ -756,8 +756,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotPartOfAssignment');
         }
         if (\OmegaUp\DAO\Submissions::countTotalRunsOfProblemInProblemset(
-            (int)$problem->problem_id,
-            (int)$problemSet->problemset_id
+            intval($problem->problem_id),
+            intval($problemSet->problemset_id)
         ) > 0 &&
             !\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
@@ -806,7 +806,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $time = \OmegaUp\Time::get();
         foreach ($assignments as $assignment) {
             $assignment['has_runs'] = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-                (int)$assignment['problemset_id']
+                intval($assignment['problemset_id'])
             ) > 0;
             unset($assignment['problemset_id']);
             if ($assignment['start_time'] > $time &&
@@ -1026,14 +1026,14 @@ class Course extends \OmegaUp\Controllers\Controller {
         $letter = 0;
         foreach ($problems as &$problem) {
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                (int)$problem['problem_id'],
-                (int)$r['assignment']->problemset_id,
-                (int)$resolvedIdentity->identity_id
+                intval($problem['problem_id']),
+                intval($r['assignment']->problemset_id),
+                intval($resolvedIdentity->identity_id)
             );
             $problem['runs'] = [];
             foreach ($runsArray as $run) {
-                $run['time'] = (int)$run['time'];
-                $run['contest_score'] = (float)$run['contest_score'];
+                $run['time'] = intval($run['time']);
+                $run['contest_score'] = floatval($run['contest_score']);
                 try {
                     $run['source'] = \OmegaUp\Controllers\Submission::getSource($run['guid']);
                 } catch (\Exception $e) {
@@ -1812,9 +1812,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         $result = [];
 
         foreach ($runs as $run) {
-            $run['time'] = (int)$run['time'];
-            $run['score'] = (float)$run['score'];
-            $run['contest_score'] = (float)$run['contest_score'];
+            $run['time'] = intval($run['time']);
+            $run['score'] = floatval($run['score']);
+            $run['contest_score'] = floatval($run['contest_score']);
             array_push($result, $run);
         }
 
