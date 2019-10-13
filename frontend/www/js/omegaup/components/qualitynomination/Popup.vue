@@ -13,7 +13,7 @@
         <div class="container-fluid">
           <template v-if="currentView == 'suggestion'">
             <div class="title-text">
-              {{ this.solved ? T.qualityFormCongrats : T.qualityFormGreeting }}
+              {{ this.solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAC }}
             </div>
             <div class="form-group">
               <label class="control-label">{{ T.qualityFormDifficulty }}</label><br>

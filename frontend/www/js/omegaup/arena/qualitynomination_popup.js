@@ -25,7 +25,7 @@ OmegaUp.on('ready', function() {
           submit: function(ev) {
             let contents = {};
             if (!ev.solved && ev.tried) {
-              contents['before_ac'] = true;
+              contents.before_ac = true;
             }
             if (ev.difficulty !== '') {
               contents.difficulty = Number.parseInt(ev.difficulty, 10);
@@ -46,7 +46,7 @@ OmegaUp.on('ready', function() {
           dismiss: function(ev) {
             let contents = {};
             if (!ev.solved && ev.tried) {
-              contents['before_ac'] = true;
+              contents.before_ac = true;
             }
             API.QualityNomination.create({
                                    problem_alias: qualityPayload.problem_alias,
