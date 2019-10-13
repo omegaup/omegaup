@@ -42,7 +42,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'recommended' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -51,13 +51,13 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = (int)$data['contest_id'];
+            $this->contest_id = intval($data['contest_id']);
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval($data['problemset_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['title'])) {
             $this->title = strval($data['title']);
@@ -89,10 +89,10 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             $this->last_updated = \OmegaUp\Time::get();
         }
         if (isset($data['window_length'])) {
-            $this->window_length = (int)$data['window_length'];
+            $this->window_length = intval($data['window_length']);
         }
         if (isset($data['rerun_id'])) {
-            $this->rerun_id = (int)$data['rerun_id'];
+            $this->rerun_id = intval($data['rerun_id']);
         }
         if (isset($data['admission_mode'])) {
             $this->admission_mode = strval($data['admission_mode']);
@@ -101,22 +101,22 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             $this->alias = strval($data['alias']);
         }
         if (isset($data['scoreboard'])) {
-            $this->scoreboard = (int)$data['scoreboard'];
+            $this->scoreboard = intval($data['scoreboard']);
         }
         if (isset($data['points_decay_factor'])) {
-            $this->points_decay_factor = (float)$data['points_decay_factor'];
+            $this->points_decay_factor = floatval($data['points_decay_factor']);
         }
         if (isset($data['partial_score'])) {
             $this->partial_score = boolval($data['partial_score']);
         }
         if (isset($data['submissions_gap'])) {
-            $this->submissions_gap = (int)$data['submissions_gap'];
+            $this->submissions_gap = intval($data['submissions_gap']);
         }
         if (isset($data['feedback'])) {
             $this->feedback = strval($data['feedback']);
         }
         if (isset($data['penalty'])) {
-            $this->penalty = (int)$data['penalty'];
+            $this->penalty = intval($data['penalty']);
         }
         if (isset($data['penalty_type'])) {
             $this->penalty_type = strval($data['penalty_type']);

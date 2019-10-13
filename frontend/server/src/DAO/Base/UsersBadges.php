@@ -28,10 +28,10 @@ abstract class UsersBadges {
     final public static function update(\OmegaUp\DAO\VO\UsersBadges $Users_Badges) : int {
         $sql = 'UPDATE `Users_Badges` SET `user_id` = ?, `badge_alias` = ?, `assignation_time` = ? WHERE `user_badge_id` = ?;';
         $params = [
-            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
+            is_null($Users_Badges->user_id) ? null : intval($Users_Badges->user_id),
             $Users_Badges->badge_alias,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Users_Badges->assignation_time),
-            (int)$Users_Badges->user_badge_id,
+            intval($Users_Badges->user_badge_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -118,7 +118,7 @@ abstract class UsersBadges {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -142,7 +142,7 @@ abstract class UsersBadges {
     final public static function create(\OmegaUp\DAO\VO\UsersBadges $Users_Badges) : int {
         $sql = 'INSERT INTO Users_Badges (`user_id`, `badge_alias`, `assignation_time`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Users_Badges->user_id) ? null : (int)$Users_Badges->user_id,
+            is_null($Users_Badges->user_id) ? null : intval($Users_Badges->user_id),
             $Users_Badges->badge_alias,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Users_Badges->assignation_time),
         ];

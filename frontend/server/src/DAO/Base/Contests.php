@@ -28,30 +28,30 @@ abstract class Contests {
     final public static function update(\OmegaUp\DAO\VO\Contests $Contests) : int {
         $sql = 'UPDATE `Contests` SET `problemset_id` = ?, `acl_id` = ?, `title` = ?, `description` = ?, `start_time` = ?, `finish_time` = ?, `last_updated` = ?, `window_length` = ?, `rerun_id` = ?, `admission_mode` = ?, `alias` = ?, `scoreboard` = ?, `points_decay_factor` = ?, `partial_score` = ?, `submissions_gap` = ?, `feedback` = ?, `penalty` = ?, `penalty_type` = ?, `penalty_calc_policy` = ?, `show_scoreboard_after` = ?, `urgent` = ?, `languages` = ?, `recommended` = ? WHERE `contest_id` = ?;';
         $params = [
-            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
-            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
+            is_null($Contests->problemset_id) ? null : intval($Contests->problemset_id),
+            is_null($Contests->acl_id) ? null : intval($Contests->acl_id),
             $Contests->title,
             $Contests->description,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contests->start_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contests->finish_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contests->last_updated),
-            is_null($Contests->window_length) ? null : (int)$Contests->window_length,
-            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
+            is_null($Contests->window_length) ? null : intval($Contests->window_length),
+            is_null($Contests->rerun_id) ? null : intval($Contests->rerun_id),
             $Contests->admission_mode,
             $Contests->alias,
-            (int)$Contests->scoreboard,
-            (float)$Contests->points_decay_factor,
-            (int)$Contests->partial_score,
-            (int)$Contests->submissions_gap,
+            intval($Contests->scoreboard),
+            floatval($Contests->points_decay_factor),
+            intval($Contests->partial_score),
+            intval($Contests->submissions_gap),
             $Contests->feedback,
-            (int)$Contests->penalty,
+            intval($Contests->penalty),
             $Contests->penalty_type,
             $Contests->penalty_calc_policy,
-            (int)$Contests->show_scoreboard_after,
-            (int)$Contests->urgent,
+            intval($Contests->show_scoreboard_after),
+            intval($Contests->urgent),
             $Contests->languages,
-            (int)$Contests->recommended,
-            (int)$Contests->contest_id,
+            intval($Contests->recommended),
+            intval($Contests->contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -138,7 +138,7 @@ abstract class Contests {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -162,29 +162,29 @@ abstract class Contests {
     final public static function create(\OmegaUp\DAO\VO\Contests $Contests) : int {
         $sql = 'INSERT INTO Contests (`problemset_id`, `acl_id`, `title`, `description`, `start_time`, `finish_time`, `last_updated`, `window_length`, `rerun_id`, `admission_mode`, `alias`, `scoreboard`, `points_decay_factor`, `partial_score`, `submissions_gap`, `feedback`, `penalty`, `penalty_type`, `penalty_calc_policy`, `show_scoreboard_after`, `urgent`, `languages`, `recommended`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Contests->problemset_id) ? null : (int)$Contests->problemset_id,
-            is_null($Contests->acl_id) ? null : (int)$Contests->acl_id,
+            is_null($Contests->problemset_id) ? null : intval($Contests->problemset_id),
+            is_null($Contests->acl_id) ? null : intval($Contests->acl_id),
             $Contests->title,
             $Contests->description,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contests->start_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contests->finish_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Contests->last_updated),
-            is_null($Contests->window_length) ? null : (int)$Contests->window_length,
-            is_null($Contests->rerun_id) ? null : (int)$Contests->rerun_id,
+            is_null($Contests->window_length) ? null : intval($Contests->window_length),
+            is_null($Contests->rerun_id) ? null : intval($Contests->rerun_id),
             $Contests->admission_mode,
             $Contests->alias,
-            (int)$Contests->scoreboard,
-            (float)$Contests->points_decay_factor,
-            (int)$Contests->partial_score,
-            (int)$Contests->submissions_gap,
+            intval($Contests->scoreboard),
+            floatval($Contests->points_decay_factor),
+            intval($Contests->partial_score),
+            intval($Contests->submissions_gap),
             $Contests->feedback,
-            (int)$Contests->penalty,
+            intval($Contests->penalty),
             $Contests->penalty_type,
             $Contests->penalty_calc_policy,
-            (int)$Contests->show_scoreboard_after,
-            (int)$Contests->urgent,
+            intval($Contests->show_scoreboard_after),
+            intval($Contests->urgent),
             $Contests->languages,
-            (int)$Contests->recommended,
+            intval($Contests->recommended),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -60,10 +60,10 @@ abstract class GroupsScoreboardsProblemsets {
     final public static function update(\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
         $sql = 'UPDATE `Groups_Scoreboards_Problemsets` SET `only_ac` = ?, `weight` = ? WHERE `group_scoreboard_id` = ? AND `problemset_id` = ?;';
         $params = [
-            (int)$Groups_Scoreboards_Problemsets->only_ac,
-            (int)$Groups_Scoreboards_Problemsets->weight,
-            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
+            intval($Groups_Scoreboards_Problemsets->only_ac),
+            intval($Groups_Scoreboards_Problemsets->weight),
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : intval($Groups_Scoreboards_Problemsets->group_scoreboard_id),
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : intval($Groups_Scoreboards_Problemsets->problemset_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -150,7 +150,7 @@ abstract class GroupsScoreboardsProblemsets {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -174,10 +174,10 @@ abstract class GroupsScoreboardsProblemsets {
     final public static function create(\OmegaUp\DAO\VO\GroupsScoreboardsProblemsets $Groups_Scoreboards_Problemsets) : int {
         $sql = 'INSERT INTO Groups_Scoreboards_Problemsets (`group_scoreboard_id`, `problemset_id`, `only_ac`, `weight`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : (int)$Groups_Scoreboards_Problemsets->group_scoreboard_id,
-            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : (int)$Groups_Scoreboards_Problemsets->problemset_id,
-            (int)$Groups_Scoreboards_Problemsets->only_ac,
-            (int)$Groups_Scoreboards_Problemsets->weight,
+            is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ? null : intval($Groups_Scoreboards_Problemsets->group_scoreboard_id),
+            is_null($Groups_Scoreboards_Problemsets->problemset_id) ? null : intval($Groups_Scoreboards_Problemsets->problemset_id),
+            intval($Groups_Scoreboards_Problemsets->only_ac),
+            intval($Groups_Scoreboards_Problemsets->weight),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

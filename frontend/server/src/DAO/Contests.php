@@ -239,7 +239,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
-            $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . (int)$pageSize;
+            $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . intval($pageSize);
         }
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
@@ -272,8 +272,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             LIMIT ?, ?;';
         $params = [
             $user_id,
-            (int)$offset,
-            (int)$pageSize,
+            intval($offset),
+            intval($pageSize),
         ];
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -324,8 +324,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$pageSize;
+        $params[] = intval($offset);
+        $params[] = intval($pageSize);
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
@@ -367,8 +367,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$pageSize;
+        $params[] = intval($offset);
+        $params[] = intval($pageSize);
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
@@ -540,8 +540,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$renglones_por_pagina;
+        $params[] = intval($offset);
+        $params[] = intval($renglones_por_pagina);
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -583,8 +583,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$renglones_por_pagina;
+        $params[] = intval($offset);
+        $params[] = intval($renglones_por_pagina);
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -622,8 +622,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params[] = $filter['query'];
             $params[] = $filter['query'];
         }
-        $params[] = (int)$offset;
-        $params[] = (int)$renglones_por_pagina;
+        $params[] = intval($offset);
+        $params[] = intval($renglones_por_pagina);
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

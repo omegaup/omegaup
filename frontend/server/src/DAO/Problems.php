@@ -322,8 +322,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $sql .= " ORDER BY `{$orderBy}` {$collation} {$order} ";
         }
         $sql .= ' LIMIT ?, ? ';
-        $args[] = (int)$offset;
-        $args[] = (int)$rowcount;
+        $args[] = intval($offset);
+        $args[] = intval($rowcount);
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll("{$select} {$sql};", $args);
         if (is_null($result)) {
             return [];
@@ -817,8 +817,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
             \OmegaUp\Controllers\Problem::VISIBILITY_DELETED,
-            (int)$offset,
-            (int)$pageSize,
+            intval($offset),
+            intval($pageSize),
         ];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -856,8 +856,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params = [
             $user_id,
             \OmegaUp\Controllers\Problem::VISIBILITY_DELETED,
-            (int)$offset,
-            (int)$pageSize,
+            intval($offset),
+            intval($pageSize),
         ];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -878,7 +878,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($order) . '` ' . ($order_type == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($page)) {
-            $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . (int)$cols_per_page;
+            $sql .= ' LIMIT ' . (($page - 1) * $cols_per_page) . ', ' . intval($cols_per_page);
         }
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [\OmegaUp\Controllers\Problem::VISIBILITY_DELETED]);
         $allData = [];
@@ -924,7 +924,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     final public static function isVisible(\OmegaUp\DAO\VO\Problems $problem) {
-        return ((int) $problem->visibility) >= 1;
+        return intval($problem->visibility) >= 1;
     }
 
     public static function deleteProblem($problem_id) {

@@ -28,7 +28,7 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
         'type' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -37,19 +37,19 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['submission_id'])) {
-            $this->submission_id = (int)$data['submission_id'];
+            $this->submission_id = intval($data['submission_id']);
         }
         if (isset($data['current_run_id'])) {
-            $this->current_run_id = (int)$data['current_run_id'];
+            $this->current_run_id = intval($data['current_run_id']);
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = (int)$data['identity_id'];
+            $this->identity_id = intval($data['identity_id']);
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval($data['problem_id']);
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval($data['problemset_id']);
         }
         if (isset($data['guid'])) {
             $this->guid = strval($data['guid']);
@@ -67,7 +67,7 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
             $this->time = \OmegaUp\Time::get();
         }
         if (isset($data['submit_delay'])) {
-            $this->submit_delay = (int)$data['submit_delay'];
+            $this->submit_delay = intval($data['submit_delay']);
         }
         if (isset($data['type'])) {
             $this->type = strval($data['type']);

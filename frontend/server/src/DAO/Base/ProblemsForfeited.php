@@ -60,8 +60,8 @@ abstract class ProblemsForfeited {
         $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
         $params = [
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
-            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
-            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
+            is_null($Problems_Forfeited->user_id) ? null : intval($Problems_Forfeited->user_id),
+            is_null($Problems_Forfeited->problem_id) ? null : intval($Problems_Forfeited->problem_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -148,7 +148,7 @@ abstract class ProblemsForfeited {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -172,8 +172,8 @@ abstract class ProblemsForfeited {
     final public static function create(\OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited) : int {
         $sql = 'INSERT INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Problems_Forfeited->user_id) ? null : (int)$Problems_Forfeited->user_id,
-            is_null($Problems_Forfeited->problem_id) ? null : (int)$Problems_Forfeited->problem_id,
+            is_null($Problems_Forfeited->user_id) ? null : intval($Problems_Forfeited->user_id),
+            is_null($Problems_Forfeited->problem_id) ? null : intval($Problems_Forfeited->problem_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

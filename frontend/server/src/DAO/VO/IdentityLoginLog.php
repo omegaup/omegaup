@@ -21,7 +21,7 @@ class IdentityLoginLog extends \OmegaUp\DAO\VO\VO {
         'time' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -30,10 +30,10 @@ class IdentityLoginLog extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = (int)$data['identity_id'];
+            $this->identity_id = intval($data['identity_id']);
         }
         if (isset($data['ip'])) {
-            $this->ip = (int)$data['ip'];
+            $this->ip = intval($data['ip']);
         }
         if (isset($data['time'])) {
             /**

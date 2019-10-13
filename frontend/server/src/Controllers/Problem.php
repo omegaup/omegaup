@@ -639,7 +639,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $runs = [];
         try {
             \OmegaUp\DAO\DAO::transBegin();
-            $runs = \OmegaUp\DAO\Runs::getByProblem((int)$r['problem']->problem_id);
+            $runs = \OmegaUp\DAO\Runs::getByProblem(intval($r['problem']->problem_id));
 
             foreach ($runs as $run) {
                 $run->status = 'new';
@@ -1441,14 +1441,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             unset($response['source']);
         }
 
-        $problemsetId = !is_null($problemset) ? (int)$problemset->problemset_id : null;
+        $problemsetId = !is_null($problemset) ? intval($problemset->problemset_id) : null;
 
         if (!is_null($r->identity)) {
             // Get all the available runs done by the current_user
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                (int)$problem->problem_id,
+                intval($problem->problem_id),
                 $problemsetId,
-                (int)$r->identity->identity_id
+                intval($r->identity->identity_id)
             );
 
             // Add each filtered run to an array
@@ -1456,8 +1456,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             foreach ($runsArray as $run) {
                 $run['alias'] = $problem->alias;
                 $run['username'] = $r->identity->username;
-                $run['time'] = (int)$run['time'];
-                $run['contest_score'] = (float)$run['contest_score'];
+                $run['time'] = intval($run['time']);
+                $run['contest_score'] = floatval($run['contest_score']);
                 array_push($response['runs'], $run);
             }
         }
@@ -1494,7 +1494,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($showSolvers) {
             $response['solvers'] = \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
-                (int)$problem->problem_id
+                intval($problem->problem_id)
             );
         }
 
@@ -1909,10 +1909,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $result = [];
 
             foreach ($runs as $run) {
-                $run['time'] = (int)$run['time'];
-                $run['score'] = round((float)$run['score'], 4);
+                $run['time'] = intval($run['time']);
+                $run['score'] = round(floatval($run['score']), 4);
                 if ($run['contest_score'] != null) {
-                    $run['contest_score'] = round((float)$run['contest_score'], 2);
+                    $run['contest_score'] = round(floatval($run['contest_score']), 2);
                 }
                 array_push($result, $run);
             }
@@ -1921,17 +1921,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } else {
             // Get all the available runs
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                (int)$r['problem']->problem_id,
+                intval($r['problem']->problem_id),
                 null,
-                (int)$r->identity->identity_id
+                intval($r->identity->identity_id)
             );
 
             // Add each filtered run to an array
             $response['runs'] = [];
             if (!empty($runsArray)) {
                 foreach ($runsArray as $run) {
-                    $run['time'] = (int)$run['time'];
-                    $run['contest_score'] = (float)$run['contest_score'];
+                    $run['time'] = intval($run['time']);
+                    $run['contest_score'] = floatval($run['contest_score']);
                     $run['username'] = $r->identity->username;
                     $run['alias'] = $r['problem']->alias;
                     array_push($response['runs'], $run);
@@ -1968,7 +1968,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         foreach ($clarifications as &$clar) {
-            $clar['time'] = (int)$clar['time'];
+            $clar['time'] = intval($clar['time']);
         }
 
         // Add response to array
@@ -2000,12 +2000,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Array of GUIDs of pending runs
         $pendingRunsGuids = \OmegaUp\DAO\Runs::getPendingRunsOfProblem(
-            (int)$r['problem']->problem_id
+            intval($r['problem']->problem_id)
         );
 
         // Count of pending runs (int)
         $totalRunsCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblem(
-            (int)$r['problem']->problem_id
+            intval($r['problem']->problem_id)
         );
 
         // List of verdicts
@@ -2013,7 +2013,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         foreach (self::$verdicts as $verdict) {
             $verdict_counts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemByVerdict(
-                (int)$r['problem']->problem_id,
+                intval($r['problem']->problem_id),
                 $verdict
             );
         }
@@ -2033,8 +2033,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Get all runs of this problem after the last id we had
         $runs = \OmegaUp\DAO\Runs::searchWithRunIdGreaterThan(
-            (int)$r['problem']->problem_id,
-            (int)$casesStats['last_submission_id']
+            intval($r['problem']->problem_id),
+            intval($casesStats['last_submission_id'])
         );
 
         // For each run we got
@@ -2201,7 +2201,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $authorIdentityId,
             $authorUserId,
             $r['tag'],
-            is_null($r['min_visibility']) ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC : (int) $r['min_visibility'],
+            is_null($r['min_visibility']) ? \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC : intval($r['min_visibility']),
             is_null($r['require_all_tags']) ? true : !!$r['require_all_tags'],
             $r['programming_languages'],
             $r['difficulty_range'],
@@ -2432,21 +2432,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function updateProblemSettings(array &$problemSettings, \OmegaUp\Request $r) : void {
         if (!is_null($r['extra_wall_time'])) {
-            $problemSettings['limits']['ExtraWallTime'] = (int)$r['extra_wall_time'] . 'ms';
+            $problemSettings['limits']['ExtraWallTime'] = intval($r['extra_wall_time']) . 'ms';
         }
         if (!is_null($r['memory_limit'])) {
-            $problemSettings['limits']['MemoryLimit'] = (int)$r['memory_limit'] . 'KiB';
+            $problemSettings['limits']['MemoryLimit'] = intval($r['memory_limit']) . 'KiB';
         }
         if (!is_null($r['output_limit'])) {
-            $problemSettings['limits']['OutputLimit'] = (int)$r['output_limit'];
+            $problemSettings['limits']['OutputLimit'] = intval($r['output_limit']);
         }
         if (!is_null($r['overall_wall_time_limit'])) {
             $problemSettings['limits']['OverallWallTimeLimit'] = (
-                (int)$r['overall_wall_time_limit'] . 'ms'
+                intval($r['overall_wall_time_limit']) . 'ms'
             );
         }
         if (!is_null($r['time_limit'])) {
-            $problemSettings['limits']['TimeLimit'] = (int)$r['time_limit'] . 'ms';
+            $problemSettings['limits']['TimeLimit'] = intval($r['time_limit']) . 'ms';
         }
         if (!is_null($r['validator'])) {
             $problemSettings['validator']['name'] = $r['validator'];
@@ -2462,7 +2462,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ];
             }
             $problemSettings['validator']['limits']['TimeLimit'] = (
-                (int)$r['validator_time_limit'] . 'ms'
+                intval($r['validator_time_limit']) . 'ms'
             );
         }
     }
@@ -2489,7 +2489,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Get problem details from API
         $details = self::getProblemDetails($r, $problem, $problemset, /*showSolvers=*/true);
 
-        $memoryLimit = (int) $details['settings']['limits']['MemoryLimit'] / 1024 / 1024;
+        $memoryLimit = intval($details['settings']['limits']['MemoryLimit']) / 1024 / 1024;
         $result = [
             'problem_alias' => $details['alias'],
             'visibility' => $details['visibility'],

@@ -64,10 +64,10 @@ abstract class ProblemsetProblems {
         $params = [
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            (float)$Problemset_Problems->points,
-            (int)$Problemset_Problems->order,
-            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
-            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
+            floatval($Problemset_Problems->points),
+            intval($Problemset_Problems->order),
+            is_null($Problemset_Problems->problemset_id) ? null : intval($Problemset_Problems->problemset_id),
+            is_null($Problemset_Problems->problem_id) ? null : intval($Problemset_Problems->problem_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -154,7 +154,7 @@ abstract class ProblemsetProblems {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -178,12 +178,12 @@ abstract class ProblemsetProblems {
     final public static function create(\OmegaUp\DAO\VO\ProblemsetProblems $Problemset_Problems) : int {
         $sql = 'INSERT INTO Problemset_Problems (`problemset_id`, `problem_id`, `commit`, `version`, `points`, `order`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Problems->problemset_id) ? null : (int)$Problemset_Problems->problemset_id,
-            is_null($Problemset_Problems->problem_id) ? null : (int)$Problemset_Problems->problem_id,
+            is_null($Problemset_Problems->problemset_id) ? null : intval($Problemset_Problems->problemset_id),
+            is_null($Problemset_Problems->problem_id) ? null : intval($Problemset_Problems->problem_id),
             $Problemset_Problems->commit,
             $Problemset_Problems->version,
-            (float)$Problemset_Problems->points,
-            (int)$Problemset_Problems->order,
+            floatval($Problemset_Problems->points),
+            intval($Problemset_Problems->order),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

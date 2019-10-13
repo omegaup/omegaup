@@ -61,9 +61,9 @@ abstract class ProblemsetProblemOpened {
         $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
         $params = [
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
-            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
-            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
-            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
+            is_null($Problemset_Problem_Opened->problemset_id) ? null : intval($Problemset_Problem_Opened->problemset_id),
+            is_null($Problemset_Problem_Opened->problem_id) ? null : intval($Problemset_Problem_Opened->problem_id),
+            is_null($Problemset_Problem_Opened->identity_id) ? null : intval($Problemset_Problem_Opened->identity_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -150,7 +150,7 @@ abstract class ProblemsetProblemOpened {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -174,9 +174,9 @@ abstract class ProblemsetProblemOpened {
     final public static function create(\OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
         $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
         $params = [
-            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
-            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
-            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
+            is_null($Problemset_Problem_Opened->problemset_id) ? null : intval($Problemset_Problem_Opened->problemset_id),
+            is_null($Problemset_Problem_Opened->problem_id) ? null : intval($Problemset_Problem_Opened->problem_id),
+            is_null($Problemset_Problem_Opened->identity_id) ? null : intval($Problemset_Problem_Opened->identity_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

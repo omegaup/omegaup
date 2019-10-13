@@ -77,13 +77,13 @@ abstract class {{ table.class_name }} {
     {%- if 'timestamp' in column.type or 'datetime' in column.type %}
             \OmegaUp\DAO\DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('?bool', '?int') %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+            is_null(${{ table.name }}->{{ column.name }}) ? null : intval(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type == '?float' %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+            is_null(${{ table.name }}->{{ column.name }}) ? null : floatval(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('bool', 'int') %}
-            (int)${{ table.name }}->{{ column.name }},
+            intval(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type == 'float' %}
-            (float)${{ table.name }}->{{ column.name }},
+            floatval(${{ table.name }}->{{ column.name }}),
     {%- else %}
             ${{ table.name }}->{{ column.name }},
     {%- endif %}
@@ -92,13 +92,13 @@ abstract class {{ table.class_name }} {
     {%- if 'timestamp' in column.type or 'datetime' in column.type %}
             \OmegaUp\DAO\DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('?bool', '?int') %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+            is_null(${{ table.name }}->{{ column.name }}) ? null : intval(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type == '?float' %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+            is_null(${{ table.name }}->{{ column.name }}) ? null : floatval(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type in ('bool', 'int') %}
-            (int)${{ table.name }}->{{ column.name }},
+            intval(${{ table.name }}->{{ column.name }}),
     {%- elif column.php_type == 'float' %}
-            (float)${{ table.name }}->{{ column.name }},
+            floatval(${{ table.name }}->{{ column.name }}),
     {%- else %}
             ${{ table.name }}->{{ column.name }},
     {%- endif %}
@@ -195,7 +195,7 @@ abstract class {{ table.class_name }} {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -229,13 +229,13 @@ abstract class {{ table.class_name }} {
   {%- if 'timestamp' in column.type or 'datetime' in column.type %}
             \OmegaUp\DAO\DAO::toMySQLTimestamp(${{ table.name }}->{{ column.name }}),
   {%- elif column.php_type in ('?bool', '?int') %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (int)${{ table.name }}->{{ column.name }},
+            is_null(${{ table.name }}->{{ column.name }}) ? null : intval(${{ table.name }}->{{ column.name }}),
   {%- elif column.php_type == '?float' %}
-            is_null(${{ table.name }}->{{ column.name }}) ? null : (float)${{ table.name }}->{{ column.name }},
+            is_null(${{ table.name }}->{{ column.name }}) ? null : floatval(${{ table.name }}->{{ column.name }}),
   {%- elif column.php_type in ('bool', 'int') %}
-            (int)${{ table.name }}->{{ column.name }},
+            intval(${{ table.name }}->{{ column.name }}),
   {%- elif column.php_type == 'float' %}
-            (float)${{ table.name }}->{{ column.name }},
+            floatval(${{ table.name }}->{{ column.name }}),
   {%- else %}
             ${{ table.name }}->{{ column.name }},
   {%- endif %}

@@ -27,7 +27,7 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
         'school_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -36,16 +36,16 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
         if (isset($data['rank'])) {
-            $this->rank = (int)$data['rank'];
+            $this->rank = intval($data['rank']);
         }
         if (isset($data['problems_solved_count'])) {
-            $this->problems_solved_count = (int)$data['problems_solved_count'];
+            $this->problems_solved_count = intval($data['problems_solved_count']);
         }
         if (isset($data['score'])) {
-            $this->score = (float)$data['score'];
+            $this->score = floatval($data['score']);
         }
         if (isset($data['username'])) {
             $this->username = strval($data['username']);
@@ -60,7 +60,7 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
             $this->state_id = strval($data['state_id']);
         }
         if (isset($data['school_id'])) {
-            $this->school_id = (int)$data['school_id'];
+            $this->school_id = intval($data['school_id']);
         }
     }
 

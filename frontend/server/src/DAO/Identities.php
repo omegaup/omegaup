@@ -118,7 +118,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    public static function getExtraInformation($email) {
+    /**
+     * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: null|int}
+     */
+    public static function getExtraInformation(string $email) : ?array {
         $sql = 'SELECT
                   UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
                   u.verified,
@@ -147,17 +150,16 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        $params = [ $email ];
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        /** @var null|array{reset_sent_at: int, verified: int, username: string, last_login: null|int} */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
         }
         return [
-          // Asks whether request was made on the last day
-          'within_last_day' => \OmegaUp\Time::get() - ((int)$rs['reset_sent_at']) < 60 * 60 * 24,
-          'verified' => $rs['verified'] == 1,
-          'username' => $rs['username'],
-          'last_login' => is_null($rs['last_login']) ? null : ((int)$rs['last_login']),
+            'within_last_day' => (\OmegaUp\Time::get() - intval($rs['reset_sent_at'])) < 60 * 60 * 24,
+            'verified' => $rs['verified'] == 1,
+            'username' => $rs['username'],
+            'last_login' => $rs['last_login'],
         ];
     }
 

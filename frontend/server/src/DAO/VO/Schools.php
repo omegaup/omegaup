@@ -22,7 +22,7 @@ class Schools extends \OmegaUp\DAO\VO\VO {
         'name' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -31,7 +31,7 @@ class Schools extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['school_id'])) {
-            $this->school_id = (int)$data['school_id'];
+            $this->school_id = intval($data['school_id']);
         }
         if (isset($data['country_id'])) {
             $this->country_id = strval($data['country_id']);

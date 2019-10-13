@@ -28,15 +28,15 @@ abstract class Clarifications {
     final public static function update(\OmegaUp\DAO\VO\Clarifications $Clarifications) : int {
         $sql = 'UPDATE `Clarifications` SET `author_id` = ?, `receiver_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `problemset_id` = ?, `public` = ? WHERE `clarification_id` = ?;';
         $params = [
-            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
-            is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
+            is_null($Clarifications->author_id) ? null : intval($Clarifications->author_id),
+            is_null($Clarifications->receiver_id) ? null : intval($Clarifications->receiver_id),
             $Clarifications->message,
             $Clarifications->answer,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Clarifications->time),
-            is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
-            (int)$Clarifications->public,
-            (int)$Clarifications->clarification_id,
+            is_null($Clarifications->problem_id) ? null : intval($Clarifications->problem_id),
+            is_null($Clarifications->problemset_id) ? null : intval($Clarifications->problemset_id),
+            intval($Clarifications->public),
+            intval($Clarifications->clarification_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -123,7 +123,7 @@ abstract class Clarifications {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -147,14 +147,14 @@ abstract class Clarifications {
     final public static function create(\OmegaUp\DAO\VO\Clarifications $Clarifications) : int {
         $sql = 'INSERT INTO Clarifications (`author_id`, `receiver_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
-            is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
+            is_null($Clarifications->author_id) ? null : intval($Clarifications->author_id),
+            is_null($Clarifications->receiver_id) ? null : intval($Clarifications->receiver_id),
             $Clarifications->message,
             $Clarifications->answer,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Clarifications->time),
-            is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
-            (int)$Clarifications->public,
+            is_null($Clarifications->problem_id) ? null : intval($Clarifications->problem_id),
+            is_null($Clarifications->problemset_id) ? null : intval($Clarifications->problemset_id),
+            intval($Clarifications->public),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

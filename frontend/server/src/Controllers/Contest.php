@@ -705,7 +705,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
                 $result['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['start_time']);
                 $result['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['finish_time']);
-                $result['show_scoreboard_after'] = (bool)$result['show_scoreboard_after'];
+                $result['show_scoreboard_after'] = boolval($result['show_scoreboard_after']);
                 $result['original_contest_alias'] = null;
                 $result['original_problemset_id'] = null;
                 if ($result['rerun_id'] != 0) {
@@ -824,8 +824,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $result = self::getCachedDetails($r['contest_alias'], $response['contest']);
 
         $result['opened'] = \OmegaUp\DAO\ProblemsetIdentities::checkProblemsetOpened(
-            (int)$r->identity->identity_id,
-            (int)$response['contest']->problemset_id
+            intval($r->identity->identity_id),
+            intval($response['contest']->problemset_id)
         );
         $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
         $result['status'] = 'ok';
@@ -1280,7 +1280,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $runCount = 0;
 
             $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-                (int)$contest->problemset_id
+                intval($contest->problemset_id)
             );
 
             if ($runCount > 0) {
@@ -1574,8 +1574,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
-            (int)$contest->problemset_id,
-            (int)$problem->problem_id
+            intval($contest->problemset_id),
+            intval($problem->problem_id)
         );
         if (is_null($problemsetProblem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
@@ -1585,7 +1585,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'status' => 'ok',
             'diff' => \OmegaUp\DAO\Runs::getRunsDiffsForVersion(
                 $problem,
-                (int)$contest->problemset_id,
+                intval($contest->problemset_id),
                 $problemsetProblem->version,
                 $r['version']
             ),
@@ -1832,7 +1832,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         foreach ($clarifications as &$clar) {
-            $clar['time'] = (int)$clar['time'];
+            $clar['time'] = intval($clar['time']);
         }
 
         // Add response to array
@@ -2486,9 +2486,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $result = [];
 
         foreach ($runs as $run) {
-            $run['time'] = (int)$run['time'];
-            $run['score'] = round((float)$run['score'], 4);
-            $run['contest_score'] = round((float)$run['contest_score'], 2);
+            $run['time'] = intval($run['time']);
+            $run['score'] = round(floatval($run['score']), 4);
+            $run['contest_score'] = round(floatval($run['contest_score']), 2);
             array_push($result, $run);
         }
 
@@ -2529,22 +2529,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
-        $pendingRunGuids = \OmegaUp\DAO\Runs::getPendingRunGuidsOfProblemset((int)$contest->problemset_id);
+        $pendingRunGuids = \OmegaUp\DAO\Runs::getPendingRunGuidsOfProblemset(intval($contest->problemset_id));
 
         // Count of pending runs (int)
         $totalRunsCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-            (int)$contest->problemset_id
+            intval($contest->problemset_id)
         );
 
         // Wait time
-        $waitTimeArray = \OmegaUp\DAO\Runs::getLargestWaitTimeOfProblemset((int)$contest->problemset_id);
+        $waitTimeArray = \OmegaUp\DAO\Runs::getLargestWaitTimeOfProblemset(intval($contest->problemset_id));
 
         // List of verdicts
         $verdictCounts = [];
 
         foreach (self::$verdicts as $verdict) {
-            $verdictCounts[$verdict] = (int)\OmegaUp\DAO\Runs::countTotalRunsOfProblemsetByVerdict(
-                (int)$contest->problemset_id,
+            $verdictCounts[$verdict] = \OmegaUp\DAO\Runs::countTotalRunsOfProblemsetByVerdict(
+                intval($contest->problemset_id),
                 $verdict
             );
         }
@@ -2562,7 +2562,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if ($sizeOfBucket > 0) {
             $scoreboardResponse = self::apiScoreboard($r);
             foreach ($scoreboardResponse['ranking'] as $results) {
-                $distribution[(int)($results['total']['points'] / $sizeOfBucket)]++;
+                $distribution[intval($results['total']['points'] / $sizeOfBucket)]++;
             }
         }
 
@@ -2638,11 +2638,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
                 foreach ($problem['run_details']['groups'] as &$group) {
                     foreach ($group['cases'] as &$case) {
-                        $case['meta']['time'] = (float)$case['meta']['time'];
+                        $case['meta']['time'] = floatval($case['meta']['time']);
                         $case['meta']['time-wall'] =
-                            (float)$case['meta']['time-wall'];
+                            floatval($case['meta']['time-wall']);
                         $case['meta']['mem'] =
-                            (float)$case['meta']['mem'] / 1024.0 / 1024.0;
+                            floatval($case['meta']['mem']) / 1024.0 / 1024.0;
                     }
                 }
             }

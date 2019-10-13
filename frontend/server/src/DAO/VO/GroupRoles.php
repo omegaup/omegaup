@@ -21,7 +21,7 @@ class GroupRoles extends \OmegaUp\DAO\VO\VO {
         'acl_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -30,13 +30,13 @@ class GroupRoles extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_id'])) {
-            $this->group_id = (int)$data['group_id'];
+            $this->group_id = intval($data['group_id']);
         }
         if (isset($data['role_id'])) {
-            $this->role_id = (int)$data['role_id'];
+            $this->role_id = intval($data['role_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
     }
 

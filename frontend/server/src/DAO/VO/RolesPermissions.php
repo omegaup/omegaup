@@ -20,7 +20,7 @@ class RolesPermissions extends \OmegaUp\DAO\VO\VO {
         'permission_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -29,10 +29,10 @@ class RolesPermissions extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['role_id'])) {
-            $this->role_id = (int)$data['role_id'];
+            $this->role_id = intval($data['role_id']);
         }
         if (isset($data['permission_id'])) {
-            $this->permission_id = (int)$data['permission_id'];
+            $this->permission_id = intval($data['permission_id']);
         }
     }
 

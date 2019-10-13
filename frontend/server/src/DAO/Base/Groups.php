@@ -28,12 +28,12 @@ abstract class Groups {
     final public static function update(\OmegaUp\DAO\VO\Groups $Groups) : int {
         $sql = 'UPDATE `Groups` SET `acl_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_id` = ?;';
         $params = [
-            is_null($Groups->acl_id) ? null : (int)$Groups->acl_id,
+            is_null($Groups->acl_id) ? null : intval($Groups->acl_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups->create_time),
             $Groups->alias,
             $Groups->name,
             $Groups->description,
-            (int)$Groups->group_id,
+            intval($Groups->group_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -120,7 +120,7 @@ abstract class Groups {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -144,7 +144,7 @@ abstract class Groups {
     final public static function create(\OmegaUp\DAO\VO\Groups $Groups) : int {
         $sql = 'INSERT INTO Groups (`acl_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Groups->acl_id) ? null : (int)$Groups->acl_id,
+            is_null($Groups->acl_id) ? null : intval($Groups->acl_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups->create_time),
             $Groups->alias,
             $Groups->name,

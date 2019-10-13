@@ -28,10 +28,10 @@ abstract class PrivacyStatementConsentLog {
     final public static function update(\OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         $sql = 'UPDATE `PrivacyStatement_Consent_Log` SET `identity_id` = ?, `privacystatement_id` = ?, `timestamp` = ? WHERE `privacystatement_consent_id` = ?;';
         $params = [
-            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
-            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
+            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : intval($PrivacyStatement_Consent_Log->identity_id),
+            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : intval($PrivacyStatement_Consent_Log->privacystatement_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
-            (int)$PrivacyStatement_Consent_Log->privacystatement_consent_id,
+            intval($PrivacyStatement_Consent_Log->privacystatement_consent_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -118,7 +118,7 @@ abstract class PrivacyStatementConsentLog {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -142,8 +142,8 @@ abstract class PrivacyStatementConsentLog {
     final public static function create(\OmegaUp\DAO\VO\PrivacyStatementConsentLog $PrivacyStatement_Consent_Log) : int {
         $sql = 'INSERT INTO PrivacyStatement_Consent_Log (`identity_id`, `privacystatement_id`, `timestamp`) VALUES (?, ?, ?);';
         $params = [
-            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : (int)$PrivacyStatement_Consent_Log->identity_id,
-            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : (int)$PrivacyStatement_Consent_Log->privacystatement_id,
+            is_null($PrivacyStatement_Consent_Log->identity_id) ? null : intval($PrivacyStatement_Consent_Log->identity_id),
+            is_null($PrivacyStatement_Consent_Log->privacystatement_id) ? null : intval($PrivacyStatement_Consent_Log->privacystatement_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($PrivacyStatement_Consent_Log->timestamp),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

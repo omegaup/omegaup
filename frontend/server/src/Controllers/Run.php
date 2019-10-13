@@ -111,8 +111,8 @@ class Run extends \OmegaUp\Controllers\Controller {
                 if (!\OmegaUp\DAO\Runs::isRunInsideSubmissionGap(
                     null,
                     null,
-                    (int)$r['problem']->problem_id,
-                    (int)$r->identity->identity_id
+                    intval($r['problem']->problem_id),
+                    intval($r->identity->identity_id)
                 )
                         && !\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
                         throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runWaitGap');
@@ -183,10 +183,10 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             // Validate if the user is allowed to submit given the submissions_gap
             if (!\OmegaUp\DAO\Runs::isRunInsideSubmissionGap(
-                (int)$problemset_id,
+                intval($problemset_id),
                 $r['contest'],
-                (int)$r['problem']->problem_id,
-                (int)$r->identity->identity_id
+                intval($r['problem']->problem_id),
+                intval($r->identity->identity_id)
             )) {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('runWaitGap');
             }
@@ -223,7 +223,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         } else {
             //check the kind of penalty_type for this contest
             $start = null;
-            $problemsetId = (int)$r['problemset']->problemset_id;
+            $problemsetId = intval($r['problemset']->problemset_id);
             if (isset($r['contest'])) {
                 $penalty_type = $r['contest']->penalty_type;
 
@@ -267,7 +267,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             if (!is_null($start)) {
                 //asuming submit_delay is in minutes
-                $submitDelay = (int) ((\OmegaUp\Time::get() - $start) / 60);
+                $submitDelay = intval((\OmegaUp\Time::get() - $start) / 60);
             } else {
                 $submitDelay = 0;
             }
@@ -433,13 +433,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             ])
         );
         $filtered['time'] = $filtered['time'];
-        $filtered['score'] = round((float) $filtered['score'], 4);
-        $filtered['runtime'] = (int)$filtered['runtime'];
-        $filtered['penalty'] = (int)$filtered['penalty'];
-        $filtered['memory'] = (int)$filtered['memory'];
-        $filtered['submit_delay'] = (int)$filtered['submit_delay'];
+        $filtered['score'] = round(floatval($filtered['score']), 4);
+        $filtered['runtime'] = intval($filtered['runtime']);
+        $filtered['penalty'] = intval($filtered['penalty']);
+        $filtered['memory'] = intval($filtered['memory']);
+        $filtered['submit_delay'] = intval($filtered['submit_delay']);
         if ($filtered['contest_score'] != null) {
-            $filtered['contest_score'] = round((float) $filtered['contest_score'], 2);
+            $filtered['contest_score'] = round(floatval($filtered['contest_score']), 2);
         }
         if ($r['submission']->identity_id == $r->identity->identity_id) {
             $filtered['username'] = $r->identity->username;
@@ -578,7 +578,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'language' => $r['submission']->language,
         ];
         $showDetails = $response['admin'] ||
-            \OmegaUp\DAO\Problems::isProblemSolved($r['problem'], (int)$r->identity->identity_id);
+            \OmegaUp\DAO\Problems::isProblemSolved($r['problem'], intval($r->identity->identity_id));
 
         // Get the details, compile error, logs, etc.
         self::populateRunDetails($r['submission'], $r['run'], $showDetails, $response);
@@ -902,10 +902,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = [];
 
         foreach ($runs as $run) {
-            $run['time'] = (int)$run['time'];
-            $run['score'] = round((float)$run['score'], 4);
+            $run['time'] = intval($run['time']);
+            $run['score'] = round(floatval($run['score']), 4);
             if ($run['contest_score'] != null) {
-                $run['contest_score'] = round((float)$run['contest_score'], 2);
+                $run['contest_score'] = round(floatval($run['contest_score']), 2);
             }
             array_push($result, $run);
         }

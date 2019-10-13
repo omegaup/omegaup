@@ -28,10 +28,10 @@ abstract class Announcement {
     final public static function update(\OmegaUp\DAO\VO\Announcement $Announcement) : int {
         $sql = 'UPDATE `Announcement` SET `user_id` = ?, `time` = ?, `description` = ? WHERE `announcement_id` = ?;';
         $params = [
-            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
+            is_null($Announcement->user_id) ? null : intval($Announcement->user_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
-            (int)$Announcement->announcement_id,
+            intval($Announcement->announcement_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -118,7 +118,7 @@ abstract class Announcement {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -142,7 +142,7 @@ abstract class Announcement {
     final public static function create(\OmegaUp\DAO\VO\Announcement $Announcement) : int {
         $sql = 'INSERT INTO Announcement (`user_id`, `time`, `description`) VALUES (?, ?, ?);';
         $params = [
-            is_null($Announcement->user_id) ? null : (int)$Announcement->user_id,
+            is_null($Announcement->user_id) ? null : intval($Announcement->user_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Announcement->time),
             $Announcement->description,
         ];

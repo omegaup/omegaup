@@ -236,8 +236,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $identity_id,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identity_id,
-            (int)$offset,
-            (int)$pageSize,
+            intval($offset),
+            intval($pageSize),
         ];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -273,8 +273,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ?, ?';
         $params = [
             $user_id,
-            (int)$offset,
-            (int)$pageSize,
+            intval($offset),
+            intval($pageSize),
         ];
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);

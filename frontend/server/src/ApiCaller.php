@@ -98,7 +98,7 @@ class ApiCaller {
      *
      * @return bool whether the array is associative.
      */
-    static function isAssociativeArray(array $array) : bool {
+    private static function isAssociativeArray(array $array) : bool {
         $i = 0;
         /** @var mixed $_ */
         foreach ($array as $key => $_) {

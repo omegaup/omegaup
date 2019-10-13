@@ -50,7 +50,7 @@ abstract class UsersExperiments {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -74,7 +74,7 @@ abstract class UsersExperiments {
     final public static function create(\OmegaUp\DAO\VO\UsersExperiments $Users_Experiments) : int {
         $sql = 'INSERT INTO Users_Experiments (`user_id`, `experiment`) VALUES (?, ?);';
         $params = [
-            is_null($Users_Experiments->user_id) ? null : (int)$Users_Experiments->user_id,
+            is_null($Users_Experiments->user_id) ? null : intval($Users_Experiments->user_id),
             $Users_Experiments->experiment,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
