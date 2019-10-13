@@ -14,7 +14,13 @@ class IdentityUpdateTest extends OmegaupTestCase {
         // Identity creator group member will create an identity
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
@@ -52,7 +58,9 @@ class IdentityUpdateTest extends OmegaupTestCase {
             'original_username' => $identity->username,
         ]));
 
-        $newIdentity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
+        $newIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $username
+        );
 
         $this->assertNotEquals($newIdentity->name, $identity->name);
         $this->assertNotEquals($newIdentity->country_id, $identity->country_id);
@@ -68,7 +76,13 @@ class IdentityUpdateTest extends OmegaupTestCase {
         // Identity creator group member will create an identity
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
@@ -112,7 +126,13 @@ class IdentityUpdateTest extends OmegaupTestCase {
         // Identity creator group member will create an identity
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
@@ -161,7 +181,13 @@ class IdentityUpdateTest extends OmegaupTestCase {
         // Identity creator group member will create an identity
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         $creator2 = UserFactory::createGroupIdentityCreator();
         $creatorLogin2 = self::login($creator2);
@@ -195,7 +221,9 @@ class IdentityUpdateTest extends OmegaupTestCase {
                 'password' => $newPassword,
                 'group_alias' => $group['group']->alias,
             ]));
-            $this->fail('Creators are not authorized to change passwords from other groups they do not belong');
+            $this->fail(
+                'Creators are not authorized to change passwords from other groups they do not belong'
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
@@ -208,7 +236,13 @@ class IdentityUpdateTest extends OmegaupTestCase {
         // Identity creator group member will create an identity
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";

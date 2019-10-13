@@ -32,21 +32,33 @@ class CurlSession {
      * @param null|array<string, string> $postFields
      * @return array<string, string>
      */
-    public function get(?array $postFields = null) : array {
+    public function get(?array $postFields = null): array {
         if (!is_null($postFields)) {
-            curl_setopt($this->_curl, CURLOPT_POSTFIELDS, http_build_query($postFields));
+            curl_setopt(
+                $this->_curl,
+                CURLOPT_POSTFIELDS,
+                http_build_query(
+                    $postFields
+                )
+            );
         }
         /** @var false|string */
         $response = curl_exec($this->_curl);
         if ($response === false) {
-            $message = 'curl_exec failed: ' . curl_error($this->_curl) . ' ' . curl_errno($this->_curl);
+            $message = 'curl_exec failed: ' . curl_error(
+                $this->_curl
+            ) . ' ' . curl_errno(
+                $this->_curl
+            );
             throw new \Exception($message);
         }
 
         /** @var null|array<string, string> */
         $jsonResponse = json_decode($response, true);
         if (is_null($jsonResponse)) {
-            throw new \Exception('json_decode failed with: ' . json_last_error() . " for :{$response}");
+            throw new \Exception(
+                'json_decode failed with: ' . json_last_error() . " for :{$response}"
+            );
         }
 
         return $jsonResponse;

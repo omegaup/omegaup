@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -44,17 +44,37 @@ abstract class UsersExperiments {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Users_Experiments`.`user_id`, `Users_Experiments`.`experiment` from Users_Experiments';
+    ): array {
+        $sql = '
+            SELECT
+                `Users_Experiments`.`user_id`,
+                `Users_Experiments`.`experiment`
+            FROM
+                `Users_Experiments`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\UsersExperiments($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\UsersExperiments(
+                $row
+            );
         }
         return $allData;
     }
@@ -67,14 +87,30 @@ abstract class UsersExperiments {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\UsersExperiments $Users_Experiments El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UsersExperiments} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\UsersExperiments}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\UsersExperiments $Users_Experiments) : int {
-        $sql = 'INSERT INTO Users_Experiments (`user_id`, `experiment`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\UsersExperiments $Users_Experiments
+    ): int {
+        $sql = '
+            INSERT INTO
+                Users_Experiments (
+                    `user_id`,
+                    `experiment`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Users_Experiments->user_id) ? null : intval($Users_Experiments->user_id),
+            (
+                is_null($Users_Experiments->user_id) ?
+                null :
+                intval($Users_Experiments->user_id)
+            ),
             $Users_Experiments->experiment,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

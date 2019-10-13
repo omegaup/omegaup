@@ -20,11 +20,21 @@ class RunsTotalsTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Create a run. Submission gap must be 60 seconds
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runDataOld = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runDataOld = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
 
-        $submission = \OmegaUp\DAO\Submissions::getByGuid($runDataOld['response']['guid']);
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runDataOld['response']['guid']
+        );
         $submission->time = date('Y-m-d H:i:s', strtotime('-72 hours'));
         \OmegaUp\DAO\Submissions::update($submission);
         $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);

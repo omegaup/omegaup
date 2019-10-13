@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,10 +25,34 @@ abstract class Runs {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Runs $Runs) : int {
-        $sql = 'UPDATE `Runs` SET `submission_id` = ?, `version` = ?, `status` = ?, `verdict` = ?, `runtime` = ?, `penalty` = ?, `memory` = ?, `score` = ?, `contest_score` = ?, `time` = ?, `judged_by` = ? WHERE `run_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Runs $Runs
+    ): int {
+        $sql = '
+            UPDATE
+                `Runs`
+            SET
+                `submission_id` = ?,
+                `version` = ?,
+                `status` = ?,
+                `verdict` = ?,
+                `runtime` = ?,
+                `penalty` = ?,
+                `memory` = ?,
+                `score` = ?,
+                `contest_score` = ?,
+                `time` = ?,
+                `judged_by` = ?
+            WHERE
+                (
+                    `run_id` = ?
+                );';
         $params = [
-            is_null($Runs->submission_id) ? null : intval($Runs->submission_id),
+            (
+                is_null($Runs->submission_id) ?
+                null :
+                intval($Runs->submission_id)
+            ),
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
@@ -36,8 +60,14 @@ abstract class Runs {
             intval($Runs->penalty),
             intval($Runs->memory),
             floatval($Runs->score),
-            is_null($Runs->contest_score) ? null : floatval($Runs->contest_score),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Runs->time),
+            (
+                is_null($Runs->contest_score) ?
+                null :
+                floatval($Runs->contest_score)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Runs->time
+            ),
             $Runs->judged_by,
             intval($Runs->run_id),
         ];
@@ -48,15 +78,37 @@ abstract class Runs {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Runs} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Runs}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Runs}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Runs Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Runs} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $run_id) : ?\OmegaUp\DAO\VO\Runs {
-        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` FROM Runs WHERE (run_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $run_id
+    ): ?\OmegaUp\DAO\VO\Runs {
+        $sql = '
+            SELECT
+                `Runs`.`run_id`,
+                `Runs`.`submission_id`,
+                `Runs`.`version`,
+                `Runs`.`status`,
+                `Runs`.`verdict`,
+                `Runs`.`runtime`,
+                `Runs`.`penalty`,
+                `Runs`.`memory`,
+                `Runs`.`score`,
+                `Runs`.`contest_score`,
+                `Runs`.`time`,
+                `Runs`.`judged_by`
+            FROM
+                `Runs`
+            WHERE
+                (
+                    `run_id` = ?
+                )
+            LIMIT 1;';
         $params = [$run_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -84,9 +136,19 @@ abstract class Runs {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Runs $Runs) : void {
-        $sql = 'DELETE FROM `Runs` WHERE run_id = ?;';
-        $params = [$Runs->run_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Runs $Runs
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Runs`
+            WHERE
+                (
+                    `run_id` = ?
+                );';
+        $params = [
+            $Runs->run_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -120,17 +182,47 @@ abstract class Runs {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Runs`.`run_id`, `Runs`.`submission_id`, `Runs`.`version`, `Runs`.`status`, `Runs`.`verdict`, `Runs`.`runtime`, `Runs`.`penalty`, `Runs`.`memory`, `Runs`.`score`, `Runs`.`contest_score`, `Runs`.`time`, `Runs`.`judged_by` from Runs';
+    ): array {
+        $sql = '
+            SELECT
+                `Runs`.`run_id`,
+                `Runs`.`submission_id`,
+                `Runs`.`version`,
+                `Runs`.`status`,
+                `Runs`.`verdict`,
+                `Runs`.`runtime`,
+                `Runs`.`penalty`,
+                `Runs`.`memory`,
+                `Runs`.`score`,
+                `Runs`.`contest_score`,
+                `Runs`.`time`,
+                `Runs`.`judged_by`
+            FROM
+                `Runs`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Runs($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Runs(
+                $row
+            );
         }
         return $allData;
     }
@@ -143,14 +235,48 @@ abstract class Runs {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Runs $Runs El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Runs} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Runs}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Runs $Runs) : int {
-        $sql = 'INSERT INTO Runs (`submission_id`, `version`, `status`, `verdict`, `runtime`, `penalty`, `memory`, `score`, `contest_score`, `time`, `judged_by`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Runs $Runs
+    ): int {
+        $sql = '
+            INSERT INTO
+                Runs (
+                    `submission_id`,
+                    `version`,
+                    `status`,
+                    `verdict`,
+                    `runtime`,
+                    `penalty`,
+                    `memory`,
+                    `score`,
+                    `contest_score`,
+                    `time`,
+                    `judged_by`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Runs->submission_id) ? null : intval($Runs->submission_id),
+            (
+                is_null($Runs->submission_id) ?
+                null :
+                intval($Runs->submission_id)
+            ),
             $Runs->version,
             $Runs->status,
             $Runs->verdict,
@@ -158,8 +284,14 @@ abstract class Runs {
             intval($Runs->penalty),
             intval($Runs->memory),
             floatval($Runs->score),
-            is_null($Runs->contest_score) ? null : floatval($Runs->contest_score),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Runs->time),
+            (
+                is_null($Runs->contest_score) ?
+                null :
+                floatval($Runs->contest_score)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Runs->time
+            ),
             $Runs->judged_by,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -167,7 +299,9 @@ abstract class Runs {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Runs->run_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Runs->run_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

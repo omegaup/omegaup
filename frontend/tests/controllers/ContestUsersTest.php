@@ -39,7 +39,7 @@ class ContestUsersTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Contest::apiUsers($r);
 
         // Check that we have n+1 users
-        $this->assertEquals($n+1, count($response['users']));
+        $this->assertEquals($n + 1, count($response['users']));
     }
 
     public function testContestActivityReport() {
@@ -64,7 +64,10 @@ class ContestUsersTest extends OmegaupTestCase {
 
         // Check that we have entries in the log.
         $this->assertEquals(1, count($response['events']));
-        $this->assertEquals($user->username, $response['events'][0]['username']);
+        $this->assertEquals(
+            $user->username,
+            $response['events'][0]['username']
+        );
         $this->assertEquals(0, $response['events'][0]['ip']);
         $this->assertEquals('open', $response['events'][0]['event']['name']);
     }
@@ -217,7 +220,7 @@ class ContestUsersTest extends OmegaupTestCase {
 
     private static function numberOfUsersSharingBasicInformation(
         array $contestants
-    ) : int {
+    ): int {
         $numberOfContestants = 0;
         foreach ($contestants as $contestant) {
             if ($contestant['email']) {

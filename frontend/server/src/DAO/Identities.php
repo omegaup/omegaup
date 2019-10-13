@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class Identities extends \OmegaUp\DAO\Base\Identities {
-    public static function findByEmail(string $email) : ?\OmegaUp\DAO\VO\Identities {
+    public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                   i.*
                 FROM
@@ -36,7 +36,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function findByUsername(string $username) : ?\OmegaUp\DAO\VO\Identities {
+    public static function findByUsername(string $username): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                    i.*
                 FROM
@@ -53,7 +53,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function findByUsernameOrName(string $usernameOrName) : array {
+    public static function findByUsernameOrName(string $usernameOrName): array {
         $sql = "
             SELECT
                 i.*
@@ -80,7 +80,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return $result;
     }
 
-    public static function findByUserId(int $userId) : ?\OmegaUp\DAO\VO\Identities {
+    public static function findByUserId(int $userId): ?\OmegaUp\DAO\VO\Identities {
         $sql = 'SELECT
                   i.*
                 FROM
@@ -100,7 +100,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    public static function savePassword(\OmegaUp\DAO\VO\Identities $identities) : int {
+    public static function savePassword(\OmegaUp\DAO\VO\Identities $identities): int {
         $sql = '
             UPDATE
                 `Identities`
@@ -121,7 +121,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     /**
      * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: null|int}
      */
-    public static function getExtraInformation(string $email) : ?array {
+    public static function getExtraInformation(string $email): ?array {
         $sql = 'SELECT
                   UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
                   u.verified,
@@ -156,7 +156,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             return null;
         }
         return [
-            'within_last_day' => (\OmegaUp\Time::get() - intval($rs['reset_sent_at'])) < 60 * 60 * 24,
+            'within_last_day' => (\OmegaUp\Time::get() - intval(
+                $rs['reset_sent_at']
+            )) < 60 * 60 * 24,
             'verified' => $rs['verified'] == 1,
             'username' => $rs['username'],
             'last_login' => $rs['last_login'],
@@ -222,7 +224,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return $rs;
     }
 
-    public static function isUserAssociatedWithIdentityOfGroup(int $userId, int $identityId) {
+    public static function isUserAssociatedWithIdentityOfGroup(
+        int $userId,
+        int $identityId
+    ) {
         $sql = '
             SELECT
                 COUNT(*) = 1 AS associated
@@ -250,7 +255,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
 
     public static function getUnassociatedIdentity(
         string $username
-    ) : ?\OmegaUp\DAO\VO\Identities {
+    ): ?\OmegaUp\DAO\VO\Identities {
         $sql = '
             SELECT
                 i.*
@@ -305,7 +310,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             WHERE
                 identity_id = ?
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$userId, $identity_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$userId, $identity_id]
+        );
 
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
@@ -313,7 +321,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     /**
      * @return array{gender: string, users: int}[]
      */
-    public static function countActiveUsersByGender(int $startTimestamp, int $endTimestamp) : array {
+    public static function countActiveUsersByGender(
+        int $startTimestamp,
+        int $endTimestamp
+    ): array {
         $sql = '
             SELECT
                 "total" AS gender,
@@ -336,6 +347,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 gender;
 ';
         /** @var array{gender: string, users: int}[] */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$startTimestamp, $endTimestamp, $startTimestamp, $endTimestamp]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$startTimestamp, $endTimestamp, $startTimestamp, $endTimestamp]
+        );
     }
 }

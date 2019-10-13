@@ -44,8 +44,15 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runDataOutsideContest = RunsFactory::createRunToProblem($problemData, $contestant);
-        $runDataInsideContest = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runDataOutsideContest = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestant
+        );
+        $runDataInsideContest = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
         RunsFactory::gradeRun($runDataOutsideContest);
         RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
 

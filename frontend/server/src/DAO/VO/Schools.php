@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -28,19 +28,29 @@ class Schools extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['school_id'])) {
-            $this->school_id = intval($data['school_id']);
+            $this->school_id = intval(
+                $data['school_id']
+            );
         }
         if (isset($data['country_id'])) {
-            $this->country_id = strval($data['country_id']);
+            $this->country_id = strval(
+                $data['country_id']
+            );
         }
         if (isset($data['state_id'])) {
-            $this->state_id = strval($data['state_id']);
+            $this->state_id = strval(
+                $data['state_id']
+            );
         }
         if (isset($data['name'])) {
-            $this->name = strval($data['name']);
+            $this->name = strval(
+                $data['name']
+            );
         }
     }
 
