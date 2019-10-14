@@ -3212,12 +3212,6 @@
     <MissingDependency occurrences="1">
       <code>OmegaUpTestCase</code>
     </MissingDependency>
-    <MissingParamType occurrences="1">
-      <code>$auth_token</code>
-    </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$auth_token</code>
-    </MissingPropertyType>
     <UndefinedClass occurrences="1">
       <code>\PHPUnit\Framework\TestCase</code>
     </UndefinedClass>
@@ -3588,9 +3582,6 @@
       <code>$problemData</code>
       <code>$user</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$login-&gt;auth_token</code>
-    </MissingPropertyType>
     <MissingReturnType occurrences="10">
       <code>createCourse</code>
       <code>createCourseWithOneAssignment</code>
@@ -3668,9 +3659,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
-    <MissingPropertyType occurrences="1">
-      <code>$adminLogin-&gt;auth_token</code>
-    </MissingPropertyType>
     <MixedArgument occurrences="2">
       <code>$unassociatedIdentity['username']</code>
       <code>$associatedIdentity['username']</code>
@@ -3760,37 +3748,16 @@
     </PossiblyInvalidArgument>
   </file>
   <file src="frontend/tests/factories/QualityNominationFactory.php">
-    <MissingParamType occurrences="9">
-      <code>$login</code>
-      <code>$problemAlias</code>
-      <code>$difficulty</code>
-      <code>$quality</code>
-      <code>$tags</code>
-      <code>$login</code>
-      <code>$problemAlias</code>
-      <code>$type</code>
-      <code>$contents</code>
-    </MissingParamType>
     <MissingPropertyType occurrences="1">
       <code>$reviewers</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="4">
+    <MissingReturnType occurrences="2">
       <code>initQualityReviewers</code>
       <code>initTags</code>
-      <code>createSuggestion</code>
-      <code>createQualityNomination</code>
     </MissingReturnType>
     <MixedArgument occurrences="1">
       <code>$reviewer-&gt;main_identity_id</code>
     </MixedArgument>
-    <MixedAssignment occurrences="3">
-      <code>$contents['difficulty']</code>
-      <code>$contents['quality']</code>
-      <code>$contents['tags']</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="1">
-      <code>$login-&gt;auth_token</code>
-    </MixedPropertyFetch>
     <PossiblyNullPropertyFetch occurrences="2">
       <code>$qualityReviewerGroup-&gt;group_id</code>
       <code>$identity-&gt;identity_id</code>

@@ -50,12 +50,17 @@ class QualityNominationFactory {
         );
     }
 
+    /**
+     * @param null|string[] $tags
+     * @return array{status: string, qualitynomination_id: int}
+     */
     public static function createSuggestion(
-        $login,
-        $problemAlias,
-        $difficulty,
-        $quality,
-        $tags
+        ScopedLoginToken $login,
+        string $problemAlias,
+        ?float $difficulty,
+        ?float $quality,
+        ?array $tags,
+        ?bool $beforeAC = false
     ) {
         $contents = [];
         if (!is_null($difficulty)) {
@@ -67,27 +72,35 @@ class QualityNominationFactory {
         if (!is_null($tags)) {
             $contents['tags'] = $tags;
         }
-        $contentsJson = json_encode($contents);
+        if ($beforeAC) {
+            $contents['before_ac'] = true;
+        }
         return self::createQualityNomination(
             $login,
             $problemAlias,
             'suggestion',
-            $contentsJson
+            $contents
         );
     }
 
+    /**
+     * @param array{difficulty?: float, quality?: float, tags?: string[], before_AC?: boolean} $contents
+     * @return array{status: string, qualitynomination_id: int}
+     */
     public static function createQualityNomination(
-        $login,
-        $problemAlias,
-        $type,
+        ScopedLoginToken $login,
+        string $problemAlias,
+        string $type,
         $contents
     ) {
+        $contentsJson = json_encode($contents);
         $request = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemAlias,
             'nomination' => $type,
-            'contents' => $contents,
+            'contents' => $contentsJson,
         ]);
+        /** @var array{status: string, qualitynomination_id: int} */
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(
             $request
         );

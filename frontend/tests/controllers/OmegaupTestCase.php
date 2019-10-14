@@ -420,9 +420,15 @@ class OmegaupTestCase extends \PHPUnit\Framework\TestCase {
  * Simple RAII class that logs out as soon as it goes out of scope.
  */
 class ScopedLoginToken {
+    /**
+     * @var string|null
+     */
     public $auth_token = null;
 
-    public function __construct($auth_token) {
+    /**
+     * @param string|null $auth_token
+     */
+    public function __construct(?string $auth_token) {
         \OmegaUp\Authorization::clearCacheForTesting();
         $this->auth_token = $auth_token;
     }
