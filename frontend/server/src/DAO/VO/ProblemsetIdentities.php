@@ -27,7 +27,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
         'is_invited' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -36,10 +36,10 @@ class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = (int)$data['identity_id'];
+            $this->identity_id = intval($data['identity_id']);
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval($data['problemset_id']);
         }
         if (isset($data['access_time'])) {
             /**
@@ -56,16 +56,16 @@ class ProblemsetIdentities extends \OmegaUp\DAO\VO\VO {
             $this->end_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['end_time']);
         }
         if (isset($data['score'])) {
-            $this->score = (int)$data['score'];
+            $this->score = intval($data['score']);
         }
         if (isset($data['time'])) {
-            $this->time = (int)$data['time'];
+            $this->time = intval($data['time']);
         }
         if (isset($data['share_user_information'])) {
             $this->share_user_information = boolval($data['share_user_information']);
         }
         if (isset($data['privacystatement_consent_id'])) {
-            $this->privacystatement_consent_id = (int)$data['privacystatement_consent_id'];
+            $this->privacystatement_consent_id = intval($data['privacystatement_consent_id']);
         }
         if (isset($data['is_invited'])) {
             $this->is_invited = boolval($data['is_invited']);

@@ -25,7 +25,7 @@ class Interviews extends \OmegaUp\DAO\VO\VO {
         'window_length' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -34,13 +34,13 @@ class Interviews extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['interview_id'])) {
-            $this->interview_id = (int)$data['interview_id'];
+            $this->interview_id = intval($data['interview_id']);
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval($data['problemset_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['alias'])) {
             $this->alias = strval($data['alias']);
@@ -52,7 +52,7 @@ class Interviews extends \OmegaUp\DAO\VO\VO {
             $this->description = strval($data['description']);
         }
         if (isset($data['window_length'])) {
-            $this->window_length = (int)$data['window_length'];
+            $this->window_length = intval($data['window_length']);
         }
     }
 

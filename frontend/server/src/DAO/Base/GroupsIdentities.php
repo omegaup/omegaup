@@ -61,11 +61,11 @@ abstract class GroupsIdentities {
     final public static function update(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
         $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ?, `privacystatement_consent_id` = ?, `accept_teacher` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
         $params = [
-            is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
-            is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
-            is_null($Groups_Identities->accept_teacher) ? null : (int)$Groups_Identities->accept_teacher,
-            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
-            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
+            is_null($Groups_Identities->share_user_information) ? null : intval($Groups_Identities->share_user_information),
+            is_null($Groups_Identities->privacystatement_consent_id) ? null : intval($Groups_Identities->privacystatement_consent_id),
+            is_null($Groups_Identities->accept_teacher) ? null : intval($Groups_Identities->accept_teacher),
+            is_null($Groups_Identities->group_id) ? null : intval($Groups_Identities->group_id),
+            is_null($Groups_Identities->identity_id) ? null : intval($Groups_Identities->identity_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -152,7 +152,7 @@ abstract class GroupsIdentities {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -176,11 +176,11 @@ abstract class GroupsIdentities {
     final public static function create(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
         $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Groups_Identities->group_id) ? null : (int)$Groups_Identities->group_id,
-            is_null($Groups_Identities->identity_id) ? null : (int)$Groups_Identities->identity_id,
-            is_null($Groups_Identities->share_user_information) ? null : (int)$Groups_Identities->share_user_information,
-            is_null($Groups_Identities->privacystatement_consent_id) ? null : (int)$Groups_Identities->privacystatement_consent_id,
-            is_null($Groups_Identities->accept_teacher) ? null : (int)$Groups_Identities->accept_teacher,
+            is_null($Groups_Identities->group_id) ? null : intval($Groups_Identities->group_id),
+            is_null($Groups_Identities->identity_id) ? null : intval($Groups_Identities->identity_id),
+            is_null($Groups_Identities->share_user_information) ? null : intval($Groups_Identities->share_user_information),
+            is_null($Groups_Identities->privacystatement_consent_id) ? null : intval($Groups_Identities->privacystatement_consent_id),
+            is_null($Groups_Identities->accept_teacher) ? null : intval($Groups_Identities->accept_teacher),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

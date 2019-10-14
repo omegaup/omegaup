@@ -160,8 +160,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql .= 'ORDER BY s.submission_id DESC ';
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $val[] = (int) $offset;
-            $val[] = (int) $rowcount;
+            $val[] = intval($offset);
+            $val[] = intval($rowcount);
         }
 
         /** @var array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: null|float, judged_by: null|string, time: int, submit_delay: int, type: null|string, username: string, alias: string, country_id: null|string, contest_alias: null|string}[] */
@@ -594,7 +594,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             // Get submissions gap
             $submissionGap = max(
                 $submissionGap,
-                (int)$contest->submissions_gap
+                intval($contest->submissions_gap)
             );
         }
 
@@ -604,16 +604,18 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Returns the time of the next submission to the current problem
      */
-    final public static function nextSubmissionTimestamp($contest) {
+    final public static function nextSubmissionTimestamp(
+        ?\OmegaUp\DAO\VO\Contests $contest
+    ) : int {
         $submission_gap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
             $submission_gap = max(
                 $submission_gap,
-                (int)$contest->submissions_gap
+                intval($contest->submissions_gap)
             );
         }
-        return (\OmegaUp\Time::get() + $submission_gap);
+        return intval(\OmegaUp\Time::get() + $submission_gap);
     }
 
     final public static function searchWithRunIdGreaterThan(

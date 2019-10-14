@@ -8,7 +8,7 @@ function prefered_language(array $available_languages, $http_accept_language) {
     preg_match_all('~([\w-]+)(?:[^,\d]+([\d.]+))?~', strtolower($http_accept_language), $matches, PREG_SET_ORDER);
     foreach ($matches as $match) {
         list($a, $b) = explode('-', $match[1]) + ['', ''];
-        $value = isset($match[2]) ? (float) $match[2] : 1.0;
+        $value = isset($match[2]) ? floatval($match[2]) : 1.0;
 
         if (isset($available_languages[$match[1]])) {
             $langs[$match[1]] = $value;

@@ -20,7 +20,7 @@ class QualityNominationReviewers extends \OmegaUp\DAO\VO\VO {
         'user_id' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -29,10 +29,10 @@ class QualityNominationReviewers extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['qualitynomination_id'])) {
-            $this->qualitynomination_id = (int)$data['qualitynomination_id'];
+            $this->qualitynomination_id = intval($data['qualitynomination_id']);
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval($data['user_id']);
         }
     }
 

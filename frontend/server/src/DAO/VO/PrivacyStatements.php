@@ -21,7 +21,7 @@ class PrivacyStatements extends \OmegaUp\DAO\VO\VO {
         'type' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -30,7 +30,7 @@ class PrivacyStatements extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['privacystatement_id'])) {
-            $this->privacystatement_id = (int)$data['privacystatement_id'];
+            $this->privacystatement_id = intval($data['privacystatement_id']);
         }
         if (isset($data['git_object_id'])) {
             $this->git_object_id = strval($data['git_object_id']);

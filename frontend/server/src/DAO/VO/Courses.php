@@ -31,7 +31,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'show_scoreboard' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -40,7 +40,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['course_id'])) {
-            $this->course_id = (int)$data['course_id'];
+            $this->course_id = intval($data['course_id']);
         }
         if (isset($data['name'])) {
             $this->name = strval($data['name']);
@@ -52,10 +52,10 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->alias = strval($data['alias']);
         }
         if (isset($data['group_id'])) {
-            $this->group_id = (int)$data['group_id'];
+            $this->group_id = intval($data['group_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['start_time'])) {
             /**
@@ -75,7 +75,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->public = boolval($data['public']);
         }
         if (isset($data['school_id'])) {
-            $this->school_id = (int)$data['school_id'];
+            $this->school_id = intval($data['school_id']);
         }
         if (isset($data['needs_basic_information'])) {
             $this->needs_basic_information = boolval($data['needs_basic_information']);

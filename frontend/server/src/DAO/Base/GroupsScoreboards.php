@@ -28,12 +28,12 @@ abstract class GroupsScoreboards {
     final public static function update(\OmegaUp\DAO\VO\GroupsScoreboards $Groups_Scoreboards) : int {
         $sql = 'UPDATE `Groups_Scoreboards` SET `group_id` = ?, `create_time` = ?, `alias` = ?, `name` = ?, `description` = ? WHERE `group_scoreboard_id` = ?;';
         $params = [
-            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
+            is_null($Groups_Scoreboards->group_id) ? null : intval($Groups_Scoreboards->group_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,
             $Groups_Scoreboards->description,
-            (int)$Groups_Scoreboards->group_scoreboard_id,
+            intval($Groups_Scoreboards->group_scoreboard_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -120,7 +120,7 @@ abstract class GroupsScoreboards {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -144,7 +144,7 @@ abstract class GroupsScoreboards {
     final public static function create(\OmegaUp\DAO\VO\GroupsScoreboards $Groups_Scoreboards) : int {
         $sql = 'INSERT INTO Groups_Scoreboards (`group_id`, `create_time`, `alias`, `name`, `description`) VALUES (?, ?, ?, ?, ?);';
         $params = [
-            is_null($Groups_Scoreboards->group_id) ? null : (int)$Groups_Scoreboards->group_id,
+            is_null($Groups_Scoreboards->group_id) ? null : intval($Groups_Scoreboards->group_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Groups_Scoreboards->create_time),
             $Groups_Scoreboards->alias,
             $Groups_Scoreboards->name,

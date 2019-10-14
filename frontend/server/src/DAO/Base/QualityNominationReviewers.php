@@ -99,7 +99,7 @@ abstract class QualityNominationReviewers {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -123,8 +123,8 @@ abstract class QualityNominationReviewers {
     final public static function create(\OmegaUp\DAO\VO\QualityNominationReviewers $QualityNomination_Reviewers) : int {
         $sql = 'INSERT INTO QualityNomination_Reviewers (`qualitynomination_id`, `user_id`) VALUES (?, ?);';
         $params = [
-            is_null($QualityNomination_Reviewers->qualitynomination_id) ? null : (int)$QualityNomination_Reviewers->qualitynomination_id,
-            is_null($QualityNomination_Reviewers->user_id) ? null : (int)$QualityNomination_Reviewers->user_id,
+            is_null($QualityNomination_Reviewers->qualitynomination_id) ? null : intval($QualityNomination_Reviewers->qualitynomination_id),
+            is_null($QualityNomination_Reviewers->user_id) ? null : intval($QualityNomination_Reviewers->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

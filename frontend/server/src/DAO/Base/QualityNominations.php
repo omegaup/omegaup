@@ -28,13 +28,13 @@ abstract class QualityNominations {
     final public static function update(\OmegaUp\DAO\VO\QualityNominations $QualityNominations) : int {
         $sql = 'UPDATE `QualityNominations` SET `user_id` = ?, `problem_id` = ?, `nomination` = ?, `contents` = ?, `time` = ?, `status` = ? WHERE `qualitynomination_id` = ?;';
         $params = [
-            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
-            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : intval($QualityNominations->user_id),
+            is_null($QualityNominations->problem_id) ? null : intval($QualityNominations->problem_id),
             $QualityNominations->nomination,
             $QualityNominations->contents,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNominations->time),
             $QualityNominations->status,
-            (int)$QualityNominations->qualitynomination_id,
+            intval($QualityNominations->qualitynomination_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -121,7 +121,7 @@ abstract class QualityNominations {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -145,8 +145,8 @@ abstract class QualityNominations {
     final public static function create(\OmegaUp\DAO\VO\QualityNominations $QualityNominations) : int {
         $sql = 'INSERT INTO QualityNominations (`user_id`, `problem_id`, `nomination`, `contents`, `time`, `status`) VALUES (?, ?, ?, ?, ?, ?);';
         $params = [
-            is_null($QualityNominations->user_id) ? null : (int)$QualityNominations->user_id,
-            is_null($QualityNominations->problem_id) ? null : (int)$QualityNominations->problem_id,
+            is_null($QualityNominations->user_id) ? null : intval($QualityNominations->user_id),
+            is_null($QualityNominations->problem_id) ? null : intval($QualityNominations->problem_id),
             $QualityNominations->nomination,
             $QualityNominations->contents,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNominations->time),

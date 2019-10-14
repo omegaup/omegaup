@@ -29,8 +29,8 @@ abstract class Emails {
         $sql = 'UPDATE `Emails` SET `email` = ?, `user_id` = ? WHERE `email_id` = ?;';
         $params = [
             $Emails->email,
-            is_null($Emails->user_id) ? null : (int)$Emails->user_id,
-            (int)$Emails->email_id,
+            is_null($Emails->user_id) ? null : intval($Emails->user_id),
+            intval($Emails->email_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -117,7 +117,7 @@ abstract class Emails {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -142,7 +142,7 @@ abstract class Emails {
         $sql = 'INSERT INTO Emails (`email`, `user_id`) VALUES (?, ?);';
         $params = [
             $Emails->email,
-            is_null($Emails->user_id) ? null : (int)$Emails->user_id,
+            is_null($Emails->user_id) ? null : intval($Emails->user_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

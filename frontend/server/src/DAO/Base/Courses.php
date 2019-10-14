@@ -31,16 +31,16 @@ abstract class Courses {
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
-            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
+            is_null($Courses->group_id) ? null : intval($Courses->group_id),
+            is_null($Courses->acl_id) ? null : intval($Courses->acl_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->start_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->finish_time),
-            (int)$Courses->public,
-            is_null($Courses->school_id) ? null : (int)$Courses->school_id,
-            (int)$Courses->needs_basic_information,
+            intval($Courses->public),
+            is_null($Courses->school_id) ? null : intval($Courses->school_id),
+            intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
-            (int)$Courses->show_scoreboard,
-            (int)$Courses->course_id,
+            intval($Courses->show_scoreboard),
+            intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -127,7 +127,7 @@ abstract class Courses {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
         }
         $allData = [];
         foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
@@ -154,15 +154,15 @@ abstract class Courses {
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
-            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
+            is_null($Courses->group_id) ? null : intval($Courses->group_id),
+            is_null($Courses->acl_id) ? null : intval($Courses->acl_id),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->start_time),
             \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->finish_time),
-            (int)$Courses->public,
-            is_null($Courses->school_id) ? null : (int)$Courses->school_id,
-            (int)$Courses->needs_basic_information,
+            intval($Courses->public),
+            is_null($Courses->school_id) ? null : intval($Courses->school_id),
+            intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
-            (int)$Courses->show_scoreboard,
+            intval($Courses->show_scoreboard),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

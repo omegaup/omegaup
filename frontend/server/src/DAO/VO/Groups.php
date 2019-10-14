@@ -24,7 +24,7 @@ class Groups extends \OmegaUp\DAO\VO\VO {
         'description' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
@@ -33,10 +33,10 @@ class Groups extends \OmegaUp\DAO\VO\VO {
             throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
         }
         if (isset($data['group_id'])) {
-            $this->group_id = (int)$data['group_id'];
+            $this->group_id = intval($data['group_id']);
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval($data['acl_id']);
         }
         if (isset($data['create_time'])) {
             /**

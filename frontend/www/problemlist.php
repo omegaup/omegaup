@@ -10,7 +10,7 @@ function getTagList() {
         $tags = [];
     }
     if (!is_array($tags)) {
-        $tags = explode(',', (string)$tags);
+        $tags = explode(',', strval($tags));
     }
     return array_unique($tags);
 }
