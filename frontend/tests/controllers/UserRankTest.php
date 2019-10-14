@@ -18,7 +18,9 @@ class UserRankTest extends OmegaupTestCase {
         Utils::RunUpdateUserRank();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request()
+        );
 
         $found = false;
         foreach ($response['rank'] as $entry) {
@@ -38,17 +40,26 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testPrivateUserInRanking() {
         // Create a private user
-        $contestantPrivate = UserFactory::createUser(new UserParams(['is_private' => true]));
+        $contestantPrivate = UserFactory::createUser(
+            new UserParams(
+                ['is_private' => true]
+            )
+        );
         // Create one problem and a submission by the private user
         $problemData = ProblemsFactory::createProblem();
-        $runDataPrivate = RunsFactory::createRunToProblem($problemData, $contestantPrivate);
+        $runDataPrivate = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestantPrivate
+        );
         RunsFactory::gradeRun($runDataPrivate);
 
         // Refresh Rank
         Utils::RunUpdateUserRank();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request()
+        );
 
         // Contestants should not appear in the rank as they're private.
         $found = false;
@@ -79,14 +90,19 @@ class UserRankTest extends OmegaupTestCase {
         $problemDataPrivate = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 0
         ]));
-        $runDataPrivate = RunsFactory::createRunToProblem($problemDataPrivate, $contestant2);
+        $runDataPrivate = RunsFactory::createRunToProblem(
+            $problemDataPrivate,
+            $contestant2
+        );
         RunsFactory::gradeRun($runDataPrivate);
 
         // Refresh Rank
         Utils::RunUpdateUserRank();
 
         // Call API
-        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(
+            new \OmegaUp\Request()
+        );
 
         $found = false;
         foreach ($response['rank'] as $entry) {
@@ -162,7 +178,10 @@ class UserRankTest extends OmegaupTestCase {
         // Create a user with no country, state and school
         $contestantWithNoCountry = UserFactory::createUser();
         $problemData = ProblemsFactory::createProblem();
-        $runDataContestantWithNoCountry = RunsFactory::createRunToProblem($problemData, $contestantWithNoCountry);
+        $runDataContestantWithNoCountry = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestantWithNoCountry
+        );
         RunsFactory::gradeRun($runDataContestantWithNoCountry);
 
         // Create a user with country, state and school
@@ -178,7 +197,11 @@ class UserRankTest extends OmegaupTestCase {
         ]));
 
         // create runs
-        $runDataContestant = RunsFactory::createRunToProblem($problemData, $contestant, $login);
+        $runDataContestant = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestant,
+            $login
+        );
         RunsFactory::gradeRun($runDataContestant);
 
         // Refresh Rank
@@ -309,7 +332,10 @@ class UserRankTest extends OmegaupTestCase {
             'username' => $contestant->username
         ]));
 
-        $this->assertNotEquals($response['userinfo']['classname'], 'user-rank-unranked');
+        $this->assertNotEquals(
+            $response['userinfo']['classname'],
+            'user-rank-unranked'
+        );
     }
 
     public function testUserRankWithForfeitedProblem() {
@@ -317,22 +343,34 @@ class UserRankTest extends OmegaupTestCase {
         $login = self::login($firstPlaceUser);
         $problems = [];
         $extraProblem = ProblemsFactory::createProblem();
-        for ($i = 0;
-             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-             $i++) {
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
             $problems[] = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem($problems[$i], $firstPlaceUser, $login);
+            $run = RunsFactory::createRunToProblem(
+                $problems[$i],
+                $firstPlaceUser,
+                $login
+            );
             RunsFactory::gradeRun($run);
         }
-        $run = RunsFactory::createRunToProblem($extraProblem, $firstPlaceUser, $login);
+        $run = RunsFactory::createRunToProblem(
+            $extraProblem,
+            $firstPlaceUser,
+            $login
+        );
         RunsFactory::gradeRun($run);
 
         $user = UserFactory::createUser();
         $login = self::login($user);
-        for ($i = 0;
-            $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-            $i++) {
-            $run = RunsFactory::createRunToProblem($problems[$i], $user, $login);
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
+            $run = RunsFactory::createRunToProblem(
+                $problems[$i],
+                $user,
+                $login
+            );
             RunsFactory::gradeRun($run);
         }
 

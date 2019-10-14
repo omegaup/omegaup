@@ -25,7 +25,10 @@ class ContestProblemsListTest extends OmegaupTestCase {
             ]));
 
             // Add the problems to the contest
-            ContestsFactory::addProblemToContest($problemData[$i], $contestData);
+            ContestsFactory::addProblemToContest(
+                $problemData[$i],
+                $contestData
+            );
         }
 
         $contestants = [];
@@ -75,8 +78,14 @@ class ContestProblemsListTest extends OmegaupTestCase {
         ]));
 
         foreach ($scoreboardResponse['problems'] as $index => $problem) {
-            $this->assertEquals($problem['alias'], $detailsResponse['problems'][$index]['alias']);
-            $this->assertEquals($problem['alias'], $problemsResponse['problems'][$index]['alias']);
+            $this->assertEquals(
+                $problem['alias'],
+                $detailsResponse['problems'][$index]['alias']
+            );
+            $this->assertEquals(
+                $problem['alias'],
+                $problemsResponse['problems'][$index]['alias']
+            );
         }
     }
 }

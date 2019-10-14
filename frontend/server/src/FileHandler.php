@@ -11,11 +11,11 @@ class FileHandler {
 
     public static function setFileUploaderForTesting(
         \OmegaUp\FileUploader $fileUploader
-    ) : void {
+    ): void {
         self::$fileUploader = $fileUploader;
     }
 
-    public static function getFileUploader() : \OmegaUp\FileUploader {
+    public static function getFileUploader(): \OmegaUp\FileUploader {
         if (is_null(self::$fileUploader)) {
             self::$fileUploader = new \OmegaUp\FileUploader();
         }
@@ -26,29 +26,31 @@ class FileHandler {
         string $dir,
         string $prefix = '',
         int $mode = 0700
-    ) : string {
+    ): string {
         if (substr($dir, -1) != '/') {
             $dir .= '/';
         }
 
         do {
-            $path = $dir.$prefix.mt_rand(0, 9999999);
+            $path = $dir . $prefix . mt_rand(0, 9999999);
         } while (!@mkdir($path, $mode));
 
         return $path;
     }
 
-    public static function deleteDirRecursively(string $pathName) : void {
+    public static function deleteDirRecursively(string $pathName): void {
         self::$log->debug("Trying to delete dir recursively: {$pathName}");
         self::rrmdir($pathName);
     }
 
-    public static function deleteFile(string $pathName) : void {
+    public static function deleteFile(string $pathName): void {
         self::$log->debug("Trying to delete file: {$pathName}");
         if (!@unlink($pathName)) {
             $errors = error_get_last();
             if (is_null($errors)) {
-                throw new \RuntimeException("FATAL: Not able to delete file {$pathName}");
+                throw new \RuntimeException(
+                    "FATAL: Not able to delete file {$pathName}"
+                );
             }
             throw new \RuntimeException(
                 "FATAL: Not able to delete file {$pathName} {$errors['type']} {$errors['message']}"
@@ -56,7 +58,7 @@ class FileHandler {
         }
     }
 
-    private static function rrmdir(string $dir) : void {
+    private static function rrmdir(string $dir): void {
         if (!is_dir($dir)) {
             return;
         }
@@ -82,7 +84,9 @@ class FileHandler {
             if (is_null($errors)) {
                 self::$log->error("Not able to delete dir {$dir}");
             } else {
-                self::$log->error("Not able to delete dir {$dir} {$errors['type']} {$errors['message']}");
+                self::$log->error(
+                    "Not able to delete dir {$dir} {$errors['type']} {$errors['message']}"
+                );
             }
             throw new \RuntimeException('unableToDeleteDir');
         }

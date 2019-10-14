@@ -87,7 +87,11 @@ class ContestListTest extends OmegaupTestCase {
 
     public function testPrivateContestForInvitedUser() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -120,7 +124,11 @@ class ContestListTest extends OmegaupTestCase {
 
     public function testPrivateContestForNonInvitedUser() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -142,7 +150,11 @@ class ContestListTest extends OmegaupTestCase {
 
     public function testPrivateContestForSystemAdmin() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
 
         ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
         $login = self::login($user);
@@ -175,7 +187,11 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testPrivateContestForContestAdmin() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
 
         // Get a user for our scenario
         $contestant = UserFactory::createUser();
@@ -211,7 +227,11 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testPrivateContestForContestGroupAdmin() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
         $title = $contestData['request']['title'];
 
         $admin1 = UserFactory::createUser();
@@ -263,7 +283,11 @@ class ContestListTest extends OmegaupTestCase {
      */
     public function testAuthorOnlySeesContestsOnce() {
         // Create new private contest
-        $contestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
         $author = $contestData['director'];
         $title = $contestData['request']['title'];
 
@@ -420,7 +444,11 @@ class ContestListTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request();
 
         // Create 2 contests, the second one will occur in to the future.
-        $currentContestData = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $currentContestData = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
         $futureContestData = ContestsFactory::createContest(new ContestParams(
             [
                 'admission_mode' => 'private',
@@ -460,7 +488,11 @@ class ContestListTest extends OmegaupTestCase {
         // Create three new private contests, and one public contest
         for ($i = 0; $i < 4; $i++) {
             $isPublic = ($i === 0) ? 'public' : 'private';
-            $contestData[$i] = ContestsFactory::createContest(new ContestParams(['admission_mode' => $isPublic]));
+            $contestData[$i] = ContestsFactory::createContest(
+                new ContestParams(
+                    ['admission_mode' => $isPublic]
+                )
+            );
         }
 
         // Get a user for our scenario
@@ -478,7 +510,12 @@ class ContestListTest extends OmegaupTestCase {
         ]);
         $response = \OmegaUp\Controllers\Contest::apiListParticipating($r);
 
-        $this->assertEquals($numberOfPrivateContests, count($response['contests']));
+        $this->assertEquals(
+            $numberOfPrivateContests,
+            count(
+                $response['contests']
+            )
+        );
     }
 
     /**

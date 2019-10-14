@@ -144,7 +144,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
     private static function createGroupIdentityCreatorAndGroup(
         string $password
-    ) : array {
+    ): array {
         // Add a new user with identity groups creator privileges, and login
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
@@ -171,7 +171,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         \OmegaUp\DAO\VO\Identities $identity,
         array $contestData,
         string $identityStatus
-    ) : void {
+    ): void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
@@ -179,7 +179,9 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ]));
-            $this->fail("{$identityStatus} identity does not have access to see apiMyList");
+            $this->fail(
+                "{$identityStatus} identity does not have access to see apiMyList"
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -189,7 +191,9 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
                 'auth_token' => $login->auth_token,
                 'alias' => $contestData['contest']->alias,
             ]));
-            $this->fail("{$identityStatus} identity can not create virtual contests");
+            $this->fail(
+                "{$identityStatus} identity can not create virtual contests"
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -222,7 +226,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         \OmegaUp\DAO\VO\Identities $identity,
         array $courseData,
         string $identityStatus
-    ) : void {
+    ): void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
@@ -257,7 +261,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
     private function assertProblemRestrictionsForIdentity(
         \OmegaUp\DAO\VO\Identities $identity,
         string $identityStatus
-    ) : void {
+    ): void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
@@ -265,7 +269,9 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ]));
-            $this->fail("{$identityStatus} identity does not have access to see apiMyList");
+            $this->fail(
+                "{$identityStatus} identity does not have access to see apiMyList"
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
@@ -282,7 +288,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
     private function assertGroupRestrictionsForIdentity(
         \OmegaUp\DAO\VO\Identities $identity,
         string $identityStatus
-    ) : void {
+    ): void {
         // Login with the identity recently created
         $login = OmegaupTestCase::login($identity);
 
@@ -290,7 +296,9 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ]));
-            $this->fail("{$identityStatus} identity does not have access to see apiMyList");
+            $this->fail(
+                "{$identityStatus} identity does not have access to see apiMyList"
+            );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }

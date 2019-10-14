@@ -10,7 +10,7 @@ function getTagList() {
         $tags = [];
     }
     if (!is_array($tags)) {
-        $tags = explode(',', (string)$tags);
+        $tags = explode(',', strval($tags));
     }
     return array_unique($tags);
 }
@@ -62,8 +62,12 @@ $pager_items = \OmegaUp\Pager::paginate(
 );
 
 foreach ($response['results'] as $key => $problem) {
-    $response['results'][$key]['difficulty'] = $response['results'][$key]['difficulty'] ? floatval($problem['difficulty']) : null;
-    $response['results'][$key]['quality'] = $response['results'][$key]['quality'] ? floatval($problem['quality']) : null;
+    $response['results'][$key]['difficulty'] = $response['results'][$key]['difficulty'] ? floatval(
+        $problem['difficulty']
+    ) : null;
+    $response['results'][$key]['quality'] = $response['results'][$key]['quality'] ? floatval(
+        $problem['quality']
+    ) : null;
     $response['results'][$key]['points'] = floatval($problem['points']);
     $response['results'][$key]['ratio'] = floatval($problem['ratio']);
     $response['results'][$key]['score'] = floatval($problem['score']);

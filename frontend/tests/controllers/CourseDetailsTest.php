@@ -30,8 +30,14 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        \OmegaUp\Validators::validateNumber($response['start_time'], 'start_time');
-        \OmegaUp\Validators::validateNumber($response['finish_time'], 'finish_time');
+        \OmegaUp\Validators::validateNumber(
+            $response['start_time'],
+            'start_time'
+        );
+        \OmegaUp\Validators::validateNumber(
+            $response['finish_time'],
+            'finish_time'
+        );
 
         // Both assignments added should be visible since the caller is an
         // admin.
@@ -46,8 +52,14 @@ class CourseDetailsTest extends OmegaupTestCase {
             $this->assertNotNull($assignment['start_time']);
             $this->assertNotNull($assignment['finish_time']);
 
-            \OmegaUp\Validators::validateNumber($assignment['start_time'], 'start_time');
-            \OmegaUp\Validators::validateNumber($assignment['finish_time'], 'finish_time');
+            \OmegaUp\Validators::validateNumber(
+                $assignment['start_time'],
+                'start_time'
+            );
+            \OmegaUp\Validators::validateNumber(
+                $assignment['finish_time'],
+                'finish_time'
+            );
         }
     }
 
@@ -79,8 +91,14 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        \OmegaUp\Validators::validateNumber($response['start_time'], 'start_time');
-        \OmegaUp\Validators::validateNumber($response['finish_time'], 'finish_time');
+        \OmegaUp\Validators::validateNumber(
+            $response['start_time'],
+            'start_time'
+        );
+        \OmegaUp\Validators::validateNumber(
+            $response['finish_time'],
+            'finish_time'
+        );
 
         // Only the course that has started should be visible.
         $this->assertEquals(false, $response['is_admin']);

@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -21,13 +21,15 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
 {%- endfor %}
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {
@@ -36,13 +38,27 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
              * @var string|int|float $data['{{ column.name }}']
              * @var int $this->{{ column.name }}
              */
-            $this->{{ column.name }} = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['{{ column.name }}']);
+            $this->{{ column.name }} = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['{{ column.name }}']
+                )
+            );
 {%- elif column.php_primitive_type == 'bool' %}
-            $this->{{ column.name }} = boolval($data['{{ column.name }}']);
-{%- elif column.php_primitive_type in ('int', 'float') %}
-            $this->{{ column.name }} = ({{ column.php_primitive_type }})$data['{{ column.name }}'];
+            $this->{{ column.name }} = boolval(
+                $data['{{ column.name }}']
+            );
+{%- elif column.php_primitive_type == 'int' %}
+            $this->{{ column.name }} = intval(
+                $data['{{ column.name }}']
+            );
+{%- elif column.php_primitive_type == 'float' %}
+            $this->{{ column.name }} = floatval(
+                $data['{{ column.name }}']
+            );
 {%- else %}
-            $this->{{ column.name }} = strval($data['{{ column.name }}']);
+            $this->{{ column.name }} = strval(
+                $data['{{ column.name }}']
+            );
 {%- endif %}
     {%- if column.default == 'CURRENT_TIMESTAMP' %}
         } else {

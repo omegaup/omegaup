@@ -15,7 +15,7 @@ class Broadcaster {
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Contests $contest
-    ) : void {
+    ): void {
         try {
             $message = json_encode([
                 'message' => '/clarification/update/',
@@ -57,9 +57,11 @@ class Broadcaster {
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Clarifications $clarification
-    ) : void {
-        if (!is_null($clarification->answer) ||
-                !$problem->email_clarifications) {
+    ): void {
+        if (
+            !is_null($clarification->answer) ||
+                !$problem->email_clarifications
+        ) {
             return;
         }
         try {
@@ -67,7 +69,9 @@ class Broadcaster {
 
             $emailParams = [
                 'clarification_id' => strval($clarification->clarification_id),
-                'clarification_body' => htmlspecialchars(strval($clarification->message)),
+                'clarification_body' => htmlspecialchars(
+                    strval($clarification->message)
+                ),
                 'problem_alias' => strval($problem->alias),
                 'problem_name' => htmlspecialchars(strval($problem->title)),
                 'url' => is_null($contest) ?
@@ -76,19 +80,25 @@ class Broadcaster {
                 'user_name' => strval($identity->username),
             ];
             $subject = \OmegaUp\ApiUtils::formatString(
-                \OmegaUp\Translations::getInstance()->get('clarificationEmailSubject')
+                \OmegaUp\Translations::getInstance()->get(
+                    'clarificationEmailSubject'
+                )
                     ?: 'clarificationEmailSubject',
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
-                \OmegaUp\Translations::getInstance()->get('clarificationEmailBody')
+                \OmegaUp\Translations::getInstance()->get(
+                    'clarificationEmailBody'
+                )
                     ?: 'clarificationEmailBody',
                 $emailParams
             );
 
             \OmegaUp\Email::sendEmail($emails, $subject, $body);
         } catch (\Exception $e) {
-            $this->log->error('Failed to send clarification email ' . $e->getMessage());
+            $this->log->error(
+                'Failed to send clarification email ' . $e->getMessage()
+            );
         }
     }
 }

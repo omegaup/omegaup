@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,11 +25,25 @@ abstract class ACLs {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\ACLs $ACLs) : int {
-        $sql = 'UPDATE `ACLs` SET `owner_id` = ? WHERE `acl_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\ACLs $ACLs
+    ): int {
+        $sql = '
+            UPDATE
+                `ACLs`
+            SET
+                `owner_id` = ?
+            WHERE
+                (
+                    `acl_id` = ?
+                );';
         $params = [
-            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
-            (int)$ACLs->acl_id,
+            (
+                is_null($ACLs->owner_id) ?
+                null :
+                intval($ACLs->owner_id)
+            ),
+            intval($ACLs->acl_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -38,15 +52,27 @@ abstract class ACLs {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ACLs} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ACLs}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ACLs}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ACLs Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ACLs} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $acl_id) : ?\OmegaUp\DAO\VO\ACLs {
-        $sql = 'SELECT `ACLs`.`acl_id`, `ACLs`.`owner_id` FROM ACLs WHERE (acl_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $acl_id
+    ): ?\OmegaUp\DAO\VO\ACLs {
+        $sql = '
+            SELECT
+                `ACLs`.`acl_id`,
+                `ACLs`.`owner_id`
+            FROM
+                `ACLs`
+            WHERE
+                (
+                    `acl_id` = ?
+                )
+            LIMIT 1;';
         $params = [$acl_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -74,9 +100,19 @@ abstract class ACLs {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ACLs $ACLs) : void {
-        $sql = 'DELETE FROM `ACLs` WHERE acl_id = ?;';
-        $params = [$ACLs->acl_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ACLs $ACLs
+    ): void {
+        $sql = '
+            DELETE FROM
+                `ACLs`
+            WHERE
+                (
+                    `acl_id` = ?
+                );';
+        $params = [
+            $ACLs->acl_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -110,17 +146,37 @@ abstract class ACLs {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `ACLs`.`acl_id`, `ACLs`.`owner_id` from ACLs';
+    ): array {
+        $sql = '
+            SELECT
+                `ACLs`.`acl_id`,
+                `ACLs`.`owner_id`
+            FROM
+                `ACLs`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ACLs($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ACLs(
+                $row
+            );
         }
         return $allData;
     }
@@ -133,21 +189,37 @@ abstract class ACLs {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ACLs $ACLs El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ACLs} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ACLs}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ACLs $ACLs) : int {
-        $sql = 'INSERT INTO ACLs (`owner_id`) VALUES (?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ACLs $ACLs
+    ): int {
+        $sql = '
+            INSERT INTO
+                ACLs (
+                    `owner_id`
+                ) VALUES (
+                    ?
+                );';
         $params = [
-            is_null($ACLs->owner_id) ? null : (int)$ACLs->owner_id,
+            (
+                is_null($ACLs->owner_id) ?
+                null :
+                intval($ACLs->owner_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $ACLs->acl_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $ACLs->acl_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

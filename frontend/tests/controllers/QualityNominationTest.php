@@ -16,7 +16,10 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        $nominations = \OmegaUp\DAO\QualityNominations::getNominations(null, null);
+        $nominations = \OmegaUp\DAO\QualityNominations::getNominations(
+            null,
+            null
+        );
         self::assertArrayHasKey('author', $nominations[0]);
         self::assertArrayHasKey('nominator', $nominations[0]);
     }
@@ -36,10 +39,15 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        $nomination = \OmegaUp\DAO\QualityNominations::getById($result['qualitynomination_id']);
+        $nomination = \OmegaUp\DAO\QualityNominations::getById(
+            $result['qualitynomination_id']
+        );
         self::assertArrayHasKey('author', $nomination);
         self::assertArrayHasKey('nominator', $nomination);
-        self::assertEquals($contestant->username, $nomination['nominator']['username']);
+        self::assertEquals(
+            $contestant->username,
+            $nomination['nominator']['username']
+        );
     }
 
     public function testApiDetailsReturnsFieldsRequiredByUI() {
@@ -66,18 +74,47 @@ class QualityNominationTest extends OmegaupTestCase {
 
         // Login as a reviewer and approve ban.
         $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $request = new \OmegaUp\Request([
+        $request = new \OmegaUp\Request(
+            [
             'auth_token' => $reviewerLogin->auth_token,
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
-        $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
-        $this->assertEquals($problemData['request']['problem_alias'], $details['problem']['alias'], 'Should have set problem');
+        $this->assertEquals(
+            'demotion',
+            $details['nomination'],
+            'Should have set demotion'
+        );
+        $this->assertEquals(
+            $user->username,
+            $details['nominator']['username'],
+            'Should have set user'
+        );
+        $this->assertEquals(
+            $problemData['request']['problem_alias'],
+            $details['problem']['alias'],
+            'Should have set problem'
+        );
         $this::assertArrayHasKey('author', $details);
-        $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
-        $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
-        $this->assertEquals($qualitynomination['qualitynomination_id'], $details['qualitynomination_id'], 'Should have set qualitynomination_id');
+        $this->assertEquals(
+            json_decode(
+                $contents,
+                true
+            ),
+            $details['contents'],
+            'Should have set contents'
+        );
+        $this->assertEquals(
+            true,
+            $details['reviewer'],
+            'Should have set reviewer'
+        );
+        $this->assertEquals(
+            $qualitynomination['qualitynomination_id'],
+            $details['qualitynomination_id'],
+            'Should have set qualitynomination_id'
+        );
     }
 
     /**
@@ -168,7 +205,9 @@ class QualityNominationTest extends OmegaupTestCase {
 
         try {
             \OmegaUp\Controllers\QualityNomination::apiCreate($r);
-            $this->fail('Should not have been able to make suggestion about the problem');
+            $this->fail(
+                'Should not have been able to make suggestion about the problem'
+            );
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // still expected.
         }
@@ -217,8 +256,14 @@ class QualityNominationTest extends OmegaupTestCase {
                  'http://localhost:8080/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
 
         foreach ($inputAndExpectedOutput as $input => $expectedOutput) {
-            $actualOutput = \OmegaUp\Controllers\QualityNomination::extractAliasFromArgument($input);
-            $this->assertEquals($expectedOutput, $actualOutput, 'Incorrect alias was extracted from URL.');
+            $actualOutput = \OmegaUp\Controllers\QualityNomination::extractAliasFromArgument(
+                $input
+            );
+            $this->assertEquals(
+                $expectedOutput,
+                $actualOutput,
+                'Incorrect alias was extracted from URL.'
+            );
         }
     }
 
@@ -247,7 +292,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'rationale' => 'ew plus something else'
         ]);
         try {
-            $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+            $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+                $request
+            );
             $this->fail("Normal user shouldn't be able to resolve demotion");
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Expected.
@@ -285,13 +332,23 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else',
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+        $this->assertEquals(
+            'approved',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as approved'
+        );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            $problem['visibility'],
+            'Problem should have been public banned'
+        );
 
         // Revert ban.
         $request = new \OmegaUp\Request([
@@ -301,13 +358,23 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
+        $this->assertEquals(
+            'denied',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as denied'
+        );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have been made public');
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            $problem['visibility'],
+            'Problem should have been made public'
+        );
     }
 
     /**
@@ -342,7 +409,9 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'qwert plus something else'
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $this->assertContains(
             $problemData['problem']->title,
@@ -353,7 +422,10 @@ class QualityNominationTest extends OmegaupTestCase {
             $emailSender::$listEmails[0]['body']
         );
         $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
-        $this->assertContains('something else', $emailSender::$listEmails[0]['body']);
+        $this->assertContains(
+            'something else',
+            $emailSender::$listEmails[0]['body']
+        );
         $this->assertEquals(1, count($emailSender::$listEmails));
     }
 
@@ -390,13 +462,23 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
+        $this->assertEquals(
+            'denied',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as denied'
+        );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have remained public');
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC,
+            $problem['visibility'],
+            'Problem should have remained public'
+        );
     }
 
     /**
@@ -430,13 +512,23 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else'
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+        $this->assertEquals(
+            'approved',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as approved'
+        );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            $problem['visibility'],
+            'Problem should have been public banned'
+        );
 
         // Reopen demotion request.
         $request = new \OmegaUp\Request([
@@ -446,13 +538,23 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('open', $details['nomination_status'], 'qualitynomination should have been re-opened');
+        $this->assertEquals(
+            'open',
+            $details['nomination_status'],
+            'qualitynomination should have been re-opened'
+        );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(\OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have remained public banned');
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED,
+            $problem['visibility'],
+            'Problem should have remained public banned'
+        );
     }
 
     /**
@@ -489,13 +591,23 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else'
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+        $this->assertEquals(
+            'approved',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as approved'
+        );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED, $problem['visibility'], 'Problem should have been private banned');
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED,
+            $problem['visibility'],
+            'Problem should have been private banned'
+        );
 
         // Reopen demotion request.
         $request = new \OmegaUp\Request([
@@ -505,13 +617,105 @@ class QualityNominationTest extends OmegaupTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
         ]);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
-        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been re-opened');
+        $this->assertEquals(
+            'denied',
+            $details['nomination_status'],
+            'qualitynomination should have been re-opened'
+        );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
-        $this->assertEquals(\OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been private');
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
+            $problem['visibility'],
+            'Problem should have been private'
+        );
+    }
+
+    /**
+     * User who tried a problem but couldn't solve it yet (non AC, CE, JE verdicts),
+     * should be able to send a dismissal or suggestion for it adding the before_ac
+     * flag on nomination contents.
+     */
+    public function testBeforeACNomination() {
+        $problemData = ProblemsFactory::createProblem();
+        $user = UserFactory::createUser();
+
+        $login = self::login($user);
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    'quality' => 3,
+                    'tags' => ['ez-pz', 'ez', 'ez'],
+                    'before_ac' => true,
+                ]),
+            ]));
+            $this->fail('Must have tried to solve the problem first.');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationMustHaveTriedToSolveProblem'
+            );
+        }
+
+        // Now TRY to solve the problem
+        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        RunsFactory::gradeRun($runData, 0, 'WA', 60);
+        $login = self::login($user);
+        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'suggestion',
+            'contents' => json_encode([
+                'quality' => 3,
+                'tags' => ['ez-pz', 'ez'],
+                'before_ac' => true,
+            ]),
+        ]));
+        $this->assertEquals($result['status'], 'ok');
+
+        // Dismissals could be sent before AC also
+        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'dismissal',
+            'contents' => json_encode([
+                'before_ac' => true
+            ]),
+        ]));
+        $this->assertEquals($result['status'], 'ok');
+
+        // Now solve the problem, it must not be allowed to send a before AC
+        // nomination, as the problem is already solved
+        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        RunsFactory::gradeRun($runData);
+        $login = self::login($user);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    'quality' => 3,
+                    'tags' => ['ez-pz', 'ez'],
+                    'before_ac' => true,
+                ]),
+            ]));
+            $this->fail('Must not have solved the problem.');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationMustNotHaveSolvedProblem'
+            );
+        }
     }
 
     /**
@@ -776,8 +980,18 @@ class QualityNominationTest extends OmegaupTestCase {
         $list = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
-        $this->assertEquals('ok', $list['status'], 'Status of apiList call is not ok');
-        $this->assertGreaterThanOrEqual(2, count($list['nominations']), "List didn't return enough nominations");
+        $this->assertEquals(
+            'ok',
+            $list['status'],
+            'Status of apiList call is not ok'
+        );
+        $this->assertGreaterThanOrEqual(
+            2,
+            count(
+                $list['nominations']
+            ),
+            "List didn't return enough nominations"
+        );
         foreach ($list['nominations'] as $nomination) {
             $isPromotion = ($nomination['nomination'] == 'promotion');
             $isDemotion = ($nomination['nomination'] == 'demotion');
@@ -822,7 +1036,13 @@ class QualityNominationTest extends OmegaupTestCase {
         );
         RunsFactory::gradeRun($runData);
         try {
-            $this->assertEquals(0, count($problemDismissed), 'Should not have been able to dismiss the problem');
+            $this->assertEquals(
+                0,
+                count(
+                    $problemDismissed
+                ),
+                'Should not have been able to dismiss the problem'
+            );
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
@@ -835,7 +1055,13 @@ class QualityNominationTest extends OmegaupTestCase {
                 json_encode([]), // re-encoding it for normalization.
                 'open'
             );
-            $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
+            $this->assertGreaterThan(
+                0,
+                count(
+                    $pd
+                ),
+                'The problem should have been dismissed'
+            );
         } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
@@ -847,8 +1073,10 @@ class QualityNominationTest extends OmegaupTestCase {
         self::setUpSyntheticSuggestions($problemData);
 
         $globalContents = \OmegaUp\DAO\QualityNominations::getAllNominations();
-        $actualGlobals = \OmegaUp\DAO\QualityNominations::calculateGlobalDifficultyAndQuality($globalContents);
-        $expectedGlobals = [23/13 /*quality*/, 54/16 /*difficulty*/];
+        $actualGlobals = \OmegaUp\DAO\QualityNominations::calculateGlobalDifficultyAndQuality(
+            $globalContents
+        );
+        $expectedGlobals = [23 / 13 /*quality*/, 54 / 16 /*difficulty*/];
 
         $this->assertEquals($expectedGlobals, $actualGlobals);
     }
@@ -857,10 +1085,18 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData[0] = ProblemsFactory::createProblem();
         $problemData[1] = ProblemsFactory::createProblem();
         self::setUpSyntheticSuggestions($problemData);
-        $contents[0] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem($problemData[0]['problem']->problem_id);
-        $actualResult[0] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates($contents[0]);
-        $contents[1] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem($problemData[1]['problem']->problem_id);
-        $actualResult[1] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates($contents[1]);
+        $contents[0] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem(
+            $problemData[0]['problem']->problem_id
+        );
+        $actualResult[0] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates(
+            $contents[0]
+        );
+        $contents[1] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem(
+            $problemData[1]['problem']->problem_id
+        );
+        $actualResult[1] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates(
+            $contents[1]
+        );
 
         $expectedResult[0] = [
             'quality_sum' => 13,
@@ -912,14 +1148,41 @@ class QualityNominationTest extends OmegaupTestCase {
 
         Utils::RunAggregateFeedback();
 
-        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias($problemData[0]['request']['problem_alias']);
-        $this->assertEquals(2.971428571, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
-        $this->assertEquals(2.2, $newProblem[0]->quality, 'Wrong quality.', 0.001);
-        $this->assertEquals('[0, 0, 2, 2, 1]', $newProblem[0]->difficulty_histogram, 'Wrong difficulty histogram');
-        $this->assertEquals('[1, 1, 0, 1, 2]', $newProblem[0]->quality_histogram, 'Wrong quality histogram');
+        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[0]['request']['problem_alias']
+        );
+        $this->assertEquals(
+            2.971428571,
+            $newProblem[0]->difficulty,
+            'Wrong difficulty.',
+            0.001
+        );
+        $this->assertEquals(
+            2.2,
+            $newProblem[0]->quality,
+            'Wrong quality.',
+            0.001
+        );
+        $this->assertEquals(
+            '[0, 0, 2, 2, 1]',
+            $newProblem[0]->difficulty_histogram,
+            'Wrong difficulty histogram'
+        );
+        $this->assertEquals(
+            '[1, 1, 0, 1, 2]',
+            $newProblem[0]->quality_histogram,
+            'Wrong quality histogram'
+        );
 
-        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias($problemData[2]['request']['problem_alias']);
-        $this->assertEquals(0, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
+        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[2]['request']['problem_alias']
+        );
+        $this->assertEquals(
+            0,
+            $newProblem[2]->difficulty,
+            'Wrong difficulty',
+            0.001
+        );
         $this->assertEquals(0, $newProblem[2]->quality, 'Wrong quality', 0.001);
 
         $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
@@ -939,25 +1202,67 @@ class QualityNominationTest extends OmegaupTestCase {
         };
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals($tags1, ['dp', 'math', 'matrices', 'greedy', 'lenguaje']);
+        $this->assertEquals(
+            $tags1,
+            ['dp', 'math', 'matrices', 'greedy', 'lenguaje']
+        );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals($tags3, ['dp', 'greedy', 'geometry', 'search', 'lenguaje']);
+        $this->assertEquals(
+            $tags3,
+            ['dp', 'greedy', 'geometry', 'search', 'lenguaje']
+        );
 
         Utils::RunUpdateUserRank();
         Utils::RunAggregateFeedback();
 
-        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias($problemData[0]['request']['problem_alias']);
-        $this->assertEquals(2.895384615, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
-        $this->assertEquals(2.538378378, $newProblem[0]->quality, 'Wrong quality.', 0.001);
+        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[0]['request']['problem_alias']
+        );
+        $this->assertEquals(
+            2.895384615,
+            $newProblem[0]->difficulty,
+            'Wrong difficulty.',
+            0.001
+        );
+        $this->assertEquals(
+            2.538378378,
+            $newProblem[0]->quality,
+            'Wrong quality.',
+            0.001
+        );
 
-        $newProblem[1] = \OmegaUp\DAO\Problems::getByAlias($problemData[1]['request']['problem_alias']);
-        $this->assertEquals(3.446886447, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
-        $this->assertEquals(0, $newProblem[1]->quality, 'Wrong quality.', 0.001);
+        $newProblem[1] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[1]['request']['problem_alias']
+        );
+        $this->assertEquals(
+            3.446886447,
+            $newProblem[1]->difficulty,
+            'Wrong difficulty.',
+            0.001
+        );
+        $this->assertEquals(
+            0,
+            $newProblem[1]->quality,
+            'Wrong quality.',
+            0.001
+        );
 
-        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias($problemData[2]['request']['problem_alias']);
-        $this->assertEquals(2.684981685, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
-        $this->assertEquals(1.736164736, $newProblem[2]->quality, 'Wrong quality', 0.001);
+        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[2]['request']['problem_alias']
+        );
+        $this->assertEquals(
+            2.684981685,
+            $newProblem[2]->difficulty,
+            'Wrong difficulty',
+            0.001
+        );
+        $this->assertEquals(
+            1.736164736,
+            $newProblem[2]->quality,
+            'Wrong quality',
+            0.001
+        );
 
         $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
@@ -975,13 +1280,23 @@ class QualityNominationTest extends OmegaupTestCase {
         $this->assertEquals($tags1, ['dp', 'math', 'greedy', 'lenguaje']);
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals($tags3, ['dp', 'greedy', 'geometry', 'search', 'lenguaje']);
+        $this->assertEquals(
+            $tags3,
+            ['dp', 'greedy', 'geometry', 'search', 'lenguaje']
+        );
     }
 
-    public function setUpRankForUsers($problems, $users, $withSuggestions = false) {
+    public function setUpRankForUsers(
+        $problems,
+        $users,
+        $withSuggestions = false
+    ) {
         for ($i = 0; $i < 5; $i++) {
             for ($j = 0; $j <= $i; $j++) {
-                $runData = RunsFactory::createRunToProblem($problems[$j], $users[$i]);
+                $runData = RunsFactory::createRunToProblem(
+                    $problems[$j],
+                    $users[$i]
+                );
                 RunsFactory::gradeRun($runData);
             }
             $login[] = self::login($users[$i]);
@@ -1123,7 +1438,9 @@ class QualityNominationTest extends OmegaupTestCase {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
         Utils::RunAggregateFeedback();
 
-        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDificulty('easy');
+        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDificulty(
+            'easy'
+        );
         $this->assertEquals(count($problemOfTheWeek), 1);
         $this->assertEquals(
             $problemOfTheWeek[0]->problem_id,
@@ -1146,7 +1463,10 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($i = 0; $i < 10; $i++) {
             $contestant = UserFactory::createUser();
             for ($j = 0; $j < $numberOfProblems; $j++) {
-                $runData = RunsFactory::createRunToProblem($problemData[$j], $contestant);
+                $runData = RunsFactory::createRunToProblem(
+                    $problemData[$j],
+                    $contestant
+                );
                 RunsFactory::gradeRun($runData);
             }
             $login[] = self::login($contestant);
@@ -1179,8 +1499,17 @@ class QualityNominationTest extends OmegaupTestCase {
 
         // Set date for all quality nominations as 1 week ago, so that they are eligible for
         // current problem of the week.
-        $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
-        \OmegaUp\MySQLConnection::getInstance()->Execute('UPDATE `QualityNominations` SET `time` = ?', [$dateOneWeekAgo]);
+        $dateOneWeekAgo = (new DateTime())->sub(
+            new DateInterval(
+                'P7D'
+            )
+        )->format(
+            'Y-m-d H:i:s'
+        );
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'UPDATE `QualityNominations` SET `time` = ?',
+            [$dateOneWeekAgo]
+        );
 
         return $problemData;
     }
@@ -1221,7 +1550,10 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($i = 0; $i < 10; $i++) {
             $contestant = UserFactory::createUser();
             for ($j = 0; $j < 2; $j++) {
-                $runData = RunsFactory::createRunToProblem($problemData[$j], $contestant);
+                $runData = RunsFactory::createRunToProblem(
+                    $problemData[$j],
+                    $contestant
+                );
                 RunsFactory::gradeRun($runData);
             }
             $login[] = self::login($contestant);
@@ -1410,7 +1742,10 @@ class QualityNominationTest extends OmegaupTestCase {
         ];
 
         $this->assertEquals(
-            \OmegaUp\DAO\QualityNominations::mostVotedTags($tagsWithLittleVotes, 0.25),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags(
+                $tagsWithLittleVotes,
+                0.25
+            ),
             [],
             'There must be at least 5 votes.'
         );
@@ -1420,7 +1755,10 @@ class QualityNominationTest extends OmegaupTestCase {
             'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
 
         $this->assertEquals(
-            \OmegaUp\DAO\QualityNominations::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags(
+                $tooManyTagsWithMaxVotes,
+                0.25
+            ),
             [],
             'There must be a maximum number of tags to be assigned.'
         );

@@ -14,10 +14,18 @@ class UserSupportTest extends OmegaupTestCase {
         ['user' => $mentorUser, 'identity' => $mentorIdentity] = UserFactory::createMentorIdentity();
 
         // Asserting that user belongs to the support group
-        $this->assertTrue(\OmegaUp\Authorization::isSupportTeamMember($supportIdentity));
+        $this->assertTrue(
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $supportIdentity
+            )
+        );
 
         // Asserting that user doesn't belong to the support group
-        $this->assertFalse(\OmegaUp\Authorization::isSupportTeamMember($mentorIdentity));
+        $this->assertFalse(
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $mentorIdentity
+            )
+        );
     }
 
     /**
@@ -28,7 +36,7 @@ class UserSupportTest extends OmegaupTestCase {
         ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
+        $email = Utils::CreateRandomString() . '@mail.com';
         $user = UserFactory::createUser(new UserParams([
             'email' => $email,
             'verify' => false
@@ -68,7 +76,7 @@ class UserSupportTest extends OmegaupTestCase {
         ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
+        $email = Utils::CreateRandomString() . '@mail.com';
         $user = UserFactory::createUser(new UserParams(['email' => $email]));
 
         // Call api using support team member
@@ -118,7 +126,7 @@ class UserSupportTest extends OmegaupTestCase {
         ['user' => $supportUser, 'identity' => $supportIdentity] = UserFactory::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
+        $email = Utils::CreateRandomString() . '@mail.com';
         $user = UserFactory::createUser(new UserParams(['email' => $email]));
 
         // Call api using support team member

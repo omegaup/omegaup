@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -21,26 +21,36 @@ class ProblemViewed extends \OmegaUp\DAO\VO\VO {
         'view_time' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval(
+                $data['problem_id']
+            );
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = (int)$data['identity_id'];
+            $this->identity_id = intval(
+                $data['identity_id']
+            );
         }
         if (isset($data['view_time'])) {
             /**
              * @var string|int|float $data['view_time']
              * @var int $this->view_time
              */
-            $this->view_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['view_time']);
+            $this->view_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['view_time']
+                )
+            );
         } else {
             $this->view_time = \OmegaUp\Time::get();
         }

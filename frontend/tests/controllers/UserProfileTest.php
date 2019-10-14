@@ -10,7 +10,11 @@ class UserProfileTest extends OmegaupTestCase {
      * Test for the function which returns the general user info
      */
     public function testUserData() {
-        $user = UserFactory::createUser(new UserParams(['username' => 'testuser1']));
+        $user = UserFactory::createUser(
+            new UserParams(
+                ['username' => 'testuser1']
+            )
+        );
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -26,8 +30,16 @@ class UserProfileTest extends OmegaupTestCase {
      * Test for the function which returns the general user info
      */
     public function testUserDataAnotherUser() {
-        $user = UserFactory::createUser(new UserParams(['username' => 'testuser2']));
-        $user2 = UserFactory::createUser(new UserParams(['username' => 'testuser3']));
+        $user = UserFactory::createUser(
+            new UserParams(
+                ['username' => 'testuser2']
+            )
+        );
+        $user2 = UserFactory::createUser(
+            new UserParams(
+                ['username' => 'testuser3']
+            )
+        );
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -38,7 +50,10 @@ class UserProfileTest extends OmegaupTestCase {
 
         $this->assertArrayNotHasKey('password', $response['userinfo']);
         $this->assertArrayNotHasKey('email', $response['userinfo']);
-        $this->assertEquals($user2->username, $response['userinfo']['username']);
+        $this->assertEquals(
+            $user2->username,
+            $response['userinfo']['username']
+        );
     }
 
     /*
@@ -47,7 +62,11 @@ class UserProfileTest extends OmegaupTestCase {
     public function testUserPrivateDataAnotherUser() {
         $user = UserFactory::createUser();
         // Mark user2's profile as private (5th argument)
-        $user2 = UserFactory::createUser(new UserParams(['is_private' => true]));
+        $user2 = UserFactory::createUser(
+            new UserParams(
+                ['is_private' => true]
+            )
+        );
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -69,7 +88,10 @@ class UserProfileTest extends OmegaupTestCase {
             }
             $this->assertNull($v);
         }
-        $this->assertEquals($user2->username, $response['userinfo']['username']);
+        $this->assertEquals(
+            $user2->username,
+            $response['userinfo']['username']
+        );
     }
 
     /*
@@ -147,7 +169,11 @@ class UserProfileTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contests[0]);
 
-        $runData = RunsFactory::createRun($problemData, $contests[0], $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contests[0],
+            $contestant
+        );
         RunsFactory::gradeRun($runData);
 
         // Get ContestStats
@@ -170,7 +196,11 @@ class UserProfileTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         $contests = [];
-        $contests[0] = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']));
+        $contests[0] = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        );
         $contests[1] = ContestsFactory::createContest();
 
         ContestsFactory::addUser($contests[0], $contestant);
@@ -179,7 +209,11 @@ class UserProfileTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contests[0]);
 
-        $runData = RunsFactory::createRun($problemData, $contests[0], $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contests[0],
+            $contestant
+        );
         RunsFactory::gradeRun($runData);
 
         $externalUser = UserFactory::createUser();

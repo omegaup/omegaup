@@ -7,7 +7,7 @@
  * @author juan.pablo@omegaup.com
  */
 class ContestRequestsTest extends OmegaupTestCase {
-    private function preparePublicContestWithRegistration() : array {
+    private function preparePublicContestWithRegistration(): array {
         // create a contest and its admin
         $contestAdmin = UserFactory::createUser();
         $contestData = ContestsFactory::createContest(new ContestParams([
@@ -34,7 +34,7 @@ class ContestRequestsTest extends OmegaupTestCase {
     private function registerUserForContest(
         \OmegaUp\DAO\VO\Users $contestant,
         \OmegaUp\Request $contest
-    ) : void {
+    ): void {
         $contestantLogin = self::login($contestant);
 
         \OmegaUp\Controllers\Contest::apiRegisterForContest(new \OmegaUp\Request([
@@ -46,7 +46,7 @@ class ContestRequestsTest extends OmegaupTestCase {
     private function assertDefaultParamsInRequest(
         array $userRequest,
         bool $hasRequestResponse = false
-    ) : void {
+    ): void {
         $this->assertArrayHasKey('username', $userRequest);
         $this->assertArrayHasKey('country', $userRequest);
         $this->assertArrayHasKey('request_time', $userRequest);

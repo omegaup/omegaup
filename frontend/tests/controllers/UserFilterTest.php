@@ -135,7 +135,11 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousProblemsetAccess() {
-        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
+        $contest = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        )['contest'];
 
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $contest->problemset_id,
@@ -146,7 +150,11 @@ class UserFilterTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\UnauthorizedException
      */
     public function testAnonymousContestAccess() {
-        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
+        $contest = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        )['contest'];
 
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $contest->problemset_id,
@@ -154,8 +162,14 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousProblemsetWithToken() {
-        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
+        $contest = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        )['contest'];
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $contest->problemset_id . '/' .
@@ -165,8 +179,14 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithToken() {
-        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
+        $contest = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        )['contest'];
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $problemset->problemset_id . '/' .
@@ -176,8 +196,14 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousProblemsetWithAdminToken() {
-        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
+        $contest = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        )['contest'];
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $problemset->problemset_id . '/' .
@@ -188,8 +214,14 @@ class UserFilterTest extends OmegaupTestCase {
     }
 
     public function testAnonymousContestWithAdminToken() {
-        $contest = ContestsFactory::createContest(new ContestParams(['admission_mode' => 'private']))['contest'];
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
+        $contest = ContestsFactory::createContest(
+            new ContestParams(
+                ['admission_mode' => 'private']
+            )
+        )['contest'];
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problemset/' . $problemset->problemset_id . '/' .
