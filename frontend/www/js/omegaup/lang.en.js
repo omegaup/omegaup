@@ -747,6 +747,7 @@ const translations = {
 	qualityFormQualityGood: "Good",
 	qualityFormQualityVeryBad: "Very bad",
 	qualityFormQualityVeryGood: "Very good",
+	qualityFormRateBeforeAC: "You can already rate this problem!",
 	qualityFormTags: "What subject(s) is this problem about?",
 	qualityFormThanksForReview: "Thanks for review!",
 	qualityNomination: "Quality nominations",
