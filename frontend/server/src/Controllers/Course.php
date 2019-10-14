@@ -132,6 +132,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateBasicCreateOrUpdate(\OmegaUp\Request $r, bool $isUpdate = false) : void {
+        $r->ensureMainUserIdentity();
         $isRequired = true;
 
         \OmegaUp\Validators::validateOptionalStringNonEmpty($r['name'], 'name', $isRequired);
@@ -180,7 +181,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function validateCourseExists(string $courseAlias) : \OmegaUp\DAO\VO\Courses {
-        \OmegaUp\Validators::validateStringNonEmpty($courseAlias, 'course_alias');
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
@@ -202,10 +202,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (!is_null($group)) {
             return $group;
         }
+        if (is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
 
         $group = \OmegaUp\DAO\Groups::getByPK($course->group_id);
         if (is_null($group)) {
-            throw new \OmegaUp\Exceptions\NotFoundException();
+            throw new \OmegaUp\Exceptions\NotFoundException('courseGroupNotFound');
         }
         return $group;
     }
@@ -1420,7 +1423,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{course: array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array<array-key, array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: null|int, school_name?: string|null}, students: array{name: string, progress: array<string, null|float>, username: string}[], student?: string}}
+     * @return array{payload: array{course: array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}, students: array{name: string, progress: array<string, float>, username: string}[], student?: string}}
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -1488,9 +1491,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $group
             );
             $isFirstTimeAccess =
-                $sharingInformation['share_user_information'] === null;
+                is_null($sharingInformation['share_user_information']);
             $shouldShowAcceptTeacher =
-                $sharingInformation['accept_teacher'] === null;
+                is_null($sharingInformation['accept_teacher']);
         }
         if ($shouldShowIntro && !$course->public) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -1540,15 +1543,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             if (is_null($markdown)) {
                 throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException();
             }
-            $teacherStatement =
-                \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
-                    'accept_teacher'
-                );
             $acceptTeacherStatement = [
                 'markdown' => $markdown,
                 'statementType' => 'accept_teacher',
                 'gitObjectId' => null,
             ];
+            $teacherStatement =
+                \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                    'accept_teacher'
+                );
             if (!is_null($teacherStatement)) {
                 $acceptTeacherStatement['gitObjectId'] = $teacherStatement['git_object_id'];
             }
@@ -1609,7 +1612,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\DAO\VO\Courses $course
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @param bool $onlyIntroDetails
-     * @return array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array<array-key, array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>, school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: null|int, school_name?: string|null}
+     * @return array{status: string, name: string, description: string, alias: string, basic_information_required: bool, requests_user_information: string, assignments?: array{name: string, description: string, alias: string, publish_time_delay?: int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}[], school_id?: int|null, start_time?: int, finish_time?: int, is_admin?: bool, public?: bool, show_scoreboard?: bool, student_count?: int, school_name?: string|null}
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,

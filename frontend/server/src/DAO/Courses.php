@@ -101,7 +101,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Returns a list of students within a course
      * @param  int $course_id
      * @param  int $group_id
-     * @return array{name: string, progress: array<string, null|float>, username: string}[]
+     * @return array{name: string, progress: array<string, float>, username: string}[]
      */
     public static function getStudentsInCourseWithProgressPerAssignment($course_id, $group_id) {
         $sql = 'SELECT i.username, i.name, pr.alias as assignment_alias, pr.assignment_score
@@ -338,7 +338,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * @return array{share_user_information: null|int, accept_teacher: null|int}
+     * @return array{share_user_information: null|bool, accept_teacher: null|bool}
      */
     final public static function getSharingInformation(
         int $identityId,
@@ -372,7 +372,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             return ['share_user_information' => null, 'accept_teacher' => null];
         }
 
-        return $row;
+        return [
+            'share_user_information' => boolval($row['share_user_information']),
+            'accept_teacher' => boolval($row['accept_teacher']),
+        ];
     }
 
     public static function countCourses(int $startTimestamp, int $endTimestamp) : int {

@@ -69,7 +69,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         return $identities;
     }
 
-    public static function GetMemberCountById(int $groupId) : ?int {
+    public static function GetMemberCountById(int $groupId) : int {
         $sql = '
             SELECT
                 COUNT(*) AS count
@@ -78,7 +78,11 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             WHERE
                 gi.group_id = ?;';
         /** @var null|int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$groupId]);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$groupId]);
+        if (empty($result)) {
+            return 0;
+        }
+        return intval($result);
     }
 
     /**

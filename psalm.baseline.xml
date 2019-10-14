@@ -720,7 +720,7 @@
     <MixedReturnStatement occurrences="1">
       <code>$assignment</code>
     </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="9">
+    <PossiblyNullArgument occurrences="7">
       <code>$course-&gt;group_id</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$points</code>
@@ -736,7 +736,6 @@
     <PossiblyNullPropertyFetch occurrences="2">
       <code>$resolvedUser-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
-    <RedundantCondition occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Grader.php">
     <MissingReturnType occurrences="1">
