@@ -12,14 +12,20 @@ class IdentityCreateTest extends OmegaupTestCase {
      */
     public function testIdentityHasContestOrganizerRole() {
         $creator = UserFactory::createGroupIdentityCreator();
-        $creatorIdentity = \OmegaUp\DAO\Identities::getByPK($creator->main_identity_id);
+        $creatorIdentity = \OmegaUp\DAO\Identities::getByPK(
+            $creator->main_identity_id
+        );
         [, $mentorIdentity] = UserFactory::createMentorIdentity();
 
-        $isCreatorMember = \OmegaUp\Authorization::isGroupIdentityCreator($creatorIdentity);
+        $isCreatorMember = \OmegaUp\Authorization::isGroupIdentityCreator(
+            $creatorIdentity
+        );
         // Asserting that user belongs to the  identity creator group
         $this->assertTrue($isCreatorMember);
 
-        $isCreatorMember = \OmegaUp\Authorization::isGroupIdentityCreator($mentorIdentity);
+        $isCreatorMember = \OmegaUp\Authorization::isGroupIdentityCreator(
+            $mentorIdentity
+        );
         // Asserting that user doesn't belong to the identity creator group
         $this->assertFalse($isCreatorMember);
     }
@@ -31,7 +37,13 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Identity creator group member will create the identity
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         // Call api using identity creator group member
@@ -62,7 +74,13 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Identity creator group member will upload csv file
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
         $wrongGroupAlias = 'wrongGroupAlias';
         $identityName = substr(Utils::CreateRandomString(), - 10);
         // Call api using identity creator group member
@@ -78,7 +96,9 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'school_name' => Utils::CreateRandomString(),
                 'group_alias' => $group['group']->alias,
             ]));
-            $this->fail('Identity should not be created because group alias is not correct');
+            $this->fail(
+                'Identity should not be created because group alias is not correct'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
@@ -91,7 +111,13 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Identity creator group member will upload csv file
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
         $identityName = substr(Utils::CreateRandomString(), - 10);
         // Call api using identity creator group member
         try {
@@ -106,7 +132,9 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'school_name' => Utils::CreateRandomString(),
                 'group_alias' => $group['group']->alias,
             ]));
-            $this->fail('Identity should not be created because group alias must be included in username');
+            $this->fail(
+                'Identity should not be created because group alias must be included in username'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
@@ -119,7 +147,13 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Identity creator group member will upload csv file
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
         $wrongIdentityName = 'username:with:wrong:char';
         // Call api using identity creator group member
         try {
@@ -134,7 +168,9 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'school_name' => Utils::CreateRandomString(),
                 'group_alias' => $group['group']->alias,
             ]));
-            $this->fail('Identity should not be created because of the wrong username (Use of [:] is not allowed)');
+            $this->fail(
+                'Identity should not be created because of the wrong username (Use of [:] is not allowed)'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
@@ -151,7 +187,9 @@ class IdentityCreateTest extends OmegaupTestCase {
                 'school_name' => Utils::CreateRandomString(),
                 'group_alias' => $group['group']->alias,
             ]));
-            $this->fail('Identity should not be created because of the wrong username (Username needs include group_alias)');
+            $this->fail(
+                'Identity should not be created because of the wrong username (Username needs include group_alias)'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK.
         }
@@ -164,12 +202,21 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Identity creator group member will upload csv file
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         // Call api using identity creator group member
         $response = \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
-            'identities' => IdentityFactory::getCsvData('identities.csv', $group['group']->alias),
+            'identities' => IdentityFactory::getCsvData(
+                'identities.csv',
+                $group['group']->alias
+            ),
             'group_alias' => $group['group']->alias,
         ]));
 
@@ -189,13 +236,22 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Identity creator group member will upload csv file
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         try {
             // Call api using identity creator group member
             $response = \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => IdentityFactory::getCsvData('duplicated_identities.csv', $group['group']->alias),
+                'identities' => IdentityFactory::getCsvData(
+                    'duplicated_identities.csv',
+                    $group['group']->alias
+                ),
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
@@ -211,13 +267,22 @@ class IdentityCreateTest extends OmegaupTestCase {
         // Identity creator group member will upload csv file
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         try {
             // Call api using identity creator group team member
             $response = \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => IdentityFactory::getCsvData('identities_wrong_country_id.csv', $group['group']->alias),
+                'identities' => IdentityFactory::getCsvData(
+                    'identities_wrong_country_id.csv',
+                    $group['group']->alias
+                ),
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
@@ -232,7 +297,13 @@ class IdentityCreateTest extends OmegaupTestCase {
     public function testLoginIdentity() {
         $creator = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
-        $group = GroupsFactory::createGroup($creator, null, null, null, $creatorLogin);
+        $group = GroupsFactory::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $identityPassword = Utils::CreateRandomString();
@@ -254,17 +325,28 @@ class IdentityCreateTest extends OmegaupTestCase {
             'group_alias' => $group['group']->alias,
         ]));
 
-        $user = \OmegaUp\DAO\Users::FindByUsername("{$group['group']->alias}:{$identityName}");
+        $user = \OmegaUp\DAO\Users::FindByUsername(
+            "{$group['group']->alias}:{$identityName}"
+        );
         $this->assertNull($user);
         $user = \OmegaUp\DAO\Users::FindByUsername($identityName);
         $this->assertNull($user);
 
-        $identity = \OmegaUp\DAO\Identities::findByUsername("{$group['group']->alias}:{$identityName}");
+        $identity = \OmegaUp\DAO\Identities::findByUsername(
+            "{$group['group']->alias}:{$identityName}"
+        );
 
         $this->assertEquals($identityName, $identity->name);
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
+        $this->assertEquals(
+            0,
+            count(
+                \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
+                    $identity->identity_id
+                )
+            )
+        );
 
         // Call the API
         $loginResponse = \OmegaUp\Controllers\User::apiLogin(new \OmegaUp\Request([
@@ -276,13 +358,26 @@ class IdentityCreateTest extends OmegaupTestCase {
         $this->assertLogin($identity, $loginResponse['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
+        $this->assertEquals(
+            1,
+            count(
+                \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
+                    $identity->identity_id
+                )
+            )
+        );
 
         $profileResponse = \OmegaUp\Controllers\User::apiProfile(new \OmegaUp\Request([
             'auth_token' => $loginResponse['auth_token'],
         ]));
 
-        $this->assertEquals("{$group['group']->alias}:{$identityName}", $profileResponse['userinfo']['username']);
-        $this->assertEquals($identityName, $profileResponse['userinfo']['name']);
+        $this->assertEquals(
+            "{$group['group']->alias}:{$identityName}",
+            $profileResponse['userinfo']['username']
+        );
+        $this->assertEquals(
+            $identityName,
+            $profileResponse['userinfo']['name']
+        );
     }
 }

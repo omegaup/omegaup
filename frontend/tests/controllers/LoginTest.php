@@ -16,7 +16,14 @@ class LoginTest extends OmegaupTestCase {
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
+        $this->assertEquals(
+            0,
+            count(
+                \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
+                    $identity->identity_id
+                )
+            )
+        );
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -31,7 +38,14 @@ class LoginTest extends OmegaupTestCase {
         $this->assertLogin($identity, $response['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
+        $this->assertEquals(
+            1,
+            count(
+                \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
+                    $identity->identity_id
+                )
+            )
+        );
     }
 
     /**
@@ -164,7 +178,10 @@ class LoginTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response2['status']);
         $this->assertLogin($identity, $response2['auth_token']);
 
-        $this->assertNotEquals($response1['auth_token'], $response2['auth_token']);
+        $this->assertNotEquals(
+            $response1['auth_token'],
+            $response2['auth_token']
+        );
     }
 
     /**

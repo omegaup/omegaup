@@ -30,11 +30,19 @@ class ProblemsLanguages extends \OmegaUp\DAO\Base\ProblemsLanguages {
                 WHERE
                     problem_id = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemId]
+        );
 
         $problemsLanguages = [];
         foreach ($rs as $row) {
-            array_push($problemsLanguages, new \OmegaUp\DAO\VO\ProblemsLanguages($row));
+            array_push(
+                $problemsLanguages,
+                new \OmegaUp\DAO\VO\ProblemsLanguages(
+                    $row
+                )
+            );
         }
         return $problemsLanguages;
     }

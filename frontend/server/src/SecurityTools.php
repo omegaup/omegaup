@@ -40,18 +40,30 @@ class SecurityTools {
      * @param string $hashedPassword
      * @return boolean
      */
-    public static function compareHashedStrings(string $passwordToCheck, string $hashedPassword) : bool {
-        if (!defined('PASSWORD_ARGON2ID') &&
+    public static function compareHashedStrings(
+        string $passwordToCheck,
+        string $hashedPassword
+    ): bool {
+        if (
+            !defined('PASSWORD_ARGON2ID') &&
             strpos($hashedPassword, self::ARGON2ID_CRYPT_HASH_PREFIX) === 0
         ) {
-            return sodium_crypto_pwhash_str_verify($hashedPassword, $passwordToCheck);
+            return sodium_crypto_pwhash_str_verify(
+                $hashedPassword,
+                $passwordToCheck
+            );
         }
         return password_verify($passwordToCheck, $hashedPassword);
     }
 
-    public static function testStrongPassword(?string $password) : void {
+    public static function testStrongPassword(?string $password): void {
         // Setting max passwd length to 72 to avoid DoS attacks
-        \OmegaUp\Validators::validateStringOfLengthInRange($password, 'password', 8, 72);
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $password,
+            'password',
+            8,
+            72
+        );
     }
 
     /**
@@ -60,7 +72,7 @@ class SecurityTools {
      * @param string $string
      * @return string
      */
-    public static function hashString(string $string) : string {
+    public static function hashString(string $string): string {
         if (!defined('PASSWORD_ARGON2ID')) {
             $hashedString = sodium_crypto_pwhash_str(
                 $string,
@@ -90,9 +102,14 @@ class SecurityTools {
      * @param string $hashedPassword The hashed password
      * @return bool Whether it is produced using the old Blowfish algorithm.
      */
-    public static function isOldHash(string $hashedPassword) : bool {
+    public static function isOldHash(string $hashedPassword): bool {
         if (!defined('PASSWORD_ARGON2ID')) {
-            if (strpos($hashedPassword, self::ARGON2ID_CRYPT_HASH_PREFIX) !== 0) {
+            if (
+                strpos(
+                    $hashedPassword,
+                    self::ARGON2ID_CRYPT_HASH_PREFIX
+                ) !== 0
+            ) {
                 return true;
             }
             return sodium_crypto_pwhash_str_needs_rehash(
@@ -102,7 +119,11 @@ class SecurityTools {
             );
         }
         /** @psalm-suppress MixedArgument blocked by https://github.com/vimeo/psalm/pull/2069 */
-        return password_needs_rehash($hashedPassword, PASSWORD_ARGON2ID, self::PASSWORD_HASH_OPTIONS);
+        return password_needs_rehash(
+            $hashedPassword,
+            PASSWORD_ARGON2ID,
+            self::PASSWORD_HASH_OPTIONS
+        );
     }
 
     /**
@@ -111,7 +132,7 @@ class SecurityTools {
      * @param int $length
      * @return string
      */
-    public static function randomString(int $length) : string {
+    public static function randomString(int $length): string {
         $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         $str = '';
         $max = strlen($chars) - 1;
@@ -130,7 +151,7 @@ class SecurityTools {
      * @param int $length The length of the string.
      * @return string The string.
      */
-    public static function randomHexString(int $length) : string {
+    public static function randomHexString(int $length): string {
         return bin2hex(random_bytes(intval($length / 2)));
     }
 
@@ -141,12 +162,18 @@ class SecurityTools {
      * @param string $username The username that is going to be authenticated.
      * @return string The Bearer HTTP authorization header.
      */
-    public static function getGitserverAuthorizationHeader(string $problem, string $username) : string {
+    public static function getGitserverAuthorizationHeader(
+        string $problem,
+        string $username
+    ): string {
         if (OMEGAUP_GITSERVER_SECRET_TOKEN != '') {
             return 'Authorization: OmegaUpSharedSecret ' . OMEGAUP_GITSERVER_SECRET_TOKEN . ' ' . $username;
         }
 
-        return 'Authorization: Bearer ' . self::getGitserverAuthorizationToken($problem, $username);
+        return 'Authorization: Bearer ' . self::getGitserverAuthorizationToken(
+            $problem,
+            $username
+        );
     }
 
     /**
@@ -157,7 +184,10 @@ class SecurityTools {
      * @param string $username The username that can use the token.
      * @return string The Bearer authorization token.
      */
-    public static function getGitserverAuthorizationToken(string $problem, string $username) : string {
+    public static function getGitserverAuthorizationToken(
+        string $problem,
+        string $username
+    ): string {
         // Given that we already have an autoload configured, we cannot use
         // sodium_compat's (fast) autoloader. Instead, simulate what it does
         // here, with the full path of the standard autoload file.

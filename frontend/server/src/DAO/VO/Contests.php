@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -48,93 +48,149 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = intval($data['contest_id']);
+            $this->contest_id = intval(
+                $data['contest_id']
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = intval($data['problemset_id']);
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = intval($data['acl_id']);
+            $this->acl_id = intval(
+                $data['acl_id']
+            );
         }
         if (isset($data['title'])) {
-            $this->title = strval($data['title']);
+            $this->title = strval(
+                $data['title']
+            );
         }
         if (isset($data['description'])) {
-            $this->description = strval($data['description']);
+            $this->description = strval(
+                $data['description']
+            );
         }
         if (isset($data['start_time'])) {
             /**
              * @var string|int|float $data['start_time']
              * @var int $this->start_time
              */
-            $this->start_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['start_time']);
+            $this->start_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['start_time']
+                )
+            );
         }
         if (isset($data['finish_time'])) {
             /**
              * @var string|int|float $data['finish_time']
              * @var int $this->finish_time
              */
-            $this->finish_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['finish_time']);
+            $this->finish_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['finish_time']
+                )
+            );
         }
         if (isset($data['last_updated'])) {
             /**
              * @var string|int|float $data['last_updated']
              * @var int $this->last_updated
              */
-            $this->last_updated = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['last_updated']);
+            $this->last_updated = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['last_updated']
+                )
+            );
         } else {
             $this->last_updated = \OmegaUp\Time::get();
         }
         if (isset($data['window_length'])) {
-            $this->window_length = intval($data['window_length']);
+            $this->window_length = intval(
+                $data['window_length']
+            );
         }
         if (isset($data['rerun_id'])) {
-            $this->rerun_id = intval($data['rerun_id']);
+            $this->rerun_id = intval(
+                $data['rerun_id']
+            );
         }
         if (isset($data['admission_mode'])) {
-            $this->admission_mode = strval($data['admission_mode']);
+            $this->admission_mode = strval(
+                $data['admission_mode']
+            );
         }
         if (isset($data['alias'])) {
-            $this->alias = strval($data['alias']);
+            $this->alias = strval(
+                $data['alias']
+            );
         }
         if (isset($data['scoreboard'])) {
-            $this->scoreboard = intval($data['scoreboard']);
+            $this->scoreboard = intval(
+                $data['scoreboard']
+            );
         }
         if (isset($data['points_decay_factor'])) {
-            $this->points_decay_factor = floatval($data['points_decay_factor']);
+            $this->points_decay_factor = floatval(
+                $data['points_decay_factor']
+            );
         }
         if (isset($data['partial_score'])) {
-            $this->partial_score = boolval($data['partial_score']);
+            $this->partial_score = boolval(
+                $data['partial_score']
+            );
         }
         if (isset($data['submissions_gap'])) {
-            $this->submissions_gap = intval($data['submissions_gap']);
+            $this->submissions_gap = intval(
+                $data['submissions_gap']
+            );
         }
         if (isset($data['feedback'])) {
-            $this->feedback = strval($data['feedback']);
+            $this->feedback = strval(
+                $data['feedback']
+            );
         }
         if (isset($data['penalty'])) {
-            $this->penalty = intval($data['penalty']);
+            $this->penalty = intval(
+                $data['penalty']
+            );
         }
         if (isset($data['penalty_type'])) {
-            $this->penalty_type = strval($data['penalty_type']);
+            $this->penalty_type = strval(
+                $data['penalty_type']
+            );
         }
         if (isset($data['penalty_calc_policy'])) {
-            $this->penalty_calc_policy = strval($data['penalty_calc_policy']);
+            $this->penalty_calc_policy = strval(
+                $data['penalty_calc_policy']
+            );
         }
         if (isset($data['show_scoreboard_after'])) {
-            $this->show_scoreboard_after = boolval($data['show_scoreboard_after']);
+            $this->show_scoreboard_after = boolval(
+                $data['show_scoreboard_after']
+            );
         }
         if (isset($data['urgent'])) {
-            $this->urgent = boolval($data['urgent']);
+            $this->urgent = boolval(
+                $data['urgent']
+            );
         }
         if (isset($data['languages'])) {
-            $this->languages = strval($data['languages']);
+            $this->languages = strval(
+                $data['languages']
+            );
         }
         if (isset($data['recommended'])) {
-            $this->recommended = boolval($data['recommended']);
+            $this->recommended = boolval(
+                $data['recommended']
+            );
         }
     }
 

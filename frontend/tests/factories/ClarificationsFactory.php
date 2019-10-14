@@ -27,11 +27,19 @@ class ClarificationsFactory {
         ContestsFactory::openContest($contestData, $contestant);
 
         // Then we need to open the problem
-        ContestsFactory::openProblemInContest($contestData, $problemData, $contestant);
+        ContestsFactory::openProblemInContest(
+            $contestData,
+            $problemData,
+            $contestant
+        );
 
         // Create the request for our api
         $r = new \OmegaUp\Request();
-        $r['message'] = ($message === null ? Utils::CreateRandomString() : $message);
+        $r['message'] = (
+            is_null($message) ?
+            Utils::CreateRandomString() :
+            $message
+        );
         $r['contest_alias'] = $contestData['request']['alias'];
         $r['problem_alias'] = $problemData['request']['problem_alias'];
         $r['username'] = $receiver;

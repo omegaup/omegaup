@@ -67,15 +67,34 @@ class ListClarificationsContest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Contest::apiClarifications($r);
 
         // Check that we got all clarifications
-        $this->assertEquals(count($clarificationData1), count($response['clarifications']));
+        $this->assertEquals(
+            count(
+                $clarificationData1
+            ),
+            count(
+                $response['clarifications']
+            )
+        );
 
         // Check that the clarifications came in the order we expect
         // First we expect clarifications not answered
-        $this->assertEquals($clarificationData1[3]['request']['message'], $response['clarifications'][0]['message']);
-        $this->assertEquals($clarificationData1[1]['request']['message'], $response['clarifications'][1]['message']);
+        $this->assertEquals(
+            $clarificationData1[3]['request']['message'],
+            $response['clarifications'][0]['message']
+        );
+        $this->assertEquals(
+            $clarificationData1[1]['request']['message'],
+            $response['clarifications'][1]['message']
+        );
 
         // Then clarifications answered, newer first
-        $this->assertEquals($clarificationData1[2]['request']['message'], $response['clarifications'][2]['message']);
-        $this->assertEquals($clarificationData1[0]['request']['message'], $response['clarifications'][3]['message']);
+        $this->assertEquals(
+            $clarificationData1[2]['request']['message'],
+            $response['clarifications'][2]['message']
+        );
+        $this->assertEquals(
+            $clarificationData1[0]['request']['message'],
+            $response['clarifications'][3]['message']
+        );
     }
 }

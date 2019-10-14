@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Groups extends \OmegaUp\DAO\Base\Groups {
-    public static function findByAlias(string $alias) : ?\OmegaUp\DAO\VO\Groups {
+    public static function findByAlias(string $alias): ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* FROM Groups g WHERE g.alias = ? LIMIT 1;';
         $params = [$alias];
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
@@ -39,7 +39,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         return $ar;
     }
 
-    public static function getByName(string $name) : ?\OmegaUp\DAO\VO\Groups {
+    public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
         $sql = 'SELECT g.* from Groups g where g.name = ? LIMIT 1;';
 
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
@@ -58,7 +58,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     final public static function getAllGroupsAdminedByUser(
         int $userId,
         int $identityId
-    ) : array {
+    ): array {
         // group_id is only necessary to make ORDER BY work, because
         // ONLY_FULL_GROUP_BY mode is enabled.
         $sql = '
@@ -106,7 +106,10 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      *
      * @return \OmegaUp\DAO\VO\Identities[] $identities
      */
-    final public static function sampleMembers(\OmegaUp\DAO\VO\Groups $group, int $n): array {
+    final public static function sampleMembers(
+        \OmegaUp\DAO\VO\Groups $group,
+        int $n
+    ): array {
         $sql = '
             SELECT
                 i.*
@@ -123,10 +126,12 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
 
         /** @var \OmegaUp\DAO\VO\Identities[] */
         $identities = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$group->group_id, $n]
-        ) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$group->group_id, $n]
+            ) as $row
+        ) {
             $identities[] = new \OmegaUp\DAO\VO\Identities($row);
         }
         return $identities;

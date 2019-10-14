@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -21,15 +21,32 @@ abstract class UserRoles {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\UserRoles} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\UserRoles}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\UserRoles}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\UserRoles Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\UserRoles} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $user_id, ?int $role_id, ?int $acl_id) : ?\OmegaUp\DAO\VO\UserRoles {
-        $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` FROM User_Roles WHERE (user_id = ? AND role_id = ? AND acl_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $user_id,
+        ?int $role_id,
+        ?int $acl_id
+    ): ?\OmegaUp\DAO\VO\UserRoles {
+        $sql = '
+            SELECT
+                `User_Roles`.`user_id`,
+                `User_Roles`.`role_id`,
+                `User_Roles`.`acl_id`
+            FROM
+                `User_Roles`
+            WHERE
+                (
+                    `user_id` = ? AND
+                    `role_id` = ? AND
+                    `acl_id` = ?
+                )
+            LIMIT 1;';
         $params = [$user_id, $role_id, $acl_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -57,9 +74,23 @@ abstract class UserRoles {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\UserRoles $User_Roles) : void {
-        $sql = 'DELETE FROM `User_Roles` WHERE user_id = ? AND role_id = ? AND acl_id = ?;';
-        $params = [$User_Roles->user_id, $User_Roles->role_id, $User_Roles->acl_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\UserRoles $User_Roles
+    ): void {
+        $sql = '
+            DELETE FROM
+                `User_Roles`
+            WHERE
+                (
+                    `user_id` = ? AND
+                    `role_id` = ? AND
+                    `acl_id` = ?
+                );';
+        $params = [
+            $User_Roles->user_id,
+            $User_Roles->role_id,
+            $User_Roles->acl_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -93,17 +124,38 @@ abstract class UserRoles {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `User_Roles`.`user_id`, `User_Roles`.`role_id`, `User_Roles`.`acl_id` from User_Roles';
+    ): array {
+        $sql = '
+            SELECT
+                `User_Roles`.`user_id`,
+                `User_Roles`.`role_id`,
+                `User_Roles`.`acl_id`
+            FROM
+                `User_Roles`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\UserRoles($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\UserRoles(
+                $row
+            );
         }
         return $allData;
     }
@@ -116,16 +168,42 @@ abstract class UserRoles {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\UserRoles $User_Roles El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRoles} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRoles}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\UserRoles $User_Roles) : int {
-        $sql = 'INSERT INTO User_Roles (`user_id`, `role_id`, `acl_id`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\UserRoles $User_Roles
+    ): int {
+        $sql = '
+            INSERT INTO
+                User_Roles (
+                    `user_id`,
+                    `role_id`,
+                    `acl_id`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($User_Roles->user_id) ? null : intval($User_Roles->user_id),
-            is_null($User_Roles->role_id) ? null : intval($User_Roles->role_id),
-            is_null($User_Roles->acl_id) ? null : intval($User_Roles->acl_id),
+            (
+                is_null($User_Roles->user_id) ?
+                null :
+                intval($User_Roles->user_id)
+            ),
+            (
+                is_null($User_Roles->role_id) ?
+                null :
+                intval($User_Roles->role_id)
+            ),
+            (
+                is_null($User_Roles->acl_id) ?
+                null :
+                intval($User_Roles->acl_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -20,7 +20,11 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Create a new run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
 
         RunsFactory::gradeRun($runData);
 
@@ -51,8 +55,16 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $contestant2 = UserFactory::createUser();
 
         // Create new runs
-        $runData1 = RunsFactory::createRun($problemData, $contestData, $contestant1);
-        $runData2 = RunsFactory::createRun($problemData, $contestData, $contestant2);
+        $runData1 = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant1
+        );
+        $runData2 = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant2
+        );
 
         RunsFactory::gradeRun($runData1);
         RunsFactory::gradeRun($runData2);
@@ -73,12 +85,24 @@ class RunDisqualifyTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Contest::apiScoreboard($r);
 
         // Contestant 2 should not be changed
-        $this->assertEquals($contestant2->username, $response['ranking'][0]['username']);
-        $this->assertEquals(100, $response['ranking'][0]['problems'][0]['points']);
+        $this->assertEquals(
+            $contestant2->username,
+            $response['ranking'][0]['username']
+        );
+        $this->assertEquals(
+            100,
+            $response['ranking'][0]['problems'][0]['points']
+        );
         $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
         // Contestant 1 should be changed
-        $this->assertEquals($contestant1->username, $response['ranking'][1]['username']);
-        $this->assertEquals(0, $response['ranking'][1]['problems'][0]['points']);
+        $this->assertEquals(
+            $contestant1->username,
+            $response['ranking'][1]['username']
+        );
+        $this->assertEquals(
+            0,
+            $response['ranking'][1]['problems'][0]['points']
+        );
         $this->assertEquals(0, $response['ranking'][1]['problems'][0]['runs']);
     }
 }

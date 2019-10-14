@@ -7,14 +7,21 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
     ) {
-        if ($problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED ||
-            $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
+        if (
+            $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED ||
+            $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'problemIsBanned'
+            );
         }
-        if (!\OmegaUp\DAO\Problems::isVisible($problem)
+        if (
+            !\OmegaUp\DAO\Problems::isVisible($problem)
             && !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'problemIsPrivate'
+            );
         }
     }
 
@@ -57,11 +64,14 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             $updatedProblemsetProblem->problem_id
         );
         if (is_null($oldProblemsetProblem)) {
-            \OmegaUp\DAO\Base\ProblemsetProblems::create($updatedProblemsetProblem);
+            \OmegaUp\DAO\Base\ProblemsetProblems::create(
+                $updatedProblemsetProblem
+            );
             return;
         }
         \OmegaUp\DAO\Base\ProblemsetProblems::update($updatedProblemsetProblem);
-        if ($oldProblemsetProblem->points == $updatedProblemsetProblem->points &&
+        if (
+            $oldProblemsetProblem->points == $updatedProblemsetProblem->points &&
             $oldProblemsetProblem->version == $updatedProblemsetProblem->version
         ) {
             return;
@@ -183,9 +193,13 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     public static function wrapRequest(\OmegaUp\Request $r) {
         $r->ensureInt('problemset_id');
 
-        $r['problemset'] = \OmegaUp\DAO\Problemsets::getWithTypeByPK($r['problemset_id']);
+        $r['problemset'] = \OmegaUp\DAO\Problemsets::getWithTypeByPK(
+            $r['problemset_id']
+        );
         if (is_null($r['problemset'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemsetNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
         }
         if ($r['problemset']['type'] == 'Contest') {
             $request = new \OmegaUp\Request([
@@ -214,7 +228,10 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @param int $problemsetId The problemset ID.
      * @param \ZipStream $zip The object that represents the .zip file.
      */
-    public static function downloadRuns(int $problemsetId, \ZipStream $zip): void {
+    public static function downloadRuns(
+        int $problemsetId,
+        \ZipStream $zip
+    ): void {
         $runs = \OmegaUp\DAO\Runs::getByProblemset($problemsetId);
 
         $table = ['guid,user,problem,verdict,points'];

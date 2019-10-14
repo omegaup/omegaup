@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -29,22 +29,34 @@ class GroupsIdentities extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['group_id'])) {
-            $this->group_id = intval($data['group_id']);
+            $this->group_id = intval(
+                $data['group_id']
+            );
         }
         if (isset($data['identity_id'])) {
-            $this->identity_id = intval($data['identity_id']);
+            $this->identity_id = intval(
+                $data['identity_id']
+            );
         }
         if (isset($data['share_user_information'])) {
-            $this->share_user_information = boolval($data['share_user_information']);
+            $this->share_user_information = boolval(
+                $data['share_user_information']
+            );
         }
         if (isset($data['privacystatement_consent_id'])) {
-            $this->privacystatement_consent_id = intval($data['privacystatement_consent_id']);
+            $this->privacystatement_consent_id = intval(
+                $data['privacystatement_consent_id']
+            );
         }
         if (isset($data['accept_teacher'])) {
-            $this->accept_teacher = boolval($data['accept_teacher']);
+            $this->accept_teacher = boolval(
+                $data['accept_teacher']
+            );
         }
     }
 

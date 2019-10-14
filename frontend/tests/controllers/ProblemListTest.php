@@ -40,7 +40,9 @@ class ProblemList extends OmegaupTestCase {
                 }
             }
             if ($count != 1) {
-                $this->fail('Problem' . $problemData[$i]['request']['alias'] . ' is not exactly once.');
+                $this->fail(
+                    'Problem' . $problemData[$i]['request']['alias'] . ' is not exactly once.'
+                );
             }
         }
 
@@ -52,12 +54,24 @@ class ProblemList extends OmegaupTestCase {
                 break;
             }
             // Check if quality_histogram and difficulty_histogram fields are being returned also
-            $this->assertTrue(array_key_exists('quality_histogram', $problemResponse));
-            $this->assertTrue(array_key_exists('difficulty_histogram', $problemResponse));
+            $this->assertTrue(
+                array_key_exists(
+                    'quality_histogram',
+                    $problemResponse
+                )
+            );
+            $this->assertTrue(
+                array_key_exists(
+                    'difficulty_histogram',
+                    $problemResponse
+                )
+            );
         }
 
         if ($exists) {
-            $this->fail('Private problem' . $privateProblemData['request']['problem_alias'] . ' is in the list.');
+            $this->fail(
+                'Private problem' . $privateProblemData['request']['problem_alias'] . ' is in the list.'
+            );
         }
     }
 
@@ -72,7 +86,11 @@ class ProblemList extends OmegaupTestCase {
                 'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED
             ]));
             for ($j = 0; $j <= $i; $j++) {
-                ProblemsFactory::addTag($problemData[$i], "tag-$j", 1 /* public */);
+                ProblemsFactory::addTag(
+                    $problemData[$i],
+                    "tag-$j",
+                    1 /* public */
+                );
             }
         }
 
@@ -81,7 +99,11 @@ class ProblemList extends OmegaupTestCase {
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
         ]));
         for ($j = 0; $j < $n; $j++) {
-            ProblemsFactory::addTag($privateProblemData, "tag-$j", 1 /* public */);
+            ProblemsFactory::addTag(
+                $privateProblemData,
+                "tag-$j",
+                1 /* public */
+            );
         }
 
         $login = self::login(UserFactory::createUser());
@@ -133,7 +155,11 @@ class ProblemList extends OmegaupTestCase {
                 'languages' => $i % 2 == 0 ? $karel_problem : 'kj,cpp,c',
             ]));
             for ($j = 0; $j <= $i; $j++) {
-                ProblemsFactory::addTag($problemData[$i], "test-tag-$j", 1 /* public */);
+                ProblemsFactory::addTag(
+                    $problemData[$i],
+                    "test-tag-$j",
+                    1 /* public */
+                );
             }
         }
 
@@ -142,7 +168,10 @@ class ProblemList extends OmegaupTestCase {
         for ($i = 0; $i < 5; $i++) {
             $users[$i] = UserFactory::createUser();
             for ($j = 0; $j <= $i; $j++) {
-                $runData = RunsFactory::createRunToProblem($problemData[$j], $users[$i]);
+                $runData = RunsFactory::createRunToProblem(
+                    $problemData[$j],
+                    $users[$i]
+                );
                 RunsFactory::gradeRun($runData);
             }
             $login[] = self::login($users[$i]);
@@ -203,8 +232,14 @@ class ProblemList extends OmegaupTestCase {
             'order_by' => 'submissions',
         ]));
         $this->assertCount(2, $response['results']);
-        $this->assertEquals($problemData[2]['request']['problem_alias'], $response['results'][0]['alias']);
-        $this->assertEquals($problemData[4]['request']['problem_alias'], $response['results'][1]['alias']);
+        $this->assertEquals(
+            $problemData[2]['request']['problem_alias'],
+            $response['results'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemData[4]['request']['problem_alias'],
+            $response['results'][1]['alias']
+        );
 
         // Filter 2:
         // - Containing tag-0 or/and tag-3
@@ -218,7 +253,10 @@ class ProblemList extends OmegaupTestCase {
             'order_by' => 'quality',
         ]));
         $this->assertCount(5, $response['results']);
-        $this->assertEquals($problemData[0]['request']['problem_alias'], $response['results'][0]['alias']);
+        $this->assertEquals(
+            $problemData[0]['request']['problem_alias'],
+            $response['results'][0]['alias']
+        );
 
         // Filter 3:
         // - Containing tag-2 or/and tag-3
@@ -239,10 +277,26 @@ class ProblemList extends OmegaupTestCase {
      * Tests problem lists when searching by tag when tags are not public.
      */
     public function testProblemListWithPrivateTags() {
-        $admin = UserFactory::createAdminUser(new UserParams(['username' => 'admin']));
-        $user_a = UserFactory::createUser(new UserParams(['username' => 'user_a']));
-        $user_b = UserFactory::createUser(new UserParams(['username' => 'user_b']));
-        $other_user = UserFactory::createUser(new UserParams(['username' => 'other']));
+        $admin = UserFactory::createAdminUser(
+            new UserParams(
+                ['username' => 'admin']
+            )
+        );
+        $user_a = UserFactory::createUser(
+            new UserParams(
+                ['username' => 'user_a']
+            )
+        );
+        $user_b = UserFactory::createUser(
+            new UserParams(
+                ['username' => 'user_b']
+            )
+        );
+        $other_user = UserFactory::createUser(
+            new UserParams(
+                ['username' => 'other']
+            )
+        );
 
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
@@ -338,7 +392,10 @@ class ProblemList extends OmegaupTestCase {
             'offset' => 1,
         ]));
         $this->assertCount(1, $response['results']);
-        $this->assertEquals($problemData[1]['request']['problem_alias'], $response['results'][0]['alias']);
+        $this->assertEquals(
+            $problemData[1]['request']['problem_alias'],
+            $response['results'][0]['alias']
+        );
     }
 
     /**
@@ -367,7 +424,11 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPrivate['request']['problem_alias']
+        );
     }
 
     /**
@@ -393,7 +454,11 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPrivate['request']['problem_alias']
+        );
     }
 
     /**
@@ -416,7 +481,11 @@ class ProblemList extends OmegaupTestCase {
 
         // Should not be contained in problem list.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
-        $this->assertArrayNotContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPrivate['request']['problem_alias']
+        );
 
         $login = self::login($author);
         $response = \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
@@ -429,7 +498,11 @@ class ProblemList extends OmegaupTestCase {
 
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
-        $this->assertArrayContainsInKey($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPrivate['request']['problem_alias']
+        );
     }
 
     /**
@@ -453,13 +526,27 @@ class ProblemList extends OmegaupTestCase {
 
         // Should not be contained in problem list.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
-        $this->assertArrayNotContainsInKey($response['results'], 'alias', $alias);
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'alias',
+            $alias
+        );
 
         $response = \OmegaUp\Controllers\Problem::apiAdminList($r);
-        $this->assertArrayNotContainsInKey($response['problems'], 'alias', $alias);
+        $this->assertArrayNotContainsInKey(
+            $response['problems'],
+            'alias',
+            $alias
+        );
 
         $authorLogin = self::login($author);
-        $group = GroupsFactory::createGroup($author, null, null, null, $authorLogin);
+        $group = GroupsFactory::createGroup(
+            $author,
+            null,
+            null,
+            null,
+            $authorLogin
+        );
         GroupsFactory::addUserToGroup($group, $addedAdmin, $authorLogin);
         GroupsFactory::addUserToGroup($group, $author, $authorLogin);
 
@@ -473,10 +560,18 @@ class ProblemList extends OmegaupTestCase {
 
         // Now it should be visible.
         $response = \OmegaUp\Controllers\Problem::apiList($r);
-        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $alias);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'alias',
+            $alias
+        );
 
         $response = \OmegaUp\Controllers\Problem::apiAdminList($r);
-        $this->assertArrayContainsInKeyExactlyOnce($response['problems'], 'alias', $alias);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['problems'],
+            'alias',
+            $alias
+        );
     }
 
     /**
@@ -492,8 +587,18 @@ class ProblemList extends OmegaupTestCase {
         $alias = $problemDataPrivate['request']['problem_alias'];
 
         $authorLogin = self::login($author);
-        $group = GroupsFactory::createGroup($author, null, null, null, $authorLogin);
-        GroupsFactory::addUserToGroup($group, UserFactory::createUser(), $authorLogin);
+        $group = GroupsFactory::createGroup(
+            $author,
+            null,
+            null,
+            null,
+            $authorLogin
+        );
+        GroupsFactory::addUserToGroup(
+            $group,
+            UserFactory::createUser(),
+            $authorLogin
+        );
         GroupsFactory::addUserToGroup($group, $author, $authorLogin);
 
         $response = \OmegaUp\Controllers\Problem::apiAddGroupAdmin(new \OmegaUp\Request([
@@ -509,10 +614,18 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $authorLogin->auth_token,
         ]);
         $response = \OmegaUp\Controllers\Problem::apiList($r);
-        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $alias);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'alias',
+            $alias
+        );
 
         $response = \OmegaUp\Controllers\Problem::apiAdminList($r);
-        $this->assertArrayContainsInKeyExactlyOnce($response['problems'], 'alias', $alias);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['problems'],
+            'alias',
+            $alias
+        );
     }
 
     /**
@@ -543,7 +656,11 @@ class ProblemList extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertArrayContainsInKeyExactlyOnce($response['results'], 'alias', $problemDataPrivate['request']['problem_alias']);
+        $this->assertArrayContainsInKeyExactlyOnce(
+            $response['results'],
+            'alias',
+            $problemDataPrivate['request']['problem_alias']
+        );
     }
 
     /**
@@ -565,7 +682,10 @@ class ProblemList extends OmegaupTestCase {
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals(3, count($response['problems']));
-        $this->assertEquals($problemData[2]['request']['problem_alias'], $response['problems'][0]['alias']);
+        $this->assertEquals(
+            $problemData[2]['request']['problem_alias'],
+            $response['problems'][0]['alias']
+        );
     }
 
     /**
@@ -581,7 +701,10 @@ class ProblemList extends OmegaupTestCase {
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
 
-        $runDataDecimal = RunsFactory::createRunToProblem($problemDataDecimal, $contestant);
+        $runDataDecimal = RunsFactory::createRunToProblem(
+            $problemDataDecimal,
+            $contestant
+        );
         RunsFactory::gradeRun($runDataDecimal, '.123456', 'PA');
 
         $login = self::login($contestant);
@@ -613,12 +736,16 @@ class ProblemList extends OmegaupTestCase {
     public function testListScoresForNonLoggedIn() {
         $problemData = ProblemsFactory::createProblem();
 
-        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request()
+        );
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
             if ($responseProblem['score'] != '0') {
-                $this->fail('Expecting score to be not set for non-logged in users');
+                $this->fail(
+                    'Expecting score to be not set for non-logged in users'
+                );
             }
         }
     }
@@ -661,7 +788,11 @@ class ProblemList extends OmegaupTestCase {
             $adminLogin = self::login($admin);
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
-                'query' => substr($problemDataPrivate['request']['title'], 2, 5),
+                'query' => substr(
+                    $problemDataPrivate['request']['title'],
+                    2,
+                    5
+                ),
             ]));
             $this->assertArrayContainsInKey(
                 $response['results'],
@@ -693,7 +824,10 @@ class ProblemList extends OmegaupTestCase {
             ]));
             $runs = $i / 2;
             for ($r = 0; $r < $runs; $r++) {
-                $runData = RunsFactory::createRunToProblem($problemData[$i], $contestant);
+                $runData = RunsFactory::createRunToProblem(
+                    $problemData[$i],
+                    $contestant
+                );
                 $points = rand(0, 100);
                 $verdict = 'WA';
                 if ($points > 0) {
@@ -750,17 +884,23 @@ class ProblemList extends OmegaupTestCase {
                             unset($request['rowcount']);
                         }
                         $request['page'] = 1;
-                        $response = \OmegaUp\Controllers\Problem::apiList($request);
+                        $response = \OmegaUp\Controllers\Problem::apiList(
+                            $request
+                        );
                         $first = $response['results'];
                         $request['page'] = $pages;
-                        $response = \OmegaUp\Controllers\Problem::apiList($request);
+                        $response = \OmegaUp\Controllers\Problem::apiList(
+                            $request
+                        );
                         $last = $response['results'];
 
                         // Test number of problems per page
                         $this->assertEquals(PROBLEMS_PER_PAGE, count($first));
                     } else {
-                        $request['page']= null;
-                        $response = \OmegaUp\Controllers\Problem::apiList($request);
+                        $request['page'] = null;
+                        $response = \OmegaUp\Controllers\Problem::apiList(
+                            $request
+                        );
                         $first = $response['results'];
                         $last = $first;
                     }
@@ -776,9 +916,13 @@ class ProblemList extends OmegaupTestCase {
                         }
                     } else {
                         if ($mode === 'asc') {
-                            $this->assertTrue($first[$i][$col] <= $last[$j][$col]);
+                            $this->assertTrue(
+                                $first[$i][$col] <= $last[$j][$col]
+                            );
                         } else {
-                            $this->assertTrue($first[$i][$col] >= $last[$j][$col]);
+                            $this->assertTrue(
+                                $first[$i][$col] >= $last[$j][$col]
+                            );
                         }
                     }
                 }
@@ -831,7 +975,13 @@ class ProblemList extends OmegaupTestCase {
         /* -------- VALIDATE RESULTS -------*/
 
         // Expected to have only two problems as response although one same problem hasn't been accepted two times.
-        $this->assertEquals(count($response['problems']), 2, 'Expected to have only 2 problems as response.');
+        $this->assertEquals(
+            count(
+                $response['problems']
+            ),
+            2,
+            'Expected to have only 2 problems as response.'
+        );
 
         foreach ($response['problems'] as $responseProblem) {
             // The title should match one of the non accepted problems's titles.
@@ -842,15 +992,23 @@ class ProblemList extends OmegaupTestCase {
                     break;
 
                 case $problemDataPE['problem']->title:
-                    $this->assertEquals($responseProblem['title'], $problemDataPE['problem']->title);
+                    $this->assertEquals(
+                        $responseProblem['title'],
+                        $problemDataPE['problem']->title
+                    );
                     break;
 
                 case $problemDataWA['problem']->title:
-                    $this->assertEquals($responseProblem['title'], $problemDataWA['problem']->title);
+                    $this->assertEquals(
+                        $responseProblem['title'],
+                        $problemDataWA['problem']->title
+                    );
                     break;
 
                 default:
-                    $this->fail('Expected to see only problems tried (but not solved) by the user.');
+                    $this->fail(
+                        'Expected to see only problems tried (but not solved) by the user.'
+                    );
             }
         }
     }

@@ -23,10 +23,16 @@ class PrivacyStatements extends \OmegaUp\DAO\Base\PrivacyStatements {
                 ORDER BY
                   privacystatement_id DESC
                 LIMIT 1';
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$statement_type]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$statement_type]
+        );
     }
 
-    public static function getId(string $gitObjectId, string $statementType) : ?int {
+    public static function getId(
+        string $gitObjectId,
+        string $statementType
+    ): ?int {
         $sql = 'SELECT
                   privacystatement_id
                 FROM
@@ -38,6 +44,9 @@ class PrivacyStatements extends \OmegaUp\DAO\Base\PrivacyStatements {
                   privacystatement_id DESC
                 LIMIT 1';
         /** @var int|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$gitObjectId, $statementType]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$gitObjectId, $statementType]
+        );
     }
 }

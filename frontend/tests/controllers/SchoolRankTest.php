@@ -44,7 +44,10 @@ class SchoolRankTest extends OmegaupTestCase {
      */
     public function testSchoolRankPositive() {
         $currentTime = \OmegaUp\Time::get();
-        $pastMonthTime = strtotime('first day of last month', \OmegaUp\Time::get());
+        $pastMonthTime = strtotime(
+            'first day of last month',
+            \OmegaUp\Time::get()
+        );
 
         \OmegaUp\Time::setTimeForTesting($pastMonthTime);
 

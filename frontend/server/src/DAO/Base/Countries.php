@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,11 +35,23 @@ abstract class Countries {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\Countries $Countries) : int {
-        if (empty($Countries->country_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\Countries $Countries
+    ): int {
+        if (
+            empty($Countries->country_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Countries (`country_id`, `name`) VALUES (?, ?);';
+        $sql = '
+            REPLACE INTO
+                Countries (
+                    `country_id`,
+                    `name`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
             $Countries->country_id,
             $Countries->name,
@@ -55,8 +67,18 @@ abstract class Countries {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Countries $Countries) : int {
-        $sql = 'UPDATE `Countries` SET `name` = ? WHERE `country_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Countries $Countries
+    ): int {
+        $sql = '
+            UPDATE
+                `Countries`
+            SET
+                `name` = ?
+            WHERE
+                (
+                    `country_id` = ?
+                );';
         $params = [
             $Countries->name,
             $Countries->country_id,
@@ -68,15 +90,27 @@ abstract class Countries {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Countries} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Countries}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Countries}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Countries Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Countries} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?string $country_id) : ?\OmegaUp\DAO\VO\Countries {
-        $sql = 'SELECT `Countries`.`country_id`, `Countries`.`name` FROM Countries WHERE (country_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?string $country_id
+    ): ?\OmegaUp\DAO\VO\Countries {
+        $sql = '
+            SELECT
+                `Countries`.`country_id`,
+                `Countries`.`name`
+            FROM
+                `Countries`
+            WHERE
+                (
+                    `country_id` = ?
+                )
+            LIMIT 1;';
         $params = [$country_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -104,9 +138,19 @@ abstract class Countries {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Countries $Countries) : void {
-        $sql = 'DELETE FROM `Countries` WHERE country_id = ?;';
-        $params = [$Countries->country_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Countries $Countries
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Countries`
+            WHERE
+                (
+                    `country_id` = ?
+                );';
+        $params = [
+            $Countries->country_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -140,17 +184,37 @@ abstract class Countries {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Countries`.`country_id`, `Countries`.`name` from Countries';
+    ): array {
+        $sql = '
+            SELECT
+                `Countries`.`country_id`,
+                `Countries`.`name`
+            FROM
+                `Countries`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Countries($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Countries(
+                $row
+            );
         }
         return $allData;
     }
@@ -163,12 +227,24 @@ abstract class Countries {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Countries $Countries El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Countries} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Countries}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Countries $Countries) : int {
-        $sql = 'INSERT INTO Countries (`country_id`, `name`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Countries $Countries
+    ): int {
+        $sql = '
+            INSERT INTO
+                Countries (
+                    `country_id`,
+                    `name`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
             $Countries->country_id,
             $Countries->name,

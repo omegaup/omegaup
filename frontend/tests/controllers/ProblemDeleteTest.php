@@ -32,7 +32,11 @@ class ProblemDeleteTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
 
         // Grade the run
         RunsFactory::gradeRun($runData);
@@ -73,11 +77,18 @@ class ProblemDeleteTest extends OmegaupTestCase {
         ]));
 
         // Get problems list
-        $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([]));
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request(
+                []
+            )
+        );
 
         // Asserting deleted problem is not in the list
         foreach ($response['results'] as $key => $problem) {
-            $this->assertNotEquals($deletedProblemData['request']['problem_alias'], $problem['alias']);
+            $this->assertNotEquals(
+                $deletedProblemData['request']['problem_alias'],
+                $problem['alias']
+            );
         }
 
         // Asserting not deleted problem is in the list
@@ -123,7 +134,10 @@ class ProblemDeleteTest extends OmegaupTestCase {
 
         // Asserting deleted problem is not in the list
         foreach ($response['results'] as $key => $problem) {
-            $this->assertNotEquals($deletedProblemData['request']['problem_alias'], $problem['alias']);
+            $this->assertNotEquals(
+                $deletedProblemData['request']['problem_alias'],
+                $problem['alias']
+            );
         }
 
         // Asserting not deleted problem is in the list
@@ -143,7 +157,10 @@ class ProblemDeleteTest extends OmegaupTestCase {
 
         // Asserting deleted problem is not in the list
         foreach ($response['problems'] as $key => $problem) {
-            $this->assertNotEquals($deletedProblemData['request']['problem_alias'], $problem['alias']);
+            $this->assertNotEquals(
+                $deletedProblemData['request']['problem_alias'],
+                $problem['alias']
+            );
         }
 
         // Asserting not deleted problem is in the list
@@ -196,7 +213,10 @@ class ProblemDeleteTest extends OmegaupTestCase {
 
         // Asserting deleted problem is not in the list
         foreach ($response['results'] as $key => $problem) {
-            $this->assertNotEquals($deletedProblemData['request']['problem_alias'], $problem['alias']);
+            $this->assertNotEquals(
+                $deletedProblemData['request']['problem_alias'],
+                $problem['alias']
+            );
         }
 
         // Asserting not deleted problem is in the list

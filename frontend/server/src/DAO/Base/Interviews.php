@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,15 +25,42 @@ abstract class Interviews {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Interviews $Interviews) : int {
-        $sql = 'UPDATE `Interviews` SET `problemset_id` = ?, `acl_id` = ?, `alias` = ?, `title` = ?, `description` = ?, `window_length` = ? WHERE `interview_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Interviews $Interviews
+    ): int {
+        $sql = '
+            UPDATE
+                `Interviews`
+            SET
+                `problemset_id` = ?,
+                `acl_id` = ?,
+                `alias` = ?,
+                `title` = ?,
+                `description` = ?,
+                `window_length` = ?
+            WHERE
+                (
+                    `interview_id` = ?
+                );';
         $params = [
-            is_null($Interviews->problemset_id) ? null : intval($Interviews->problemset_id),
-            is_null($Interviews->acl_id) ? null : intval($Interviews->acl_id),
+            (
+                is_null($Interviews->problemset_id) ?
+                null :
+                intval($Interviews->problemset_id)
+            ),
+            (
+                is_null($Interviews->acl_id) ?
+                null :
+                intval($Interviews->acl_id)
+            ),
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            is_null($Interviews->window_length) ? null : intval($Interviews->window_length),
+            (
+                is_null($Interviews->window_length) ?
+                null :
+                intval($Interviews->window_length)
+            ),
             intval($Interviews->interview_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -43,15 +70,32 @@ abstract class Interviews {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Interviews} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Interviews}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Interviews}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Interviews Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Interviews} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $interview_id) : ?\OmegaUp\DAO\VO\Interviews {
-        $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` FROM Interviews WHERE (interview_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $interview_id
+    ): ?\OmegaUp\DAO\VO\Interviews {
+        $sql = '
+            SELECT
+                `Interviews`.`interview_id`,
+                `Interviews`.`problemset_id`,
+                `Interviews`.`acl_id`,
+                `Interviews`.`alias`,
+                `Interviews`.`title`,
+                `Interviews`.`description`,
+                `Interviews`.`window_length`
+            FROM
+                `Interviews`
+            WHERE
+                (
+                    `interview_id` = ?
+                )
+            LIMIT 1;';
         $params = [$interview_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -79,9 +123,19 @@ abstract class Interviews {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Interviews $Interviews) : void {
-        $sql = 'DELETE FROM `Interviews` WHERE interview_id = ?;';
-        $params = [$Interviews->interview_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Interviews $Interviews
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Interviews`
+            WHERE
+                (
+                    `interview_id` = ?
+                );';
+        $params = [
+            $Interviews->interview_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -115,17 +169,42 @@ abstract class Interviews {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Interviews`.`interview_id`, `Interviews`.`problemset_id`, `Interviews`.`acl_id`, `Interviews`.`alias`, `Interviews`.`title`, `Interviews`.`description`, `Interviews`.`window_length` from Interviews';
+    ): array {
+        $sql = '
+            SELECT
+                `Interviews`.`interview_id`,
+                `Interviews`.`problemset_id`,
+                `Interviews`.`acl_id`,
+                `Interviews`.`alias`,
+                `Interviews`.`title`,
+                `Interviews`.`description`,
+                `Interviews`.`window_length`
+            FROM
+                `Interviews`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Interviews($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Interviews(
+                $row
+            );
         }
         return $allData;
     }
@@ -138,26 +217,60 @@ abstract class Interviews {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Interviews $Interviews El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Interviews} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Interviews}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Interviews $Interviews) : int {
-        $sql = 'INSERT INTO Interviews (`problemset_id`, `acl_id`, `alias`, `title`, `description`, `window_length`) VALUES (?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Interviews $Interviews
+    ): int {
+        $sql = '
+            INSERT INTO
+                Interviews (
+                    `problemset_id`,
+                    `acl_id`,
+                    `alias`,
+                    `title`,
+                    `description`,
+                    `window_length`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Interviews->problemset_id) ? null : intval($Interviews->problemset_id),
-            is_null($Interviews->acl_id) ? null : intval($Interviews->acl_id),
+            (
+                is_null($Interviews->problemset_id) ?
+                null :
+                intval($Interviews->problemset_id)
+            ),
+            (
+                is_null($Interviews->acl_id) ?
+                null :
+                intval($Interviews->acl_id)
+            ),
             $Interviews->alias,
             $Interviews->title,
             $Interviews->description,
-            is_null($Interviews->window_length) ? null : intval($Interviews->window_length),
+            (
+                is_null($Interviews->window_length) ?
+                null :
+                intval($Interviews->window_length)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Interviews->interview_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Interviews->interview_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

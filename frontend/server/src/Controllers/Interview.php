@@ -3,20 +3,36 @@
  namespace OmegaUp\Controllers;
 
 class Interview extends \OmegaUp\Controllers\Controller {
-    private static function validateCreateOrUpdate(\OmegaUp\Request $r, $is_update = false) {
+    private static function validateCreateOrUpdate(
+        \OmegaUp\Request $r,
+        $is_update = false
+    ) {
         $r->ensureMainUserIdentity();
         $is_required = !$is_update;
 
         // Only site-admins and interviewers can create interviews for now
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
-            !\OmegaUp\DAO\Users::IsUserInterviewer($r->user->user_id)) {
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
+            !\OmegaUp\DAO\Users::IsUserInterviewer($r->user->user_id)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['title'], 'title', $is_required);
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['description'], 'description');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['title'],
+            'title',
+            $is_required
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['description'],
+            'description'
+        );
         $r->ensureInt('duration', 60, 60 * 5, false);
-        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', $is_required);
+        \OmegaUp\Validators::validateValidAlias(
+            $r['alias'],
+            'alias',
+            $is_required
+        );
     }
 
     public static function apiCreate(\OmegaUp\Request $r) {
@@ -34,7 +50,10 @@ class Interview extends \OmegaUp\Controllers\Controller {
         $interview = new \OmegaUp\DAO\VO\Interviews([
             'alias' => $r['alias'],
             'title' => $r['title'],
-            'description' => array_key_exists('description', $r) ? $r['description'] : $r['title'],
+            'description' => array_key_exists(
+                'description',
+                $r
+            ) ? $r['description'] : $r['title'],
             'window_length' => $r['duration'],
         ]);
 
@@ -48,7 +67,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
                 'acl_id' => $acl->acl_id,
                 'type' => 'Interview',
                 'scoreboard_url' => \OmegaUp\SecurityTools::randomString(30),
-                'scoreboard_url_admin' => \OmegaUp\SecurityTools::randomString(30),
+                'scoreboard_url_admin' => \OmegaUp\SecurityTools::randomString(
+                    30
+                ),
             ]);
             \OmegaUp\DAO\Problemsets::create($problemset);
             $interview->problemset_id = $problemset->problemset_id;
@@ -64,7 +85,10 @@ class Interview extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
 
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'aliasInUse',
+                    $e
+                );
             }
             throw $e;
         }
@@ -82,7 +106,10 @@ class Interview extends \OmegaUp\Controllers\Controller {
         // Authenticate logged user
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmailsCSV'], 'usernameOrEmailsCSV');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmailsCSV'],
+            'usernameOrEmailsCSV'
+        );
         $usersToAdd = explode(',', $r['usernameOrEmailsCSV']);
 
         foreach ($usersToAdd as $addThisUser) {
@@ -98,45 +125,69 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     private static function addUserInternal($r) {
-        \OmegaUp\Validators::validateStringNonEmpty($r['interview_alias'], 'interview_alias');
-        \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['interview_alias'],
+            'interview_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
 
         // Does the interview exist ?
-        $r['interview'] = \OmegaUp\DAO\Interviews::getByAlias($r['interview_alias']);
+        $r['interview'] = \OmegaUp\DAO\Interviews::getByAlias(
+            $r['interview_alias']
+        );
         if (is_null($r['interview'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('interviewNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'interviewNotFound'
+            );
         }
 
         // Does the user exist ?
         try {
             $r['user'] = null;
-            $r['user'] = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
+            $r['user'] = \OmegaUp\Controllers\User::resolveUser(
+                $r['usernameOrEmail']
+            );
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             // this is fine, we'll create an account for this user
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailSubject')
+        $subject = \OmegaUp\Translations::getInstance()->get(
+            'interviewInvitationEmailSubject'
+        )
             ?: 'interviewInvitationEmailSubject';
 
         if (is_null($r['user'])) {
             // create a new user
-            self::$log->info('Could not find user, this must be a new email, registering: ' . $r['usernameOrEmail']);
+            self::$log->info(
+                'Could not find user, this must be a new email, registering: ' . $r['usernameOrEmail']
+            );
 
             $newUserRequest = new \OmegaUp\Request($r);
             $newUserRequest['email'] = $r['usernameOrEmail'];
-            $newUserRequest['username'] = \OmegaUp\Controllers\User::makeUsernameFromEmail($r['usernameOrEmail']);
-            $newUserRequest['password'] = \OmegaUp\SecurityTools::randomString(8);
+            $newUserRequest['username'] = \OmegaUp\Controllers\User::makeUsernameFromEmail(
+                $r['usernameOrEmail']
+            );
+            $newUserRequest['password'] = \OmegaUp\SecurityTools::randomString(
+                8
+            );
 
             \OmegaUp\Controllers\User::apiCreate($newUserRequest);
 
             // Email to new OmegaUp users
-            $body = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
+            $body = \OmegaUp\Translations::getInstance()->get(
+                'interviewInvitationEmailBodyIntro'
+            )
                . '<br>'
                . " <a href=\"https://omegaup.com/user/verifyemail/{$newUserRequest['user']->verification_id}/redirecttointerview/{$r['interview']->alias}/\">"
                . " https://omegaup.com/user/verifyemail/{$newUserRequest['user']->verification_id}/redirecttointerview/{$r['interview']->alias}/</a>"
                . '<br>';
 
-            $body .= \OmegaUp\Translations::getInstance()->get('interviewEmailDraft')
+            $body .= \OmegaUp\Translations::getInstance()->get(
+                'interviewEmailDraft'
+            )
                 . '<br>'
                 . \OmegaUp\Translations::getInstance()->get('profileUsername')
                 . ' : '
@@ -150,18 +201,26 @@ class Interview extends \OmegaUp\Controllers\Controller {
             $r['user'] = $newUserRequest['user'];
         } else {
             // Email to current OmegaUp user
-            $body = \OmegaUp\Translations::getInstance()->get('interviewInvitationEmailBodyIntro')
+            $body = \OmegaUp\Translations::getInstance()->get(
+                'interviewInvitationEmailBodyIntro'
+            )
                . " <a href=\"https://omegaup.com/interview/{$r['interview']->alias}/arena/\">"
                . "https://omegaup.com/interview/{$r['interview']->alias}/arena/</a>";
         }
 
         if (is_null($r['user'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userOrMailNotFound'
+            );
         }
 
         // Only director is allowed to add people to interview
-        if (is_null($r->identity)
-            || !\OmegaUp\Authorization::isInterviewAdmin($r->identity, $r['interview'])
+        if (
+            is_null($r->identity)
+            || !\OmegaUp\Authorization::isInterviewAdmin(
+                $r->identity,
+                $r['interview']
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -176,7 +235,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
         ]));
         $email = \OmegaUp\DAO\Emails::getByPK($r['user']->main_email_id);
         if (is_null($email) || is_null($email->email)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userOrMailNotFound'
+            );
         }
         \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
 
@@ -197,11 +258,18 @@ class Interview extends \OmegaUp\Controllers\Controller {
         }
 
         // Only admins can view interview details
-        if (!\OmegaUp\Authorization::isInterviewAdmin($r->identity, $interview)) {
+        if (
+            !\OmegaUp\Authorization::isInterviewAdmin(
+                $r->identity,
+                $interview
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $problemsetIdentities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset($interview->problemset_id);
+        $problemsetIdentities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset(
+            $interview->problemset_id
+        );
 
         $users = [];
 
@@ -212,7 +280,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
                         'username' => $identity['username'],
                         'access_time' => $identity['access_time'],
                         'email' => $identity['email'],
-                        'opened_interview' => !is_null($identity['access_time']),
+                        'opened_interview' => !is_null(
+                            $identity['access_time']
+                        ),
                         'country' => $identity['country_id'],
                     ];
         }
@@ -234,12 +304,16 @@ class Interview extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok',
-            'result' => \OmegaUp\DAO\Interviews::getMyInterviews($r->user->user_id),
+            'result' => \OmegaUp\DAO\Interviews::getMyInterviews(
+                $r->user->user_id
+            ),
         ];
     }
 
     public static function showIntro(\OmegaUp\Request $r) {
-        $contest = \OmegaUp\Controllers\Contest::validateContest($r['contest_alias'] ?? '');
+        $contest = \OmegaUp\Controllers\Contest::validateContest(
+            $r['contest_alias'] ?? ''
+        );
         // TODO: Arreglar esto para que Problemsets se encargue de obtener
         //       la info correcta
         return \OmegaUp\Controllers\Contest::shouldShowIntro($r, $contest);

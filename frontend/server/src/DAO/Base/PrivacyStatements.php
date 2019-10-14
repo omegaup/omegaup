@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,8 +25,19 @@ abstract class PrivacyStatements {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\PrivacyStatements $PrivacyStatements) : int {
-        $sql = 'UPDATE `PrivacyStatements` SET `git_object_id` = ?, `type` = ? WHERE `privacystatement_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\PrivacyStatements $PrivacyStatements
+    ): int {
+        $sql = '
+            UPDATE
+                `PrivacyStatements`
+            SET
+                `git_object_id` = ?,
+                `type` = ?
+            WHERE
+                (
+                    `privacystatement_id` = ?
+                );';
         $params = [
             $PrivacyStatements->git_object_id,
             $PrivacyStatements->type,
@@ -39,15 +50,28 @@ abstract class PrivacyStatements {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\PrivacyStatements} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\PrivacyStatements}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\PrivacyStatements}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\PrivacyStatements Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\PrivacyStatements} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $privacystatement_id) : ?\OmegaUp\DAO\VO\PrivacyStatements {
-        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` FROM PrivacyStatements WHERE (privacystatement_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $privacystatement_id
+    ): ?\OmegaUp\DAO\VO\PrivacyStatements {
+        $sql = '
+            SELECT
+                `PrivacyStatements`.`privacystatement_id`,
+                `PrivacyStatements`.`git_object_id`,
+                `PrivacyStatements`.`type`
+            FROM
+                `PrivacyStatements`
+            WHERE
+                (
+                    `privacystatement_id` = ?
+                )
+            LIMIT 1;';
         $params = [$privacystatement_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -75,9 +99,19 @@ abstract class PrivacyStatements {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\PrivacyStatements $PrivacyStatements) : void {
-        $sql = 'DELETE FROM `PrivacyStatements` WHERE privacystatement_id = ?;';
-        $params = [$PrivacyStatements->privacystatement_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\PrivacyStatements $PrivacyStatements
+    ): void {
+        $sql = '
+            DELETE FROM
+                `PrivacyStatements`
+            WHERE
+                (
+                    `privacystatement_id` = ?
+                );';
+        $params = [
+            $PrivacyStatements->privacystatement_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -111,17 +145,38 @@ abstract class PrivacyStatements {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `PrivacyStatements`.`privacystatement_id`, `PrivacyStatements`.`git_object_id`, `PrivacyStatements`.`type` from PrivacyStatements';
+    ): array {
+        $sql = '
+            SELECT
+                `PrivacyStatements`.`privacystatement_id`,
+                `PrivacyStatements`.`git_object_id`,
+                `PrivacyStatements`.`type`
+            FROM
+                `PrivacyStatements`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\PrivacyStatements($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\PrivacyStatements(
+                $row
+            );
         }
         return $allData;
     }
@@ -134,12 +189,24 @@ abstract class PrivacyStatements {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\PrivacyStatements $PrivacyStatements El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\PrivacyStatements} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\PrivacyStatements}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\PrivacyStatements $PrivacyStatements) : int {
-        $sql = 'INSERT INTO PrivacyStatements (`git_object_id`, `type`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\PrivacyStatements $PrivacyStatements
+    ): int {
+        $sql = '
+            INSERT INTO
+                PrivacyStatements (
+                    `git_object_id`,
+                    `type`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
             $PrivacyStatements->git_object_id,
             $PrivacyStatements->type,
@@ -149,7 +216,9 @@ abstract class PrivacyStatements {
         if ($affectedRows == 0) {
             return 0;
         }
-        $PrivacyStatements->privacystatement_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $PrivacyStatements->privacystatement_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }
