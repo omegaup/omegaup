@@ -72,10 +72,8 @@ class UserParams implements ArrayAccess {
 class UserFactory {
    /**
     * Creates a native user in Omegaup and returns the DAO populated
-    *
-    * @return \OmegaUp\DAO\VO\Users
     */
-    public static function createUser(UserParams $params = null) {
+    public static function createUser(UserParams $params = null) : \OmegaUp\DAO\VO\Users {
         if (!($params instanceof UserParams)) {
             $params = new UserParams($params);
         }
@@ -164,7 +162,7 @@ class UserFactory {
     }
 
     /**
-     * Creates a new user and elevates his privileges
+     * Creates a new user and elevates their privileges
      *
      * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
@@ -174,7 +172,6 @@ class UserFactory {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -194,7 +191,6 @@ class UserFactory {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -214,7 +210,6 @@ class UserFactory {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -234,7 +229,6 @@ class UserFactory {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
