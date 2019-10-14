@@ -43,10 +43,13 @@ class ProblemDeployer {
         $this->log = \Logger::getLogger('ProblemDeployer');
         $this->alias = $alias;
 
-        if (isset($_FILES['problem_contents'])
+        if (
+            isset($_FILES['problem_contents'])
             && isset($_FILES['problem_contents']['tmp_name'])
             && is_string($_FILES['problem_contents']['tmp_name'])
-            && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile($_FILES['problem_contents']['tmp_name'])
+            && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
+                $_FILES['problem_contents']['tmp_name']
+            )
         ) {
             /** @psalm-suppress MixedArrayAccess */
             $this->zipPath = strval($_FILES['problem_contents']['tmp_name']);
@@ -66,7 +69,7 @@ class ProblemDeployer {
         \OmegaUp\DAO\VO\Identities $identity,
         int $operation,
         array $problemSettings
-    ) : void {
+    ): void {
         $mergeStrategy = 'ours';
 
         switch ($operation) {
@@ -106,7 +109,7 @@ class ProblemDeployer {
      *
      * @param array{status: string, error?: string, updated_refs?: array{name: string, from: string, to: string, from_tree: string, to_tree: string}[], updated_files: array{path: string, type: string}[]} $result the JSON from omegaup-gitserver.
      */
-    private function processResult(array $result) : void {
+    private function processResult(array $result): void {
         if (!empty($result['updated_refs'])) {
             foreach ($result['updated_refs'] as $ref) {
                 if ($ref['name'] == 'refs/heads/private') {
@@ -124,24 +127,30 @@ class ProblemDeployer {
                 if (strpos($updatedFile['path'], 'examples/') === 0) {
                     $updatedExamples = true;
                 }
-                if (preg_match(
-                    '%statements/([a-z]{2})\\.markdown%',
-                    $updatedFile['path'],
-                    $matches
-                ) === 1) {
+                if (
+                    preg_match(
+                        '%statements/([a-z]{2})\\.markdown%',
+                        $updatedFile['path'],
+                        $matches
+                    ) === 1
+                ) {
                     $this->updatedLanguages[] = $matches[1];
                 }
-                if (preg_match(
-                    '%solutions/([a-z]{2})\\.markdown%',
-                    $updatedFile['path'],
-                    $matches
-                ) === 1) {
+                if (
+                    preg_match(
+                        '%solutions/([a-z]{2})\\.markdown%',
+                        $updatedFile['path'],
+                        $matches
+                    ) === 1
+                ) {
                     $this->updatedLanguages[] = $matches[1];
                 }
-                if (preg_match(
-                    '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
-                    $updatedFile['path']
-                ) === 1) {
+                if (
+                    preg_match(
+                        '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
+                        $updatedFile['path']
+                    ) === 1
+                ) {
                     $updatedInteractiveFiles = true;
                 }
             }
@@ -155,11 +164,14 @@ class ProblemDeployer {
      * Calling this function is a no-op if the problem turns out to not be an
      * interactive problem.
      */
-    public function generateLibinteractiveTemplates(?string $publishedCommit) : void {
+    public function generateLibinteractiveTemplates(?string $publishedCommit): void {
         if (is_null($publishedCommit)) {
             return;
         }
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($this->alias, $publishedCommit);
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $this->alias,
+            $publishedCommit
+        );
         /** @var null|array{interactive?: array{module_name: string, language: string}, cases: array<string, mixed>} */
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
@@ -169,7 +181,11 @@ class ProblemDeployer {
             // oops, this was not an interactive problem.
             return;
         }
-        $tmpDir = \OmegaUp\FileHandler::tempDir('/tmp', 'ProblemDeployer', 0755);
+        $tmpDir = \OmegaUp\FileHandler::tempDir(
+            '/tmp',
+            'ProblemDeployer',
+            0755
+        );
         try {
             $idlPath = "{$tmpDir}/{$distribSettings['interactive']['module_name']}.idl";
             file_put_contents(
@@ -222,7 +238,7 @@ class ProblemDeployer {
         string $message,
         \OmegaUp\DAO\VO\Identities $identity,
         array $blobUpdate
-    ) : void {
+    ): void {
         $tmpfile = tmpfile();
         try {
             $zipPath = stream_get_meta_data($tmpfile)['uri'];
@@ -270,7 +286,7 @@ class ProblemDeployer {
         return $this->updatedLanguages;
     }
 
-    private function executeRaw(array $args, string $cwd) : array {
+    private function executeRaw(array $args, string $cwd): array {
         $descriptorspec = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
@@ -342,7 +358,7 @@ class ProblemDeployer {
         bool $create,
         bool $acceptsSubmissions,
         bool $updatePublished
-    ) : array {
+    ): array {
         $curl = curl_init();
         $zipFile = fopen($zipPath, 'r');
         /** @var int */
@@ -363,7 +379,9 @@ class ProblemDeployer {
             curl_setopt_array(
                 $curl,
                 [
-                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-upload-zip?" . http_build_query($queryParams),
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/git-upload-zip?" . http_build_query(
+                        $queryParams
+                    ),
                     CURLOPT_HTTPHEADER => [
                         'Accept: application/json',
                         'Content-Type: application/zip',
@@ -457,7 +475,7 @@ class ProblemDeployer {
         string $oldOid,
         string $newOid,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : void {
+    ): void {
         $curl = curl_init();
 
         $pktline = "${oldOid} ${newOid} refs/heads/published\n";

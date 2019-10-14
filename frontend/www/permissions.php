@@ -12,9 +12,13 @@ if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
 $r = new \OmegaUp\Request($_REQUEST);
 $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
 
-$systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($session['user']->user_id);
+$systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles(
+    $session['user']->user_id
+);
 $roles = \OmegaUp\DAO\Roles::getAll();
-$systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($session['user']->user_id);
+$systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+    $session['user']->user_id
+);
 $groups = \OmegaUp\DAO\Groups::SearchByName('omegaup:');
 $userSystemRoles = [];
 $userSystemGroups = [];

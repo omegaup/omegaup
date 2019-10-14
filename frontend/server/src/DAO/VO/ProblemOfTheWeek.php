@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -28,19 +28,29 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['problem_of_the_week_id'])) {
-            $this->problem_of_the_week_id = intval($data['problem_of_the_week_id']);
+            $this->problem_of_the_week_id = intval(
+                $data['problem_of_the_week_id']
+            );
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = intval($data['problem_id']);
+            $this->problem_id = intval(
+                $data['problem_id']
+            );
         }
         if (isset($data['time'])) {
-            $this->time = strval($data['time']);
+            $this->time = strval(
+                $data['time']
+            );
         }
         if (isset($data['difficulty'])) {
-            $this->difficulty = strval($data['difficulty']);
+            $this->difficulty = strval(
+                $data['difficulty']
+            );
         }
     }
 

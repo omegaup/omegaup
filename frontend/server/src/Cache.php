@@ -9,7 +9,7 @@ abstract class CacheAdapter {
     /** @var CacheAdapter|null */
     private static $_instance = null;
 
-    public static function getInstance() : CacheAdapter {
+    public static function getInstance(): CacheAdapter {
         if (is_null(CacheAdapter::$_instance)) {
             if (function_exists('apcu_clear_cache')) {
                 CacheAdapter::$_instance = new APCCacheAdapter();
@@ -34,10 +34,10 @@ abstract class CacheAdapter {
      * @param int $ttl
      * @return bool
      */
-    abstract public function add(string $key, $var, int $ttl = 0) : bool;
-    abstract public function cas(string $key, int $old, int $new) : bool;
-    abstract public function clear() : void;
-    abstract public function delete(string $key) : bool;
+    abstract public function add(string $key, $var, int $ttl = 0): bool;
+    abstract public function cas(string $key, int $old, int $new): bool;
+    abstract public function clear(): void;
+    abstract public function delete(string $key): bool;
 
     /**
      * @param string $key
@@ -50,7 +50,7 @@ abstract class CacheAdapter {
      * @param mixed $var
      * @param int $ttl
      */
-    abstract public function store(string $key, $var, int $ttl = 0) : bool;
+    abstract public function store(string $key, $var, int $ttl = 0): bool;
 }
 
 /**
@@ -80,19 +80,19 @@ class APCCacheAdapter extends CacheAdapter {
      * @param int $ttl
      * @return bool
      */
-    public function add(string $key, $var, int $ttl = 0) : bool {
+    public function add(string $key, $var, int $ttl = 0): bool {
         return apcu_add($key, $var, $ttl);
     }
 
-    public function cas(string $key, int $old, int $new) : bool {
+    public function cas(string $key, int $old, int $new): bool {
         return apcu_cas($key, $old, $new);
     }
 
-    public function clear() : void {
+    public function clear(): void {
         apcu_clear_cache();
     }
 
-    public function delete(string $key) : bool {
+    public function delete(string $key): bool {
         return apcu_delete($key);
     }
 
@@ -109,7 +109,7 @@ class APCCacheAdapter extends CacheAdapter {
      * @param mixed $var
      * @param int $ttl
      */
-    public function store(string $key, $var, int $ttl = 0) : bool {
+    public function store(string $key, $var, int $ttl = 0): bool {
         return apcu_store($key, $var, $ttl);
     }
 }
@@ -141,7 +141,7 @@ class InProcessCacheAdapter extends CacheAdapter {
      * @param int $ttl
      * @return bool
      */
-    public function add(string $key, $var, int $ttl = 0) : bool {
+    public function add(string $key, $var, int $ttl = 0): bool {
         if (array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -149,19 +149,22 @@ class InProcessCacheAdapter extends CacheAdapter {
         return true;
     }
 
-    public function cas(string $key, int $old, int $new) : bool {
-        if (!array_key_exists($key, $this->cache) || $this->cache[$key] !== $old) {
+    public function cas(string $key, int $old, int $new): bool {
+        if (
+            !array_key_exists($key, $this->cache) ||
+            $this->cache[$key] !== $old
+        ) {
             return false;
         }
         $this->cache[$key] = $new;
         return true;
     }
 
-    public function clear() : void {
+    public function clear(): void {
         $this->cache = [];
     }
 
-    public function delete(string $key) : bool {
+    public function delete(string $key): bool {
         if (!array_key_exists($key, $this->cache)) {
             return false;
         }
@@ -185,7 +188,7 @@ class InProcessCacheAdapter extends CacheAdapter {
      * @param mixed $var
      * @param int $ttl
      */
-    public function store(string $key, $var, int $ttl = 0) : bool {
+    public function store(string $key, $var, int $ttl = 0): bool {
         $this->cache[$key] = $var;
         return true;
     }
@@ -248,11 +251,17 @@ class Cache {
      * @param int $timeout (seconds)
      * @return boolean
      */
-    public function set($value, int $timeout = APC_USER_CACHE_TIMEOUT) : bool {
+    public function set($value, int $timeout = APC_USER_CACHE_TIMEOUT): bool {
         if (!self::isEnabled()) {
             return false;
         }
-        if (CacheAdapter::getInstance()->store($this->key, $value, $timeout) !== true) {
+        if (
+            CacheAdapter::getInstance()->store(
+                $this->key,
+                $value,
+                $timeout
+            ) !== true
+        ) {
             $this->log->debug("Cache store failed for key: {$this->key}");
             return false;
         }
@@ -267,12 +276,14 @@ class Cache {
      *
      * @return boolean
      */
-    public function delete() : bool {
+    public function delete(): bool {
         if (!self::isEnabled()) {
             return false;
         }
         if (CacheAdapter::getInstance()->delete($this->key) !== true) {
-            $this->log->warn("Failed to invalidate cache for key: {$this->key}");
+            $this->log->warn(
+                "Failed to invalidate cache for key: {$this->key}"
+            );
             return false;
         }
         return true;
@@ -347,7 +358,7 @@ class Cache {
      * @param string $prefix
      * @param string $id
      */
-    public static function deleteFromCache($prefix, $id = '') : void {
+    public static function deleteFromCache($prefix, $id = ''): void {
         $cache = new \OmegaUp\Cache($prefix, $id);
         $cache->delete();
     }
@@ -357,7 +368,7 @@ class Cache {
      *
      * @param string $prefix
      */
-    private static function getVersion(string $prefix) : int {
+    private static function getVersion(string $prefix): int {
         $key = "v{$prefix}";
         return intval(CacheAdapter::getInstance()->entry($key, 0));
     }
@@ -370,7 +381,7 @@ class Cache {
      *
      * @param string $prefix
      */
-    public static function invalidateAllKeys(string $prefix) : void {
+    public static function invalidateAllKeys(string $prefix): void {
         if (!self::isEnabled()) {
             return;
         }
@@ -380,10 +391,16 @@ class Cache {
         do {
             // Ensure the version key exists.
             $version = self::getVersion($prefix);
-        } while (!CacheAdapter::getInstance()->cas($key, $version, $version + 1));
+        } while (
+            !CacheAdapter::getInstance()->cas(
+                $key,
+                $version,
+                $version + 1
+            )
+        );
     }
 
-    private static function isEnabled() : bool {
+    private static function isEnabled(): bool {
         return defined('APC_USER_CACHE_ENABLED') &&
             APC_USER_CACHE_ENABLED === true;
     }
@@ -393,7 +410,7 @@ class Cache {
      *
      * Only use this for testing purposes.
      */
-    public static function clearCacheForTesting() : void {
+    public static function clearCacheForTesting(): void {
         CacheAdapter::getInstance()->clear();
     }
 }

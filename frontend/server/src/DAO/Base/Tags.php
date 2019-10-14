@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,8 +25,18 @@ abstract class Tags {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Tags $Tags) : int {
-        $sql = 'UPDATE `Tags` SET `name` = ? WHERE `tag_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Tags $Tags
+    ): int {
+        $sql = '
+            UPDATE
+                `Tags`
+            SET
+                `name` = ?
+            WHERE
+                (
+                    `tag_id` = ?
+                );';
         $params = [
             $Tags->name,
             intval($Tags->tag_id),
@@ -38,15 +48,27 @@ abstract class Tags {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Tags} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Tags}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Tags}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Tags Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Tags} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $tag_id) : ?\OmegaUp\DAO\VO\Tags {
-        $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` FROM Tags WHERE (tag_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $tag_id
+    ): ?\OmegaUp\DAO\VO\Tags {
+        $sql = '
+            SELECT
+                `Tags`.`tag_id`,
+                `Tags`.`name`
+            FROM
+                `Tags`
+            WHERE
+                (
+                    `tag_id` = ?
+                )
+            LIMIT 1;';
         $params = [$tag_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -74,9 +96,19 @@ abstract class Tags {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Tags $Tags) : void {
-        $sql = 'DELETE FROM `Tags` WHERE tag_id = ?;';
-        $params = [$Tags->tag_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Tags $Tags
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Tags`
+            WHERE
+                (
+                    `tag_id` = ?
+                );';
+        $params = [
+            $Tags->tag_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -110,17 +142,37 @@ abstract class Tags {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Tags`.`tag_id`, `Tags`.`name` from Tags';
+    ): array {
+        $sql = '
+            SELECT
+                `Tags`.`tag_id`,
+                `Tags`.`name`
+            FROM
+                `Tags`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Tags($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Tags(
+                $row
+            );
         }
         return $allData;
     }
@@ -133,12 +185,22 @@ abstract class Tags {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Tags $Tags El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Tags} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Tags}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Tags $Tags) : int {
-        $sql = 'INSERT INTO Tags (`name`) VALUES (?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Tags $Tags
+    ): int {
+        $sql = '
+            INSERT INTO
+                Tags (
+                    `name`
+                ) VALUES (
+                    ?
+                );';
         $params = [
             $Tags->name,
         ];
@@ -147,7 +209,9 @@ abstract class Tags {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Tags->tag_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Tags->tag_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

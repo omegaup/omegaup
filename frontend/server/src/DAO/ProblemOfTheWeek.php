@@ -20,11 +20,19 @@ class ProblemOfTheWeek extends \OmegaUp\DAO\Base\ProblemOfTheWeek {
                 WHERE
                     difficulty = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$difficulty]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$difficulty]
+        );
 
         $problemsOfTheWeek = [];
         foreach ($rs as $row) {
-            array_push($problemsOfTheWeek, new \OmegaUp\DAO\VO\ProblemOfTheWeek($row));
+            array_push(
+                $problemsOfTheWeek,
+                new \OmegaUp\DAO\VO\ProblemOfTheWeek(
+                    $row
+                )
+            );
         }
         return $problemsOfTheWeek;
     }

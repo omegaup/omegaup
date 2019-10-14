@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,13 +25,41 @@ abstract class QualityNominationComments {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments) : int {
-        $sql = 'UPDATE `QualityNomination_Comments` SET `qualitynomination_id` = ?, `user_id` = ?, `time` = ?, `vote` = ?, `contents` = ? WHERE `qualitynomination_comment_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments
+    ): int {
+        $sql = '
+            UPDATE
+                `QualityNomination_Comments`
+            SET
+                `qualitynomination_id` = ?,
+                `user_id` = ?,
+                `time` = ?,
+                `vote` = ?,
+                `contents` = ?
+            WHERE
+                (
+                    `qualitynomination_comment_id` = ?
+                );';
         $params = [
-            is_null($QualityNomination_Comments->qualitynomination_id) ? null : intval($QualityNomination_Comments->qualitynomination_id),
-            is_null($QualityNomination_Comments->user_id) ? null : intval($QualityNomination_Comments->user_id),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Comments->time),
-            is_null($QualityNomination_Comments->vote) ? null : intval($QualityNomination_Comments->vote),
+            (
+                is_null($QualityNomination_Comments->qualitynomination_id) ?
+                null :
+                intval($QualityNomination_Comments->qualitynomination_id)
+            ),
+            (
+                is_null($QualityNomination_Comments->user_id) ?
+                null :
+                intval($QualityNomination_Comments->user_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $QualityNomination_Comments->time
+            ),
+            (
+                is_null($QualityNomination_Comments->vote) ?
+                null :
+                intval($QualityNomination_Comments->vote)
+            ),
             $QualityNomination_Comments->contents,
             intval($QualityNomination_Comments->qualitynomination_comment_id),
         ];
@@ -42,15 +70,31 @@ abstract class QualityNominationComments {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\QualityNominationComments} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\QualityNominationComments}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\QualityNominationComments}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\QualityNominationComments Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\QualityNominationComments} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $qualitynomination_comment_id) : ?\OmegaUp\DAO\VO\QualityNominationComments {
-        $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` FROM QualityNomination_Comments WHERE (qualitynomination_comment_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $qualitynomination_comment_id
+    ): ?\OmegaUp\DAO\VO\QualityNominationComments {
+        $sql = '
+            SELECT
+                `QualityNomination_Comments`.`qualitynomination_comment_id`,
+                `QualityNomination_Comments`.`qualitynomination_id`,
+                `QualityNomination_Comments`.`user_id`,
+                `QualityNomination_Comments`.`time`,
+                `QualityNomination_Comments`.`vote`,
+                `QualityNomination_Comments`.`contents`
+            FROM
+                `QualityNomination_Comments`
+            WHERE
+                (
+                    `qualitynomination_comment_id` = ?
+                )
+            LIMIT 1;';
         $params = [$qualitynomination_comment_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -78,9 +122,19 @@ abstract class QualityNominationComments {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments) : void {
-        $sql = 'DELETE FROM `QualityNomination_Comments` WHERE qualitynomination_comment_id = ?;';
-        $params = [$QualityNomination_Comments->qualitynomination_comment_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments
+    ): void {
+        $sql = '
+            DELETE FROM
+                `QualityNomination_Comments`
+            WHERE
+                (
+                    `qualitynomination_comment_id` = ?
+                );';
+        $params = [
+            $QualityNomination_Comments->qualitynomination_comment_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -114,17 +168,41 @@ abstract class QualityNominationComments {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `QualityNomination_Comments`.`qualitynomination_comment_id`, `QualityNomination_Comments`.`qualitynomination_id`, `QualityNomination_Comments`.`user_id`, `QualityNomination_Comments`.`time`, `QualityNomination_Comments`.`vote`, `QualityNomination_Comments`.`contents` from QualityNomination_Comments';
+    ): array {
+        $sql = '
+            SELECT
+                `QualityNomination_Comments`.`qualitynomination_comment_id`,
+                `QualityNomination_Comments`.`qualitynomination_id`,
+                `QualityNomination_Comments`.`user_id`,
+                `QualityNomination_Comments`.`time`,
+                `QualityNomination_Comments`.`vote`,
+                `QualityNomination_Comments`.`contents`
+            FROM
+                `QualityNomination_Comments`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\QualityNominationComments($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\QualityNominationComments(
+                $row
+            );
         }
         return $allData;
     }
@@ -137,17 +215,49 @@ abstract class QualityNominationComments {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\QualityNominationComments} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\QualityNominationComments}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments) : int {
-        $sql = 'INSERT INTO QualityNomination_Comments (`qualitynomination_id`, `user_id`, `time`, `vote`, `contents`) VALUES (?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\QualityNominationComments $QualityNomination_Comments
+    ): int {
+        $sql = '
+            INSERT INTO
+                QualityNomination_Comments (
+                    `qualitynomination_id`,
+                    `user_id`,
+                    `time`,
+                    `vote`,
+                    `contents`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($QualityNomination_Comments->qualitynomination_id) ? null : intval($QualityNomination_Comments->qualitynomination_id),
-            is_null($QualityNomination_Comments->user_id) ? null : intval($QualityNomination_Comments->user_id),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Comments->time),
-            is_null($QualityNomination_Comments->vote) ? null : intval($QualityNomination_Comments->vote),
+            (
+                is_null($QualityNomination_Comments->qualitynomination_id) ?
+                null :
+                intval($QualityNomination_Comments->qualitynomination_id)
+            ),
+            (
+                is_null($QualityNomination_Comments->user_id) ?
+                null :
+                intval($QualityNomination_Comments->user_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $QualityNomination_Comments->time
+            ),
+            (
+                is_null($QualityNomination_Comments->vote) ?
+                null :
+                intval($QualityNomination_Comments->vote)
+            ),
             $QualityNomination_Comments->contents,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -155,7 +265,9 @@ abstract class QualityNominationComments {
         if ($affectedRows == 0) {
             return 0;
         }
-        $QualityNomination_Comments->qualitynomination_comment_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $QualityNomination_Comments->qualitynomination_comment_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

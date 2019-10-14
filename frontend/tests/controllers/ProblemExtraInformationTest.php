@@ -144,7 +144,10 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(\OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED, $result['payload']['solution_status']);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED,
+            $result['payload']['solution_status']
+        );
 
         // Normal user should see the problem as locked
         $user = UserFactory::createUser();
@@ -153,7 +156,10 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(\OmegaUp\Controllers\Problem::SOLUTION_LOCKED, $result['payload']['solution_status']);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::SOLUTION_LOCKED,
+            $result['payload']['solution_status']
+        );
 
         // Problem with no solutions should return NOT_FOUND
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -163,6 +169,9 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(\OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND, $result['payload']['solution_status']);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND,
+            $result['payload']['solution_status']
+        );
     }
 }

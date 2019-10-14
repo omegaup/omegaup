@@ -21,7 +21,11 @@ class RunStatusTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
 
         $login = self::login($contestant);
         $response = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
@@ -40,7 +44,9 @@ class RunStatusTest extends OmegaupTestCase {
     public function testDownload() {
         $problemData = ProblemsFactory::createProblem();
         $user = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\Controllers\Identity::resolveIdentity($user->username);
+        $contestantIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $user->username
+        );
         $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $problemData['author']->username
         );

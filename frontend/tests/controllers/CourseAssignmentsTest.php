@@ -43,7 +43,10 @@ class CourseAssignmentsTest extends OmegaupTestCase {
                 'alias' => $assignments['assignments'][$index]['alias'],
                 'order' => $assignments['assignments'][$index]['order']
             ];
-            $this->assertEquals($assignments['assignments'][$index]['order'], $i++);
+            $this->assertEquals(
+                $assignments['assignments'][$index]['order'],
+                $i++
+            );
         }
 
         // Reordering assignments

@@ -26,7 +26,10 @@ class Tag extends \OmegaUp\Controllers\Controller {
         } elseif (!is_null($r['query'])) {
             $param = 'query';
         } else {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', 'query');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'query'
+            );
         }
 
         $tags = \OmegaUp\DAO\Tags::FindByName($r[$param]);

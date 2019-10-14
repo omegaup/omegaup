@@ -12,11 +12,15 @@ class NotificationTest extends OmegaupTestCase {
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'read' => true,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testRead'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testRead']
+            )
         ]));
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread']
+            )
         ]));
 
         // Get all unread notifications through API
@@ -27,22 +31,33 @@ class NotificationTest extends OmegaupTestCase {
         ]));
         $notifications = $results['notifications'];
         $this->assertEquals(1, sizeof($notifications));
-        $this->assertEquals('testUnread', json_decode($notifications[0]['contents'])->badge);
+        $this->assertEquals(
+            'testUnread',
+            json_decode(
+                $notifications[0]['contents']
+            )->badge
+        );
     }
 
     public function testReadNotifications() {
         $user = UserFactory::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread']
+            )
         ]));
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread2'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread2']
+            )
         ]));
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread3'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread3']
+            )
         ]));
 
         // Get all unread notifications (3) for user
@@ -104,7 +119,9 @@ class NotificationTest extends OmegaupTestCase {
         $user = UserFactory::createUser();
         $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
-            'contents' => json_encode(['type' => 'badge', 'badge' => 'testUnread'])
+            'contents' => json_encode(
+                ['type' => 'badge', 'badge' => 'testUnread']
+            )
         ]);
         \OmegaUp\DAO\Notifications::create($notification);
 

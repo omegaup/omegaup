@@ -19,7 +19,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function getBestSolvingRunsForProblem(
         int $problemId
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 i.username, s.language, r.runtime, r.memory, UNIX_TIMESTAMP(s.time) time
@@ -70,7 +70,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function getPendingRunGuidsOfProblemset(
         int $problemsetId
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 s.guid
@@ -86,7 +86,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val = [$problemsetId];
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $val
+            ) as $row
+        ) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -104,7 +109,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?int $identity_id,
         ?int $offset,
         ?int $rowcount
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 r.run_id, s.guid, s.language, r.status, r.verdict, r.runtime,
@@ -173,7 +178,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function getPendingRunsOfProblem(
         int $problemId
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 s.guid
@@ -188,7 +193,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val = [$problemId];
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $val
+            ) as $row
+        ) {
             $result[] = $row['guid'];
         }
         return $result;
@@ -200,7 +210,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function countTotalRunsOfProblemsetByVerdict(
         int $problemsetId,
         string $verdict
-    ) : int {
+    ): int {
         $sql = '
             SELECT
                 COUNT(*)
@@ -224,7 +234,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function countTotalRunsOfProblemByVerdict(
         int $problemId,
         string $verdict
-    ) : int {
+    ): int {
         $sql = '
             SELECT
                 COUNT(*)
@@ -276,7 +286,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function getLargestWaitTimeOfProblemset(
         int $problemsetId
-    ) : ?array {
+    ): ?array {
         $sql = '
             SELECT
                 s.guid, UNIX_TIMESTAMP(s.time) AS time
@@ -313,7 +323,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?string $filterUsersBy = null,
         ?int $groupId = null,
         ?bool $excludeAdmin = true
-    ) : array {
+    ): array {
         // Build SQL statement
         if ($showAllRuns) {
             if (is_null($groupId)) {
@@ -391,7 +401,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: bool}[] */
         $result = [];
         /** @var array{identity_id: int, username: string, name: string, country_id: string, is_invited: int} $row */
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $val
+            ) as $row
+        ) {
             $row['is_invited'] = boolval($row['is_invited']);
             array_push($result, $row);
         }
@@ -404,7 +419,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function getProblemsetRuns(
         \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $onlyAC = false
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 r.score, r.penalty, r.contest_score, s.problem_id,
@@ -434,7 +449,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         /** @var array{score: float, penalty: int, contest_score: float, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string}[] */
         $result = [];
         /** @var array{score: float, penalty: int, contest_score: float, problem_id: int, identity_id: int, type: string, time: int, submit_delay: int, guid: string} $row */
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemset->problemset_id]) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$problemset->problemset_id]
+            ) as $row
+        ) {
             array_push($result, $row);
         }
         return $result;
@@ -447,7 +467,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $problemsetId,
         int $problemId,
         int $identityId
-    ) : ?float {
+    ): ?float {
         $sql = '
             SELECT
                 r.contest_score
@@ -474,7 +494,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function getBestProblemScore(
         int $problemId,
         int $identityId
-    ) : ?float {
+    ): ?float {
         $sql = '
             SELECT
                 r.score * 100
@@ -495,7 +515,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
     }
 
-    final public static function getByProblemset(int $problemsetId) : array {
+    final public static function getByProblemset(int $problemsetId): array {
         $sql = '
             SELECT
                 s.guid,
@@ -524,12 +544,15 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.`time` DESC;
         ';
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemsetId]
+        );
     }
 
     final public static function getByProblem(
         int $problemId
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 *
@@ -555,7 +578,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $problemId,
         ?int $problemsetId,
         int $identityId
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 s.guid, s.language, r.status, r.verdict, r.runtime, r.penalty,
@@ -583,8 +606,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
         int $identityId
-    ) : bool {
-        $lastRunTime = \OmegaUp\DAO\Submissions::getLastSubmissionTime($identityId, $problemId, $problemsetId);
+    ): bool {
+        $lastRunTime = \OmegaUp\DAO\Submissions::getLastSubmissionTime(
+            $identityId,
+            $problemId,
+            $problemsetId
+        );
         if (is_null($lastRunTime)) {
             return true;
         }
@@ -606,7 +633,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function nextSubmissionTimestamp(
         ?\OmegaUp\DAO\VO\Contests $contest
-    ) : int {
+    ): int {
         $submission_gap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
             // Get submissions gap
@@ -621,7 +648,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function searchWithRunIdGreaterThan(
         int $problemId,
         int $submissionId
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 r.*
@@ -638,7 +665,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemId, $submissionId]) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$problemId, $submissionId]
+            ) as $row
+        ) {
             array_push($result, new \OmegaUp\DAO\VO\Runs($row));
         }
         return $result;
@@ -647,7 +679,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Recalculate the contest_score of all problemset and problem Runs
      */
-    public static function recalculateScore($problemset_id, $problem_id, $current_points, $original_points) {
+    public static function recalculateScore(
+        $problemset_id,
+        $problem_id,
+        $current_points,
+        $original_points
+    ) {
         $sql = '
             UPDATE
               Runs r
@@ -753,7 +790,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function createRunsForVersion(
         \OmegaUp\DAO\VO\Problems $problem
-    ) : void {
+    ): void {
         $sql = '
             INSERT IGNORE INTO
                 Runs (
@@ -768,7 +805,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ORDER BY
                 s.submission_id;
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$problem->current_version, $problem->problem_id]
+        );
     }
 
     /**
@@ -777,7 +817,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      *
      * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      */
-    final public static function updateVersionToCurrent(\OmegaUp\DAO\VO\Problems $problem) : void {
+    final public static function updateVersionToCurrent(\OmegaUp\DAO\VO\Problems $problem): void {
         $sql = '
             UPDATE
                 Submissions s
@@ -792,7 +832,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.version = ? AND
                 s.problem_id = ?;
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problem->current_version, $problem->problem_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$problem->current_version, $problem->problem_id]
+        );
     }
 
     /**
@@ -800,7 +843,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      *
      * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      */
-    final public static function getNewRunsForVersion(\OmegaUp\DAO\VO\Problems $problem) : array {
+    final public static function getNewRunsForVersion(\OmegaUp\DAO\VO\Problems $problem): array {
         $sql = '
             SELECT
                 r.run_id
@@ -818,7 +861,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $params = [$problem->current_version, $problem->problem_id];
 
         $result = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $params
+            ) as $row
+        ) {
             $result[] = new \OmegaUp\DAO\VO\Runs($row);
         }
         return $result;
@@ -838,7 +886,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?int $problemsetId,
         string $oldVersion,
         string $newVersion
-    ) : array {
+    ): array {
         $sql = '
             SELECT
                 i.username,
@@ -886,7 +934,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LIMIT 0, 1000;
         ';
 
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
         foreach ($result as &$row) {
             $row['old_score'] = floatval($row['old_score']);
             $row['new_score'] = floatval($row['new_score']);

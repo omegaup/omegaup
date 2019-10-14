@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,17 +35,48 @@ abstract class GroupsIdentities {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
-        if (empty($Groups_Identities->group_id) || empty($Groups_Identities->identity_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+    ): int {
+        if (
+            empty($Groups_Identities->group_id) ||
+            empty($Groups_Identities->identity_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Groups_Identities (
+                    `group_id`,
+                    `identity_id`,
+                    `share_user_information`,
+                    `privacystatement_consent_id`,
+                    `accept_teacher`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Groups_Identities->group_id,
             $Groups_Identities->identity_id,
-            !is_null($Groups_Identities->share_user_information) ? intval($Groups_Identities->share_user_information) : null,
-            !is_null($Groups_Identities->privacystatement_consent_id) ? intval($Groups_Identities->privacystatement_consent_id) : null,
-            !is_null($Groups_Identities->accept_teacher) ? intval($Groups_Identities->accept_teacher) : null,
+            (
+                !is_null($Groups_Identities->share_user_information) ?
+                intval($Groups_Identities->share_user_information) :
+                null
+            ),
+            (
+                !is_null($Groups_Identities->privacystatement_consent_id) ?
+                intval($Groups_Identities->privacystatement_consent_id) :
+                null
+            ),
+            (
+                !is_null($Groups_Identities->accept_teacher) ?
+                intval($Groups_Identities->accept_teacher) :
+                null
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -58,14 +89,47 @@ abstract class GroupsIdentities {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
-        $sql = 'UPDATE `Groups_Identities` SET `share_user_information` = ?, `privacystatement_consent_id` = ?, `accept_teacher` = ? WHERE `group_id` = ? AND `identity_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+    ): int {
+        $sql = '
+            UPDATE
+                `Groups_Identities`
+            SET
+                `share_user_information` = ?,
+                `privacystatement_consent_id` = ?,
+                `accept_teacher` = ?
+            WHERE
+                (
+                    `group_id` = ? AND
+                    `identity_id` = ?
+                );';
         $params = [
-            is_null($Groups_Identities->share_user_information) ? null : intval($Groups_Identities->share_user_information),
-            is_null($Groups_Identities->privacystatement_consent_id) ? null : intval($Groups_Identities->privacystatement_consent_id),
-            is_null($Groups_Identities->accept_teacher) ? null : intval($Groups_Identities->accept_teacher),
-            is_null($Groups_Identities->group_id) ? null : intval($Groups_Identities->group_id),
-            is_null($Groups_Identities->identity_id) ? null : intval($Groups_Identities->identity_id),
+            (
+                is_null($Groups_Identities->share_user_information) ?
+                null :
+                intval($Groups_Identities->share_user_information)
+            ),
+            (
+                is_null($Groups_Identities->privacystatement_consent_id) ?
+                null :
+                intval($Groups_Identities->privacystatement_consent_id)
+            ),
+            (
+                is_null($Groups_Identities->accept_teacher) ?
+                null :
+                intval($Groups_Identities->accept_teacher)
+            ),
+            (
+                is_null($Groups_Identities->group_id) ?
+                null :
+                intval($Groups_Identities->group_id)
+            ),
+            (
+                is_null($Groups_Identities->identity_id) ?
+                null :
+                intval($Groups_Identities->identity_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -74,15 +138,32 @@ abstract class GroupsIdentities {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\GroupsIdentities} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\GroupsIdentities}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\GroupsIdentities Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\GroupsIdentities} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $group_id, ?int $identity_id) : ?\OmegaUp\DAO\VO\GroupsIdentities {
-        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` FROM Groups_Identities WHERE (group_id = ? AND identity_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $group_id,
+        ?int $identity_id
+    ): ?\OmegaUp\DAO\VO\GroupsIdentities {
+        $sql = '
+            SELECT
+                `Groups_Identities`.`group_id`,
+                `Groups_Identities`.`identity_id`,
+                `Groups_Identities`.`share_user_information`,
+                `Groups_Identities`.`privacystatement_consent_id`,
+                `Groups_Identities`.`accept_teacher`
+            FROM
+                `Groups_Identities`
+            WHERE
+                (
+                    `group_id` = ? AND
+                    `identity_id` = ?
+                )
+            LIMIT 1;';
         $params = [$group_id, $identity_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -110,9 +191,21 @@ abstract class GroupsIdentities {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : void {
-        $sql = 'DELETE FROM `Groups_Identities` WHERE group_id = ? AND identity_id = ?;';
-        $params = [$Groups_Identities->group_id, $Groups_Identities->identity_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Groups_Identities`
+            WHERE
+                (
+                    `group_id` = ? AND
+                    `identity_id` = ?
+                );';
+        $params = [
+            $Groups_Identities->group_id,
+            $Groups_Identities->identity_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -146,17 +239,40 @@ abstract class GroupsIdentities {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Groups_Identities`.`group_id`, `Groups_Identities`.`identity_id`, `Groups_Identities`.`share_user_information`, `Groups_Identities`.`privacystatement_consent_id`, `Groups_Identities`.`accept_teacher` from Groups_Identities';
+    ): array {
+        $sql = '
+            SELECT
+                `Groups_Identities`.`group_id`,
+                `Groups_Identities`.`identity_id`,
+                `Groups_Identities`.`share_user_information`,
+                `Groups_Identities`.`privacystatement_consent_id`,
+                `Groups_Identities`.`accept_teacher`
+            FROM
+                `Groups_Identities`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\GroupsIdentities($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\GroupsIdentities(
+                $row
+            );
         }
         return $allData;
     }
@@ -169,18 +285,56 @@ abstract class GroupsIdentities {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsIdentities} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\GroupsIdentities}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities) : int {
-        $sql = 'INSERT INTO Groups_Identities (`group_id`, `identity_id`, `share_user_information`, `privacystatement_consent_id`, `accept_teacher`) VALUES (?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\GroupsIdentities $Groups_Identities
+    ): int {
+        $sql = '
+            INSERT INTO
+                Groups_Identities (
+                    `group_id`,
+                    `identity_id`,
+                    `share_user_information`,
+                    `privacystatement_consent_id`,
+                    `accept_teacher`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Groups_Identities->group_id) ? null : intval($Groups_Identities->group_id),
-            is_null($Groups_Identities->identity_id) ? null : intval($Groups_Identities->identity_id),
-            is_null($Groups_Identities->share_user_information) ? null : intval($Groups_Identities->share_user_information),
-            is_null($Groups_Identities->privacystatement_consent_id) ? null : intval($Groups_Identities->privacystatement_consent_id),
-            is_null($Groups_Identities->accept_teacher) ? null : intval($Groups_Identities->accept_teacher),
+            (
+                is_null($Groups_Identities->group_id) ?
+                null :
+                intval($Groups_Identities->group_id)
+            ),
+            (
+                is_null($Groups_Identities->identity_id) ?
+                null :
+                intval($Groups_Identities->identity_id)
+            ),
+            (
+                is_null($Groups_Identities->share_user_information) ?
+                null :
+                intval($Groups_Identities->share_user_information)
+            ),
+            (
+                is_null($Groups_Identities->privacystatement_consent_id) ?
+                null :
+                intval($Groups_Identities->privacystatement_consent_id)
+            ),
+            (
+                is_null($Groups_Identities->accept_teacher) ?
+                null :
+                intval($Groups_Identities->accept_teacher)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -95,7 +95,6 @@
       <code>$r['clarification_id']</code>
       <code>$r['clarification']</code>
       <code>$clarification</code>
-      <code>\OmegaUp\DAO\Contests::getByProblemset($clarification-&gt;problemset_id)</code>
       <code>$r['problem']</code>
       <code>$r['user']</code>
       <code>$r['contest']</code>
@@ -206,7 +205,6 @@
       <code>$problemsetProblem['order'] ?: 1</code>
       <code>$r['alias']</code>
       <code>$r['languages']</code>
-      <code>$r['submissions_gap']/60</code>
       <code>$contest_length / 60</code>
       <code>$r['problems']</code>
       <code>$r['contest_alias']</code>
@@ -627,7 +625,6 @@
       <code>$run['guid']</code>
       <code>$problem['runs']</code>
       <code>$problem['problem_id']</code>
-      <code>self::getIntroDetails($r)['smartyProperties']['coursePayload']</code>
       <code>$sharingInformation['share_user_information']</code>
       <code>$sharingInformation['accept_teacher']</code>
       <code>$assignmentProblemset['scoreboard_url_admin']</code>
@@ -748,9 +745,7 @@
       <code>$course-&gt;course_id</code>
       <code>$course-&gt;group_id</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="1">
-      <code>\OmegaUp\Controllers\Session::apiCurrentSession($r)['session']['identity']</code>
-    </PossiblyNullArrayAccess>
+    <PossiblyNullArrayAccess occurrences="1"/>
     <PossiblyNullPropertyFetch occurrences="2">
       <code>$resolvedUser-&gt;user_id</code>
     </PossiblyNullPropertyFetch>
@@ -921,7 +916,6 @@
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="2">
       <code>self::convertToSupportedLanguage($_GET['lang'])</code>
-      <code>\OmegaUp\Controllers\Identity::convertToSupportedLanguage($result-&gt;name)</code>
     </MixedReturnStatement>
     <PossiblyNullArgument occurrences="1">
       <code>$identity-&gt;username</code>
@@ -1003,11 +997,8 @@
       <code>$r['user']-&gt;main_email_id</code>
     </MixedPropertyFetch>
     <PossiblyNullOperand occurrences="5">
-      <code>\OmegaUp\Translations::getInstance()-&gt;get('interviewInvitationEmailBodyIntro')</code>
-      <code>\OmegaUp\Translations::getInstance()-&gt;get('interviewEmailDraft')</code>
       <code>\OmegaUp\Translations::getInstance()-&gt;get('profileUsername')</code>
       <code>\OmegaUp\Translations::getInstance()-&gt;get('loginPassword')</code>
-      <code>\OmegaUp\Translations::getInstance()-&gt;get('interviewInvitationEmailBodyIntro')</code>
     </PossiblyNullOperand>
   </file>
   <file src="frontend/server/src/Controllers/Notification.php">
@@ -1125,13 +1116,11 @@
       <code>$response['creation_date']</code>
       <code>$container</code>
       <code>$response['languages']</code>
-      <code>max($response['accepted'], 1.0) + 1</code>
       <code>$problem</code>
       <code>$r['lang']</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problem-&gt;commit</code>
-      <code>((new \OmegaUp\ProblemArtifacts($problem-&gt;alias, 'published'))-&gt;commit())['commit']</code>
       <code>$updatePublished</code>
       <code>$run-&gt;run_id</code>
       <code>$problem</code>
@@ -1274,7 +1263,6 @@
     </MixedMethodCall>
     <MixedOperand occurrences="4">
       <code>$_SERVER['HTTP_REFERER']</code>
-      <code>max($response['accepted'], 1.0)</code>
       <code>$casesStats['counts'][$case-&gt;name]</code>
       <code>$details['input_limit']</code>
     </MixedOperand>
@@ -1315,7 +1303,6 @@
       <code>$group-&gt;cases</code>
       <code>$case-&gt;name</code>
       <code>$case-&gt;score</code>
-      <code>$runs[count($runs) - 1]-&gt;submission_id</code>
     </MixedPropertyFetch>
     <MixedReturnStatement occurrences="3"/>
     <PossiblyNullArgument occurrences="19">
@@ -1324,15 +1311,11 @@
       <code>$acl-&gt;owner_id</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
-      <code>((new \OmegaUp\ProblemArtifacts($problem-&gt;alias, 'published'))-&gt;commit())['commit']</code>
       <code>$problem-&gt;current_version</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
     </PossiblyNullArgument>
-    <PossiblyNullArrayAccess occurrences="2">
-      <code>(new \OmegaUp\ProblemArtifacts($problem-&gt;alias, 'published'))-&gt;commit()['commit']</code>
-      <code>((new \OmegaUp\ProblemArtifacts($problem-&gt;alias, 'published'))-&gt;commit())['commit']</code>
-    </PossiblyNullArrayAccess>
+    <PossiblyNullArrayAccess occurrences="2"/>
     <PossiblyNullPropertyAssignmentValue occurrences="1">
       <code>$problemDeployer-&gt;publishedCommit</code>
     </PossiblyNullPropertyAssignmentValue>
@@ -1362,7 +1345,6 @@
       <code>wrapRequest</code>
     </MissingReturnType>
     <MixedArgument occurrences="3">
-      <code>\OmegaUp\DAO\Problemsets::getWithTypeByPK($r['problemset_id'])</code>
       <code>$r['tokens']</code>
       <code>$run['guid']</code>
     </MixedArgument>
@@ -1524,7 +1506,6 @@
     </MissingReturnType>
     <MixedArgument occurrences="44">
       <code>$r['problem']-&gt;languages</code>
-      <code>\OmegaUp\DAO\Problemsets::getProblemsetContainer($problemset_id)</code>
       <code>$r['contest']-&gt;languages</code>
       <code>$r['problem']</code>
       <code>$r['problem']</code>
@@ -1987,7 +1968,6 @@
     </UndefinedDocblockClass>
     <UndefinedMethod occurrences="2">
       <code>\OmegaUp\DAO\Identities::getStatusVerified($r['email'])</code>
-      <code>\OmegaUp\DAO\Problemsets::insideSubmissionWindow($contest, $user-&gt;user_id)</code>
     </UndefinedMethod>
   </file>
   <file src="frontend/server/src/DAO/Assignments.php">

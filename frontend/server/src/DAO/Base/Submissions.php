@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,16 +25,52 @@ abstract class Submissions {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Submissions $Submissions) : int {
-        $sql = 'UPDATE `Submissions` SET `current_run_id` = ?, `identity_id` = ?, `problem_id` = ?, `problemset_id` = ?, `guid` = ?, `language` = ?, `time` = ?, `submit_delay` = ?, `type` = ? WHERE `submission_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Submissions $Submissions
+    ): int {
+        $sql = '
+            UPDATE
+                `Submissions`
+            SET
+                `current_run_id` = ?,
+                `identity_id` = ?,
+                `problem_id` = ?,
+                `problemset_id` = ?,
+                `guid` = ?,
+                `language` = ?,
+                `time` = ?,
+                `submit_delay` = ?,
+                `type` = ?
+            WHERE
+                (
+                    `submission_id` = ?
+                );';
         $params = [
-            is_null($Submissions->current_run_id) ? null : intval($Submissions->current_run_id),
-            is_null($Submissions->identity_id) ? null : intval($Submissions->identity_id),
-            is_null($Submissions->problem_id) ? null : intval($Submissions->problem_id),
-            is_null($Submissions->problemset_id) ? null : intval($Submissions->problemset_id),
+            (
+                is_null($Submissions->current_run_id) ?
+                null :
+                intval($Submissions->current_run_id)
+            ),
+            (
+                is_null($Submissions->identity_id) ?
+                null :
+                intval($Submissions->identity_id)
+            ),
+            (
+                is_null($Submissions->problem_id) ?
+                null :
+                intval($Submissions->problem_id)
+            ),
+            (
+                is_null($Submissions->problemset_id) ?
+                null :
+                intval($Submissions->problemset_id)
+            ),
             $Submissions->guid,
             $Submissions->language,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submissions->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Submissions->time
+            ),
             intval($Submissions->submit_delay),
             $Submissions->type,
             intval($Submissions->submission_id),
@@ -46,15 +82,35 @@ abstract class Submissions {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Submissions} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Submissions}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Submissions}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Submissions Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Submissions} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $submission_id) : ?\OmegaUp\DAO\VO\Submissions {
-        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` FROM Submissions WHERE (submission_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $submission_id
+    ): ?\OmegaUp\DAO\VO\Submissions {
+        $sql = '
+            SELECT
+                `Submissions`.`submission_id`,
+                `Submissions`.`current_run_id`,
+                `Submissions`.`identity_id`,
+                `Submissions`.`problem_id`,
+                `Submissions`.`problemset_id`,
+                `Submissions`.`guid`,
+                `Submissions`.`language`,
+                `Submissions`.`time`,
+                `Submissions`.`submit_delay`,
+                `Submissions`.`type`
+            FROM
+                `Submissions`
+            WHERE
+                (
+                    `submission_id` = ?
+                )
+            LIMIT 1;';
         $params = [$submission_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -82,9 +138,19 @@ abstract class Submissions {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Submissions $Submissions) : void {
-        $sql = 'DELETE FROM `Submissions` WHERE submission_id = ?;';
-        $params = [$Submissions->submission_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Submissions $Submissions
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Submissions`
+            WHERE
+                (
+                    `submission_id` = ?
+                );';
+        $params = [
+            $Submissions->submission_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -118,17 +184,45 @@ abstract class Submissions {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Submissions`.`submission_id`, `Submissions`.`current_run_id`, `Submissions`.`identity_id`, `Submissions`.`problem_id`, `Submissions`.`problemset_id`, `Submissions`.`guid`, `Submissions`.`language`, `Submissions`.`time`, `Submissions`.`submit_delay`, `Submissions`.`type` from Submissions';
+    ): array {
+        $sql = '
+            SELECT
+                `Submissions`.`submission_id`,
+                `Submissions`.`current_run_id`,
+                `Submissions`.`identity_id`,
+                `Submissions`.`problem_id`,
+                `Submissions`.`problemset_id`,
+                `Submissions`.`guid`,
+                `Submissions`.`language`,
+                `Submissions`.`time`,
+                `Submissions`.`submit_delay`,
+                `Submissions`.`type`
+            FROM
+                `Submissions`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Submissions($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Submissions(
+                $row
+            );
         }
         return $allData;
     }
@@ -141,20 +235,64 @@ abstract class Submissions {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Submissions $Submissions El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Submissions} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Submissions}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Submissions $Submissions) : int {
-        $sql = 'INSERT INTO Submissions (`current_run_id`, `identity_id`, `problem_id`, `problemset_id`, `guid`, `language`, `time`, `submit_delay`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Submissions $Submissions
+    ): int {
+        $sql = '
+            INSERT INTO
+                Submissions (
+                    `current_run_id`,
+                    `identity_id`,
+                    `problem_id`,
+                    `problemset_id`,
+                    `guid`,
+                    `language`,
+                    `time`,
+                    `submit_delay`,
+                    `type`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Submissions->current_run_id) ? null : intval($Submissions->current_run_id),
-            is_null($Submissions->identity_id) ? null : intval($Submissions->identity_id),
-            is_null($Submissions->problem_id) ? null : intval($Submissions->problem_id),
-            is_null($Submissions->problemset_id) ? null : intval($Submissions->problemset_id),
+            (
+                is_null($Submissions->current_run_id) ?
+                null :
+                intval($Submissions->current_run_id)
+            ),
+            (
+                is_null($Submissions->identity_id) ?
+                null :
+                intval($Submissions->identity_id)
+            ),
+            (
+                is_null($Submissions->problem_id) ?
+                null :
+                intval($Submissions->problem_id)
+            ),
+            (
+                is_null($Submissions->problemset_id) ?
+                null :
+                intval($Submissions->problemset_id)
+            ),
             $Submissions->guid,
             $Submissions->language,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Submissions->time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Submissions->time
+            ),
             intval($Submissions->submit_delay),
             $Submissions->type,
         ];
@@ -163,7 +301,9 @@ abstract class Submissions {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Submissions->submission_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Submissions->submission_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

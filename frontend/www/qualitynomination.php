@@ -1,17 +1,23 @@
 <?php
 
 require_once('../server/bootstrap_smarty.php');
-$qualitynomination_id = isset($_GET['qualitynomination_id']) ? $_GET['qualitynomination_id'] : null;
+$qualitynomination_id = isset(
+    $_GET['qualitynomination_id']
+) ? $_GET['qualitynomination_id'] : null;
 
 try {
-    if ($qualitynomination_id != null) {
+    if (!is_null($qualitynomination_id)) {
         $payload = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
-        'qualitynomination_id' => $qualitynomination_id
+            'qualitynomination_id' => $qualitynomination_id,
         ]));
         $template = '../templates/quality.nomination.details.tpl';
     } else {
         $payload = [
-        'nominations' => \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([]))['nominations'],
+        'nominations' => \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request(
+                []
+            )
+        )['nominations'],
         'myView' => false,
         ];
         if (!is_null($session['identity'])) {

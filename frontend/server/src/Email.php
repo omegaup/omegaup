@@ -15,13 +15,19 @@ class Email {
      * @param string $body
      * @throws \OmegaUp\Exceptions\EmailVerificationSendException
      */
-    public static function sendEmail(array $emails, string $subject, string $body) : void {
-        if (self::$emailSender != null) {
+    public static function sendEmail(
+        array $emails,
+        string $subject,
+        string $body
+    ): void {
+        if (!is_null(self::$emailSender)) {
             self::$emailSender->sendEmail($emails, $subject, $body);
             return;
         }
         if (!OMEGAUP_EMAIL_SEND_EMAILS) {
-            self::$log->info('Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:');
+            self::$log->info(
+                'Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:'
+            );
             self::$log->info('     to = ' . join(',', $emails));
             self::$log->info('subject = ' . $subject);
             self::$log->info('   body = ' . $body);
@@ -60,7 +66,7 @@ class Email {
 
     public static function setEmailSenderForTesting(
         ?\OmegaUp\EmailSender $emailSender
-    ) : void {
+    ): void {
         self::$emailSender = $emailSender;
     }
 }

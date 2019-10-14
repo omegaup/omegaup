@@ -21,9 +21,18 @@ class UserProblemsTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiMyList($r);
 
         $this->assertEquals(count($problemData), count($response['problems']));
-        $this->assertEquals($problemData[2]['request']['problem_alias'], $response['problems'][0]['alias']);
-        $this->assertEquals($problemData[1]['request']['problem_alias'], $response['problems'][1]['alias']);
-        $this->assertEquals($problemData[0]['request']['problem_alias'], $response['problems'][2]['alias']);
+        $this->assertEquals(
+            $problemData[2]['request']['problem_alias'],
+            $response['problems'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemData[1]['request']['problem_alias'],
+            $response['problems'][1]['alias']
+        );
+        $this->assertEquals(
+            $problemData[0]['request']['problem_alias'],
+            $response['problems'][2]['alias']
+        );
     }
 
     public function testNoProblems() {
@@ -76,11 +85,32 @@ class UserProblemsTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiAdminList($r);
 
         // Problems should come ordered by problem id desc
-        $this->assertEquals(count($problemAuthorData) + count($problemAdminData), count($response['problems']));
-        $this->assertEquals($problemAuthorData[1]['request']['problem_alias'], $response['problems'][0]['alias']);
-        $this->assertEquals($problemAuthorData[0]['request']['problem_alias'], $response['problems'][1]['alias']);
-        $this->assertEquals($problemAdminData[1]['request']['problem_alias'], $response['problems'][2]['alias']);
-        $this->assertEquals($problemAdminData[0]['request']['problem_alias'], $response['problems'][3]['alias']);
+        $this->assertEquals(
+            count(
+                $problemAuthorData
+            ) + count(
+                $problemAdminData
+            ),
+            count(
+                $response['problems']
+            )
+        );
+        $this->assertEquals(
+            $problemAuthorData[1]['request']['problem_alias'],
+            $response['problems'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemAuthorData[0]['request']['problem_alias'],
+            $response['problems'][1]['alias']
+        );
+        $this->assertEquals(
+            $problemAdminData[1]['request']['problem_alias'],
+            $response['problems'][2]['alias']
+        );
+        $this->assertEquals(
+            $problemAdminData[0]['request']['problem_alias'],
+            $response['problems'][3]['alias']
+        );
     }
 
     /**
