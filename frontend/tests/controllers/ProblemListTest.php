@@ -277,22 +277,25 @@ class ProblemList extends OmegaupTestCase {
      * Tests problem lists when searching by tag when tags are not public.
      */
     public function testProblemListWithPrivateTags() {
-        $admin = UserFactory::createAdminUser(
+        [
+            'user' => $admin,
+            'identity' => $identityAdmin
+        ] = UserFactory::createAdminUser(
             new UserParams(
                 ['username' => 'admin']
             )
         );
-        $user_a = UserFactory::createUser(
+        $userA = UserFactory::createUser(
             new UserParams(
                 ['username' => 'user_a']
             )
         );
-        $user_b = UserFactory::createUser(
+        $userB = UserFactory::createUser(
             new UserParams(
                 ['username' => 'user_b']
             )
         );
-        $other_user = UserFactory::createUser(
+        $otherUser = UserFactory::createUser(
             new UserParams(
                 ['username' => 'other']
             )
@@ -308,19 +311,19 @@ class ProblemList extends OmegaupTestCase {
         ]));
         $problem_a = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
-            'author' => $user_a
+            'author' => $userA
         ]));
         $private_problem_a = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
-            'author' => $user_a
+            'author' => $userA
         ]));
         $problem_b = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PROMOTED,
-            'author' => $user_b
+            'author' => $userB
         ]));
         $private_problem_b = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE,
-            'author' => $user_b
+            'author' => $userB
         ]));
 
         $all_problems = [$problem, $private_problem,
@@ -332,7 +335,7 @@ class ProblemList extends OmegaupTestCase {
             ProblemsFactory::addTag($problem, 'c', 0 /* public */);
         }
 
-        $all_users = [$admin, $user_a, $user_b, $other_user];
+        $all_users = [$admin, $userA, $userB, $otherUser];
         $tag_a_results = [
             6,      // admin user can see all 6 problems
             4,      // User A sees 3 public problems and private_problem_a
@@ -447,7 +450,7 @@ class ProblemList extends OmegaupTestCase {
             'author' => $author
         ]));
 
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         $login = self::login($admin);
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
@@ -784,7 +787,7 @@ class ProblemList extends OmegaupTestCase {
 
         // Expect 1 problem, admin can see private problem
         {
-            $admin = UserFactory::createAdminUser();
+            ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
             $adminLogin = self::login($admin);
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,

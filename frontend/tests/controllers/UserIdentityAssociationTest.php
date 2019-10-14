@@ -21,7 +21,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      * with a registred user
      */
     public function testAssociateIdentityWithUser() {
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup(
             $creator,
@@ -100,7 +100,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      * with a registered user, but wrong username
      */
     public function testAssociateIdentityWithWrongUser() {
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup(
             $creator,
@@ -151,7 +151,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      * with a registered user, but wrong password
      */
     public function testAssociateIdentityWithWrongPassword() {
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup(
             $creator,
@@ -200,7 +200,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
      */
     public function testAssociateDuplicatedIdentitiesOfAGroup() {
         // Identity creator group member will upload csv file
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup(
             $creator,

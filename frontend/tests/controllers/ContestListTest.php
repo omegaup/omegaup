@@ -156,7 +156,8 @@ class ContestListTest extends OmegaupTestCase {
             )
         );
 
-        $login = self::login(UserFactory::createAdminUser());
+        ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+        $login = self::login($user);
 
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -337,7 +338,8 @@ class ContestListTest extends OmegaupTestCase {
         $contestant = UserFactory::createUser();
 
         // Turn recommended ON
-        $login = self::login(UserFactory::createAdminUser());
+        ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+        $login = self::login($user);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $recommendedContestData['request']['alias'],
@@ -407,7 +409,8 @@ class ContestListTest extends OmegaupTestCase {
         // phpcbf does not like a block just for scoping purposes and
         // messes up the alignment pretty badly.
         if (true) {
-            $login = self::login(UserFactory::createAdminUser());
+            ['user' => $user, 'identity' => $identity] = UserFactory::createAdminUser();
+            $login = self::login($user);
             for ($i = 0; $i < 2; $i++) {
                 \OmegaUp\Controllers\Contest::apiSetRecommended(new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
