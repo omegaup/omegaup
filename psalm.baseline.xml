@@ -1435,7 +1435,7 @@
       <code>null</code>
       <code>null</code>
     </NullArgument>
-    <PossiblyNullArgument occurrences="3">
+    <PossiblyNullArgument occurrences="2">
       <code>$qualitynominationlog-&gt;rationale</code>
     </PossiblyNullArgument>
     <PossiblyNullPropertyFetch occurrences="2"/>
