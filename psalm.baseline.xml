@@ -2978,10 +2978,6 @@
       <code>PROBLEMS_GIT_PATH</code>
       <code>RUNS_PATH</code>
     </UndefinedConstant>
-    <UndefinedDocblockClass occurrences="2">
-      <code>$admin-&gt;user_id</code>
-      <code>$admin-&gt;user_id</code>
-    </UndefinedDocblockClass>
     <UndefinedMethod occurrences="3">
       <code>setGraderResourceForTesting</code>
       <code>setGraderResourceForTesting</code>
@@ -3755,16 +3751,10 @@
       <code>initQualityReviewers</code>
       <code>initTags</code>
     </MissingReturnType>
-    <MixedArgument occurrences="1">
-      <code>$reviewer-&gt;main_identity_id</code>
-    </MixedArgument>
     <PossiblyNullPropertyFetch occurrences="2">
       <code>$qualityReviewerGroup-&gt;group_id</code>
       <code>$identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedDocblockClass occurrences="1">
-      <code>$reviewer-&gt;main_identity_id</code>
-    </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/RunsFactory.php">
     <MissingReturnType occurrences="1">
@@ -3816,39 +3806,12 @@
     </MixedInferredReturnType>
   </file>
   <file src="frontend/tests/factories/UserFactory.php">
-    <InvalidArgument occurrences="1">
-      <code>$user</code>
-    </InvalidArgument>
-    <InvalidDocblockParamName occurrences="15">
-      <code>$username</code>
-      <code>$password</code>
-      <code>$email</code>
-      <code>$username</code>
-      <code>$password</code>
-      <code>$email</code>
-      <code>$username</code>
-      <code>$password</code>
-      <code>$email</code>
-      <code>$username</code>
-      <code>$password</code>
-      <code>$email</code>
-      <code>$username</code>
-      <code>$password</code>
-      <code>$email</code>
-    </InvalidDocblockParamName>
-    <InvalidReturnStatement occurrences="2">
-      <code>$user</code>
-    </InvalidReturnStatement>
+    <InvalidReturnStatement occurrences="2"/>
     <InvalidReturnType occurrences="2">
       <code>user</code>
       <code>Boolean</code>
     </InvalidReturnType>
-    <MismatchingDocblockReturnType occurrences="3">
-      <code>Identity</code>
-      <code>User</code>
-      <code>User</code>
-    </MismatchingDocblockReturnType>
-    <MissingParamType occurrences="6">
+    <MissingParamType occurrences="4">
       <code>$params</code>
       <code>$default</code>
       <code>$params</code>
@@ -3880,11 +3843,6 @@
       <code>$array[$parameter]</code>
       <code>$user-&gt;password</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="3">
-      <code>Identity</code>
-      <code>User</code>
-      <code>User</code>
-    </MixedInferredReturnType>
     <PossiblyInvalidArgument occurrences="1">
       <code>$this-&gt;params</code>
     </PossiblyInvalidArgument>
@@ -3893,10 +3851,9 @@
       <code>$support_group-&gt;group_id</code>
       <code>$groupIdentityCreator-&gt;group_id</code>
     </PossiblyNullPropertyFetch>
-    <UndefinedDocblockClass occurrences="4">
+    <UndefinedDocblockClass occurrences="2">
       <code>user</code>
       <code>user</code>
-      <code>User</code>
       <code>Boolean</code>
     </UndefinedDocblockClass>
   </file>

@@ -17,7 +17,7 @@ class AdminTest extends OmegaupTestCase {
     }
 
     public function testPlatformReportStats() {
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createAdminUser();
         $adminLogin = OmegaupTestCase::login($admin);
 
         \OmegaUp\Controllers\Admin::apiPlatformReportStats(new \OmegaUp\Request([

@@ -99,7 +99,7 @@ class UserProfileTest extends OmegaupTestCase {
      */
     public function testAdminCanSeeEmails() {
         $user = UserFactory::createUser();
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         $login = self::login($admin);
         $r = new \OmegaUp\Request([
@@ -116,7 +116,7 @@ class UserProfileTest extends OmegaupTestCase {
      */
     public function testAdminCanSeePrivateProfile() {
         $user = UserFactory::createUser(new UserParams(['is_private' => true]));
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         $login = self::login($admin);
         $r = new \OmegaUp\Request([

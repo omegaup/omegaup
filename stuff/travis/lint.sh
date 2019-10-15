@@ -33,7 +33,7 @@ stage_script() {
 	docker run --rm \
 		--volume "$PWD:/src" \
 		--volume "$PWD:/opt/omegaup" \
-		omegaup/hook_tools:20191013 -j4 validate --all < /dev/null
+		omegaup/hook_tools:20191014 -j4 validate --all < /dev/null
 }
 
 stage_after_success() {
