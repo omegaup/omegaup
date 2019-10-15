@@ -358,7 +358,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
 
-        $nomination = \OmegaUp\Controllers\QualityNomination::createNomination($problem, $r->user, strval($r['nomination']), $contents);
+        $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
+            $problem,
+            $r->user,
+            strval(
+                $r['nomination']
+            ),
+            $contents
+        );
 
         if ($nomination->nomination == 'promotion') {
             $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
