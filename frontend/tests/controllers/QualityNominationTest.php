@@ -973,7 +973,8 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math']
+            ['DP', 'Math'],
+            false
         );
 
         $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
@@ -1310,7 +1311,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 1, /* quality */
-                ['DP', 'Math']
+                ['DP', 'Math'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1318,7 +1320,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 3, /* quality */
-                ['Matrices', 'Math']
+                ['Matrices', 'Math'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1326,7 +1329,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Math', 'DP']
+                ['Math', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1334,7 +1338,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 4, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['DP', 'Math', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1342,7 +1347,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 4, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1350,7 +1356,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Matrices', 'Math']
+                ['Matrices', 'Math'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1358,7 +1365,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 null, /* difficulty */
                 1, /* quality */
-                ['Math', 'DP']
+                ['Math', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1366,7 +1374,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 null, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['DP', 'Math', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1374,7 +1383,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1382,7 +1392,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 4, /* quality */
-                ['Search', 'DP', 'Greedy']
+                ['Search', 'DP', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1390,7 +1401,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 1, /* quality */
-                ['Geometry', 'DP', 'Search', 'Greedy']
+                ['Geometry', 'DP', 'Search', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1398,7 +1410,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[2]['request']['problem_alias'],
                 1, /* difficulty */
                 1, /* quality */
-                ['Search', 'Greedy']
+                ['Search', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1406,7 +1419,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[3]['request']['problem_alias'],
                 4, /* difficulty */
                 3, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['DP', 'Math', 'Greedy'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1414,7 +1428,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[3]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
 
             QualityNominationFactory::createSuggestion(
@@ -1422,7 +1437,8 @@ class QualityNominationTest extends OmegaupTestCase {
                 $problems[4]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP']
+                ['Greedy', 'DP'],
+                false
             );
         }
     }
@@ -1492,7 +1508,8 @@ class QualityNominationTest extends OmegaupTestCase {
                     $problemData[$problemIdx]['request']['problem_alias'],
                     $difficultyRatings[$problemIdx][$userIdx],
                     $qualityRatings[$problemIdx][$userIdx],
-                    [] // No tags.
+                    [], // No tags.
+                    false
                 );
             }
         }
@@ -1564,70 +1581,80 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[0]['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math']
+            ['DP', 'Math'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[1],
             $problemData[0]['request']['problem_alias'],
             3,
             3,
-            ['Math', 'DP']
+            ['Math', 'DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[2],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['Matrices', 'Math']
+            ['Matrices', 'Math'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[3],
             $problemData[0]['request']['problem_alias'],
             null,
             null,
-            ['Math']
+            ['Math'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[4],
             $problemData[0]['request']['problem_alias'],
             3,
             4,
-            ['DP', 'Math', 'Greedy']
+            ['DP', 'Math', 'Greedy'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[5],
             $problemData[0]['request']['problem_alias'],
             3,
             null,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[6],
             $problemData[0]['request']['problem_alias'],
             null,
             1,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[7],
             $problemData[0]['request']['problem_alias'],
             4,
             null,
-            ['Greedy', 'DP']
+            ['Greedy', 'DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[8],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['DP']
+            ['DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[9],
             $problemData[0]['request']['problem_alias'],
             4,
             4,
-            ['DP', 'Math']
+            ['DP', 'Math'],
+            false
         );
 
         QualityNominationFactory::createSuggestion(
@@ -1635,70 +1662,80 @@ class QualityNominationTest extends OmegaupTestCase {
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['Search', 'Geometry']
+            ['Search', 'Geometry'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[1],
             $problemData[1]['request']['problem_alias'],
             1,
             1,
-            ['Search', 'Geometry']
+            ['Search', 'Geometry'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[2],
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Matrices', 'Search']
+            ['Matrices', 'Search'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[3],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search']
+            ['Search'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[4],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'Math', 'Geometry']
+            ['Search', 'Math', 'Geometry'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[5],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[6],
             $problemData[1]['request']['problem_alias'],
             null,
             1,
-            []
+            [],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[7],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'DP']
+            ['Search', 'DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[8],
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['DP']
+            ['DP'],
+            false
         );
         QualityNominationFactory::createSuggestion(
             $login[9],
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Geometry', 'Math']
+            ['Geometry', 'Math'],
+            false
         );
     }
 

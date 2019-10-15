@@ -51,7 +51,12 @@ class QualityNominationFactory {
     }
 
     /**
+     * @param ScopedLoginToken $login
+     * @param string $problemAlias
+     * @param null|float $difficulty
+     * @param null|float $quality
      * @param null|string[] $tags
+     * @param bool $beforeAC
      * @return array{status: string, qualitynomination_id: int}
      */
     public static function createSuggestion(
@@ -60,8 +65,8 @@ class QualityNominationFactory {
         ?float $difficulty,
         ?float $quality,
         ?array $tags,
-        ?bool $beforeAC = false
-    ) {
+        bool $beforeAC
+    ): array {
         $contents = [];
         if (!is_null($difficulty)) {
             $contents['difficulty'] = $difficulty;

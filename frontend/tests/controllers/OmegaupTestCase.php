@@ -425,9 +425,6 @@ class ScopedLoginToken {
      */
     public $auth_token = null;
 
-    /**
-     * @param string|null $auth_token
-     */
     public function __construct(?string $auth_token) {
         \OmegaUp\Authorization::clearCacheForTesting();
         $this->auth_token = $auth_token;
