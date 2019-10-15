@@ -12,7 +12,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testAddStudentToCourse() {
         $courseData = CoursesFactory::createCourse();
         $student = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($student->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK(
+            $student->main_identity_id
+        );
 
         $adminLogin = OmegaupTestCase::login($courseData['admin']);
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
@@ -39,7 +41,12 @@ class CourseStudentAddTest extends OmegaupTestCase {
      * apiAddStudent test with a duplicate student.
      */
     public function testAddDuplicateStudentToCourse() {
-        $courseData = CoursesFactory::createCourse(null, null, true, 'optional');
+        $courseData = CoursesFactory::createCourse(
+            null,
+            null,
+            true,
+            'optional'
+        );
         $student = UserFactory::createUser();
         UserFactory::createPrivacyStatement('course_optional_consent');
         UserFactory::createPrivacyStatement('course_required_consent');
@@ -135,7 +142,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
         $this->assertNotNull($course);
 
-        $studentsInGroup = \OmegaUp\DAO\GroupsIdentities::getByGroupId($course->group_id);
+        $studentsInGroup = \OmegaUp\DAO\GroupsIdentities::getByGroupId(
+            $course->group_id
+        );
 
         $this->assertNotNull($studentsInGroup);
         $this->assertEquals(0, count($studentsInGroup));
@@ -181,7 +190,9 @@ class CourseStudentAddTest extends OmegaupTestCase {
     public function testSelfAddStudentPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true /*public*/);
         $student = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($student->main_identity_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK(
+            $student->main_identity_id
+        );
 
         $login = OmegaupTestCase::login($student);
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([

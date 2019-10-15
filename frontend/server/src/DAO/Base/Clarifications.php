@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,18 +25,53 @@ abstract class Clarifications {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Clarifications $Clarifications) : int {
-        $sql = 'UPDATE `Clarifications` SET `author_id` = ?, `receiver_id` = ?, `message` = ?, `answer` = ?, `time` = ?, `problem_id` = ?, `problemset_id` = ?, `public` = ? WHERE `clarification_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Clarifications $Clarifications
+    ): int {
+        $sql = '
+            UPDATE
+                `Clarifications`
+            SET
+                `author_id` = ?,
+                `receiver_id` = ?,
+                `message` = ?,
+                `answer` = ?,
+                `time` = ?,
+                `problem_id` = ?,
+                `problemset_id` = ?,
+                `public` = ?
+            WHERE
+                (
+                    `clarification_id` = ?
+                );';
         $params = [
-            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
-            is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
+            (
+                is_null($Clarifications->author_id) ?
+                null :
+                intval($Clarifications->author_id)
+            ),
+            (
+                is_null($Clarifications->receiver_id) ?
+                null :
+                intval($Clarifications->receiver_id)
+            ),
             $Clarifications->message,
             $Clarifications->answer,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Clarifications->time),
-            is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
-            (int)$Clarifications->public,
-            (int)$Clarifications->clarification_id,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Clarifications->time
+            ),
+            (
+                is_null($Clarifications->problem_id) ?
+                null :
+                intval($Clarifications->problem_id)
+            ),
+            (
+                is_null($Clarifications->problemset_id) ?
+                null :
+                intval($Clarifications->problemset_id)
+            ),
+            intval($Clarifications->public),
+            intval($Clarifications->clarification_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -45,15 +80,34 @@ abstract class Clarifications {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Clarifications} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Clarifications}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Clarifications}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Clarifications Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Clarifications} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $clarification_id) : ?\OmegaUp\DAO\VO\Clarifications {
-        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` FROM Clarifications WHERE (clarification_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $clarification_id
+    ): ?\OmegaUp\DAO\VO\Clarifications {
+        $sql = '
+            SELECT
+                `Clarifications`.`clarification_id`,
+                `Clarifications`.`author_id`,
+                `Clarifications`.`receiver_id`,
+                `Clarifications`.`message`,
+                `Clarifications`.`answer`,
+                `Clarifications`.`time`,
+                `Clarifications`.`problem_id`,
+                `Clarifications`.`problemset_id`,
+                `Clarifications`.`public`
+            FROM
+                `Clarifications`
+            WHERE
+                (
+                    `clarification_id` = ?
+                )
+            LIMIT 1;';
         $params = [$clarification_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -81,9 +135,19 @@ abstract class Clarifications {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Clarifications $Clarifications) : void {
-        $sql = 'DELETE FROM `Clarifications` WHERE clarification_id = ?;';
-        $params = [$Clarifications->clarification_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Clarifications $Clarifications
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Clarifications`
+            WHERE
+                (
+                    `clarification_id` = ?
+                );';
+        $params = [
+            $Clarifications->clarification_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -117,17 +181,44 @@ abstract class Clarifications {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Clarifications`.`clarification_id`, `Clarifications`.`author_id`, `Clarifications`.`receiver_id`, `Clarifications`.`message`, `Clarifications`.`answer`, `Clarifications`.`time`, `Clarifications`.`problem_id`, `Clarifications`.`problemset_id`, `Clarifications`.`public` from Clarifications';
+    ): array {
+        $sql = '
+            SELECT
+                `Clarifications`.`clarification_id`,
+                `Clarifications`.`author_id`,
+                `Clarifications`.`receiver_id`,
+                `Clarifications`.`message`,
+                `Clarifications`.`answer`,
+                `Clarifications`.`time`,
+                `Clarifications`.`problem_id`,
+                `Clarifications`.`problemset_id`,
+                `Clarifications`.`public`
+            FROM
+                `Clarifications`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Clarifications($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Clarifications(
+                $row
+            );
         }
         return $allData;
     }
@@ -140,28 +231,72 @@ abstract class Clarifications {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Clarifications $Clarifications El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Clarifications} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Clarifications}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Clarifications $Clarifications) : int {
-        $sql = 'INSERT INTO Clarifications (`author_id`, `receiver_id`, `message`, `answer`, `time`, `problem_id`, `problemset_id`, `public`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Clarifications $Clarifications
+    ): int {
+        $sql = '
+            INSERT INTO
+                Clarifications (
+                    `author_id`,
+                    `receiver_id`,
+                    `message`,
+                    `answer`,
+                    `time`,
+                    `problem_id`,
+                    `problemset_id`,
+                    `public`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Clarifications->author_id) ? null : (int)$Clarifications->author_id,
-            is_null($Clarifications->receiver_id) ? null : (int)$Clarifications->receiver_id,
+            (
+                is_null($Clarifications->author_id) ?
+                null :
+                intval($Clarifications->author_id)
+            ),
+            (
+                is_null($Clarifications->receiver_id) ?
+                null :
+                intval($Clarifications->receiver_id)
+            ),
             $Clarifications->message,
             $Clarifications->answer,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Clarifications->time),
-            is_null($Clarifications->problem_id) ? null : (int)$Clarifications->problem_id,
-            is_null($Clarifications->problemset_id) ? null : (int)$Clarifications->problemset_id,
-            (int)$Clarifications->public,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Clarifications->time
+            ),
+            (
+                is_null($Clarifications->problem_id) ?
+                null :
+                intval($Clarifications->problem_id)
+            ),
+            (
+                is_null($Clarifications->problemset_id) ?
+                null :
+                intval($Clarifications->problemset_id)
+            ),
+            intval($Clarifications->public),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Clarifications->clarification_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Clarifications->clarification_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

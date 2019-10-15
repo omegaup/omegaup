@@ -15,7 +15,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -93,14 +93,28 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user/identity from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
-        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+            $r['auth_token']
+        );
 
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
         $this->assertEquals($r['state_id'], $identityDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
-        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['birth_date']
+            ),
+            $userDb->birth_date
+        );
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['graduation_date']
+            ),
+            $userDb->graduation_date
+        );
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Edit all fields again with diff values
@@ -122,13 +136,27 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
-        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+            $r['auth_token']
+        );
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
         $this->assertEquals($r['state_id'], $identityDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
-        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['birth_date']
+            ),
+            $userDb->birth_date
+        );
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['graduation_date']
+            ),
+            $userDb->graduation_date
+        );
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
@@ -164,7 +192,9 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
-        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+            $r['auth_token']
+        );
 
         // Getting identity data from db
         $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);

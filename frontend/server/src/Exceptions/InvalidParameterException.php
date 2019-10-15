@@ -14,14 +14,20 @@ class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
      * @param null|string $parameter
      * @param array<string, string> $additionalParameters
      */
-    public function __construct(string $message, ?string $parameter = null, array $additionalParameters = []) {
+    public function __construct(
+        string $message,
+        ?string $parameter = null,
+        array $additionalParameters = []
+    ) {
         parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400);
         $this->parameter = $parameter;
         $this->additionalParameters = $additionalParameters;
     }
 
-    public function getErrorMessage() : string {
-        $localizedText = \OmegaUp\Translations::getInstance()->get($this->message);
+    public function getErrorMessage(): string {
+        $localizedText = \OmegaUp\Translations::getInstance()->get(
+            $this->message
+        );
         if (empty($localizedText)) {
             self::$log->error("Untranslated error message: {$this->message}");
             return "{untranslated:{$this->message}}";

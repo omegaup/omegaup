@@ -10,7 +10,9 @@ try {
     if (isset($_POST['request'])) {
         if ($_POST['request'] == 'submit') {
             \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
-                'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+                'auth_token' => $smarty->getTemplateVars(
+                    'CURRENT_USER_AUTH_TOKEN'
+                ),
                 'problem_alias' => $_POST['problem_alias'] ?? null,
                 'title' => $_POST['title'] ?? null,
                 'message' => $_POST['message'] ?? null,
@@ -29,7 +31,9 @@ try {
             ]));
         } elseif ($_POST['request'] == 'markdown') {
             \OmegaUp\Controllers\Problem::apiUpdateStatement([
-                'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+                'auth_token' => $smarty->getTemplateVars(
+                    'CURRENT_USER_AUTH_TOKEN'
+                ),
                 'problem_alias' => $_POST['problem_alias'] ?? null,
                 'statement' => $_POST['wmd-input-statement'] ?? null,
                 'message' => $_POST['message'] ?? null,

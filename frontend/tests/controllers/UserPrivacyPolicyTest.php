@@ -20,7 +20,10 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]));
 
-        $this->assertFalse($response['hasAccepted'], 'User should not have already accepted privacy policy');
+        $this->assertFalse(
+            $response['hasAccepted'],
+            'User should not have already accepted privacy policy'
+        );
     }
 
     /**
@@ -49,7 +52,10 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]));
 
-        $this->assertTrue($response['hasAccepted'], 'User should have already accepted privacy policy');
+        $this->assertTrue(
+            $response['hasAccepted'],
+            'User should have already accepted privacy policy'
+        );
     }
 
     /**
@@ -80,7 +86,9 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
                 'privacy_git_object_id' => $latest_privacy_policy['git_object_id'],
                 'statement_type' => $latest_privacy_policy['statement_type'],
             ]));
-            $this->fail('Should have thrown a DuplicatedEntryInDatabaseException');
+            $this->fail(
+                'Should have thrown a DuplicatedEntryInDatabaseException'
+            );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // OK.
         }
@@ -105,7 +113,10 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
             'privacystatement_id' => $latest_privacy_policy,
         ]));
 
-        $this->assertFalse($response['hasAccepted'], 'User should not have already accepted privacy policy');
+        $this->assertFalse(
+            $response['hasAccepted'],
+            'User should not have already accepted privacy policy'
+        );
 
         $response = \OmegaUp\Controllers\User::apiAcceptPrivacyPolicy(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -122,6 +133,9 @@ class UserPrivacyPolicyTest extends OmegaupTestCase {
             'auth_token' => $login->auth_token
         ]));
 
-        $this->assertFalse($response['hasAccepted'], 'User should not have already accepted privacy policy');
+        $this->assertFalse(
+            $response['hasAccepted'],
+            'User should not have already accepted privacy policy'
+        );
     }
 }

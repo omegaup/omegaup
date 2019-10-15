@@ -21,7 +21,10 @@ foreach (\OmegaUp\Experiments::getInstance()->getAllKnownExperiments() as $exper
     $systemExperiments[] = [
         'name' => $experiment,
         'hash' => \OmegaUp\Experiments::getExperimentHash($experiment),
-        'config' => \OmegaUp\Experiments::getInstance()->isEnabledByConfig($experiment, $defines),
+        'config' => \OmegaUp\Experiments::getInstance()->isEnabledByConfig(
+            $experiment,
+            $defines
+        ),
     ];
 }
 

@@ -39,7 +39,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         RunsFactory::gradeRun($runs[3]); // run with a AC verdict
         RunsFactory::gradeRun($runs[4]); // run with a AC verdict
         // Users must join course
-        for ($i=0; $i<$num_users; $i++) {
+        for ($i = 0; $i < $num_users; $i++) {
             $userLogin[$i] = self::login($user[$i]);
             $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
@@ -64,14 +64,46 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $this->assertArrayHasKey($user[0]->username, $unsolvedProblems['user_problems']);
-        $this->assertEquals(1, count($unsolvedProblems['user_problems'][$user[0]->username]));
-        $this->assertArrayHasKey($user[1]->username, $unsolvedProblems['user_problems']);
-        $this->assertEquals(1, count($unsolvedProblems['user_problems'][$user[1]->username]));
-        $this->assertArrayHasKey($user[1]->username, $solvedProblems['user_problems']);
-        $this->assertEquals(1, count($solvedProblems['user_problems'][$user[1]->username]));
-        $this->assertArrayHasKey($user[2]->username, $solvedProblems['user_problems']);
-        $this->assertEquals(2, count($solvedProblems['user_problems'][$user[2]->username]));
+        $this->assertArrayHasKey(
+            $user[0]->username,
+            $unsolvedProblems['user_problems']
+        );
+        $this->assertEquals(
+            1,
+            count(
+                $unsolvedProblems['user_problems'][$user[0]->username]
+            )
+        );
+        $this->assertArrayHasKey(
+            $user[1]->username,
+            $unsolvedProblems['user_problems']
+        );
+        $this->assertEquals(
+            1,
+            count(
+                $unsolvedProblems['user_problems'][$user[1]->username]
+            )
+        );
+        $this->assertArrayHasKey(
+            $user[1]->username,
+            $solvedProblems['user_problems']
+        );
+        $this->assertEquals(
+            1,
+            count(
+                $solvedProblems['user_problems'][$user[1]->username]
+            )
+        );
+        $this->assertArrayHasKey(
+            $user[2]->username,
+            $solvedProblems['user_problems']
+        );
+        $this->assertEquals(
+            2,
+            count(
+                $solvedProblems['user_problems'][$user[2]->username]
+            )
+        );
         // Now, user[0] submit one run with AC verdict
         $runs[5] = RunsFactory::createRunToProblem($problem[0], $user[0]);
         RunsFactory::gradeRun($runs[5]);
@@ -83,8 +115,14 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $this->assertArrayNotHasKey($user[0]->username, $unsolvedProblems['user_problems']);
-        $this->assertArrayHasKey($user[0]->username, $solvedProblems['user_problems']);
+        $this->assertArrayNotHasKey(
+            $user[0]->username,
+            $unsolvedProblems['user_problems']
+        );
+        $this->assertArrayHasKey(
+            $user[0]->username,
+            $solvedProblems['user_problems']
+        );
     }
     public function testUsersOfACourseDenyAccessFromATeacher() {
         $num_users = 3;
@@ -132,7 +170,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         $this->assertEquals(0, count($solvedProblems['user_problems']));
         $this->assertEquals(0, count($unsolvedProblems['user_problems']));
         // Users must join course
-        for ($i=0; $i<($num_users - 1); $i++) {
+        for ($i = 0; $i < ($num_users - 1); $i++) {
             $userLogin[$i] = self::login($user[$i]);
             $details = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
@@ -182,8 +220,16 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
         ]));
-        $this->assertArrayHasKey($user[2]->username, $solvedProblems['user_problems']);
-        $this->assertEquals(2, count($solvedProblems['user_problems'][$user[2]->username]));
+        $this->assertArrayHasKey(
+            $user[2]->username,
+            $solvedProblems['user_problems']
+        );
+        $this->assertEquals(
+            2,
+            count(
+                $solvedProblems['user_problems'][$user[2]->username]
+            )
+        );
         $this->assertEquals(0, count($unsolvedProblems['user_problems']));
     }
 }

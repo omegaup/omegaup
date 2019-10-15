@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -24,37 +24,53 @@ class Groups extends \OmegaUp\DAO\VO\VO {
         'description' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['group_id'])) {
-            $this->group_id = (int)$data['group_id'];
+            $this->group_id = intval(
+                $data['group_id']
+            );
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval(
+                $data['acl_id']
+            );
         }
         if (isset($data['create_time'])) {
             /**
              * @var string|int|float $data['create_time']
              * @var int $this->create_time
              */
-            $this->create_time = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['create_time']);
+            $this->create_time = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['create_time']
+                )
+            );
         } else {
             $this->create_time = \OmegaUp\Time::get();
         }
         if (isset($data['alias'])) {
-            $this->alias = strval($data['alias']);
+            $this->alias = strval(
+                $data['alias']
+            );
         }
         if (isset($data['name'])) {
-            $this->name = strval($data['name']);
+            $this->name = strval(
+                $data['name']
+            );
         }
         if (isset($data['description'])) {
-            $this->description = strval($data['description']);
+            $this->description = strval(
+                $data['description']
+            );
         }
     }
 

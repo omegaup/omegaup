@@ -53,7 +53,10 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             WHERE
                 gi.group_id = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group->group_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$group->group_id]
+        );
         $identities = [];
         foreach ($rs as $row) {
             $row['classname'] = $row['classname'] ?? 'user-rank-unranked';
@@ -69,7 +72,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         return $identities;
     }
 
-    public static function GetMemberCountById(int $groupId) : int {
+    public static function GetMemberCountById(int $groupId): int {
         $sql = '
             SELECT
                 COUNT(*) AS count
@@ -78,7 +81,10 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             WHERE
                 gi.group_id = ?;';
         /** @var null|int */
-        $result = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$groupId]);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$groupId]
+        );
         if (empty($result)) {
             return 0;
         }
@@ -88,7 +94,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     /**
      * @return \OmegaUp\DAO\VO\GroupsIdentities[]
      */
-    final public static function getByGroupId(int $groupId) : array {
+    final public static function getByGroupId(int $groupId): array {
         $sql = '
             SELECT
                 *
@@ -98,8 +104,18 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 group_id = ?;';
 
         $groupsIdentities = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$groupId]) as $row) {
-            array_push($groupsIdentities, new \OmegaUp\DAO\VO\GroupsIdentities($row));
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$groupId]
+            ) as $row
+        ) {
+            array_push(
+                $groupsIdentities,
+                new \OmegaUp\DAO\VO\GroupsIdentities(
+                    $row
+                )
+            );
         }
         return $groupsIdentities;
     }
@@ -118,7 +134,12 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
                 gi.group_id = ?;';
 
         $identities = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$group_id]) as $row) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [$group_id]
+            ) as $row
+        ) {
             array_push($identities, $row['username']);
         }
         return $identities;

@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -24,31 +24,45 @@ class ProblemsetProblems extends \OmegaUp\DAO\VO\VO {
         'order' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = (int)$data['problemset_id'];
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval(
+                $data['problem_id']
+            );
         }
         if (isset($data['commit'])) {
-            $this->commit = strval($data['commit']);
+            $this->commit = strval(
+                $data['commit']
+            );
         }
         if (isset($data['version'])) {
-            $this->version = strval($data['version']);
+            $this->version = strval(
+                $data['version']
+            );
         }
         if (isset($data['points'])) {
-            $this->points = (float)$data['points'];
+            $this->points = floatval(
+                $data['points']
+            );
         }
         if (isset($data['order'])) {
-            $this->order = (int)$data['order'];
+            $this->order = intval(
+                $data['order']
+            );
         }
     }
 

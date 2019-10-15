@@ -5,7 +5,7 @@
  *
  * @author carlosabcs
  */
-class oneHundredSolvedProblems extends BadgesTestCase {
+class OneHundredSolvedProblems extends BadgesTestCase {
     public function test100SolvedProblems() {
         // Creates two users, one solves 99 problems the other 101.
         $user99 = UserFactory::createUser();

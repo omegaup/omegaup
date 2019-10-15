@@ -23,7 +23,7 @@ class ProblemArtifacts {
         $this->commit = $commit;
     }
 
-    public function get(string $path, bool $quiet = false) : string {
+    public function get(string $path, bool $quiet = false): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->commit, $path)
@@ -33,14 +33,17 @@ class ProblemArtifacts {
         return $browser->exec();
     }
 
-    public function exists(string $path) : bool {
+    public function exists(string $path): bool {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->commit, $path)
         );
         $browser->headers[] = 'Accept: application/json';
         curl_setopt($browser->curl, CURLOPT_NOBODY, 1);
-        return $browser->exec() !== false && curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200;
+        return (
+            $browser->exec() !== false &&
+            curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200
+        );
     }
 
     /**
@@ -50,10 +53,14 @@ class ProblemArtifacts {
      * @return array{mode: int, type: string, name: string}[] The list of
      * direct entries in $path.
      */
-    public function lsTree(string $path) : array {
+    public function lsTree(string $path): array {
         $browser = new GitServerBrowser(
             $this->alias,
-            GitServerBrowser::buildShowURL($this->alias, $this->commit, "{$path}/")
+            GitServerBrowser::buildShowURL(
+                $this->alias,
+                $this->commit,
+                "{$path}/"
+            )
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
@@ -89,7 +96,7 @@ class ProblemArtifacts {
      * @return array{path: string, mode: int, type: string}[] The list of files
      * that are transitively reachable from $path.
      */
-    public function lsTreeRecursive(string $path = '.') : array {
+    public function lsTreeRecursive(string $path = '.'): array {
         /** @var array{path: string, mode: int, type: string}[] */
         $entries = [];
         /** @var string[] */
@@ -111,7 +118,7 @@ class ProblemArtifacts {
                 array_push($entries, $entry);
             }
         }
-        usort($entries, function (array $lhs, array $rhs) : int {
+        usort($entries, function (array $lhs, array $rhs): int {
             if ($lhs['path'] == $rhs['path']) {
                 return 0;
             }
@@ -121,7 +128,7 @@ class ProblemArtifacts {
         return $entries;
     }
 
-    public function commit() : ?array {
+    public function commit(): ?array {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowCommitURL($this->alias, $this->commit)
@@ -148,7 +155,7 @@ class ProblemArtifacts {
     /**
      * @return array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}[]
      */
-    public function log() : array {
+    public function log(): array {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildLogURL($this->alias, $this->commit)
@@ -180,14 +187,17 @@ class ProblemArtifacts {
         return $logEntries;
     }
 
-    public function download() : bool {
+    public function download(): bool {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildArchiveURL($this->alias, $this->commit),
             /*passthru=*/true
         );
         $browser->headers[] = 'Accept: application/zip';
-        return $browser->exec() !== false && curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200;
+        return (
+            $browser->exec() !== false &&
+            curl_getinfo($browser->curl, CURLINFO_HTTP_CODE) == 200
+        );
     }
 }
 
@@ -201,10 +211,17 @@ class GitServerBrowser {
     /** @var bool */
     private $passthru;
 
-    public function __construct(string $alias, string $url, bool $passthru = false) {
+    public function __construct(
+        string $alias,
+        string $url,
+        bool $passthru = false
+    ) {
         $this->curl = curl_init();
         $this->headers = [
-            \OmegaUp\SecurityTools::getGitserverAuthorizationHeader($alias, 'omegaup:system'),
+            \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
+                $alias,
+                'omegaup:system'
+            ),
         ];
         $this->passthru = $passthru;
         curl_setopt_array(
@@ -220,28 +237,28 @@ class GitServerBrowser {
         string $alias,
         string $commit,
         string $path
-    ) : string {
+    ): string {
         return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$commit}/{$path}";
     }
 
     public static function buildShowCommitURL(
         string $alias,
         string $commit
-    ) : string {
+    ): string {
         return OMEGAUP_GITSERVER_URL . "/{$alias}/+/{$commit}";
     }
 
     public static function buildArchiveURL(
         string $alias,
         string $commit
-    ) : string {
+    ): string {
         return OMEGAUP_GITSERVER_URL . "/{$alias}/+archive/{$commit}.zip";
     }
 
     public static function buildLogURL(
         string $alias,
         string $commit
-    ) : string {
+    ): string {
         return OMEGAUP_GITSERVER_URL . "/{$alias}/+log/{$commit}";
     }
 

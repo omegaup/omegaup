@@ -20,11 +20,19 @@ class IdentityLoginLog extends \OmegaUp\DAO\Base\IdentityLoginLog {
                 WHERE
                     identity_id = ?;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$identityId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identityId]
+        );
 
         $identityLoginLogs = [];
         foreach ($rs as $row) {
-            array_push($identityLoginLogs, new \OmegaUp\DAO\VO\IdentityLoginLog($row));
+            array_push(
+                $identityLoginLogs,
+                new \OmegaUp\DAO\VO\IdentityLoginLog(
+                    $row
+                )
+            );
         }
         return $identityLoginLogs;
     }
