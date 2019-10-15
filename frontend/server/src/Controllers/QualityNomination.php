@@ -2,11 +2,37 @@
 
  namespace OmegaUp\Controllers;
 
+use OmegaUp\Exceptions\NotFoundException;
+
 class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Number of reviewers to automatically assign each nomination.
      */
     const REVIEWERS_PER_NOMINATION = 2;
+
+    /**
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @param \OmegaUp\DAO\VO\Users $user
+     * @param string $nominationType
+     * @param array $contents
+     * @return \OmegaUp\DAO\VO\QualityNominations
+     */
+    public static function createNomination(
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Users $user,
+        string $nominationType,
+        array $contents
+    ): \OmegaUp\DAO\VO\QualityNominations {
+        $nomination = new \OmegaUp\DAO\VO\QualityNominations([
+            'user_id' => $user->user_id,
+            'problem_id' => $problem->problem_id,
+            'nomination' => $nominationType,
+            'contents' => json_encode($contents),
+            'status' => 'open',
+        ]);
+        \OmegaUp\DAO\QualityNominations::create($nomination);
+        return $nomination;
+    }
 
     /**
      * Creates a new QualityNomination
@@ -328,15 +354,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Create object
-        $nomination = new \OmegaUp\DAO\VO\QualityNominations([
-            'user_id' => $r->user->user_id,
-            'problem_id' => $problem->problem_id,
-            'nomination' => $r['nomination'],
-            'contents' => json_encode($contents), // re-encoding it for normalization.
-            'status' => 'open',
-        ]);
-        \OmegaUp\DAO\QualityNominations::create($nomination);
+        if (is_null($r->user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
+
+        $nomination = \OmegaUp\Controllers\QualityNomination::createNomination($problem, $r->user, strval($r['nomination']), $contents);
 
         if ($nomination->nomination == 'promotion') {
             $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
