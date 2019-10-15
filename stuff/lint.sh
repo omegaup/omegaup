@@ -20,4 +20,4 @@ exec /usr/bin/docker run --interactive --tty --rm \
 	--volume "${OMEGAUP_ROOT}:/src" \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
-	omegaup/hook_tools:20191013 -j4 $ARGS
+	omegaup/hook_tools:20191014 -j4 $ARGS
