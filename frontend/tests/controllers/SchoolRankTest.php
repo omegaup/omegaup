@@ -12,8 +12,9 @@ class SchoolRankTest extends OmegaupTestCase {
      */
     private function createRunsWithSchool(&$schoolsData) {
         $users = [];
+        $identities = [];
         for ($i = 0; $i < 5; $i++) {
-            $users[] = UserFactory::createUser();
+            ['user' => $users[], 'identity' => $identities[]] = UserFactory::createUser();
         }
 
         SchoolsFactory::addUserToSchool($schoolsData[0], $users[0]);
@@ -44,7 +45,10 @@ class SchoolRankTest extends OmegaupTestCase {
      */
     public function testSchoolRankPositive() {
         $currentTime = \OmegaUp\Time::get();
-        $pastMonthTime = strtotime('first day of last month', \OmegaUp\Time::get());
+        $pastMonthTime = strtotime(
+            'first day of last month',
+            \OmegaUp\Time::get()
+        );
 
         \OmegaUp\Time::setTimeForTesting($pastMonthTime);
 
@@ -69,7 +73,7 @@ class SchoolRankTest extends OmegaupTestCase {
         $this->createRunsWithSchool($schoolsData);
 
         // Call API
-        $rankViewer = UserFactory::createUser();
+        ['user' => $rankViewer, 'identity' => $identity] = UserFactory::createUser();
         $rankViewerLogin = self::login($rankViewer);
         $response = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token
@@ -105,7 +109,7 @@ class SchoolRankTest extends OmegaupTestCase {
         // 1 in school #2 but PA, 1 with no school.
         $schoolsData = [SchoolsFactory::createSchool(), SchoolsFactory::createSchool()];
 
-        $rankViewer = UserFactory::createUser();
+        ['user' => $rankViewer, 'identity' => $identity] = UserFactory::createUser();
         $rankViewerLogin = self::login($rankViewer);
         $originalResponse = \OmegaUp\Controllers\School::apiRank(new \OmegaUp\Request([
             'auth_token' => $rankViewerLogin->auth_token,

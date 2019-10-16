@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -39,82 +39,128 @@ class Problems extends \OmegaUp\DAO\VO\VO {
         'difficulty_histogram' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval(
+                $data['problem_id']
+            );
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = (int)$data['acl_id'];
+            $this->acl_id = intval(
+                $data['acl_id']
+            );
         }
         if (isset($data['visibility'])) {
-            $this->visibility = (int)$data['visibility'];
+            $this->visibility = intval(
+                $data['visibility']
+            );
         }
         if (isset($data['title'])) {
-            $this->title = strval($data['title']);
+            $this->title = strval(
+                $data['title']
+            );
         }
         if (isset($data['alias'])) {
-            $this->alias = strval($data['alias']);
+            $this->alias = strval(
+                $data['alias']
+            );
         }
         if (isset($data['commit'])) {
-            $this->commit = strval($data['commit']);
+            $this->commit = strval(
+                $data['commit']
+            );
         }
         if (isset($data['current_version'])) {
-            $this->current_version = strval($data['current_version']);
+            $this->current_version = strval(
+                $data['current_version']
+            );
         }
         if (isset($data['languages'])) {
-            $this->languages = strval($data['languages']);
+            $this->languages = strval(
+                $data['languages']
+            );
         }
         if (isset($data['input_limit'])) {
-            $this->input_limit = (int)$data['input_limit'];
+            $this->input_limit = intval(
+                $data['input_limit']
+            );
         }
         if (isset($data['visits'])) {
-            $this->visits = (int)$data['visits'];
+            $this->visits = intval(
+                $data['visits']
+            );
         }
         if (isset($data['submissions'])) {
-            $this->submissions = (int)$data['submissions'];
+            $this->submissions = intval(
+                $data['submissions']
+            );
         }
         if (isset($data['accepted'])) {
-            $this->accepted = (int)$data['accepted'];
+            $this->accepted = intval(
+                $data['accepted']
+            );
         }
         if (isset($data['difficulty'])) {
-            $this->difficulty = (float)$data['difficulty'];
+            $this->difficulty = floatval(
+                $data['difficulty']
+            );
         }
         if (isset($data['creation_date'])) {
             /**
              * @var string|int|float $data['creation_date']
              * @var int $this->creation_date
              */
-            $this->creation_date = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['creation_date']);
+            $this->creation_date = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['creation_date']
+                )
+            );
         } else {
             $this->creation_date = \OmegaUp\Time::get();
         }
         if (isset($data['source'])) {
-            $this->source = strval($data['source']);
+            $this->source = strval(
+                $data['source']
+            );
         }
         if (isset($data['order'])) {
-            $this->order = strval($data['order']);
+            $this->order = strval(
+                $data['order']
+            );
         }
         if (isset($data['deprecated'])) {
-            $this->deprecated = boolval($data['deprecated']);
+            $this->deprecated = boolval(
+                $data['deprecated']
+            );
         }
         if (isset($data['email_clarifications'])) {
-            $this->email_clarifications = boolval($data['email_clarifications']);
+            $this->email_clarifications = boolval(
+                $data['email_clarifications']
+            );
         }
         if (isset($data['quality'])) {
-            $this->quality = (float)$data['quality'];
+            $this->quality = floatval(
+                $data['quality']
+            );
         }
         if (isset($data['quality_histogram'])) {
-            $this->quality_histogram = strval($data['quality_histogram']);
+            $this->quality_histogram = strval(
+                $data['quality_histogram']
+            );
         }
         if (isset($data['difficulty_histogram'])) {
-            $this->difficulty_histogram = strval($data['difficulty_histogram']);
+            $this->difficulty_histogram = strval(
+                $data['difficulty_histogram']
+            );
         }
     }
 

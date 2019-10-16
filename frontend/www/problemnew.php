@@ -52,7 +52,10 @@ if (isset($_POST['request']) && ($_POST['request'] == 'submit')) {
         $smarty->assign('VALIDATOR', $_POST['validator']);
         $smarty->assign('VALIDATOR_TIME_LIMIT', $_POST['validator_time_limit']);
         $smarty->assign('TIME_LIMIT', $_POST['time_limit']);
-        $smarty->assign('OVERALL_WALL_TIME_LIMIT', $_POST['overall_wall_time_limit']);
+        $smarty->assign(
+            'OVERALL_WALL_TIME_LIMIT',
+            $_POST['overall_wall_time_limit']
+        );
         $smarty->assign('EXTRA_WALL_TIME', $_POST['extra_wall_time']);
         $smarty->assign('MEMORY_LIMIT', $_POST['memory_limit']);
         $smarty->assign('OUTPUT_LIMIT', $_POST['output_limit']);

@@ -21,10 +21,14 @@ class ContestRunsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
 
         // Grade the run
         RunsFactory::gradeRun($runData);
@@ -41,8 +45,14 @@ class ContestRunsTest extends OmegaupTestCase {
 
         // Assert
         $this->assertEquals(1, count($response['runs']));
-        $this->assertEquals($runData['response']['guid'], $response['runs'][0]['guid']);
-        $this->assertEquals($contestant->username, $response['runs'][0]['username']);
+        $this->assertEquals(
+            $runData['response']['guid'],
+            $response['runs'][0]['guid']
+        );
+        $this->assertEquals(
+            $contestant->username,
+            $response['runs'][0]['username']
+        );
         $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Contest admin should be able to view run, even if not problem admin.
@@ -77,10 +87,14 @@ class ContestRunsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
 
         // Grade the run
         RunsFactory::gradeRun($runData);

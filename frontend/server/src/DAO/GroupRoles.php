@@ -28,7 +28,10 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
             $acl_id,
         ];
 
-        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        $admins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
 
         for ($i = 0; $i < count($admins); $i++) {
             if ($admins[$i]['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
@@ -109,7 +112,12 @@ class GroupRoles extends \OmegaUp\DAO\Base\GroupRoles {
         ];
 
         $roles = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params) as $role) {
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $params
+            ) as $role
+        ) {
             $roles[] = $role['name'];
         }
         return $roles;

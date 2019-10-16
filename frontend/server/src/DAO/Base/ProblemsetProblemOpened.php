@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,16 +35,36 @@ abstract class ProblemsetProblemOpened {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
-        if (empty($Problemset_Problem_Opened->problemset_id) || empty($Problemset_Problem_Opened->problem_id) || empty($Problemset_Problem_Opened->identity_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+    ): int {
+        if (
+            empty($Problemset_Problem_Opened->problemset_id) ||
+            empty($Problemset_Problem_Opened->problem_id) ||
+            empty($Problemset_Problem_Opened->identity_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Problemset_Problem_Opened (
+                    `problemset_id`,
+                    `problem_id`,
+                    `identity_id`,
+                    `open_time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Problemset_Problem_Opened->problemset_id,
             $Problemset_Problem_Opened->problem_id,
             $Problemset_Problem_Opened->identity_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problemset_Problem_Opened->open_time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -57,13 +77,39 @@ abstract class ProblemsetProblemOpened {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
-        $sql = 'UPDATE `Problemset_Problem_Opened` SET `open_time` = ? WHERE `problemset_id` = ? AND `problem_id` = ? AND `identity_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+    ): int {
+        $sql = '
+            UPDATE
+                `Problemset_Problem_Opened`
+            SET
+                `open_time` = ?
+            WHERE
+                (
+                    `problemset_id` = ? AND
+                    `problem_id` = ? AND
+                    `identity_id` = ?
+                );';
         $params = [
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
-            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
-            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
-            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problemset_Problem_Opened->open_time
+            ),
+            (
+                is_null($Problemset_Problem_Opened->problemset_id) ?
+                null :
+                intval($Problemset_Problem_Opened->problemset_id)
+            ),
+            (
+                is_null($Problemset_Problem_Opened->problem_id) ?
+                null :
+                intval($Problemset_Problem_Opened->problem_id)
+            ),
+            (
+                is_null($Problemset_Problem_Opened->identity_id) ?
+                null :
+                intval($Problemset_Problem_Opened->identity_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -72,15 +118,33 @@ abstract class ProblemsetProblemOpened {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ProblemsetProblemOpened Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $problemset_id, ?int $problem_id, ?int $identity_id) : ?\OmegaUp\DAO\VO\ProblemsetProblemOpened {
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` FROM Problemset_Problem_Opened WHERE (problemset_id = ? AND problem_id = ? AND identity_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $problemset_id,
+        ?int $problem_id,
+        ?int $identity_id
+    ): ?\OmegaUp\DAO\VO\ProblemsetProblemOpened {
+        $sql = '
+            SELECT
+                `Problemset_Problem_Opened`.`problemset_id`,
+                `Problemset_Problem_Opened`.`problem_id`,
+                `Problemset_Problem_Opened`.`identity_id`,
+                `Problemset_Problem_Opened`.`open_time`
+            FROM
+                `Problemset_Problem_Opened`
+            WHERE
+                (
+                    `problemset_id` = ? AND
+                    `problem_id` = ? AND
+                    `identity_id` = ?
+                )
+            LIMIT 1;';
         $params = [$problemset_id, $problem_id, $identity_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -108,9 +172,23 @@ abstract class ProblemsetProblemOpened {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened) : void {
-        $sql = 'DELETE FROM `Problemset_Problem_Opened` WHERE problemset_id = ? AND problem_id = ? AND identity_id = ?;';
-        $params = [$Problemset_Problem_Opened->problemset_id, $Problemset_Problem_Opened->problem_id, $Problemset_Problem_Opened->identity_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problemset_Problem_Opened`
+            WHERE
+                (
+                    `problemset_id` = ? AND
+                    `problem_id` = ? AND
+                    `identity_id` = ?
+                );';
+        $params = [
+            $Problemset_Problem_Opened->problemset_id,
+            $Problemset_Problem_Opened->problem_id,
+            $Problemset_Problem_Opened->identity_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -144,17 +222,39 @@ abstract class ProblemsetProblemOpened {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problemset_Problem_Opened`.`problemset_id`, `Problemset_Problem_Opened`.`problem_id`, `Problemset_Problem_Opened`.`identity_id`, `Problemset_Problem_Opened`.`open_time` from Problemset_Problem_Opened';
+    ): array {
+        $sql = '
+            SELECT
+                `Problemset_Problem_Opened`.`problemset_id`,
+                `Problemset_Problem_Opened`.`problem_id`,
+                `Problemset_Problem_Opened`.`identity_id`,
+                `Problemset_Problem_Opened`.`open_time`
+            FROM
+                `Problemset_Problem_Opened`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemsetProblemOpened($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemsetProblemOpened(
+                $row
+            );
         }
         return $allData;
     }
@@ -167,17 +267,47 @@ abstract class ProblemsetProblemOpened {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetProblemOpened}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened) : int {
-        $sql = 'INSERT INTO Problemset_Problem_Opened (`problemset_id`, `problem_id`, `identity_id`, `open_time`) VALUES (?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemsetProblemOpened $Problemset_Problem_Opened
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problemset_Problem_Opened (
+                    `problemset_id`,
+                    `problem_id`,
+                    `identity_id`,
+                    `open_time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problemset_Problem_Opened->problemset_id) ? null : (int)$Problemset_Problem_Opened->problemset_id,
-            is_null($Problemset_Problem_Opened->problem_id) ? null : (int)$Problemset_Problem_Opened->problem_id,
-            is_null($Problemset_Problem_Opened->identity_id) ? null : (int)$Problemset_Problem_Opened->identity_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Problem_Opened->open_time),
+            (
+                is_null($Problemset_Problem_Opened->problemset_id) ?
+                null :
+                intval($Problemset_Problem_Opened->problemset_id)
+            ),
+            (
+                is_null($Problemset_Problem_Opened->problem_id) ?
+                null :
+                intval($Problemset_Problem_Opened->problem_id)
+            ),
+            (
+                is_null($Problemset_Problem_Opened->identity_id) ?
+                null :
+                intval($Problemset_Problem_Opened->identity_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problemset_Problem_Opened->open_time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

@@ -10,7 +10,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testUserUpdate() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
@@ -30,13 +30,27 @@ class UserUpdateTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
-        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+            $r['auth_token']
+        );
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
         $this->assertEquals($r['state_id'], $identityDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
-        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['birth_date']
+            ),
+            $userDb->birth_date
+        );
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['graduation_date']
+            ),
+            $userDb->graduation_date
+        );
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Edit all fields again with diff values
@@ -57,13 +71,27 @@ class UserUpdateTest extends OmegaupTestCase {
 
         // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
-        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($r['auth_token']);
+        $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+            $r['auth_token']
+        );
         $this->assertEquals($r['name'], $identityDb->name);
         $this->assertEquals($r['country_id'], $identityDb->country_id);
         $this->assertEquals($r['state_id'], $identityDb->state_id);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
-        $this->assertEquals(gmdate('Y-m-d', $r['birth_date']), $userDb->birth_date);
-        $this->assertEquals(gmdate('Y-m-d', $r['graduation_date']), $userDb->graduation_date);
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['birth_date']
+            ),
+            $userDb->birth_date
+        );
+        $this->assertEquals(
+            gmdate(
+                'Y-m-d',
+                $r['graduation_date']
+            ),
+            $userDb->graduation_date
+        );
         $this->assertEquals($locale->language_id, $identityDb->language_id);
 
         // Double check language update with the appropiate API
@@ -80,7 +108,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNegativeStateUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -97,7 +125,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * Update profile username with non-existence username
      */
     public function testUsernameUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $newUsername = Utils::CreateRandomString();
         $r = new \OmegaUp\Request([
@@ -117,13 +145,13 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicateUsernameUpdate() {
-        $old_user = UserFactory::createUser();
-        $user = UserFactory::createUser();
+        ['user' => $oldUser, 'identity' => $oldIdentity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             //update username with existed username
-            'username' => $old_user->username
+            'username' => $oldUser->username
         ]);
         \OmegaUp\Controllers\User::apiUpdate($r);
     }
@@ -133,7 +161,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNameUpdateTooLong() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -151,7 +179,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testEmptyNameUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -168,7 +196,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testFutureBirthday() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $r = new \OmegaUp\Request([
@@ -185,7 +213,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testUpdateCountryWithNoStateData() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Omit state.
@@ -197,7 +225,9 @@ class UserUpdateTest extends OmegaupTestCase {
 
         try {
             \OmegaUp\Controllers\User::apiUpdate($r);
-            $this->fail('All countries now have state information, so it must be provided.');
+            $this->fail(
+                'All countries now have state information, so it must be provided.'
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // OK!
         }
@@ -209,7 +239,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithInvalidOption() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         //generate wrong gender option
@@ -232,7 +262,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithValidOption() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $r = new \OmegaUp\Request([
@@ -249,7 +279,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithNull() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $r = new \OmegaUp\Request([
@@ -266,7 +296,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithEmptyString() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         //generate wrong gender option
@@ -287,10 +317,9 @@ class UserUpdateTest extends OmegaupTestCase {
      * Tests that the user can generate a git token.
      */
     public function testGenerateGitToken() {
-        $identity = UserFactory::createUser();
-        $dbUser = \OmegaUp\DAO\Users::FindByUsername($identity->username);
-        $this->assertNull($dbUser->git_token);
-        $login = self::login($identity);
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $this->assertNull($user->git_token);
+        $login = self::login($user);
         $response = \OmegaUp\Controllers\User::apiGenerateGitToken(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -298,7 +327,12 @@ class UserUpdateTest extends OmegaupTestCase {
 
         $dbUser = \OmegaUp\DAO\Users::FindByUsername($identity->username);
         $this->assertNotNull($dbUser->git_token);
-        $this->assertTrue(\OmegaUp\SecurityTools::compareHashedStrings($response['token'], $dbUser->git_token));
+        $this->assertTrue(
+            \OmegaUp\SecurityTools::compareHashedStrings(
+                $response['token'],
+                $dbUser->git_token
+            )
+        );
     }
 
     /**
@@ -308,16 +342,26 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testOldHashTransparentMigration() {
         // Create the user and manually set its password to the well-known
         // 'omegaup' hash.
-        $identity = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $identity->password = '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a';
         \OmegaUp\DAO\Identities::update($identity);
-        $this->assertTrue(\OmegaUp\SecurityTools::isOldHash($identity->password));
+        $user->password = $identity->password;
+        \OmegaUp\DAO\Users::update($user);
+        $this->assertTrue(
+            \OmegaUp\SecurityTools::isOldHash(
+                $identity->password
+            )
+        );
 
         // After logging in, the password should have been updated.
         $identity->password = 'omegaup';
         self::login($identity);
         $identity = \OmegaUp\DAO\Identities::getByPK($identity->identity_id);
-        $this->assertFalse(\OmegaUp\SecurityTools::isOldHash($identity->password));
+        $this->assertFalse(
+            \OmegaUp\SecurityTools::isOldHash(
+                $identity->password
+            )
+        );
 
         // After logging in once, the user should be able to log in again with
         // the exact same password.

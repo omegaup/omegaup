@@ -23,7 +23,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
     public static function calculateCoderOfTheMonth(
         string $startTime,
         string $endTime
-    ) : ?array {
+    ): ?array {
         $sql = "
           SELECT DISTINCT
             i.user_id,
@@ -100,7 +100,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Get all first coders of the month
      * @return array{time: string, username: string, country_id: string, email: string}[]
      */
-    final public static function getCodersOfTheMonth() : array {
+    final public static function getCodersOfTheMonth(): array {
         $sql = '
           SELECT
             cm.time, i.username, COALESCE(i.country_id, "xx") AS country_id, e.email
@@ -126,7 +126,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      * Get all coder of the months based on month
      * @return array{time: string, username: string, country_id: string, email: string}[]
      */
-    final public static function getMonthlyList(string $firstDay) : array {
+    final public static function getMonthlyList(string $firstDay): array {
         $date = date('Y-m-01', strtotime($firstDay));
         $sql = '
           SELECT
@@ -183,7 +183,10 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         return $username == $rs['username'];
     }
 
-    final public static function getByTimeAndSelected($time, $autoselected = false) {
+    final public static function getByTimeAndSelected(
+        $time,
+        $autoselected = false
+    ) {
         $clause = $autoselected ? 'IS NULL' : 'IS NOT NULL';
         $sql = 'SELECT
                     *
@@ -224,7 +227,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      */
     public static function calculateCoderOfMonthByGivenDate(
         string $date
-    ) : ?array {
+    ): ?array {
         $date = new \DateTimeImmutable($date);
         $firstDayOfLastMonth = $date->modify('first day of last month');
         $startTime = $firstDayOfLastMonth->format('Y-m-d');

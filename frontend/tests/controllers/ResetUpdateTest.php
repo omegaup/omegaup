@@ -52,7 +52,10 @@ class ResetUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('parameterStringTooShort', $expected->getMessage());
+            $this->assertEquals(
+                'parameterStringTooShort',
+                $expected->getMessage()
+            );
         }
 
         $user_data['password'] = str_pad('', 73, 'a');
@@ -62,7 +65,10 @@ class ResetUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('parameterStringTooLong', $expected->getMessage());
+            $this->assertEquals(
+                'parameterStringTooLong',
+                $expected->getMessage()
+            );
         }
     }
 
@@ -86,7 +92,10 @@ class ResetUpdateTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Reset::apiUpdate($r);
             $this->fail('Request should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $expected) {
-            $this->assertEquals('passwordResetResetExpired', $expected->getMessage());
+            $this->assertEquals(
+                'passwordResetResetExpired',
+                $expected->getMessage()
+            );
         }
     }
 

@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,22 +25,59 @@ abstract class Courses {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\Courses $Courses) : int {
-        $sql = 'UPDATE `Courses` SET `name` = ?, `description` = ?, `alias` = ?, `group_id` = ?, `acl_id` = ?, `start_time` = ?, `finish_time` = ?, `public` = ?, `school_id` = ?, `needs_basic_information` = ?, `requests_user_information` = ?, `show_scoreboard` = ? WHERE `course_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\Courses $Courses
+    ): int {
+        $sql = '
+            UPDATE
+                `Courses`
+            SET
+                `name` = ?,
+                `description` = ?,
+                `alias` = ?,
+                `group_id` = ?,
+                `acl_id` = ?,
+                `start_time` = ?,
+                `finish_time` = ?,
+                `public` = ?,
+                `school_id` = ?,
+                `needs_basic_information` = ?,
+                `requests_user_information` = ?,
+                `show_scoreboard` = ?
+            WHERE
+                (
+                    `course_id` = ?
+                );';
         $params = [
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
-            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->start_time),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->finish_time),
-            (int)$Courses->public,
-            is_null($Courses->school_id) ? null : (int)$Courses->school_id,
-            (int)$Courses->needs_basic_information,
+            (
+                is_null($Courses->group_id) ?
+                null :
+                intval($Courses->group_id)
+            ),
+            (
+                is_null($Courses->acl_id) ?
+                null :
+                intval($Courses->acl_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Courses->start_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Courses->finish_time
+            ),
+            intval($Courses->public),
+            (
+                is_null($Courses->school_id) ?
+                null :
+                intval($Courses->school_id)
+            ),
+            intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
-            (int)$Courses->show_scoreboard,
-            (int)$Courses->course_id,
+            intval($Courses->show_scoreboard),
+            intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -49,15 +86,38 @@ abstract class Courses {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\Courses} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\Courses}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\Courses}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\Courses Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\Courses} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $course_id) : ?\OmegaUp\DAO\VO\Courses {
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` FROM Courses WHERE (course_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $course_id
+    ): ?\OmegaUp\DAO\VO\Courses {
+        $sql = '
+            SELECT
+                `Courses`.`course_id`,
+                `Courses`.`name`,
+                `Courses`.`description`,
+                `Courses`.`alias`,
+                `Courses`.`group_id`,
+                `Courses`.`acl_id`,
+                `Courses`.`start_time`,
+                `Courses`.`finish_time`,
+                `Courses`.`public`,
+                `Courses`.`school_id`,
+                `Courses`.`needs_basic_information`,
+                `Courses`.`requests_user_information`,
+                `Courses`.`show_scoreboard`
+            FROM
+                `Courses`
+            WHERE
+                (
+                    `course_id` = ?
+                )
+            LIMIT 1;';
         $params = [$course_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -85,9 +145,19 @@ abstract class Courses {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\Courses $Courses) : void {
-        $sql = 'DELETE FROM `Courses` WHERE course_id = ?;';
-        $params = [$Courses->course_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\Courses $Courses
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Courses`
+            WHERE
+                (
+                    `course_id` = ?
+                );';
+        $params = [
+            $Courses->course_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -121,17 +191,48 @@ abstract class Courses {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Courses`.`course_id`, `Courses`.`name`, `Courses`.`description`, `Courses`.`alias`, `Courses`.`group_id`, `Courses`.`acl_id`, `Courses`.`start_time`, `Courses`.`finish_time`, `Courses`.`public`, `Courses`.`school_id`, `Courses`.`needs_basic_information`, `Courses`.`requests_user_information`, `Courses`.`show_scoreboard` from Courses';
+    ): array {
+        $sql = '
+            SELECT
+                `Courses`.`course_id`,
+                `Courses`.`name`,
+                `Courses`.`description`,
+                `Courses`.`alias`,
+                `Courses`.`group_id`,
+                `Courses`.`acl_id`,
+                `Courses`.`start_time`,
+                `Courses`.`finish_time`,
+                `Courses`.`public`,
+                `Courses`.`school_id`,
+                `Courses`.`needs_basic_information`,
+                `Courses`.`requests_user_information`,
+                `Courses`.`show_scoreboard`
+            FROM
+                `Courses`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\Courses($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\Courses(
+                $row
+            );
         }
         return $allData;
     }
@@ -144,32 +245,82 @@ abstract class Courses {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\Courses $Courses El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\Courses} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\Courses}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\Courses $Courses) : int {
-        $sql = 'INSERT INTO Courses (`name`, `description`, `alias`, `group_id`, `acl_id`, `start_time`, `finish_time`, `public`, `school_id`, `needs_basic_information`, `requests_user_information`, `show_scoreboard`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\Courses $Courses
+    ): int {
+        $sql = '
+            INSERT INTO
+                Courses (
+                    `name`,
+                    `description`,
+                    `alias`,
+                    `group_id`,
+                    `acl_id`,
+                    `start_time`,
+                    `finish_time`,
+                    `public`,
+                    `school_id`,
+                    `needs_basic_information`,
+                    `requests_user_information`,
+                    `show_scoreboard`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Courses->name,
             $Courses->description,
             $Courses->alias,
-            is_null($Courses->group_id) ? null : (int)$Courses->group_id,
-            is_null($Courses->acl_id) ? null : (int)$Courses->acl_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->start_time),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Courses->finish_time),
-            (int)$Courses->public,
-            is_null($Courses->school_id) ? null : (int)$Courses->school_id,
-            (int)$Courses->needs_basic_information,
+            (
+                is_null($Courses->group_id) ?
+                null :
+                intval($Courses->group_id)
+            ),
+            (
+                is_null($Courses->acl_id) ?
+                null :
+                intval($Courses->acl_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Courses->start_time
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Courses->finish_time
+            ),
+            intval($Courses->public),
+            (
+                is_null($Courses->school_id) ?
+                null :
+                intval($Courses->school_id)
+            ),
+            intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
-            (int)$Courses->show_scoreboard,
+            intval($Courses->show_scoreboard),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
         if ($affectedRows == 0) {
             return 0;
         }
-        $Courses->course_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Courses->course_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

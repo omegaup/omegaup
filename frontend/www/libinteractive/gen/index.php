@@ -15,7 +15,10 @@ if ($_POST) {
         $smarty->assign('error', $smarty->getConfigVars('parameterInvalid'));
         $smarty->assign('error_field', 'idl');
     } else {
-        $dirname = \OmegaUp\FileHandler::TempDir(sys_get_temp_dir(), 'libinteractive');
+        $dirname = \OmegaUp\FileHandler::TempDir(
+            sys_get_temp_dir(),
+            'libinteractive'
+        );
         try {
             file_put_contents("{$dirname}/{$_POST['name']}.idl", $_POST['idl']);
             $args = ['/usr/bin/java', '-jar', '/usr/share/java/libinteractive.jar',
@@ -76,7 +79,9 @@ if ($_POST) {
                     $zip->close();
 
                     header('Content-Type: application/zip');
-                    header("Content-Disposition: attachment; filename={$_POST['name']}.zip");
+                    header(
+                        "Content-Disposition: attachment; filename={$_POST['name']}.zip"
+                    );
                     readfile("{$dirname}/interactive.zip");
                     \OmegaUp\FileHandler::deleteDirRecursively($dirname);
                     die();

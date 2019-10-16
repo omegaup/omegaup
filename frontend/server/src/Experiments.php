@@ -100,7 +100,10 @@ class Experiments {
         }
 
         if (!is_null($requestExperiments)) {
-            $this->loadExperimentsFromRequest($requestExperiments, $knownExperiments);
+            $this->loadExperimentsFromRequest(
+                $requestExperiments,
+                $knownExperiments
+            );
         }
     }
 
@@ -114,7 +117,7 @@ class Experiments {
     private function loadExperimentsFromConfig(
         array $defines,
         array $knownExperiments
-    ) : void {
+    ): void {
         foreach ($knownExperiments as $name) {
             if ($this->isEnabledByConfig($name, $defines)) {
                 $this->enabledExperiments[] = $name;
@@ -131,13 +134,17 @@ class Experiments {
     private function loadExperimentsForUser(
         \OmegaUp\DAO\VO\Identities $identity,
         array $knownExperiments
-    ) : void {
-        if (is_null($identity->user_id)) {
-            // It means that user is trying to login with an unassociated identity
-            return;
+    ): void {
+        if (is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
-        foreach (\OmegaUp\DAO\UsersExperiments::getByUserId($identity->user_id) as $ue) {
-            if (in_array($ue->experiment, $knownExperiments) &&
+        foreach (
+            \OmegaUp\DAO\UsersExperiments::getByUserId(
+                $user->user_id
+            ) as $ue
+        ) {
+            if (
+                in_array($ue->experiment, $knownExperiments) &&
                 !is_null($ue->experiment) &&
                 !$this->isEnabled($ue->experiment)
             ) {
@@ -158,7 +165,7 @@ class Experiments {
     private function loadExperimentsFromRequest(
         string $requestExperiments,
         array $knownExperiments
-    ) : void {
+    ): void {
         $tokens = explode(',', $requestExperiments);
         foreach ($tokens as $token) {
             $kvp = explode('=', $token);
@@ -167,7 +174,8 @@ class Experiments {
             }
             $name = $kvp[0];
             $hash = $kvp[1];
-            if (in_array($name, $knownExperiments) &&
+            if (
+                in_array($name, $knownExperiments) &&
                 !$this->isEnabled($name) &&
                 $hash == self::getExperimentHash($name)
             ) {
@@ -181,7 +189,7 @@ class Experiments {
      * @param string $name The name of the experiment.
      * @throws \OmegaUp\Exceptions\NotFoundException if the experiment is not enabled.
      */
-    public function ensureEnabled(string $name) : void {
+    public function ensureEnabled(string $name): void {
         if (!$this->isEnabled($name)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
@@ -192,7 +200,7 @@ class Experiments {
      * @param string $name The experiment name.
      * @return bool True iff the experiment is enabled.
      */
-    public function isEnabled(string $name) : bool {
+    public function isEnabled(string $name): bool {
         return in_array($name, $this->enabledExperiments);
     }
 
@@ -201,7 +209,7 @@ class Experiments {
      * @param string $name The experiment name.
      * @return string The hashed experiment name.
      */
-    public static function getExperimentHash(string $name) : string {
+    public static function getExperimentHash(string $name): string {
         return hash_hmac('sha1', $name, OMEGAUP_EXPERIMENT_SECRET);
     }
 
@@ -209,7 +217,7 @@ class Experiments {
      * Returns an array with all the enabled experiments.
      * @return string[] The array with all experiment names.
      */
-    public function getEnabledExperiments() : array {
+    public function getEnabledExperiments(): array {
         return $this->enabledExperiments;
     }
 
@@ -217,7 +225,7 @@ class Experiments {
      * Returns an array with all the known experiments.
      * @return string[] The array with all the known experiment names.
      */
-    public function getAllKnownExperiments() : array {
+    public function getAllKnownExperiments(): array {
         return self::KNOWN_EXPERIMENTS;
     }
 
@@ -227,7 +235,7 @@ class Experiments {
      * @param array<string, mixed> $defines The array with all the user-defined constants.
      * @return bool True iff the experiment is enabled by config.
      */
-    public function isEnabledByConfig(string $name, array $defines) : bool {
+    public function isEnabledByConfig(string $name, array $defines): bool {
         return array_key_exists(
             self::EXPERIMENT_PREFIX . strtoupper($name),
             $defines
@@ -237,7 +245,7 @@ class Experiments {
     /**
      * Returns the global instance of Experiments.
      */
-    public static function getInstance() : Experiments {
+    public static function getInstance(): Experiments {
         if (is_null(self::$_instance)) {
             /** @psalm-suppress RedundantCondition This is not set on tests. */
             if (isset($_REQUEST)) {
@@ -249,11 +257,14 @@ class Experiments {
             $session = \OmegaUp\Controllers\Session::apiCurrentSession(
                 new \OmegaUp\Request($request)
             )['session'];
-            if (isset($request[self::EXPERIMENT_REQUEST_NAME])
+            if (
+                isset($request[self::EXPERIMENT_REQUEST_NAME])
                 && !empty($request[self::EXPERIMENT_REQUEST_NAME])
                 && is_string($request[self::EXPERIMENT_REQUEST_NAME])
             ) {
-                $requestExperiments = strval($request[self::EXPERIMENT_REQUEST_NAME]);
+                $requestExperiments = strval(
+                    $request[self::EXPERIMENT_REQUEST_NAME]
+                );
             } else {
                 $requestExperiments = null;
             }

@@ -21,7 +21,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /** @var bool */
     private static $_setCookieOnRegisterSession = true;
 
-    public static function getSessionManagerInstance() : \OmegaUp\SessionManager {
+    public static function getSessionManagerInstance(): \OmegaUp\SessionManager {
         if (is_null(self::$_sessionManager)) {
             self::$_sessionManager = new \OmegaUp\SessionManager();
         }
@@ -44,19 +44,19 @@ class Session extends \OmegaUp\Controllers\Controller {
         return self::$_facebook;
     }
 
-    public static function getFacebookLoginUrl() : string {
+    public static function getFacebookLoginUrl(): string {
         $facebook = self::getFacebookInstance();
 
         $helper = $facebook->getRedirectLoginHelper();
-        return $helper->getLoginUrl(OMEGAUP_URL.'/login?fb', ['email']);
+        return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
     }
 
-    private static function isAuthTokenValid(string $authToken) : bool {
+    private static function isAuthTokenValid(string $authToken): bool {
         //do some other basic testing on authToken
         return true;
     }
 
-    public static function currentSessionAvailable() : bool {
+    public static function currentSessionAvailable(): bool {
         $session = self::apiCurrentSession()['session'];
         return !is_null($session) && !is_null($session['identity']);
     }
@@ -70,8 +70,9 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @return array
      * @psalm-return array{status: string, session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
      */
-    public static function apiCurrentSession(?\OmegaUp\Request $r = null) : array {
-        if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+    public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
+        if (
+            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null(self::$_currentSession)
         ) {
@@ -90,7 +91,8 @@ class Session extends \OmegaUp\Controllers\Controller {
         } else {
             $authToken = strval($r['auth_token']);
         }
-        if (defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+        if (
+            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
             !is_null($authToken)
         ) {
@@ -113,7 +115,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    private static function getAuthToken(\OmegaUp\Request $r) : ?string {
+    private static function getAuthToken(\OmegaUp\Request $r): ?string {
         $SessionM = self::getSessionManagerInstance();
         $SessionM->sessionStart();
         $authToken = null;
@@ -125,8 +127,14 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
             return $authToken;
         }
-        if (isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
-                && self::isAuthTokenValid(strval($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]))) {
+        if (
+            isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
+                && self::isAuthTokenValid(
+                    strval(
+                        $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]
+                    )
+                )
+        ) {
             return strval($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
         }
         return null;
@@ -136,7 +144,7 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @return array
      * @psalm-return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
      */
-    public static function getCurrentSession(\OmegaUp\Request $r) : array {
+    public static function getCurrentSession(\OmegaUp\Request $r): array {
         if (empty($r['auth_token'])) {
             return [
                 'valid' => false,
@@ -149,7 +157,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
         $authToken = strval($r['auth_token']);
 
-        $currentIdentity = \OmegaUp\DAO\AuthTokens::getIdentityByToken($authToken);
+        $currentIdentity = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+            $authToken
+        );
         if (is_null($currentIdentity)) {
             // Means user has auth token, but does not exist in DB
             return [
@@ -166,7 +176,9 @@ class Session extends \OmegaUp\Controllers\Controller {
             $currentUser = null;
             $email = null;
         } else {
-            $currentUser = \OmegaUp\DAO\Users::getByPK($currentIdentity->user_id);
+            $currentUser = \OmegaUp\DAO\Users::getByPK(
+                $currentIdentity->user_id
+            );
             if (is_null($currentUser)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
@@ -181,33 +193,44 @@ class Session extends \OmegaUp\Controllers\Controller {
             'user' => $currentUser,
             'identity' => $currentIdentity,
             'auth_token' => $authToken,
-            'is_admin' => \OmegaUp\Authorization::isSystemAdmin($currentIdentity),
+            'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
+                $currentIdentity
+            ),
         ];
     }
 
     /**
      * Invalidates the current user's session cache.
      */
-    public static function invalidateCache() : void {
+    public static function invalidateCache(): void {
         $currentSession = self::apiCurrentSession()['session'];
-        if (is_null($currentSession) || is_null($currentSession['auth_token'])) {
+        if (
+            is_null($currentSession) ||
+            is_null($currentSession['auth_token'])
+        ) {
             return;
         }
-        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::SESSION_PREFIX, $currentSession['auth_token']);
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::SESSION_PREFIX,
+            $currentSession['auth_token']
+        );
     }
 
     /**
      * Invalidates the current request's session cache.
      */
-    public static function invalidateLocalCache() : void {
+    public static function invalidateLocalCache(): void {
         self::$_currentSession = null;
     }
 
-    public static function unregisterSession() : void {
+    public static function unregisterSession(): void {
         self::invalidateCache();
 
         $currentSession = self::apiCurrentSession()['session'];
-        if (is_null($currentSession) || is_null($currentSession['auth_token'])) {
+        if (
+            is_null($currentSession) ||
+            is_null($currentSession['auth_token'])
+        ) {
             return;
         }
         $authToken = new \OmegaUp\DAO\VO\AuthTokens([
@@ -226,7 +249,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private static function registerSession(\OmegaUp\DAO\VO\Identities $identity) : string {
+    private static function registerSession(\OmegaUp\DAO\VO\Identities $identity): string {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => $identity->identity_id,
@@ -240,13 +263,18 @@ class Session extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\AuthTokens::expireAuthTokens($identity->identity_id);
         } catch (\Exception $e) {
             // Best effort
-            self::$log->error("Failed to delete expired tokens: {$e->getMessage()}");
+            self::$log->error(
+                "Failed to delete expired tokens: {$e->getMessage()}"
+            );
         }
 
         // Create the new token
         $entropy = bin2hex(random_bytes(self::AUTH_TOKEN_ENTROPY_SIZE));
         /** @var int $identity->identity_id */
-        $hash = hash('sha256', OMEGAUP_MD5_SALT . $identity->identity_id . $entropy);
+        $hash = hash(
+            'sha256',
+            OMEGAUP_MD5_SALT . $identity->identity_id . $entropy
+        );
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
 
         \OmegaUp\DAO\AuthTokens::replace(new \OmegaUp\DAO\VO\AuthTokens([
@@ -256,14 +284,19 @@ class Session extends \OmegaUp\Controllers\Controller {
         ]));
 
         if (self::$_setCookieOnRegisterSession) {
-            self::getSessionManagerInstance()->setCookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, $token, 0, '/');
+            self::getSessionManagerInstance()->setCookie(
+                OMEGAUP_AUTH_TOKEN_COOKIE_NAME,
+                $token,
+                0,
+                '/'
+            );
         }
 
         \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::SESSION_PREFIX, $token);
         return $token;
     }
 
-    private static function getUniqueUsernameFromEmail(string $email) : string {
+    private static function getUniqueUsernameFromEmail(string $email): string {
         $idx = strpos($email, '@');
         if ($idx === false) {
             $username = 'OmegaupUser';
@@ -285,7 +318,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         for (;;) {
             // Maybe we can bring all records from db
             // with prefix $username, beacuse this:
-            $userexists = \OmegaUp\DAO\Users::FindByUsername("{$username}{$suffix}");
+            $userexists = \OmegaUp\DAO\Users::FindByUsername(
+                "{$username}{$suffix}"
+            );
             // will query db every single time probably.
 
             if (empty($userexists)) {
@@ -304,8 +339,11 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @return array<string, mixed>
      */
-    public static function apiGoogleLogin(\OmegaUp\Request $r) : array {
-        \OmegaUp\Validators::validateStringNonEmpty($r['storeToken'], 'storeToken');
+    public static function apiGoogleLogin(\OmegaUp\Request $r): array {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['storeToken'],
+            'storeToken'
+        );
 
         require_once 'libs/third_party/google-api-php-client/src/Google/autoload.php';
 
@@ -316,7 +354,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         try {
             $loginTicket = $client->verifyIdToken($r['storeToken']);
         } catch (\Google_Auth_Exception $ge) {
-            throw new \OmegaUp\Exceptions\UnauthorizedException('loginRequired', $ge);
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'loginRequired',
+                $ge
+            );
         }
 
         $payload = $loginTicket->getAttributes()['payload'];
@@ -337,7 +378,10 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @return array<string, mixed>
      */
-    public static function LoginViaGoogle(string $email, ?string $name = null) : array {
+    public static function LoginViaGoogle(
+        string $email,
+        ?string $name = null
+    ): array {
         return self::ThirdPartyLogin('Google', $email, $name);
     }
 
@@ -346,7 +390,7 @@ class Session extends \OmegaUp\Controllers\Controller {
      *
      * @return array<string, mixed>
      */
-    public static function LoginViaFacebook() : array {
+    public static function LoginViaFacebook(): array {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
         $facebook = self::getFacebookInstance();
@@ -363,7 +407,11 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($accessToken)) {
             $response = ['status' => 'error'];
             if (!is_null($helper->getError())) {
-                $response['error'] = strval($helper->getError()) . ' ' . strval($helper->getErrorDescription());
+                $response['error'] = strval(
+                    $helper->getError()
+                ) . ' ' . strval(
+                    $helper->getErrorDescription()
+                );
             }
         }
 
@@ -400,31 +448,67 @@ class Session extends \OmegaUp\Controllers\Controller {
      * usernameOrEmail
      * password
      */
-    public static function nativeLogin(\OmegaUp\Request $r) : string {
+    public static function nativeLogin(\OmegaUp\Request $r): string {
         \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
-        \OmegaUp\Validators::validateStringNonEmpty($r['usernameOrEmail'], 'usernameOrEmail');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['usernameOrEmail'],
+            'usernameOrEmail'
+        );
 
         try {
-            $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['usernameOrEmail']);
+            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+                $r['usernameOrEmail']
+            );
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
 
-        if (!\OmegaUp\Controllers\Identity::testPassword($identity, $r['password'])) {
-            self::$log->warn("Identity {$identity->username} has introduced invalid credentials.");
+        if (
+            !\OmegaUp\Controllers\Identity::testPassword(
+                $identity,
+                $r['password']
+            )
+        ) {
+            self::$log->warn(
+                "Identity {$identity->username} has introduced invalid credentials."
+            );
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
-        if (!is_null($identity->password)
+        if (
+            !is_null($identity->password)
             && \OmegaUp\SecurityTools::isOldHash($identity->password)
         ) {
             // Update the password using the new Argon2i algorithm.
-            self::$log->warn("Identity {$identity->username}'s password hash is being upgraded.");
-            $identity->password = \OmegaUp\SecurityTools::hashString($r['password']);
-            \OmegaUp\DAO\Identities::update($identity);
+            self::$log->warn(
+                "Identity {$identity->username}'s password hash is being upgraded."
+            );
+            try {
+                \OmegaUp\DAO\DAO::transBegin();
+                $identity->password = \OmegaUp\SecurityTools::hashString(
+                    $r['password']
+                );
+                \OmegaUp\DAO\Identities::update($identity);
+                if (!is_null($identity->user_id)) {
+                    $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+                    if (is_null($user)) {
+                        throw new \OmegaUp\Exceptions\NotFoundException(
+                            'userNotExist'
+                        );
+                    }
+                    $user->password = $identity->password;
+                    \OmegaUp\DAO\Users::update($user);
+                }
+                \OmegaUp\DAO\DAO::transEnd();
+            } catch (\Exception $e) {
+                \OmegaUp\DAO\DAO::transRollback();
+                throw $e;
+            }
         }
 
-        self::$log->info("Identity {$identity->username} has logged in natively.");
+        self::$log->info(
+            "Identity {$identity->username} has logged in natively."
+        );
 
         if (!is_null($identity->user_id)) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
@@ -442,22 +526,22 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
     }
 
-    public static function getLinkedInInstance() : \OmegaUp\LinkedIn {
+    public static function getLinkedInInstance(): \OmegaUp\LinkedIn {
         return new \OmegaUp\LinkedIn(
             OMEGAUP_LINKEDIN_CLIENTID,
             OMEGAUP_LINKEDIN_SECRET,
-            OMEGAUP_URL.'/login?linkedin',
+            OMEGAUP_URL . '/login?linkedin',
             isset($_GET['redirect']) ? strval($_GET['redirect']) : null
         );
     }
-    public static function getLinkedInLoginUrl() : string {
+    public static function getLinkedInLoginUrl(): string {
         return self::getLinkedInInstance()->getLoginUrl();
     }
 
     /**
      * @return array<string, mixed>
      */
-    public static function LoginViaLinkedIn() : array {
+    public static function LoginViaLinkedIn(): array {
         if (empty($_GET['code']) || empty($_GET['state'])) {
             return ['status' => 'error'];
         }
@@ -492,7 +576,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         string $provider,
         string $email,
         ?string $name = null
-    ) : array {
+    ): array {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
@@ -527,7 +611,9 @@ class Session extends \OmegaUp\Controllers\Controller {
                 self::$log->error("Unable to login via $provider: $e");
                 return $e->asResponseArray();
             }
-            $identity = \OmegaUp\DAO\Identities::findByUsername($res['username']);
+            $identity = \OmegaUp\DAO\Identities::findByUsername(
+                $res['username']
+            );
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
@@ -539,11 +625,11 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     public static function setSessionManagerForTesting(
         \OmegaUp\SessionManager $sessionManager
-    ) : void {
+    ): void {
         self::$_sessionManager = $sessionManager;
     }
 
-    public static function setCookieOnRegisterSessionForTesting(bool $newValue) : bool {
+    public static function setCookieOnRegisterSessionForTesting(bool $newValue): bool {
         $oldValue = self::$_setCookieOnRegisterSession;
         self::$_setCookieOnRegisterSession = $newValue;
         return $oldValue;

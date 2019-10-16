@@ -20,11 +20,31 @@ class UserParams implements ArrayAccess {
             $this->params = clone $params;
         }
         $username = Utils::CreateRandomString();
-        UserParams::validateParameter('username', $this->params, false, $username);
+        UserParams::validateParameter(
+            'username',
+            $this->params,
+            false,
+            $username
+        );
         UserParams::validateParameter('name', $this->params, false, $username);
-        UserParams::validateParameter('password', $this->params, false, Utils::CreateRandomString());
-        UserParams::validateParameter('email', $this->params, false, Utils::CreateRandomString() . '@mail.com');
-        UserParams::validateParameter('is_private', $this->params, false, false);
+        UserParams::validateParameter(
+            'password',
+            $this->params,
+            false,
+            Utils::CreateRandomString()
+        );
+        UserParams::validateParameter(
+            'email',
+            $this->params,
+            false,
+            Utils::CreateRandomString() . '@mail.com'
+        );
+        UserParams::validateParameter(
+            'is_private',
+            $this->params,
+            false,
+            false
+        );
         UserParams::validateParameter('verify', $this->params, false, true);
     }
 
@@ -57,10 +77,18 @@ class UserParams implements ArrayAccess {
      * @return boolean
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    private static function validateParameter($parameter, &$array, $required = true, $default = null) {
+    private static function validateParameter(
+        $parameter,
+        &$array,
+        $required = true,
+        $default = null
+    ) {
         if (!isset($array[$parameter])) {
             if ($required) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('ParameterEmpty', $parameter);
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'ParameterEmpty',
+                    $parameter
+                );
             }
             $array[$parameter] = $default;
         }
@@ -72,13 +100,11 @@ class UserParams implements ArrayAccess {
 class UserFactory {
    /**
     * Creates a native user in Omegaup and returns the DAO populated
-    *
-    * @param string $username optional
-    * @param string $password optional
-    * @param string $email optional
-    * @return \OmegaUp\DAO\VO\Identities
+    * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
     */
-    public static function createUser($params = null) : \OmegaUp\DAO\VO\Identities {
+    public static function createUser(
+        UserParams $params = null
+    ): array {
         if (!($params instanceof UserParams)) {
             $params = new UserParams($params);
         }
@@ -120,10 +146,10 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
+        $user->password = strval($params['password']);
         $identity->password = strval($params['password']);
 
-        // TODO: This method should return both Users and Identities Objects
-        return $identity;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
@@ -135,7 +161,7 @@ class UserFactory {
     public static function generateUser($verify = true) {
         $username = Utils::CreateRandomString();
         $password = Utils::CreateRandomString();
-        $email = Utils::CreateRandomString().'@mail.com';
+        $email = Utils::CreateRandomString() . '@mail.com';
         self::createUser(new UserParams([
             'username' => $username,
             'password' => $password,
@@ -163,7 +189,7 @@ class UserFactory {
      */
     public static function verifyUser(
         \OmegaUp\DAO\VO\Users $user
-    ) : \OmegaUp\DAO\VO\Users {
+    ): \OmegaUp\DAO\VO\Users {
         \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'id' => $user->verification_id
         ]));
@@ -172,65 +198,57 @@ class UserFactory {
     }
 
     /**
-     * Creates a new user and elevates his priviledges
+     * Creates a new user and elevates their privileges
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return \OmegaUp\DAO\VO\Identities
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createAdminUser($params = null) : \OmegaUp\DAO\VO\Identities {
-        $identity = self::createUser($params);
+    public static function createAdminUser(UserParams $params = null): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
+        self::addSystemRole($user, \OmegaUp\Authorization::ADMIN_ROLE);
 
-        self::addSystemRole($identity, \OmegaUp\Authorization::ADMIN_ROLE);
-
-        return $identity;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new identity with mentor role
      *
-     * @param UserParams|null $params
-     * @return \OmegaUp\DAO\VO\Identities
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createMentorIdentity(UserParams $params = null) : \OmegaUp\DAO\VO\Identities {
-        $identity = self::createUser($params);
-
+    public static function createMentorIdentity(
+        UserParams $params = null
+    ): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addMentorRole($identity);
 
-        return $identity;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new user with support role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createSupportUser($params = null) : \OmegaUp\DAO\VO\Identities {
-        $identity = self::createUser($params);
-
+    public static function createSupportUser(
+        UserParams $params = null
+    ): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addSupportRole($identity);
 
-        return $identity;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new user with contest organizer role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createGroupIdentityCreator($params = null) : \OmegaUp\DAO\VO\Identities {
-        $identity = self::createUser($params);
-
+    public static function createGroupIdentityCreator(
+        UserParams $params = null
+    ): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addGroupIdentityCreator($identity);
 
-        return $identity;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
@@ -239,7 +257,10 @@ class UserFactory {
      * @param \OmegaUp\DAO\VO\Users $user
      * @param int $role_id
      */
-    public static function addSystemRole(\OmegaUp\DAO\VO\Identities $identity, $role_id) {
+    public static function addSystemRole(
+        \OmegaUp\DAO\VO\Users $user,
+        $role_id
+    ) {
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
             'user_id' => $identity->user_id,
             'role_id' => $role_id,

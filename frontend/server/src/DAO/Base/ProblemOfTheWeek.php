@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,13 +25,29 @@ abstract class ProblemOfTheWeek {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : int {
-        $sql = 'UPDATE `Problem_Of_The_Week` SET `problem_id` = ?, `time` = ?, `difficulty` = ? WHERE `problem_of_the_week_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week
+    ): int {
+        $sql = '
+            UPDATE
+                `Problem_Of_The_Week`
+            SET
+                `problem_id` = ?,
+                `time` = ?,
+                `difficulty` = ?
+            WHERE
+                (
+                    `problem_of_the_week_id` = ?
+                );';
         $params = [
-            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
+            (
+                is_null($Problem_Of_The_Week->problem_id) ?
+                null :
+                intval($Problem_Of_The_Week->problem_id)
+            ),
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
-            (int)$Problem_Of_The_Week->problem_of_the_week_id,
+            intval($Problem_Of_The_Week->problem_of_the_week_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -40,15 +56,29 @@ abstract class ProblemOfTheWeek {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ProblemOfTheWeek} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ProblemOfTheWeek Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ProblemOfTheWeek} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $problem_of_the_week_id) : ?\OmegaUp\DAO\VO\ProblemOfTheWeek {
-        $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` FROM Problem_Of_The_Week WHERE (problem_of_the_week_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $problem_of_the_week_id
+    ): ?\OmegaUp\DAO\VO\ProblemOfTheWeek {
+        $sql = '
+            SELECT
+                `Problem_Of_The_Week`.`problem_of_the_week_id`,
+                `Problem_Of_The_Week`.`problem_id`,
+                `Problem_Of_The_Week`.`time`,
+                `Problem_Of_The_Week`.`difficulty`
+            FROM
+                `Problem_Of_The_Week`
+            WHERE
+                (
+                    `problem_of_the_week_id` = ?
+                )
+            LIMIT 1;';
         $params = [$problem_of_the_week_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -76,9 +106,19 @@ abstract class ProblemOfTheWeek {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : void {
-        $sql = 'DELETE FROM `Problem_Of_The_Week` WHERE problem_of_the_week_id = ?;';
-        $params = [$Problem_Of_The_Week->problem_of_the_week_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problem_Of_The_Week`
+            WHERE
+                (
+                    `problem_of_the_week_id` = ?
+                );';
+        $params = [
+            $Problem_Of_The_Week->problem_of_the_week_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -112,17 +152,39 @@ abstract class ProblemOfTheWeek {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problem_Of_The_Week`.`problem_of_the_week_id`, `Problem_Of_The_Week`.`problem_id`, `Problem_Of_The_Week`.`time`, `Problem_Of_The_Week`.`difficulty` from Problem_Of_The_Week';
+    ): array {
+        $sql = '
+            SELECT
+                `Problem_Of_The_Week`.`problem_of_the_week_id`,
+                `Problem_Of_The_Week`.`problem_id`,
+                `Problem_Of_The_Week`.`time`,
+                `Problem_Of_The_Week`.`difficulty`
+            FROM
+                `Problem_Of_The_Week`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemOfTheWeek($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemOfTheWeek(
+                $row
+            );
         }
         return $allData;
     }
@@ -135,14 +197,32 @@ abstract class ProblemOfTheWeek {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemOfTheWeek} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemOfTheWeek}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week) : int {
-        $sql = 'INSERT INTO Problem_Of_The_Week (`problem_id`, `time`, `difficulty`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemOfTheWeek $Problem_Of_The_Week
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problem_Of_The_Week (
+                    `problem_id`,
+                    `time`,
+                    `difficulty`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problem_Of_The_Week->problem_id) ? null : (int)$Problem_Of_The_Week->problem_id,
+            (
+                is_null($Problem_Of_The_Week->problem_id) ?
+                null :
+                intval($Problem_Of_The_Week->problem_id)
+            ),
             $Problem_Of_The_Week->time,
             $Problem_Of_The_Week->difficulty,
         ];
@@ -151,7 +231,9 @@ abstract class ProblemOfTheWeek {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Problem_Of_The_Week->problem_of_the_week_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $Problem_Of_The_Week->problem_of_the_week_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

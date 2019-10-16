@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -21,26 +21,36 @@ class ProblemsForfeited extends \OmegaUp\DAO\VO\VO {
         'forfeited_date' => true,
     ];
 
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['user_id'])) {
-            $this->user_id = (int)$data['user_id'];
+            $this->user_id = intval(
+                $data['user_id']
+            );
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = (int)$data['problem_id'];
+            $this->problem_id = intval(
+                $data['problem_id']
+            );
         }
         if (isset($data['forfeited_date'])) {
             /**
              * @var string|int|float $data['forfeited_date']
              * @var int $this->forfeited_date
              */
-            $this->forfeited_date = \OmegaUp\DAO\DAO::fromMySQLTimestamp($data['forfeited_date']);
+            $this->forfeited_date = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['forfeited_date']
+                )
+            );
         } else {
             $this->forfeited_date = \OmegaUp\Time::get();
         }

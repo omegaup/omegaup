@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,11 +35,25 @@ abstract class RunCounts {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : int {
-        if (empty($Run_Counts->date)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\RunCounts $Run_Counts
+    ): int {
+        if (
+            empty($Run_Counts->date)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Run_Counts (
+                    `date`,
+                    `total`,
+                    `ac_count`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Run_Counts->date,
             intval($Run_Counts->total),
@@ -56,11 +70,22 @@ abstract class RunCounts {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : int {
-        $sql = 'UPDATE `Run_Counts` SET `total` = ?, `ac_count` = ? WHERE `date` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\RunCounts $Run_Counts
+    ): int {
+        $sql = '
+            UPDATE
+                `Run_Counts`
+            SET
+                `total` = ?,
+                `ac_count` = ?
+            WHERE
+                (
+                    `date` = ?
+                );';
         $params = [
-            (int)$Run_Counts->total,
-            (int)$Run_Counts->ac_count,
+            intval($Run_Counts->total),
+            intval($Run_Counts->ac_count),
             $Run_Counts->date,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -70,15 +95,28 @@ abstract class RunCounts {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\RunCounts} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\RunCounts}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\RunCounts}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\RunCounts Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\RunCounts} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?string $date) : ?\OmegaUp\DAO\VO\RunCounts {
-        $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` FROM Run_Counts WHERE (date = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?string $date
+    ): ?\OmegaUp\DAO\VO\RunCounts {
+        $sql = '
+            SELECT
+                `Run_Counts`.`date`,
+                `Run_Counts`.`total`,
+                `Run_Counts`.`ac_count`
+            FROM
+                `Run_Counts`
+            WHERE
+                (
+                    `date` = ?
+                )
+            LIMIT 1;';
         $params = [$date];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -106,9 +144,19 @@ abstract class RunCounts {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : void {
-        $sql = 'DELETE FROM `Run_Counts` WHERE date = ?;';
-        $params = [$Run_Counts->date];
+    final public static function delete(
+        \OmegaUp\DAO\VO\RunCounts $Run_Counts
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Run_Counts`
+            WHERE
+                (
+                    `date` = ?
+                );';
+        $params = [
+            $Run_Counts->date
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -142,17 +190,38 @@ abstract class RunCounts {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Run_Counts`.`date`, `Run_Counts`.`total`, `Run_Counts`.`ac_count` from Run_Counts';
+    ): array {
+        $sql = '
+            SELECT
+                `Run_Counts`.`date`,
+                `Run_Counts`.`total`,
+                `Run_Counts`.`ac_count`
+            FROM
+                `Run_Counts`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\RunCounts($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\RunCounts(
+                $row
+            );
         }
         return $allData;
     }
@@ -165,16 +234,30 @@ abstract class RunCounts {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\RunCounts $Run_Counts El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\RunCounts} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\RunCounts}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\RunCounts $Run_Counts) : int {
-        $sql = 'INSERT INTO Run_Counts (`date`, `total`, `ac_count`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\RunCounts $Run_Counts
+    ): int {
+        $sql = '
+            INSERT INTO
+                Run_Counts (
+                    `date`,
+                    `total`,
+                    `ac_count`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Run_Counts->date,
-            (int)$Run_Counts->total,
-            (int)$Run_Counts->ac_count,
+            intval($Run_Counts->total),
+            intval($Run_Counts->ac_count),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
