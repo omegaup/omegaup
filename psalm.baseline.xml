@@ -171,7 +171,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="75">
+    <MixedArgument occurrences="74">
       <code>$callback_user_function</code>
       <code>$contest['start_time']</code>
       <code>$contest['finish_time']</code>
@@ -254,7 +254,6 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$problemStats[$key]['cases_stats']</code>
-      <code>$caseData['meta']['status']</code>
       <code>$caseData['out_diff']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
@@ -1358,10 +1357,10 @@
       <code>null</code>
       <code>null</code>
     </NullArgument>
-    <PossiblyNullArgument occurrences="3">
+    <PossiblyNullArgument occurrences="2">
       <code>$qualitynominationlog-&gt;rationale</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="3"/>
+    <PossiblyNullPropertyFetch occurrences="2"/>
   </file>
   <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">
@@ -3127,12 +3126,6 @@
     <MissingDependency occurrences="1">
       <code>OmegaUpTestCase</code>
     </MissingDependency>
-    <MissingParamType occurrences="1">
-      <code>$auth_token</code>
-    </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$auth_token</code>
-    </MissingPropertyType>
     <UndefinedClass occurrences="1">
       <code>\PHPUnit\Framework\TestCase</code>
     </UndefinedClass>
@@ -3503,9 +3496,6 @@
       <code>$problemData</code>
       <code>$user</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="1">
-      <code>$login-&gt;auth_token</code>
-    </MissingPropertyType>
     <MissingReturnType occurrences="10">
       <code>createCourse</code>
       <code>createCourseWithOneAssignment</code>
@@ -3583,9 +3573,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
-    <MissingPropertyType occurrences="1">
-      <code>$adminLogin-&gt;auth_token</code>
-    </MissingPropertyType>
     <MixedArgument occurrences="2">
       <code>$unassociatedIdentity['username']</code>
       <code>$associatedIdentity['username']</code>
@@ -3675,34 +3662,13 @@
     </PossiblyInvalidArgument>
   </file>
   <file src="frontend/tests/factories/QualityNominationFactory.php">
-    <MissingParamType occurrences="9">
-      <code>$login</code>
-      <code>$problemAlias</code>
-      <code>$difficulty</code>
-      <code>$quality</code>
-      <code>$tags</code>
-      <code>$login</code>
-      <code>$problemAlias</code>
-      <code>$type</code>
-      <code>$contents</code>
-    </MissingParamType>
     <MissingPropertyType occurrences="1">
       <code>$reviewers</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="4">
+    <MissingReturnType occurrences="2">
       <code>initQualityReviewers</code>
       <code>initTags</code>
-      <code>createSuggestion</code>
-      <code>createQualityNomination</code>
     </MissingReturnType>
-    <MixedAssignment occurrences="3">
-      <code>$contents['difficulty']</code>
-      <code>$contents['quality']</code>
-      <code>$contents['tags']</code>
-    </MixedAssignment>
-    <MixedPropertyFetch occurrences="1">
-      <code>$login-&gt;auth_token</code>
-    </MixedPropertyFetch>
     <PossiblyNullPropertyFetch occurrences="1">
       <code>$qualityReviewerGroup-&gt;group_id</code>
     </PossiblyNullPropertyFetch>

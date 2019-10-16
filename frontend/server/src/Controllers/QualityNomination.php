@@ -624,7 +624,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate request
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
 
         return self::getListImpl($r, null /* nominator */, $r->user->user_id);
