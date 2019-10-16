@@ -14,9 +14,10 @@ class ContestUsersTest extends OmegaupTestCase {
         // Create 10 users
         $n = 10;
         $users = [];
+        $identities = [];
         for ($i = 0; $i < $n; $i++) {
             // Create a user
-            $users[$i] = UserFactory::createUser();
+            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
 
             // Add it to the contest
             ContestsFactory::addUser($contestData, $users[$i]);
@@ -25,7 +26,7 @@ class ContestUsersTest extends OmegaupTestCase {
         // Create a n+1 user who will just join to the contest without being
         // added via API. For public contests, by entering to the contest, the user should be in
         // the list of contest's users.
-        $nonRegisteredUser = UserFactory::createUser();
+        ['user' => $nonRegisteredUser, 'identity' => $identity] = UserFactory::createUser();
         ContestsFactory::openContest($contestData, $nonRegisteredUser);
 
         // Log in with the admin of the contest
@@ -46,7 +47,7 @@ class ContestUsersTest extends OmegaupTestCase {
         // Get a contest
         $contestData = ContestsFactory::createContest();
 
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         ContestsFactory::openContest($contestData, $user);
 
         $userLogin = self::login($user);
@@ -77,10 +78,11 @@ class ContestUsersTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest(new ContestParams([
             'requests_user_information' => 'optional'
         ]));
-
+        $user = [];
+        $identity = [];
         for ($i = 0; $i < 3; $i++) {
             // Create users
-            $user[$i] = UserFactory::createUser();
+            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
 
             // Add users to our private contest
             ContestsFactory::addUser($contestData, $user[$i]);
@@ -193,7 +195,7 @@ class ContestUsersTest extends OmegaupTestCase {
         ]));
 
         // Create and login a user to view the contest
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $userLogin = self::login($user);
 
         $r = new \OmegaUp\Request([

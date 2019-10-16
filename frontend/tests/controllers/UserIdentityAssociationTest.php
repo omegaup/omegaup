@@ -48,7 +48,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $associatedIdentities = \OmegaUp\Controllers\User::apiListAssociatedIdentities(new \OmegaUp\Request([
@@ -127,7 +127,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         try {
@@ -177,7 +177,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         try {
@@ -229,7 +229,7 @@ class UserIdentityAssociationTest extends OmegaupTestCase {
         ]));
 
         // Create the user to associate
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Trying to associate first identity to the logged user

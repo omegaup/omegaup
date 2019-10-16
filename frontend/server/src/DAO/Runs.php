@@ -16,6 +16,7 @@ namespace OmegaUp\DAO;
 class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets an array of the guids of the pending runs
+     * @return array{username: string, language: string, runtime: float, memory: float, time: int}[]
      */
     final public static function getBestSolvingRunsForProblem(
         int $problemId
@@ -62,6 +63,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Runs r ON r.run_id = s.current_run_id;';
         $val = [$problemId, $problemId];
 
+        /** @var array{username: string, language: string, runtime: float, memory: float, time: int}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
@@ -574,6 +576,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return $runs;
     }
 
+    /**
+     * @return array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, time: int, submit_delay: int}[]
+     */
     final public static function getForProblemDetails(
         int $problemId,
         ?int $problemsetId,
@@ -598,6 +603,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
+        /** @var array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, time: int, submit_delay: int}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

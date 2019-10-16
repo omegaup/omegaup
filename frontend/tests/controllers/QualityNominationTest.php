@@ -3,7 +3,7 @@
 class QualityNominationTest extends OmegaupTestCase {
     public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($contestant);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -26,7 +26,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
     public function testGetByIdHasAuthorAndNominatorSet() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($contestant);
         $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -52,7 +52,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
     public function testApiDetailsReturnsFieldsRequiredByUI() {
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $contents = json_encode([
                  'statements' => [
@@ -123,7 +123,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testMustSolveBeforeNominatingItForPromotion() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
 
         $login = self::login($contestant);
@@ -188,7 +188,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testMustSolveBeforeSuggesting() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
 
         $login = self::login($contestant);
@@ -230,7 +230,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testNominatingForDemotion() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($contestant);
         \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -272,7 +272,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testDemotionCannotBeResolvedByRegularUser() {
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -306,7 +306,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testDemotionCanBeApprovedAndLaterRevertedByReviewer() {
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -383,7 +383,7 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testDemotionApprovedByReviewerAndSendMail() {
         $emailSender = new ScopedEmailSender();
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -436,7 +436,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
         ]));
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -486,7 +486,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testDemotionCanBeApprovedAndThenReopenedByReviewer() {
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -565,7 +565,7 @@ class QualityNominationTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE
         ]));
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
@@ -643,7 +643,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testBeforeACNomination() {
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
 
@@ -724,7 +724,7 @@ class QualityNominationTest extends OmegaupTestCase {
     public function testNominatingForDuplicate() {
         $originalProblemData = ProblemsFactory::createProblem();
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($contestant);
 
@@ -787,7 +787,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testNominationList() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
 
@@ -850,7 +850,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testTagsForDuplicate() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
 
@@ -926,7 +926,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testNominationListDoesntShowSuggestionsOrDismisssal() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);
 
@@ -1009,7 +1009,7 @@ class QualityNominationTest extends OmegaupTestCase {
      */
     public function testMustSolveBeforeDismissed() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         $login = self::login($contestant);
         $r = new \OmegaUp\Request([
@@ -1142,8 +1142,10 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($i = 0; $i < 5; $i++) {
             $problemData[$i] = ProblemsFactory::createProblem();
         }
+        $userData = [];
+        $identityData = [];
         for ($i = 0; $i < 5; $i++) {
-            $userData[$i] = UserFactory::createUser();
+            ['user' => $userData[$i], 'identity' => $identityData[$i]] = UserFactory::createUser();
         }
         self::setUpRankForUsers($problemData, $userData, true);
 
@@ -1477,7 +1479,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
         $login = [];
         for ($i = 0; $i < 10; $i++) {
-            $contestant = UserFactory::createUser();
+            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
             for ($j = 0; $j < $numberOfProblems; $j++) {
                 $runData = RunsFactory::createRunToProblem(
                     $problemData[$j],
@@ -1565,7 +1567,7 @@ class QualityNominationTest extends OmegaupTestCase {
         // Setup synthetic data.
         $login = [];
         for ($i = 0; $i < 10; $i++) {
-            $contestant = UserFactory::createUser();
+            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
             for ($j = 0; $j < 2; $j++) {
                 $runData = RunsFactory::createRunToProblem(
                     $problemData[$j],

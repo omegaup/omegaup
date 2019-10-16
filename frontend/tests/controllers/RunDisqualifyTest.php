@@ -17,7 +17,7 @@ class RunDisqualifyTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a new run
         $runData = RunsFactory::createRun(
@@ -51,8 +51,8 @@ class RunDisqualifyTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestants
-        $contestant1 = UserFactory::createUser();
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant1, 'identity' => $identity1] = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Create new runs
         $runData1 = RunsFactory::createRun(

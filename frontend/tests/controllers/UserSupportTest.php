@@ -37,7 +37,7 @@ class UserSupportTest extends OmegaupTestCase {
 
         // Creates a user
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(new UserParams([
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(new UserParams([
             'email' => $email,
             'verify' => false
         ]));
@@ -77,7 +77,11 @@ class UserSupportTest extends OmegaupTestCase {
 
         // Creates a user
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(
+                ['email' => $email]
+            )
+        );
 
         // Call api using support team member
         $supportLogin = self::login($supportUser);
@@ -127,7 +131,11 @@ class UserSupportTest extends OmegaupTestCase {
 
         // Creates a user
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(
+                ['email' => $email]
+            )
+        );
 
         // Call api using support team member
         $supportLogin = self::login($supportUser);

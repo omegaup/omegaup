@@ -211,7 +211,6 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName
-     * @param bool $required
      * @psalm-assert string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
@@ -226,10 +225,11 @@ class Validators {
             $parameter,
             $parameterName,
             2,
-            null, /*required=*/
-            true
+            null,
+            /*required=*/true
         );
 
+        /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
         if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidAlias',

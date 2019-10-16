@@ -31,7 +31,7 @@ class CourseRunsTest extends OmegaupTestCase {
         );
 
         // Create our participant
-        $participant = UserFactory::createUser();
+        ['user' => $participant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add student to course
         CoursesFactory::addStudentToCourse($courseData, $participant);

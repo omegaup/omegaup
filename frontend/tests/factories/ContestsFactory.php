@@ -39,11 +39,12 @@ class ContestParams implements ArrayAccess {
             false,
             'no'
         );
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         ContestParams::validateParameter(
             'contestDirector',
             $this->params,
             false,
-            UserFactory::createUser()
+            $user
         );
         ContestParams::validateParameter('window_length', $this->params, false);
         ContestParams::validateParameter('languages', $this->params, false);

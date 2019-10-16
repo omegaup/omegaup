@@ -22,8 +22,10 @@ class ProblemListCourseTest extends OmegaupTestCase {
             $problem
         );
         // Create users and add to course
+        $user = [];
+        $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
-            $user[$i] = UserFactory::createUser();
+            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
             CoursesFactory::addStudentToCourse($courseData, $user[$i]);
         }
         // Create runs to problems directly
@@ -140,9 +142,11 @@ class ProblemListCourseTest extends OmegaupTestCase {
             $courseData['assignment_alias'],
             $problem
         );
-        // Create users and add to course
+        // Create users and add to course$user = [];
+        $user = [];
+        $identity = [];
         for ($i = 0; $i < $num_users; $i++) {
-            $user[$i] = UserFactory::createUser();
+            ['user' => $user[$i], 'identity' => $identity[$i]] = UserFactory::createUser();
             CoursesFactory::addStudentToCourse($courseData, $user[$i]);
         }
         // Create runs to problems directly
