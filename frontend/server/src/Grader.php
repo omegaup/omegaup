@@ -247,7 +247,6 @@ class Grader {
             }
 
             // Execute call
-            /** @var bool|string */
             $response = curl_exec($curl);
             /** @var int */
             $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);

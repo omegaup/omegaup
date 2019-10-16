@@ -144,7 +144,7 @@ class Controller {
                 continue;
             }
             // Get or calculate new value.
-            /** @var mixed */
+            /** @var null|mixed */
             $value = $request[$fieldName];
             if (!is_null($transform)) {
                 /** @var mixed */

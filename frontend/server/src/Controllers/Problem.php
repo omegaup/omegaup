@@ -1349,14 +1349,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $commit,
         string $language
     ): array {
-        /** @var array{language: string, markdown: string, images: array<string, string>}  */
-        $response = \OmegaUp\Cache::getFromCacheOrSet(
+        /** @var array{language: string, images: array<string, string>, markdown: string} */
+        return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$problem->alias}-{$commit}-{$language}-markdown",
+            /** @return array{language: string, images: array<string, string>, markdown: string} */
             function () use ($problem, $commit, $language) {
                 return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'statements',
-                    'alias' => $problem->alias,
+                    'alias' => strval($problem->alias),
                     'commit' => $commit,
                     'language' => $language,
                 ]);
@@ -1388,7 +1389,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             function () use ($problem, $commit, $language) {
                 return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'solutions',
-                    'alias' => $problem->alias,
+                    'alias' => strval($problem->alias),
                     'commit' => $commit,
                     'language' => $language,
                 ]);
@@ -1402,18 +1403,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * if needed.
      *
      * @param \OmegaUp\DAO\VO\Problems $problem the problem.
-     * @return array the problem settings.
+     * @return array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int}, validator: mixed}
      */
     private static function getProblemSettingsDistrib(
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit
     ): array {
+        /** @var array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int}, validator: mixed} */
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            function () use ($problem) {
+            /** @return array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int}, validator: mixed} */
+            function () use ($problem): array {
                 return \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
-                    'alias' => $problem->alias,
+                    'alias' => strval($problem->alias),
                     'commit' => $problem->commit,
                 ]);
             },
@@ -1424,10 +1427,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the distributable problem settings for the problem.
      *
-     * @param array $params the payload with the problem and commit.
-     * @return array the problem settings.
+     * @param array{alias: string, commit: string} $params
+     * @return array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int}, validator: mixed}
      */
     public static function getProblemSettingsDistribImpl(array $params): array {
+        /** @var array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int}, validator: mixed} */
         return json_decode(
             (new \OmegaUp\ProblemArtifacts(
                 $params['alias'],
@@ -1563,6 +1567,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureBool('show_solvers', /*required=*/false);
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         $result = self::getValidProblemAndProblemset($r);
         [
             'exists' => $problemExisits,
@@ -1572,12 +1577,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!$problemExisits) {
             return $result;
         }
-        return self::getProblemDetails(
+        $details = self::getProblemDetails(
             $r,
             $problem,
             $problemset,
-            $r['show_solvers'] === true
+            strval($r['lang']),
+            boolval($r['show_solvers']) === true
         );
+        if (is_null($details)) {
+            return [
+                'status' => 'ok',
+                'exists' => false,
+            ];
+        }
+        $details['status'] = 'ok';
+        $details['exists'] = true;
+        return $details;
     }
 
     /**
@@ -1606,41 +1621,36 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get the extra problem details with all the validations
-     * @param \OmegaUp\Request $r
-     * @param \OmegaUp\DAO\VO\Problems $problem
-     * @param bool $showSolvers
-     * @return array
+     * @return null|array{statement: array{language: string, images: array<string, string>, markdown: string}, settings: array{cases: array<string, mixed>, limits: array{TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int}, validator: mixed}, preferred_language?: string, problemsetter?: array{username: string, name: string, creation_date: int}, version: string, commit: string, title: string, alias: string, input_limit: int, visits: int, submissions: int, accepted: int, difficulty: null|float, creation_date: int, source?: string, order: string, points: null|float, visibility: int, languages: string[], email_clarifications: bool, runs?: array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, time: int, submit_delay: int, alias: string, username: string}[], admin?: bool, solvers?: array{username: string, language: string, runtime: float, memory: float, time: int}[], points: float, score: float}
      */
     private static function getProblemDetails(
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
+        string $statementLanguage,
         bool $showSolvers
-    ): array {
+    ): ?array {
         $response = [];
 
         // Get the expected commit version.
         $commit = $problem->commit;
-        $version = $problem->current_version;
+        $version = strval($problem->current_version);
         if (!empty($problemset)) {
             $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
                 $problemset->problemset_id,
                 $problem->problem_id
             );
             if (is_null($problemsetProblem)) {
-                return [
-                    'status' => 'ok',
-                    'exists' => false,
-                ];
+                return null;
             }
             $commit = $problemsetProblem->commit;
-            $version = $problemsetProblem->version;
+            $version = strval($problemsetProblem->version);
         }
 
         $response['statement'] = \OmegaUp\Controllers\Problem::getProblemStatement(
             $problem,
             $commit,
-            $r['lang']
+            $statementLanguage
         );
         $response['settings'] = \OmegaUp\Controllers\Problem::getProblemSettingsDistrib(
             $problem,
@@ -1659,17 +1669,30 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     return \OmegaUp\Controllers\User::apiProfile($r);
                 }
             );
-            if (!empty($userData)) {
-                $response['preferred_language'] = $userData['userinfo']['preferred_language'];
+            if (
+                !empty($userData) &&
+                !empty($userData['userinfo']) &&
+                !empty($userData['userinfo']['preferred_language'])
+            ) {
+                $response['preferred_language'] = strval(
+                    $userData['userinfo']['preferred_language']
+                );
             }
         }
 
         // Add the problem the response
-        $response = array_merge($response, $problem->asFilteredArray([
-            'title', 'alias', 'input_limit', 'visits', 'submissions',
-            'accepted', 'difficulty', 'creation_date', 'source', 'order',
-            'points', 'visibility', 'languages', 'email_clarifications',
-        ]));
+        $response['title'] = strval($problem->title);
+        $response['alias'] = strval($problem->alias);
+        $response['input_limit'] = $problem->input_limit;
+        $response['visits'] = $problem->visits;
+        $response['submissions'] = $problem->submissions;
+        $response['accepted'] = $problem->accepted;
+        $response['difficulty'] = $problem->difficulty;
+        $response['creation_date'] = $problem->creation_date;
+        $response['source'] = strval($problem->source);
+        $response['order'] = $problem->order;
+        $response['visibility'] = $problem->visibility;
+        $response['email_clarifications'] = $problem->email_clarifications;
         $response['version'] = $version;
         $response['commit'] = $commit;
 
@@ -1684,13 +1707,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $acl->owner_id
             );
             $response['problemsetter'] = [
-                'username' => $problemsetter->username,
+                'username' => strval($problemsetter->username),
                 'name' => is_null($problemsetter->name) ?
-                          $problemsetter->username :
+                          strval($problemsetter->username) :
                           $problemsetter->name,
-                'creation_date' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                'creation_date' => intval(\OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $response['creation_date']
-                ),
+                )),
             ];
         } else {
             unset($response['source']);
@@ -1711,12 +1734,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
 
             // Add each filtered run to an array
+            /** @var array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, time: int, submit_delay: int, alias: string, username: string}[] */
             $response['runs'] = [];
             foreach ($runsArray as $run) {
                 $run['alias'] = $problem->alias;
                 $run['username'] = $r->identity->username;
-                $run['time'] = intval($run['time']);
-                $run['contest_score'] = floatval($run['contest_score']);
                 array_push($response['runs'], $run);
             }
         }
@@ -1772,10 +1794,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // send the supported languages as a JSON array instead of csv
         // array_filter is needed to handle when $response['languages'] is empty
         $response['languages'] = array_filter(
-            explode(
-                ',',
-                $response['languages']
-            )
+            explode(',', $problem->languages)
         );
 
         $response['points'] = round(
@@ -1795,11 +1814,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 $problemsetId,
                 $r['contest_alias'],
-                $r->identity->identity_id
+                intval($r->identity->identity_id)
             );
         }
-        $response['status'] = 'ok';
-        $response['exists'] = true;
         return $response;
     }
 
@@ -1825,7 +1842,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Get the expected commit version.
         $commit = $problem->commit;
-        $version = $problem->current_version;
+        $version = strval($problem->current_version);
         if (!empty($problemset)) {
             $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
                 $problemset->problemset_id,
@@ -1838,7 +1855,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ];
             }
             $commit = $problemsetProblem->commit;
-            $version = $problemsetProblem->version;
+            $version = strval($problemsetProblem->version);
         }
 
         if (
@@ -2168,24 +2185,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\DAO\VO\Problems $problem the problem.
      * @param ?string  $commit  the optional explicit commit hash.
      *
-     * @return the SHA1 of a commit in the problem's master branch, plus
-     *         the SHA1 of the private branch tree associated with that commit.
+     * @return array{string, string} the SHA1 of a commit in the problem's
+     *                               master branch, plus the SHA1 of the
+     *                               private branch tree associated with that
+     *                               commit.
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function resolveCommit(
         \OmegaUp\DAO\VO\Problems $problem,
         ?string $commit
     ): array {
+        /** @var null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string} */
         $masterCommit = null;
         if (is_null($commit)) {
             $masterCommit = (new \OmegaUp\ProblemArtifacts(
-                $problem->alias,
+                strval($problem->alias),
                 'published'
             ))->commit();
         } else {
             foreach (
                 (new \OmegaUp\ProblemArtifacts(
-                    $problem->alias,
+                    strval($problem->alias),
                     'master'
                 ))->log() as $logEntry
             ) {
@@ -2200,7 +2220,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
-
         if (is_null($masterCommit)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemVersionNotFound'
@@ -2212,10 +2231,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $masterCommit['parents']
         ) - 1];
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
-            $problem->alias,
+            strval($problem->alias),
             $privateCommitHash
         );
         $privateCommit = $problemArtifacts->commit();
+        if (is_null($privateCommit)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemVersionNotFound'
+            );
+        }
 
         // Update problem fields.
         return [$masterCommit['commit'], $privateCommit['tree']];
@@ -2440,30 +2464,47 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
 
             // Try to open the details file. It's okay if the file is missing.
-            $details = \OmegaUp\Grader::getInstance()->getGraderResource(
+            $detailsJson = \OmegaUp\Grader::getInstance()->getGraderResource(
                 $run,
                 'details.json',
                 /*missingOk=*/true
             );
-            if (!is_null($details)) {
-                $details = json_decode($details);
+            if (!is_null($detailsJson)) {
+                /** @var null|mixed */
+                $details = json_decode($detailsJson, /*associative=*/true);
+                if (!is_array($details)) {
+                    self::$log->error(
+                        "Failed to interpret run details: {$detailsJson}"
+                    );
+                    continue;
+                }
                 foreach ($details as $group) {
-                    if (!isset($group->cases) || !is_array($group->cases)) {
+                    if (!isset($group['cases']) || !is_array($group['cases'])) {
                         continue;
                     }
-                    foreach ($group->cases as $case) {
+                    foreach ($group['cases'] as $case) {
+                        if (
+                            !is_array($case) ||
+                            !isset($case['name']) ||
+                            !is_string($case['name'])
+                        ) {
+                            self::$log->error(
+                                "Failed to interpret run details: {$detailsJson}"
+                            );
+                            continue;
+                        }
                         if (
                             !array_key_exists(
-                                $case->name,
+                                $case['name'],
                                 $casesStats['counts']
                             )
                         ) {
-                            $casesStats['counts'][$case->name] = 0;
+                            $casesStats['counts'][$case['name']] = 0;
                         }
                         if ($case->score == 0) {
                             continue;
                         }
-                        $casesStats['counts'][$case->name]++;
+                        $casesStats['counts'][$case['name']]++;
                     }
                 }
             }
@@ -2941,6 +2982,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
+        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         [
             'problem' => $problem,
             'problemset' => $problemset,
@@ -2953,9 +2995,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $details = self::getProblemDetails(
             $r,
             $problem,
-            $problemset, /*showSolvers=*/
-            true
+            $problemset,
+            strval($r['lang']),
+            /*showSolvers=*/true
         );
+        if (is_null($details)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
 
         $memoryLimit = intval(
             $details['settings']['limits']['MemoryLimit']
@@ -2963,16 +3009,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $result = [
             'problem_alias' => $details['alias'],
             'visibility' => $details['visibility'],
-            'source' => $details['source'],
-            'problemsetter' => $details['problemsetter'],
+            'source' => (
+                isset($details['source']) ?
+                strval($details['source']) :
+                null
+            ),
+            'problemsetter' => $details['problemsetter'] ?? null,
             'title' => $details['title'],
             'points' => $details['points'],
             'time_limit' => $details['settings']['limits']['TimeLimit'],
-            'overall_wall_time_limit' =>
-                $details['settings']['limits']['OverallWallTimeLimit'],
+            'overall_wall_time_limit' => $details['settings']['limits']['OverallWallTimeLimit'],
             'memory_limit' => "{$memoryLimit} MiB",
             'input_limit' => ($details['input_limit'] / 1024) . ' KiB',
-            'solvers' => $details['solvers'],
+            'solvers' => isset($details['solvers']) ? $details['solvers'] : [],
             'quality_payload' => [
                 'solved' => false,
                 'tried' => false,
@@ -3019,8 +3068,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $nominationStatus['tried'] = false;
         $nominationStatus['solved'] = false;
 
-        /** @var array{verdict: string} $run */
-        foreach ($details['runs'] as $run) {
+        foreach ($details['runs'] ?? [] as $run) {
             if ($run['verdict'] === 'AC') {
                 $nominationStatus['solved'] = true;
                 break;

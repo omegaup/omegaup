@@ -185,7 +185,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\CaptchaVerificationFailedException();
             }
 
-            $resultAsJson = json_decode($result, true);
+            /** @var null|mixed */
+            $resultAsJson = json_decode($result, /*assoc=*/true);
             if (is_null($resultAsJson)) {
                 self::$log->error('Captcha response was not a json');
                 self::$log->error('Here is the result:' . $result);
@@ -193,8 +194,9 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             if (
+                !is_array($resultAsJson) ||
                 !array_key_exists('success', $resultAsJson) ||
-                !$resultAsJson['success']
+                !boolval($resultAsJson['success'])
             ) {
                 self::$log->error('Captcha response said no');
                 throw new \OmegaUp\Exceptions\CaptchaVerificationFailedException();
