@@ -15,7 +15,7 @@ import logging
 import sqlite3
 import warnings
 
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import MySQLdb.connections
 
@@ -38,7 +38,7 @@ ProblemList = List[int]
 
 def mean_average_precision(predicted: ProblemList,
                            expected: ProblemList,
-                           k: int) -> float:
+                           k: int) -> Optional[float]:
     '''Compute MAP@k - https://goo.gl/KMghXR'''
     if not predicted or not expected:
         return None
@@ -68,9 +68,11 @@ def get_first_run_per_problem(runs: pd.DataFrame) -> pd.DataFrame:
 class TrainingConfig:
     '''A class to store the configuration for training a model.'''
     def __init__(self, args: argparse.Namespace):
-        self.train_fraction = args.train_fraction
-        self.num_followups = args.num_followups
-        self.followup_decay = args.followup_decay
+        self.train_fraction: float = args.train_fraction
+        assert 0 < self.train_fraction < 1
+        self.rng_seed: Optional[int] = args.rng_seed
+        self.num_followups: int = args.num_followups
+        self.followup_decay: float = args.followup_decay
 
 
 class Model:
@@ -80,16 +82,16 @@ class Model:
         self.config = config
 
         # Set of users from the training data.
-        self.users = None
+        self.users: Optional[pd.Series] = None
 
         # Train/test runs
-        self.train_runs = None
-        self.test_runs = None
-        self.train_ac = None
-        self.test_ac = None
+        self.train_runs: Optional[pd.DataFrame] = None
+        self.test_runs: Optional[pd.DataFrame] = None
+        self.train_ac: Optional[pd.DataFrame] = None
+        self.test_ac: Optional[pd.DataFrame] = None
 
         # Actual recommendation model
-        self.model = None
+        self.model: Optional[pd.DataFrame] = None
 
     def load(
             self,
@@ -104,11 +106,11 @@ class Model:
 
         The split is done based on `self.config.train_fraction`.
         '''
-        runs = pd.read_sql_query("""
+        runs: pd.DataFrame = pd.read_sql_query("""
             SELECT
-                  s.identity_id
-                , s.problem_id
-                , s.time
+                s.identity_id,
+                s.problem_id,
+                s.time
             FROM
                 Submissions s
             INNER JOIN
@@ -116,17 +118,17 @@ class Model:
             ON
                 r.run_id = s.current_run_id
             WHERE
-                    s.problemset_id IS NULL
-                AND s.type = "normal"
-                AND r.status = "ready"
-                AND r.verdict = "AC";
+                s.problemset_id IS NULL AND
+                s.type = "normal" AND
+                r.status = "ready" AND
+                r.verdict = "AC";
             """, dbconn)
         logging.info('Found %d runs', len(runs))
 
         # Split dataset into test/train
         users = pd.Series(runs.identity_id.unique())
         train_users = users.sample(frac=self.config.train_fraction,
-                                   random_state=self.rng_seed)
+                                   random_state=self.config.rng_seed)
         test_users = users.drop(train_users.index)
         logging.info('Training users: %d', len(train_users))
         logging.info('Testing users: %d', len(test_users))
@@ -170,7 +172,7 @@ class Model:
 
     def generate_weighted_pairs(self) -> pd.DataFrame:
         '''Assumes runs are sorted by submission time'''
-        tuples = []
+        tuples: Tuple[int, int, float] = []
         for _, problems in self.train_ac.groupby('identity_id'):
             num_problems = len(problems)
             # TODO: Figure out how to ask Pandas nicely for this.
@@ -184,14 +186,12 @@ class Model:
                     tuples.append((source, current, weight))
                     weight *= self.config.followup_decay
 
-        output = pd.DataFrame(tuples)
-        output.columns = ('source', 'target', 'weight')
-        return output
+        return pd.DataFrame(tuples, columns=('source', 'target', 'weight'))
 
     def recommend(self,
                   latest_problem: int,
                   banned_problems: ProblemList,
-                  k: int) -> ProblemList:
+                  k: int) -> Optional[ProblemList]:
         '''Recommends the a problem given that a user just solved last_problem.
 
         Args:
@@ -215,7 +215,7 @@ class Model:
         except KeyError:
             return None
 
-    def evaluate(self, k: int = None) -> float:
+    def evaluate(self, k: Optional[int] = None) -> float:
         '''Compute a score about how good the model is.'''
         if k is None:
             k = self.config.num_followups
@@ -273,21 +273,26 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Model params
     model_args = parser.add_argument_group('Model')
-    model_args.add_argument('--num_followups', type=int,
+    model_args.add_argument('--num-followups', type=int,
                             default=_NUM_FOLLOWUPS,
                             help='Number of problems to count')
-    model_args.add_argument('--followup_decay', type=float,
+    model_args.add_argument('--followup-decay', type=float,
                             default=_FOLLOWUP_DECAY,
                             help='The decay factor in followup problems\'s'
                                  'weight')
 
     # Training params
     training_args = parser.add_argument_group('Training')
-    training_args.add_argument('--train_frac', type=float,
+    training_args.add_argument('--train-fraction', type=float,
                                default=_TRAIN_FRACTION,
                                help='Fraction of data to use for training, '
                                     'leaving the rest for testing.')
-    training_args.add_argument('--min_map_score', type=float, default=0.3,
+    training_args.add_argument('--rng-seed', type=int,
+                               default=None,
+                               help='Seed value for the Random Number '
+                                    'Generator so that tests behave '
+                                    'deterministically.')
+    training_args.add_argument('--min-map-score', type=float, default=0.3,
                                help='Minimum MAP score to consider the '
                                     'training sucessful. Use to ensure we '
                                     'don\'t push bad models to prod.')
