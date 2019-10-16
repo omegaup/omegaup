@@ -10,7 +10,7 @@ class UserProfileTest extends OmegaupTestCase {
      * Test for the function which returns the general user info
      */
     public function testUserData() {
-        $user = UserFactory::createUser(
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
             new UserParams(
                 ['username' => 'testuser1']
             )
@@ -30,12 +30,12 @@ class UserProfileTest extends OmegaupTestCase {
      * Test for the function which returns the general user info
      */
     public function testUserDataAnotherUser() {
-        $user = UserFactory::createUser(
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
             new UserParams(
                 ['username' => 'testuser2']
             )
         );
-        $user2 = UserFactory::createUser(
+        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser(
             new UserParams(
                 ['username' => 'testuser3']
             )
@@ -60,9 +60,9 @@ class UserProfileTest extends OmegaupTestCase {
      * Test apiProfile with is_private enabled
      */
     public function testUserPrivateDataAnotherUser() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         // Mark user2's profile as private (5th argument)
-        $user2 = UserFactory::createUser(
+        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser(
             new UserParams(
                 ['is_private' => true]
             )
@@ -98,7 +98,7 @@ class UserProfileTest extends OmegaupTestCase {
      * Test admin can see emails for all non-private profiles
      */
     public function testAdminCanSeeEmails() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         $login = self::login($admin);
@@ -115,7 +115,9 @@ class UserProfileTest extends OmegaupTestCase {
      * Test admin can see all details for private profiles
      */
     public function testAdminCanSeePrivateProfile() {
-        $user = UserFactory::createUser(new UserParams(['is_private' => true]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(['is_private' => true])
+        );
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         $login = self::login($admin);
@@ -141,7 +143,7 @@ class UserProfileTest extends OmegaupTestCase {
      * User can see his own email
      */
     public function testUserCanSeeSelfEmail() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -157,7 +159,7 @@ class UserProfileTest extends OmegaupTestCase {
      * Test the contest which a certain user has participated
      */
     public function testUserContests() {
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $contests = [];
         $contests[0] = ContestsFactory::createContest();
@@ -193,7 +195,7 @@ class UserProfileTest extends OmegaupTestCase {
      * API can be accessed by a user who cannot see the contest (contest is private)
      */
     public function testUserContestsPrivateContestOutsider() {
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $contests = [];
         $contests[0] = ContestsFactory::createContest(
@@ -216,7 +218,7 @@ class UserProfileTest extends OmegaupTestCase {
         );
         RunsFactory::gradeRun($runData);
 
-        $externalUser = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $externalIdentity] = UserFactory::createUser();
 
         $login = self::login($externalUser);
         // Get ContestStats
@@ -235,7 +237,7 @@ class UserProfileTest extends OmegaupTestCase {
      * Test the problems solved by user
      */
     public function testProblemsSolved() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $contest = ContestsFactory::createContest();
 
@@ -273,7 +275,7 @@ class UserProfileTest extends OmegaupTestCase {
      * Test update main email api
      */
     public function testUpdateMainEmail() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -291,7 +293,7 @@ class UserProfileTest extends OmegaupTestCase {
      * Test update main email api
      */
     public function testStats() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $problem = ProblemsFactory::createProblem();
 
         $login = self::login($user);

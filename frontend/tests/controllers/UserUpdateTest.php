@@ -10,7 +10,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testUserUpdate() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
@@ -108,7 +108,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNegativeStateUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -125,7 +125,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * Update profile username with non-existence username
      */
     public function testUsernameUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $new_username = Utils::CreateRandomString();
         $r = new \OmegaUp\Request([
@@ -144,13 +144,13 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     public function testDuplicateUsernameUpdate() {
-        $old_user = UserFactory::createUser();
-        $user = UserFactory::createUser();
+        ['user' => $oldUser, 'identity' => $oldIdentity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             //update username with existed username
-            'username' => $old_user->username
+            'username' => $oldUser->username
         ]);
         \OmegaUp\Controllers\User::apiUpdate($r);
     }
@@ -160,7 +160,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testNameUpdateTooLong() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -178,7 +178,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\InvalidParameterException
      */
     public function testEmptyNameUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -195,7 +195,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testFutureBirthday() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $r = new \OmegaUp\Request([
@@ -212,7 +212,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testUpdateCountryWithNoStateData() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Omit state.
@@ -238,7 +238,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithInvalidOption() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         //generate wrong gender option
@@ -261,7 +261,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithValidOption() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $r = new \OmegaUp\Request([
@@ -278,7 +278,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithNull() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $r = new \OmegaUp\Request([
@@ -295,7 +295,7 @@ class UserUpdateTest extends OmegaupTestCase {
      */
     public function testGenderWithEmptyString() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         //generate wrong gender option
@@ -316,7 +316,7 @@ class UserUpdateTest extends OmegaupTestCase {
      * Tests that the user can generate a git token.
      */
     public function testGenerateGitToken() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $this->assertNull($user->git_token);
         $login = self::login($user);
         $response = \OmegaUp\Controllers\User::apiGenerateGitToken(new \OmegaUp\Request([
@@ -341,8 +341,7 @@ class UserUpdateTest extends OmegaupTestCase {
     public function testOldHashTransparentMigration() {
         // Create the user and manually set its password to the well-known
         // 'omegaup' hash.
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $identity->password = '$2a$08$tyE7x/yxOZ1ltM7YAuFZ8OK/56c9Fsr/XDqgPe22IkOORY2kAAg2a';
         \OmegaUp\DAO\Identities::update($identity);
         $user->password = $identity->password;

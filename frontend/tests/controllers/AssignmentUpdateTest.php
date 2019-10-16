@@ -5,7 +5,7 @@
  */
 class AssignmentUpdateTest extends OmegaupTestCase {
     public function testAssignmentUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment(
@@ -50,7 +50,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * alias and course alias
      */
     public function testMissingDataOnAssignmentUpdate() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment(
@@ -77,7 +77,7 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Can't update the start time to be after the finish time.
      */
     public function testAssignmentUpdateWithInvertedTimes() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment(
@@ -106,14 +106,14 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Students should not be able to update the assignment.
      */
     public function testAssignmentUpdateByStudent() {
-        $admin = UserFactory::createUser();
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
         $adminLogin = OmegaupTestCase::login($admin);
         $courseData = CoursesFactory::createCourseWithOneAssignment(
             $admin,
             $adminLogin
         );
 
-        $student = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => $student->username,

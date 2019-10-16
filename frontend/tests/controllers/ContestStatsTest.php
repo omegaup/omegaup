@@ -21,7 +21,7 @@ class ContestStatsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run that we will wait to grade it
         $maxWaitRunData = RunsFactory::createRun(
@@ -129,7 +129,7 @@ class ContestStatsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $ACRunsCount = 2;
         $ACRunsData = [];

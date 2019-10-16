@@ -9,6 +9,11 @@
 class RunCreateTest extends OmegaupTestCase {
     private $contestData;
     private $contestant;
+    private $contestantIdentity;
+    private $student;
+    private $studentIdentity;
+    private $non_student;
+    private $non_student_identity;
 
     /**
      * Prepares the context to submit a run to a problem. Creates the contest,
@@ -32,7 +37,7 @@ class RunCreateTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $this->contestData);
 
         // Create our contestant
-        $this->contestant = UserFactory::createUser();
+        ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = UserFactory::createUser();
 
         // If the contest is private, add the user
         if ($contestParams['admission_mode'] === 'private') {
@@ -80,11 +85,11 @@ class RunCreateTest extends OmegaupTestCase {
         );
 
         // Student user
-        $this->student = UserFactory::createUser();
+        ['user' => $this->student, 'identity' => $this->studentIdentity] = UserFactory::createUser();
         CoursesFactory::addStudentToCourse($this->courseData, $this->student);
 
         // Non-student user
-        $this->non_student = UserFactory::createUser();
+        ['user' => $this->non_student, 'identity' => $this->non_student_identity] = UserFactory::createUser();
 
         // Get the actual DB entries for later
         $this->course = \OmegaUp\DAO\Courses::getByAlias(
@@ -247,7 +252,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]));
 
         // Create a second user not regitered to private contest
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity] = UserFactory::createUser();
 
         // Log in this second user
         $login = self::login($contestant2);
@@ -525,7 +530,7 @@ class RunCreateTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $this->contestant = UserFactory::createUser();
+        ['user' => $this->contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
 
         // Create an empty request
         $login = self::login($this->contestant);
@@ -558,7 +563,7 @@ class RunCreateTest extends OmegaupTestCase {
         ]));
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create an empty request
         $login = self::login($contestant);
@@ -592,7 +597,7 @@ class RunCreateTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Our contestant has to open the contest before sending a run
         ContestsFactory::openContest($contestData, $contestant);
@@ -637,7 +642,7 @@ class RunCreateTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $this->contestant = UserFactory::createUser();
+        ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = UserFactory::createUser();
 
         $login = self::login($this->contestant);
         $r = new \OmegaUp\Request([
@@ -665,7 +670,7 @@ class RunCreateTest extends OmegaupTestCase {
             $problemData = ProblemsFactory::createProblem();
 
             // Create our contestant
-            $this->contestant = UserFactory::createUser();
+            ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = UserFactory::createUser();
 
             // Create an empty request
             $r = new \OmegaUp\Request();
@@ -850,7 +855,7 @@ class RunCreateTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
 
         $login = self::login($contestant);
         $waRunData = RunsFactory::createRunToProblem(
@@ -861,9 +866,6 @@ class RunCreateTest extends OmegaupTestCase {
         RunsFactory::gradeRun($waRunData, 0, 'WA', 60);
 
         // Contestant should be able to view run (but not the run details).
-        $contestantIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
-            $contestant->username
-        );
         $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $contestantIdentity,
             $problemData['problem']
@@ -896,7 +898,7 @@ class RunCreateTest extends OmegaupTestCase {
         // But having solved a problem does not grant permission to view
         // details to runs that the user would otherwise not had permission to
         // view.
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $contestantIdentity2] = UserFactory::createUser();
         $login2 = self::login($contestant2);
         $runData = RunsFactory::createRunToProblem(
             $problemData,

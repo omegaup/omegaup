@@ -17,7 +17,7 @@ class RunsTotalsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run. Submission gap must be 60 seconds
         $runData = RunsFactory::createRun(

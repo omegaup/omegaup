@@ -152,7 +152,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $login = OmegaupTestCase::login($contestant);
 
@@ -315,7 +315,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
 
@@ -351,7 +351,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
-        $secondaryAdmin = UserFactory::createUser();
+        ['user' => $secondaryAdmin, 'identity' => $identity] = UserFactory::createUser();
 
         // Prepare request
         $login = OmegaupTestCase::login($contestData['director']);
@@ -397,7 +397,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
 
@@ -423,7 +423,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
 
@@ -453,7 +453,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
 
@@ -483,7 +483,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
 
@@ -508,7 +508,7 @@ class ContestRemoveProblemTest extends OmegaupTestCase {
         );
         $problemData = ProblemsFactory::createProblem();
         ContestsFactory::addProblemToContest($problemData, $contestData);
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
 

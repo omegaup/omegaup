@@ -49,7 +49,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
         $runData[0] = RunsFactory::createRun(
@@ -184,7 +184,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         // Get a problem with a run.
         $problemData = ProblemsFactory::createProblem();
         $problemAlias = $problemData['request']['problem_alias'];
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData[0] = RunsFactory::createRunToProblem(
             $problemData,
             $contestant
@@ -465,7 +465,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create our new admin
-        $problemAdmin = UserFactory::createUser();
+        ['user' => $problemAdmin, 'identity' => $identity] = UserFactory::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -503,7 +503,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create our new admin
-        $problemAdmin = UserFactory::createUser();
+        ['user' => $problemAdmin, 'identity' => $identity] = UserFactory::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -545,7 +545,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create our new admin
-        $problemAdmin = UserFactory::createUser();
+        ['user' => $problemAdmin, 'identity' => $identity] = UserFactory::createUser();
 
         // Add admin to the problem
         $login = self::login($problemData['author']);
@@ -589,7 +589,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ]));
 
         // Normal user shouldn't even be able to see the problem.
-        $reviewer = UserFactory::createUser();
+        ['user' => $reviewer, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($reviewer);
         try {
             \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
@@ -878,7 +878,7 @@ class UpdateProblemTest extends OmegaupTestCase {
     public function testProblemVersionUpdate() {
         $problemData = ProblemsFactory::createProblem();
         $problem = $problemData['problem'];
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData, 1.0, 'AC');
 
@@ -1068,7 +1068,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 'author' => $problemAuthor,
             ]));
             $problem = $problemData['problem'];
-            $contestant = UserFactory::createUser();
+            ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
             \OmegaUp\Time::setTimeForTesting($originalTime - 30 * 60);
 
@@ -1190,7 +1190,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
             $owner,
@@ -1239,7 +1239,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
             $owner,
@@ -1304,7 +1304,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
             $owner,
@@ -1410,7 +1410,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $owner,
@@ -1434,7 +1434,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             )->verdict
         );
 
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
             $owner,

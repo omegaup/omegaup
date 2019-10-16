@@ -18,7 +18,7 @@ class RunStatusTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -43,10 +43,8 @@ class RunStatusTest extends OmegaupTestCase {
      */
     public function testDownload() {
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
-            $user->username
-        );
+        ['user' => $user, 'identity' => $contestantIdentity] = UserFactory::createUser();
+
         $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $problemData['author']->username
         );

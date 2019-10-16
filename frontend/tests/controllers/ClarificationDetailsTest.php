@@ -48,7 +48,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
@@ -88,7 +88,7 @@ class DetailsClarificationTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
@@ -129,10 +129,10 @@ class DetailsClarificationTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create our contestant who will try to view the clarification
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();
@@ -165,10 +165,10 @@ class DetailsClarificationTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create our contestant who will try to view the clarification
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Create the clarification, note that contestant will create it
         $this->detourBroadcasterCalls();

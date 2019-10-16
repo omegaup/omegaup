@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="3.5.0@f8b8f35c031e2fad6754a961a9fad2708649d8da">
+<files psalm-version="3.6.1@7857b07f91bed5afae98574243fed7ec4088d623">
   <file src="frontend/server/bootstrap_smarty.php">
     <MixedArrayAccess occurrences="13">
       <code>$session['identity']</code>
@@ -153,13 +153,12 @@
       <code>function ($value) {</code>
       <code>function ($value) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="4">
+    <MissingParamType occurrences="3">
       <code>$callback_user_function</code>
       <code>$idx</code>
-      <code>$csvRow</code>
       <code>$admission_mode</code>
     </MissingParamType>
-    <MissingReturnType occurrences="12">
+    <MissingReturnType occurrences="11">
       <code>apiPublicDetails</code>
       <code>apiRegisterForContest</code>
       <code>apiOpen</code>
@@ -169,11 +168,10 @@
       <code>apiRequests</code>
       <code>apiArbitrateRequest</code>
       <code>validateContestCanBePublic</code>
-      <code>escapeCsv</code>
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="79">
+    <MixedArgument occurrences="75">
       <code>$callback_user_function</code>
       <code>$contest['start_time']</code>
       <code>$contest['finish_time']</code>
@@ -211,8 +209,6 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['problem_alias']</code>
-      <code>$masterCommit</code>
-      <code>$currentVersion</code>
       <code>$r['points']</code>
       <code>$r['order_in_contest'] ?: 1</code>
       <code>$r['contest_alias']</code>
@@ -260,12 +256,11 @@
       <code>$problemStats[$key]['cases_stats']</code>
       <code>$caseData['meta']['status']</code>
       <code>$caseData['out_diff']</code>
-      <code>\OmegaUp\Controllers\Contest::escapeCsv($csvRow)</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="40">
+    <MixedArrayAccess occurrences="30">
       <code>$contestInfo['window_length']</code>
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['start_time']</code>
@@ -287,8 +282,6 @@
       <code>$problem['problem_id']</code>
       <code>$clar['time']</code>
       <code>$results['total']</code>
-      <code>$user['problems']</code>
-      <code>$problem['run_details']</code>
       <code>$group['cases']</code>
       <code>$case['meta']</code>
       <code>$case['meta']</code>
@@ -296,22 +289,10 @@
       <code>$case['meta']</code>
       <code>$case['meta']</code>
       <code>$case['meta']</code>
-      <code>$entry['alias']</code>
-      <code>$entry['alias']</code>
-      <code>$entry['alias']</code>
-      <code>$userData['username']</code>
-      <code>$userData['problems']</code>
-      <code>$problemData['run_details']</code>
       <code>$caseData['meta']</code>
       <code>$caseData['out_diff']</code>
-      <code>$problemData['points']</code>
-      <code>$userData['total']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="2">
-      <code>$problemStats[$problem_alias]</code>
-      <code>$problemStats[$entry['alias']]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="61">
+    <MixedAssignment occurrences="46">
       <code>$query</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -355,25 +336,11 @@
       <code>$totalPoints</code>
       <code>$sizeOfBucket</code>
       <code>$results</code>
-      <code>$params-&gt;auth_token</code>
-      <code>$contestReport</code>
-      <code>$user</code>
       <code>$problem</code>
       <code>$group</code>
       <code>$case</code>
-      <code>$entry</code>
-      <code>$problem_alias</code>
-      <code>$entry</code>
       <code>$counts</code>
-      <code>$csvRow[]</code>
-      <code>$userData</code>
-      <code>$csvRow[]</code>
-      <code>$problemData</code>
       <code>$caseData</code>
-      <code>$csvRow[]</code>
-      <code>$csvRow[]</code>
-      <code>$field</code>
-      <code>$escapedRow[]</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="2">
       <code>bool</code>
@@ -382,7 +349,7 @@
     <MixedMethodCall occurrences="1">
       <code>asFilteredArray</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="16">
+    <MixedOperand occurrences="14">
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['window_length']</code>
       <code>$idx</code>
@@ -397,7 +364,6 @@
       <code>$r['contest_alias']</code>
       <code>$totalPoints</code>
       <code>$results['total']['points']</code>
-      <code>$entry['alias']</code>
       <code>$r['contest_alias']</code>
     </MixedOperand>
     <MixedPropertyFetch occurrences="6">
@@ -451,9 +417,7 @@
       <code>$session['identity']</code>
       <code>$session['identity']</code>
     </PossiblyNullArrayAccess>
-    <PossiblyNullArrayOffset occurrences="3">
-      <code>$scoreboards</code>
-    </PossiblyNullArrayOffset>
+    <PossiblyNullArrayOffset occurrences="1"/>
     <PossiblyNullIterator occurrences="1">
       <code>$resultAdmins</code>
     </PossiblyNullIterator>
@@ -521,12 +485,10 @@
       <code>apiListCourses</code>
       <code>apiStudentProgress</code>
     </MissingReturnType>
-    <MixedArgument occurrences="88">
+    <MixedArgument occurrences="85">
       <code>$r['school_id']</code>
       <code>$r['course_alias']</code>
       <code>$r['start_time']</code>
-      <code>$masterCommit</code>
-      <code>$currentVersion</code>
       <code>$r['course_alias']</code>
       <code>$r['course']</code>
       <code>$r['assignment']</code>
@@ -551,7 +513,6 @@
       <code>$r['course_alias']</code>
       <code>$r['usernameOrEmail']</code>
       <code>$r['assignment']-&gt;problemset_id</code>
-      <code>$run['guid']</code>
       <code>$problem['runs']</code>
       <code>$r['alias']</code>
       <code>$r['group']</code>
@@ -612,17 +573,13 @@
       <code>$r['course_alias']</code>
       <code>$r['course_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="18">
+    <MixedArrayAccess occurrences="14">
       <code>$assignment['alias']</code>
       <code>$assignment['order']</code>
       <code>$assignment['problemset_id']</code>
       <code>$assignment['problemset_id']</code>
       <code>$assignment['start_time']</code>
       <code>$problem['problem_id']</code>
-      <code>$run['time']</code>
-      <code>$run['contest_score']</code>
-      <code>$run['guid']</code>
-      <code>$run['guid']</code>
       <code>$problem['runs']</code>
       <code>$problem['problem_id']</code>
       <code>$sharingInformation['share_user_information']</code>
@@ -630,10 +587,8 @@
       <code>$assignmentProblemset['scoreboard_url_admin']</code>
       <code>$assignmentProblemset['scoreboard_url']</code>
       <code>$problem['problem_id']</code>
-      <code>$run['time']</code>
-      <code>$run['contest_score']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="38">
+    <MixedAssignment occurrences="37">
       <code>$assignment</code>
       <code>$course</code>
       <code>$problem</code>
@@ -662,7 +617,6 @@
       <code>$result</code>
       <code>$r['assignment']</code>
       <code>$problem</code>
-      <code>$run</code>
       <code>$run['source']</code>
       <code>$problem['letter']</code>
       <code>$course</code>
@@ -682,7 +636,6 @@
       <code>$assignment</code>
       <code>$problem</code>
       <code>$problem['letter']</code>
-      <code>$run</code>
       <code>$r['assignment']</code>
       <code>$problem</code>
       <code>$problem</code>
@@ -1042,9 +995,8 @@
       <code>JSON_OBJECT_AS_ARRAY</code>
       <code>JSON_OBJECT_AS_ARRAY</code>
     </InvalidScalarArgument>
-    <MismatchingDocblockReturnType occurrences="2">
+    <MismatchingDocblockReturnType occurrences="1">
       <code>\OmegaUp\DAO\VO\Problems</code>
-      <code>the</code>
     </MismatchingDocblockReturnType>
     <MissingParamType occurrences="1">
       <code>$is_update</code>
@@ -1069,7 +1021,7 @@
       <code>apiMyList</code>
       <code>apiBestScore</code>
     </MissingReturnType>
-    <MixedArgument occurrences="65">
+    <MixedArgument occurrences="56">
       <code>$r['problem']</code>
       <code>$r['selected_tags']</code>
       <code>$_REQUEST['languages']</code>
@@ -1104,18 +1056,12 @@
       <code>$r['problem']</code>
       <code>$r['problem']</code>
       <code>$problem</code>
-      <code>$params['alias']</code>
-      <code>$params['commit']</code>
-      <code>$params['alias']</code>
-      <code>$params['commit']</code>
       <code>$problem-&gt;alias</code>
       <code>$problem</code>
       <code>$problem</code>
       <code>$problemset</code>
       <code>$r['lang']</code>
-      <code>$response['creation_date']</code>
       <code>$container</code>
-      <code>$response['languages']</code>
       <code>$problem</code>
       <code>$r['lang']</code>
       <code>$problem</code>
@@ -1138,34 +1084,21 @@
       <code>$verdict</code>
       <code>$r['problem']-&gt;alias</code>
       <code>$run</code>
-      <code>$case-&gt;name</code>
       <code>$casesStats['counts']</code>
       <code>$language</code>
       <code>$orderBy</code>
       <code>$query</code>
       <code>$problem</code>
       <code>$problemset</code>
-      <code>$details['languages']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="16">
+    <MixedArrayAccess occurrences="12">
       <code>$_FILES['problem_contents']['tmp_name']</code>
-      <code>$userData['userinfo']</code>
-      <code>$run['time']</code>
-      <code>$run['contest_score']</code>
-      <code>$run['time']</code>
-      <code>$run['contest_score']</code>
-      <code>$run['contest_score']</code>
-      <code>$run['time']</code>
-      <code>$run['contest_score']</code>
       <code>$clar['time']</code>
       <code>$casesStats['last_submission_id']</code>
       <code>$casesStats['counts']</code>
       <code>$casesStats['counts']</code>
       <code>$casesStats['counts']</code>
       <code>$casesStats['counts']</code>
-      <code>$details['settings']['limits']</code>
-      <code>$details['settings']['limits']</code>
-      <code>$details['settings']['limits']</code>
     </MixedArrayAccess>
     <MixedArrayAssignment occurrences="8">
       <code>$problemSettings['limits']['ExtraWallTime']</code>
@@ -1177,10 +1110,8 @@
       <code>$problemSettings['validator']['limits']</code>
       <code>$problemSettings['validator']['limits']</code>
     </MixedArrayAssignment>
-    <MixedArrayOffset occurrences="1">
-      <code>$casesStats['counts'][$case-&gt;name]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="53">
+    <MixedArrayOffset occurrences="1"/>
+    <MixedAssignment occurrences="47">
       <code>$r['selected_tags']</code>
       <code>$tag</code>
       <code>$tag</code>
@@ -1207,7 +1138,6 @@
       <code>$problem</code>
       <code>$problem</code>
       <code>$userData</code>
-      <code>$response['preferred_language']</code>
       <code>$run</code>
       <code>$container</code>
       <code>$problem</code>
@@ -1227,7 +1157,6 @@
       <code>$verdict</code>
       <code>$casesStats</code>
       <code>$run</code>
-      <code>$details</code>
       <code>$group</code>
       <code>$case</code>
       <code>$casesStats['last_submission_id']</code>
@@ -1249,22 +1178,19 @@
       <code>$problemSettings['validator']['name']</code>
       <code>$result['sample_input']</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="5">
+    <MixedInferredReturnType occurrences="2">
       <code>array</code>
       <code>array</code>
       <code>array</code>
       <code>array</code>
       <code>\OmegaUp\DAO\VO\Problems</code>
-      <code>the</code>
     </MixedInferredReturnType>
     <MixedMethodCall occurrences="2">
       <code>asArray</code>
       <code>asArray</code>
     </MixedMethodCall>
-    <MixedOperand occurrences="4">
+    <MixedOperand occurrences="2">
       <code>$_SERVER['HTTP_REFERER']</code>
-      <code>$casesStats['counts'][$case-&gt;name]</code>
-      <code>$details['input_limit']</code>
     </MixedOperand>
     <MixedPropertyAssignment occurrences="5">
       <code>$run</code>
@@ -1273,7 +1199,7 @@
       <code>$run</code>
       <code>$run</code>
     </MixedPropertyAssignment>
-    <MixedPropertyFetch occurrences="30">
+    <MixedPropertyFetch occurrences="27">
       <code>$r['problem']-&gt;visibility</code>
       <code>$r['problem']-&gt;deprecated</code>
       <code>$r['problem']-&gt;visibility</code>
@@ -1299,13 +1225,10 @@
       <code>$r['problem']-&gt;alias</code>
       <code>$r['problem']-&gt;problem_id</code>
       <code>$run-&gt;verdict</code>
-      <code>$group-&gt;cases</code>
-      <code>$group-&gt;cases</code>
-      <code>$case-&gt;name</code>
       <code>$case-&gt;score</code>
     </MixedPropertyFetch>
-    <MixedReturnStatement occurrences="3"/>
-    <PossiblyNullArgument occurrences="19">
+    <MixedReturnStatement occurrences="1"/>
+    <PossiblyNullArgument occurrences="18">
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;acl_id</code>
       <code>$acl-&gt;owner_id</code>
@@ -1487,12 +1410,10 @@
     <MissingParamType occurrences="1">
       <code>$response</code>
     </MissingParamType>
-    <MissingPropertyType occurrences="2">
+    <MissingPropertyType occurrences="1">
       <code>$defaultSubmissionGap</code>
-      <code>$practice</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="11">
-      <code>validateCreateRequest</code>
+    <MissingReturnType occurrences="10">
       <code>validateDetailsRequest</code>
       <code>apiRejudge</code>
       <code>apiDisqualify</code>
@@ -1771,11 +1692,10 @@
       <code>apiListAssociatedIdentities</code>
       <code>apiGenerateGitToken</code>
     </MissingReturnType>
-    <MixedArgument occurrences="27">
+    <MixedArgument occurrences="26">
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
-      <code>$resultAsJson</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
       <code>$r['password']</code>
@@ -1842,13 +1762,12 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="47">
+    <MixedAssignment occurrences="46">
       <code>$user</code>
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
       <code>$identityData['gender']</code>
       <code>$userData['facebook_user_id']</code>
-      <code>$resultAsJson</code>
       <code>$user</code>
       <code>$user</code>
       <code>$usersMissing</code>
@@ -3784,9 +3703,8 @@
     <MixedPropertyFetch occurrences="1">
       <code>$login-&gt;auth_token</code>
     </MixedPropertyFetch>
-    <PossiblyNullPropertyFetch occurrences="2">
+    <PossiblyNullPropertyFetch occurrences="1">
       <code>$qualityReviewerGroup-&gt;group_id</code>
-      <code>$identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/tests/factories/RunsFactory.php">
@@ -3872,9 +3790,8 @@
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="2">
+    <MixedAssignment occurrences="1">
       <code>$array[$parameter]</code>
-      <code>$user-&gt;password</code>
     </MixedAssignment>
     <PossiblyInvalidArgument occurrences="1">
       <code>$this-&gt;params</code>

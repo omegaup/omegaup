@@ -11,7 +11,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
      */
     public function testResetMyPassword() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -44,7 +44,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
      */
     public function testResetMyPasswordBadOldPassword() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([

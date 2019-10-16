@@ -10,7 +10,7 @@ class SchoolCreateTest extends OmegaupTestCase {
      * Create school happy path
      */
     public function testCreateSchool() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -36,7 +36,7 @@ class SchoolCreateTest extends OmegaupTestCase {
      *
      */
     public function testCreateSchoolDuplicatedName() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([

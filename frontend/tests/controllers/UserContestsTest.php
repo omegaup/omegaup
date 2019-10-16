@@ -11,7 +11,7 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testDirectorList() {
         // Our director
-        $director = UserFactory::createUser();
+        ['user' => $director, 'identity' => $identity] = UserFactory::createUser();
 
         $contestData[0] = ContestsFactory::createContest(
             new ContestParams(
@@ -48,13 +48,17 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testAdminList() {
         // Our director
-        $director = UserFactory::createUser();
+        ['user' => $director, 'identity' => $identity] = UserFactory::createUser();
         $contestAdminData = [];
 
         // Create a group with two arbitrary users.
         $helperGroup = GroupsFactory::createGroup($director);
-        GroupsFactory::addUserToGroup($helperGroup, UserFactory::createUser());
-        GroupsFactory::addUserToGroup($helperGroup, UserFactory::createUser());
+        $users = [];
+        $identities = [];
+        for ($i = 0; $i < 2; $i++) {
+            ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
+            GroupsFactory::addUserToGroup($helperGroup, $users[$i]);
+        }
 
         // Get two contests with another director, add $director to their
         // admin list
@@ -70,7 +74,8 @@ class UserContestsTest extends OmegaupTestCase {
         $contestAdminData[1] = ContestsFactory::createContest();
         $group = GroupsFactory::createGroup($contestAdminData[1]['director']);
         GroupsFactory::addUserToGroup($group, $director);
-        GroupsFactory::addUserToGroup($group, UserFactory::createUser());
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        GroupsFactory::addUserToGroup($group, $user);
         ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
         ContestsFactory::addGroupAdmin(
             $contestAdminData[1],
@@ -174,7 +179,7 @@ class UserContestsTest extends OmegaupTestCase {
      * created
      */
     public function testPrivateContestsCountWithNoContests() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $this->assertEquals(
             0,
