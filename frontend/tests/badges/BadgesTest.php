@@ -218,8 +218,8 @@ class BadgesTest extends BadgesTestCase {
         // Create two badge receivers:
         // - User 1 will receive: Problem Setter badge
         // - User 2 will receive: Problem Setter and Contest Manager badges
-        $userOne = UserFactory::createUser();
-        $userTwo = UserFactory::createUser();
+        ['user' => $userOne, 'identity' => $identityOne] = UserFactory::createUser();
+        ['user' => $userTwo, 'identity' => $identityTwo] = UserFactory::createUser();
         ProblemsFactory::createProblemWithAuthor($userOne);
         ProblemsFactory::createProblemWithAuthor($userTwo);
         ContestsFactory::createContest(
@@ -295,7 +295,7 @@ class BadgesTest extends BadgesTestCase {
     }
 
     public function testGetAssignationTime() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         ProblemsFactory::createProblemWithAuthor($user);
 
         $previousTime = \OmegaUp\Time::get();
@@ -327,7 +327,7 @@ class BadgesTest extends BadgesTestCase {
     public function testBadgeDetails() {
         // Creates one owner for ContestManager Badge and no owner for
         // ContestManager, then checks badge details results.
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // For some reason, this method creates a new user also.
         ProblemsFactory::createProblemWithAuthor($user);

@@ -100,10 +100,11 @@ class UserParams implements ArrayAccess {
 class UserFactory {
    /**
     * Creates a native user in Omegaup and returns the DAO populated
+    * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
     */
     public static function createUser(
         UserParams $params = null
-    ): \OmegaUp\DAO\VO\Users {
+    ): array {
         if (!($params instanceof UserParams)) {
             $params = new UserParams($params);
         }
@@ -129,7 +130,11 @@ class UserFactory {
 
         // Get user from db
         $user = \OmegaUp\DAO\Users::FindByUsername($params['username']);
-        if (is_null($user)) {
+        if (is_null($user) || is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
 
@@ -141,9 +146,10 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $user->password = $params['password'];
+        $user->password = strval($params['password']);
+        $identity->password = strval($params['password']);
 
-        return $user;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
@@ -197,14 +203,7 @@ class UserFactory {
      * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
     public static function createAdminUser(UserParams $params = null): array {
-        $user = self::createUser($params);
-        if (is_null($user->main_identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($identity)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addSystemRole($user, \OmegaUp\Authorization::ADMIN_ROLE);
 
         return ['user' => $user, 'identity' => $identity];
@@ -218,14 +217,7 @@ class UserFactory {
     public static function createMentorIdentity(
         UserParams $params = null
     ): array {
-        $user = self::createUser($params);
-        if (is_null($user->main_identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($identity)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addMentorRole($identity);
 
         return ['user' => $user, 'identity' => $identity];
@@ -239,14 +231,7 @@ class UserFactory {
     public static function createSupportUser(
         UserParams $params = null
     ): array {
-        $user = self::createUser($params);
-        if (is_null($user->main_identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($identity)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addSupportRole($identity);
 
         return ['user' => $user, 'identity' => $identity];
@@ -260,14 +245,7 @@ class UserFactory {
     public static function createGroupIdentityCreator(
         UserParams $params = null
     ): array {
-        $user = self::createUser($params);
-        if (is_null($user->main_identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($identity)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
-        }
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addGroupIdentityCreator($identity);
 
         return ['user' => $user, 'identity' => $identity];

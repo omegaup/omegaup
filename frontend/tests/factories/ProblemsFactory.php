@@ -34,11 +34,12 @@ class ProblemParams implements ArrayAccess {
             false,
             \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC
         );
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         ProblemParams::validateParameter(
             'author',
             $this->params,
             false,
-            UserFactory::createUser()
+            $user
         );
         ProblemParams::validateParameter(
             'languages',

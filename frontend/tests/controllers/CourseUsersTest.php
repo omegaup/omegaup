@@ -11,7 +11,7 @@ class CourseUsersTest extends OmegaupTestCase {
         // Create a course with 5 assignments
         $courseData = CoursesFactory::createCourseWithAssignments(5);
 
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         CoursesFactory::addStudentToCourse($courseData, $user);
 

@@ -265,7 +265,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         $identityLogin = self::login($identity);
 
         // Normal user will try change the passowrd of an identity
-        $normalUser = UserFactory::createUser();
+        ['user' => $normalUser, 'identity' => $identity] = UserFactory::createUser();
         $userLogin = self::login($normalUser);
 
         try {

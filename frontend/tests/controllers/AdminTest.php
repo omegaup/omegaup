@@ -3,7 +3,7 @@
 /** @psalm-suppress MissingDependency we need to add PHPUnit */
 class AdminTest extends OmegaupTestCase {
     public function testPlatformReportStatsRequiresAdmin() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = OmegaupTestCase::login($user);
 
         try {

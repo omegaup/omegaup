@@ -115,7 +115,7 @@ class CourseDetailsTest extends OmegaupTestCase {
      */
     public function testGetCourseDetailsNoCourseMember() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $userLogin = self::login($user);
 
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
@@ -130,7 +130,7 @@ class CourseDetailsTest extends OmegaupTestCase {
      */
     public function testGetCourseDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $userLogin = self::login($user);
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
@@ -141,7 +141,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
     public function testGetCourseIntroDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $userLogin = self::login($user);
         $response = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
@@ -185,7 +185,7 @@ class CourseDetailsTest extends OmegaupTestCase {
             'assignment_type' => 'homework',
         ]));
 
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $userLogin = self::login($user);
 
         // Try to get details before being added to the course;

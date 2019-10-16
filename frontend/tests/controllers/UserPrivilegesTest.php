@@ -11,7 +11,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
      */
     public function testAddRemoveRoles() {
         $username = 'testuserrole';
-        $user = UserFactory::createUser(
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
             new UserParams(
                 ['username' => $username]
             )
@@ -55,7 +55,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
      */
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
-        $user = UserFactory::createUser(
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
             new UserParams(
                 ['username' => $username]
             )
