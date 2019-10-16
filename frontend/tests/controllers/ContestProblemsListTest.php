@@ -32,15 +32,16 @@ class ContestProblemsListTest extends OmegaupTestCase {
         }
 
         $contestants = [];
+        $identities = [];
         for ($i = 0; $i < $numUsers; $i++) {
             // Create our contestants
-            $contestants[] = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]]  = UserFactory::createUser();
 
             // Add users to contest
             ContestsFactory::addUser($contestData, $contestants[$i]);
         }
         $contestDirector = $contestData['director'];
-        $contestAdmin = UserFactory::createUser();
+        ['user' => $contestAdmin, 'identity' => $identity]  = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
         return [

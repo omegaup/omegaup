@@ -3,7 +3,7 @@
 class CourseProblemsTest extends OmegaupTestCase {
     public function testOrderProblems() {
         // Create a test course
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
 
@@ -89,8 +89,8 @@ class CourseProblemsTest extends OmegaupTestCase {
     }
 
     public function testCourseProblemUsers() {
-        $admin = UserFactory::createUser();
-        $student = UserFactory::createUser();
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $student, 'identity' => $identityStudent] = UserFactory::createUser();
 
         // Create a course with an assignment
         $adminLogin = self::login($admin);

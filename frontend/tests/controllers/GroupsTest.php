@@ -11,8 +11,7 @@ class GroupsTest extends OmegaupTestCase {
      * Basic create group test
      */
     public function testCreateGroup() {
-        $owner = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($owner->main_identity_id);
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $name = Utils::CreateRandomString();
         $description = Utils::CreateRandomString();
         $alias = Utils::CreateRandomString();
@@ -42,7 +41,7 @@ class GroupsTest extends OmegaupTestCase {
      * Attempts to create groups with a restricted alias should fail.
      */
     public function testCreateGroupRestrictedAlias() {
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
 
         try {
             $login = self::login($owner);
@@ -63,8 +62,7 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testAddUserToGroup() {
         $group = GroupsFactory::createGroup();
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($group['owner']);
         $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
@@ -88,8 +86,8 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testAddUserToGroupNotOwned() {
         $group = GroupsFactory::createGroup();
-        $user = UserFactory::createUser();
-        $userCalling = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $userCalling, 'identity' => $identityCalling] = UserFactory::createUser();
 
         $login = self::login($userCalling);
         $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
@@ -104,7 +102,7 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testRemoveUserFromGroup() {
         $groupData = GroupsFactory::createGroup();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         GroupsFactory::addUserToGroup($groupData, $user);
 
         $login = self::login($groupData['owner']);
@@ -130,7 +128,7 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testRemoveUserFromGroupUserNotInGroup() {
         $groupData = GroupsFactory::createGroup();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($groupData['owner']);
         \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
@@ -147,7 +145,7 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testRemoveUserFromGroupUserNotOwner() {
         $groupData = GroupsFactory::createGroup();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
@@ -162,7 +160,7 @@ class GroupsTest extends OmegaupTestCase {
      */
     public function testGroupsMyList() {
         // Create 5 groups for the same owner
-        $owner = UserFactory::createUser();
+        ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $groups = [];
         $n = 5;
         for ($i = 0; $i < $n; $i++) {
@@ -188,9 +186,10 @@ class GroupsTest extends OmegaupTestCase {
         // Create a group with 5 users
         $groupData = GroupsFactory::createGroup();
         $users = [];
+        $identities = [];
         $nUsers = 5;
         for ($i = 0; $i < $nUsers; $i++) {
-            $users[] = UserFactory::createUser();
+            ['user' => $users[], 'identity' => $identities[]] = UserFactory::createUser();
             GroupsFactory::addUserToGroup($groupData, $users[$i]);
         }
 
@@ -336,9 +335,9 @@ class GroupsTest extends OmegaupTestCase {
         $contestsData = [];
 
         // Create contestants to submit runs
-        $contestantInGroup = UserFactory::createUser();
+        ['user' => $contestantInGroup, 'identity' => $identityInGroup] = UserFactory::createUser();
         GroupsFactory::addUserToGroup($groupData, $contestantInGroup);
-        $contestantNotInGroup = UserFactory::createUser();
+        ['user' => $contestantNotInGroup, 'identity' => $identityNotInGroup] = UserFactory::createUser();
 
         $n = 5;
 
@@ -425,9 +424,9 @@ class GroupsTest extends OmegaupTestCase {
         $contestsData = [];
 
         // Create contestants to submit runs
-        $contestantInGroup = UserFactory::createUser();
+        ['user' => $contestantInGroup, 'identity' => $identityInGroup] = UserFactory::createUser();
         GroupsFactory::addUserToGroup($groupData, $contestantInGroup);
-        $contestantInGroupNoAc = UserFactory::createUser();
+        ['user' => $contestantInGroupNoAc, 'identity' => $identityInGroupNoAc] = UserFactory::createUser();
         GroupsFactory::addUserToGroup($groupData, $contestantInGroupNoAc);
 
         $n = 5;

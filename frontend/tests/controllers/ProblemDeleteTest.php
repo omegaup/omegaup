@@ -14,7 +14,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testProblemCanNotBeDeletedAfterSubmissionsInACourseOrContest() {
         // Get a user
-        $userLogin = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -29,7 +29,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -55,7 +55,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testAnonymousUserCannotSeeDeletedProblems() {
         // Get a user
-        $userLogin = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -107,7 +107,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testLoggedUserCannotSeeDeletedProblems() {
         // Get a user
-        $userLogin = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -179,7 +179,7 @@ class ProblemDeleteTest extends OmegaupTestCase {
      */
     public function testSysadminCanSeeDeletedProblemsOnlyInAdminList() {
         // Get a user
-        $userLogin = UserFactory::createUser();
+        ['user' => $userLogin, 'identity' => $identity] = UserFactory::createUser();
 
         // Get problems
         $deletedProblemData = ProblemsFactory::createProblem(
@@ -196,9 +196,9 @@ class ProblemDeleteTest extends OmegaupTestCase {
         );
 
         // Get admin user
-        $adminLogin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
-        $login = self::login($adminLogin);
+        $login = self::login($admin);
 
         // Call API to delete a problem
         \OmegaUp\Controllers\Problem::apiDelete(new \OmegaUp\Request([

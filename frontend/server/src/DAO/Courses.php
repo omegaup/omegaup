@@ -161,24 +161,19 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $progress[$username]['progress'][$row['assignment_alias']] = $row['assignment_score'];
             }
         }
-        usort($progress, function (array $a, array $b) {
-            return strcasecmp(
-                !empty(
-                    $a['name']
-                ) ? strval(
-                    $a['name']
-                ) : strval(
-                    $a['username']
-                ),
-                !empty(
-                    $b['name']
-                ) ? strval(
-                    $b['name']
-                ) : strval(
-                    $b['username']
-                )
-            );
-        });
+        usort(
+            $progress,
+            /**
+             * @param array{name: string, progress: array<string, float>, username: string} $a
+             * @param array{name: string, progress: array<string, float>, username: string} $b
+             */
+            function (array $a, array $b): int {
+                return strcasecmp(
+                    !empty($a['name']) ? $a['name'] : $a['username'],
+                    !empty($b['name']) ? $b['name'] : $b['username']
+                );
+            }
+        );
         return $progress;
     }
 

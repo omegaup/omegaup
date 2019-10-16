@@ -16,7 +16,7 @@ class GroupsFactory {
         ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
-            $owner = UserFactory::createUser();
+            ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         }
 
         if (is_null($name)) {

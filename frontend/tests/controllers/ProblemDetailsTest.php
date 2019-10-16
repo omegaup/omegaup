@@ -15,10 +15,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $contestData = ContestsFactory::createContest();
 
         // Get a user to be the author
-        $authorUser = UserFactory::createUser();
-        $authorIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $authorUser->main_identity_id
-        );
+        ['user' => $authorUser, 'identity' => $authorIdentity] = UserFactory::createUser();
 
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -30,7 +27,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Get a user for our scenario
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Explicitly join contest
         $login = self::login($contestant);
@@ -107,7 +104,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Get a user for our scenario
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Call api
         $login = self::login($contestant);
@@ -145,7 +142,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ]));
 
         // Get a user for our scenario
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Call api
         $login = self::login($contestant);
@@ -180,7 +177,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ]));
 
         // Get a user for our scenario
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Call api
         $login = self::login($contestant);
@@ -215,7 +212,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -243,7 +240,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
         $runDataOutsideContest = RunsFactory::createRunToProblem(
@@ -283,7 +280,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Get a user for our scenario
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $runDataOutOfContest = RunsFactory::createRunToProblem(
             $problemData,
@@ -324,7 +321,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create an accepted run.
         $runDataInsideContest = RunsFactory::createRun(
@@ -400,7 +397,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
     public function testShowSolutionBySolver() {
         $problemData = ProblemsFactory::createProblem();
 
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         try {
             $login = self::login($contestant);
@@ -435,7 +432,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
     public function testAuthorizationController() {
         $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
         RunsFactory::gradeRun($runData);

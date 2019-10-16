@@ -100,13 +100,11 @@ class UserParams implements ArrayAccess {
 class UserFactory {
    /**
     * Creates a native user in Omegaup and returns the DAO populated
-    *
-    * @param string $username optional
-    * @param string $password optional
-    * @param string $email optional
-    * @return user (DAO)
+    * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
     */
-    public static function createUser($params = null) {
+    public static function createUser(
+        UserParams $params = null
+    ): array {
         if (!($params instanceof UserParams)) {
             $params = new UserParams($params);
         }
@@ -132,7 +130,11 @@ class UserFactory {
 
         // Get user from db
         $user = \OmegaUp\DAO\Users::FindByUsername($params['username']);
-        if (is_null($user)) {
+        if (is_null($user) || is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
 
@@ -144,9 +146,10 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $user->password = $params['password'];
+        $user->password = strval($params['password']);
+        $identity->password = strval($params['password']);
 
-        return $user;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
@@ -195,70 +198,57 @@ class UserFactory {
     }
 
     /**
-     * Creates a new user and elevates his priviledges
+     * Creates a new user and elevates their privileges
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createAdminUser($params = null) {
-        $user = self::createUser($params);
-
+    public static function createAdminUser(UserParams $params = null): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addSystemRole($user, \OmegaUp\Authorization::ADMIN_ROLE);
 
-        return $user;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new identity with mentor role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return Identity
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createMentorIdentity($params = null): array {
-        $user = self::createUser($params);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-
+    public static function createMentorIdentity(
+        UserParams $params = null
+    ): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addMentorRole($identity);
 
-        return [$user, $identity];
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new user with support role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createSupportUser($params = null): array {
-        $user = self::createUser($params);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-
+    public static function createSupportUser(
+        UserParams $params = null
+    ): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addSupportRole($identity);
 
-        return [$user, $identity];
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**
      * Creates a new user with contest organizer role
      *
-     * @param string $username
-     * @param string $password
-     * @param string $email
-     * @return User
+     * @return array{user: \OmegaUp\DAO\VO\Users, identity: \OmegaUp\DAO\VO\Identities}
      */
-    public static function createGroupIdentityCreator($params = null): \OmegaUp\DAO\VO\Users {
-        $user = self::createUser($params);
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-
+    public static function createGroupIdentityCreator(
+        UserParams $params = null
+    ): array {
+        ['user' => $user, 'identity' => $identity] = self::createUser($params);
         self::addGroupIdentityCreator($identity);
 
-        return $user;
+        return ['user' => $user, 'identity' => $identity];
     }
 
     /**

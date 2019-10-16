@@ -294,13 +294,13 @@ class Cache {
      *
      * Si el cache está prendido y la clave está en el cache, regresa el valor. Si no está, regresa null
      *
-     * @return mixed
+     * @return null|mixed
      */
     public function get() {
         if (!self::isEnabled()) {
             return null;
         }
-        /** @var mixed */
+        /** @var false|mixed */
         $result = CacheAdapter::getInstance()->fetch($this->key);
         if ($result === false) {
             $this->log->info("Cache miss for key: {$this->key}");
@@ -330,7 +330,7 @@ class Cache {
         ?bool &$cacheUsed = null
     ) {
         $cache = new \OmegaUp\Cache($prefix, $id);
-        /** @var mixed */
+        /** @var null|mixed */
         $returnValue = $cache->get();
 
         // If there wasn't a value in the cache for the key ($prefix, $id)

@@ -8,7 +8,7 @@
 
 class NotificationTest extends OmegaupTestCase {
     public function testListUnreadNotifications() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'read' => true,
@@ -40,7 +40,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotifications() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         \OmegaUp\DAO\Notifications::create(new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -91,7 +91,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsExceptions() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
@@ -116,7 +116,7 @@ class NotificationTest extends OmegaupTestCase {
     }
 
     public function testReadNotificationsForbbidenAccessException() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $notification = new \OmegaUp\DAO\VO\Notifications([
             'user_id' => $user->user_id,
             'contents' => json_encode(
@@ -125,7 +125,7 @@ class NotificationTest extends OmegaupTestCase {
         ]);
         \OmegaUp\DAO\Notifications::create($notification);
 
-        $maliciousUser = UserFactory::createUser();
+        ['user' => $maliciousUser, 'identity' => $maliciousIdentity] = UserFactory::createUser();
         $login = self::login($maliciousUser);
 
         try {
