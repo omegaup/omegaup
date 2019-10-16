@@ -25,19 +25,17 @@ class Run extends \OmegaUp\Controllers\Controller {
         'lua' => 'Lua',
     ];
     public static $defaultSubmissionGap = 60; /*seconds*/
-    private static $practice = false;
 
     /**
      *
      * Validates Create Run request
      *
-     * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotAllowedToSubmitException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateCreateRequest(\OmegaUp\Request $r) {
+    private static function validateCreateRequest(\OmegaUp\Request $r): bool {
         $r->ensureIdentity();
         // https://github.com/omegaup/omegaup/issues/739
         if ($r->identity->username == 'omi') {
@@ -143,8 +141,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                         );
                 }
 
-                self::$practice = true;
-                return;
+                return true;
             } else {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
                     'problemIsNotPublic'
@@ -243,6 +240,8 @@ class Run extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
+
+        return false;
     }
 
     /**
@@ -254,18 +253,16 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        self::$practice = false;
-
         // Authenticate user
         $r->ensureIdentity();
 
         // Validate request
-        self::validateCreateRequest($r);
+        $practice = self::validateCreateRequest($r);
 
         self::$log->info('New run being submitted!!');
         $response = [];
 
-        if (self::$practice) {
+        if ($practice) {
             if (OMEGAUP_LOCKDOWN) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'lockdown'
@@ -408,7 +405,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $r['problem']->submissions++;
         \OmegaUp\DAO\Problems::update($r['problem']);
 
-        if (self::$practice) {
+        if ($practice) {
             $response['submission_deadline'] = 0;
         } else {
             // Add remaining time to the response
@@ -536,8 +533,6 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      */
     public static function apiRejudge(\OmegaUp\Request $r) {
-        self::$practice = false;
-
         // Get the user who is calling this API
         $r->ensureIdentity();
 

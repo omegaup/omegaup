@@ -171,7 +171,6 @@ class MySQLConnection {
         array $params,
         int $resultmode
     ): ?\mysqli_result {
-        /** @var \mysqli_result|bool */
         $result = $this->_connection->query(
             $this->BindQueryParams(
                 $sql,
