@@ -3703,9 +3703,8 @@
     <MixedPropertyFetch occurrences="1">
       <code>$login-&gt;auth_token</code>
     </MixedPropertyFetch>
-    <PossiblyNullPropertyFetch occurrences="2">
+    <PossiblyNullPropertyFetch occurrences="1">
       <code>$qualityReviewerGroup-&gt;group_id</code>
-      <code>$identity-&gt;identity_id</code>
     </PossiblyNullPropertyFetch>
   </file>
   <file src="frontend/tests/factories/RunsFactory.php">
@@ -3791,9 +3790,8 @@
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="2">
+    <MixedAssignment occurrences="1">
       <code>$array[$parameter]</code>
-      <code>$user-&gt;password</code>
     </MixedAssignment>
     <PossiblyInvalidArgument occurrences="1">
       <code>$this-&gt;params</code>

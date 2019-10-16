@@ -18,7 +18,7 @@ class SchoolsFactory {
             $name = Utils::CreateRandomString();
         }
 
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = OmegaupTestCase::login($user);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,

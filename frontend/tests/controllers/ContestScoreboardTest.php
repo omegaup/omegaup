@@ -30,11 +30,12 @@ class ContestScoreboardTest extends OmegaupTestCase {
 
         // Create our contestants
         $contestants = [];
+        $identities = [];
         for ($i = 0; $i < $nUsers; $i++) {
-            $contestants[] = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]] = UserFactory::createUser();
         }
         $contestDirector = $contestData['director'];
-        $contestAdmin = UserFactory::createUser();
+        ['user' => $contestAdmin, 'identity' => $identity] = UserFactory::createUser();
         ContestsFactory::addAdminUser($contestData, $contestAdmin);
 
         foreach ($runMap as $runDescription) {
@@ -238,7 +239,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData2, $contestData);
 
         // Create our contestants
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create runs
         $runData = RunsFactory::createRun(
@@ -295,7 +296,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -358,7 +359,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -420,8 +421,8 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData2);
 
         // Create our contestants
-        $contestant = UserFactory::createUser();
-        $contestant2 = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
@@ -480,10 +481,10 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our user not added to the contest
-        $externalUser = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $externalIdentity] = UserFactory::createUser();
 
         // Create our contestant, will submit 1 run
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
         $runData = RunsFactory::createRun(
@@ -554,7 +555,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
      */
     public function testScoreboardUrlInvalidToken() {
         // Create our user not added to the contest
-        $externalUser = UserFactory::createUser();
+        ['user' => $externalUser, 'identity' => $externalIdentity] = UserFactory::createUser();
 
         // Get a contest with 0% of scoreboard show percentage
         $contestData = ContestsFactory::createContest();
@@ -588,7 +589,7 @@ class ContestScoreboardTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant, will submit 1 run
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         ContestsFactory::addUser($contestData, $contestant);
         $runData = RunsFactory::createRun(

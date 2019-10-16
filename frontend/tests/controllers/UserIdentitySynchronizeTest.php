@@ -37,7 +37,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testResetMyPassword() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $r = new \OmegaUp\Request([
@@ -72,7 +72,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testUserUpdate() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
@@ -177,7 +177,7 @@ class UserIdentitySynchronizeTest extends OmegaupTestCase {
      */
     public function testUserUpdateBasicInfo() {
         // Create the user to edit
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         $newUsername = 'new_username_basic_info';

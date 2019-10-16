@@ -2,7 +2,7 @@
 
 class AssignmentProblemsTest extends OmegaupTestCase {
     public function testAddProblemToAssignment() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Create a course with an assignment
@@ -49,7 +49,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     }
 
     public function testDeleteProblemFromAssignment() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Create a course with an assignment
@@ -91,7 +91,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
     }
 
     public function testAddRemoveProblems() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Create a course with an assignment
@@ -170,7 +170,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddProblemForbiddenAccess() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
@@ -186,7 +186,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment with a normal user
-        $forbiddenUser = UserFactory::createUser();
+        ['user' => $forbiddenUser, 'identity' => $forbiddenIdentity] = UserFactory::createUser();
         $forbiddenUserLogin = self::login($forbiddenUser);
         CoursesFactory::addProblemsToAssignment(
             $forbiddenUserLogin,
@@ -202,7 +202,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testAddProblemForbiddenAccessStudent() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $problem = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
@@ -234,7 +234,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDeleteProblemForbiddenAccess() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Create a course with an assignment
@@ -258,7 +258,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
         );
 
         // Remove a problem from the assignment with a normal user
-        $forbiddenUser = UserFactory::createUser();
+        ['user' => $forbiddenUser, 'identity' => $forbiddenIdentity] = UserFactory::createUser();
         $forbiddenUserLogin = self::login($forbiddenUser);
         $removeProblemResponse = \OmegaUp\Controllers\Course::apiRemoveProblem(new \OmegaUp\Request([
             'auth_token' => $forbiddenUserLogin->auth_token,
@@ -274,7 +274,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testDeleteProblemForbiddenAccessStudent() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Create a course with an assignment
@@ -314,7 +314,7 @@ class AssignmentProblemsTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\NotFoundException
      */
     public function testDeleteNonExistingProblem() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Create a course with an assignment

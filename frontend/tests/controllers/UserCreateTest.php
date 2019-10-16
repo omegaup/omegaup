@@ -248,7 +248,9 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(new UserParams(['verify' => false]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(['verify' => false])
+        );
 
         // Admin will verify $user
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
@@ -292,10 +294,12 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdminNotAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(new UserParams(['verify' => false]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(['verify' => false])
+        );
 
         // Another user will try to verify $user
-        $user2 = UserFactory::createUser();
+        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Call api using admin
         $login = self::login($user2);
@@ -311,7 +315,7 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testMailingListBackfillNotAdmin() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
@@ -324,7 +328,7 @@ class CreateUserTest extends OmegaupTestCase {
      * into Sendy.
      */
     public function testMailingtListBackfill() {
-        $userUnregistered = UserFactory::createUser();
+        ['user' => $unregisteredUser, 'identity' => $unregisteredIdentity] = UserFactory::createUser();
 
         $urlHelperMock = $this
             ->getMockBuilder('\\OmegaUp\\UrlHelper')
@@ -347,7 +351,7 @@ class CreateUserTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals(
             true,
-            $response['users'][$userUnregistered->username]
+            $response['users'][$unregisteredUser->username]
         );
     }
 
@@ -355,7 +359,7 @@ class CreateUserTest extends OmegaupTestCase {
      * Test only verified users are backfilled into Sendy
      */
     public function testMailingListBackfillOnlyVerified() {
-        $userNotVerified = UserFactory::createUser(
+        ['user' => $userNotVerified, 'identity' => $identityNotVerified] = UserFactory::createUser(
             new UserParams(
                 ['verify' => false]
             )

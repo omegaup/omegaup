@@ -8,8 +8,8 @@
 class OneHundredSolvedProblems extends BadgesTestCase {
     public function test100SolvedProblems() {
         // Creates two users, one solves 99 problems the other 101.
-        $user99 = UserFactory::createUser();
-        $user101 = UserFactory::createUser();
+        ['user' => $user99, 'identity' => $identity99] = UserFactory::createUser();
+        ['user' => $user101, 'identity' => $identity101] = UserFactory::createUser();
         $problems = [];
         for ($i = 0; $i < 101; $i++) {
             $newProblem = ProblemsFactory::createProblem();
@@ -29,7 +29,7 @@ class OneHundredSolvedProblems extends BadgesTestCase {
 
     public function test100RunsToSameProblem() {
         $problem = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         for ($i = 0; $i < 101; $i++) {
             $run = RunsFactory::createRunToProblem($problem, $user);
             RunsFactory::gradeRun($run);

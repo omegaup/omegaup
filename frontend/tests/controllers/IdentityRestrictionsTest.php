@@ -19,7 +19,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Associate identity with user
@@ -56,7 +56,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Associate identity with user
@@ -90,7 +90,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Associate identity with user
@@ -122,7 +122,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
         ] = self::createGroupIdentityCreatorAndGroup($password);
 
         // Create a new user to associate with identity
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
         // Associate identity with user

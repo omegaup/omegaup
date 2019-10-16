@@ -13,7 +13,7 @@ class CourseListTest extends OmegaupTestCase {
         );
         $this->admin_user = $courseData['admin'];
         $this->course_alias = $courseData['course_alias'];
-        $this->other_user = UserFactory::createUser();
+        ['user' => $this->other_user, 'identity' => $this->other_identity] = UserFactory::createUser();
 
         CoursesFactory::addStudentToCourse($courseData, $this->other_user);
     }
@@ -21,6 +21,8 @@ class CourseListTest extends OmegaupTestCase {
     protected $admin_user;
     protected $course_user;
     protected $other_user;
+    protected $identity_user;
+    protected $other_identity;
     protected $course_alias;
 
     public function testGetCourseForAdminUser() {

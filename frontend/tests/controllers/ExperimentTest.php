@@ -81,7 +81,7 @@ class ExperimentsTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testUserExperiments() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $experiments = new
             \OmegaUp\Experiments(
                 null,

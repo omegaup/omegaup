@@ -162,7 +162,7 @@ class Utils {
     public static function setUpDefaultDataConfig() {
         // Create a test default user for manual UI operations
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
-        $admin = UserFactory::createUser(new UserParams([
+        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser(new UserParams([
             'username' => 'admintest',
             'password' => 'testtesttest',
         ]));

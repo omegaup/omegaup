@@ -9,7 +9,7 @@ class CoursesFactory {
         $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
-            $admin = UserFactory::createUser();
+            ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($admin->main_identity_id);
@@ -56,7 +56,7 @@ class CoursesFactory {
         $startTimeDelay = 0
     ) {
         if (is_null($admin)) {
-            $admin = UserFactory::createUser();
+            ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
 
@@ -152,7 +152,7 @@ class CoursesFactory {
         ?ScopedLoginToken $login = null
     ) {
         if (is_null($student)) {
-            $student = UserFactory::createUser();
+            ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
