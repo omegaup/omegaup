@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="3.5.0@f8b8f35c031e2fad6754a961a9fad2708649d8da">
+<files psalm-version="3.6.1@7857b07f91bed5afae98574243fed7ec4088d623">
   <file src="frontend/server/bootstrap_smarty.php">
     <MixedArrayAccess occurrences="13">
       <code>$session['identity']</code>
@@ -254,7 +254,6 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$problemStats[$key]['cases_stats']</code>
-      <code>$caseData['meta']['status']</code>
       <code>$caseData['out_diff']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
