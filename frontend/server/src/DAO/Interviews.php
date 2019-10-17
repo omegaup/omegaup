@@ -64,7 +64,10 @@ class Interviews extends \OmegaUp\DAO\Base\Interviews {
     public static function getByProblemset($problemset_id) {
         $sql = 'SELECT i.* from Interviews i where i.problemset_id = ?;';
 
-        $interviews = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$problemset_id]);
+        $interviews = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$problemset_id]
+        );
         if (empty($interviews)) {
             return null;
         }

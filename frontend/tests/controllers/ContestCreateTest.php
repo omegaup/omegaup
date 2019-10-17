@@ -234,7 +234,7 @@ class CreateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problem, $contest);
 
         // Create a contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add contestant to contest
         ContestsFactory::addUser($contest, $contestant);
@@ -255,7 +255,9 @@ class CreateContestTest extends OmegaupTestCase {
             \OmegaUp\Time::setTimeForTesting($updatedTime);
             $run = RunsFactory::createRun($problem, $contest, $contestant);
             RunsFactory::gradeRun($run, 1.0, 'AC', 10);
-            $this->fail('Contestant should not create a run after contest finishes');
+            $this->fail(
+                'Contestant should not create a run after contest finishes'
+            );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());

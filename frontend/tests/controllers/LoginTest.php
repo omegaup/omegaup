@@ -12,11 +12,17 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByUserPositive() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Assert the log is empty.
-        $this->assertEquals(0, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
+        $this->assertEquals(
+            0,
+            count(
+                \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
+                    $identity->identity_id
+                )
+            )
+        );
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -31,7 +37,14 @@ class LoginTest extends OmegaupTestCase {
         $this->assertLogin($identity, $response['auth_token']);
 
         // Assert the log is not empty.
-        $this->assertEquals(1, count(\OmegaUp\DAO\IdentityLoginLog::getByIdentity($identity->identity_id)));
+        $this->assertEquals(
+            1,
+            count(
+                \OmegaUp\DAO\IdentityLoginLog::getByIdentity(
+                    $identity->identity_id
+                )
+            )
+        );
     }
 
     /**
@@ -40,8 +53,9 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByEmailPositive() {
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(['email' => $email])
+        );
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -62,7 +76,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginByUserInvalidPassword() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -98,7 +112,9 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginByEmailInvalidPassword() {
         // Create an user in omegaup
         $email = Utils::CreateRandomString() . '@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(['email' => $email])
+        );
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
@@ -117,7 +133,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginPositiveViaHttp() {
         // Create an user
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Set required context
@@ -145,7 +161,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function test2ConsecutiveLogins() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Inflate request with user data
@@ -164,7 +180,10 @@ class LoginTest extends OmegaupTestCase {
         $this->assertEquals('ok', $response2['status']);
         $this->assertLogin($identity, $response2['auth_token']);
 
-        $this->assertNotEquals($response1['auth_token'], $response2['auth_token']);
+        $this->assertNotEquals(
+            $response1['auth_token'],
+            $response2['auth_token']
+        );
     }
 
     /**
@@ -174,7 +193,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testNativeLoginWithOldPassword() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $plainPassword = $user->password;
         // Set old password
@@ -199,7 +218,7 @@ class LoginTest extends OmegaupTestCase {
 
     public function testDeleteTokenExpired() {
         // Create an user in omegaup
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
 
@@ -219,7 +238,7 @@ class LoginTest extends OmegaupTestCase {
      */
     public function testLoginDisabled() {
         // User to be verified
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Force empty password
         $user->password = '';

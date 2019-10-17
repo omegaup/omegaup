@@ -9,6 +9,7 @@ stage_before_install() {
 	# Install pre-dependencies
 	python3.5 -m pip install --user --upgrade pip
 	python3.5 -m pip install --user --upgrade urllib3
+	python3.5 -m pip install --user setuptools
 	python3.5 -m pip install --user selenium
 	python3.5 -m pip install --user pytest
 	python3.5 -m pip install --user pytest-xdist

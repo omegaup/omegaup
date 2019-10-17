@@ -14,14 +14,19 @@ OmegaUp.on('ready', function() {
       return createElement('qualitynomination-popup', {
         props: {
           nominated: this.nominated,
+          nominatedBeforeAC: this.nominatedBeforeAC,
           solved: this.solved,
+          tried: this.tried,
           dismissed: this.dismissed,
+          dismissedBeforeAC: this.dismissedBeforeAC,
           canNominateProblem: this.canNominateProblem,
         },
         on: {
           submit: function(ev) {
             let contents = {};
-
+            if (!ev.solved && ev.tried) {
+              contents.before_ac = true;
+            }
             if (ev.difficulty !== '') {
               contents.difficulty = Number.parseInt(ev.difficulty, 10);
             }
@@ -38,8 +43,11 @@ OmegaUp.on('ready', function() {
                                  })
                 .fail(UI.apiError);
           },
-          dismiss: function() {
+          dismiss: function(ev) {
             let contents = {};
+            if (!ev.solved && ev.tried) {
+              contents.before_ac = true;
+            }
             API.QualityNomination.create({
                                    problem_alias: qualityPayload.problem_alias,
                                    nomination: 'dismissal',
@@ -55,8 +63,11 @@ OmegaUp.on('ready', function() {
     },
     data: {
       nominated: qualityPayload.nominated,
+      nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
       solved: qualityPayload.solved,
+      tried: qualityPayload.tried,
       dismissed: qualityPayload.dismissed,
+      dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
       canNominateProblem: qualityPayload.can_nominate_problem,
     },
     components: {

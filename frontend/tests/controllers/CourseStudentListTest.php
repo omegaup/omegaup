@@ -42,7 +42,8 @@ class CourseStudentListTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourse();
 
         // Call apiStudentList by another random user
-        $userLogin = self::login(UserFactory::createUser());
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $userLogin = self::login($user);
         $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['course_alias']
@@ -55,7 +56,8 @@ class CourseStudentListTest extends OmegaupTestCase {
      */
     public function testCourseStudentListInvalidCourse() {
         // Call apiStudentList by another random user
-        $userLogin = self::login(UserFactory::createUser());
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
+        $userLogin = self::login($user);
         $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => 'foo'
@@ -74,7 +76,9 @@ class CourseStudentListTest extends OmegaupTestCase {
         $problemAssignmentsMap = [];
 
         // Create course with assignments
-        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(['homework' => 5, 'test' => 5]);
+        $courseData = CoursesFactory::createCourseWithNAssignmentsPerType(
+            ['homework' => 5, 'test' => 5]
+        );
 
         // Add problems to assignments
         $adminLogin = self::login($courseData['admin']);
@@ -125,13 +129,23 @@ class CourseStudentListTest extends OmegaupTestCase {
             $student = $this->findByPredicate($response['students'], function ($value) use ($username) {
                 return $value['username'] == $username;
             });
-            if ($student == null) {
-                $this->fail("Failed asserting that the response has student {$username}");
+            if (is_null($student)) {
+                $this->fail(
+                    "Failed asserting that the response has student {$username}"
+                );
             }
 
             foreach ($scores as $assignmentAlias => $assignmentScore) {
-                $this->assertArrayHasKey($assignmentAlias, $student['progress'], "Alias $assignmentAlias not found in response");
-                $this->assertEquals($assignmentScore, $student['progress'][$assignmentAlias], "Score for $username $assignmentAlias did not match expected.");
+                $this->assertArrayHasKey(
+                    $assignmentAlias,
+                    $student['progress'],
+                    "Alias $assignmentAlias not found in response"
+                );
+                $this->assertEquals(
+                    $assignmentScore,
+                    $student['progress'][$assignmentAlias],
+                    "Score for $username $assignmentAlias did not match expected."
+                );
             }
         }
 
@@ -139,8 +153,10 @@ class CourseStudentListTest extends OmegaupTestCase {
         $student = $this->findByPredicate($response['students'], function ($value) use ($studentWithNoRuns) {
             return $value['username'] == $studentWithNoRuns->username;
         });
-        if ($student == null) {
-            $this->fail("Failed asserting that the response has student {$studentWithNoRuns->username}");
+        if (is_null($student)) {
+            $this->fail(
+                "Failed asserting that the response has student {$studentWithNoRuns->username}"
+            );
         }
         $this->assertEquals(0, count($student['progress']));
     }

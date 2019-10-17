@@ -12,7 +12,7 @@ class ActivityReport {
     final public static function getActivityReport(
         array $accesses,
         array $submissions
-    ) : array {
+    ): array {
         // Merge both logs.
         /** @var array{username: string, ip: int, time: int, classname: string, alias?: string}[] */
         $events = [];
@@ -51,7 +51,10 @@ class ActivityReport {
         /** @var array<int, int> */
         $ipMapping = [];
         foreach ($events as &$entry) {
-            if (!isset($ipMapping[$entry['ip']]) || !array_key_exists($entry['ip'], $ipMapping)) {
+            if (
+                !isset($ipMapping[$entry['ip']]) ||
+                !array_key_exists($entry['ip'], $ipMapping)
+            ) {
                 $ipMapping[$entry['ip']] = count($ipMapping);
             }
             $entry['ip'] = $ipMapping[$entry['ip']];
@@ -68,7 +71,7 @@ class ActivityReport {
     private static function processData(
         array $data,
         bool $isSubmission = false
-    ) : array {
+    ): array {
         return [
             'username' => $data['username'],
             'classname' => $data['classname'] ?? 'user-rank-unranked',

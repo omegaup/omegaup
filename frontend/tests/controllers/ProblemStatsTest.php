@@ -21,20 +21,28 @@ class ProblemStatsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create some runs to be pending
         $pendingRunsCount = 5;
         $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
-            $pendingRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $pendingRunsData[$i] = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestant
+            );
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $ACRunsCount = 2;
         $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
-            $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $ACRunsData[$i] = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestant
+            );
 
             // Grade the run
             RunsFactory::gradeRun($ACRunsData[$i]);
@@ -44,7 +52,11 @@ class ProblemStatsTest extends OmegaupTestCase {
         $WARunsCount = 1;
         $WARunsData = [];
         for ($i = 0; $i < $WARunsCount; $i++) {
-            $WARunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $WARunsData[$i] = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestant
+            );
 
             // Grade the run with WA
             RunsFactory::gradeRun($WARunsData[$i], 0, 'WA');
@@ -62,10 +74,30 @@ class ProblemStatsTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Problem::apiStats($r);
 
         // Check number of pending runs
-        $this->assertEquals(count($pendingRunsData), count($response['pending_runs']));
-        $this->assertEquals(count($ACRunsData), ($response['verdict_counts']['AC']));
-        $this->assertEquals(count($WARunsData), ($response['verdict_counts']['WA']));
+        $this->assertEquals(
+            count(
+                $pendingRunsData
+            ),
+            count(
+                $response['pending_runs']
+            )
+        );
+        $this->assertEquals(
+            count(
+                $ACRunsData
+            ),
+            ($response['verdict_counts']['AC'])
+        );
+        $this->assertEquals(
+            count(
+                $WARunsData
+            ),
+            ($response['verdict_counts']['WA'])
+        );
 
-        $this->assertEquals($pendingRunsCount + $ACRunsCount + $WARunsCount, $response['total_runs']);
+        $this->assertEquals(
+            $pendingRunsCount + $ACRunsCount + $WARunsCount,
+            $response['total_runs']
+        );
     }
 }

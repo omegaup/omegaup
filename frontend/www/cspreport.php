@@ -1,7 +1,10 @@
 <?php
 require_once('../server/bootstrap_smarty.php');
 
-if (empty($_SERVER['CONTENT_TYPE']) || $_SERVER['CONTENT_TYPE'] != 'application/csp-report') {
+if (
+    empty($_SERVER['CONTENT_TYPE']) ||
+    $_SERVER['CONTENT_TYPE'] != 'application/csp-report'
+) {
     header('HTTP/1.1 400 Bad Request');
     die();
 }

@@ -62,15 +62,21 @@ class CourseCloneTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
         foreach ($assignments['assignments'] as $key => $assignment) {
-            $this->assertEquals($courseData['assignment_aliases'][$key], $assignment['alias']);
+            $this->assertEquals(
+                $courseData['assignment_aliases'][$key],
+                $assignment['alias']
+            );
             $problems = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
                 'assignment' => $assignment['alias'],
                 'course' => $courseAlias,
                 'auth_token' => $adminLogin->auth_token
             ]));
             foreach ($problems['problems'] as $index => $problem) {
-                $this->assertEquals($problemAssignmentsMap[$courseData[
-                    'assignment_aliases'][$key]][$index]['problem']->alias, $problem['alias']);
+                $this->assertEquals(
+                    $problemAssignmentsMap[$courseData[
+                    'assignment_aliases'][$key]][$index]['problem']->alias,
+                    $problem['alias']
+                );
             }
         }
         $students = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
@@ -177,7 +183,11 @@ class CourseCloneTest extends OmegaupTestCase {
                     'problem_alias' => $problem['problem']->alias,
                 ]));
 
-                $this->assertEquals(1, $problem['visibility'], 'Problem visibility must be public');
+                $this->assertEquals(
+                    1,
+                    $problem['visibility'],
+                    'Problem visibility must be public'
+                );
             }
 
             // Update visibility mode to private for some problems
@@ -206,7 +216,11 @@ class CourseCloneTest extends OmegaupTestCase {
                 'problem_alias' => $problems[0]['problem']->alias,
             ]));
 
-            $this->assertEquals(0, $problem['visibility'], 'Problem visibility must be private');
+            $this->assertEquals(
+                0,
+                $problem['visibility'],
+                'Problem visibility must be private'
+            );
         }
 
         $courseAlias = Utils::CreateRandomString();
@@ -234,7 +248,12 @@ class CourseCloneTest extends OmegaupTestCase {
             ]));
 
             // All cloned assignments must have the same number of problems than the original ones
-            $this->assertEquals($problemsPerAssignment, count($problems['problems']));
+            $this->assertEquals(
+                $problemsPerAssignment,
+                count(
+                    $problems['problems']
+                )
+            );
         }
     }
 }

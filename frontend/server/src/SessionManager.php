@@ -8,7 +8,7 @@ class SessionManager {
         string $value,
         int $expire,
         string $path
-    ) : void {
+    ): void {
         // Expire all old cookies
         if (isset($_SERVER['HTTP_COOKIE'])) {
             $cookies = explode(';', strval($_SERVER['HTTP_COOKIE']));
@@ -34,7 +34,7 @@ class SessionManager {
         );
     }
 
-    public function getCookie(string $name) : ?string {
+    public function getCookie(string $name): ?string {
         if (!array_key_exists($name, $_COOKIE)) {
             return null;
         }
@@ -42,7 +42,7 @@ class SessionManager {
         return strval($_COOKIE[$name]);
     }
 
-    public function sessionStart() : void {
+    public function sessionStart(): void {
         if (session_status() == PHP_SESSION_ACTIVE) {
             return;
         }

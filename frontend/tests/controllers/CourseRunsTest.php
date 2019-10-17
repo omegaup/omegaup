@@ -23,16 +23,25 @@ class CourseRunsTest extends OmegaupTestCase {
         $login = self::login($courseData['admin']);
 
         // Add the problem to the assignment
-        CoursesFactory::addProblemsToAssignment($login, $courseAlias, $assignmentAlias, [$problemData]);
+        CoursesFactory::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemData]
+        );
 
         // Create our participant
-        $participant = UserFactory::createUser();
+        ['user' => $participant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add student to course
         CoursesFactory::addStudentToCourse($courseData, $participant);
 
         // Create a run for assignment
-        $runData = RunsFactory::createCourseAssignmentRun($problemData, $courseData, $participant);
+        $runData = RunsFactory::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
 
         // Grade the run
         RunsFactory::gradeRun($runData);
@@ -49,8 +58,14 @@ class CourseRunsTest extends OmegaupTestCase {
 
         // Assert
         $this->assertEquals(1, count($response['runs']));
-        $this->assertEquals($runData['response']['guid'], $response['runs'][0]['guid']);
-        $this->assertEquals($participant->username, $response['runs'][0]['username']);
+        $this->assertEquals(
+            $runData['response']['guid'],
+            $response['runs'][0]['guid']
+        );
+        $this->assertEquals(
+            $participant->username,
+            $response['runs'][0]['username']
+        );
         $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Course admin should be able to view run, even if not problem admin.

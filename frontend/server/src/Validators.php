@@ -18,12 +18,15 @@ class Validators {
     public static function validateEmail(
         $parameter,
         string $parameterName
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
         if (!filter_var($parameter, FILTER_VALIDATE_EMAIL)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $parameterName
+            );
         }
     }
 
@@ -37,14 +40,17 @@ class Validators {
     public static function validateStringNonEmpty(
         $parameter,
         string $parameterName
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
 
         // Validate data is string
         if (!is_string($parameter) || empty($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterEmpty', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $parameterName
+            );
         }
     }
 
@@ -60,7 +66,7 @@ class Validators {
         $parameter,
         string $parameterName,
         bool $required = false
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
@@ -81,12 +87,15 @@ class Validators {
         ?int $minLength,
         ?int $maxLength,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
         if (!is_string($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $parameterName
+            );
         }
 
         if (!is_null($minLength) && strlen($parameter) < $minLength) {
@@ -115,22 +124,31 @@ class Validators {
         $parameter,
         string $parameterName,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
 
-        if (!is_string($parameter) ||
+        if (
+            !is_string($parameter) ||
             empty($parameter) ||
             strlen($parameter) > 32
         ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
         }
         if (self::isRestrictedAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('aliasInUse');
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'aliasInUse'
+            );
         }
         if (!self::isValidAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
         }
     }
 
@@ -140,8 +158,13 @@ class Validators {
      * @param string $alias
      * @return boolean
      */
-    public static function isValidAlias(string $alias) : bool {
-        return preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1 && !self::isRestrictedAlias($alias);
+    public static function isValidAlias(string $alias): bool {
+        return preg_match(
+            '/^[a-zA-Z0-9_-]+$/',
+            $alias
+        ) === 1 && !self::isRestrictedAlias(
+            $alias
+        );
     }
 
     /**
@@ -150,7 +173,7 @@ class Validators {
      * @param string $alias the alias.
      * @return boolean whether the alias is restricted.
      */
-    public static function isRestrictedAlias(string $alias) : bool {
+    public static function isRestrictedAlias(string $alias): bool {
         $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup'];
         return in_array(strtolower($alias), $restrictedAliases);
     }
@@ -166,11 +189,20 @@ class Validators {
     public static function validateValidUsername(
         $parameter,
         string $parameterName
-    ) : void {
-        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, /*required=*/true);
+    ): void {
+        self::validateStringOfLengthInRange(
+            $parameter,
+            $parameterName,
+            2,
+            null, /*required=*/
+            true
+        );
 
         if (preg_match('/[^a-zA-Z0-9_.-]/', $parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
         }
     }
 
@@ -179,21 +211,30 @@ class Validators {
      *
      * @param mixed $parameter
      * @param string $parameterName
-     * @param bool $required
      * @psalm-assert string $parameter
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateValidUsernameIdentity(
         $parameter,
         string $parameterName
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
-        self::validateStringOfLengthInRange($parameter, $parameterName, 2, null, /*required=*/true);
+        self::validateStringOfLengthInRange(
+            $parameter,
+            $parameterName,
+            2,
+            null,
+            /*required=*/true
+        );
 
+        /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
         if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalidAlias', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
         }
     }
 
@@ -206,7 +247,7 @@ class Validators {
     public static function validateDate(
         $parameter,
         string $parameterName
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
@@ -214,7 +255,10 @@ class Validators {
         // Validate that we are working with a date
         // @TODO This strtotime() allows nice strings like "next Thursday".
         if (!is_string($parameter) || strtotime($parameter) === false) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $parameterName
+            );
         }
     }
 
@@ -229,7 +273,7 @@ class Validators {
         $parameter,
         string $parameterName,
         bool $required = false
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
@@ -251,12 +295,15 @@ class Validators {
         $lowerBound,
         $upperBound,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
         if (!is_numeric($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotANumber', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotANumber',
+                $parameterName
+            );
         }
         // Coerce $parameter into a numeric value.
         $parameter = $parameter + 0;
@@ -286,12 +333,15 @@ class Validators {
     public static function validateNumber(
         $parameter,
         string $parameterName
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
             return;
         }
         if (!is_numeric($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotANumber', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotANumber',
+                $parameterName
+            );
         }
     }
 
@@ -306,7 +356,7 @@ class Validators {
         $parameter,
         string $parameterName,
         bool $required = false
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
@@ -326,7 +376,7 @@ class Validators {
         string $parameterName,
         array $enum,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
@@ -356,12 +406,15 @@ class Validators {
         string $parameterName,
         array $enum,
         bool $required = true
-    ) : void {
+    ): void {
         if (!self::isPresent($parameter, $parameterName, $required)) {
             return;
         }
         if (!is_string($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', $parameterName);
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $parameterName
+            );
         }
 
         $badElements = [];
@@ -395,7 +448,7 @@ class Validators {
         $parameter,
         string $parameterName,
         bool $required = true
-    ) : bool {
+    ): bool {
         if (!is_null($parameter)) {
             return true;
         }
@@ -419,7 +472,7 @@ class Validators {
     public static function validateBadgeExists(
         string $badgeAlias,
         array $allExistingBadges
-    ) : void {
+    ): void {
         if (!in_array($badgeAlias, $allExistingBadges)) {
             throw new \OmegaUp\Exceptions\NotFoundException('badgeNotExist');
         }

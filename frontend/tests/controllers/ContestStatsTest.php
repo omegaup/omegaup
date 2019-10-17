@@ -21,24 +21,36 @@ class ContestStatsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create a run that we will wait to grade it
-        $maxWaitRunData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $maxWaitRunData = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
 
         // Create some runs to be pending
         $pendingRunsCount = 10;
         $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
-            $pendingRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $pendingRunsData[$i] = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestant
+            );
             \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $ACRunsCount = 7;
         $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
-            $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $ACRunsData[$i] = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestant
+            );
 
             // Grade the run
             RunsFactory::gradeRun($ACRunsData[$i]);
@@ -48,7 +60,11 @@ class ContestStatsTest extends OmegaupTestCase {
         $WARunsCount = 5;
         $WARunsData = [];
         for ($i = 0; $i < $WARunsCount; $i++) {
-            $WARunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $WARunsData[$i] = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestant
+            );
 
             // Grade the run with WA
             RunsFactory::gradeRun($WARunsData[$i], 0, 'WA');
@@ -66,13 +82,36 @@ class ContestStatsTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\Contest::apiStats($r);
 
         // Check number of pending runs
-        $this->assertEquals(count($pendingRunsData) + 1 /* max wait run */, count($response['pending_runs']));
-        $this->assertEquals(count($ACRunsData), ($response['verdict_counts']['AC']));
-        $this->assertEquals(count($WARunsData), ($response['verdict_counts']['WA']));
+        $this->assertEquals(
+            count(
+                $pendingRunsData
+            ) + 1 /* max wait run */,
+            count(
+                $response['pending_runs']
+            )
+        );
+        $this->assertEquals(
+            count(
+                $ACRunsData
+            ),
+            ($response['verdict_counts']['AC'])
+        );
+        $this->assertEquals(
+            count(
+                $WARunsData
+            ),
+            ($response['verdict_counts']['WA'])
+        );
 
-        $this->assertEquals($maxWaitRunData['response']['guid'], $response['max_wait_time_guid']);
+        $this->assertEquals(
+            $maxWaitRunData['response']['guid'],
+            $response['max_wait_time_guid']
+        );
 
-        $this->assertEquals($pendingRunsCount + $ACRunsCount + $WARunsCount + 1, $response['total_runs']);
+        $this->assertEquals(
+            $pendingRunsCount + $ACRunsCount + $WARunsCount + 1,
+            $response['total_runs']
+        );
         $this->assertEquals(1, $response['distribution'][100]);
     }
 
@@ -90,12 +129,16 @@ class ContestStatsTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         $ACRunsCount = 2;
         $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
-            $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $ACRunsData[$i] = RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestant
+            );
 
             // Grade the run
             RunsFactory::gradeRun($ACRunsData[$i]);

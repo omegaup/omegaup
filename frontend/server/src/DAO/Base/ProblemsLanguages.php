@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -21,15 +21,29 @@ abstract class ProblemsLanguages {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ProblemsLanguages} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsLanguages}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsLanguages}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ProblemsLanguages Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ProblemsLanguages} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $problem_id, ?int $language_id) : ?\OmegaUp\DAO\VO\ProblemsLanguages {
-        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` FROM Problems_Languages WHERE (problem_id = ? AND language_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $problem_id,
+        ?int $language_id
+    ): ?\OmegaUp\DAO\VO\ProblemsLanguages {
+        $sql = '
+            SELECT
+                `Problems_Languages`.`problem_id`,
+                `Problems_Languages`.`language_id`
+            FROM
+                `Problems_Languages`
+            WHERE
+                (
+                    `problem_id` = ? AND
+                    `language_id` = ?
+                )
+            LIMIT 1;';
         $params = [$problem_id, $language_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -57,9 +71,21 @@ abstract class ProblemsLanguages {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ProblemsLanguages $Problems_Languages) : void {
-        $sql = 'DELETE FROM `Problems_Languages` WHERE problem_id = ? AND language_id = ?;';
-        $params = [$Problems_Languages->problem_id, $Problems_Languages->language_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ProblemsLanguages $Problems_Languages
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problems_Languages`
+            WHERE
+                (
+                    `problem_id` = ? AND
+                    `language_id` = ?
+                );';
+        $params = [
+            $Problems_Languages->problem_id,
+            $Problems_Languages->language_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -93,17 +119,37 @@ abstract class ProblemsLanguages {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problems_Languages`.`problem_id`, `Problems_Languages`.`language_id` from Problems_Languages';
+    ): array {
+        $sql = '
+            SELECT
+                `Problems_Languages`.`problem_id`,
+                `Problems_Languages`.`language_id`
+            FROM
+                `Problems_Languages`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemsLanguages($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemsLanguages(
+                $row
+            );
         }
         return $allData;
     }
@@ -116,15 +162,35 @@ abstract class ProblemsLanguages {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ProblemsLanguages $Problems_Languages El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsLanguages} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsLanguages}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ProblemsLanguages $Problems_Languages) : int {
-        $sql = 'INSERT INTO Problems_Languages (`problem_id`, `language_id`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemsLanguages $Problems_Languages
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problems_Languages (
+                    `problem_id`,
+                    `language_id`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problems_Languages->problem_id) ? null : (int)$Problems_Languages->problem_id,
-            is_null($Problems_Languages->language_id) ? null : (int)$Problems_Languages->language_id,
+            (
+                is_null($Problems_Languages->problem_id) ?
+                null :
+                intval($Problems_Languages->problem_id)
+            ),
+            (
+                is_null($Problems_Languages->language_id) ?
+                null :
+                intval($Problems_Languages->language_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

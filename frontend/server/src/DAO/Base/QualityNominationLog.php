@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -25,16 +25,41 @@ abstract class QualityNominationLog {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log) : int {
-        $sql = 'UPDATE `QualityNomination_Log` SET `qualitynomination_id` = ?, `time` = ?, `user_id` = ?, `from_status` = ?, `to_status` = ?, `rationale` = ? WHERE `qualitynomination_log_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log
+    ): int {
+        $sql = '
+            UPDATE
+                `QualityNomination_Log`
+            SET
+                `qualitynomination_id` = ?,
+                `time` = ?,
+                `user_id` = ?,
+                `from_status` = ?,
+                `to_status` = ?,
+                `rationale` = ?
+            WHERE
+                (
+                    `qualitynomination_log_id` = ?
+                );';
         $params = [
-            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Log->time),
-            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
+            (
+                is_null($QualityNomination_Log->qualitynomination_id) ?
+                null :
+                intval($QualityNomination_Log->qualitynomination_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $QualityNomination_Log->time
+            ),
+            (
+                is_null($QualityNomination_Log->user_id) ?
+                null :
+                intval($QualityNomination_Log->user_id)
+            ),
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,
-            (int)$QualityNomination_Log->qualitynomination_log_id,
+            intval($QualityNomination_Log->qualitynomination_log_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -43,15 +68,32 @@ abstract class QualityNominationLog {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\QualityNominationLog} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\QualityNominationLog}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\QualityNominationLog}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\QualityNominationLog Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\QualityNominationLog} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(int $qualitynomination_log_id) : ?\OmegaUp\DAO\VO\QualityNominationLog {
-        $sql = 'SELECT `QualityNomination_Log`.`qualitynomination_log_id`, `QualityNomination_Log`.`qualitynomination_id`, `QualityNomination_Log`.`time`, `QualityNomination_Log`.`user_id`, `QualityNomination_Log`.`from_status`, `QualityNomination_Log`.`to_status`, `QualityNomination_Log`.`rationale` FROM QualityNomination_Log WHERE (qualitynomination_log_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        int $qualitynomination_log_id
+    ): ?\OmegaUp\DAO\VO\QualityNominationLog {
+        $sql = '
+            SELECT
+                `QualityNomination_Log`.`qualitynomination_log_id`,
+                `QualityNomination_Log`.`qualitynomination_id`,
+                `QualityNomination_Log`.`time`,
+                `QualityNomination_Log`.`user_id`,
+                `QualityNomination_Log`.`from_status`,
+                `QualityNomination_Log`.`to_status`,
+                `QualityNomination_Log`.`rationale`
+            FROM
+                `QualityNomination_Log`
+            WHERE
+                (
+                    `qualitynomination_log_id` = ?
+                )
+            LIMIT 1;';
         $params = [$qualitynomination_log_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -79,9 +121,19 @@ abstract class QualityNominationLog {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log) : void {
-        $sql = 'DELETE FROM `QualityNomination_Log` WHERE qualitynomination_log_id = ?;';
-        $params = [$QualityNomination_Log->qualitynomination_log_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log
+    ): void {
+        $sql = '
+            DELETE FROM
+                `QualityNomination_Log`
+            WHERE
+                (
+                    `qualitynomination_log_id` = ?
+                );';
+        $params = [
+            $QualityNomination_Log->qualitynomination_log_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -115,17 +167,42 @@ abstract class QualityNominationLog {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `QualityNomination_Log`.`qualitynomination_log_id`, `QualityNomination_Log`.`qualitynomination_id`, `QualityNomination_Log`.`time`, `QualityNomination_Log`.`user_id`, `QualityNomination_Log`.`from_status`, `QualityNomination_Log`.`to_status`, `QualityNomination_Log`.`rationale` from QualityNomination_Log';
+    ): array {
+        $sql = '
+            SELECT
+                `QualityNomination_Log`.`qualitynomination_log_id`,
+                `QualityNomination_Log`.`qualitynomination_id`,
+                `QualityNomination_Log`.`time`,
+                `QualityNomination_Log`.`user_id`,
+                `QualityNomination_Log`.`from_status`,
+                `QualityNomination_Log`.`to_status`,
+                `QualityNomination_Log`.`rationale`
+            FROM
+                `QualityNomination_Log`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\QualityNominationLog($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\QualityNominationLog(
+                $row
+            );
         }
         return $allData;
     }
@@ -138,16 +215,46 @@ abstract class QualityNominationLog {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\QualityNominationLog} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\QualityNominationLog}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log) : int {
-        $sql = 'INSERT INTO QualityNomination_Log (`qualitynomination_id`, `time`, `user_id`, `from_status`, `to_status`, `rationale`) VALUES (?, ?, ?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\QualityNominationLog $QualityNomination_Log
+    ): int {
+        $sql = '
+            INSERT INTO
+                QualityNomination_Log (
+                    `qualitynomination_id`,
+                    `time`,
+                    `user_id`,
+                    `from_status`,
+                    `to_status`,
+                    `rationale`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($QualityNomination_Log->qualitynomination_id) ? null : (int)$QualityNomination_Log->qualitynomination_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($QualityNomination_Log->time),
-            is_null($QualityNomination_Log->user_id) ? null : (int)$QualityNomination_Log->user_id,
+            (
+                is_null($QualityNomination_Log->qualitynomination_id) ?
+                null :
+                intval($QualityNomination_Log->qualitynomination_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $QualityNomination_Log->time
+            ),
+            (
+                is_null($QualityNomination_Log->user_id) ?
+                null :
+                intval($QualityNomination_Log->user_id)
+            ),
             $QualityNomination_Log->from_status,
             $QualityNomination_Log->to_status,
             $QualityNomination_Log->rationale,
@@ -157,7 +264,9 @@ abstract class QualityNominationLog {
         if ($affectedRows == 0) {
             return 0;
         }
-        $QualityNomination_Log->qualitynomination_log_id = \OmegaUp\MySQLConnection::getInstance()->Insert_ID();
+        $QualityNomination_Log->qualitynomination_log_id = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 
         return $affectedRows;
     }

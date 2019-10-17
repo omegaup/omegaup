@@ -13,7 +13,7 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
@@ -41,11 +41,18 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runDataOutsideContest = RunsFactory::createRunToProblem($problemData, $contestant);
-        $runDataInsideContest = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runDataOutsideContest = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestant
+        );
+        $runDataInsideContest = RunsFactory::createRun(
+            $problemData,
+            $contestData,
+            $contestant
+        );
         RunsFactory::gradeRun($runDataOutsideContest);
         RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
 
@@ -68,10 +75,10 @@ class ProblemBestScoreTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
 
         // Create user who will use the API
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
         $runData = RunsFactory::createRunToProblem($problemData, $contestant);
