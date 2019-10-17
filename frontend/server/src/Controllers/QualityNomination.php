@@ -12,7 +12,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\DAO\VO\Problems $problem
      * @param \OmegaUp\DAO\VO\Users $user
      * @param string $nominationType
-     * @param array $contents
+     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
