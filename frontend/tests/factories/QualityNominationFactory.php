@@ -99,7 +99,6 @@ class QualityNominationFactory {
         $contents
     ): \OmegaUp\DAO\VO\QualityNominations {
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'

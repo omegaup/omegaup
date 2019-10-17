@@ -377,9 +377,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
             $problem,
             $r->user,
-            strval(
-                $r['nomination']
-            ),
+            strval($r['nomination']),
             $contents
         );
 
