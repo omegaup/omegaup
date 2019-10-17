@@ -231,7 +231,7 @@ class BadgesTest extends BadgesTestCase {
         $expectedUserTwoResults = ['contestManager', 'problemSetter'];
         Utils::RunAssignBadges();
         {
-            $login = self::login($userOne);
+            $login = self::login($identityOne);
             // Fetch badges through apiMyList
             $userOneBadges = \OmegaUp\Controllers\Badge::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -279,7 +279,7 @@ class BadgesTest extends BadgesTestCase {
             );
         }
         {
-            $login = self::login($userTwo);
+            $login = self::login($identityTwo);
             $userTwoNotifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
@@ -301,7 +301,7 @@ class BadgesTest extends BadgesTestCase {
         $previousTime = \OmegaUp\Time::get();
         Utils::RunAssignBadges();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $problemSetterResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,

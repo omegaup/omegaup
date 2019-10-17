@@ -47,7 +47,7 @@ class CourseListTest extends OmegaupTestCase {
     }
 
     public function testGetCourseListForNormalUser() {
-        $otherUserLogin = self::login($this->other_user);
+        $otherUserLogin = self::login($this->other_identity);
         $response = \OmegaUp\Controllers\Course::apiListCourses(new \OmegaUp\Request([
             'auth_token' => $otherUserLogin->auth_token,
         ]));

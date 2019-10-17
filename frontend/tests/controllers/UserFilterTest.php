@@ -28,7 +28,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testInsufficientPrivileges() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/all-events',
             'auth_token' => $login->auth_token,
@@ -38,7 +38,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testAllEventsWithAdmin() {
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
-        $login = self::login($admin);
+        $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/all-events',
             'auth_token' => $login->auth_token,
@@ -49,7 +49,7 @@ class UserFilterTest extends OmegaupTestCase {
     public function testMyEvents() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/user/' . $user->username,
             'auth_token' => $login->auth_token,
@@ -68,7 +68,7 @@ class UserFilterTest extends OmegaupTestCase {
         ['user' => $user1, 'identity' => $identity1] = UserFactory::createUser();
         ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
 
-        $login = self::login($user1);
+        $login = self::login($identity1);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/user/' . $user2->username,
             'auth_token' => $login->auth_token,
@@ -79,7 +79,7 @@ class UserFilterTest extends OmegaupTestCase {
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($admin);
+        $login = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/user/' . $user->username,
             'auth_token' => $login->auth_token,
@@ -91,7 +91,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest()['contest'];
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'filter' => '/problemset/' . $contest->problemset_id,
@@ -102,7 +102,7 @@ class UserFilterTest extends OmegaupTestCase {
         $contest = ContestsFactory::createContest()['contest'];
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'filter' => '/problemset/' . $contest->problemset_id,
@@ -235,7 +235,7 @@ class UserFilterTest extends OmegaupTestCase {
         $problem = ProblemsFactory::createProblem()['problem'];
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'filter' => '/problem/' . $problem->alias,
             'auth_token' => $login->auth_token,

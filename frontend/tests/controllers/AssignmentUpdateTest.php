@@ -6,10 +6,10 @@
 class AssignmentUpdateTest extends OmegaupTestCase {
     public function testAssignmentUpdate() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $user,
+            $identity,
             $login
         );
         $assignmentAlias = $courseData['assignment_alias'];
@@ -51,10 +51,10 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      */
     public function testMissingDataOnAssignmentUpdate() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $user,
+            $identity,
             $login
         );
 
@@ -78,10 +78,10 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      */
     public function testAssignmentUpdateWithInvertedTimes() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $user,
+            $identity,
             $login
         );
 
@@ -106,21 +106,21 @@ class AssignmentUpdateTest extends OmegaupTestCase {
      * Students should not be able to update the assignment.
      */
     public function testAssignmentUpdateByStudent() {
-        ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
-        $adminLogin = OmegaupTestCase::login($admin);
+        ['user' => $admin, 'identity' => $adminIdentity] = UserFactory::createUser();
+        $adminLogin = OmegaupTestCase::login($adminIdentity);
         $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $admin,
+            $adminIdentity,
             $adminLogin
         );
 
         ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
         $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $student->username,
+            'usernameOrEmail' => $identity->username,
             'course_alias' => $courseData['course_alias'],
         ]));
 
-        $login = OmegaupTestCase::login($student);
+        $login = OmegaupTestCase::login($identity);
         try {
             \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,

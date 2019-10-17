@@ -256,10 +256,10 @@ class CreateUserTest extends OmegaupTestCase {
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         // Call api using admin
-        $adminLogin = self::login($admin);
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
         ]));
 
         // Get user from db again to pick up verification changes
@@ -280,7 +280,7 @@ class CreateUserTest extends OmegaupTestCase {
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         // Call api using admin
-        $adminLogin = self::login($admin);
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'usernameOrEmail' => Utils::CreateRandomString(),
@@ -302,7 +302,7 @@ class CreateUserTest extends OmegaupTestCase {
         ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Call api using admin
-        $login = self::login($user2);
+        $login = self::login($identity2);
         $response = \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
@@ -317,7 +317,7 @@ class CreateUserTest extends OmegaupTestCase {
     public function testMailingListBackfillNotAdmin() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -343,7 +343,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
-        $adminLogin = self::login($admin);
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
@@ -378,7 +378,7 @@ class CreateUserTest extends OmegaupTestCase {
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
         ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
-        $adminLogin = self::login($admin);
+        $adminLogin = self::login($identityAdmin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));

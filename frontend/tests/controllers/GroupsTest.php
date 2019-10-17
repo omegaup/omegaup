@@ -16,7 +16,7 @@ class GroupsTest extends OmegaupTestCase {
         $description = Utils::CreateRandomString();
         $alias = Utils::CreateRandomString();
 
-        $login = self::login($owner);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Group::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => $name,
@@ -44,7 +44,7 @@ class GroupsTest extends OmegaupTestCase {
         ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
 
         try {
-            $login = self::login($owner);
+            $login = self::login($identity);
             \OmegaUp\Controllers\Group::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'name' => Utils::CreateRandomString(),
@@ -89,7 +89,7 @@ class GroupsTest extends OmegaupTestCase {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         ['user' => $userCalling, 'identity' => $identityCalling] = UserFactory::createUser();
 
-        $login = self::login($userCalling);
+        $login = self::login($identityCalling);
         $response = \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
@@ -103,7 +103,7 @@ class GroupsTest extends OmegaupTestCase {
     public function testRemoveUserFromGroup() {
         $groupData = GroupsFactory::createGroup();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        GroupsFactory::addUserToGroup($groupData, $user);
+        GroupsFactory::addUserToGroup($groupData, $identity);
 
         $login = self::login($groupData['owner']);
         $response = \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
@@ -147,7 +147,7 @@ class GroupsTest extends OmegaupTestCase {
         $groupData = GroupsFactory::createGroup();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'usernameOrEmail' => $user->username,
@@ -164,14 +164,14 @@ class GroupsTest extends OmegaupTestCase {
         $groups = [];
         $n = 5;
         for ($i = 0; $i < $n; $i++) {
-            $groups[] = GroupsFactory::createGroup($owner);
+            $groups[] = GroupsFactory::createGroup($identity);
         }
 
         // Create a group for another user
         GroupsFactory::createGroup();
 
         // Call API
-        $login = self::login($owner);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Group::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
@@ -190,7 +190,7 @@ class GroupsTest extends OmegaupTestCase {
         $nUsers = 5;
         for ($i = 0; $i < $nUsers; $i++) {
             ['user' => $users[], 'identity' => $identities[]] = UserFactory::createUser();
-            GroupsFactory::addUserToGroup($groupData, $users[$i]);
+            GroupsFactory::addUserToGroup($groupData, $identities[$i]);
         }
 
         // Call API
@@ -336,7 +336,7 @@ class GroupsTest extends OmegaupTestCase {
 
         // Create contestants to submit runs
         ['user' => $contestantInGroup, 'identity' => $identityInGroup] = UserFactory::createUser();
-        GroupsFactory::addUserToGroup($groupData, $contestantInGroup);
+        GroupsFactory::addUserToGroup($groupData, $identityInGroup);
         ['user' => $contestantNotInGroup, 'identity' => $identityNotInGroup] = UserFactory::createUser();
 
         $n = 5;
@@ -364,12 +364,12 @@ class GroupsTest extends OmegaupTestCase {
             $run1 = RunsFactory::createRun(
                 $problemData,
                 $contestsData[$i],
-                $contestantInGroup
+                $identityInGroup
             );
             $run2 = RunsFactory::createRun(
                 $problemData,
                 $contestsData[$i],
-                $contestantNotInGroup
+                $identityNotInGroup
             );
             RunsFactory::gradeRun($run1);
             RunsFactory::gradeRun($run2);
@@ -425,9 +425,9 @@ class GroupsTest extends OmegaupTestCase {
 
         // Create contestants to submit runs
         ['user' => $contestantInGroup, 'identity' => $identityInGroup] = UserFactory::createUser();
-        GroupsFactory::addUserToGroup($groupData, $contestantInGroup);
+        GroupsFactory::addUserToGroup($groupData, $identityInGroup);
         ['user' => $contestantInGroupNoAc, 'identity' => $identityInGroupNoAc] = UserFactory::createUser();
-        GroupsFactory::addUserToGroup($groupData, $contestantInGroupNoAc);
+        GroupsFactory::addUserToGroup($groupData, $identityInGroupNoAc);
 
         $n = 5;
 
@@ -456,12 +456,12 @@ class GroupsTest extends OmegaupTestCase {
             $run1 = RunsFactory::createRun(
                 $problemData,
                 $contestsData[$i],
-                $contestantInGroup
+                $identityInGroup
             );
             $run2 = RunsFactory::createRun(
                 $problemData,
                 $contestsData[$i],
-                $contestantInGroupNoAc
+                $identityInGroupNoAc
             );
             RunsFactory::gradeRun($run1);
             RunsFactory::gradeRun($run2, 0.5, 'PA');

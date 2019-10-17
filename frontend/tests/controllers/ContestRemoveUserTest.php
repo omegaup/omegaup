@@ -14,7 +14,7 @@ class ContestRemoveUserTest extends OmegaupTestCase {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // Add user to contest
-        ContestsFactory::addUser($contestData, $user);
+        ContestsFactory::addUser($contestData, $identity);
 
         $login = self::login($contestData['director']);
 
