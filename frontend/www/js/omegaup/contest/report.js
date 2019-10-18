@@ -1,10 +1,11 @@
 import contest_Report from '../components/contest/Report.vue';
-import {OmegaUp} from '../omegaup.js';
+import { OmegaUp } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  const contestAlias =
-      /\/contest\/([^\/]+)\/report\/?.*/.exec(window.location.pathname)[1];
+  const contestAlias = /\/contest\/([^\/]+)\/report\/?.*/.exec(
+    window.location.pathname,
+  )[1];
   const payload = JSON.parse(document.getElementById('payload').innerText);
 
   let contestReport = new Vue({
@@ -14,7 +15,7 @@ OmegaUp.on('ready', function() {
         props: {
           contestReport: this.contestReport,
           contestAlias: this.contestAlias,
-        }
+        },
       });
     },
     data: {
@@ -23,6 +24,6 @@ OmegaUp.on('ready', function() {
     },
     components: {
       contestReport: contest_Report,
-    }
+    },
   });
 });
