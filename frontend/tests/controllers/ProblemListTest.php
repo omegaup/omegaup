@@ -182,7 +182,7 @@ class ProblemList extends OmegaupTestCase {
         }
 
         QualityNominationFactory::createSuggestion(
-            $login[0],
+            $users[0],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
             3, // quality
@@ -191,7 +191,7 @@ class ProblemList extends OmegaupTestCase {
         );
 
         QualityNominationFactory::createSuggestion(
-            $login[1],
+            $users[1],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
             4, // quality
@@ -200,7 +200,7 @@ class ProblemList extends OmegaupTestCase {
         );
 
         QualityNominationFactory::createSuggestion(
-            $login[2],
+            $users[2],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
             2, // quality
@@ -209,7 +209,7 @@ class ProblemList extends OmegaupTestCase {
         );
 
         QualityNominationFactory::createSuggestion(
-            $login[3],
+            $users[3],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
             4, // quality
@@ -218,7 +218,7 @@ class ProblemList extends OmegaupTestCase {
         );
 
         QualityNominationFactory::createSuggestion(
-            $login[4],
+            $users[4],
             $problemData[0]['request']['problem_alias'],
             4, // difficulty
             4, // quality

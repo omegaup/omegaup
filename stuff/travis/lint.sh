@@ -30,10 +30,7 @@ stage_script() {
 	yarn test
 
 	python3 stuff/db-migrate.py validate
-	docker run --rm \
-		--volume "$PWD:/src" \
-		--volume "$PWD:/opt/omegaup" \
-		omegaup/hook_tools:20191014 -j4 validate --all < /dev/null
+	"${OMEGAUP_ROOT}/stuff/lint.sh" validate --all < /dev/null
 }
 
 stage_after_success() {

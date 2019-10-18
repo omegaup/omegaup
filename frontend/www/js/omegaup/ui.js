@@ -1,26 +1,31 @@
 import API from './api.js';
-import {T} from './omegaup.js';
+import { T } from './omegaup.js';
 
 let UI = {
-  navigateTo: function(url) { window.location = url; },
+  navigateTo: function(url) {
+    window.location = url;
+  },
 
   escape: function(s) {
     if (typeof s !== 'string') return '';
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   },
 
   buildURLQuery: function(queryParameters) {
     return Object.entries(queryParameters)
-        .map(([key, value]) => {
-          const encodedKey = encodeURIComponent(key);
-          if (Array.isArray(value)) {
-            return value.map(entry =>
-                                 `${encodedKey}[]=` + encodeURIComponent(entry))
-                .join('&');
-          }
-          return `${encodedKey}=` + encodeURIComponent(value);
-        })
-        .join('&');
+      .map(([key, value]) => {
+        const encodedKey = encodeURIComponent(key);
+        if (Array.isArray(value)) {
+          return value
+            .map(entry => `${encodedKey}[]=` + encodeURIComponent(entry))
+            .join('&');
+        }
+        return `${encodedKey}=` + encodeURIComponent(value);
+      })
+      .join('&');
   },
 
   formatDelta: function(delta) {
@@ -47,11 +52,13 @@ let UI = {
     return clock;
   },
 
-  isVirtual: function(contest) { return contest.rerun_id > 0; },
+  isVirtual: function(contest) {
+    return contest.rerun_id > 0;
+  },
 
   contestTitle: function(contest) {
     if (UI.isVirtual(contest)) {
-      return UI.formatString(T.virtualContestSuffix, {title: contest.title});
+      return UI.formatString(T.virtualContestSuffix, { title: contest.title });
     }
     return contest.title;
   },
@@ -60,15 +67,17 @@ let UI = {
     let username = rank.username;
     if (rank.name != rank.username) username += ` (${UI.escape(rank.name)})`;
     if (rank.virtual)
-      username = UI.formatString(T.virtualSuffix, {username: username});
+      username = UI.formatString(T.virtualSuffix, { username: username });
     return username;
   },
 
   formatString: function(template, values) {
     for (var key in values) {
       if (!values.hasOwnProperty(key)) continue;
-      template =
-          template.replace(new RegExp('%\\(' + key + '\\)', 'g'), values[key]);
+      template = template.replace(
+        new RegExp('%\\(' + key + '\\)', 'g'),
+        values[key],
+      );
     }
     return template;
   },
@@ -78,8 +87,14 @@ let UI = {
       UI.error(data.error || 'error');
       return;
     }
-    UI.success(omegaup.T.contestEditContestEdited + ' <a href="/arena/' +
-               contestAlias + '">' + T.contestEditGoToContest + '</a>');
+    UI.success(
+      omegaup.T.contestEditContestEdited +
+        ' <a href="/arena/' +
+        contestAlias +
+        '">' +
+        T.contestEditGoToContest +
+        '</a>',
+    );
   },
 
   displayStatus: function(message, type) {
@@ -93,24 +108,33 @@ let UI = {
 
     $('#status .message').html(message);
     $('#status')
-        .removeClass('alert-success alert-info alert-warning alert-danger')
-        .addClass(type + ' animating')
-        .slideDown({
-          complete: function() { $('#status')
-                                     .removeClass('animating'); },
-        });
+      .removeClass('alert-success alert-info alert-warning alert-danger')
+      .addClass(type + ' animating')
+      .slideDown({
+        complete: function() {
+          $('#status').removeClass('animating');
+        },
+      });
     if (type == 'alert-success') {
       setTimeout(UI.dismissNotifications, 5000);
     }
   },
 
-  error: function(message) { UI.displayStatus(message, 'alert-danger'); },
+  error: function(message) {
+    UI.displayStatus(message, 'alert-danger');
+  },
 
-  info: function(message) { UI.displayStatus(message, 'alert-info'); },
+  info: function(message) {
+    UI.displayStatus(message, 'alert-info');
+  },
 
-  success: function(message) { UI.displayStatus(message, 'alert-success'); },
+  success: function(message) {
+    UI.displayStatus(message, 'alert-success');
+  },
 
-  warning: function(message) { UI.displayStatus(message, 'alert-warning'); },
+  warning: function(message) {
+    UI.displayStatus(message, 'alert-warning');
+  },
 
   apiError: function(response) {
     UI.error(((response && response.error) || 'error').toString());
@@ -120,11 +144,12 @@ let UI = {
 
   dismissNotifications: function() {
     $('#status')
-        .addClass('animating')
-        .slideUp({
-          complete: function() { $('#status')
-                                     .removeClass('animating'); },
-        });
+      .addClass('animating')
+      .slideUp({
+        complete: function() {
+          $('#status').removeClass('animating');
+        },
+      });
   },
 
   bulkOperation: function(operation, onOperationFinished, options) {
@@ -137,34 +162,35 @@ let UI = {
       success = false;
       error = data.error;
     };
-    $('input[type=checkbox]')
-        .each(function() {
-          if (this.checked) {
-            operation(this.id, resolve, reject);
-          }
-        });
+    $('input[type=checkbox]').each(function() {
+      if (this.checked) {
+        operation(this.id, resolve, reject);
+      }
+    });
 
     // Wait for all
-    $(document)
-        .ajaxStop(function() {
-          if (!isStopExecuted) {
-            // Make sure we execute this block once. onOperationFinish might
-            // have
-            // async calls that would fire ajaxStop event
-            isStopExecuted = true;
-            $(document).off('ajaxStop');
+    $(document).ajaxStop(function() {
+      if (!isStopExecuted) {
+        // Make sure we execute this block once. onOperationFinish might
+        // have
+        // async calls that would fire ajaxStop event
+        isStopExecuted = true;
+        $(document).off('ajaxStop');
 
-            onOperationFinished();
+        onOperationFinished();
 
-            if (success === false) {
-              UI.error(UI.formatString(
-                  options && options.errorTemplate || T.bulkOperationError,
-                  error));
-            } else {
-              UI.success(T.updateItemsSuccess);
-            }
-          }
-        });
+        if (success === false) {
+          UI.error(
+            UI.formatString(
+              (options && options.errorTemplate) || T.bulkOperationError,
+              error,
+            ),
+          );
+        } else {
+          UI.success(T.updateItemsSuccess);
+        }
+      }
+    });
   },
 
   prettyPrintJSON: function(json) {
@@ -172,10 +198,11 @@ let UI = {
   },
 
   syntaxHighlight: function(json) {
-    var jsonRE =
-        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
-    json =
-        json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
+    json = json
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
     return json.replace(jsonRE, function(match) {
       var cls = 'number';
       if (/^"/.test(match)) {
@@ -194,11 +221,11 @@ let UI = {
   },
 
   columnName: function(idx) {
-    var name = String.fromCharCode('A'.charCodeAt(0) + idx % 26);
+    var name = String.fromCharCode('A'.charCodeAt(0) + (idx % 26));
     while (idx >= 26) {
       idx = (idx / 26) | 0;
       idx--;
-      name = String.fromCharCode('A'.charCodeAt(0) + idx % 26) + name;
+      name = String.fromCharCode('A'.charCodeAt(0) + (idx % 26)) + name;
     }
     return name;
   },
@@ -212,68 +239,83 @@ let UI = {
         return;
       }
       pendingRequest = true;
-      f({query: query})
-          .then(data => asyncResults(data.results || data))
-          .fail(UI.ignoreError)
-          .always(() => {
-            pendingRequest = false;
+      f({ query: query })
+        .then(data => asyncResults(data.results || data))
+        .fail(UI.ignoreError)
+        .always(() => {
+          pendingRequest = false;
 
-            // If there is a pending request, send it out now.
-            if (!lastRequest) return;
-            let currentRequest = lastRequest;
-            lastRequest = null;
-            wrappedCall(...currentRequest);
-          });
+          // If there is a pending request, send it out now.
+          if (!lastRequest) return;
+          let currentRequest = lastRequest;
+          lastRequest = null;
+          wrappedCall(...currentRequest);
+        });
     }
     return wrappedCall;
   },
 
   typeahead: function(elem, searchFn, cb) {
-    cb = cb || function(event, val) { $(event.target).val(val.value); };
-    elem.typeahead(
-            {
-              minLength: 2,
-              highlight: true,
+    cb =
+      cb ||
+      function(event, val) {
+        $(event.target).val(val.value);
+      };
+    elem
+      .typeahead(
+        {
+          minLength: 2,
+          highlight: true,
+        },
+        {
+          source: UI.typeaheadWrapper(searchFn),
+          async: true,
+          limit: 100,
+          display: 'label',
+          templates: {
+            suggestion: function(val) {
+              return UI.formatString(
+                '<div data-value="%(value)">%(label)</div>',
+                val,
+              );
             },
-            {
-              source: UI.typeaheadWrapper(searchFn),
-              async: true,
-              limit: 100,
-              display: 'label',
-              templates: {
-                suggestion: function(val) {
-                  return UI.formatString(
-                      '<div data-value="%(value)">%(label)</div>', val);
-                },
-              },
-            })
-        .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb)
-        .trigger('change');
+          },
+        },
+      )
+      .on('typeahead:select', cb)
+      .on('typeahead:autocomplete', cb)
+      .trigger('change');
   },
 
   problemTypeahead: function(elem, cb) {
-    cb = cb || function(event, val) { $(event.target).val(val.alias); };
-    elem.typeahead(
-            {
-              minLength: 3,
-              highlight: false,
+    cb =
+      cb ||
+      function(event, val) {
+        $(event.target).val(val.alias);
+      };
+    elem
+      .typeahead(
+        {
+          minLength: 3,
+          highlight: false,
+        },
+        {
+          source: UI.typeaheadWrapper(API.Problem.list),
+          async: true,
+          display: 'alias',
+          templates: {
+            suggestion: function(val) {
+              return UI.formatString(
+                '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
+                val,
+              );
             },
-            {
-              source: UI.typeaheadWrapper(API.Problem.list),
-              async: true,
-              display: 'alias',
-              templates: {
-                suggestion: function(val) {
-                  return UI.formatString(
-                      '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
-                      val);
-                }
-              }
-            })
-        .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb)
-        .trigger('change');
+          },
+        },
+      )
+      .on('typeahead:select', cb)
+      .on('typeahead:autocomplete', cb)
+      .trigger('change');
   },
 
   problemContestTypeahead: function(elem, problemList, cb) {
@@ -297,52 +339,70 @@ let UI = {
       cb(matches);
     };
 
-    cb = cb || function(event, val) { $(event.target).val(val.alias); };
+    cb =
+      cb ||
+      function(event, val) {
+        $(event.target).val(val.alias);
+      };
 
-    elem.typeahead(
-            {
-              minLength: 3,
-              highlight: false,
+    elem
+      .typeahead(
+        {
+          minLength: 3,
+          highlight: false,
+        },
+        {
+          source: substringMatcher,
+          async: true,
+          display: 'alias',
+          templates: {
+            suggestion: function(val) {
+              return UI.formatString(
+                '<div data-value="%(alias)">%(alias)</div>',
+                val,
+              );
             },
-            {
-              source: substringMatcher,
-              async: true,
-              display: 'alias',
-              templates: {
-                suggestion: function(val) {
-                  return UI.formatString(
-                      '<div data-value="%(alias)">%(alias)</div>', val);
-                },
-              },
-            })
-        .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+          },
+        },
+      )
+      .on('typeahead:select', cb)
+      .on('typeahead:autocomplete', cb);
   },
 
   schoolTypeahead: function(elem, cb) {
-    cb = cb || function(event, val) { $(event.target).val(val.value); };
-    elem.typeahead(
-            {
-              minLength: 2,
-              highlight: true,
+    cb =
+      cb ||
+      function(event, val) {
+        $(event.target).val(val.value);
+      };
+    elem
+      .typeahead(
+        {
+          minLength: 2,
+          highlight: true,
+        },
+        {
+          source: UI.typeaheadWrapper(omegaup.API.School.list),
+          async: true,
+          display: 'label',
+          templates: {
+            empty: T.schoolToBeAdded,
+            suggestion: function(val) {
+              return UI.formatString(
+                '<div data-value="%(value)">%(label)</div>',
+                val,
+              );
             },
-            {
-              source: UI.typeaheadWrapper(omegaup.API.School.list),
-              async: true,
-              display: 'label',
-              templates: {
-                empty: T.schoolToBeAdded,
-                suggestion: function(val) {
-                  return UI.formatString(
-                      '<div data-value="%(value)">%(label)</div>', val);
-                },
-              }
-            })
-        .on('typeahead:select', cb)
-        .on('typeahead:autocomplete', cb);
+          },
+        },
+      )
+      .on('typeahead:select', cb)
+      .on('typeahead:autocomplete', cb);
   },
 
-  userTypeahead: function(elem, cb) { UI.typeahead(elem, API.User.list, cb); },
+  userTypeahead: function(elem, cb) {
+    UI.typeahead(elem, API.User.list, cb);
+  },
 
   groupTypeahead: function(elem, cb) {
     UI.typeahead(elem, API.Group.list, cb);
@@ -355,9 +415,9 @@ let UI = {
   toDDHHMM: function(duration) {
     var sec_num = parseInt(duration, 10);
     var days = Math.floor(sec_num / 86400);
-    var hours = Math.floor((sec_num - (days * 86400)) / 3600);
-    var minutes = Math.floor((sec_num - (days * 86400) - (hours * 3600)) / 60);
-    var seconds = sec_num - (days * 86400) - (hours * 3600) - (minutes * 60);
+    var hours = Math.floor((sec_num - days * 86400) / 3600);
+    var minutes = Math.floor((sec_num - days * 86400 - hours * 3600) / 60);
+    var seconds = sec_num - days * 86400 - hours * 3600 - minutes * 60;
 
     if (minutes < 10) {
       minutes = '0' + minutes;
@@ -375,26 +435,37 @@ let UI = {
     if (!country) {
       return '';
     }
-    return ' <img src="/media/flags/' + country.toLowerCase() +
-           '.png" width="16" height="11" title="' + country + '" />';
+    return (
+      ' <img src="/media/flags/' +
+      country.toLowerCase() +
+      '.png" width="16" height="11" title="' +
+      country +
+      '" />'
+    );
   },
 
-  formatDateTime: function(date) { return date.toLocaleString(T.locale); },
+  formatDateTime: function(date) {
+    return date.toLocaleString(T.locale);
+  },
 
-  formatDate: function(date) { return date.toLocaleDateString(T.locale); },
+  formatDate: function(date) {
+    return date.toLocaleDateString(T.locale);
+  },
 
   parseDuration: function(str) {
     let duration = 0;
-    const durationRegexp =
-        new RegExp('(\\d+(?:\\.\\d+)?)(ns|us|µs|ms|s|m|h)?', 'g');
+    const durationRegexp = new RegExp(
+      '(\\d+(?:\\.\\d+)?)(ns|us|µs|ms|s|m|h)?',
+      'g',
+    );
     const factor = {
-      'h': 3600000.0,
-      'm': 60000.0,
-      's': 1000.0,
-      'ms': 1.0,
-      'us': 0.001,
-      'µs': 0.001,
-      'ns': 0.000001,
+      h: 3600000.0,
+      m: 60000.0,
+      s: 1000.0,
+      ms: 1.0,
+      us: 0.001,
+      µs: 0.001,
+      ns: 0.000001,
     };
     let lastIndex = 0;
     let match = null;
@@ -420,7 +491,7 @@ let UI = {
     document.body.appendChild(tempInput);
 
     try {
-      tempInput.select();  // refactor-lint-disable
+      tempInput.select(); // refactor-lint-disable
       document.execCommand('copy');
     } finally {
       document.body.removeChild(tempInput);
@@ -428,22 +499,23 @@ let UI = {
   },
 
   renderSampleToClipboardButton: function() {
-    document.querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
-        .forEach(function(item, index) {
-          let inputValue = item.querySelector('pre').innerHTML;
+    document
+      .querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
+      .forEach(function(item, index) {
+        let inputValue = item.querySelector('pre').innerHTML;
 
-          let clipboardButton = document.createElement('button');
-          clipboardButton.title = T.copySampleCaseTooltip;
-          clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
+        let clipboardButton = document.createElement('button');
+        clipboardButton.title = T.copySampleCaseTooltip;
+        clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
 
-          clipboardButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            UI.copyToClipboard(inputValue);
-          });
-
-          item.appendChild(clipboardButton);
+        clipboardButton.addEventListener('click', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          UI.copyToClipboard(inputValue);
         });
+
+        item.appendChild(clipboardButton);
+      });
   },
 
   markdownConverter: function(options) {
@@ -453,11 +525,12 @@ let UI = {
     var templates = {};
     if (options.preview) {
       templates['libinteractive:download'] =
-          '<code class="libinteractive-download">' +
-          '<i class="glyphicon glyphicon-download-alt"></i></code>';
+        '<code class="libinteractive-download">' +
+        '<i class="glyphicon glyphicon-download-alt"></i></code>';
     } else {
-      templates['libinteractive:download'] =
-          `<div class="libinteractive-download panel panel-default">
+      templates[
+        'libinteractive:download'
+      ] = `<div class="libinteractive-download panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">
             ${T.libinteractiveTitle}
@@ -509,7 +582,10 @@ let UI = {
 
     let converter = Markdown.getSanitizingConverter();
     let whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
-    let imageWhitelist = new RegExp('^<img\\ssrc="data:image\/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$', 'i');
+    let imageWhitelist = new RegExp(
+      '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',
+      'i',
+    );
 
     converter.hooks.chain('isValidTag', function(tag) {
       return tag.match(whitelist) || tag.match(imageWhitelist);
@@ -527,55 +603,80 @@ let UI = {
       }
 
       const regex = new RegExp(regexString, 'g');
-      return text.replace(/~/g, '~T')
-          .replace(/\$/g, '~D')
-          .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`)
+      return text
+        .replace(/~/g, '~T')
+        .replace(/\$/g, '~D')
+        .replace(regex, (wholeMatch, m1) => `~E${m1.charCodeAt(0)}E`);
     }
     function unescapeCharacters(text) {
       //
       // Swap back in all the special characters we've hidden.
       //
-      return text.replace(/~E(\d+)E/g, function(wholeMatch, m1) {
-                   const charCodeToReplace = parseInt(m1);
-                   return String.fromCharCode(charCodeToReplace);
-                 }).replace(/~D/g, '$').replace(/~T/g, '~');
+      return text
+        .replace(/~E(\d+)E/g, function(wholeMatch, m1) {
+          const charCodeToReplace = parseInt(m1);
+          return String.fromCharCode(charCodeToReplace);
+        })
+        .replace(/~D/g, '$')
+        .replace(/~T/g, '~');
     }
 
     converter.hooks.chain('postSpanGamut', function(text) {
       // Templates.
-      text = text.replace(
-          /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g, function(wholematch, m1) {
-            if (templates.hasOwnProperty(m1)) {
-              return templates[m1];
-            }
-            return '<strong style="color: red">Unrecognized template name: ' +
-                   m1 + '</strong>';
-          });
+      text = text.replace(/^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g, function(
+        wholematch,
+        m1,
+      ) {
+        if (templates.hasOwnProperty(m1)) {
+          return templates[m1];
+        }
+        return (
+          '<strong style="color: red">Unrecognized template name: ' +
+          m1 +
+          '</strong>'
+        );
+      });
       // Images.
       let imageMapping = converter._imageMapping || options.imageMapping || {};
       text = text.replace(/<img src="([^"]+)"\s*([^>]+)>/g, function(
-                                                                wholeMatch, url,
-                                                                attributes) {
+        wholeMatch,
+        url,
+        attributes,
+      ) {
         url = unescapeCharacters(url);
         if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
           return wholeMatch;
         }
-        return `<img src="${escapeCharacters(imageMapping[url], '*_')}" ${attributes}>`;
+        return `<img src="${escapeCharacters(
+          imageMapping[url],
+          '*_',
+        )}" ${attributes}>`;
       });
       // Figures.
       text = text.replace(
-          /^\s*<img src="([^"]+)"\s*([^>]+)\s+title="([^"]+)"\s*\/>\s*$/g,
-          function(wholeMatch, url, attributes, title) {
-            return `<figure><img src="${url}" ${attributes} />` +
-                   `<figcaption>${title}</figcaption></figure>`;
-          });
+        /^\s*<img src="([^"]+)"\s*([^>]+)\s+title="([^"]+)"\s*\/>\s*$/g,
+        function(wholeMatch, url, attributes, title) {
+          return (
+            `<figure><img src="${url}" ${attributes} />` +
+            `<figcaption>${title}</figcaption></figure>`
+          );
+        },
+      );
       return text;
     });
-    converter.hooks.chain('preBlockGamut', function(text, blockGamut,
-                                                    spanGamut) {
+    converter.hooks.chain('preBlockGamut', function(
+      text,
+      blockGamut,
+      spanGamut,
+    ) {
       // GitHub-flavored fenced code blocks
-      function fencedCodeBlock(whole, indentation, fence, infoString,
-                               contents) {
+      function fencedCodeBlock(
+        whole,
+        indentation,
+        fence,
+        infoString,
+        contents,
+      ) {
         contents = contents.replace(/&/g, '&amp;');
         contents = contents.replace(/</g, '&lt;');
         contents = contents.replace(/>/g, '&gt;');
@@ -594,168 +695,189 @@ let UI = {
         }
         return `<pre><code${className}>${contents}</code></pre>`;
       }
-      text = text.replace(/^( {0,3})(`{3,})([^`\n]*)\n(.*?\n|) {0,3}\2`* *$/gsm,
-                          fencedCodeBlock);
+      text = text.replace(
+        /^( {0,3})(`{3,})([^`\n]*)\n(.*?\n|) {0,3}\2`* *$/gms,
+        fencedCodeBlock,
+      );
       return text.replace(
-          /^( {0,3})((?:~T){3,})(?!~)([^\n]*)\n(.*?\n|) {0,3}\2(?:~T)* *$/gsm,
-          fencedCodeBlock);
+        /^( {0,3})((?:~T){3,})(?!~)([^\n]*)\n(.*?\n|) {0,3}\2(?:~T)* *$/gms,
+        fencedCodeBlock,
+      );
     });
     converter.hooks.chain('preBlockGamut', function(text, blockGamut) {
       // Sample I/O table.
-      let settings = converter._settings || options.settings || {cases: {}};
+      let settings = converter._settings || options.settings || { cases: {} };
       return text.replace(
-          /^( {0,3}\|\| *(?:input|examplefile) *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
-          function(whole, inner) {
-            var matches = inner.split(
-                / {0,3}\|\| *(examplefile|input|output|description) *\n/);
-            var result = '';
-            var description_column = false;
-            for (var i = 1; i < matches.length; i += 2) {
-              if (matches[i] == 'description') {
-                description_column = true;
-                break;
-              }
+        /^( {0,3}\|\| *(?:input|examplefile) *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
+        function(whole, inner) {
+          var matches = inner.split(
+            / {0,3}\|\| *(examplefile|input|output|description) *\n/,
+          );
+          var result = '';
+          var description_column = false;
+          for (var i = 1; i < matches.length; i += 2) {
+            if (matches[i] == 'description') {
+              description_column = true;
+              break;
             }
-            result += '<thead><tr>';
-            result += `<th>${T.wordsInput}</th>`;
-            result += `<th>${T.wordsOutput}</th>`;
-            if (description_column) {
-              result += `<th>${T.wordsDescription}</th>`;
-            }
-            result += '</tr></thead>';
-            var first_row = true;
-            var columns = 0;
-            result += '<tbody>';
-            for (var i = 1; i < matches.length; i += 2) {
-              if (matches[i] == 'description') {
-                result += '<td>' + blockGamut(matches[i + 1]) + '</td>';
-                columns++;
-              } else {
-                if (matches[i] == 'input' || matches[i] == 'examplefile') {
-                  if (!first_row) {
-                    while (columns < (description_column ? 3 : 2)) {
-                      result += '<td></td>';
-                      columns++;
-                    }
-                    result += '</tr>';
-                  }
-                  first_row = false;
-                  result += '<tr>';
-                  columns = 0;
-                }
-
-                if (matches[i] == 'examplefile') {
-                  let exampleFilename = matches[i + 1].trim();
-                  let exampleFile = {
-                    'in': `{{examples/${exampleFilename}.in}}`,
-                    out: `{{examples/${exampleFilename}.out}}`,
-                  };
-                  if (settings.cases.hasOwnProperty(exampleFilename)) {
-                    exampleFile = settings.cases[exampleFilename];
-                  }
-                  result +=
-                      `<td><pre>${exampleFile['in'].replace(/\s+$/, '')}</pre></td>`;
-                  result +=
-                      `<td><pre>${exampleFile.out.replace(/\s+$/, '')}</pre></td>`;
-                  columns += 2;
-                } else {
-                  result +=
-                      `<td><pre>${matches[i + 1].replace(/\s+$/, '')}</pre></td>`;
-                  columns++;
-                }
-              }
-            }
-            while (columns < (description_column ? 3 : 2)) {
-              result += '<td></td>';
+          }
+          result += '<thead><tr>';
+          result += `<th>${T.wordsInput}</th>`;
+          result += `<th>${T.wordsOutput}</th>`;
+          if (description_column) {
+            result += `<th>${T.wordsDescription}</th>`;
+          }
+          result += '</tr></thead>';
+          var first_row = true;
+          var columns = 0;
+          result += '<tbody>';
+          for (var i = 1; i < matches.length; i += 2) {
+            if (matches[i] == 'description') {
+              result += '<td>' + blockGamut(matches[i + 1]) + '</td>';
               columns++;
+            } else {
+              if (matches[i] == 'input' || matches[i] == 'examplefile') {
+                if (!first_row) {
+                  while (columns < (description_column ? 3 : 2)) {
+                    result += '<td></td>';
+                    columns++;
+                  }
+                  result += '</tr>';
+                }
+                first_row = false;
+                result += '<tr>';
+                columns = 0;
+              }
+
+              if (matches[i] == 'examplefile') {
+                let exampleFilename = matches[i + 1].trim();
+                let exampleFile = {
+                  in: `{{examples/${exampleFilename}.in}}`,
+                  out: `{{examples/${exampleFilename}.out}}`,
+                };
+                if (settings.cases.hasOwnProperty(exampleFilename)) {
+                  exampleFile = settings.cases[exampleFilename];
+                }
+                result += `<td><pre>${exampleFile['in'].replace(
+                  /\s+$/,
+                  '',
+                )}</pre></td>`;
+                result += `<td><pre>${exampleFile.out.replace(
+                  /\s+$/,
+                  '',
+                )}</pre></td>`;
+                columns += 2;
+              } else {
+                result += `<td><pre>${matches[i + 1].replace(
+                  /\s+$/,
+                  '',
+                )}</pre></td>`;
+                columns++;
+              }
             }
-            result += '</tr></tbody>';
+          }
+          while (columns < (description_column ? 3 : 2)) {
+            result += '<td></td>';
+            columns++;
+          }
+          result += '</tr></tbody>';
 
-            return '<table class="sample_io">\n' + result + '\n</table>\n';
-          });
+          return '<table class="sample_io">\n' + result + '\n</table>\n';
+        },
+      );
     });
-    converter.hooks.chain(
-        'preBlockGamut', function(text, blockGamut, spanGamut) {
-          // GitHub-flavored Markdown table.
-          return text.replace(
-              /^ {0,3}\|[^\n]*\|[ \t]*(\n {0,3}\|[^\n]*\|[ \t]*)+$/gm,
-              function(whole, inner) {
-                var cells = whole.trim().split('\n').map(function(line) {
-                  return line.match(/(\\\||[^|])+/g)
-                      .map(function(value) {
-                        return value.trim().replace(/\\\|/g, '|');
-                      });
-                });
-
-                // The header row must match the delimiter row in the number of
-                // cells. If not, a table will not be recognized.
-                if (cells.length < 2) {
-                  return whole;
-                }
-
-                var header = cells[0];
-                var delimiter = cells[1];
-                var alignment = [];
-                if (header.length != delimiter.length) {
-                  return whole;
-                }
-                cells = cells.slice(2);
-
-                // The delimiter row consists of cells whose only content are
-                // hyphens (-), and optionally, a leading or trailing colon (:),
-                // or
-                // both, to indicate left, right, or center alignment
-                // respectively.
-                for (var i = 0; i < delimiter.length; i++) {
-                  if (!delimiter[i].match(/^:?-+:?$/)) {
-                    return whole;
-                  }
-                  if (delimiter[i][0] == ':' &&
-                      delimiter[i][delimiter[i].length - 1] == ':') {
-                    alignment.push('center');
-                  } else if (delimiter[i][delimiter[i].length - 1] == ':') {
-                    alignment.push('right');
-                  } else {
-                    alignment.push('');
-                  }
-                }
-
-                function alignedTag(tagName, align) {
-                  return '<' + tagName +
-                         (align ? ' align="' + align + '"' : '') + '>';
-                }
-
-                var text = '<table>\n';
-                text += '<thead>\n';
-                text += '<tr>\n';
-                for (var i = 0; i < header.length; i++) {
-                  text += alignedTag('th', alignment[i]) +
-                          spanGamut(header[i]) + '</th>\n';
-                }
-                text += '</tr>\n';
-                text += '</thead>\n';
-                if (cells.length) {
-                  text += '<tbody>\n';
-                  for (var i = 0; i < cells.length; i++) {
-                    text += '<tr>\n';
-                    var row = cells[i];
-                    for (var j = 0; j < Math.min(alignment.length, row.length);
-                         j++) {
-                      text += alignedTag('td', alignment[j]) +
-                              spanGamut(row[j]) + '</td>\n';
-                    }
-                    for (var j = row.length; j < alignment.length; j++) {
-                      text += alignedTag('td', alignment[j]) + '</td>\n';
-                    }
-                    text += '</tr>\n';
-                  }
-                  text += '</tbody>\n';
-                }
-                text += '</table>\n';
-
-                return text;
+    converter.hooks.chain('preBlockGamut', function(
+      text,
+      blockGamut,
+      spanGamut,
+    ) {
+      // GitHub-flavored Markdown table.
+      return text.replace(
+        /^ {0,3}\|[^\n]*\|[ \t]*(\n {0,3}\|[^\n]*\|[ \t]*)+$/gm,
+        function(whole, inner) {
+          var cells = whole
+            .trim()
+            .split('\n')
+            .map(function(line) {
+              return line.match(/(\\\||[^|])+/g).map(function(value) {
+                return value.trim().replace(/\\\|/g, '|');
               });
-        });
+            });
+
+          // The header row must match the delimiter row in the number of
+          // cells. If not, a table will not be recognized.
+          if (cells.length < 2) {
+            return whole;
+          }
+
+          var header = cells[0];
+          var delimiter = cells[1];
+          var alignment = [];
+          if (header.length != delimiter.length) {
+            return whole;
+          }
+          cells = cells.slice(2);
+
+          // The delimiter row consists of cells whose only content are
+          // hyphens (-), and optionally, a leading or trailing colon (:),
+          // or
+          // both, to indicate left, right, or center alignment
+          // respectively.
+          for (var i = 0; i < delimiter.length; i++) {
+            if (!delimiter[i].match(/^:?-+:?$/)) {
+              return whole;
+            }
+            if (
+              delimiter[i][0] == ':' &&
+              delimiter[i][delimiter[i].length - 1] == ':'
+            ) {
+              alignment.push('center');
+            } else if (delimiter[i][delimiter[i].length - 1] == ':') {
+              alignment.push('right');
+            } else {
+              alignment.push('');
+            }
+          }
+
+          function alignedTag(tagName, align) {
+            return (
+              '<' + tagName + (align ? ' align="' + align + '"' : '') + '>'
+            );
+          }
+
+          var text = '<table>\n';
+          text += '<thead>\n';
+          text += '<tr>\n';
+          for (var i = 0; i < header.length; i++) {
+            text +=
+              alignedTag('th', alignment[i]) + spanGamut(header[i]) + '</th>\n';
+          }
+          text += '</tr>\n';
+          text += '</thead>\n';
+          if (cells.length) {
+            text += '<tbody>\n';
+            for (var i = 0; i < cells.length; i++) {
+              text += '<tr>\n';
+              var row = cells[i];
+              for (var j = 0; j < Math.min(alignment.length, row.length); j++) {
+                text +=
+                  alignedTag('td', alignment[j]) +
+                  spanGamut(row[j]) +
+                  '</td>\n';
+              }
+              for (var j = row.length; j < alignment.length; j++) {
+                text += alignedTag('td', alignment[j]) + '</td>\n';
+              }
+              text += '</tr>\n';
+            }
+            text += '</tbody>\n';
+          }
+          text += '</table>\n';
+
+          return text;
+        },
+      );
+    });
 
     converter.makeHtmlWithImages = function(markdown, imageMapping, settings) {
       try {
@@ -772,23 +894,22 @@ let UI = {
   },
 };
 
-export {UI as default};
+export { UI as default };
 
-$(document)
-    .ajaxError(function(e, xhr, settings, exception) {
-      if (xhr.status == 499 || xhr.readyState != 4) {
-        // If we cancel the connection, let's just swallow the error since
-        // the user is not going to see it.
-        return;
-      }
-      try {
-        var responseText = xhr.responseText;
-        var response = {};
-        if (responseText) {
-          response = JSON.parse(responseText);
-        }
-        console.error(settings.url, xhr.status, response.error, response);
-      } catch (e) {
-        console.error(settings.url, xhr.status, xhr.responseText);
-      }
-    });
+$(document).ajaxError(function(e, xhr, settings, exception) {
+  if (xhr.status == 499 || xhr.readyState != 4) {
+    // If we cancel the connection, let's just swallow the error since
+    // the user is not going to see it.
+    return;
+  }
+  try {
+    var responseText = xhr.responseText;
+    var response = {};
+    if (responseText) {
+      response = JSON.parse(responseText);
+    }
+    console.error(settings.url, xhr.status, response.error, response);
+  } catch (e) {
+    console.error(settings.url, xhr.status, xhr.responseText);
+  }
+});
