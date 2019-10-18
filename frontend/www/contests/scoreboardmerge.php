@@ -1,4 +1,3 @@
 <?php
 require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
-$constant = 'constant';
-$smarty->display("{$constant('OMEGAUP_ROOT')}/templates/scoreboardmerge.tpl");
+$smarty->display(sprintf('%s/templates/scoreboardmerge.tpl', OMEGAUP_ROOT));

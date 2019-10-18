@@ -153,8 +153,7 @@
       <code>function ($value) {</code>
       <code>function ($value) {</code>
     </MissingClosureReturnType>
-    <MissingParamType occurrences="3">
-      <code>$callback_user_function</code>
+    <MissingParamType occurrences="2">
       <code>$idx</code>
       <code>$admission_mode</code>
     </MissingParamType>
@@ -171,11 +170,7 @@
       <code>apiDownload</code>
       <code>isPublic</code>
     </MissingReturnType>
-    <MixedArgument occurrences="74">
-      <code>$callback_user_function</code>
-      <code>$contest['start_time']</code>
-      <code>$contest['finish_time']</code>
-      <code>$contest['last_updated']</code>
+    <MixedArgument occurrences="70">
       <code>$contestProblemset</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
@@ -259,14 +254,11 @@
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="30">
+    <MixedArrayAccess occurrences="27">
       <code>$contestInfo['window_length']</code>
       <code>$contestInfo['finish_time']</code>
       <code>$contestInfo['start_time']</code>
       <code>$contestInfo['window_length']</code>
-      <code>$contest['start_time']</code>
-      <code>$contest['finish_time']</code>
-      <code>$contest['last_updated']</code>
       <code>$result['admission_mode']</code>
       <code>$result['start_time']</code>
       <code>$result['finish_time']</code>
@@ -291,8 +283,7 @@
       <code>$caseData['meta']</code>
       <code>$caseData['out_diff']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="46">
-      <code>$query</code>
+    <MixedAssignment occurrences="41">
       <code>$contests</code>
       <code>$contests</code>
       <code>$contests</code>
@@ -301,9 +292,7 @@
       <code>$contestInfo['duration']</code>
       <code>$addedContests[]</code>
       <code>$contests</code>
-      <code>$query</code>
       <code>$contests</code>
-      <code>$contest</code>
       <code>$addedContests[]</code>
       <code>$contestProblemset</code>
       <code>$result</code>
@@ -433,7 +422,7 @@
       <code>$problemset</code>
       <code>$problemsetIdentity</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="12">
+    <PossiblyNullPropertyFetch occurrences="10">
       <code>$original_contest-&gt;alias</code>
       <code>$original_contest-&gt;problemset_id</code>
       <code>$acl-&gt;owner_id</code>
@@ -1985,7 +1974,7 @@
     </MissingReturnType>
   </file>
   <file src="frontend/server/src/DAO/Contests.php">
-    <MissingParamType occurrences="21">
+    <MissingParamType occurrences="14">
       <code>$title</code>
       <code>$alias</code>
       <code>$problemset_id</code>
@@ -1997,29 +1986,22 @@
       <code>$pageSize</code>
       <code>$order</code>
       <code>$orderType</code>
-      <code>$user_id</code>
       <code>$page</code>
       <code>$pageSize</code>
       <code>$identity_id</code>
       <code>$page</code>
       <code>$pageSize</code>
-      <code>$query</code>
-      <code>$user_id</code>
       <code>$page</code>
       <code>$pageSize</code>
-      <code>$query</code>
-      <code>$query</code>
-      <code>$query</code>
       <code>$problemset_id</code>
       <code>$problemset_id</code>
-      <code>$query</code>
       <code>$contestId</code>
       <code>$contestId</code>
     </MissingParamType>
     <MissingPropertyType occurrences="1">
       <code>$getContestsColumns</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="15">
+    <MissingReturnType occurrences="13">
       <code>getByTitle</code>
       <code>getByAliasWithExtraInformation</code>
       <code>getByProblemset</code>
@@ -2027,8 +2009,6 @@
       <code>hasFinished</code>
       <code>getContestsParticipated</code>
       <code>getAllContestsAdminedByIdentity</code>
-      <code>getAllContestsOwnedByUser</code>
-      <code>getContestsParticipating</code>
       <code>getRecentPublicContests</code>
       <code>getAllPublicContests</code>
       <code>getAllContests</code>
@@ -2036,56 +2016,27 @@
       <code>getNeedsInformation</code>
       <code>requestsUserInformation</code>
     </MissingReturnType>
-    <MixedArgument occurrences="5">
+    <MixedArgument occurrences="4">
       <code>$order</code>
       <code>$params</code>
       <code>$params</code>
       <code>$params</code>
-      <code>$query</code>
     </MixedArgument>
-    <MixedAssignment occurrences="10">
+    <MixedAssignment occurrences="7">
       <code>$offset</code>
       <code>$offset</code>
       <code>$columns</code>
       <code>$offset</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
       <code>$columns</code>
       <code>$offset</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
       <code>$columns</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
       <code>$offset</code>
       <code>$columns</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
       <code>$offset</code>
       <code>$columns</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
-      <code>$params[]</code>
       <code>$requestsUsersInfo</code>
     </MixedAssignment>
-    <MixedOperand occurrences="5">
+    <MixedOperand occurrences="3">
       <code>$page</code>
       <code>$page</code>
       <code>($page - 1) * $pageSize</code>

@@ -2,7 +2,6 @@
 require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 try {
-    /** @var array{IS_ORGANIZER: bool, payload: array{countries: array<int, \OmegaUp\DAO\VO\Countries>}} */
     $result = \OmegaUp\Controllers\Group::getGroupEditDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
@@ -14,5 +13,4 @@ foreach ($result as $key => $value) {
     $smarty->assign($key, $value);
 }
 
-$constant = 'constant';
-$smarty->display("{$constant('OMEGAUP_ROOT')}/templates/group.edit.tpl");
+$smarty->display(sprintf('%s/templates/group.edit.tpl', OMEGAUP_ROOT));

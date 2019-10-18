@@ -1,4 +1,3 @@
 <?php
 require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
-$constant = 'constant';
-$smarty->display("{$constant('OMEGAUP_ROOT')}/templates/group.new.tpl");
+$smarty->display(sprintf('%s/templates/group.new.tpl', OMEGAUP_ROOT));

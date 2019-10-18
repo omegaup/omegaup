@@ -228,12 +228,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Callback to get contests list, depending on a given method
      * @param \OmegaUp\Request $r
-     * @param $callbackUserFunction
-     * @return array{status: string, contests: array{title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]}
+     * @param callback(int, int, int, string):array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string} $callbackUserFunction
+     * @return array{status: string, contests: array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: string, start_time: int|null, finish_time: int|null, last_updated: int|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string, finish_time: int|null}[]}
      */
     private static function getContestListInternal(
         \OmegaUp\Request $r,
-        $callbackUserFunction
+        callback $callbackUserFunction
     ): array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
@@ -241,13 +241,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
         $query = $r['query'];
-        $contests = null;
-        $identity_id = $callbackUserFunction ==
-            '\OmegaUp\DAO\Contests::getContestsParticipating'
-            ? $r->identity->identity_id : $r->user->user_id;
-        $contests = call_user_func(
-            $callbackUserFunction,
-            $identity_id,
+        $contests = $callbackUserFunction(
+            $r->identity->identity_id,
             $page,
             $pageSize,
             $query
@@ -287,9 +282,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
+
         return self::getContestListInternal(
             $r,
-            '\OmegaUp\DAO\Contests::getAllContestsOwnedByUser'
+            function (
+                int $identityId,
+                int $page,
+                int $pageSize,
+                string $query
+            ) {
+                return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
+                    $identityId,
+                    $page,
+                    $pageSize
+                );
+            }
         );
     }
 
@@ -303,7 +310,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         return self::getContestListInternal(
             $r,
-            '\OmegaUp\DAO\Contests::getContestsParticipating'
+            function (
+                int $identityId,
+                int $page,
+                int $pageSize,
+                string $query
+            ) {
+                return \OmegaUp\DAO\Contests::getContestsParticipating(
+                    $identityId,
+                    $page,
+                    $pageSize,
+                    $query
+                );
+            }
         );
     }
 
@@ -502,11 +521,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{status: string, contests: array{title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]}, privateContestsAlert: bool}
+     * @return array{payload: array{status: string, contests: array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: string, start_time: int|null, finish_time: int|null, last_updated: int|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]}, privateContestsAlert: bool}
      */
     public static function getContestListMineForSmarty(
         \OmegaUp\Request $r
-    ) : array {
+    ): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
@@ -526,21 +545,34 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'payload' => self::getContestListInternal(
                 $r,
-                '\OmegaUp\DAO\Contests::getAllContestsOwnedByUser'
+                function (
+                    int $identityId,
+                    int $page,
+                    int $pageSize,
+                    string $query
+                ) {
+                    return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
+                        $identityId,
+                        $page,
+                        $pageSize
+                    );
+                }
             ),
             'privateContestsAlert' => $privateContestsAlert,
         ];
     }
 
     /**
-     * @return array{LANGUAGES: array<int, string>, IS_UPDATE?: int}
+     * @return array{LANGUAGES: string[], IS_UPDATE?: int}
      */
     public static function getContestNewDetailsForSmarty(
         \OmegaUp\Request $r,
         bool $isUpdate = false
-    ) : array {
+    ): array {
         $result = [
-            'LANGUAGES' => array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES),
+            'LANGUAGES' => array_keys(
+                \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
+            ),
         ];
         if ($isUpdate === true) {
             $result['IS_UPDATE'] = 1;

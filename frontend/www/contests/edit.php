@@ -2,7 +2,6 @@
 require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 try {
-    /** @var array{LANGUAGES: array<int, string>, IS_UPDATE?: int} */
     $result = \OmegaUp\Controllers\Contest::getContestNewDetailsForSmarty(
         new \OmegaUp\Request($_REQUEST),
         /*$isUpdate=*/true
@@ -15,5 +14,4 @@ foreach ($result as $key => $value) {
     $smarty->assign($key, $value);
 }
 
-$constant = 'constant';
-$smarty->display("{$constant('OMEGAUP_ROOT')}/templates/contest.edit.tpl");
+$smarty->display(sprintf('%s/templates/contest.edit.tpl', OMEGAUP_ROOT));

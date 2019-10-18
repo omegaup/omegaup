@@ -259,12 +259,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
     /**
      * Returns all contests owned by a user.
+     *
+     * @return array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]
      */
     final public static function getAllContestsOwnedByUser(
-        $user_id,
-        $page = 1,
-        $pageSize = 1000
-    ) {
+        int $identityId,
+        int $page = 1,
+        int $pageSize = 1000
+    ): array {
         $offset = ($page - 1) * $pageSize;
         $sql = '
             SELECT
@@ -276,29 +278,34 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             INNER JOIN
                 ACLs a ON a.acl_id = c.acl_id
             INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            INNER JOIN
                 Problemsets p ON p.problemset_id = c.problemset_id
             WHERE
-                a.owner_id = ?
+                u.main_identity_id = ?
             ORDER BY
                 c.contest_id DESC
             LIMIT ?, ?;';
         $params = [
-            $user_id,
+            $identityId,
             intval($offset),
             intval($pageSize),
         ];
 
+        /** @var array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: int, submissions_gap: int, feedback: string, penalty: int, penalty_type: string, penalty_calc_policy: string, show_scoreboard_after: int, urgent: int, languages: null|string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
      * Returns all contests where a user is participating in.
+     *
+     * @return array{contest_id: int, problemset_id: int, title: string, description: string, original_finish_time: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[]
      */
     final public static function getContestsParticipating(
-        $identity_id,
-        $page = 1,
-        $pageSize = 1000,
-        $query = null
+        int $identityId,
+        int $page = 1,
+        int $pageSize = 1000,
+        ?string $query = null
     ) {
         $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql(
             \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE
@@ -333,7 +340,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 recommended DESC,
                 finish_time DESC
             LIMIT ?, ?;";
-        $params[] = $identity_id;
+        $params[] = $identityId;
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
@@ -343,6 +350,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
+        /** @var array{contest_id: int, problemset_id: int, title: string, description: string, original_finish_time: string, start_time: int, finish_time: int, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, recommended: int, scoreboard_url: string, scoreboard_url_admin: string}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

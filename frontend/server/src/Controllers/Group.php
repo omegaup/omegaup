@@ -322,11 +322,11 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{IS_ORGANIZER: bool, payload: array{countries: array<int, \OmegaUp\DAO\VO\Countries>}}
+     * @return array{IS_ORGANIZER: bool, payload: array{countries: \OmegaUp\DAO\VO\Countries[]}}
      */
     public static function getGroupEditDetailsForSmarty(
         \OmegaUp\Request $r
-    ) : array {
+    ): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
@@ -338,15 +338,19 @@ class Group extends \OmegaUp\Controllers\Controller {
         return [
             'IS_ORGANIZER' => $isOrganizer,
             'payload' => [
-                'countries' => \OmegaUp\DAO\Countries::getAll(null, 100, 'name'),
+                'countries' => \OmegaUp\DAO\Countries::getAll(
+                    null,
+                    100,
+                    'name'
+                ),
             ],
         ];
     }
 
     /**
-     * @return array{payload: array{groups: array<array-key, array{alias: string, create_time: int, description: string, name: string}>}}
+     * @return array{payload: array{groups: array{alias: string, create_time: int, description: string, name: string}[]}}
      */
-    public static function getGroupListForSmarty(\OmegaUp\Request $r) : array {
+    public static function getGroupListForSmarty(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
