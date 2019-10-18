@@ -40,17 +40,20 @@ import Vue from 'vue';
 Vue.use(AsyncComputed);
 
 function escapeCsv(cell) {
-  if (typeof(cell) === 'undefined' || typeof(cell) === 'null') {
+  if (typeof cell === 'undefined' || typeof cell === 'null') {
     return '';
   }
-  if (typeof(cell) === 'number') {
+  if (typeof cell === 'number') {
     cell = Math.round(cell);
   }
-  if (typeof(cell) !== 'string') {
+  if (typeof cell !== 'string') {
     cell = JSON.stringify(cell);
   }
-  if (cell.indexOf(',') === -1 && cell.indexOf('"') === -1 &&
-      cell.indexOf("'") === -1) {
+  if (
+    cell.indexOf(',') === -1 &&
+    cell.indexOf('"') === -1 &&
+    cell.indexOf("'") === -1
+  ) {
     return cell;
   }
   return '"' + cell.replace('"', '""') + '"';
@@ -58,31 +61,39 @@ function escapeCsv(cell) {
 
 function escapeXml(str) {
   if (str === null) return '';
-  return str.replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/'/g, '&apos;')
-      .replace(/"/g, '&quot;');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/'/g, '&apos;')
+    .replace(/"/g, '&quot;');
 }
 
 function toCsv(table) {
-  return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
+  return table.map(row => row.map(escapeCsv).join(',')).join('\r\n');
 }
 
 function toOds(courseName, table) {
   let result = '<table:table table:name="' + escapeXml(courseName) + '">\n';
-  result += '<table:table-column table:number-columns-repeated="' +
-            table[0].length + '"/>\n';
+  result +=
+    '<table:table-column table:number-columns-repeated="' +
+    table[0].length +
+    '"/>\n';
   for (let row of table) {
     result += '<table:table-row>\n';
     for (let cell of row) {
       if (typeof cell === 'number') {
-        result += '<table:table-cell office:value-type="float" office:value="' +
-                  cell + '"><text:p>' + cell.toPrecision(2) +
-                  '</text:p></table:table-cell>';
+        result +=
+          '<table:table-cell office:value-type="float" office:value="' +
+          cell +
+          '"><text:p>' +
+          cell.toPrecision(2) +
+          '</text:p></table:table-cell>';
       } else {
-        result += '<table:table-cell office:value-type="string"><text:p>' +
-                  escapeXml(cell) + '</text:p></table:table-cell>';
+        result +=
+          '<table:table-cell office:value-type="string"><text:p>' +
+          escapeXml(cell) +
+          '</text:p></table:table-cell>';
       }
     }
     result += '</table:table-row>\n';
@@ -98,19 +109,24 @@ export default {
     students: Array,
     assignments: Array,
   },
-  data: function() { return {};},
+  data: function() {
+    return {};
+  },
   methods: {
     score: function(student, assignment) {
       let score = student.progress[assignment.alias] || '0';
       return parseFloat(score);
     },
     studentProgressUrl: function(student) {
-      return '/course/' + this.course.alias + '/student/' + student.username +
-             '/';
+      return (
+        '/course/' + this.course.alias + '/student/' + student.username + '/'
+      );
     },
   },
   computed: {
-    courseUrl: function() { return '/course/' + this.course.alias + '/';},
+    courseUrl: function() {
+      return '/course/' + this.course.alias + '/';
+    },
     progressTable: function() {
       let table = [];
       let header = [this.T.profileUsername, this.T.wordsName];
@@ -127,13 +143,17 @@ export default {
       }
       return table;
     },
-    csvFilename: function() { return this.course.alias + '.csv';},
+    csvFilename: function() {
+      return this.course.alias + '.csv';
+    },
     csvDataUrl: function() {
       let table = this.progressTable;
-      let blob = new Blob([toCsv(table)], {type: 'text/csv;charset=utf-8;'});
+      let blob = new Blob([toCsv(table)], { type: 'text/csv;charset=utf-8;' });
       return window.URL.createObjectURL(blob);
     },
-    odsFilename: function() { return this.course.alias + '.ods';},
+    odsFilename: function() {
+      return this.course.alias + '.ods';
+    },
   },
   asyncComputed: {
     async odsDataUrl() {
@@ -143,7 +163,9 @@ export default {
       });
       let metaInf = zip.folder('META-INF');
       let table = this.progressTable;
-      metaInf.file('manifest.xml', `<?xml version="1.0" encoding="UTF-8"?>
+      metaInf.file(
+        'manifest.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
 <manifest:manifest
     xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
     manifest:version="1.2">
@@ -152,18 +174,27 @@ export default {
  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
  <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
  <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
-</manifest:manifest>`);
-      zip.file('styles.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</manifest:manifest>`,
+      );
+      zip.file(
+        'styles.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     office:version="1.2">
-</office:document-styles>`);
-      zip.file('settings.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</office:document-styles>`,
+      );
+      zip.file(
+        'settings.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-settings
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     office:version="1.2">
-</office:document-settings>`);
-      zip.file('meta.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</office:document-settings>`,
+      );
+      zip.file(
+        'meta.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-meta
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
@@ -171,23 +202,30 @@ export default {
   <office:meta>
     <meta:generator>omegaUp</meta:generator>
   </office:meta>
-</office:document-meta>`);
-      zip.file('content.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</office:document-meta>`,
+      );
+      zip.file(
+        'content.xml',
+        `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     office:version="1.2">
   <office:body>
-    <office:spreadsheet>` + toOds(this.course.name, table) +
-                                  `</office:spreadsheet>
+    <office:spreadsheet>` +
+          toOds(this.course.name, table) +
+          `</office:spreadsheet>
   </office:body>
-</office:document-content>`);
-      return window.URL.createObjectURL(await zip.generateAsync({
-        type: 'blob',
-        mimeType: 'application/ods',
-        compression: 'DEFLATE',
-      }));
+</office:document-content>`,
+      );
+      return window.URL.createObjectURL(
+        await zip.generateAsync({
+          type: 'blob',
+          mimeType: 'application/ods',
+          compression: 'DEFLATE',
+        }),
+      );
     },
   },
 };
