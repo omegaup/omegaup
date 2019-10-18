@@ -220,11 +220,11 @@ class BadgesTest extends BadgesTestCase {
         // - User 2 will receive: Problem Setter and Contest Manager badges
         ['user' => $userOne, 'identity' => $identityOne] = UserFactory::createUser();
         ['user' => $userTwo, 'identity' => $identityTwo] = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($userOne);
-        ProblemsFactory::createProblemWithAuthor($userTwo);
+        ProblemsFactory::createProblemWithAuthor($identityOne);
+        ProblemsFactory::createProblemWithAuthor($identityTwo);
         ContestsFactory::createContest(
             new ContestParams(
-                ['contestDirector' => $userTwo]
+                ['contestDirector' => $identityTwo]
             )
         );
         $expectedUserOneResults = ['problemSetter'];
@@ -296,7 +296,7 @@ class BadgesTest extends BadgesTestCase {
 
     public function testGetAssignationTime() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($user);
+        ProblemsFactory::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
         Utils::RunAssignBadges();
@@ -330,7 +330,7 @@ class BadgesTest extends BadgesTestCase {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // For some reason, this method creates a new user also.
-        ProblemsFactory::createProblemWithAuthor($user);
+        ProblemsFactory::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
         Utils::RunAssignBadges();
