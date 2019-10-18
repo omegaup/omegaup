@@ -53,20 +53,20 @@ class QualityNominationFactory {
     /**
      * @param ScopedLoginToken $login
      * @param string $problemAlias
-     * @param null|float $difficulty
-     * @param null|float $quality
+     * @param null|int $difficulty
+     * @param null|int $quality
      * @param null|string[] $tags
      * @param bool $beforeAC
-     * @return array{status: string, qualitynomination_id: int}
+     * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createSuggestion(
-        ScopedLoginToken $login,
+        \OmegaUp\DAO\VO\Users $user,
         string $problemAlias,
-        ?float $difficulty,
-        ?float $quality,
+        ?int $difficulty,
+        ?int $quality,
         ?array $tags,
         bool $beforeAC
-    ): array {
+    ): \OmegaUp\DAO\VO\QualityNominations {
         $contents = [];
         if (!is_null($difficulty)) {
             $contents['difficulty'] = $difficulty;
@@ -81,7 +81,7 @@ class QualityNominationFactory {
             $contents['before_ac'] = true;
         }
         return self::createQualityNomination(
-            $login,
+            $user,
             $problemAlias,
             'suggestion',
             $contents
@@ -90,25 +90,26 @@ class QualityNominationFactory {
 
     /**
      * @param array{difficulty?: float, quality?: float, tags?: string[], before_AC?: boolean} $contents
-     * @return array{status: string, qualitynomination_id: int}
+     * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createQualityNomination(
-        ScopedLoginToken $login,
+        \OmegaUp\DAO\VO\Users $user,
         string $problemAlias,
         string $type,
         $contents
-    ) {
-        $contentsJson = json_encode($contents);
-        $request = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemAlias,
-            'nomination' => $type,
-            'contents' => $contentsJson,
-        ]);
-        /** @var array{status: string, qualitynomination_id: int} */
-        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(
-            $request
+    ): \OmegaUp\DAO\VO\QualityNominations {
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        return \OmegaUp\Controllers\QualityNomination::createNomination(
+            $problem,
+            $user,
+            $type,
+            $contents
         );
-        return $qualitynomination;
     }
 }

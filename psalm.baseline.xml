@@ -1360,7 +1360,7 @@
     <PossiblyNullArgument occurrences="2">
       <code>$qualitynominationlog-&gt;rationale</code>
     </PossiblyNullArgument>
-    <PossiblyNullPropertyFetch occurrences="2"/>
+    <PossiblyNullPropertyFetch occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Reset.php">
     <MissingParamType occurrences="2">
