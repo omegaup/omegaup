@@ -39,7 +39,9 @@ GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
                                       AND qn.`qualitynomination_id` IN (
                                           SELECT MAX(qualitynomination_id)
                                           FROM `QualityNominations`
-                                          GROUP BY user_id, problem_id
+                                          WHERE
+                                            `user_id` = qn.`user_id` AND
+                                            `problem_id` = qn.`problem_id`
                                       );"""
 
 GET_PROBLEM_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
@@ -52,7 +54,9 @@ GET_PROBLEM_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
                                         AND qn.`qualitynomination_id` IN (
                                           SELECT MAX(qualitynomination_id)
                                           FROM `QualityNominations`
-                                          GROUP BY user_id, problem_id
+                                          WHERE
+                                            `user_id` = qn.`user_id` AND
+                                            `problem_id` = qn.`problem_id`
                                         );"""
 
 # weighting factors according to user's range
@@ -97,25 +101,16 @@ def fill_rank_cutoffs(dbconn):
         return [rank_cutoff(row[0], row[1]) for row in cur]
 
 
-def get_weighting_factor(score, rank_cutoffs, before_ac):
+def get_weighting_factor(score, rank_cutoffs, weighting_factors):
     '''Gets the user vote weighting factor based on nomination status
     (before_AC or not), user's score stored in User_Rank table and
     according to the User_Rank_Cutoffs scores and classnames'''
-    if not before_ac:
-        if score is None:
-            return WEIGHTING_FACTORS['user-rank-unranked']
-        for cutoff in rank_cutoffs:
-            if cutoff.score <= score:
-                return WEIGHTING_FACTORS[cutoff.classname]
-        return WEIGHTING_FACTORS['user-rank-unranked']
-
-    # Before AC
     if score is None:
-        return BEFORE_AC_WEIGHTING_FACTORS['user-rank-unranked']
+        return weighting_factors['user-rank-unranked']
     for cutoff in rank_cutoffs:
         if cutoff.score <= score:
-            return BEFORE_AC_WEIGHTING_FACTORS[cutoff.classname]
-    return BEFORE_AC_WEIGHTING_FACTORS['user-rank-unranked']
+            return weighting_factors[cutoff.classname]
+    return weighting_factors['user-rank-unranked']
 
 
 def get_global_quality_and_difficulty_average(dbconn, rank_cutoffs):
@@ -138,10 +133,12 @@ def get_global_quality_and_difficulty_average(dbconn, rank_cutoffs):
                 logging.exception('Failed to parse contents')
                 continue
 
-            before_ac = 'before_ac' in contents and contents['before_ac']
+            before_ac = contents.get('before_ac', False)
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score, rank_cutoffs,
-                                                    before_ac)
+            weighting_factor = get_weighting_factor(
+                user_score, rank_cutoffs,
+                WEIGHTING_FACTORS if not before_ac else
+                BEFORE_AC_WEIGHTING_FACTORS)
             if 'quality' in contents and contents['quality'] is not None:
                 quality_sum += weighting_factor * contents['quality']
                 quality_n += weighting_factor
@@ -172,10 +169,12 @@ def get_problem_aggregates(dbconn, problem_id, rank_cutoffs):
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
-            before_ac = 'before_ac' in contents and contents['before_ac']
+            before_ac = contents.get('before_ac', False)
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score, rank_cutoffs,
-                                                    before_ac)
+            weighting_factor = get_weighting_factor(
+                user_score, rank_cutoffs,
+                WEIGHTING_FACTORS if not before_ac else
+                BEFORE_AC_WEIGHTING_FACTORS)
             if 'quality' in contents and contents['quality'] is not None:
                 # TODO: This is just provisional until
                 # obtaining the before_ac weighting factors
