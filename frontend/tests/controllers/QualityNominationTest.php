@@ -1147,7 +1147,25 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($i = 0; $i < 5; $i++) {
             ['user' => $userData[$i], 'identity' => $identityData[$i]] = UserFactory::createUser();
         }
+
         self::setUpRankForUsers($problemData, $userData, true);
+
+        // Create and extra user and send a before_ac nomination
+        // that should not affect the current results.
+        $beforeACUser = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem(
+            $problemData[0],
+            $beforeACUser['user']
+        );
+        RunsFactory::gradeRun($runData, 0, 'WA');
+        QualityNominationFactory::createSuggestion(
+            $beforeACUser['user'],
+            $problemData[0]['request']['problem_alias'],
+            4, /* difficulty */
+            4, /* quality */
+            ['DP', 'Math'],
+            true
+        );
 
         Utils::RunAggregateFeedback();
 

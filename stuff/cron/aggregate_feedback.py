@@ -36,15 +36,29 @@ GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
                                     LEFT JOIN `User_Rank` as ur
                                     ON ur.`user_id` = qn.`user_id`
                                     WHERE `nomination` = 'suggestion'
-                                      AND qn.`qualitynomination_id` > %s;"""
+                                      AND qn.`qualitynomination_id` > %s
+                                      AND qn.`qualitynomination_id` IN (
+                                          SELECT MAX(qualitynomination_id)
+                                          FROM `QualityNominations`
+                                          WHERE
+                                            `user_id` = qn.`user_id` AND
+                                            `problem_id` = qn.`problem_id`
+                                      );"""
 
 GET_PROBLEM_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
                                         FROM `QualityNominations` as qn
                                         LEFT JOIN `User_Rank` as ur
                                         ON ur.`user_id` = qn.`user_id`
                                         WHERE qn.`nomination` = 'suggestion'
-                                          AND qn.`qualitynomination_id` > %s
-                                          AND qn.`problem_id` = %s;"""
+                                        AND qn.`qualitynomination_id` > %s
+                                        AND qn.`problem_id` = %s
+                                        AND qn.`qualitynomination_id` IN (
+                                          SELECT MAX(qualitynomination_id)
+                                          FROM `QualityNominations`
+                                          WHERE
+                                            `user_id` = qn.`user_id` AND
+                                            `problem_id` = qn.`problem_id`
+                                        );"""
 
 # weighting factors according to user's range
 WEIGHTING_FACTORS = {
@@ -54,6 +68,17 @@ WEIGHTING_FACTORS = {
     'user-rank-expert': 4,
     'user-rank-master': 5,
     'user-rank-international-master': 6,
+}
+
+# before_ac weighting factors
+# TODO: Set correct weighting factors after regression
+BEFORE_AC_WEIGHTING_FACTORS = {
+    'user-rank-unranked': 0,
+    'user-rank-beginner': 0,
+    'user-rank-specialist': 0,
+    'user-rank-expert': 0,
+    'user-rank-master': 0,
+    'user-rank-international-master': 0,
 }
 
 
@@ -84,16 +109,17 @@ def fill_rank_cutoffs(
 
 
 def get_weighting_factor(score: float,
-                         rank_cutoffs: Sequence[RankCutoff]) -> int:
-    '''Gets the user vote weighting factor based on user's
-    score stored in User_Rank table and according to the
-    User_Rank_Cutoffs scores and classnames'''
+                         rank_cutoffs: Sequence[RankCutoff],
+                         weighting_factors: Mapping[str, float]) -> int:
+    '''Gets the user vote weighting factor based on nomination status
+    (before_AC or not), user's score stored in User_Rank table and
+    according to the User_Rank_Cutoffs scores and classnames'''
     if score is None:
-        return WEIGHTING_FACTORS['user-rank-unranked']
+        return weighting_factors['user-rank-unranked']
     for cutoff in rank_cutoffs:
         if cutoff.score <= score:
-            return WEIGHTING_FACTORS[cutoff.classname]
-    return WEIGHTING_FACTORS['user-rank-unranked']
+            return weighting_factors[cutoff.classname]
+    return weighting_factors['user-rank-unranked']
 
 
 def get_global_quality_and_difficulty_average(
@@ -119,8 +145,12 @@ def get_global_quality_and_difficulty_average(
                 logging.exception('Failed to parse contents')
                 continue
 
+            before_ac = contents.get('before_ac', False)
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
+            weighting_factor = get_weighting_factor(
+                user_score, rank_cutoffs,
+                WEIGHTING_FACTORS if not before_ac else
+                BEFORE_AC_WEIGHTING_FACTORS)
             if 'quality' in contents and contents['quality'] is not None:
                 quality_sum += weighting_factor * contents['quality']
                 quality_n += weighting_factor
@@ -154,15 +184,23 @@ def get_problem_aggregates(
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
+            before_ac = contents.get('before_ac', False)
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
+            weighting_factor = get_weighting_factor(
+                user_score, rank_cutoffs,
+                WEIGHTING_FACTORS if not before_ac else
+                BEFORE_AC_WEIGHTING_FACTORS)
             if 'quality' in contents and contents['quality'] is not None:
-                quality_votes[contents['quality']].count += 1
+                # TODO: This is just provisional until
+                # obtaining the before_ac weighting factors
+                quality_votes[contents['quality']].count += (
+                    1 if not before_ac else 0)
                 quality_votes[contents['quality']].weighted_sum += (
                     weighting_factor)
             if ('difficulty' in contents and
                     contents['difficulty'] is not None):
-                difficulty_votes[contents['difficulty']].count += 1
+                difficulty_votes[contents['difficulty']].count += (
+                    1 if not before_ac else 0)
                 difficulty_votes[contents['difficulty']].weighted_sum += (
                     weighting_factor)
             if 'tags' in contents and contents['tags']:
