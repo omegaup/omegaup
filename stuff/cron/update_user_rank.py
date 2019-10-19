@@ -3,19 +3,23 @@
 '''Updates the user ranking.'''
 
 import argparse
-import collections
 import logging
+from typing import Sequence, NamedTuple
 
 import MySQLdb
+import MySQLdb.cursors
 
 import lib.db
 import lib.logs
 
 
-Cutoff = collections.namedtuple('Cutoff', ['percentile', 'classname'])
+class Cutoff(NamedTuple):
+    '''Cutoff percentile for user ranking.'''
+    percentile: float
+    classname: str
 
 
-def update_user_rank(cur):
+def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
     '''Updates the user ranking.'''
 
     cur.execute('DELETE FROM `User_Rank`;')
@@ -141,7 +145,8 @@ def update_user_rank(cur):
     return scores
 
 
-def update_user_rank_cutoffs(cur, scores):
+def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
+                             scores: Sequence[float]) -> None:
     '''Updates the user ranking cutoff table.'''
 
     cur.execute('DELETE FROM `User_Rank_Cutoffs`;')
@@ -166,7 +171,7 @@ def update_user_rank_cutoffs(cur, scores):
                      cutoff.percentile, cutoff.classname))
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser(description=__doc__)

@@ -8,9 +8,7 @@ stage_before_install() {
 
 	init_frontend_submodules
 
-	pip install --user --upgrade pip
-	pip install --user six
-	pip install --user https://github.com/google/closure-linter/zipball/master
+	sudo ln -sf python3.6 /usr/bin/python3
 	python3 -m pip install --user --upgrade pip
 	python3 -m pip install --user setuptools
 	python3 -m pip install --user wheel
