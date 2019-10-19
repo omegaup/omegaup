@@ -46,7 +46,7 @@ def get_current_owners(badge: str,
     return results
 
 
-def save_new_owners(badge: str, users: set,
+def save_new_owners(badge: str, users: Set[int],
                     cur: MySQLdb.cursors.DictCursor) -> None:
     '''Adds new badge owners entries to Users_Badges table'''
     badges_tuples = []
@@ -82,7 +82,7 @@ def process_badges(cur: MySQLdb.cursors.DictCursor) -> None:
             raise
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(
         description='Assign badges and create notifications.')
@@ -97,7 +97,7 @@ def main():
     dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            process_badges(cur)
+            process_badges(cur)  # type: ignore
         dbconn.commit()
     except:  # noqa: bare-except
         logging.exception(
