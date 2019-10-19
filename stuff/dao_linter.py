@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 '''The omegaUp DAO linter.'''
 
 import importlib
