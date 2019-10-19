@@ -20,17 +20,19 @@ import MySQLdb
 import cron.lib.db as db
 import cron.lib.logs as logs
 
-LOCALIZATIONS_ROOT = os.path.abspath(os.path.join(__file__, '..',
-                                    '..', 'frontend/www/js/omegaup'))
+LOCALIZATIONS_ROOT = os.path.abspath(os.path.join(__file__,
+                                                  '..', '..',
+                                                  'frontend/www/js/omegaup'))
 LANGS = ['en', 'es', 'pt']
 
 
 def normalize_tag(tag):
+    '''Normalizes tags, similar to Tags::normalize() in PHP'''
     # Remove empty spaces
     tag = tag.strip()
     # Remove accents
-    tag = unicodedata.normalize('NFD', tag).encode('ascii', 'ignore')\
-            .decode("utf-8")
+    tag = unicodedata.normalize('NFD',
+                                tag).encode('ascii', 'ignore').decode("utf-8")
     # Use '-' for splitting if necessary
     tag = re.sub(r'[^a-z0-9]', '-', tag.lower())
     tag = re.sub(r'--+', '-', tag)
@@ -38,27 +40,51 @@ def normalize_tag(tag):
 
 
 def get_inverse_mapper():
+    '''Gets the inverse mapper for problem tags entries in lang files'''
     inverse_mapper = {}
     for lang in LANGS:
         path = os.path.join(LOCALIZATIONS_ROOT, 'lang.%s.json' % (lang))
         with open(path, 'r') as f:
             mappings = json.load(f)
             inverse_mapping = {}
-            for k, v in mappings.items():
-                if k.startswith('problemTopic'):
-                    inverse_mapping[normalize_tag(v)] = normalize_tag(k)
+            for key, value in mappings.items():
+                if key.startswith('problemTopic'):
+                    inverse_mapping[normalize_tag(value)] = normalize_tag(key)
             inverse_mapper[lang] = inverse_mapping
     return inverse_mapper
 
 
 def migrate_tags(cur: MySQLdb.cursors.DictCursor,
                  mapper: Dict[str, Dict[str, str]]):
-    '''Reads all suggestions and modify their tags if necessary'''
-    cur.execute('''SELECT qn.`qualitynomination_id`, qn.`contents`
-                    FROM `QualityNominations` as qn
+    '''Reads all suggestions and modifies their tags if necessary'''
+    cur.execute('''SELECT `qualitynomination_id`, `contents`
+                    FROM `QualityNominations`
                     WHERE `nomination` = 'suggestion';''')
+    to_update = []
     for row in cur:
-        logging.info(row)
+        try:
+            contents = json.loads(row['contents'])
+        except json.JSONDecodeError:  # pylint: disable=no-member
+            logging.exception('Failed to parse contents')
+            continue
+        if not contents.get('tags'):
+            continue
+        nomination_id = row['qualitynomination_id']
+        canonized_tags = []
+        for tag in contents['tags']:
+            for lang in LANGS:
+                if mapper[lang].get(tag):
+                    canonized_tags.append(mapper[lang][tag])
+                    break
+        contents['tags'] = canonized_tags
+        to_update.append((json.dumps(contents), nomination_id))
+
+    # Now update records
+    cur.executemany('''UPDATE `QualityNominations`
+                        SET `contents` = %s
+                        WHERE `qualitynomination_id` = %s''',
+                    to_update)
+    logging.info('Feedback problem tags updated.')
 
 
 def main():
@@ -78,18 +104,19 @@ def main():
     try:
         try:
             mapper = get_inverse_mapper()
-        except:
+        except:  # noqa: bare-except
             logging.exception('Failed to get mapper from lang json files')
             raise
 
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             migrate_tags(cur, mapper)
         dbconn.commit()
-    except:
+    except:  # noqa: bare-except
         logging.exception('Failed to migrate canonical tags.')
     finally:
         dbconn.close()
         logging.info('Finished')
+
 
 if __name__ == '__main__':
     main()
