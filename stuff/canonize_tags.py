@@ -42,7 +42,7 @@ def insert_new_tags(tags: Set[Tuple[str]],
                     cur: MySQLdb.cursors.DictCursor) -> None:
     '''Inserts new problem tags inside Tags table on DB'''
     logging.info('Inserting new Tags on database')
-    cur.executemany('''INSERT IGNORE INTO `Tags`(`name`)
+    cur.execute('''INSERT IGNORE INTO `Tags`(`name`)
                     VALUES (%s);''', tags)
 
 
