@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "vimeo/psalm": "^3.6.1",
+        "vimeo/psalm": "^3.6.2",
         "jetbrains/phpstorm-stubs": "^2019.2"
     }
 }
