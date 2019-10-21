@@ -27,4 +27,4 @@ exec /usr/bin/docker run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:/src" \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
-	omegaup/hook_tools:20191019 -j4 $ARGS
+	omegaup/hook_tools:20191021 -j4 $ARGS
