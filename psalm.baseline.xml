@@ -3450,9 +3450,6 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
-    <InvalidPropertyFetch occurrences="1">
-      <code>$studentLogin-&gt;auth_token</code>
-    </InvalidPropertyFetch>
     <MissingDependency occurrences="8">
       <code>OmegaupTestCase</code>
       <code>OmegaupTestCase</code>
@@ -3506,26 +3503,20 @@
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="5">
-      <code>$expectedScores[$studentUsername]</code>
-      <code>$expectedScores[$studentUsername]</code>
+    <MixedArrayOffset occurrences="4">
       <code>$problemAssignmentsMap[$assignmentAlias]</code>
-      <code>$expectedScores[$studentUsername]</code>
-      <code>$expectedScores[$studentUsername]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="8">
+    <MixedAssignment occurrences="7">
       <code>$courseFactoryResult</code>
       <code>$courseAlias</code>
       <code>$admin</code>
       <code>$problem</code>
-      <code>$studentUsername</code>
       <code>$assignmentAlias</code>
       <code>$assignment</code>
       <code>$problemData</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="4">
+    <MixedPropertyFetch occurrences="3">
       <code>$problem['problem']-&gt;alias</code>
-      <code>$students[$s]-&gt;username</code>
       <code>$assignment-&gt;problemset_id</code>
       <code>$assignment-&gt;problemset_id</code>
     </MixedPropertyFetch>
@@ -3613,9 +3604,8 @@
       <code>addGroupAdmin</code>
       <code>addTag</code>
     </MissingReturnType>
-    <MixedArgument occurrences="2">
+    <MixedArgument occurrences="1">
       <code>$params['title']</code>
-      <code>$problemData['author']-&gt;main_identity_id</code>
     </MixedArgument>
     <MixedArrayAccess occurrences="5">
       <code>$this-&gt;params[$offset]</code>
@@ -3637,13 +3627,11 @@
       <code>$array[$parameter]</code>
       <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$r</code>
-      <code>$problemAuthorUser</code>
       <code>$r['problem_alias']</code>
       <code>$r['usernameOrEmail']</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="3">
+    <MixedPropertyFetch occurrences="2">
       <code>$params['author']-&gt;username</code>
-      <code>$problemData['author']-&gt;main_identity_id</code>
       <code>$user-&gt;username</code>
     </MixedPropertyFetch>
     <PossiblyInvalidArgument occurrences="1">

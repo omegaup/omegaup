@@ -9,7 +9,7 @@
 class ProblemsForfeitedTest extends OmegaupTestCase {
     public function testGetCounts() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
@@ -35,7 +35,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
 
     public function testGetSolution() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
         $problems = [];
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
@@ -77,7 +77,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
 
     public function testGetSolutionForbiddenAccessException() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
         $problem = ProblemsFactory::createProblem()['problem'];
         try {
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([

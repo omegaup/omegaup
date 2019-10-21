@@ -24,10 +24,10 @@ class RunStatusTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData['response']['guid'],
@@ -48,7 +48,10 @@ class RunStatusTest extends OmegaupTestCase {
         $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $problemData['author']->username
         );
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
+        $runData = RunsFactory::createRunToProblem(
+            $problemData,
+            $contestantIdentity
+        );
         RunsFactory::gradeRun($runData);
 
         try {

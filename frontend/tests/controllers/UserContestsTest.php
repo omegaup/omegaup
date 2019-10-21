@@ -15,17 +15,17 @@ class UserContestsTest extends OmegaupTestCase {
 
         $contestData[0] = ContestsFactory::createContest(
             new ContestParams(
-                ['contestDirector' => $director]
+                ['contestDirector' => $identity]
             )
         );
         $contestData[1] = ContestsFactory::createContest(
             new ContestParams(
-                ['contestDirector' => $director]
+                ['contestDirector' => $identity]
             )
         );
 
         // Call api
-        $login = self::login($director);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
@@ -48,22 +48,22 @@ class UserContestsTest extends OmegaupTestCase {
      */
     public function testAdminList() {
         // Our director
-        ['user' => $director, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $director, 'identity' => $directorIdentity] = UserFactory::createUser();
         $contestAdminData = [];
 
         // Create a group with two arbitrary users.
-        $helperGroup = GroupsFactory::createGroup($director);
+        $helperGroup = GroupsFactory::createGroup($directorIdentity);
         $users = [];
         $identities = [];
         for ($i = 0; $i < 2; $i++) {
             ['user' => $users[$i], 'identity' => $identities[$i]] = UserFactory::createUser();
-            GroupsFactory::addUserToGroup($helperGroup, $users[$i]);
+            GroupsFactory::addUserToGroup($helperGroup, $identities[$i]);
         }
 
         // Get two contests with another director, add $director to their
         // admin list
         $contestAdminData[0] = ContestsFactory::createContest();
-        ContestsFactory::addAdminUser($contestAdminData[0], $director);
+        ContestsFactory::addAdminUser($contestAdminData[0], $directorIdentity);
         ContestsFactory::addGroupAdmin(
             $contestAdminData[0],
             $helperGroup['group']
@@ -73,9 +73,9 @@ class UserContestsTest extends OmegaupTestCase {
         // group admin list
         $contestAdminData[1] = ContestsFactory::createContest();
         $group = GroupsFactory::createGroup($contestAdminData[1]['director']);
-        GroupsFactory::addUserToGroup($group, $director);
+        GroupsFactory::addUserToGroup($group, $directorIdentity);
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        GroupsFactory::addUserToGroup($group, $user);
+        GroupsFactory::addUserToGroup($group, $identity);
         ContestsFactory::addGroupAdmin($contestAdminData[1], $group['group']);
         ContestsFactory::addGroupAdmin(
             $contestAdminData[1],
@@ -84,7 +84,7 @@ class UserContestsTest extends OmegaupTestCase {
 
         $contestDirectorData[0] = ContestsFactory::createContest(
             new ContestParams(
-                ['contestDirector' => $director]
+                ['contestDirector' => $directorIdentity]
             )
         );
         ContestsFactory::addGroupAdmin(
@@ -93,7 +93,10 @@ class UserContestsTest extends OmegaupTestCase {
         );
         $contestDirectorData[1] = ContestsFactory::createContest(
             new ContestParams(
-                ['contestDirector' => $director, 'admission_mode' => 'private']
+                [
+                    'contestDirector' => $directorIdentity,
+                    'admission_mode' => 'private'
+                ]
             )
         );
         ContestsFactory::addGroupAdmin(
@@ -102,7 +105,7 @@ class UserContestsTest extends OmegaupTestCase {
         );
 
         // Call api
-        $login = self::login($director);
+        $login = self::login($directorIdentity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]);
@@ -148,7 +151,7 @@ class UserContestsTest extends OmegaupTestCase {
                 ['admission_mode' => 'private']
             )
         );
-        $user = $contestData['director'];
+        $user = $contestData['userDirector'];
 
         $this->assertEquals(
             1,
@@ -164,7 +167,7 @@ class UserContestsTest extends OmegaupTestCase {
     public function testPrivateContestsCountWithPublicContest() {
         // Create private contest
         $contestData = ContestsFactory::createContest();
-        $user = $contestData['director'];
+        $user = $contestData['userDirector'];
 
         $this->assertEquals(
             0,

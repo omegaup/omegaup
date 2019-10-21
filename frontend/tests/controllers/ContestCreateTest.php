@@ -237,23 +237,23 @@ class CreateContestTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Add contestant to contest
-        ContestsFactory::addUser($contest, $contestant);
+        ContestsFactory::addUser($contest, $identity);
 
         // User joins the contest 1 hour and 50 minutes after it starts
         $updatedTime = $originalTime + 110 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        ContestsFactory::openContest($contest, $contestant);
-        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+        ContestsFactory::openContest($contest, $identity);
+        ContestsFactory::openProblemInContest($contest, $problem, $identity);
 
         // User creates a run in a valid time
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
+        $run = RunsFactory::createRun($problem, $contest, $identity);
         RunsFactory::gradeRun($run, 1.0, 'AC', 10);
 
         try {
             // User tries to create a run 5 minutes after contest has finished
             $updatedTime = $updatedTime + 15 * 60;
             \OmegaUp\Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $contestant);
+            $run = RunsFactory::createRun($problem, $contest, $identity);
             RunsFactory::gradeRun($run, 1.0, 'AC', 10);
             $this->fail(
                 'Contestant should not create a run after contest finishes'
