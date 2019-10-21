@@ -1,5 +1,5 @@
 import course_ViewProgress from '../components/course/ViewProgress.vue';
-import {API, UI, OmegaUp, T} from '../omegaup.js';
+import { API, UI, OmegaUp, T } from '../omegaup.js';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
           T: T,
           course: payload.course,
           students: payload.students,
-          assignments: payload.course.assignments
+          assignments: payload.course.assignments,
         },
       });
     },

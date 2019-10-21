@@ -519,7 +519,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $user->verification_id = null;
         \OmegaUp\DAO\Users::update($user);
 
-        self::$log->info("User verification complete for {$identity->username}");
+        self::$log->info(
+            "User verification complete for {$identity->username}"
+        );
 
         // Expire profile cache
         \OmegaUp\Cache::deleteFromCache(

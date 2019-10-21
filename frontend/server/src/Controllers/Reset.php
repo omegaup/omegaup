@@ -140,7 +140,9 @@ class Reset extends \OmegaUp\Controllers\Controller {
                 'invalidUser'
             );
         }
-        $identity->password = \OmegaUp\SecurityTools::hashString($r['password']);
+        $identity->password = \OmegaUp\SecurityTools::hashString(
+            $r['password']
+        );
         try {
             \OmegaUp\DAO\Identities::update($identity);
         } catch (\Exception $e) {

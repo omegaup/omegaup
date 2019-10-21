@@ -216,14 +216,14 @@ class LoginTest extends OmegaupTestCase {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
 
         // Expire token manually
         $authToken = \OmegaUp\DAO\AuthTokens::getByPK($login->auth_token);
         $authToken->create_time -= 9 * 3600;  // 9 hours
         \OmegaUp\DAO\AuthTokens::update($authToken);
 
-        $login2 = self::login($user);
+        $login2 = self::login($identity);
 
         $existingTokens = \OmegaUp\DAO\AuthTokens::getByPK($login->auth_token);
         $this->assertNull($existingTokens);

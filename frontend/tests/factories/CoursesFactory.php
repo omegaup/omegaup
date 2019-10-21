@@ -9,7 +9,7 @@ class CoursesFactory {
         $showScoreboard = 'false'
     ) {
         if (is_null($admin)) {
-            ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
         if ($public != false) {
@@ -55,7 +55,7 @@ class CoursesFactory {
         $startTimeDelay = 0
     ) {
         if (is_null($admin)) {
-            ['user' => $admin, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $admin] = UserFactory::createUser();
             $adminLogin = OmegaupTestCase::login($admin);
         }
 
@@ -151,7 +151,7 @@ class CoursesFactory {
         ?ScopedLoginToken $login = null
     ) {
         if (is_null($student)) {
-            ['user' => $student, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $student] = UserFactory::createUser();
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
@@ -212,9 +212,16 @@ class CoursesFactory {
         $expectedScores = [];
         for ($s = 0; $s < count($students); $s++) {
             if (is_null($students[$s]->username)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
             }
             $studentUsername = $students[$s]->username;
+            if (is_null($studentUsername)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
+            }
             $expectedScores[$studentUsername] = [];
             $studentLogin = OmegaupTestCase::login($students[$s]);
 

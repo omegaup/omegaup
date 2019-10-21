@@ -135,12 +135,12 @@ class Experiments {
         \OmegaUp\DAO\VO\Identities $identity,
         array $knownExperiments
     ): void {
-        if (is_null($user->user_id)) {
+        if (is_null($identity->user_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
         foreach (
             \OmegaUp\DAO\UsersExperiments::getByUserId(
-                $user->user_id
+                $identity->user_id
             ) as $ue
         ) {
             if (

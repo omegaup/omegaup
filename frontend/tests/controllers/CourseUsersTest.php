@@ -15,7 +15,7 @@ class CourseUsersTest extends OmegaupTestCase {
 
         CoursesFactory::addStudentToCourse($courseData, $user);
 
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
 
         // Call the details API for the assignment that's already started.
         \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([

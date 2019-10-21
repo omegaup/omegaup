@@ -55,12 +55,12 @@ class UpdateProblemTest extends OmegaupTestCase {
         $runData[0] = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runData[1] = RunsFactory::createRunToProblem(
             $problemData,
-            $contestant
+            $identity
         );
 
         // Grade the run
@@ -187,7 +187,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
         $runData[0] = RunsFactory::createRunToProblem(
             $problemData,
-            $contestant
+            $identity
         );
         RunsFactory::gradeRun($runData[0]);
 
@@ -471,7 +471,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $adminLogin = self::login($problemData['author']);
         $response = \OmegaUp\Controllers\Problem::apiAddAdmin(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'usernameOrEmail' => $problemAdmin->username,
+            'usernameOrEmail' => $identity->username,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
 
@@ -479,7 +479,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         //Call API
         $newTitle = 'new title coadmin';
-        $login = self::login($problemAdmin);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -503,7 +503,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
 
         // Create our new admin
-        ['user' => $problemAdmin, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $user, 'identity' => $problemAdmin] = UserFactory::createUser();
 
         // Add admin to the problem
         $adminLogin = self::login($problemData['author']);
@@ -590,7 +590,7 @@ class UpdateProblemTest extends OmegaupTestCase {
 
         // Normal user shouldn't even be able to see the problem.
         ['user' => $reviewer, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($reviewer);
+        $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -879,7 +879,7 @@ class UpdateProblemTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         $problem = $problemData['problem'];
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData, 1.0, 'AC');
 
         $login = self::login($problemData['author']);
@@ -1075,7 +1075,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             // Create a standalone run.
             $pastStandaloneRunData = RunsFactory::createRunToProblem(
                 $problemData,
-                $contestant
+                $identity
             );
             RunsFactory::gradeRun($pastStandaloneRunData);
 
@@ -1089,14 +1089,14 @@ class UpdateProblemTest extends OmegaupTestCase {
                 $problemData,
                 $pastContestData
             );
-            ContestsFactory::addUser($pastContestData, $contestant);
+            ContestsFactory::addUser($pastContestData, $identity);
             if (!is_null($contestAdmin)) {
                 ContestsFactory::addAdminUser($pastContestData, $contestAdmin);
             }
             $pastRunData = RunsFactory::createRun(
                 $problemData,
                 $pastContestData,
-                $contestant
+                $identity
             );
             RunsFactory::gradeRun($pastRunData);
 
@@ -1110,7 +1110,7 @@ class UpdateProblemTest extends OmegaupTestCase {
                 $problemData,
                 $presentContestData
             );
-            ContestsFactory::addUser($presentContestData, $contestant);
+            ContestsFactory::addUser($presentContestData, $identity);
             if (!is_null($contestAdmin)) {
                 ContestsFactory::addAdminUser(
                     $presentContestData,
@@ -1120,7 +1120,7 @@ class UpdateProblemTest extends OmegaupTestCase {
             $presentRunData = RunsFactory::createRun(
                 $problemData,
                 $presentContestData,
-                $contestant
+                $identity
             );
             RunsFactory::gradeRun($presentRunData);
 
@@ -1193,8 +1193,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NONE,
-            $owner,
-            $owner
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',
@@ -1242,8 +1242,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_NON_PROBLEMSET,
-            $owner,
-            $owner
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',
@@ -1307,8 +1307,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_OWNED_PROBLEMSETS,
-            $owner,
-            $owner
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',
@@ -1413,9 +1413,9 @@ class UpdateProblemTest extends OmegaupTestCase {
         ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-            $owner,
+            $identity,
             null,
-            $owner
+            $identity
         );
         $this->assertEquals(
             'AC',
@@ -1437,8 +1437,8 @@ class UpdateProblemTest extends OmegaupTestCase {
         ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
         $result = $this->updateProblemsetProblemWithRuns(
             \OmegaUp\Controllers\Problem::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS,
-            $owner,
-            $owner
+            $identity,
+            $identity
         );
         $this->assertEquals(
             'AC',

@@ -17,7 +17,7 @@ class UserPrivilegesTest extends OmegaupTestCase {
             )
         );
 
-        $login = self::login($user);
+        $login = self::login($identity);
         // Call to API Add Role
         $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -92,7 +92,9 @@ class UserPrivilegesTest extends OmegaupTestCase {
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
-        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups($identity->user_id);
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+            $identity->user_id
+        );
         $this->assertNotContains('omegaup:mentor', $systemGroups);
     }
 }

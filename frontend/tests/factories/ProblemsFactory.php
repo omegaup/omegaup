@@ -39,6 +39,12 @@ class ProblemParams implements ArrayAccess {
             'author',
             $this->params,
             false,
+            $identity
+        );
+        ProblemParams::validateParameter(
+            'authorUser',
+            $this->params,
+            false,
             $user
         );
         ProblemParams::validateParameter(
@@ -170,12 +176,13 @@ class ProblemsFactory {
         return [
             'request' => $r,
             'author' => $params['author'],
+            'authorUser' => $params['authorUser'],
             'zip_path' => $params['zipName'],
         ];
     }
 
     public static function createProblemWithAuthor(
-        \OmegaUp\DAO\VO\Users $author,
+        \OmegaUp\DAO\VO\Identities $author,
         ScopedLoginToken $login = null
     ) {
         return self::createProblem(new ProblemParams([
@@ -202,14 +209,11 @@ class ProblemsFactory {
         // Get a user
         $problemData = self::getRequest($params);
         $r = $problemData['request'];
-        $problemAuthorUser = $problemData['author'];
-        $problemAuthorIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $problemData['author']->identity_id
-        );
+        $problemAuthorIdentity = $problemData['author'];
 
         if (is_null($login)) {
             // Login user
-            $login = OmegaupTestCase::login($problemAuthorUser);
+            $login = OmegaupTestCase::login($problemAuthorIdentity);
         }
         $r['auth_token'] = $login->auth_token;
 
@@ -235,8 +239,8 @@ class ProblemsFactory {
 
         return  [
             'request' => $r,
-            'author' => $problemAuthorUser,
-            'authorIdentity' => $problemAuthorIdentity,
+            'author' => $problemAuthorIdentity,
+            'authorUser' => $problemData['authorUser'],
             'problem' => $problem,
         ];
     }

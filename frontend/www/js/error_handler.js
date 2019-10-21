@@ -65,8 +65,13 @@ if (window.addEventListener) {
   // Let's stop making it worse for them and just silently degrade.
   window.addEventListener('error', function(event) {
     'use strict';
-    sendError(event.message, event.filename, event.lineno, event.colno,
-              event.error);
+    sendError(
+      event.message,
+      event.filename,
+      event.lineno,
+      event.colno,
+      event.error,
+    );
     return true;
   });
 }

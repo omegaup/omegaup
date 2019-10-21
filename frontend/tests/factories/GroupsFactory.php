@@ -12,14 +12,14 @@ class GroupsFactory {
      * @return array{request: \OmegaUp\Request, response: array{status: string}, owner: \OmegaUp\DAO\VO\Identities, group: \OmegaUp\DAO\VO\Groups}
      */
     public static function createGroup(
-        \OmegaUp\DAO\VO\Users $owner = null,
+        \OmegaUp\DAO\VO\Identities $owner = null,
         $name = null,
         $description = null,
         $alias = null,
         ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
-            ['user' => $owner, 'identity' => $identity] = UserFactory::createUser();
+            ['user' => $user, 'identity' => $owner] = UserFactory::createUser();
         }
 
         if (is_null($name)) {
@@ -65,7 +65,7 @@ class GroupsFactory {
      */
     public static function addUserToGroup(
         array $groupData,
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity,
         ScopedLoginToken $login = null
     ) {
         if (is_null($login)) {

@@ -49,27 +49,11 @@ class Users extends \OmegaUp\DAO\VO\VO {
                 $data['user_id']
             );
         }
-<<<<<<< HEAD
-=======
-        if (isset($data['username'])) {
-            $this->username = strval(
-                $data['username']
-            );
-        }
->>>>>>> upstream/master
         if (isset($data['facebook_user_id'])) {
             $this->facebook_user_id = strval(
                 $data['facebook_user_id']
             );
         }
-<<<<<<< HEAD
-=======
-        if (isset($data['password'])) {
-            $this->password = strval(
-                $data['password']
-            );
-        }
->>>>>>> upstream/master
         if (isset($data['git_token'])) {
             $this->git_token = strval(
                 $data['git_token']

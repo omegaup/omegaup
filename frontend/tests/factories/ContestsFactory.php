@@ -44,6 +44,12 @@ class ContestParams implements ArrayAccess {
             'contestDirector',
             $this->params,
             false,
+            $identity
+        );
+        ContestParams::validateParameter(
+            'contestUserDirector',
+            $this->params,
+            false,
             $user
         );
         ContestParams::validateParameter('window_length', $this->params, false);
@@ -174,7 +180,8 @@ class ContestsFactory {
 
         return [
             'request' => $r,
-            'director' => $params['contestDirector']
+            'director' => $params['contestDirector'],
+            'userDirector' => $params['contestUserDirector'],
         ];
     }
 
@@ -204,7 +211,7 @@ class ContestsFactory {
      */
     public static function createContest(
         ContestParams $params = null
-    ) : array {
+    ): array {
         if (!($params instanceof ContestParams)) {
             $params = new ContestParams($params);
         }
@@ -232,6 +239,7 @@ class ContestsFactory {
 
         return [
             'director' => $contestData['director'],
+            'userDirector' => $contestData['userDirector'],
             'request' => $r,
             'contest' => $contest
         ];
@@ -321,12 +329,12 @@ class ContestsFactory {
 
     public static function addUser(
         array $contestData,
-        \OmegaUp\DAO\VO\Users $user
+        \OmegaUp\DAO\VO\Identities $identity
     ): void {
         // Prepare our request
         $r = new \OmegaUp\Request();
         $r['contest_alias'] = $contestData['request']['alias'];
-        $r['usernameOrEmail'] = $identitiy->username;
+        $r['usernameOrEmail'] = $identity->username;
 
         // Log in the contest director
         $login = OmegaupTestCase::login($contestData['director']);

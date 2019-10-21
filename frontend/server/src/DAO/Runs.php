@@ -886,6 +886,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * @param ?int     $problemsetId the optional problemset.
      * @param string   $oldVersion   the old version.
      * @param string   $newVersion   the new version.
+     *
+     * @return list<array{username: string, guid: string, problemset_id: int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?string}>
      */
     final public static function getRunsDiffsForVersion(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -940,6 +942,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LIMIT 0, 1000;
         ';
 
+        /** @var list<array{username: string, guid: string, problemset_id: int, old_status: ?string, old_verdict: ?string, old_score: ?float, new_status: ?string, new_verdict: ?string, new_score: ?string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
