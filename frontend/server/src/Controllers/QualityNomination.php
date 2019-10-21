@@ -10,14 +10,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
     /**
      * @param \OmegaUp\DAO\VO\Problems $problem
-     * @param \OmegaUp\DAO\VO\Users $user
+     * @param \OmegaUp\DAO\VO\Identities $user
      * @param string $nominationType
      * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $identity,
         string $nominationType,
         array $contents
     ): \OmegaUp\DAO\VO\QualityNominations {
@@ -33,7 +33,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     \OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($user->main_identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -44,7 +44,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::hasTriedToSolveProblem(
                         $problem,
-                        intval($user->main_identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -58,7 +58,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 if (
                     !\OmegaUp\DAO\Problems::isProblemSolved(
                         $problem,
-                        intval($user->main_identity_id)
+                        intval($identity->identity_id)
                     )
                 ) {
                     throw new \OmegaUp\Exceptions\PreconditionFailedException(
@@ -255,7 +255,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
-            'user_id' => $user->user_id,
+            'user_id' => $identity->user_id,
             'problem_id' => $problem->problem_id,
             'nomination' => $nominationType,
             'contents' => json_encode($contents),
@@ -376,7 +376,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
             $problem,
-            $r->user,
+            $r->identity,
             strval($r['nomination']),
             $contents
         );

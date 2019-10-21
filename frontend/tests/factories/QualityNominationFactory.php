@@ -57,7 +57,7 @@ class QualityNominationFactory {
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createSuggestion(
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $user,
         string $problemAlias,
         ?int $difficulty,
         ?int $quality,
@@ -90,7 +90,7 @@ class QualityNominationFactory {
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createQualityNomination(
-        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $user,
         string $problemAlias,
         string $type,
         $contents

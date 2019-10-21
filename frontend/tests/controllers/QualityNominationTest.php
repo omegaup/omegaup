@@ -969,7 +969,7 @@ class QualityNominationTest extends OmegaupTestCase {
 
         // Create dismissal nomination.
         QualityNominationFactory::createSuggestion(
-            $contestant,
+            $identity,
             $problemData['request']['problem_alias'],
             null,
             1,
@@ -1148,6 +1148,23 @@ class QualityNominationTest extends OmegaupTestCase {
             ['user' => $userData[$i], 'identity' => $identityData[$i]] = UserFactory::createUser();
         }
         self::setUpRankForUsers($problemData, $identityData, true);
+
+        // Create and extra user and send a before_ac nomination
+        // that should not affect the current results.
+        $beforeACUser = UserFactory::createUser();
+        $runData = RunsFactory::createRunToProblem(
+            $problemData[0],
+            $beforeACUser['identity']
+        );
+        RunsFactory::gradeRun($runData, 0, 'WA');
+        QualityNominationFactory::createSuggestion(
+            $beforeACUser['identity'],
+            $problemData[0]['request']['problem_alias'],
+            4, /* difficulty */
+            4, /* quality */
+            ['DP', 'Math'],
+            true
+        );
 
         Utils::RunAggregateFeedback();
 
@@ -1505,7 +1522,7 @@ class QualityNominationTest extends OmegaupTestCase {
         for ($problemIdx = 0; $problemIdx < $numberOfProblems; $problemIdx++) {
             for ($userIdx = 0; $userIdx < 10; $userIdx++) {
                 QualityNominationFactory::createSuggestion(
-                    $contestants[$userIdx],
+                    $identities[$userIdx],
                     $problemData[$problemIdx]['request']['problem_alias'],
                     $difficultyRatings[$problemIdx][$userIdx],
                     $qualityRatings[$problemIdx][$userIdx],
@@ -1578,7 +1595,7 @@ class QualityNominationTest extends OmegaupTestCase {
         }
 
         QualityNominationFactory::createSuggestion(
-            $contestants[0],
+            $identities[0],
             $problemData[0]['request']['problem_alias'],
             null,
             1,
@@ -1586,7 +1603,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[1],
+            $identities[1],
             $problemData[0]['request']['problem_alias'],
             3,
             3,
@@ -1594,7 +1611,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[2],
+            $identities[2],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
@@ -1602,7 +1619,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[3],
+            $identities[3],
             $problemData[0]['request']['problem_alias'],
             null,
             null,
@@ -1610,7 +1627,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[4],
+            $identities[4],
             $problemData[0]['request']['problem_alias'],
             3,
             4,
@@ -1618,7 +1635,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[5],
+            $identities[5],
             $problemData[0]['request']['problem_alias'],
             3,
             null,
@@ -1626,7 +1643,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[6],
+            $identities[6],
             $problemData[0]['request']['problem_alias'],
             null,
             1,
@@ -1634,7 +1651,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[7],
+            $identities[7],
             $problemData[0]['request']['problem_alias'],
             4,
             null,
@@ -1642,7 +1659,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[8],
+            $identities[8],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
@@ -1650,7 +1667,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[9],
+            $identities[9],
             $problemData[0]['request']['problem_alias'],
             4,
             4,
@@ -1659,7 +1676,7 @@ class QualityNominationTest extends OmegaupTestCase {
         );
 
         QualityNominationFactory::createSuggestion(
-            $contestants[0],
+            $identities[0],
             $problemData[1]['request']['problem_alias'],
             4,
             1,
@@ -1667,7 +1684,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[1],
+            $identities[1],
             $problemData[1]['request']['problem_alias'],
             1,
             1,
@@ -1675,7 +1692,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[2],
+            $identities[2],
             $problemData[1]['request']['problem_alias'],
             4,
             3,
@@ -1683,7 +1700,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[3],
+            $identities[3],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
@@ -1691,7 +1708,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[4],
+            $identities[4],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
@@ -1699,7 +1716,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[5],
+            $identities[5],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
@@ -1707,7 +1724,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[6],
+            $identities[6],
             $problemData[1]['request']['problem_alias'],
             null,
             1,
@@ -1715,7 +1732,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[7],
+            $identities[7],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
@@ -1723,7 +1740,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[8],
+            $identities[8],
             $problemData[1]['request']['problem_alias'],
             4,
             1,
@@ -1731,7 +1748,7 @@ class QualityNominationTest extends OmegaupTestCase {
             false
         );
         QualityNominationFactory::createSuggestion(
-            $contestants[9],
+            $identities[9],
             $problemData[1]['request']['problem_alias'],
             4,
             3,

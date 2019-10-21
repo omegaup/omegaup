@@ -39,7 +39,7 @@
                 <li class="tag-select"
                     v-for="problemTopic in sortedProblemTopics"><label class=
                     "tag-select"><input type="checkbox"
-                       v-bind:value="problemTopic.text"
+                       v-bind:value="problemTopic.value"
                        v-model="tags"> {{ problemTopic.text }}</label></li>
               </ul></label>
             </div>
