@@ -26,7 +26,7 @@ LOCALIZATIONS_ROOT = os.path.abspath(os.path.join(__file__,
 LANGS = ['en', 'es', 'pt']
 
 
-def normalize_tag(tag):
+def normalize_tag(tag: str):
     '''Normalizes tags, similar to Tags::normalize() in PHP'''
     # Remove empty spaces
     tag = tag.strip()
@@ -39,8 +39,18 @@ def normalize_tag(tag):
     return tag
 
 
-def get_inverse_mapper():
+def insert_new_tags(tags, cur: MySQLdb.cursors.DictCursor):
+    '''Inserts new problem tags inside Tags table on DB'''
+    logging.info('Inserting new Tags on database')
+    cur.executemany('''INSERT IGNORE INTO `Tags`(`name`)
+                    VALUES (%s);''', tags)
+
+
+
+def get_inverse_mapper(cur: MySQLdb.cursors.DictCursor):
     '''Gets the inverse mapper for problem tags entries in lang files'''
+    logging.info('Getting tags mapper from lang files.')
+    new_tags = set()
     inverse_mapper = {}
     for lang in LANGS:
         path = os.path.join(LOCALIZATIONS_ROOT, 'lang.%s.json' % (lang))
@@ -49,8 +59,11 @@ def get_inverse_mapper():
             inverse_mapping = {}
             for key, value in mappings.items():
                 if key.startswith('problemTopic'):
-                    inverse_mapping[normalize_tag(value)] = normalize_tag(key)
+                    normalized_tag = normalize_tag(key)
+                    new_tags.add((normalized_tag,))
+                    inverse_mapping[normalize_tag(value)] = normalized_tag
             inverse_mapper[lang] = inverse_mapping
+    insert_new_tags(new_tags, cur)
     return inverse_mapper
 
 
@@ -62,6 +75,7 @@ def migrate_tags(cur: MySQLdb.cursors.DictCursor,
                     WHERE `nomination` = 'suggestion';''')
     to_update = []
     for row in cur:
+        logging.info(row)
         try:
             contents = json.loads(row['contents'])
         except json.JSONDecodeError:  # pylint: disable=no-member
@@ -72,11 +86,13 @@ def migrate_tags(cur: MySQLdb.cursors.DictCursor,
         nomination_id = row['qualitynomination_id']
         canonized_tags = []
         for tag in contents['tags']:
+            canonized_tags.append(tag)
             for lang in LANGS:
                 if mapper[lang].get(tag):
-                    canonized_tags.append(mapper[lang][tag])
+                    canonized_tags[-1] = mapper[lang][tag]
                     break
         contents['tags'] = canonized_tags
+        logging.info(json.dumps(contents))
         to_update.append((json.dumps(contents), nomination_id))
 
     # Now update records
@@ -102,15 +118,14 @@ def main():
     dbconn = db.connect(args)
     # warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
-        try:
-            mapper = get_inverse_mapper()
-        except:  # noqa: bare-except
-            logging.exception('Failed to get mapper from lang json files')
-            raise
-
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
+            try:
+                mapper = get_inverse_mapper(cur)
+            except:  # noqa: bare-except
+                logging.exception('Failed to get mapper from lang json files')
+                raise
             migrate_tags(cur, mapper)
-        dbconn.commit()
+            dbconn.commit()
     except:  # noqa: bare-except
         logging.exception('Failed to migrate canonical tags.')
     finally:
