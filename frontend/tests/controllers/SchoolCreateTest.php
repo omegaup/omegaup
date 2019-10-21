@@ -12,7 +12,7 @@ class SchoolCreateTest extends OmegaupTestCase {
     public function testCreateSchool() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString(),
@@ -38,7 +38,7 @@ class SchoolCreateTest extends OmegaupTestCase {
     public function testCreateSchoolDuplicatedName() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'name' => Utils::CreateRandomString()

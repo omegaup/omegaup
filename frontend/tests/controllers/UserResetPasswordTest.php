@@ -13,7 +13,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,
@@ -26,15 +26,15 @@ class UserResetPasswordTest extends OmegaupTestCase {
 
         // Try to login with old password, should fail
         try {
-            self::login($user);
+            self::login($identity);
             $this->fail('Reset password failed');
         } catch (Exception $e) {
             // We are OK
         }
 
         // Set new password and try again, should succeed
-        $user->password = $r['password'];
-        self::login($user);
+        $identity->password = $r['password'];
+        self::login($identity);
     }
 
     /**
@@ -46,7 +46,7 @@ class UserResetPasswordTest extends OmegaupTestCase {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $user->username,

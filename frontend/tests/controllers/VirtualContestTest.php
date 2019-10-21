@@ -23,7 +23,7 @@ class VirtualContestTest extends OmegaupTestCase {
         // Create a new contestant
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -111,7 +111,7 @@ class VirtualContestTest extends OmegaupTestCase {
         // Create a new contestant
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -140,7 +140,7 @@ class VirtualContestTest extends OmegaupTestCase {
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -178,7 +178,7 @@ class VirtualContestTest extends OmegaupTestCase {
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token
@@ -209,7 +209,7 @@ class VirtualContestTest extends OmegaupTestCase {
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token

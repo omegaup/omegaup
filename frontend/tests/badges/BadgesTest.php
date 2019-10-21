@@ -220,18 +220,18 @@ class BadgesTest extends BadgesTestCase {
         // - User 2 will receive: Problem Setter and Contest Manager badges
         ['user' => $userOne, 'identity' => $identityOne] = UserFactory::createUser();
         ['user' => $userTwo, 'identity' => $identityTwo] = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($userOne);
-        ProblemsFactory::createProblemWithAuthor($userTwo);
+        ProblemsFactory::createProblemWithAuthor($identityOne);
+        ProblemsFactory::createProblemWithAuthor($identityTwo);
         ContestsFactory::createContest(
             new ContestParams(
-                ['contestDirector' => $userTwo]
+                ['contestDirector' => $identityTwo]
             )
         );
         $expectedUserOneResults = ['problemSetter'];
         $expectedUserTwoResults = ['contestManager', 'problemSetter'];
         Utils::RunAssignBadges();
         {
-            $login = self::login($userOne);
+            $login = self::login($identityOne);
             // Fetch badges through apiMyList
             $userOneBadges = \OmegaUp\Controllers\Badge::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -279,7 +279,7 @@ class BadgesTest extends BadgesTestCase {
             );
         }
         {
-            $login = self::login($userTwo);
+            $login = self::login($identityTwo);
             $userTwoNotifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'user' => $userOne,
@@ -296,12 +296,12 @@ class BadgesTest extends BadgesTestCase {
 
     public function testGetAssignationTime() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        ProblemsFactory::createProblemWithAuthor($user);
+        ProblemsFactory::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
         Utils::RunAssignBadges();
 
-        $login = self::login($user);
+        $login = self::login($identity);
         $problemSetterResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
@@ -330,7 +330,7 @@ class BadgesTest extends BadgesTestCase {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         // For some reason, this method creates a new user also.
-        ProblemsFactory::createProblemWithAuthor($user);
+        ProblemsFactory::createProblemWithAuthor($identity);
 
         $previousTime = \OmegaUp\Time::get();
         Utils::RunAssignBadges();
