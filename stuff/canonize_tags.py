@@ -10,12 +10,11 @@ import argparse
 import json
 import logging
 import os
-from typing import Dict
-
 import unicodedata
 import re
+from typing import Mapping, Set, Tuple
 
-import MySQLdb
+import MySQLdb.constants.ER
 
 import cron.lib.db as db
 import cron.lib.logs as logs
@@ -26,7 +25,7 @@ LOCALIZATIONS_ROOT = os.path.abspath(os.path.join(__file__,
 LANGS = ['en', 'es', 'pt']
 
 
-def normalize_tag(tag: str):
+def normalize_tag(tag: str) -> str:
     '''Normalizes tags, similar to Tags::normalize() in PHP'''
     # Remove empty spaces
     tag = tag.strip()
@@ -39,15 +38,16 @@ def normalize_tag(tag: str):
     return tag
 
 
-def insert_new_tags(tags, cur: MySQLdb.cursors.DictCursor):
+def insert_new_tags(tags: Set[Tuple[str]],
+                    cur: MySQLdb.cursors.DictCursor) -> None:
     '''Inserts new problem tags inside Tags table on DB'''
     logging.info('Inserting new Tags on database')
     cur.executemany('''INSERT IGNORE INTO `Tags`(`name`)
                     VALUES (%s);''', tags)
 
 
-
-def get_inverse_mapper(cur: MySQLdb.cursors.DictCursor):
+def get_inverse_mapper(
+        cur: MySQLdb.cursors.DictCursor) -> Mapping[str, Mapping[str, str]]:
     '''Gets the inverse mapper for problem tags entries in lang files'''
     logging.info('Getting tags mapper from lang files.')
     new_tags = set()
@@ -68,7 +68,7 @@ def get_inverse_mapper(cur: MySQLdb.cursors.DictCursor):
 
 
 def migrate_tags(cur: MySQLdb.cursors.DictCursor,
-                 mapper: Dict[str, Dict[str, str]]):
+                 mapper: Mapping[str, Mapping[str, str]]) -> None:
     '''Reads all suggestions and modifies their tags if necessary'''
     cur.execute('''SELECT `qualitynomination_id`, `contents`
                     FROM `QualityNominations`
@@ -103,7 +103,7 @@ def migrate_tags(cur: MySQLdb.cursors.DictCursor,
     logging.info('Feedback problem tags updated.')
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(
         description='Migrate canonical tags.')
