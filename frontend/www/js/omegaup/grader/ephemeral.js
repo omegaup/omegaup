@@ -213,7 +213,9 @@ let store = new Vuex.Store({
       }
       return result;
     },
-    currentCase(state) { return state.currentCase; },
+    currentCase(state) {
+      return state.currentCase;
+    },
     inputIn(state) {
       return state.request.input.cases[state.currentCase]['in'];
     },
@@ -251,7 +253,7 @@ let store = new Vuex.Store({
           Weight: state.request.input.cases[caseName].weight,
         });
         resultMap[tokens[0]].Weight +=
-            state.request.input.cases[caseName].weight;
+          state.request.input.cases[caseName].weight;
       }
       let result = [];
       for (let groupName in resultMap) {
@@ -270,7 +272,9 @@ let store = new Vuex.Store({
       });
       return result;
     },
-    'request.language'(state) { return state.request.language; },
+    'request.language'(state) {
+      return state.request.language;
+    },
     'request.input.validator.custom_validator.language'(state) {
       if (!state.request.input.validator.custom_validator) return '';
       return state.request.input.validator.custom_validator.language;
@@ -290,15 +294,29 @@ let store = new Vuex.Store({
     isCustomValidator(state) {
       return !!state.request.input.validator.custom_validator;
     },
-    isInteractive(state) { return !!state.request.input.interactive; },
-    isUpdatingSettings(state) { return !!state.updatingSettings; },
-    isDirty(state) { return !!state.dirty; },
+    isInteractive(state) {
+      return !!state.request.input.interactive;
+    },
+    isUpdatingSettings(state) {
+      return !!state.updatingSettings;
+    },
+    isDirty(state) {
+      return !!state.dirty;
+    },
   },
   mutations: {
-    currentCase(state, value) { state.currentCase = value; },
-    compilerOutput(state, value) { state.compilerOutput = value; },
-    logs(state, value) { state.logs = value; },
-    request(state, value) { Vue.set(state, 'request', value); },
+    currentCase(state, value) {
+      state.currentCase = value;
+    },
+    compilerOutput(state, value) {
+      state.compilerOutput = value;
+    },
+    logs(state, value) {
+      state.logs = value;
+    },
+    request(state, value) {
+      Vue.set(state, 'request', value);
+    },
     'request.language'(state, value) {
       state.request.language = value;
       state.dirty = true;
@@ -319,7 +337,9 @@ let store = new Vuex.Store({
       Vue.set(state, 'results', value);
       state.dirty = false;
     },
-    clearOutputs(state) { Vue.set(state, 'outputs', {}); },
+    clearOutputs(state) {
+      Vue.set(state, 'outputs', {});
+    },
     output(state, payload) {
       Vue.set(state.outputs, payload.name, payload.contents);
     },
@@ -411,7 +431,9 @@ let store = new Vuex.Store({
       state.request.input.interactive.module_name = value;
       state.dirty = true;
     },
-    updatingSettings(state, value) { state.updatingSettings = value; },
+    updatingSettings(state, value) {
+      state.updatingSettings = value;
+    },
 
     createCase(state, caseData) {
       if (!state.request.input.cases.hasOwnProperty(caseData.name)) {
@@ -438,11 +460,11 @@ let store = new Vuex.Store({
         language: 'cpp11',
         input: {
           limits: {
-            TimeLimit: 1.0,             // 1s
-            MemoryLimit: 67108864,      // 64MB
-            OverallWallTimeLimit: 5.0,  // 5s
-            ExtraWallTime: 0,           // 0s
-            OutputLimit: 10240,         // 10k
+            TimeLimit: 1.0, // 1s
+            MemoryLimit: 67108864, // 64MB
+            OverallWallTimeLimit: 5.0, // 5s
+            ExtraWallTime: 0, // 0s
+            OutputLimit: 10240, // 10k
           },
           validator: {
             name: 'token-caseless',
@@ -709,8 +731,10 @@ const interactiveMainSourceSettings = {
   isClosable: false,
 };
 
-const layout = new GoldenLayout(goldenLayoutSettings,
-                                document.getElementById('layout-root'));
+const layout = new GoldenLayout(
+  goldenLayoutSettings,
+  document.getElementById('layout-root'),
+);
 
 function RegisterVueComponent(layout, componentName, component, componentMap) {
   layout.registerComponent(componentName, function(container, componentState) {
@@ -738,8 +762,9 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       let vueComponent = vue.$children[0];
       if (vueComponent.title) {
         container.setTitle(vueComponent.title);
-        vueComponent.$watch('title',
-                            function(title) { container.setTitle(title); });
+        vueComponent.$watch('title', function(title) {
+          container.setTitle(title);
+        });
       }
       if (vueComponent.onResize) {
         container.on('resize', () => vueComponent.onResize());
@@ -750,18 +775,42 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
 }
 
 let componentMapping = {};
-RegisterVueComponent(layout, 'case-selector-component', CaseSelectorComponent,
-                     componentMapping);
-RegisterVueComponent(layout, 'monaco-editor-component', MonacoEditorComponent,
-                     componentMapping);
-RegisterVueComponent(layout, 'monaco-diff-component', MonacoDiffComponent,
-                     componentMapping);
-RegisterVueComponent(layout, 'settings-component', SettingsComponent,
-                     componentMapping);
-RegisterVueComponent(layout, 'text-editor-component', TextEditorComponent,
-                     componentMapping);
-RegisterVueComponent(layout, 'zip-viewer-component', ZipViewerComponent,
-                     componentMapping);
+RegisterVueComponent(
+  layout,
+  'case-selector-component',
+  CaseSelectorComponent,
+  componentMapping,
+);
+RegisterVueComponent(
+  layout,
+  'monaco-editor-component',
+  MonacoEditorComponent,
+  componentMapping,
+);
+RegisterVueComponent(
+  layout,
+  'monaco-diff-component',
+  MonacoDiffComponent,
+  componentMapping,
+);
+RegisterVueComponent(
+  layout,
+  'settings-component',
+  SettingsComponent,
+  componentMapping,
+);
+RegisterVueComponent(
+  layout,
+  'text-editor-component',
+  TextEditorComponent,
+  componentMapping,
+);
+RegisterVueComponent(
+  layout,
+  'zip-viewer-component',
+  ZipViewerComponent,
+  componentMapping,
+);
 
 function initialize() {
   layout.init();
@@ -770,13 +819,12 @@ function initialize() {
   if (store.getters.isCustomValidator)
     sourceAndSettings.addChild(validatorSettings);
   store.watch(
-      Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
-      function(value) {
-        if (value)
-          sourceAndSettings.addChild(validatorSettings);
-        else
-          layout.root.getItemsById(validatorSettings.id)[0].remove();
-      });
+    Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
+    function(value) {
+      if (value) sourceAndSettings.addChild(validatorSettings);
+      else layout.root.getItemsById(validatorSettings.id)[0].remove();
+    },
+  );
   if (store.getters.isInteractive) {
     sourceAndSettings.addChild(interactiveIdlSettings);
     sourceAndSettings.addChild(interactiveMainSourceSettings);
@@ -784,19 +832,19 @@ function initialize() {
     sourceItem.parent.setActiveContentItem(sourceItem);
   }
   store.watch(
-      Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
-      function(value) {
-        if (value) {
-          sourceAndSettings.addChild(interactiveIdlSettings);
-          sourceAndSettings.addChild(interactiveMainSourceSettings);
-          let sourceItem = layout.root.getItemsById('source')[0];
-          sourceItem.parent.setActiveContentItem(sourceItem);
-        } else {
-          layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
-          layout.root.getItemsById(interactiveMainSourceSettings.id)[0]
-              .remove();
-        }
-      });
+    Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
+    function(value) {
+      if (value) {
+        sourceAndSettings.addChild(interactiveIdlSettings);
+        sourceAndSettings.addChild(interactiveMainSourceSettings);
+        let sourceItem = layout.root.getItemsById('source')[0];
+        sourceItem.parent.setActiveContentItem(sourceItem);
+      } else {
+        layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
+        layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
+      }
+    },
+  );
 
   if (isEmbedded) {
     // Embedded layout should not be able to modify the settings.
@@ -809,8 +857,9 @@ function initialize() {
     // move the first two columns into a stack so they can be switched between.
     let mainColumn = layout.root.getItemsById('main-column')[0];
     let casesColumn = layout.root.getItemsById('cases-column')[0];
-    let caseSelectorColumn =
-        layout.root.getItemsById('case-selector-column')[0];
+    let caseSelectorColumn = layout.root.getItemsById(
+      'case-selector-column',
+    )[0];
     let oldWidth = caseSelectorColumn.element[0].clientWidth;
     let oldHeight = caseSelectorColumn.element[0].clientHeight;
 
@@ -835,11 +884,12 @@ function initialize() {
 
     // Whenever a case is selected, show the cases tab.
     store.watch(
-        Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
-        (value) => {
-          if (store.getters.isUpdatingSettings) return;
-          casesColumn.parent.setActiveContentItem(casesColumn);
-        });
+      Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
+      value => {
+        if (store.getters.isUpdatingSettings) return;
+        casesColumn.parent.setActiveContentItem(casesColumn);
+      },
+    );
   }
 }
 
@@ -859,20 +909,19 @@ if (window.ResizeObserver) {
 }
 onResized();
 
-document.getElementById('language')
-    .addEventListener('change', function() {
-      store.commit('request.language', this.value);
-      document.getElementById('language').value = this.value;
-      if (!Util.languageExtensionMapping.hasOwnProperty(this.value)) return;
-      let language = Util.languageExtensionMapping[this.value];
-      if (store.getters.isInteractive) {
-        if (!interactiveTemplates.hasOwnProperty(language)) return;
-        store.commit('request.source', interactiveTemplates[language]);
-      } else {
-        if (!sourceTemplates.hasOwnProperty(language)) return;
-        store.commit('request.source', sourceTemplates[language]);
-      }
-    });
+document.getElementById('language').addEventListener('change', function() {
+  store.commit('request.language', this.value);
+  document.getElementById('language').value = this.value;
+  if (!Util.languageExtensionMapping.hasOwnProperty(this.value)) return;
+  let language = Util.languageExtensionMapping[this.value];
+  if (store.getters.isInteractive) {
+    if (!interactiveTemplates.hasOwnProperty(language)) return;
+    store.commit('request.source', interactiveTemplates[language]);
+  } else {
+    if (!sourceTemplates.hasOwnProperty(language)) return;
+    store.commit('request.source', sourceTemplates[language]);
+  }
+});
 
 function onDetailsJsonReady(results) {
   store.commit('results', results);
@@ -891,56 +940,59 @@ function onFilesZipReady(blob) {
   reader.addEventListener('loadend', e => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
-        .then(zip => {
-          if (componentMapping.zipviewer) {
-            componentMapping.zipviewer.zip = zip;
-          }
-          store.commit('clearOutputs');
-          Promise.all([
-                   zip.file('Main/compile.err')
-                       .async('string'),
-                   zip.file('Main/compile.out').async('string'),
-                 ])
-              .then(values => {
-                for (let value of values) {
-                  if (!value) continue;
-                  store.commit('compilerOutput', value);
-                  return;
-                }
-                store.commit('compilerOutput', '');
-              })
-              .catch(Util.asyncError);
-          for (let filename in zip.files) {
-            if (filename.indexOf('/') !== -1) continue;
-            zip.file(filename)
-                .async('string')
-                .then(contents => {
-                  store.commit('output', {
-                    name: filename,
-                    contents: contents,
-                  });
-                })
-                .catch(Util.asyncError);
-          }
-        })
-        .catch(Util.asyncError);
+      .then(zip => {
+        if (componentMapping.zipviewer) {
+          componentMapping.zipviewer.zip = zip;
+        }
+        store.commit('clearOutputs');
+        Promise.all([
+          zip.file('Main/compile.err').async('string'),
+          zip.file('Main/compile.out').async('string'),
+        ])
+          .then(values => {
+            for (let value of values) {
+              if (!value) continue;
+              store.commit('compilerOutput', value);
+              return;
+            }
+            store.commit('compilerOutput', '');
+          })
+          .catch(Util.asyncError);
+        for (let filename in zip.files) {
+          if (filename.indexOf('/') !== -1) continue;
+          zip
+            .file(filename)
+            .async('string')
+            .then(contents => {
+              store.commit('output', {
+                name: filename,
+                contents: contents,
+              });
+            })
+            .catch(Util.asyncError);
+        }
+      })
+      .catch(Util.asyncError);
   });
   reader.readAsArrayBuffer(blob);
 }
 
 store.watch(
-    Object.getOwnPropertyDescriptor(store.getters, 'isDirty').get,
-    function(value) {
-      let downloadLabelElement = document.getElementById('download-label');
-      if (!value || !downloadLabelElement) return;
+  Object.getOwnPropertyDescriptor(store.getters, 'isDirty').get,
+  function(value) {
+    let downloadLabelElement = document.getElementById('download-label');
+    if (!value || !downloadLabelElement) return;
 
-      if (downloadLabelElement.className.indexOf('fa-download') == -1) return;
-      downloadLabelElement.className = downloadLabelElement.className.replace(
-          'fa-download', 'fa-file-archive-o');
-      let downloadElement = document.getElementById('download');
-      downloadElement.download = undefined;
-      downloadElement.href = undefined;
-    });
+    if (downloadLabelElement.className.indexOf('fa-download') == -1) return;
+    downloadLabelElement.className = downloadLabelElement.className.replace(
+      'fa-download',
+      'fa-file-archive-o',
+    );
+    let downloadElement = document.getElementById('download');
+    downloadElement.download = undefined;
+    downloadElement.href = undefined;
+  },
+);
 
 document.getElementById('upload').addEventListener('change', e => {
   let files = e.target.files;
@@ -950,259 +1002,283 @@ document.getElementById('upload').addEventListener('change', e => {
   reader.addEventListener('loadend', e => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
-        .then(zip => {
-          store.commit('reset');
-          store.commit('removeCase', 'long');
-          let cases = {};
-          for (let fileName in zip.files) {
-            if (!zip.files.hasOwnProperty(fileName)) continue;
+      .then(zip => {
+        store.commit('reset');
+        store.commit('removeCase', 'long');
+        let cases = {};
+        for (let fileName in zip.files) {
+          if (!zip.files.hasOwnProperty(fileName)) continue;
 
-            if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
-              let caseName = fileName.substring('cases/'.length,
-                                                fileName.length - '.in'.length);
-              cases[caseName] = true;
-              let caseOutFileName = `cases/${caseName}.out`;
-              if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
-              store.commit('createCase', {
-                name: caseName,
-                weight: 1,
-              });
+          if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
+            let caseName = fileName.substring(
+              'cases/'.length,
+              fileName.length - '.in'.length,
+            );
+            cases[caseName] = true;
+            let caseOutFileName = `cases/${caseName}.out`;
+            if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
+            store.commit('createCase', {
+              name: caseName,
+              weight: 1,
+            });
 
-              zip.file(fileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('currentCase', caseName);
-                    store.commit('inputIn', value);
-                  })
-                  .catch(Util.asyncError);
-              zip.file(caseOutFileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('currentCase', caseName);
-                    store.commit('inputOut', value);
-                  })
-                  .catch(Util.asyncError);
-            } else if (fileName.startsWith('validator.')) {
-              let extension = fileName.substring('validator.'.length);
-              if (!Util.languageExtensionMapping.hasOwnProperty(extension))
-                continue;
-              zip.file(fileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('Validator', 'custom');
-                    store.commit('ValidatorLanguage', extension);
-                    store.commit(
-                        'request.input.validator.custom_validator.source',
-                        value);
-                  })
-                  .catch(Util.asyncError);
-            } else if (fileName.startsWith('interactive/') &&
-                       fileName.endsWith('.idl')) {
-              let moduleName = fileName.substring(
-                  'interactive/'.length, fileName.length - '.idl'.length);
-              zip.file(fileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('Interactive', true);
-                    store.commit('InteractiveModuleName', moduleName);
-                    store.commit('request.input.interactive.idl', value);
-                  })
-                  .catch(Util.asyncError);
-            } else if (fileName.startsWith('interactive/Main.')) {
-              let extension = fileName.substring('interactive/Main.'.length);
-              if (!Util.languageExtensionMapping.hasOwnProperty(extension))
-                continue;
-              zip.file(fileName)
-                  .async('string')
-                  .then(value => {
-                    store.commit('Interactive', true);
-                    store.commit('InteractiveLanguage', extension);
-                    store.commit('request.input.interactive.main_source',
-                                 value);
-                  })
-                  .catch(Util.asyncError);
-            }
+            zip
+              .file(fileName)
+              .async('string')
+              .then(value => {
+                store.commit('currentCase', caseName);
+                store.commit('inputIn', value);
+              })
+              .catch(Util.asyncError);
+            zip
+              .file(caseOutFileName)
+              .async('string')
+              .then(value => {
+                store.commit('currentCase', caseName);
+                store.commit('inputOut', value);
+              })
+              .catch(Util.asyncError);
+          } else if (fileName.startsWith('validator.')) {
+            let extension = fileName.substring('validator.'.length);
+            if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+              continue;
+            zip
+              .file(fileName)
+              .async('string')
+              .then(value => {
+                store.commit('Validator', 'custom');
+                store.commit('ValidatorLanguage', extension);
+                store.commit(
+                  'request.input.validator.custom_validator.source',
+                  value,
+                );
+              })
+              .catch(Util.asyncError);
+          } else if (
+            fileName.startsWith('interactive/') &&
+            fileName.endsWith('.idl')
+          ) {
+            let moduleName = fileName.substring(
+              'interactive/'.length,
+              fileName.length - '.idl'.length,
+            );
+            zip
+              .file(fileName)
+              .async('string')
+              .then(value => {
+                store.commit('Interactive', true);
+                store.commit('InteractiveModuleName', moduleName);
+                store.commit('request.input.interactive.idl', value);
+              })
+              .catch(Util.asyncError);
+          } else if (fileName.startsWith('interactive/Main.')) {
+            let extension = fileName.substring('interactive/Main.'.length);
+            if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+              continue;
+            zip
+              .file(fileName)
+              .async('string')
+              .then(value => {
+                store.commit('Interactive', true);
+                store.commit('InteractiveLanguage', extension);
+                store.commit('request.input.interactive.main_source', value);
+              })
+              .catch(Util.asyncError);
           }
+        }
 
-          if (zip.files.hasOwnProperty('testplan')) {
-            zip.file('testplan')
-                .async('string')
-                .then(value => {
-                  for (let line of value.split('\n')) {
-                    if (line.startsWith('#') || line.trim() == '') continue;
-                    let tokens = line.split(/\s+/);
-                    if (tokens.length != 2) continue;
-                    let[caseName, weight] = tokens;
-                    if (!cases.hasOwnProperty(caseName)) continue;
-                    store.commit('createCase', {
-                      name: caseName,
-                      weight: parseFloat(weight),
-                    });
-                  }
-                })
-                .catch(Util.asyncError);
-          }
-          if (zip.files.hasOwnProperty('settings.json')) {
-            zip.file('settings.json')
-                .async('string')
-                .then(value => {
-                  value = JSON.parse(value);
-                  if (value.hasOwnProperty('Limits')) {
-                    for (let name
-                             of['TimeLimit', 'OverallWallTimeLimit',
-                                'ExtraWallTime', 'MemoryLimit', 'OutputLimit',
-                    ]) {
-                      if (!value.Limits.hasOwnProperty(name)) continue;
-                      store.commit(name, value.Limits[name]);
-                    }
-                  }
-                  if (value.hasOwnProperty('Validator')) {
-                    if (value.Validator.hasOwnProperty('Name')) {
-                      store.commit('Validator', value.Validator.Name);
-                    }
-                    if (value.Validator.hasOwnProperty('Tolerance')) {
-                      store.commit('Tolerance', value.Validator.Tolerance);
-                    }
-                  }
-                })
-                .catch(Util.asyncError);
-          }
-        })
-        .catch(Util.asyncError);
+        if (zip.files.hasOwnProperty('testplan')) {
+          zip
+            .file('testplan')
+            .async('string')
+            .then(value => {
+              for (let line of value.split('\n')) {
+                if (line.startsWith('#') || line.trim() == '') continue;
+                let tokens = line.split(/\s+/);
+                if (tokens.length != 2) continue;
+                let [caseName, weight] = tokens;
+                if (!cases.hasOwnProperty(caseName)) continue;
+                store.commit('createCase', {
+                  name: caseName,
+                  weight: parseFloat(weight),
+                });
+              }
+            })
+            .catch(Util.asyncError);
+        }
+        if (zip.files.hasOwnProperty('settings.json')) {
+          zip
+            .file('settings.json')
+            .async('string')
+            .then(value => {
+              value = JSON.parse(value);
+              if (value.hasOwnProperty('Limits')) {
+                for (let name of [
+                  'TimeLimit',
+                  'OverallWallTimeLimit',
+                  'ExtraWallTime',
+                  'MemoryLimit',
+                  'OutputLimit',
+                ]) {
+                  if (!value.Limits.hasOwnProperty(name)) continue;
+                  store.commit(name, value.Limits[name]);
+                }
+              }
+              if (value.hasOwnProperty('Validator')) {
+                if (value.Validator.hasOwnProperty('Name')) {
+                  store.commit('Validator', value.Validator.Name);
+                }
+                if (value.Validator.hasOwnProperty('Tolerance')) {
+                  store.commit('Tolerance', value.Validator.Tolerance);
+                }
+              }
+            })
+            .catch(Util.asyncError);
+        }
+      })
+      .catch(Util.asyncError);
   });
   reader.readAsArrayBuffer(files[0]);
 });
 
-document.getElementById('download')
-    .addEventListener('click', e => {
-      let downloadLabelElement = document.getElementById('download-label');
-      if (downloadLabelElement.className.indexOf('fa-download') != -1)
-        return true;
-      e.preventDefault();
+document.getElementById('download').addEventListener('click', e => {
+  let downloadLabelElement = document.getElementById('download-label');
+  if (downloadLabelElement.className.indexOf('fa-download') != -1) return true;
+  e.preventDefault();
 
-      let zip = new JSZip();
-      let cases = zip.folder('cases');
+  let zip = new JSZip();
+  let cases = zip.folder('cases');
 
-      let testplan = '';
-      for (let caseName in store.state.request.input.cases) {
-        if (!store.state.request.input.cases.hasOwnProperty(caseName)) continue;
+  let testplan = '';
+  for (let caseName in store.state.request.input.cases) {
+    if (!store.state.request.input.cases.hasOwnProperty(caseName)) continue;
 
-        cases.file(`${caseName}.in`,
-                   store.state.request.input.cases[caseName].in);
-        cases.file(`${caseName}.out`,
-                   store.state.request.input.cases[caseName].out);
-        testplan += caseName + ' ' +
-                    store.state.request.input.cases[caseName].weight + '\n';
-      }
-      zip.file('testplan', testplan);
-      let settingsValidator = {
-        Name: store.state.request.input.validator.name,
-      };
-      if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
-        settingsValidator.Tolerance =
-            store.state.request.input.validator.Tolerance;
-      }
-      if (store.state.request.input.validator.hasOwnProperty(
-              'custom_validator')) {
-        settingsValidator.Lang =
-            store.state.request.input.validator.custom_validator.lang;
-      }
-      zip.file('settings.json', JSON.stringify(
-                                    {
-                                      Cases: store.getters.settingsCases,
-                                      Limits: store.state.request.input.limits,
-                                      Validator: settingsValidator,
-                                    },
-                                    null, '  '));
+    cases.file(`${caseName}.in`, store.state.request.input.cases[caseName].in);
+    cases.file(
+      `${caseName}.out`,
+      store.state.request.input.cases[caseName].out,
+    );
+    testplan +=
+      caseName + ' ' + store.state.request.input.cases[caseName].weight + '\n';
+  }
+  zip.file('testplan', testplan);
+  let settingsValidator = {
+    Name: store.state.request.input.validator.name,
+  };
+  if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
+    settingsValidator.Tolerance = store.state.request.input.validator.Tolerance;
+  }
+  if (store.state.request.input.validator.hasOwnProperty('custom_validator')) {
+    settingsValidator.Lang =
+      store.state.request.input.validator.custom_validator.lang;
+  }
+  zip.file(
+    'settings.json',
+    JSON.stringify(
+      {
+        Cases: store.getters.settingsCases,
+        Limits: store.state.request.input.limits,
+        Validator: settingsValidator,
+      },
+      null,
+      '  ',
+    ),
+  );
 
-      let interactive = store.state.request.input.interactive;
-      if (interactive) {
-        let interactiveFolder = zip.folder('interactive');
-        interactiveFolder.file(`${interactive.module_name}.idl`,
-                               interactive.idl);
-        interactiveFolder.file(`Main.${interactive.language}`,
-                               interactive.main_source);
-        interactiveFolder.file('examples/sample.in',
-                               store.state.request.input.cases.sample.in);
-      }
+  let interactive = store.state.request.input.interactive;
+  if (interactive) {
+    let interactiveFolder = zip.folder('interactive');
+    interactiveFolder.file(`${interactive.module_name}.idl`, interactive.idl);
+    interactiveFolder.file(
+      `Main.${interactive.language}`,
+      interactive.main_source,
+    );
+    interactiveFolder.file(
+      'examples/sample.in',
+      store.state.request.input.cases.sample.in,
+    );
+  }
 
-      let customValidator =
-          store.state.request.input.validator.custom_validator;
-      if (customValidator) {
-        zip.file('validator.' + customValidator.language,
-                 customValidator.source);
-      }
+  let customValidator = store.state.request.input.validator.custom_validator;
+  if (customValidator) {
+    zip.file('validator.' + customValidator.language, customValidator.source);
+  }
 
-      zip.generateAsync({type: 'blob'})
-          .then(blob => {
-            downloadLabelElement.className =
-                downloadLabelElement.className.replace('fa-file-archive-o',
-                                                       'fa-download');
-            let downloadElement = document.getElementById('download');
-            downloadElement.download = 'omegaup.zip';
-            downloadElement.href = window.URL.createObjectURL(blob);
-          })
-          .catch(Util.asyncError);
-    });
+  zip
+    .generateAsync({ type: 'blob' })
+    .then(blob => {
+      downloadLabelElement.className = downloadLabelElement.className.replace(
+        'fa-file-archive-o',
+        'fa-download',
+      );
+      let downloadElement = document.getElementById('download');
+      downloadElement.download = 'omegaup.zip';
+      downloadElement.href = window.URL.createObjectURL(blob);
+    })
+    .catch(Util.asyncError);
+});
 
 document.getElementsByTagName('form')[0].addEventListener('submit', e => {
   e.preventDefault();
   document.getElementsByTagName('button')[0].setAttribute('disabled', '');
-  fetch('run/new/',
-        {
-          method: 'POST',
-          headers: new Headers({
-            'Content-Type': 'application/json',
-          }),
-          body: JSON.stringify(store.state.request),
-        })
-      .then(response => {
-        if (!response.ok) return null;
-        history.replaceState(
-            undefined, undefined,
-            '#' + response.headers.get('X-OmegaUp-EphemeralToken'));
-        return response.formData();
-      })
-      .then(formData => {
-        document.getElementsByTagName('button')[0].removeAttribute('disabled');
-        if (!formData) {
-          onDetailsJsonReady({
-            verdict: 'JE',
-            contest_score: 0,
-            max_score: this.state.max_score,
-          });
-          store.commit('logs', '');
-          onFilesZipReady(null);
-          return;
-        }
+  fetch('run/new/', {
+    method: 'POST',
+    headers: new Headers({
+      'Content-Type': 'application/json',
+    }),
+    body: JSON.stringify(store.state.request),
+  })
+    .then(response => {
+      if (!response.ok) return null;
+      history.replaceState(
+        undefined,
+        undefined,
+        '#' + response.headers.get('X-OmegaUp-EphemeralToken'),
+      );
+      return response.formData();
+    })
+    .then(formData => {
+      document.getElementsByTagName('button')[0].removeAttribute('disabled');
+      if (!formData) {
+        onDetailsJsonReady({
+          verdict: 'JE',
+          contest_score: 0,
+          max_score: this.state.max_score,
+        });
+        store.commit('logs', '');
+        onFilesZipReady(null);
+        return;
+      }
 
-        if (formData.has('details.json')) {
-          let reader = new FileReader();
-          reader.addEventListener('loadend', function() {
-            onDetailsJsonReady(JSON.parse(reader.result));
-          });
-          reader.readAsText(formData.get('details.json'));
-        }
+      if (formData.has('details.json')) {
+        let reader = new FileReader();
+        reader.addEventListener('loadend', function() {
+          onDetailsJsonReady(JSON.parse(reader.result));
+        });
+        reader.readAsText(formData.get('details.json'));
+      }
 
-        if (formData.has('logs.txt.gz')) {
-          let reader = new FileReader();
-          reader.addEventListener('loadend', function() {
-            if (reader.result.byteLength == 0) {
-              store.commit('logs', '');
-              return;
-            }
+      if (formData.has('logs.txt.gz')) {
+        let reader = new FileReader();
+        reader.addEventListener('loadend', function() {
+          if (reader.result.byteLength == 0) {
+            store.commit('logs', '');
+            return;
+          }
 
-            store.commit('logs', new TextDecoder('utf-8')
-                                     .decode(pako.inflate(reader.result)));
-          });
-          reader.readAsArrayBuffer(formData.get('logs.txt.gz'));
-        } else {
-          store.commit('logs', '');
-        }
+          store.commit(
+            'logs',
+            new TextDecoder('utf-8').decode(pako.inflate(reader.result)),
+          );
+        });
+        reader.readAsArrayBuffer(formData.get('logs.txt.gz'));
+      } else {
+        store.commit('logs', '');
+      }
 
-        onFilesZipReady(formData.get('files.zip'));
-      })
-      .catch(Util.asyncError);
+      onFilesZipReady(formData.get('files.zip'));
+    })
+    .catch(Util.asyncError);
 });
 
 function setSettings(settings) {
@@ -1211,7 +1287,7 @@ function setSettings(settings) {
   store.commit('removeCase', 'long');
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
-  for (let name of['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
+  for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
     if (!settings.limits.hasOwnProperty(name)) continue;
     store.commit(name, Util.parseDuration(settings.limits[name]));
   }
@@ -1228,8 +1304,10 @@ function setSettings(settings) {
     store.commit('InteractiveLanguage', settings.interactive.language);
     store.commit('InteractiveModuleName', settings.interactive.module_name);
     store.commit('request.input.interactive.idl', settings.interactive.idl);
-    store.commit('request.input.interactive.main_source',
-                 settings.interactive.main_source);
+    store.commit(
+      'request.input.interactive.main_source',
+      settings.interactive.main_source,
+    );
   }
   for (let caseName in settings.cases) {
     if (!settings.cases.hasOwnProperty(caseName)) continue;
@@ -1255,15 +1333,19 @@ function setSettings(settings) {
 
 // Add a message listener in case we are embedded or the embedded runner was
 // popped into a full-blown tab.
-window.addEventListener('message', e => {
-  if (e.origin != window.location.origin || !e.data) return;
+window.addEventListener(
+  'message',
+  e => {
+    if (e.origin != window.location.origin || !e.data) return;
 
-  switch (e.data.method) {
-    case 'setSettings':
-      setSettings(...e.data.params);
-      break;
-  }
-}, false);
+    switch (e.data.method) {
+      case 'setSettings':
+        setSettings(...e.data.params);
+        break;
+    }
+  },
+  false,
+);
 
 function onHashChanged() {
   if (window.location.hash.length == 0) {
@@ -1276,58 +1358,61 @@ function onHashChanged() {
 
   let token = window.location.hash.substring(1);
   fetch(`run/${token}/request.json`)
-      .then(response => {
-        if (!response.ok) return null;
-        return response.json();
-      })
-      .then(request => {
-        if (!request) {
-          store.commit('reset');
-          store.commit('logs', '');
-          onDetailsJsonReady({});
-          onFilesZipReady(null);
-          return;
-        }
-        request.input.limits.ExtraWallTime =
-            Util.parseDuration(request.input.limits.ExtraWallTime);
-        request.input.limits.OverallWallTimeLimit =
-            Util.parseDuration(request.input.limits.OverallWallTimeLimit);
-        request.input.limits.TimeLimit =
-            Util.parseDuration(request.input.limits.TimeLimit);
-        if (!request.input.cases.sample) {
-          // When the run was made programatically, it does not always contain
-          // a sample case. In order to display those runs without crashing,
-          // just create a fake entry with no weight.
-          request.input.cases.sample = {
-            'in': '',
-            out: '',
-            weight: 0,
-          };
-        }
-        store.commit('request', request);
-        fetch(`run/${token}/details.json`)
-            .then(response => {
-              if (!response.ok) return {};
-              return response.json();
-            })
-            .then(onDetailsJsonReady)
-            .catch(Util.asyncError);
-        fetch(`run/${token}/files.zip`)
-            .then(response => {
-              if (!response.ok) return null;
-              return response.blob();
-            })
-            .then(onFilesZipReady)
-            .catch(Util.asyncError);
-        fetch(`run/${token}/logs.txt`)
-            .then(response => {
-              if (!response.ok) return '';
-              return response.text();
-            })
-            .then(text => store.commit('logs', text))
-            .catch(Util.asyncError);
-      })
-      .catch(Util.asyncError);
+    .then(response => {
+      if (!response.ok) return null;
+      return response.json();
+    })
+    .then(request => {
+      if (!request) {
+        store.commit('reset');
+        store.commit('logs', '');
+        onDetailsJsonReady({});
+        onFilesZipReady(null);
+        return;
+      }
+      request.input.limits.ExtraWallTime = Util.parseDuration(
+        request.input.limits.ExtraWallTime,
+      );
+      request.input.limits.OverallWallTimeLimit = Util.parseDuration(
+        request.input.limits.OverallWallTimeLimit,
+      );
+      request.input.limits.TimeLimit = Util.parseDuration(
+        request.input.limits.TimeLimit,
+      );
+      if (!request.input.cases.sample) {
+        // When the run was made programatically, it does not always contain
+        // a sample case. In order to display those runs without crashing,
+        // just create a fake entry with no weight.
+        request.input.cases.sample = {
+          in: '',
+          out: '',
+          weight: 0,
+        };
+      }
+      store.commit('request', request);
+      fetch(`run/${token}/details.json`)
+        .then(response => {
+          if (!response.ok) return {};
+          return response.json();
+        })
+        .then(onDetailsJsonReady)
+        .catch(Util.asyncError);
+      fetch(`run/${token}/files.zip`)
+        .then(response => {
+          if (!response.ok) return null;
+          return response.blob();
+        })
+        .then(onFilesZipReady)
+        .catch(Util.asyncError);
+      fetch(`run/${token}/logs.txt`)
+        .then(response => {
+          if (!response.ok) return '';
+          return response.text();
+        })
+        .then(text => store.commit('logs', text))
+        .catch(Util.asyncError);
+    })
+    .catch(Util.asyncError);
 }
 window.addEventListener('hashchange', onHashChanged, false);
 onHashChanged();

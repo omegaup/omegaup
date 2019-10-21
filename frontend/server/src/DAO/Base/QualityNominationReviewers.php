@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -21,15 +21,29 @@ abstract class QualityNominationReviewers {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\QualityNominationReviewers} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\QualityNominationReviewers}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\QualityNominationReviewers}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\QualityNominationReviewers Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\QualityNominationReviewers} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $qualitynomination_id, ?int $user_id) : ?\OmegaUp\DAO\VO\QualityNominationReviewers {
-        $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` FROM QualityNomination_Reviewers WHERE (qualitynomination_id = ? AND user_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $qualitynomination_id,
+        ?int $user_id
+    ): ?\OmegaUp\DAO\VO\QualityNominationReviewers {
+        $sql = '
+            SELECT
+                `QualityNomination_Reviewers`.`qualitynomination_id`,
+                `QualityNomination_Reviewers`.`user_id`
+            FROM
+                `QualityNomination_Reviewers`
+            WHERE
+                (
+                    `qualitynomination_id` = ? AND
+                    `user_id` = ?
+                )
+            LIMIT 1;';
         $params = [$qualitynomination_id, $user_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -57,9 +71,21 @@ abstract class QualityNominationReviewers {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\QualityNominationReviewers $QualityNomination_Reviewers) : void {
-        $sql = 'DELETE FROM `QualityNomination_Reviewers` WHERE qualitynomination_id = ? AND user_id = ?;';
-        $params = [$QualityNomination_Reviewers->qualitynomination_id, $QualityNomination_Reviewers->user_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\QualityNominationReviewers $QualityNomination_Reviewers
+    ): void {
+        $sql = '
+            DELETE FROM
+                `QualityNomination_Reviewers`
+            WHERE
+                (
+                    `qualitynomination_id` = ? AND
+                    `user_id` = ?
+                );';
+        $params = [
+            $QualityNomination_Reviewers->qualitynomination_id,
+            $QualityNomination_Reviewers->user_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -93,17 +119,37 @@ abstract class QualityNominationReviewers {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `QualityNomination_Reviewers`.`qualitynomination_id`, `QualityNomination_Reviewers`.`user_id` from QualityNomination_Reviewers';
+    ): array {
+        $sql = '
+            SELECT
+                `QualityNomination_Reviewers`.`qualitynomination_id`,
+                `QualityNomination_Reviewers`.`user_id`
+            FROM
+                `QualityNomination_Reviewers`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\QualityNominationReviewers($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\QualityNominationReviewers(
+                $row
+            );
         }
         return $allData;
     }
@@ -116,15 +162,35 @@ abstract class QualityNominationReviewers {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\QualityNominationReviewers $QualityNomination_Reviewers El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\QualityNominationReviewers} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\QualityNominationReviewers}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\QualityNominationReviewers $QualityNomination_Reviewers) : int {
-        $sql = 'INSERT INTO QualityNomination_Reviewers (`qualitynomination_id`, `user_id`) VALUES (?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\QualityNominationReviewers $QualityNomination_Reviewers
+    ): int {
+        $sql = '
+            INSERT INTO
+                QualityNomination_Reviewers (
+                    `qualitynomination_id`,
+                    `user_id`
+                ) VALUES (
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($QualityNomination_Reviewers->qualitynomination_id) ? null : intval($QualityNomination_Reviewers->qualitynomination_id),
-            is_null($QualityNomination_Reviewers->user_id) ? null : intval($QualityNomination_Reviewers->user_id),
+            (
+                is_null($QualityNomination_Reviewers->qualitynomination_id) ?
+                null :
+                intval($QualityNomination_Reviewers->qualitynomination_id)
+            ),
+            (
+                is_null($QualityNomination_Reviewers->user_id) ?
+                null :
+                intval($QualityNomination_Reviewers->user_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

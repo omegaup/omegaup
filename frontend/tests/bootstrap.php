@@ -1,4 +1,5 @@
 <?php
+
 namespace {
     define('IS_TEST', true);
     // Set timezone to UTC
@@ -28,7 +29,9 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/factories/RunsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/GroupsFactory.php');
     require_once(OMEGAUP_ROOT . '/tests/factories/SchoolsFactory.php');
-    require_once(OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php');
+    require_once(
+        OMEGAUP_ROOT . '/tests/factories/QualityNominationFactory.php'
+    );
     Utils::CleanupFilesAndDb();
     // Clean APC cache
     \OmegaUp\Cache::clearCacheForTesting();

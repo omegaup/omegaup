@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,15 +35,32 @@ abstract class ProblemsForfeited {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited) : int {
-        if (empty($Problems_Forfeited->user_id) || empty($Problems_Forfeited->problem_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited
+    ): int {
+        if (
+            empty($Problems_Forfeited->user_id) ||
+            empty($Problems_Forfeited->problem_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                Problems_Forfeited (
+                    `user_id`,
+                    `problem_id`,
+                    `forfeited_date`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $Problems_Forfeited->user_id,
             $Problems_Forfeited->problem_id,
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problems_Forfeited->forfeited_date
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -56,12 +73,33 @@ abstract class ProblemsForfeited {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited) : int {
-        $sql = 'UPDATE `Problems_Forfeited` SET `forfeited_date` = ? WHERE `user_id` = ? AND `problem_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited
+    ): int {
+        $sql = '
+            UPDATE
+                `Problems_Forfeited`
+            SET
+                `forfeited_date` = ?
+            WHERE
+                (
+                    `user_id` = ? AND
+                    `problem_id` = ?
+                );';
         $params = [
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
-            is_null($Problems_Forfeited->user_id) ? null : intval($Problems_Forfeited->user_id),
-            is_null($Problems_Forfeited->problem_id) ? null : intval($Problems_Forfeited->problem_id),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problems_Forfeited->forfeited_date
+            ),
+            (
+                is_null($Problems_Forfeited->user_id) ?
+                null :
+                intval($Problems_Forfeited->user_id)
+            ),
+            (
+                is_null($Problems_Forfeited->problem_id) ?
+                null :
+                intval($Problems_Forfeited->problem_id)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -70,15 +108,30 @@ abstract class ProblemsForfeited {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\ProblemsForfeited} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsForfeited}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemsForfeited}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\ProblemsForfeited Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\ProblemsForfeited} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?int $user_id, ?int $problem_id) : ?\OmegaUp\DAO\VO\ProblemsForfeited {
-        $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` FROM Problems_Forfeited WHERE (user_id = ? AND problem_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?int $user_id,
+        ?int $problem_id
+    ): ?\OmegaUp\DAO\VO\ProblemsForfeited {
+        $sql = '
+            SELECT
+                `Problems_Forfeited`.`user_id`,
+                `Problems_Forfeited`.`problem_id`,
+                `Problems_Forfeited`.`forfeited_date`
+            FROM
+                `Problems_Forfeited`
+            WHERE
+                (
+                    `user_id` = ? AND
+                    `problem_id` = ?
+                )
+            LIMIT 1;';
         $params = [$user_id, $problem_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -106,9 +159,21 @@ abstract class ProblemsForfeited {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited) : void {
-        $sql = 'DELETE FROM `Problems_Forfeited` WHERE user_id = ? AND problem_id = ?;';
-        $params = [$Problems_Forfeited->user_id, $Problems_Forfeited->problem_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problems_Forfeited`
+            WHERE
+                (
+                    `user_id` = ? AND
+                    `problem_id` = ?
+                );';
+        $params = [
+            $Problems_Forfeited->user_id,
+            $Problems_Forfeited->problem_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -142,17 +207,38 @@ abstract class ProblemsForfeited {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problems_Forfeited`.`user_id`, `Problems_Forfeited`.`problem_id`, `Problems_Forfeited`.`forfeited_date` from Problems_Forfeited';
+    ): array {
+        $sql = '
+            SELECT
+                `Problems_Forfeited`.`user_id`,
+                `Problems_Forfeited`.`problem_id`,
+                `Problems_Forfeited`.`forfeited_date`
+            FROM
+                `Problems_Forfeited`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemsForfeited($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemsForfeited(
+                $row
+            );
         }
         return $allData;
     }
@@ -165,16 +251,40 @@ abstract class ProblemsForfeited {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsForfeited} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsForfeited}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited) : int {
-        $sql = 'INSERT INTO Problems_Forfeited (`user_id`, `problem_id`, `forfeited_date`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemsForfeited $Problems_Forfeited
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problems_Forfeited (
+                    `user_id`,
+                    `problem_id`,
+                    `forfeited_date`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problems_Forfeited->user_id) ? null : intval($Problems_Forfeited->user_id),
-            is_null($Problems_Forfeited->problem_id) ? null : intval($Problems_Forfeited->problem_id),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problems_Forfeited->forfeited_date),
+            (
+                is_null($Problems_Forfeited->user_id) ?
+                null :
+                intval($Problems_Forfeited->user_id)
+            ),
+            (
+                is_null($Problems_Forfeited->problem_id) ?
+                null :
+                intval($Problems_Forfeited->problem_id)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problems_Forfeited->forfeited_date
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

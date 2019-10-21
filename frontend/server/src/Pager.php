@@ -8,7 +8,7 @@ class Pager {
      *
      * @param array<string, string[]|string> $dict
      */
-    public static function buildQueryString($dict) : string {
+    public static function buildQueryString($dict): string {
         $params = [];
         foreach ($dict as $key => $val) {
             if (is_array($val)) {
@@ -49,7 +49,7 @@ class Pager {
         string $url,
         int $adjacent,
         array $params
-    ) : array {
+    ): array {
         $pages = intval(($rows + PROBLEMS_PER_PAGE - 1) / PROBLEMS_PER_PAGE);
         if ($current < 1 || $current > $pages) {
             $current = 1;
@@ -90,7 +90,15 @@ class Pager {
             );
         }
 
-        for ($i = max(1, $current - $adjacent); $i <= min($pages, $current + $adjacent); $i++) {
+        for (
+            $i = max(
+                1,
+                $current - $adjacent
+            ); $i <= min(
+                $pages,
+                $current + $adjacent
+            ); $i++
+        ) {
             array_push(
                 $items,
                 [

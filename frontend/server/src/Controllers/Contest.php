@@ -39,12 +39,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // a number and should pass this check.
         \OmegaUp\Validators::validateNumber($activeContests, 'active');
         $recommended = isset($r['recommended'])
-            ? \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue($r['recommended'])
+            ? \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
+                $r['recommended']
+            )
             : \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
         // Same as above.
         \OmegaUp\Validators::validateNumber($recommended, 'recommended');
         $participating = isset($r['participating'])
-            ? \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue($r['participating'])
+            ? \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
+                $r['participating']
+            )
             : \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
         \OmegaUp\Validators::validateInEnum($r['admission_mode'], 'admission_mode', [
             'public',
@@ -53,10 +57,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ], false);
 
         // admission mode status in contest is public
-        $public = isset($r['admission_mode']) && self::isPublic($r['admission_mode']);
+        $public = (
+            isset($r['admission_mode']) &&
+            self::isPublic($r['admission_mode'])
+        );
 
         if (is_null($participating)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterInvalid', 'participating');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'participating'
+            );
         }
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
@@ -69,7 +79,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$page_size}";
         if (is_null($r->identity)) {
             // Get all public contests
-            $callback = function () use ($page, $page_size, $activeContests, $recommended, $query) {
+            $callback = function () use (
+                $page,
+                $page_size,
+                $activeContests,
+                $recommended,
+                $query
+            ) {
                 return \OmegaUp\DAO\Contests::getAllPublicContests(
                     $page,
                     $page_size,
@@ -103,7 +119,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             // Get all contests
-            $callback = function () use ($page, $page_size, $activeContests, $recommended, $query) {
+            $callback = function () use (
+                $page,
+                $page_size,
+                $activeContests,
+                $recommended,
+                $query
+            ) {
                 return \OmegaUp\DAO\Contests::getAllContests(
                     $page,
                     $page_size,
@@ -209,7 +231,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param $callback_user_function
      * @return array
      */
-    private static function getContestListInternal(\OmegaUp\Request $r, $callback_user_function) : Array {
+    private static function getContestListInternal(
+        \OmegaUp\Request $r,
+        $callback_user_function
+    ): array {
         $r->ensureInt('page', null, null, false);
         $r->ensureInt('page_size', null, null, false);
 
@@ -229,15 +254,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $addedContests = [];
         foreach ($contests as $contest) {
-            $contest['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest['start_time']);
-            $contest['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest['finish_time']);
-            $contest['last_updated'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest['last_updated']);
+            $contest['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                $contest['start_time']
+            );
+            $contest['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                $contest['finish_time']
+            );
+            $contest['last_updated'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                $contest['last_updated']
+            );
             $addedContests[] = $contest;
         }
 
         // Expire contest-list cache
         \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
-        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
+        );
 
         return [
             'status' => 'ok',
@@ -253,7 +286,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
-        return self::getContestListInternal($r, '\OmegaUp\DAO\Contests::getAllContestsOwnedByUser');
+        return self::getContestListInternal(
+            $r,
+            '\OmegaUp\DAO\Contests::getAllContestsOwnedByUser'
+        );
     }
 
     /**
@@ -264,7 +300,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiListParticipating(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        return self::getContestListInternal($r, '\OmegaUp\DAO\Contests::getContestsParticipating');
+        return self::getContestListInternal(
+            $r,
+            '\OmegaUp\DAO\Contests::getContestsParticipating'
+        );
     }
 
     /**
@@ -284,16 +323,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
     private static function canAccessContest(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : void {
+    ): void {
         if ($contest->admission_mode == 'private') {
-            if (is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
-                $identity->identity_id,
-                $contest->problemset_id
-            )) && !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
+            if (
+                is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
+                    $identity->identity_id,
+                    $contest->problemset_id
+                )) &&
+                !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
             ) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
             }
-        } elseif ($contest->admission_mode == 'registration' &&
+        } elseif (
+            $contest->admission_mode == 'registration' &&
             !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
         ) {
             $req = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
@@ -301,7 +345,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $contest->problemset_id
             );
             if (is_null($req) || $req->accepted === '0') {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestNotRegistered');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'contestNotRegistered'
+                );
             }
         }
     }
@@ -313,19 +359,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{0: \OmegaUp\DAO\VO\Contests, 1: \OmegaUp\DAO\VO\Problemsets}
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
-    private static function validateBasicDetails(?string $contestAlias) : array {
-        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+    private static function validateBasicDetails(?string $contestAlias): array {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $contestAlias,
+            'contest_alias'
+        );
         // If the contest is private, verify that our user is invited
-        $contestProblemset = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation($contestAlias);
+        $contestProblemset = \OmegaUp\DAO\Contests::getByAliasWithExtraInformation(
+            $contestAlias
+        );
         if (is_null($contestProblemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
         return [
             new \OmegaUp\DAO\VO\Contests(
-                array_intersect_key($contestProblemset, \OmegaUp\DAO\VO\Contests::FIELD_NAMES)
+                array_intersect_key(
+                    $contestProblemset,
+                    \OmegaUp\DAO\VO\Contests::FIELD_NAMES
+                )
             ),
             new \OmegaUp\DAO\VO\Problemsets(
-                array_intersect_key($contestProblemset, \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES)
+                array_intersect_key(
+                    $contestProblemset,
+                    \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES
+                )
             ),
         ];
     }
@@ -339,8 +396,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function validateContest(
         ?string $contestAlias
-    ) : \OmegaUp\DAO\VO\Contests {
-        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+    ): \OmegaUp\DAO\VO\Contests {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $contestAlias,
+            'contest_alias'
+        );
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -358,7 +418,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     private static function isInvitedToContest(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : bool {
+    ): bool {
         if (is_null($identity->user_id)) {
             return false;
         }
@@ -373,15 +433,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Get all the properties for smarty.
      * @param \OmegaUp\Request $r
      * @param \OmegaUp\DAO\VO\Contests $contest
-     * @return Array
+     * @return array
      */
     public static function getContestDetailsForSmarty(
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Contests $contest,
         bool $shouldShowIntro
-    ) : array {
+    ): array {
         // Half-authenticate, in case there is no session in place.
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+            $r
+        )['session'];
         if (!$shouldShowIntro) {
             return ['payload' => [
                 'shouldShowFirstAssociatedIdentityRunWarning' =>
@@ -448,9 +510,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function shouldShowIntro(
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Contests $contest
-    ) : bool {
+    ): bool {
         try {
-            $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
+            $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+                $r
+            )['session'];
             if (is_null($session['identity'])) {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);
@@ -472,7 +536,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contest->problemset_id
         );
         if (!is_null($contestOpened) && !is_null($contestOpened->access_time)) {
-            self::$log->debug('No intro because you already started the contest');
+            self::$log->debug(
+                'No intro because you already started the contest'
+            );
             return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
         }
         return \OmegaUp\Controllers\Contest::SHOW_INTRO;
@@ -486,8 +552,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\PreconditionFailedException
      */
-    public static function validateDetails(\OmegaUp\Request $r) : Array {
-        [$contest, $problemset] = self::validateBasicDetails($r['contest_alias']);
+    public static function validateDetails(\OmegaUp\Request $r): array {
+        [$contest, $problemset] = self::validateBasicDetails(
+            $r['contest_alias']
+        );
 
         $contestAdmin = false;
         $contestAlias = '';
@@ -499,10 +567,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
             self::canAccessContest($contest, $r->identity);
 
-            $contestAdmin = \OmegaUp\Authorization::isContestAdmin($r->identity, $contest);
-            if (!\OmegaUp\DAO\Contests::hasStarted($contest) && !$contestAdmin) {
-                $exception = new \OmegaUp\Exceptions\PreconditionFailedException('contestNotStarted');
-                $exception->addCustomMessageToArray('start_time', $contest->start_time);
+            $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
+                $r->identity,
+                $contest
+            );
+            if (
+                !\OmegaUp\DAO\Contests::hasStarted($contest) &&
+                !$contestAdmin
+            ) {
+                $exception = new \OmegaUp\Exceptions\PreconditionFailedException(
+                    'contestNotStarted'
+                );
+                $exception->addCustomMessageToArray(
+                    'start_time',
+                    $contest->start_time
+                );
 
                 throw $exception;
             }
@@ -512,7 +591,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 /** @var string */
                 $contestAlias = $contest->alias;
             } elseif ($r['token'] !== $problemset->scoreboard_url) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException('invalidScoreboardUrl');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'invalidScoreboardUrl'
+                );
             }
         }
         return [
@@ -523,7 +604,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function apiPublicDetails(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
         $result = [];
 
@@ -557,7 +641,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
 
-        if (!is_null($session['identity']) && $result['admission_mode'] == 'registration') {
+        if (
+            !is_null($session['identity']) &&
+            $result['admission_mode'] == 'registration'
+        ) {
             $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
                 $session['identity']->identity_id,
                 $r['contest']->problemset_id
@@ -569,13 +656,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $result['user_registration_accepted'] = false;
                 $result['user_registration_answered'] = false;
             } else {
-                $result['user_registration_answered'] = !is_null($registration->accepted);
+                $result['user_registration_answered'] = !is_null(
+                    $registration->accepted
+                );
                 $result['user_registration_accepted'] = $registration->accepted == '1';
             }
         }
 
-        $result['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['start_time']);
-        $result['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['finish_time']);
+        $result['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $result['start_time']
+        );
+        $result['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $result['finish_time']
+        );
 
         $result['status'] = 'ok';
 
@@ -608,14 +701,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
         [
             'needsBasicInformation' => $needsInformation,
             'requestsUserInformation' => $requestsUserInformation
-        ] = \OmegaUp\DAO\Contests::getNeedsInformation($response['contest']->problemset_id);
-        $session = \OmegaUp\Controllers\Session::apiCurrentSession($r)['session'];
+        ] = \OmegaUp\DAO\Contests::getNeedsInformation(
+            $response['contest']->problemset_id
+        );
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession(
+            $r
+        )['session'];
 
-        if ($needsInformation && !is_null($session['identity']) &&
-              (!$session['identity']->country_id || !$session['identity']->state_id
+        if (
+            $needsInformation
+            && !is_null($session['identity'])
+              && (!$session['identity']->country_id
+              || !$session['identity']->state_id
                 || !$session['identity']->school_id)
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestBasicInformationNeeded');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'contestBasicInformationNeeded'
+            );
         }
 
         $r->ensureBool('share_user_information', false);
@@ -661,7 +763,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
 
-        self::$log->info("User '{$r->identity->username}' joined contest '{$response['contest']->alias}'");
+        self::$log->info(
+            "User '{$r->identity->username}' joined contest '{$response['contest']->alias}'"
+        );
         return ['status' => 'ok'];
     }
 
@@ -673,7 +777,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\DAO\VO\Contests $contest
      * @param $result
      */
-    private static function getCachedDetails(string $contestAlias, \OmegaUp\DAO\VO\Contests $contest) : array {
+    private static function getCachedDetails(
+        string $contestAlias,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::CONTEST_INFO,
             $contestAlias,
@@ -703,19 +810,29 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'rerun_id',
                 ]);
 
-                $result['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['start_time']);
-                $result['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp($result['finish_time']);
-                $result['show_scoreboard_after'] = boolval($result['show_scoreboard_after']);
+                $result['start_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $result['start_time']
+                );
+                $result['finish_time'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $result['finish_time']
+                );
+                $result['show_scoreboard_after'] = boolval(
+                    $result['show_scoreboard_after']
+                );
                 $result['original_contest_alias'] = null;
                 $result['original_problemset_id'] = null;
                 if ($result['rerun_id'] != 0) {
-                    $original_contest = \OmegaUp\DAO\Contests::getByPK($result['rerun_id']);
+                    $original_contest = \OmegaUp\DAO\Contests::getByPK(
+                        $result['rerun_id']
+                    );
                     $result['original_contest_alias'] = $original_contest->alias;
                     $result['original_problemset_id'] = $original_contest->problemset_id;
                 }
 
                 $acl = \OmegaUp\DAO\ACLs::getByPK($contest->acl_id);
-                $result['director'] = \OmegaUp\DAO\Identities::findByUserId($acl->owner_id)->username;
+                $result['director'] = \OmegaUp\DAO\Identities::findByUserId(
+                    $acl->owner_id
+                )->username;
 
                 $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                     $contest->problemset_id
@@ -728,7 +845,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
                 foreach ($problemsInContest as $problem) {
                     // Add the 'points' value that is stored in the ContestProblem relationship
-                    $problem['letter'] = \OmegaUp\Controllers\Contest::columnName($letter++);
+                    $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
+                        $letter++
+                    );
                     if (!empty($result['languages'])) {
                         $problem['languages'] = join(',', array_intersect(
                             explode(',', $result['languages']),
@@ -746,7 +865,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 [
                     'needsBasicInformation' => $result['needs_basic_information'],
                     'requestsUserInformation' => $result['requests_user_information'],
-                ] = \OmegaUp\DAO\Contests::getNeedsInformation($contest->problemset_id);
+                ] = \OmegaUp\DAO\Contests::getNeedsInformation(
+                    $contest->problemset_id
+                );
                 return $result;
             },
             APC_USER_CACHE_CONTEST_INFO_TIMEOUT
@@ -764,7 +885,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiDetails(\OmegaUp\Request $r) {
         $response = self::validateDetails($r);
 
-        $result = self::getCachedDetails($r['contest_alias'], $response['contest']);
+        $result = self::getCachedDetails(
+            $r['contest_alias'],
+            $response['contest']
+        );
         unset($result['scoreboard_url']);
         unset($result['scoreboard_url_admin']);
         unset($result['rerun_id']);
@@ -817,11 +941,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAdminDetails(\OmegaUp\Request $r) {
         $response = self::validateDetails($r);
 
-        if (!\OmegaUp\Authorization::isContestAdmin($r->identity, $response['contest'])) {
+        if (
+            !\OmegaUp\Authorization::isContestAdmin(
+                $r->identity,
+                $response['contest']
+            )
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $result = self::getCachedDetails($r['contest_alias'], $response['contest']);
+        $result = self::getCachedDetails(
+            $r['contest_alias'],
+            $response['contest']
+        );
 
         $result['opened'] = \OmegaUp\DAO\ProblemsetIdentities::checkProblemsetOpened(
             intval($r->identity->identity_id),
@@ -846,12 +978,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::GetAccessForProblemset($response['contest']->problemset_id);
-        $submissions = \OmegaUp\DAO\SubmissionLog::GetSubmissionsForProblemset($response['contest']->problemset_id);
+        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::GetAccessForProblemset(
+            $response['contest']->problemset_id
+        );
+        $submissions = \OmegaUp\DAO\SubmissionLog::GetSubmissionsForProblemset(
+            $response['contest']->problemset_id
+        );
 
         return [
             'status' => 'ok',
-            'events' => \OmegaUp\ActivityReport::getActivityReport($accesses, $submissions),
+            'events' => \OmegaUp\ActivityReport::getActivityReport(
+                $accesses,
+                $submissions
+            ),
         ];
     }
 
@@ -871,7 +1010,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Clone a contest
      *
-     * @return Array
+     * @return array
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
@@ -891,7 +1030,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Validates form
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
         \OmegaUp\Validators::validateStringNonEmpty($r['title'], 'title');
-        \OmegaUp\Validators::validateStringNonEmpty($r['description'], 'description');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['description'],
+            'description'
+        );
         $r->ensureInt('start_time', null, null, true);
 
         $length = $originalContest->finish_time - $originalContest->start_time;
@@ -967,15 +1109,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         if ($originalContest->finish_time > \OmegaUp\Time::get()) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('originalContestHasNotEnded');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'originalContestHasNotEnded'
+            );
         }
 
-        $virtualContestAlias = \OmegaUp\DAO\Contests::generateAlias($originalContest);
+        $virtualContestAlias = \OmegaUp\DAO\Contests::generateAlias(
+            $originalContest
+        );
 
         $contestLength = $originalContest->finish_time - $originalContest->start_time;
 
         $r->ensureInt('start_time', null, null, false);
-        $r['start_time'] = !is_null($r['start_time']) ? $r['start_time'] : \OmegaUp\Time::get();
+        $r['start_time'] = (
+            !is_null($r['start_time']) ?
+            $r['start_time'] :
+            \OmegaUp\Time::get()
+        );
 
         // Initialize contest
         $contest = new \OmegaUp\DAO\VO\Contests([
@@ -1029,7 +1179,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         int $currentUserId,
         ?int $originalProblemsetId = null
-    ) : void {
+    ): void {
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $currentUserId;
         // Push changes
@@ -1040,8 +1190,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\ACLs::create($acl);
             $problemset->acl_id = $acl->acl_id;
             $problemset->type = 'Contest';
-            $problemset->scoreboard_url = \OmegaUp\SecurityTools::randomString(30);
-            $problemset->scoreboard_url_admin = \OmegaUp\SecurityTools::randomString(30);
+            $problemset->scoreboard_url = \OmegaUp\SecurityTools::randomString(
+                30
+            );
+            $problemset->scoreboard_url_admin = \OmegaUp\SecurityTools::randomString(
+                30
+            );
             $contest->acl_id = $acl->acl_id;
 
             // Save the problemset object with data sent by user to the database
@@ -1070,14 +1224,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('titleInUse', $e);
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'titleInUse',
+                    $e
+                );
             }
             throw $e;
         }
 
         // Expire contest-list cache
         \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
-        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
+        );
 
         self::$log->info('New Contest Created: ' . $contest->alias);
     }
@@ -1101,8 +1260,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::validateCreate($r);
 
         // Set private contest by default if is not sent in request
-        if (!is_null($r['admission_mode']) && $r['admission_mode'] != 'private') {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('contestMustBeCreatedInPrivateMode');
+        if (
+            !is_null($r['admission_mode']) &&
+            $r['admission_mode'] != 'private'
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestMustBeCreatedInPrivateMode'
+            );
         }
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
@@ -1144,21 +1308,43 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    private static function validateCommonCreateOrUpdate(\OmegaUp\Request $r, ?\OmegaUp\DAO\VO\Contests $contest = null, bool $isRequired = true) : void {
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['title'], 'title', $isRequired);
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['description'], 'description', $isRequired);
+    private static function validateCommonCreateOrUpdate(
+        \OmegaUp\Request $r,
+        ?\OmegaUp\DAO\VO\Contests $contest = null,
+        bool $isRequired = true
+    ): void {
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['title'],
+            'title',
+            $isRequired
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['description'],
+            'description',
+            $isRequired
+        );
 
         $r->ensureInt('start_time', null, null, $isRequired);
         $r->ensureInt('finish_time', null, null, $isRequired);
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
-        $start_time = !is_null($r['start_time']) ? $r['start_time'] : \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->start_time);
-        $finish_time = !is_null($r['finish_time']) ? $r['finish_time'] : \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->finish_time);
+        $start_time = (
+            !is_null($r['start_time']) ?
+            $r['start_time'] :
+            \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->start_time)
+        );
+        $finish_time = (
+            !is_null($r['finish_time']) ?
+            $r['finish_time'] :
+            \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->finish_time)
+        );
 
         // Validate start & finish time
         if ($start_time > $finish_time) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('contestNewInvalidStartTime');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestNewInvalidStartTime'
+            );
         }
 
         // Calculate the actual contest length
@@ -1166,7 +1352,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Validate max contest length
         if ($contest_length > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('contestLengthTooLong');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestLengthTooLong'
+            );
         }
 
         // Window_length is optional
@@ -1184,7 +1372,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'private',
             'registration'
         ], false);
-        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', $isRequired);
+        \OmegaUp\Validators::validateValidAlias(
+            $r['alias'],
+            'alias',
+            $isRequired
+        );
         $r->ensureFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureBool('partial_score', false);
@@ -1192,30 +1384,57 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
         \OmegaUp\Validators::validateNumberInRange(
-            $r['submissions_gap'] == null ? null : floor($r['submissions_gap']/60),
+            (
+                is_null($r['submissions_gap']) ?
+                null :
+                floor($r['submissions_gap'] / 60)
+            ),
             'submissions_gap',
             1,
             floor($contest_length / 60),
             $isRequired
         );
 
-        \OmegaUp\Validators::validateInEnum($r['feedback'], 'feedback', ['no', 'yes', 'partial'], $isRequired);
-        \OmegaUp\Validators::validateInEnum($r['penalty_type'], 'penalty_type', ['contest_start', 'problem_open', 'runtime', 'none'], $isRequired);
-        \OmegaUp\Validators::validateInEnum($r['penalty_calc_policy'], 'penalty_calc_policy', ['sum', 'max'], false);
+        \OmegaUp\Validators::validateInEnum(
+            $r['feedback'],
+            'feedback',
+            ['no', 'yes', 'partial'],
+            $isRequired
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $r['penalty_type'],
+            'penalty_type',
+            ['contest_start', 'problem_open', 'runtime', 'none'],
+            $isRequired
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $r['penalty_calc_policy'],
+            'penalty_calc_policy',
+            ['sum', 'max'],
+            false
+        );
 
         // Problems is optional
         if (!is_null($r['problems'])) {
             $requestProblems = json_decode($r['problems']);
             if (is_null($requestProblems)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters', 'problems');
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidParameters',
+                    'problems'
+                );
             }
 
             $problems = [];
 
             foreach ($requestProblems as $requestProblem) {
-                $problem = \OmegaUp\DAO\Problems::getByAlias($requestProblem->problem);
+                $problem = \OmegaUp\DAO\Problems::getByAlias(
+                    $requestProblem->problem
+                );
                 if (is_null($problem)) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problems');
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterNotFound',
+                        'problems'
+                    );
                 }
                 \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                     $problem,
@@ -1254,7 +1473,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    private static function validateCreate(\OmegaUp\Request $r) : void {
+    private static function validateCreate(\OmegaUp\Request $r): void {
         self::validateCommonCreateOrUpdate($r);
     }
 
@@ -1267,16 +1486,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return \OmegaUp\DAO\VO\Contests
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    private static function validateUpdate(\OmegaUp\Request $r) : \OmegaUp\DAO\VO\Contests {
+    private static function validateUpdate(\OmegaUp\Request $r): \OmegaUp\DAO\VO\Contests {
         $contest = self::validateContestAdmin(
             $r['contest_alias'],
             $r->identity
         );
 
-        self::validateCommonCreateOrUpdate($r, $contest, false /* is required*/);
+        self::validateCommonCreateOrUpdate(
+            $r,
+            $contest,
+            false /* is required*/
+        );
 
         // Prevent date changes if a contest already has runs
-        if (!is_null($r['start_time']) && $r['start_time'] != \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->start_time)) {
+        if (
+            !is_null($r['start_time']) &&
+            $r['start_time'] != \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                $contest->start_time
+            )
+        ) {
             $runCount = 0;
 
             $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
@@ -1284,7 +1512,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
 
             if ($runCount > 0) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('contestUpdateAlreadyHasRuns');
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'contestUpdateAlreadyHasRuns'
+                );
             }
         }
         return $contest;
@@ -1304,7 +1534,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         string $contestAlias,
         \OmegaUp\DAO\VO\Identities $identity,
         string $message = 'userNotAllowed'
-    ) : \OmegaUp\DAO\VO\Contests {
+    ): \OmegaUp\DAO\VO\Contests {
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -1325,7 +1555,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function forbiddenInVirtual(\OmegaUp\DAO\VO\Contests $contest) {
         if (\OmegaUp\DAO\Contests::isVirtual($contest)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('forbiddenInVirtualContest');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'forbiddenInVirtualContest'
+            );
         }
     }
 
@@ -1339,7 +1571,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
         // Only director is allowed to create problems in contest
         $contest = self::validateContestAdmin(
@@ -1348,7 +1583,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'cannotAddProb'
         );
 
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
         $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $problemset->problemset_id
         );
@@ -1383,14 +1620,28 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::forbiddenInVirtual($params['contest']);
 
         /** @var int $params['contest']->problemset_id */
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($params['contest']->problemset_id);
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $params['contest']->problemset_id
+        );
 
-        if (\OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems($problemset)
-                >= MAX_PROBLEMS_IN_CONTEST) {
-            throw new \OmegaUp\Exceptions\PreconditionFailedException('contestAddproblemTooManyProblems');
+        if (
+            \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
+                $problemset
+            )
+                >= MAX_PROBLEMS_IN_CONTEST
+        ) {
+            throw new \OmegaUp\Exceptions\PreconditionFailedException(
+                'contestAddproblemTooManyProblems'
+            );
         }
 
-        \OmegaUp\Validators::validateStringOfLengthInRange($r['commit'], 'commit', 1, 40, false);
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['commit'],
+            'commit',
+            1,
+            40,
+            false
+        );
         [$masterCommit, $currentVersion] = \OmegaUp\Controllers\Problem::resolveCommit(
             $params['problem'],
             $r['commit']
@@ -1407,8 +1658,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         // Invalidar cache
-        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
-        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($params['contest']));
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTEST_INFO,
+            $r['contest_alias']
+        );
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(
+            \OmegaUp\ScoreboardParams::fromContest(
+                $params['contest']
+            )
+        );
 
         return ['status' => 'ok'];
     }
@@ -1427,35 +1685,58 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         ?string $contestAlias,
         ?string $problemAlias
-    ) : array {
-        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+    ): array {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $contestAlias,
+            'contest_alias'
+        );
 
         // Only director is allowed to create problems in contest
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         if (is_null($contest)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'contest_alias');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'contest_alias'
+            );
         }
         // Only contest admin is allowed to create problems in contest
         if (!\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotAddProb');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'cannotAddProb'
+            );
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $problemAlias,
+            'problem_alias'
+        );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problem_alias');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'problem_alias'
+            );
         }
 
-        if ($problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
-            || $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsBanned');
+        if (
+            $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PRIVATE_BANNED
+            || $problem->visibility == \OmegaUp\Controllers\Problem::VISIBILITY_PUBLIC_BANNED
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'problemIsBanned'
+            );
         }
-        if (!\OmegaUp\DAO\Problems::isVisible($problem) && !\OmegaUp\Authorization::isProblemAdmin(
-            $r->identity,
-            $problem
-        )) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('problemIsPrivate');
+        if (
+            !\OmegaUp\DAO\Problems::isVisible($problem) &&
+            !\OmegaUp\Authorization::isProblemAdmin(
+                $r->identity,
+                $problem
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'problemIsPrivate'
+            );
         }
 
         $r->ensureFloat('points', 0, INF);
@@ -1492,8 +1773,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ]));
 
         // Invalidar cache
-        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
-        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($params['contest']));
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTEST_INFO,
+            $r['contest_alias']
+        );
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(
+            \OmegaUp\ScoreboardParams::fromContest(
+                $params['contest']
+            )
+        );
 
         return ['status' => 'ok'];
     }
@@ -1512,41 +1800,64 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ?string $contestAlias,
         ?string $problemAlias,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : array {
-        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+    ): array {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $contestAlias,
+            'contest_alias'
+        );
 
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problem_alias');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'problem_alias'
+            );
         }
         // Only contest admin is allowed to remove problems in contest
         if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblem');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'cannotRemoveProblem'
+            );
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($problemAlias, 'problem_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $problemAlias,
+            'problem_alias'
+        );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('parameterNotFound', 'problem_alias');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'problem_alias'
+            );
         }
 
         // Disallow removing problem from contest if it already has runs within the contest
-        if (\OmegaUp\DAO\Submissions::countTotalRunsOfProblemInProblemset(
-            intval($problem->problem_id),
-            intval($contest->problemset_id)
-        ) > 0
+        if (
+            \OmegaUp\DAO\Submissions::countTotalRunsOfProblemInProblemset(
+                intval($problem->problem_id),
+                intval($contest->problemset_id)
+            ) > 0
             && !\OmegaUp\Authorization::isSystemAdmin($identity)
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('cannotRemoveProblemWithSubmissions');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'cannotRemoveProblemWithSubmissions'
+            );
         }
 
         if (self::isPublic($contest->admission_mode)) {
             // Check that contest has at least 2 problems
-            $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
-            $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::GetRelevantProblems($problemset);
+            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                $contest->problemset_id
+            );
+            $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::GetRelevantProblems(
+                $problemset
+            );
             if (count($problemsInContest) < 2) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('contestPublicRequiresProblem');
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'contestPublicRequiresProblem'
+                );
             }
         }
 
@@ -1559,14 +1870,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Return a report of which runs would change due to a version change.
      */
-    public static function apiRunsDiff(\OmegaUp\Request $r) : array {
+    public static function apiRunsDiff(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateValidAlias($r['problem_alias'], 'problem_alias');
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateValidAlias(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
         \OmegaUp\Validators::validateStringNonEmpty($r['version'], 'version');
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -1605,11 +1925,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ?string $contestAlias,
         ?string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : array {
+    ): array {
         // Check contest_alias
-        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $contestAlias,
+            'contest_alias'
+        );
 
-        $identityToRemove = \OmegaUp\Controllers\Identity::resolveIdentity($usernameOrEmail);
+        $identityToRemove = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $usernameOrEmail
+        );
         $contest = self::validateContestAdmin($contestAlias, $identity);
         return [$identityToRemove, $contest];
     }
@@ -1689,11 +2014,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check contest_alias
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
         $user = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         \OmegaUp\Controllers\ACL::addUser($contest->acl_id, $user->user_id);
 
@@ -1712,18 +2043,29 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check contest_alias
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
-        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['usernameOrEmail']);
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $r['usernameOrEmail']
+        );
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         // Check if admin to delete is actually an admin
         if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
-        \OmegaUp\Controllers\ACL::removeUser($contest->acl_id, $identity->user_id);
+        \OmegaUp\Controllers\ACL::removeUser(
+            $contest->acl_id,
+            $identity->user_id
+        );
 
         return ['status' => 'ok'];
     }
@@ -1744,15 +2086,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check contest_alias
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
         $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
-
-        if ($group == null) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
         }
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         \OmegaUp\Controllers\ACL::addGroup($contest->acl_id, $group->group_id);
 
@@ -1771,17 +2120,27 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check contest_alias
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
         $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
-
-        if ($group == null) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
         }
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
-        \OmegaUp\Controllers\ACL::removeGroup($contest->acl_id, $group->group_id);
+        \OmegaUp\Controllers\ACL::removeGroup(
+            $contest->acl_id,
+            $group->group_id
+        );
 
         return ['status' => 'ok'];
     }
@@ -1792,9 +2151,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @return \OmegaUp\DAO\VO\Contests
      */
-    private static function validateClarifications(\OmegaUp\Request $r) : \OmegaUp\DAO\VO\Contests {
+    private static function validateClarifications(\OmegaUp\Request $r): \OmegaUp\DAO\VO\Contests {
         // Check contest_alias
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         if (is_null($contest)) {
@@ -1856,10 +2218,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $params = \OmegaUp\ScoreboardParams::fromContest($response['contest']);
         $params->admin = (
-            \OmegaUp\Authorization::isContestAdmin($r->identity, $response['contest']) &&
+            \OmegaUp\Authorization::isContestAdmin(
+                $r->identity,
+                $response['contest']
+            ) &&
             !\OmegaUp\DAO\Contests::isVirtual($response['contest'])
         );
-        $params->show_all_runs = !\OmegaUp\DAO\Contests::isVirtual($response['contest']);
+        $params->show_all_runs = !\OmegaUp\DAO\Contests::isVirtual(
+            $response['contest']
+        );
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
         // Push scoreboard data in response
@@ -1877,7 +2244,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     public static function apiScoreboard(\OmegaUp\Request $r) {
-        [$contest, $problemset] = self::validateBasicDetails($r['contest_alias']);
+        [$contest, $problemset] = self::validateBasicDetails(
+            $r['contest_alias']
+        );
 
         // If true, will override Scoreboard Pertentage to 100%
         $showAllRuns = false;
@@ -1888,7 +2257,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             self::canAccessContest($contest, $r->identity);
 
-            if (\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)) {
+            if (
+                \OmegaUp\Authorization::isContestAdmin(
+                    $r->identity,
+                    $contest
+                )
+            ) {
                 $showAllRuns = true;
             }
         } else {
@@ -1897,7 +2271,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             } elseif ($r['token'] === $problemset->scoreboard_url_admin) {
                 $showAllRuns = true;
             } else {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException('invalidScoreboardUrl');
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'invalidScoreboardUrl'
+                );
             }
         }
 
@@ -1918,10 +2294,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Get the current user
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_aliases'], 'contest_aliases');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_aliases'],
+            'contest_aliases'
+        );
         $contestAliases = explode(',', $r['contest_aliases']);
 
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['usernames_filter'], 'usernames_filter');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['usernames_filter'],
+            'usernames_filter'
+        );
         /** @var string[] */
         $usernamesFilter = [];
         if (isset($r['usernames_filter'])) {
@@ -1956,13 +2338,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         array $contestAliases,
         array $usernamesFilter,
         array $contestParams
-    ) : array {
+    ): array {
         // Validate all contest alias
         $contests = [];
         foreach ($contestAliases as $contestAlias) {
             $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
             if (is_null($contest)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'contestNotFound'
+                );
             }
 
             array_push($contests, $contest);
@@ -1979,10 +2363,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ];
             }
             $params = \OmegaUp\ScoreboardParams::fromContest($contest);
-            $params->only_ac = $contestParams[$contest->alias]['only_ac'];
+            $params->only_ac = $contestParams[strval(
+                $contest->alias
+            )]['only_ac'];
             $s = new \OmegaUp\Scoreboard($params);
 
-            $scoreboards[$contest->alias] = $s->generate();
+            $scoreboards[strval($contest->alias)] = $s->generate();
         }
 
         /** @var array<string, array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
@@ -1992,7 +2378,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         /** @var string $contestAlias */
         foreach ($scoreboards as $contestAlias => $scoreboard) {
             foreach ($scoreboard['ranking'] as $userResults) {
-                /** @var string */
                 $username = $userResults['username'];
                 // If user haven't been added to the merged scoredboard, add them.
                 if (!isset($mergedScoreboard[$username])) {
@@ -2051,7 +2436,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
              * @param array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $a
              * @param array{name: string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $b
              */
-            function ($a, $b) : int {
+            function ($a, $b): int {
                 if ($a['total']['points'] == $b['total']['points']) {
                     if ($a['total']['penalty'] == $b['total']['penalty']) {
                         return 0;
@@ -2071,9 +2456,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         $resultAdmins =
             \OmegaUp\DAO\ProblemsetIdentityRequest::getFirstAdminForProblemsetRequest(
@@ -2119,20 +2510,35 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiArbitrateRequest(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
         if (is_null($r['resolution'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('invalidParameters');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
         }
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
-        $targetIdentity = \OmegaUp\DAO\Identities::findByUsername($r['username']);
+        $targetIdentity = \OmegaUp\DAO\Identities::findByUsername(
+            $r['username']
+        );
 
-        $request = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK($targetIdentity->identity_id, $contest->problemset_id);
+        $request = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
+            $targetIdentity->identity_id,
+            $contest->problemset_id
+        );
 
         if (is_null($request)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('userNotInListOfRequests');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'userNotInListOfRequests'
+            );
         }
 
         if (is_bool($r['resolution'])) {
@@ -2156,8 +2562,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'accepted' => $request->accepted,
         ]));
 
-        self::$log->info('Arbitrated contest for user, new accepted username='
-                                . $targetIdentity->username . ', state=' . $resolution);
+        self::$log->info(
+            'Arbitrated contest for user, new accepted username='
+            . $targetIdentity->username . ', state=' . $resolution
+        );
 
         return ['status' => 'ok'];
     }
@@ -2172,8 +2580,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         return [
             'status' => 'ok',
@@ -2193,14 +2607,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         return [
             'status' => 'ok',
             'admins' => \OmegaUp\DAO\UserRoles::getContestAdmins($contest),
-            'group_admins' => \OmegaUp\DAO\GroupRoles::getContestAdmins($contest)
+            'group_admins' => \OmegaUp\DAO\GroupRoles::getContestAdmins(
+                $contest
+            )
         ];
     }
 
@@ -2210,11 +2632,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\DAO\VO\Contests $contest
      */
     private static function validateContestCanBePublic(\OmegaUp\DAO\VO\Contests $contest) {
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
         // Check that contest has some problems at least 1 problem
-        $problemsInProblemset = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems($problemset);
+        $problemsInProblemset = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
+            $problemset
+        );
         if (count($problemsInProblemset) < 1) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('contestPublicRequiresProblem');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestPublicRequiresProblem'
+            );
         }
     }
 
@@ -2293,7 +2721,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             if ($updateProblemset) {
                 // Save the problemset object with data sent by user to the database
-                $problemset = \OmegaUp\DAO\Problemsets::getByPK($contest->problemset_id);
+                $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                    $contest->problemset_id
+                );
                 $problemset->needs_basic_information = $r['basic_information'] ?? 0;
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);
@@ -2309,14 +2739,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Expire contest-info cache
-        \OmegaUp\Cache::deleteFromCache(\OmegaUp\Cache::CONTEST_INFO, $r['contest_alias']);
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTEST_INFO,
+            $r['contest_alias']
+        );
 
         // Expire contest scoreboard cache
-        \OmegaUp\Scoreboard::invalidateScoreboardCache(\OmegaUp\ScoreboardParams::fromContest($contest));
+        \OmegaUp\Scoreboard::invalidateScoreboardCache(
+            \OmegaUp\ScoreboardParams::fromContest(
+                $contest
+            )
+        );
 
         // Expire contest-list cache
         \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
-        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN);
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
+        );
 
         // Happy ending
         $response = [];
@@ -2349,7 +2788,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
         $r->ensureInt('end_time');
 
-        $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['username']);
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $r['username']
+        );
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
@@ -2375,7 +2816,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Contests $originalContest,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : void {
+    ): void {
         if ($originalContest->admission_mode !== $contest->admission_mode) {
             $timestamp = \OmegaUp\Time::get();
             \OmegaUp\DAO\ContestLog::create(new \OmegaUp\DAO\VO\ContestLog([
@@ -2387,15 +2828,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ]));
             $contest->last_updated = $timestamp;
         }
-        if (($originalContest->finish_time !== $contest->finish_time) ||
-            ($originalContest->window_length !== $contest->window_length)) {
+        if (
+            ($originalContest->finish_time !== $contest->finish_time) ||
+            ($originalContest->window_length !== $contest->window_length)
+        ) {
             if (!is_null($contest->window_length)) {
                 // When window length is enabled, end time value is access time + window length
                 \OmegaUp\DAO\ProblemsetIdentities::recalculateEndTimeForProblemsetIdentities(
                     $contest
                 );
             } else {
-                \OmegaUp\DAO\ProblemsetIdentities::recalculateEndTimeAsFinishTime($contest);
+                \OmegaUp\DAO\ProblemsetIdentities::recalculateEndTimeAsFinishTime(
+                    $contest
+                );
             }
         }
 
@@ -2410,11 +2855,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Validates runs API
      *
      * @param \OmegaUp\Request $r
-     * @return Array
+     * @return array
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateRuns(\OmegaUp\Request $r) : Array {
+    private static function validateRuns(\OmegaUp\Request $r): array {
         // Defaults for offset and rowcount
         if (!isset($r['offset'])) {
             $r['offset'] = 0;
@@ -2423,23 +2868,44 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['rowcount'] = 100;
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
 
-        $contest = self::validateContestAdmin($r['contest_alias'], $r->identity);
+        $contest = self::validateContestAdmin(
+            $r['contest_alias'],
+            $r->identity
+        );
 
         $r->ensureInt('offset', null, null, false);
         $r->ensureInt('rowcount', null, null, false);
-        \OmegaUp\Validators::validateInEnum($r['status'], 'status', ['new', 'waiting', 'compiling', 'running', 'ready'], false);
-        \OmegaUp\Validators::validateInEnum($r['verdict'], 'verdict', ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'], false);
+        \OmegaUp\Validators::validateInEnum(
+            $r['status'],
+            'status',
+            ['new', 'waiting', 'compiling', 'running', 'ready'],
+            false
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $r['verdict'],
+            'verdict',
+            ['AC', 'PA', 'WA', 'TLE', 'MLE', 'OLE', 'RTE', 'RFE', 'CE', 'JE', 'NO-AC'],
+            false
+        );
 
         $problem = null;
         // Check filter by problem, is optional
         if (!is_null($r['problem_alias'])) {
-            \OmegaUp\Validators::validateStringNonEmpty($r['problem_alias'], 'problem');
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['problem_alias'],
+                'problem'
+            );
 
             $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
             if (is_null($problem)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
             }
         }
 
@@ -2453,7 +2919,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Get user if we have something in username
         $identity = null;
         if (!is_null($r['username'])) {
-            $identity = \OmegaUp\Controllers\Identity::resolveIdentity($r['username']);
+            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+                $r['username']
+            );
         }
         return [$contest, $problem, $identity];
     }
@@ -2510,8 +2978,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     private static function validateStats(
         ?string $contestAlias,
         \OmegaUp\DAO\VO\Identities $identity
-    ) : \OmegaUp\DAO\VO\Contests {
-        \OmegaUp\Validators::validateStringNonEmpty($contestAlias, 'contest_alias');
+    ): \OmegaUp\DAO\VO\Contests {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $contestAlias,
+            'contest_alias'
+        );
 
         return self::validateContestAdmin($contestAlias, $identity);
     }
@@ -2529,7 +3000,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
-        $pendingRunGuids = \OmegaUp\DAO\Runs::getPendingRunGuidsOfProblemset(intval($contest->problemset_id));
+        $pendingRunGuids = \OmegaUp\DAO\Runs::getPendingRunGuidsOfProblemset(
+            intval(
+                $contest->problemset_id
+            )
+        );
 
         // Count of pending runs (int)
         $totalRunsCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
@@ -2537,7 +3012,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         // Wait time
-        $waitTimeArray = \OmegaUp\DAO\Runs::getLargestWaitTimeOfProblemset(intval($contest->problemset_id));
+        $waitTimeArray = \OmegaUp\DAO\Runs::getLargestWaitTimeOfProblemset(
+            intval(
+                $contest->problemset_id
+            )
+        );
 
         // List of verdicts
         $verdictCounts = [];
@@ -2550,7 +3029,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Get max points posible for contest
-        $totalPoints = \OmegaUp\DAO\ProblemsetProblems::getMaxPointsByProblemset($contest->problemset_id);
+        $totalPoints = \OmegaUp\DAO\ProblemsetProblems::getMaxPointsByProblemset(
+            $contest->problemset_id
+        );
 
         // Get scoreboard to calculate distribution
         $distribution = [];
@@ -2562,15 +3043,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if ($sizeOfBucket > 0) {
             $scoreboardResponse = self::apiScoreboard($r);
             foreach ($scoreboardResponse['ranking'] as $results) {
-                $distribution[intval($results['total']['points'] / $sizeOfBucket)]++;
+                $distribution[intval(
+                    $results['total']['points'] / $sizeOfBucket
+                )]++;
             }
         }
 
         return [
             'total_runs' => $totalRunsCount,
             'pending_runs' => $pendingRunGuids,
-            'max_wait_time' => empty($waitTimeArray) ? 0 : $waitTimeArray['time'],
-            'max_wait_time_guid' => empty($waitTimeArray) ? 0 : $waitTimeArray['guid'],
+            'max_wait_time' => empty(
+                $waitTimeArray
+            ) ? 0 : $waitTimeArray['time'],
+            'max_wait_time_guid' => empty(
+                $waitTimeArray
+            ) ? 0 : $waitTimeArray['guid'],
             'verdict_counts' => $verdictCounts,
             'distribution' => $distribution,
             'size_of_bucket' => $sizeOfBucket,
@@ -2585,7 +3072,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param \OmegaUp\Request $r
      * @return array
      */
-    public static function apiReport(\OmegaUp\Request $r) {
+    public static function apiReport(\OmegaUp\Request $r): array {
         $contestReport = self::getContestReportDetails($r);
 
         $contestReport['status'] = 'ok';
@@ -2596,10 +3083,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns a detailed report of the contest. Only Admins can get the report
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string, problems: array{order: int, alias: string}[], ranking: array{problems: array{alias: string, points: float, penalty: float, percent: float, runs: int}[], username: string, name: string, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}[], start_time: int, finish_time: int, title: string, time: int}
      */
-    private static function getContestReportDetails(\OmegaUp\Request $r) : array {
+    private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['auth_token'],
+            'auth_token'
+        );
+
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         $params = \OmegaUp\ScoreboardParams::fromContest($contest);
@@ -2608,7 +3104,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
         // Check the filter if we have one
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['filterBy'], 'filterBy');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['filterBy'],
+            'filterBy'
+        );
 
         return $scoreboard->generate(
             true, // with run details for reporting
@@ -2631,8 +3130,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 continue;
             }
             foreach ($user['problems'] as &$problem) {
-                if (!isset($problem['run_details']) ||
-                    !isset($problem['run_details']['groups'])) {
+                if (
+                    !isset($problem['run_details']) ||
+                    !isset($problem['run_details']['groups'])
+                ) {
                     continue;
                 }
 
@@ -2662,10 +3163,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiCsvReport(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
         // Get full Report API of the contest
-        $contestReport = self::apiReport(new \OmegaUp\Request([
+        $contestReport = self::getContestReportDetails(new \OmegaUp\Request([
             'contest_alias' => $r['contest_alias'],
             'auth_token' => $r['auth_token'],
         ]));
@@ -2681,40 +3186,48 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         'auth_token' => $r['auth_token'],
                     ]);
 
-            $problemStats[$i] = \OmegaUp\Controllers\Problem::apiStats($problemStatsRequest);
+            $problemStats[$i] = \OmegaUp\Controllers\Problem::apiStats(
+                $problemStatsRequest
+            );
             $problemStats[$problem_alias] = $problemStats[$i];
 
             $i++;
         }
 
         // Build a csv
+        /** @var string[][] */
         $csvData = [];
 
         // Build titles
-        $csvRow = [];
-        $csvRow[] = 'username';
+        $csvRow = [
+            'username',
+        ];
         foreach ($contestReport['problems'] as $entry) {
             foreach ($problemStats[$entry['alias']]['cases_stats'] as $caseName => $counts) {
-                $csvRow[] = $caseName;
+                $csvRow[] = strval($caseName);
             }
-            $csvRow[] = $entry['alias'] . ' total';
+            $csvRow[] = "{$entry['alias']} total";
         }
         $csvRow[] = 'total';
         $csvData[] = $csvRow;
 
         foreach ($contestReport['ranking'] as $userData) {
-            if ($userData === 'ok') {
-                continue;
-            }
-
-            $csvRow = [];
-            $csvRow[] = $userData['username'];
+            $csvRow = [
+                $userData['username'],
+            ];
 
             foreach ($userData['problems'] as $key => $problemData) {
                 // If the user don't have these details then he didn't submit,
                 // we need to fill the report with 0s for completeness
-                if (!isset($problemData['run_details']['cases']) || empty($problemData['run_details']['cases'])) {
-                    for ($i = 0; $i < count($problemStats[$key]['cases_stats']); $i++) {
+                if (
+                    !isset($problemData['run_details']['cases']) ||
+                    empty($problemData['run_details']['cases'])
+                ) {
+                    for (
+                        $i = 0; $i < count(
+                            $problemStats[$key]['cases_stats']
+                        ); $i++
+                    ) {
                         $csvRow[] = '0';
                     }
 
@@ -2724,7 +3237,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     // for each case
                     foreach ($problemData['run_details']['cases'] as $caseData) {
                         // If case is correct
-                        if (strcmp($caseData['meta']['status'], 'OK') === 0 && strcmp($caseData['out_diff'], '') === 0) {
+                        if (
+                            strcmp(
+                                strval(
+                                    $caseData['meta']['status']
+                                ),
+                                'OK'
+                            ) === 0 &&
+                            strcmp($caseData['out_diff'], '') === 0
+                        ) {
                             $csvRow[] = '1';
                         } else {
                             $csvRow[] = '0';
@@ -2745,12 +3266,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         header('Content-Type: application/force-download');
         header('Content-Type: application/octet-stream');
         header('Content-Type: application/download');
-        header('Content-Disposition: attachment;filename=' . $r['contest_alias'] . '_report.csv');
+        header(
+            "Content-Disposition: attachment;filename={$contest->alias}_report.csv"
+        );
         header('Content-Transfer-Encoding: binary');
 
         // Write contents to a csv raw string
-        // TODO(https://github.com/omegaup/omegaup/issues/628): Escape = to prevent applications from inadvertently executing code
-        // http://contextis.co.uk/blog/comma-separated-vulnerabilities/
         $out = fopen('php://output', 'w');
         foreach ($csvData as $csvRow) {
             fputcsv($out, \OmegaUp\Controllers\Contest::escapeCsv($csvRow));
@@ -2761,13 +3282,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
         die();
     }
 
-    private static function escapeCsv($csvRow) {
+    /**
+     * @param mixed[] $csvRow
+     * @return string[]
+     */
+    private static function escapeCsv($csvRow): array {
         $escapedRow = [];
+        /** @var mixed $field */
         foreach ($csvRow as $field) {
             if (is_string($field) && $field[0] == '=') {
                 $escapedRow[] = "'" . $field;
             } else {
-                $escapedRow[] = $field;
+                $escapedRow[] = strval($field);
             }
         }
         return $escapedRow;
@@ -2776,13 +3302,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiDownload(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        $contest = self::validateStats(strval($r['contest_alias']), $r->identity);
+        $contest = self::validateStats(
+            strval(
+                $r['contest_alias']
+            ),
+            $r->identity
+        );
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
         include_once 'libs/third_party/ZipStream.php';
         $zip = new \ZipStream("{$r['contest_alias']}.zip");
-        \OmegaUp\Controllers\Problemset::downloadRuns($contest->problemset_id, $zip);
+        \OmegaUp\Controllers\Problemset::downloadRuns(
+            $contest->problemset_id,
+            $zip
+        );
         $zip->finish();
 
         die();
@@ -2834,11 +3368,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('userNotAllowed');
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
         }
 
         // Validate & get contest_alias
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -2865,16 +3404,27 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiContestants(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['contest_alias'], 'contest_alias');
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
         $contest = self::validateStats($r['contest_alias'], $r->identity);
 
-        if (!\OmegaUp\DAO\Contests::requestsUserInformation($contest->contest_id)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('contestInformationNotRequired');
+        if (
+            !\OmegaUp\DAO\Contests::requestsUserInformation(
+                $contest->contest_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'contestInformationNotRequired'
+            );
         }
 
         // Get contestants info
         /** @var int $contest->contest_id */
-        $contestants = \OmegaUp\DAO\Contests::getContestantsInfo($contest->contest_id);
+        $contestants = \OmegaUp\DAO\Contests::getContestantsInfo(
+            $contest->contest_id
+        );
 
         return [
             'status' => 'ok',

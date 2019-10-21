@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -27,16 +27,24 @@ class PrivacyStatements extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['privacystatement_id'])) {
-            $this->privacystatement_id = intval($data['privacystatement_id']);
+            $this->privacystatement_id = intval(
+                $data['privacystatement_id']
+            );
         }
         if (isset($data['git_object_id'])) {
-            $this->git_object_id = strval($data['git_object_id']);
+            $this->git_object_id = strval(
+                $data['git_object_id']
+            );
         }
         if (isset($data['type'])) {
-            $this->type = strval($data['type']);
+            $this->type = strval(
+                $data['type']
+            );
         }
     }
 

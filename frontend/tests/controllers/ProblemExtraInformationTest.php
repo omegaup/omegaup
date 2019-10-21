@@ -26,7 +26,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
         $this->assertFalse($result['problem_admin']);
 
         // Normal user is able to see the problem.
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $r['auth_token'] = $login->auth_token;
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty($r);
@@ -38,7 +38,7 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
 
     public function testQualityPayload() {
         $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
 
@@ -144,16 +144,22 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(\OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED, $result['payload']['solution_status']);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED,
+            $result['payload']['solution_status']
+        );
 
         // Normal user should see the problem as locked
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(\OmegaUp\Controllers\Problem::SOLUTION_LOCKED, $result['payload']['solution_status']);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::SOLUTION_LOCKED,
+            $result['payload']['solution_status']
+        );
 
         // Problem with no solutions should return NOT_FOUND
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
@@ -163,6 +169,9 @@ class ProblemExtraInformationTest extends OmegaupTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertEquals(\OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND, $result['payload']['solution_status']);
+        $this->assertEquals(
+            \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND,
+            $result['payload']['solution_status']
+        );
     }
 }

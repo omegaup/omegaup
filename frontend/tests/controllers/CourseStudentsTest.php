@@ -41,7 +41,13 @@ class CourseStudentsTest extends OmegaupTestCase {
                 'language' => 'c',
                 'source' => $submissionSource,
             ]));
-            RunsFactory::gradeRun(null /*runData*/, 0.5, 'PA', null, $runResponsePA['guid']);
+            RunsFactory::gradeRun(
+                null /*runData*/,
+                0.5,
+                'PA',
+                null,
+                $runResponsePA['guid']
+            );
         }
 
         // Call API
@@ -54,7 +60,10 @@ class CourseStudentsTest extends OmegaupTestCase {
         ]));
         $this->assertCount(1, $response['problems']);
         $this->assertCount(1, $response['problems'][0]['runs']);
-        $this->assertEquals($response['problems'][0]['runs'][0]['source'], $submissionSource);
+        $this->assertEquals(
+            $response['problems'][0]['runs'][0]['source'],
+            $submissionSource
+        );
         $this->assertEquals($response['problems'][0]['runs'][0]['score'], 0.5);
     }
 
@@ -63,7 +72,7 @@ class CourseStudentsTest extends OmegaupTestCase {
      */
     public function testAddIdentityStudentToCourse() {
         // Add a new user with identity groups creator privileges, and login
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
 
         // Create a course where course admin is a identity creator group member
@@ -83,7 +92,9 @@ class CourseStudentsTest extends OmegaupTestCase {
         ]));
 
         // Get Group object
-        $associatedGroup = \OmegaUp\DAO\Groups::findByAlias($courseData['course_alias']);
+        $associatedGroup = \OmegaUp\DAO\Groups::findByAlias(
+            $courseData['course_alias']
+        );
 
         // Create identities for a group
         $password = Utils::CreateRandomString();

@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -35,11 +35,26 @@ abstract class States {
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function replace(\OmegaUp\DAO\VO\States $States) : int {
-        if (empty($States->country_id) || empty($States->state_id)) {
+    final public static function replace(
+        \OmegaUp\DAO\VO\States $States
+    ): int {
+        if (
+            empty($States->country_id) ||
+            empty($States->state_id)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        $sql = 'REPLACE INTO States (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
+        $sql = '
+            REPLACE INTO
+                States (
+                    `country_id`,
+                    `state_id`,
+                    `name`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $States->country_id,
             $States->state_id,
@@ -56,8 +71,19 @@ abstract class States {
      *
      * @return int Número de filas afectadas
      */
-    final public static function update(\OmegaUp\DAO\VO\States $States) : int {
-        $sql = 'UPDATE `States` SET `name` = ? WHERE `country_id` = ? AND `state_id` = ?;';
+    final public static function update(
+        \OmegaUp\DAO\VO\States $States
+    ): int {
+        $sql = '
+            UPDATE
+                `States`
+            SET
+                `name` = ?
+            WHERE
+                (
+                    `country_id` = ? AND
+                    `state_id` = ?
+                );';
         $params = [
             $States->name,
             $States->country_id,
@@ -70,15 +96,30 @@ abstract class States {
     /**
      * Obtener {@link \OmegaUp\DAO\VO\States} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link \OmegaUp\DAO\VO\States}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\States}
      * de la base de datos usando sus llaves primarias.
      *
      * @return ?\OmegaUp\DAO\VO\States Un objeto del tipo
      * {@link \OmegaUp\DAO\VO\States} o NULL si no hay tal
      * registro.
      */
-    final public static function getByPK(?string $country_id, ?string $state_id) : ?\OmegaUp\DAO\VO\States {
-        $sql = 'SELECT `States`.`country_id`, `States`.`state_id`, `States`.`name` FROM States WHERE (country_id = ? AND state_id = ?) LIMIT 1;';
+    final public static function getByPK(
+        ?string $country_id,
+        ?string $state_id
+    ): ?\OmegaUp\DAO\VO\States {
+        $sql = '
+            SELECT
+                `States`.`country_id`,
+                `States`.`state_id`,
+                `States`.`name`
+            FROM
+                `States`
+            WHERE
+                (
+                    `country_id` = ? AND
+                    `state_id` = ?
+                )
+            LIMIT 1;';
         $params = [$country_id, $state_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
@@ -106,9 +147,21 @@ abstract class States {
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete(\OmegaUp\DAO\VO\States $States) : void {
-        $sql = 'DELETE FROM `States` WHERE country_id = ? AND state_id = ?;';
-        $params = [$States->country_id, $States->state_id];
+    final public static function delete(
+        \OmegaUp\DAO\VO\States $States
+    ): void {
+        $sql = '
+            DELETE FROM
+                `States`
+            WHERE
+                (
+                    `country_id` = ? AND
+                    `state_id` = ?
+                );';
+        $params = [
+            $States->country_id,
+            $States->state_id
+        ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
@@ -142,17 +195,38 @@ abstract class States {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `States`.`country_id`, `States`.`state_id`, `States`.`name` from States';
+    ): array {
+        $sql = '
+            SELECT
+                `States`.`country_id`,
+                `States`.`state_id`,
+                `States`.`name`
+            FROM
+                `States`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\States($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\States(
+                $row
+            );
         }
         return $allData;
     }
@@ -165,12 +239,26 @@ abstract class States {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\States $States El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\States} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\States}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\States $States) : int {
-        $sql = 'INSERT INTO States (`country_id`, `state_id`, `name`) VALUES (?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\States $States
+    ): int {
+        $sql = '
+            INSERT INTO
+                States (
+                    `country_id`,
+                    `state_id`,
+                    `name`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
             $States->country_id,
             $States->state_id,

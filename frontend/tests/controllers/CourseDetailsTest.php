@@ -30,8 +30,14 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        \OmegaUp\Validators::validateNumber($response['start_time'], 'start_time');
-        \OmegaUp\Validators::validateNumber($response['finish_time'], 'finish_time');
+        \OmegaUp\Validators::validateNumber(
+            $response['start_time'],
+            'start_time'
+        );
+        \OmegaUp\Validators::validateNumber(
+            $response['finish_time'],
+            'finish_time'
+        );
 
         // Both assignments added should be visible since the caller is an
         // admin.
@@ -46,8 +52,14 @@ class CourseDetailsTest extends OmegaupTestCase {
             $this->assertNotNull($assignment['start_time']);
             $this->assertNotNull($assignment['finish_time']);
 
-            \OmegaUp\Validators::validateNumber($assignment['start_time'], 'start_time');
-            \OmegaUp\Validators::validateNumber($assignment['finish_time'], 'finish_time');
+            \OmegaUp\Validators::validateNumber(
+                $assignment['start_time'],
+                'start_time'
+            );
+            \OmegaUp\Validators::validateNumber(
+                $assignment['finish_time'],
+                'finish_time'
+            );
         }
     }
 
@@ -79,8 +91,14 @@ class CourseDetailsTest extends OmegaupTestCase {
 
         $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        \OmegaUp\Validators::validateNumber($response['start_time'], 'start_time');
-        \OmegaUp\Validators::validateNumber($response['finish_time'], 'finish_time');
+        \OmegaUp\Validators::validateNumber(
+            $response['start_time'],
+            'start_time'
+        );
+        \OmegaUp\Validators::validateNumber(
+            $response['finish_time'],
+            'finish_time'
+        );
 
         // Only the course that has started should be visible.
         $this->assertEquals(false, $response['is_admin']);
@@ -97,7 +115,7 @@ class CourseDetailsTest extends OmegaupTestCase {
      */
     public function testGetCourseDetailsNoCourseMember() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $userLogin = self::login($user);
 
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
@@ -112,7 +130,7 @@ class CourseDetailsTest extends OmegaupTestCase {
      */
     public function testGetCourseDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $userLogin = self::login($user);
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
@@ -123,7 +141,7 @@ class CourseDetailsTest extends OmegaupTestCase {
 
     public function testGetCourseIntroDetailsNoCourseMemberPublic() {
         $courseData = CoursesFactory::createCourse(null, null, true);
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $userLogin = self::login($user);
         $response = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
@@ -167,7 +185,7 @@ class CourseDetailsTest extends OmegaupTestCase {
             'assignment_type' => 'homework',
         ]));
 
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $userLogin = self::login($user);
 
         // Try to get details before being added to the course;

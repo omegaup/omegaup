@@ -25,7 +25,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     a.course_id = ?';
         $params = [$courseId];
         if (is_null($assignmentAlias)) {
-            return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+            return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $params
+            );
         }
         $sql .= ' AND a.alias = ?';
         $params[] = $assignmentAlias;
@@ -43,7 +46,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 FROM Assignments a
                 WHERE a.course_id = ?
                 GROUP BY a.assignment_type;';
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$course_id]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$course_id]
+        );
         $counts = [];
         foreach ($rs as $row) {
             $counts[$row['assignment_type']] = intval($row['count']);
@@ -71,7 +77,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
-    final public static function getByAliasAndCourse($assignment_alias, $course_id) {
+    final public static function getByAliasAndCourse(
+        $assignment_alias,
+        $course_id
+    ) {
         $sql = 'SELECT
                     *
                 FROM
@@ -82,7 +91,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     alias = ?
                 LIMIT 1;';
 
-        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$course_id, $assignment_alias]);
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$course_id, $assignment_alias]
+        );
         if (empty($row)) {
             return null;
         }
@@ -104,7 +116,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 WHERE
                     a.assignment_id = ? LIMIT 1;';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$assignmentId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$assignmentId]
+        );
         if (empty($rs)) {
             return null;
         }
@@ -116,7 +131,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
       *
       * @return Affected Rows
       */
-    final public static function updateAssignmentsOrder($assignment_id, $order) {
+    final public static function updateAssignmentsOrder(
+        $assignment_id,
+        $order
+    ) {
         $sql = 'UPDATE `Assignments` SET `order` = ? WHERE `assignment_id` = ?;';
         $params = [
             $order,
@@ -153,7 +171,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 ORDER BY
                     `order` ASC, `start_time` ASC';
 
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$courseId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$courseId]
+        );
         $ar = [];
         foreach ($rs as $row) {
             $ar[] = $row;

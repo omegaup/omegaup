@@ -16,7 +16,7 @@ class CreateUserTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -43,7 +43,7 @@ class CreateUserTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -77,7 +77,7 @@ class CreateUserTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -85,7 +85,7 @@ class CreateUserTest extends OmegaupTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
 
         // Randomize email again
-        $r['email'] = Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com';
+        $r['email'] = Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com';
 
         // Call api
         $response = \OmegaUp\Controllers\User::apiCreate($r);
@@ -103,7 +103,7 @@ class CreateUserTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
             'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -128,7 +128,7 @@ class CreateUserTest extends OmegaupTestCase {
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -166,7 +166,7 @@ class CreateUserTest extends OmegaupTestCase {
         // Inflate request
         $r = new \OmegaUp\Request([
             'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -183,7 +183,7 @@ class CreateUserTest extends OmegaupTestCase {
         // Set context
         $_REQUEST['username'] = Utils::CreateRandomString();
         $_REQUEST['password'] = Utils::CreateRandomString();
-        $_REQUEST['email'] = Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com';
+        $_REQUEST['email'] = Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com';
         $_REQUEST['permission_key'] = \OmegaUp\Controllers\User::$permissionKey;
 
         // Override session_start, phpunit doesn't like it, but we still validate that it is called once
@@ -212,7 +212,7 @@ class CreateUserTest extends OmegaupTestCase {
         $r = new \OmegaUp\Request([
             'username' => 'ínvalid username',
             'password' => Utils::CreateRandomString(),
-            'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+            'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
 
@@ -232,7 +232,7 @@ class CreateUserTest extends OmegaupTestCase {
             $response = \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => 'invalid:username',
                 'password' => Utils::CreateRandomString(),
-                'email' => Utils::CreateRandomString().'@'.Utils::CreateRandomString().'.com',
+                'email' => Utils::CreateRandomString() . '@' . Utils::CreateRandomString() . '.com',
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             ]));
 
@@ -248,10 +248,12 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(new UserParams(['verify' => false]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(['verify' => false])
+        );
 
         // Admin will verify $user
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         // Call api using admin
         $adminLogin = self::login($admin);
@@ -275,7 +277,7 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdminInvalidUsername() {
         // Admin will verify $user
-        $admin = UserFactory::createAdminUser();
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
 
         // Call api using admin
         $adminLogin = self::login($admin);
@@ -292,10 +294,12 @@ class CreateUserTest extends OmegaupTestCase {
      */
     public function testUsernameVerificationByAdminNotAdmin() {
         // User to be verified
-        $user = UserFactory::createUser(new UserParams(['verify' => false]));
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser(
+            new UserParams(['verify' => false])
+        );
 
         // Another user will try to verify $user
-        $user2 = UserFactory::createUser();
+        ['user' => $user2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Call api using admin
         $login = self::login($user2);
@@ -311,7 +315,7 @@ class CreateUserTest extends OmegaupTestCase {
      * @expectedException \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public function testMailingListBackfillNotAdmin() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
         $login = self::login($user);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
@@ -324,48 +328,66 @@ class CreateUserTest extends OmegaupTestCase {
      * into Sendy.
      */
     public function testMailingtListBackfill() {
-        $userUnregistered = UserFactory::createUser();
+        ['user' => $unregisteredUser, 'identity' => $unregisteredIdentity] = UserFactory::createUser();
 
         $urlHelperMock = $this
             ->getMockBuilder('\\OmegaUp\\UrlHelper')
             ->getMock();
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
-            ->will($this->returnValue(\OmegaUp\Controllers\User::SENDY_SUCCESS));
+            ->will(
+                $this->returnValue(
+                    \OmegaUp\Controllers\User::SENDY_SUCCESS
+                )
+            );
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
-
-        $adminLogin = self::login(UserFactory::createAdminUser());
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        $adminLogin = self::login($admin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(true, $response['users'][$userUnregistered->username]);
+        $this->assertEquals(
+            true,
+            $response['users'][$unregisteredUser->username]
+        );
     }
 
     /**
      * Test only verified users are backfilled into Sendy
      */
     public function testMailingListBackfillOnlyVerified() {
-        $userNotVerified = UserFactory::createUser(new UserParams(['verify' => false]));
+        ['user' => $userNotVerified, 'identity' => $identityNotVerified] = UserFactory::createUser(
+            new UserParams(
+                ['verify' => false]
+            )
+        );
 
         $urlHelperMock = $this
             ->getMockBuilder('\\OmegaUp\\UrlHelper')
             ->getMock();
         $urlHelperMock->expects($this->atLeastOnce())
             ->method('fetchUrl')
-            ->will($this->returnValue(\OmegaUp\Controllers\User::SENDY_SUCCESS));
+            ->will(
+                $this->returnValue(
+                    \OmegaUp\Controllers\User::SENDY_SUCCESS
+                )
+            );
 
         \OmegaUp\Controllers\User::$urlHelper = $urlHelperMock;
-
-        $adminLogin = self::login(UserFactory::createAdminUser());
+        ['user' => $admin, 'identity' => $identityAdmin] = UserFactory::createAdminUser();
+        $adminLogin = self::login($admin);
         $response = \OmegaUp\Controllers\User::apiMailingListBackfill(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
         ]));
 
         // Check user was not added into the mailing list
         $this->assertEquals('ok', $response['status']);
-        $this->assertArrayNotHasKey($userNotVerified->username, $response['users']);
+        $this->assertArrayNotHasKey(
+            $userNotVerified->username,
+            $response['users']
+        );
     }
 }

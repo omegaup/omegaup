@@ -16,7 +16,7 @@ import MySQLdb
 import MySQLdb.connections
 
 
-def configure_parser(parser: argparse.ArgumentParser):
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     '''Add DB-related arguments to `parser`'''
     db_args = parser.add_argument_group('DB Access')
     db_args.add_argument('--mysql-config-file',

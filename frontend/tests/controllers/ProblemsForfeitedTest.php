@@ -8,12 +8,12 @@
 
 class ProblemsForfeitedTest extends OmegaupTestCase {
     public function testGetCounts() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
 
-        for ($i = 0;
-             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-             $i++) {
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
             $problem = ProblemsFactory::createProblem();
             $run = RunsFactory::createRunToProblem($problem, $user, $login);
             RunsFactory::gradeRun($run);
@@ -34,14 +34,18 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
     }
 
     public function testGetSolution() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $problems = [];
-        for ($i = 0;
-             $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION;
-             $i++) {
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
             $problems[] = ProblemsFactory::createProblem();
-            $run = RunsFactory::createRunToProblem($problems[$i], $user, $login);
+            $run = RunsFactory::createRunToProblem(
+                $problems[$i],
+                $user,
+                $login
+            );
             RunsFactory::gradeRun($run);
         }
 
@@ -72,7 +76,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
     }
 
     public function testGetSolutionForbiddenAccessException() {
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
         $login = self::login($user);
         $problem = ProblemsFactory::createProblem()['problem'];
         try {
@@ -83,7 +87,10 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
             ]));
             $this->fail('Should have thrown ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'allowedSolutionsLimitReached');
+            $this->assertEquals(
+                $e->getMessage(),
+                'allowedSolutionsLimitReached'
+            );
         }
     }
 }

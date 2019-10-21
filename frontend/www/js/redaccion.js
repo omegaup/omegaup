@@ -1,5 +1,5 @@
 omegaup.OmegaUp.on('ready', function() {
-  var markdownConverter = omegaup.UI.markdownConverter({preview: true});
+  var markdownConverter = omegaup.UI.markdownConverter({ preview: true });
   var markdownEditor = new Markdown.Editor(markdownConverter);
   var defaultStatement = `# Descripción
 
@@ -51,15 +51,13 @@ Case #2: 15
     $('#wmd-input').val(defaultStatement);
   }
 
-  $('#reset-statement')
-      .on('click', function(evt) {
-        $('#wmd-input').val(defaultStatement);
-        markdownEditor.refreshPreview();
-        localStorage.setItem('wmdinput', $('#wmd-input').val());
-      });
+  $('#reset-statement').on('click', function(evt) {
+    $('#wmd-input').val(defaultStatement);
+    markdownEditor.refreshPreview();
+    localStorage.setItem('wmdinput', $('#wmd-input').val());
+  });
 
-  $('#wmd-input')
-      .on('keyup', function() {
-        localStorage.setItem('wmdinput', $('#wmd-input').val());
-      });
+  $('#wmd-input').on('keyup', function() {
+    localStorage.setItem('wmdinput', $('#wmd-input').val());
+  });
 });

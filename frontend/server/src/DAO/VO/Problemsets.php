@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
@@ -36,43 +36,69 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new \Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
         if (isset($data['problemset_id'])) {
-            $this->problemset_id = intval($data['problemset_id']);
+            $this->problemset_id = intval(
+                $data['problemset_id']
+            );
         }
         if (isset($data['acl_id'])) {
-            $this->acl_id = intval($data['acl_id']);
+            $this->acl_id = intval(
+                $data['acl_id']
+            );
         }
         if (isset($data['access_mode'])) {
-            $this->access_mode = strval($data['access_mode']);
+            $this->access_mode = strval(
+                $data['access_mode']
+            );
         }
         if (isset($data['languages'])) {
-            $this->languages = strval($data['languages']);
+            $this->languages = strval(
+                $data['languages']
+            );
         }
         if (isset($data['needs_basic_information'])) {
-            $this->needs_basic_information = boolval($data['needs_basic_information']);
+            $this->needs_basic_information = boolval(
+                $data['needs_basic_information']
+            );
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = strval($data['requests_user_information']);
+            $this->requests_user_information = strval(
+                $data['requests_user_information']
+            );
         }
         if (isset($data['scoreboard_url'])) {
-            $this->scoreboard_url = strval($data['scoreboard_url']);
+            $this->scoreboard_url = strval(
+                $data['scoreboard_url']
+            );
         }
         if (isset($data['scoreboard_url_admin'])) {
-            $this->scoreboard_url_admin = strval($data['scoreboard_url_admin']);
+            $this->scoreboard_url_admin = strval(
+                $data['scoreboard_url_admin']
+            );
         }
         if (isset($data['type'])) {
-            $this->type = strval($data['type']);
+            $this->type = strval(
+                $data['type']
+            );
         }
         if (isset($data['contest_id'])) {
-            $this->contest_id = intval($data['contest_id']);
+            $this->contest_id = intval(
+                $data['contest_id']
+            );
         }
         if (isset($data['assignment_id'])) {
-            $this->assignment_id = intval($data['assignment_id']);
+            $this->assignment_id = intval(
+                $data['assignment_id']
+            );
         }
         if (isset($data['interview_id'])) {
-            $this->interview_id = intval($data['interview_id']);
+            $this->interview_id = intval(
+                $data['interview_id']
+            );
         }
     }
 

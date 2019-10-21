@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import schools_Intro from '../components/schools/Intro.vue';
-import {API, UI, OmegaUp, T} from '../omegaup.js';
+import { API, UI, OmegaUp, T } from '../omegaup.js';
 
 OmegaUp.on('ready', function() {
   var viewProgress = new Vue({

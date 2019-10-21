@@ -2,7 +2,9 @@
   <figure class="badge-container"
           v-tooltip="description">
     <a class="badge-icon"
-            v-bind:href="`/badge/${this.badge.badge_alias}/`"><img v-bind:src="this.iconUrl"></a>
+            v-bind:href="`/badge/${this.badge.badge_alias}/`"><img v-bind:class=
+            "{'badge-gray': !this.badge.unlocked}"
+         v-bind:src="this.iconUrl"></a>
     <figcaption class="badge-name">
       {{ this.name }}
     </figcaption>
@@ -27,6 +29,9 @@
 }
 .badge-name {
   padding-top: 5px;
+}
+.badge-gray {
+  filter: grayscale(100%);
 }
 </style>
 
@@ -56,9 +61,7 @@ export default class Badge extends Vue {
   }
 
   get iconUrl(): string {
-    return this.badge.unlocked
-      ? `/media/dist/badges/${this.badge.badge_alias}.svg`
-      : '/media/locked_badge.svg';
+    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
   }
 }
 

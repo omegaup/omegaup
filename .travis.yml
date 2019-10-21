@@ -20,8 +20,8 @@ addons:
       - deadsnakes
     packages: &common_packages
       - libmysqlclient-dev
-      - python-pip
-      - python3.5
+      - python3.6
+      - python3.6-dev
       - python3-pip
       - realpath
 

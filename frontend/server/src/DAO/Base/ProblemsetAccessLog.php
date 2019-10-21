@@ -1,11 +1,11 @@
 <?php
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\Base;
 
@@ -44,17 +44,39 @@ abstract class ProblemsetAccessLog {
         int $filasPorPagina = 100,
         ?string $orden = null,
         string $tipoDeOrden = 'ASC'
-    ) : array {
-        $sql = 'SELECT `Problemset_Access_Log`.`problemset_id`, `Problemset_Access_Log`.`identity_id`, `Problemset_Access_Log`.`ip`, `Problemset_Access_Log`.`time` from Problemset_Access_Log';
+    ): array {
+        $sql = '
+            SELECT
+                `Problemset_Access_Log`.`problemset_id`,
+                `Problemset_Access_Log`.`identity_id`,
+                `Problemset_Access_Log`.`ip`,
+                `Problemset_Access_Log`.`time`
+            FROM
+                `Problemset_Access_Log`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape($orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . intval($filasPorPagina);
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
         $allData = [];
-        foreach (\OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row) {
-            $allData[] = new \OmegaUp\DAO\VO\ProblemsetAccessLog($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemsetAccessLog(
+                $row
+            );
         }
         return $allData;
     }
@@ -67,17 +89,47 @@ abstract class ProblemsetAccessLog {
      * suministrado.
      *
      * @param \OmegaUp\DAO\VO\ProblemsetAccessLog $Problemset_Access_Log El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetAccessLog} a crear.
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemsetAccessLog}
+     * a crear.
      *
-     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create(\OmegaUp\DAO\VO\ProblemsetAccessLog $Problemset_Access_Log) : int {
-        $sql = 'INSERT INTO Problemset_Access_Log (`problemset_id`, `identity_id`, `ip`, `time`) VALUES (?, ?, ?, ?);';
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemsetAccessLog $Problemset_Access_Log
+    ): int {
+        $sql = '
+            INSERT INTO
+                Problemset_Access_Log (
+                    `problemset_id`,
+                    `identity_id`,
+                    `ip`,
+                    `time`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
         $params = [
-            is_null($Problemset_Access_Log->problemset_id) ? null : intval($Problemset_Access_Log->problemset_id),
-            is_null($Problemset_Access_Log->identity_id) ? null : intval($Problemset_Access_Log->identity_id),
-            is_null($Problemset_Access_Log->ip) ? null : intval($Problemset_Access_Log->ip),
-            \OmegaUp\DAO\DAO::toMySQLTimestamp($Problemset_Access_Log->time),
+            (
+                is_null($Problemset_Access_Log->problemset_id) ?
+                null :
+                intval($Problemset_Access_Log->problemset_id)
+            ),
+            (
+                is_null($Problemset_Access_Log->identity_id) ?
+                null :
+                intval($Problemset_Access_Log->identity_id)
+            ),
+            (
+                is_null($Problemset_Access_Log->ip) ?
+                null :
+                intval($Problemset_Access_Log->ip)
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problemset_Access_Log->time
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

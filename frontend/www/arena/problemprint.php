@@ -18,8 +18,14 @@ $smarty->assign('problemsetter', $result['problemsetter']);
 $smarty->assign('title', $result['title']);
 $smarty->assign('points', $result['points']);
 $smarty->assign('time_limit', $result['settings']['limits']['TimeLimit']);
-$smarty->assign('overall_wall_time_limit', $result['settings']['limits']['OverallWallTimeLimit']);
-$smarty->assign('memory_limit', ($result['settings']['limits']['MemoryLimit'] / 1024 / 1024) . ' MiB');
+$smarty->assign(
+    'overall_wall_time_limit',
+    $result['settings']['limits']['OverallWallTimeLimit']
+);
+$smarty->assign(
+    'memory_limit',
+    ($result['settings']['limits']['MemoryLimit'] / 1024 / 1024) . ' MiB'
+);
 
 $smarty->assign('payload', $result);
 
