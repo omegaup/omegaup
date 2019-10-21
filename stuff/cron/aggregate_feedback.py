@@ -108,9 +108,9 @@ def fill_rank_cutoffs(
         return [RankCutoff(row[0], row[1]) for row in cur]
 
 
-def get_weighting_factor(score: float,
+def get_weighting_factor(score: Optional[float],
                          rank_cutoffs: Sequence[RankCutoff],
-                         weighting_factors: Mapping[str, float]) -> int:
+                         weighting_factors: Mapping[str, int]) -> int:
     '''Gets the user vote weighting factor based on nomination status
     (before_AC or not), user's score stored in User_Rank table and
     according to the User_Rank_Cutoffs scores and classnames'''

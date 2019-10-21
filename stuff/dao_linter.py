@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-# type: ignore
 '''The omegaUp DAO linter.'''
 
 import importlib
 import os
+from typing import Any, Callable, Mapping, Optional, Sequence, Text, Tuple
 
 from hook_tools import linters
 
@@ -14,31 +14,38 @@ class DaoLinter(linters.Linter):
 
     # pylint: disable=R0903
 
-    def __init__(self, options=None):
+    def __init__(self, options: Optional[Mapping[Text, Any]] = None) -> None:
         # pylint: disable=unused-argument
         super().__init__()
 
-    def run_one(self, filename, contents):
+    def run_one(self, filename: Text,
+                contents: bytes) -> Tuple[bytes, Sequence[Text]]:
         '''Runs the linter against |contents|.'''
         # pylint: disable=no-self-use, unused-argument
         return contents, []
 
-    def run_all(self, file_contents, contents_callback):
+    def run_all(
+            self, filenames: Sequence[Text],
+            contents_callback: Callable[[Text], bytes]
+    ) -> Tuple[Mapping[Text, bytes], Mapping[Text, bytes], Sequence[Text]]:
         '''Runs the linter against a subset of files.'''
         # pylint: disable=no-self-use, unused-argument
 
+        # Given that this file may be loaded dynamically, we need to do some
+        # loader hackery to get the dao_utils module loaded.
         dao_utils_module_spec = importlib.util.spec_from_file_location(
             'dao_utils',
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), 'dao_utils.py'))
         dao_utils = importlib.util.module_from_spec(dao_utils_module_spec)
-        dao_utils_module_spec.loader.exec_module(dao_utils)
+        dao_utils_module_spec.loader.exec_module(dao_utils)  # type: ignore
 
         new_contents = {}
         original_contents = {}
-        for filename, file_type, contents in dao_utils.generate_dao(
-                contents_callback('frontend/database/schema.sql').decode(
-                    'utf-8')):
+        for (filename, file_type,
+             contents) in dao_utils.generate_dao(  # type: ignore
+                 contents_callback('frontend/database/schema.sql').decode(
+                     'utf-8')):
             if file_type == 'dao':
                 path = os.path.join('frontend/server/src/DAO/Base', filename)
             else:
@@ -49,7 +56,7 @@ class DaoLinter(linters.Linter):
         return new_contents, original_contents, ['dao']
 
     @property
-    def name(self):
+    def name(self) -> Text:
         '''Gets the name of the linter.'''
         return 'dao'
 
