@@ -116,7 +116,7 @@ class CourseDetailsTest extends OmegaupTestCase {
     public function testGetCourseDetailsNoCourseMember() {
         $courseData = CoursesFactory::createCourseWithOneAssignment();
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
 
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
@@ -132,7 +132,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourse(null, null, true);
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
@@ -143,7 +143,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         $courseData = CoursesFactory::createCourse(null, null, true);
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
 
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['course_alias']
@@ -186,7 +186,7 @@ class CourseDetailsTest extends OmegaupTestCase {
         ]));
 
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $userLogin = self::login($user);
+        $userLogin = self::login($identity);
 
         // Try to get details before being added to the course;
         try {

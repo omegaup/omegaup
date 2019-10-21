@@ -13,9 +13,9 @@ class IdentityUpdateTest extends OmegaupTestCase {
     public function testUpdateSingleIdentity() {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -75,9 +75,9 @@ class IdentityUpdateTest extends OmegaupTestCase {
     public function testChangePasswordIdentity() {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -125,9 +125,9 @@ class IdentityUpdateTest extends OmegaupTestCase {
     public function testChangePasswordIdentityAndLoginWithOldPassword() {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -180,9 +180,9 @@ class IdentityUpdateTest extends OmegaupTestCase {
     public function testChangePasswordIdentityFromOtherGroup() {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -190,7 +190,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
         );
 
         ['user' => $creator2, 'identity' => $creatorIdentity2] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin2 = self::login($creator2);
+        $creatorLogin2 = self::login($creatorIdentity2);
 
         $identityName = substr(Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
@@ -210,7 +210,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
 
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $identity->password = $originalPassword;
-        $identityLogin = self::login($identity);
+        $identityLogin = self::login($creatorIdentity);
 
         try {
             // Trying to change the password, it must fail
@@ -235,9 +235,9 @@ class IdentityUpdateTest extends OmegaupTestCase {
     public function testChangePasswordIdentityWithInvalidUser() {
         // Identity creator group member will create an identity
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,
@@ -262,11 +262,11 @@ class IdentityUpdateTest extends OmegaupTestCase {
 
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $identity->password = $originalPassword;
-        $identityLogin = self::login($identity);
+        $identityLogin = self::login($creatorIdentity);
 
         // Normal user will try change the passowrd of an identity
-        ['user' => $normalUser, 'identity' => $identity] = UserFactory::createUser();
-        $userLogin = self::login($normalUser);
+        ['user' => $normalUser, 'identity' => $normalIdentity] = UserFactory::createUser();
+        $userLogin = self::login($normalIdentity);
 
         try {
             // Changing password

@@ -17,7 +17,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         );
         $this->assertEquals(0, count($interviews));
 
-        $login = self::login($interviewer);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My first interview',
@@ -42,7 +42,7 @@ class InterviewCreateTest extends OmegaupTestCase {
             \OmegaUp\Authorization::INTERVIEWER_ROLE
         );
 
-        $login = self::login($interviewer);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My second interview',
@@ -62,7 +62,7 @@ class InterviewCreateTest extends OmegaupTestCase {
             \OmegaUp\Authorization::INTERVIEWER_ROLE
         );
 
-        $login = self::login($interviewer);
+        $login = self::login($identity);
         $interviewAlias = 'my-third-interview';
         $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
@@ -149,7 +149,7 @@ class InterviewCreateTest extends OmegaupTestCase {
         // Create an interview
         ['user' => $interviewer, 'identity' => $identity] = UserFactory::createUser();
 
-        $login = self::login($interviewer);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Interview::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'title' => 'My fourth interview',

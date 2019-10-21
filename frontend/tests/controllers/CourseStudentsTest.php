@@ -73,11 +73,11 @@ class CourseStudentsTest extends OmegaupTestCase {
     public function testAddIdentityStudentToCourse() {
         // Add a new user with identity groups creator privileges, and login
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
 
         // Create a course where course admin is a identity creator group member
         $courseData = CoursesFactory::createCourseWithOneAssignment(
-            $creator,
+            $creatorIdentity,
             $creatorLogin
         );
 
@@ -106,7 +106,7 @@ class CourseStudentsTest extends OmegaupTestCase {
 
         // Create an unassociated group, it does not have access to the course
         $unassociatedGroup = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,

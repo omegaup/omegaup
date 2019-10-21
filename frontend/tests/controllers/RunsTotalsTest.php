@@ -23,13 +23,13 @@ class RunsTotalsTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         $runDataOld = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         $submission = \OmegaUp\DAO\Submissions::getByGuid(

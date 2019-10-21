@@ -27,7 +27,7 @@ class RunRejudgeTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Grade the run

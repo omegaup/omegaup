@@ -27,7 +27,7 @@ class ContestRunsTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Grade the run
@@ -93,7 +93,7 @@ class ContestRunsTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Grade the run

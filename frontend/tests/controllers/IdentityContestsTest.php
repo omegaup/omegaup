@@ -53,9 +53,9 @@ class IdentityContestsTest extends OmegaupTestCase {
 
         // Identity creator group member will upload csv file
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,

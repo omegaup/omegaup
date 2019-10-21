@@ -20,7 +20,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Get a problem
         $problemData = ProblemsFactory::createProblem(new ProblemParams([
             'visibility' => 1,
-            'author' => $authorUser
+            'author' => $authorIdentity
         ]));
 
         // Add the problem to the contest
@@ -30,7 +30,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Explicitly join contest
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -107,7 +107,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Call api
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -145,7 +145,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Call api
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -180,7 +180,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Call api
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -215,13 +215,13 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         // Create 2 runs, 100 and 50.
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        $runDataPA = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
+        $runDataPA = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
         RunsFactory::gradeRun($runDataPA, 0.5, 'PA');
 
         // Call API
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias']
@@ -245,18 +245,18 @@ class ProblemDetailsTest extends OmegaupTestCase {
         // Create 2 runs, 100 and 50.
         $runDataOutsideContest = RunsFactory::createRunToProblem(
             $problemData,
-            $contestant
+            $identity
         );
         $runDataInsideContest = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
         RunsFactory::gradeRun($runDataOutsideContest);
         RunsFactory::gradeRun($runDataInsideContest, 0.5, 'PA');
 
         // Call API
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -284,17 +284,17 @@ class ProblemDetailsTest extends OmegaupTestCase {
 
         $runDataOutOfContest = RunsFactory::createRunToProblem(
             $problemData,
-            $contestant
+            $identity
         );
         $runDataInContest = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
         RunsFactory::gradeRun($runDataOutOfContest);
         RunsFactory::gradeRun($runDataInContest);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
@@ -327,12 +327,12 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $runDataInsideContest = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
         RunsFactory::gradeRun($runDataInsideContest);
 
         // Call API
-        $login = self::login($contestant);
+        $login = self::login($identity);
         {
             $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -400,7 +400,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
         try {
-            $login = self::login($contestant);
+            $login = self::login($identity);
             \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -414,11 +414,11 @@ class ProblemDetailsTest extends OmegaupTestCase {
             );
         }
 
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
 
         {
-            $login = self::login($contestant);
+            $login = self::login($identity);
             $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -434,7 +434,7 @@ class ProblemDetailsTest extends OmegaupTestCase {
         $problemData = ProblemsFactory::createProblem();
         ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
 
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $runData = RunsFactory::createRunToProblem($problemData, $identity);
         RunsFactory::gradeRun($runData);
 
         $result = \OmegaUp\Controllers\Authorization::apiProblem(new \OmegaUp\Request([

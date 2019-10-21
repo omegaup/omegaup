@@ -20,7 +20,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
         // Create a new user to associate with identity
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         // Associate identity with user
         \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
@@ -57,7 +57,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
         // Create a new user to associate with identity
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         // Associate identity with user
         \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
@@ -91,7 +91,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
         // Create a new user to associate with identity
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         // Associate identity with user
         \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
@@ -123,7 +123,7 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
 
         // Create a new user to associate with identity
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
 
         // Associate identity with user
         \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
@@ -147,11 +147,11 @@ class IdentityRestrictionsTest extends OmegaupTestCase {
     ): array {
         // Add a new user with identity groups creator privileges, and login
         ['user' => $creator, 'identity' => $creatorIdentity] = UserFactory::createGroupIdentityCreator();
-        $creatorLogin = self::login($creator);
+        $creatorLogin = self::login($creatorIdentity);
 
         // Create a group, where identities will be added
         $group = GroupsFactory::createGroup(
-            $creator,
+            $creatorIdentity,
             null,
             null,
             null,

@@ -24,7 +24,7 @@ class NotificationTest extends OmegaupTestCase {
         ]));
 
         // Get all unread notifications through API
-        $login = self::login($user);
+        $login = self::login($identity);
         $results = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
@@ -61,7 +61,7 @@ class NotificationTest extends OmegaupTestCase {
         ]));
 
         // Get all unread notifications (3) for user
-        $login = self::login($user);
+        $login = self::login($identity);
         $results = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,
@@ -92,7 +92,7 @@ class NotificationTest extends OmegaupTestCase {
 
     public function testReadNotificationsExceptions() {
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $login = self::login($user);
+        $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -126,7 +126,7 @@ class NotificationTest extends OmegaupTestCase {
         \OmegaUp\DAO\Notifications::create($notification);
 
         ['user' => $maliciousUser, 'identity' => $maliciousIdentity] = UserFactory::createUser();
-        $login = self::login($maliciousUser);
+        $login = self::login($maliciousIdentity);
 
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
