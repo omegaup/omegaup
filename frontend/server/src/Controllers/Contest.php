@@ -1752,7 +1752,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Removes a problem from a contest
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string}
      */
     public static function apiRemoveProblem(\OmegaUp\Request $r) {
         // Authenticate user

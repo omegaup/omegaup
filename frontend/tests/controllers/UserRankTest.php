@@ -106,14 +106,14 @@ class UserRankTest extends OmegaupTestCase {
 
         $found = false;
         foreach ($response['rank'] as $entry) {
-            if ($entry['username'] == $contestant->username) {
+            if ($entry['username'] == $contestantIdentity->username) {
                 $found = true;
                 $this->assertEquals($entry['name'], $contestantIdentity->name);
                 $this->assertEquals($entry['problems_solved'], 1);
                 $this->assertEquals($entry['score'], 100);
             }
 
-            if ($entry['username'] == $contestant2->username) {
+            if ($entry['username'] == $identity2->username) {
                 $this->fail('User with private problem solved showed in rank.');
             }
         }
@@ -151,17 +151,14 @@ class UserRankTest extends OmegaupTestCase {
      */
     public function testUserRankByProblemsSolvedWith0Runs() {
         // Create a user with no runs
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
-        $contestantIdentity = \OmegaUp\DAO\Identities::getByPK(
-            $contestant->identity_id
-        );
+        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
 
         // Refresh Rank
         Utils::RunUpdateUserRank();
 
         // Call API
         $response = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'username' => $contestant->username
+            'username' => $contestantIdentity->username
         ]));
 
         $this->assertEquals($response['name'], $contestantIdentity->name);
@@ -396,10 +393,10 @@ class UserRankTest extends OmegaupTestCase {
         Utils::RunUpdateUserRank();
 
         $firstPlaceUserRank = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'username' => $firstPlaceUser->username
+            'username' => $firstPlaceIdentity->username
         ]));
         $userRank = \OmegaUp\Controllers\User::apiRankByProblemsSolved(new \OmegaUp\Request([
-            'username' => $user->username
+            'username' => $identity->username
         ]));
 
         $this->assertTrue($firstPlaceUserRank['rank'] < $userRank['rank']);

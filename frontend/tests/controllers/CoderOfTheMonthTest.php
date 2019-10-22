@@ -19,7 +19,10 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             new \OmegaUp\Request()
         );
 
-        $this->assertEquals($user->username, $response['userinfo']['username']);
+        $this->assertEquals(
+            $identity->username,
+            $response['userinfo']['username']
+        );
         $this->assertFalse(array_key_exists('email', $response['userinfo']));
 
         // Calling API again to verify response is the same that in first time
@@ -27,7 +30,10 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
             new \OmegaUp\Request()
         );
 
-        $this->assertEquals($user->username, $response['userinfo']['username']);
+        $this->assertEquals(
+            $identity->username,
+            $response['userinfo']['username']
+        );
     }
 
     public function testCoderOfTheMonthList() {
@@ -122,19 +128,19 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         // Getting Coder Of The Month
         $responseCoder = $this->getCoderOfTheMonth($today, '-1 year');
         $this->assertEquals(
-            $userLastYear->username,
+            $identity->username,
             $responseCoder['userinfo']['username']
         );
 
         $responseCoder = $this->getCoderOfTheMonth($today, '-11 month');
         $this->assertNotEquals(
-            $userLastYear->username,
+            $identity->username,
             $responseCoder['userinfo']['username']
         );
 
         $responseCoder = $this->getCoderOfTheMonth($today, '1 month');
         $this->assertEquals(
-            $userLastYear->username,
+            $identity->username,
             $responseCoder['userinfo']['username']
         );
     }
@@ -340,7 +346,7 @@ class CoderOfTheMonthTest extends OmegaupTestCase {
         );
         $this->assertEquals(
             $response['userinfo']['username'],
-            $user3->username
+            $identity3->username
         );
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
             new \OmegaUp\Request()

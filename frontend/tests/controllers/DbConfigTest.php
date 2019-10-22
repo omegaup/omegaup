@@ -1,6 +1,6 @@
 <?php
 
-class DbConfigTest extends OmegaUpTestCase {
+class DbConfigTest extends OmegaupTestCase {
     public function testTimeSync() {
         $db_time = Utils::GetDbDatetime();
         $php_time = date('Y-m-d H:i:s', \OmegaUp\Time::get());

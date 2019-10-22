@@ -77,9 +77,12 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
+    /**
+     * @return null|\OmegaUp\DAO\VO\Assignments
+     */
     final public static function getByAliasAndCourse(
-        $assignment_alias,
-        $course_id
+        string $assignmentAlias,
+        int $courseId
     ) {
         $sql = 'SELECT
                     *
@@ -91,9 +94,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     alias = ?
                 LIMIT 1;';
 
+        /** @var null|array{assignment_id: int, course_id: int, problemset_id: int, acl_id: int, name: string, description: string, alias: string, publish_time_delay: null|int, assignment_type: string, start_time: int, finish_time: int, max_points: float, order: int} */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
-            [$course_id, $assignment_alias]
+            [$courseId, $assignmentAlias]
         );
         if (empty($row)) {
             return null;

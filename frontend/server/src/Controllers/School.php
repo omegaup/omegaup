@@ -46,7 +46,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * Api to create new school
      *
      * @param \OmegaUp\Request $r
-     * @return array
+     * @return array{status: string, school_id: int}
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureIdentity();

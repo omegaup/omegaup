@@ -52,7 +52,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
-                'usernameOrEmail' => $user[$i]->username,
+                'usernameOrEmail' => $identity[$i]->username,
                 'accept_teacher' => true,
                 'accept_teacher_git_object_id' => $gitObjectId,
             ]));
@@ -67,46 +67,46 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
         $this->assertArrayHasKey(
-            $user[0]->username,
+            $identity[0]->username,
             $unsolvedProblems['user_problems']
         );
         $this->assertEquals(
             1,
             count(
-                $unsolvedProblems['user_problems'][$user[0]->username]
+                $unsolvedProblems['user_problems'][$identity[0]->username]
             )
         );
         $this->assertArrayHasKey(
-            $user[1]->username,
+            $identity[1]->username,
             $unsolvedProblems['user_problems']
         );
         $this->assertEquals(
             1,
             count(
-                $unsolvedProblems['user_problems'][$user[1]->username]
+                $unsolvedProblems['user_problems'][$identity[1]->username]
             )
         );
         $this->assertArrayHasKey(
-            $user[1]->username,
+            $identity[1]->username,
             $solvedProblems['user_problems']
         );
         $this->assertEquals(
             1,
             count(
-                $solvedProblems['user_problems'][$user[1]->username]
+                $solvedProblems['user_problems'][$identity[1]->username]
             )
         );
         $this->assertArrayHasKey(
-            $user[2]->username,
+            $identity[2]->username,
             $solvedProblems['user_problems']
         );
         $this->assertEquals(
             2,
             count(
-                $solvedProblems['user_problems'][$user[2]->username]
+                $solvedProblems['user_problems'][$identity[2]->username]
             )
         );
-        // Now, user[0] submit one run with AC verdict
+        // Now, identity[0] submit one run with AC verdict
         $runs[5] = RunsFactory::createRunToProblem($problem[0], $identity[0]);
         RunsFactory::gradeRun($runs[5]);
         $solvedProblems = \OmegaUp\Controllers\Course::apiListSolvedProblems(new \OmegaUp\Request([
@@ -118,11 +118,11 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
         $this->assertArrayNotHasKey(
-            $user[0]->username,
+            $identity[0]->username,
             $unsolvedProblems['user_problems']
         );
         $this->assertArrayHasKey(
-            $user[0]->username,
+            $identity[0]->username,
             $solvedProblems['user_problems']
         );
     }
@@ -185,7 +185,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
             \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
                 'auth_token' => $userLogin[$i]->auth_token,
                 'course_alias' => $courseData['course_alias'],
-                'usernameOrEmail' => $user[$i]->username,
+                'usernameOrEmail' => $identity[$i]->username,
                 'accept_teacher' => false,
                 'accept_teacher_git_object_id' => $gitObjectId,
             ]));
@@ -212,7 +212,7 @@ class ProblemListCourseTest extends OmegaupTestCase {
         \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
             'auth_token' => $userLogin[2]->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'usernameOrEmail' => $user[2]->username,
+            'usernameOrEmail' => $identity[2]->username,
             'accept_teacher' => true,
             'accept_teacher_git_object_id' => $gitObjectId,
         ]));
@@ -225,13 +225,13 @@ class ProblemListCourseTest extends OmegaupTestCase {
             'course_alias' => $courseData['course_alias'],
         ]));
         $this->assertArrayHasKey(
-            $user[2]->username,
+            $identity[2]->username,
             $solvedProblems['user_problems']
         );
         $this->assertEquals(
             2,
             count(
-                $solvedProblems['user_problems'][$user[2]->username]
+                $solvedProblems['user_problems'][$identity[2]->username]
             )
         );
         $this->assertEquals(0, count($unsolvedProblems['user_problems']));

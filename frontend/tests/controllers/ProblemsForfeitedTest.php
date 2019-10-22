@@ -70,7 +70,7 @@ class ProblemsForfeitedTest extends OmegaupTestCase {
         $this->assertTrue(
             \OmegaUp\DAO\ProblemsForfeited::isProblemForfeited(
                 $extraProblem['problem'],
-                \OmegaUp\DAO\Identities::findByUsername($user->username)
+                \OmegaUp\DAO\Identities::findByUsername($identity->username)
             )
         );
     }

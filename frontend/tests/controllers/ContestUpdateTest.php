@@ -432,14 +432,14 @@ class UpdateContestTest extends OmegaupTestCase {
         ContestsFactory::addProblemToContest($problemData, $contestData);
 
         // Create our contestants
-        ['user' => $contestant, 'identity' => $identity] = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $contestantIdentity] = UserFactory::createUser();
         ['user' => $contestant2, 'identity' => $identity2] = UserFactory::createUser();
 
         // Create a run
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $identity
+            $contestantIdentity
         );
 
         $directorLogin = self::login($contestData['director']);
@@ -491,7 +491,11 @@ class UpdateContestTest extends OmegaupTestCase {
 
         try {
             // Trying to create a run out of contest time
-            RunsFactory::createRun($problemData, $contestData, $identity);
+            RunsFactory::createRun(
+                $problemData,
+                $contestData,
+                $contestantIdentity
+            );
             $this->fail(
                 'User could not create a run when is out of contest time'
             );
@@ -513,7 +517,7 @@ class UpdateContestTest extends OmegaupTestCase {
         $runData = RunsFactory::createRun(
             $problemData,
             $contestData,
-            $identity
+            $contestantIdentity
         );
 
         $r['window_length'] = 'Not valid';
@@ -533,7 +537,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]));
 
         $index = array_search(
-            $contestant->username,
+            $contestantIdentity->username,
             array_column($identities['users'], 'username')
         );
 
@@ -541,7 +545,7 @@ class UpdateContestTest extends OmegaupTestCase {
         \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
-            'username' => $contestant->username,
+            'username' => $contestantIdentity->username,
             'end_time' => $identities['users'][$index]['access_time'] + 60 * 60,
         ]));
 
@@ -551,7 +555,7 @@ class UpdateContestTest extends OmegaupTestCase {
         ]));
 
         foreach ($identities['users'] as $identity) {
-            if ($identity['username'] == $contestant->username) {
+            if ($identity['username'] == $contestantIdentity->username) {
                 // Identity with extended time
                 $this->assertEquals(
                     $identity['end_time'],
@@ -765,7 +769,7 @@ class UpdateContestTest extends OmegaupTestCase {
         \OmegaUp\Controllers\Contest::apiUpdateEndTimeForIdentity(new \OmegaUp\Request([
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
-            'username' => $contestant->username,
+            'username' => $identity->username,
             'end_time' => $updatedTime + 30 * 60,
         ]));
 

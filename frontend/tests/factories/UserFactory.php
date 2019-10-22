@@ -146,7 +146,6 @@ class UserFactory {
         }
 
         // Password came hashed from DB. Set password in plaintext
-        $user->password = strval($params['password']);
         $identity->password = strval($params['password']);
 
         return ['user' => $user, 'identity' => $identity];
@@ -262,7 +261,7 @@ class UserFactory {
         $role_id
     ) {
         \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
-            'user_id' => $identity->user_id,
+            'user_id' => $user->user_id,
             'role_id' => $role_id,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));

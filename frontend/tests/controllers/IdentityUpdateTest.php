@@ -74,7 +74,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
      */
     public function testUpdateNoMainIdentityUsername() {
         // Identity creator group member will create an identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $user, 'identity' => $creator] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup(
             $creator,
@@ -172,7 +172,7 @@ class IdentityUpdateTest extends OmegaupTestCase {
      */
     public function testChangePasswordNoMainIdentity() {
         // Identity creator group member will create an identity
-        $creator = UserFactory::createGroupIdentityCreator();
+        ['user' => $user, 'identity' => $creator] = UserFactory::createGroupIdentityCreator();
         $creatorLogin = self::login($creator);
         $group = GroupsFactory::createGroup(
             $creator,

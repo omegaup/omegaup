@@ -1282,6 +1282,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $r['privacy_git_object_id'],
                     $r['statement_type']
                 );
+                if (is_null($privacystatement_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException();
+                }
                 if (
                     !\OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                         $resolvedIdentity->identity_id,
@@ -1309,6 +1312,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $r['accept_teacher_git_object_id'],
                     'accept_teacher'
                 );
+                if (is_null($privacystatement_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException();
+                }
                 if (
                     !\OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
                         $resolvedIdentity->identity_id,
@@ -1973,7 +1979,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment'
         );
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
-        if (is_null($course)) {
+        if (is_null($course) || is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
@@ -2131,6 +2137,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $course = self::validateCourseExists($r['course_alias']);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
 
         $r['assignment'] = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $r['assignment_alias'],

@@ -139,10 +139,10 @@ class ContestsFactory {
      * Returns a Request object with complete context to create a contest.
      * By default, contest duration is 1HR.
      *
-     * @param string $title
-     * @param string $public
-     * @param \OmegaUp\DAO\VO\Users $contestDirector
-     * @return \OmegaUp\Request
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     * @param ContestParams $params
+     * @return array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}
      */
     public static function getRequest($params = null) {
         if (!($params instanceof ContestParams)) {
@@ -207,7 +207,7 @@ class ContestsFactory {
     }
 
     /**
-     * @return array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, contest: \OmegaUp\DAO\VO\Contests}
+     * @return array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}
      */
     public static function createContest(
         ContestParams $params = null
@@ -231,11 +231,11 @@ class ContestsFactory {
         // Call the API
         $response = \OmegaUp\Controllers\Contest::apiCreate($r);
         if ($params['admission_mode'] === 'public') {
-            self::forcePublic($contestData, $params['last_updated']);
+            self::forcePublic($contestData, intval($params['last_updated']));
             $r['admission_mode'] = 'public';
         }
 
-        $contest = \OmegaUp\DAO\Contests::getByAlias($r['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias(strval($r['alias']));
 
         return [
             'director' => $contestData['director'],
@@ -245,7 +245,14 @@ class ContestsFactory {
         ];
     }
 
-    public static function addProblemToContest($problemData, $contestData) {
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
+    public static function addProblemToContest(
+        $problemData,
+        $contestData
+    ): void {
         // Create an empty request
         $r = new \OmegaUp\Request();
 
@@ -266,10 +273,15 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @return array{status: string}
+     */
     public static function removeProblemFromContest(
         $problemData,
         $contestData
-    ) {
+    ): array {
         // Log in as contest director
         $login = OmegaupTestCase::login($contestData['director']);
 
@@ -290,7 +302,14 @@ class ContestsFactory {
         return $response;
     }
 
-    public static function openContest($contestData, $user) {
+    /**
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @param \OmegaUp\DAO\VO\Identities $user
+     */
+    public static function openContest(
+        $contestData,
+        $user
+    ) {
         // Create an empty request
         $r = new \OmegaUp\Request();
 
@@ -307,6 +326,11 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @param \OmegaUp\DAO\VO\Identities $user
+     */
     public static function openProblemInContest(
         $contestData,
         $problemData,
@@ -327,6 +351,9 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
+    /**
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
     public static function addUser(
         array $contestData,
         \OmegaUp\DAO\VO\Identities $identity
@@ -346,6 +373,9 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
+    /**
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
     public static function addIdentity(
         array $contestData,
         \OmegaUp\DAO\VO\Identities $identitiy
@@ -365,9 +395,16 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
-    public static function addAdminUser($contestData, $user) {
+    /**
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
+    public static function addAdminUser(
+        $contestData,
+        \OmegaUp\DAO\VO\Identities $user
+    ) {
         // Prepare our request
         $r = new \OmegaUp\Request();
+        /** @var string */
         $r['contest_alias'] = $contestData['request']['alias'];
         $r['usernameOrEmail'] = $user->username;
 
@@ -381,6 +418,9 @@ class ContestsFactory {
         unset($_REQUEST);
     }
 
+    /**
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
     public static function addGroupAdmin(
         $contestData,
         \OmegaUp\DAO\VO\Groups $group
@@ -399,6 +439,9 @@ class ContestsFactory {
         \OmegaUp\Controllers\Contest::apiAddGroupAdmin($r);
     }
 
+    /**
+     * @param array{director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
     public static function forcePublic(
         array $contestData,
         ?int $lastUpdated = null
@@ -411,7 +454,13 @@ class ContestsFactory {
         \OmegaUp\DAO\Contests::update($contest);
     }
 
-    public static function setScoreboardPercentage($contestData, $percentage) {
+    /**
+     * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     */
+    public static function setScoreboardPercentage(
+        $contestData,
+        int $percentage
+    ) {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );

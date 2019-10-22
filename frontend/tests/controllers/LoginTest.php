@@ -80,7 +80,7 @@ class LoginTest extends OmegaupTestCase {
 
         // Inflate request with user data
         $r = new \OmegaUp\Request([
-            'usernameOrEmail' => $user->username,
+            'usernameOrEmail' => $identity->username,
             'password' => 'badpasswordD:'
         ]);
 
@@ -134,7 +134,6 @@ class LoginTest extends OmegaupTestCase {
     public function testNativeLoginPositiveViaHttp() {
         // Create an user
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Set required context
         $_REQUEST['usernameOrEmail'] = $identity->username;
@@ -162,7 +161,6 @@ class LoginTest extends OmegaupTestCase {
     public function test2ConsecutiveLogins() {
         // Create an user in omegaup
         ['user' => $user, 'identity' => $identity] = UserFactory::createUser();
-        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
         // Inflate request with identity data
         $r = new \OmegaUp\Request([

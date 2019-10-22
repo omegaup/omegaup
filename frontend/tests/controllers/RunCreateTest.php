@@ -92,7 +92,10 @@ class RunCreateTest extends OmegaupTestCase {
 
         // Student user
         ['user' => $this->student, 'identity' => $this->studentIdentity] = UserFactory::createUser();
-        CoursesFactory::addStudentToCourse($this->courseData, $this->student);
+        CoursesFactory::addStudentToCourse(
+            $this->courseData,
+            $this->studentIdentity
+        );
 
         // Non-student user
         ['user' => $this->non_student, 'identity' => $this->non_student_identity] = UserFactory::createUser();

@@ -32,5 +32,7 @@
        <file name="frontend/server/libs/third_party/stubs/facebook.php" />
        <file name="frontend/server/libs/third_party/stubs/google.php" />
        <file name="frontend/server/libs/third_party/stubs/paragonie_sodium_compat.php" />
+       <file name="frontend/server/libs/third_party/stubs/testcase.php" />
+       <file name="frontend/server/libs/third_party/stubs/assert.php" />
     </stubs>
 </psalm>

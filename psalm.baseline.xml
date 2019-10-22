@@ -587,7 +587,7 @@
       <code>$assignmentProblemset['scoreboard_url']</code>
       <code>$problem['problem_id']</code>
     </MixedArrayAccess>
-    <MixedAssignment occurrences="37">
+    <MixedAssignment occurrences="33">
       <code>$assignment</code>
       <code>$course</code>
       <code>$problem</code>
@@ -600,7 +600,6 @@
       <code>$problemSet</code>
       <code>$problem</code>
       <code>$assignment</code>
-      <code>$currentAssignment</code>
       <code>$problem</code>
       <code>$identities</code>
       <code>$problemSet</code>
@@ -614,7 +613,6 @@
       <code>$course</code>
       <code>$course</code>
       <code>$result</code>
-      <code>$r['assignment']</code>
       <code>$problem</code>
       <code>$run['source']</code>
       <code>$problem['letter']</code>
@@ -635,7 +633,6 @@
       <code>$assignment</code>
       <code>$problem</code>
       <code>$problem['letter']</code>
-      <code>$r['assignment']</code>
       <code>$problem</code>
       <code>$problem</code>
     </MixedAssignment>
@@ -647,7 +644,7 @@
     <MixedOperand occurrences="1">
       <code>$r['course_alias']</code>
     </MixedOperand>
-    <MixedPropertyFetch occurrences="34">
+    <MixedPropertyFetch occurrences="31">
       <code>$group-&gt;group_id</code>
       <code>$group-&gt;group_id</code>
       <code>$assignment-&gt;start_time</code>
@@ -656,12 +653,10 @@
       <code>$assignment-&gt;problemset_id</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$problemSet-&gt;problemset_id</code>
-      <code>$currentAssignment-&gt;assignment_id</code>
       <code>$problemSet-&gt;problemset_id</code>
       <code>$r['assignment']-&gt;problemset_id</code>
       <code>$r['assignment']-&gt;problemset_id</code>
       <code>$assignment-&gt;start_time</code>
-      <code>$assignment-&gt;acl_id</code>
       <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
       <code>$tokenAuthenticationResult['course']-&gt;acl_id</code>
       <code>$tokenAuthenticationResult['assignment']-&gt;problemset_id</code>
@@ -687,7 +682,7 @@
       <code>$assignment</code>
       <code>$result</code>
     </MixedReturnStatement>
-    <PossiblyNullArgument occurrences="12">
+    <PossiblyNullArgument occurrences="11">
       <code>$course-&gt;group_id</code>
       <code>$problemset-&gt;problemset_id</code>
       <code>$points</code>
@@ -718,15 +713,13 @@
       <code>$description</code>
       <code>$owner_id</code>
     </MissingParamType>
-    <MissingReturnType occurrences="8">
+    <MissingReturnType occurrences="6">
       <code>createGroup</code>
-      <code>apiCreate</code>
       <code>apiAddUser</code>
       <code>apiRemoveUser</code>
       <code>apiList</code>
       <code>apiDetails</code>
       <code>apiMembers</code>
-      <code>apiCreateScoreboard</code>
     </MissingReturnType>
     <MixedArgument occurrences="8">
       <code>$r['group_alias']</code>
@@ -1565,27 +1558,15 @@
       <code>$finishTime</code>
       <code>$canUseCache</code>
     </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$school</code>
-    </MixedAssignment>
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="3">
-      <code>$school-&gt;name</code>
-      <code>$school-&gt;name</code>
-      <code>$school-&gt;school_id</code>
-    </MixedPropertyFetch>
     <MixedReturnStatement occurrences="1"/>
   </file>
   <file src="frontend/server/src/Controllers/Scoreboard.php">
     <MixedArgument occurrences="3">
       <code>$r['alias']</code>
-      <code>$assignment</code>
     </MixedArgument>
-    <MixedAssignment occurrences="1">
-      <code>$assignment</code>
-    </MixedAssignment>
   </file>
   <file src="frontend/server/src/Controllers/Submission.php">
     <MissingReturnType occurrences="1">
@@ -1750,7 +1731,7 @@
       <code>$contests[$contest['alias']]</code>
       <code>$contests[$contest['alias']]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="46">
+    <MixedAssignment occurrences="44">
       <code>$user</code>
       <code>$userData['is_private']</code>
       <code>$identityData['name']</code>
@@ -1796,7 +1777,6 @@
       <code>$problem</code>
       <code>$identity</code>
       <code>$user</code>
-      <code>$r['school_id']</code>
       <code>$language</code>
       <code>$response</code>
       <code>$r2['auth_token']</code>
@@ -1834,7 +1814,7 @@
     <PossiblyFalseArgument occurrences="1">
       <code>strpos($email, '@')</code>
     </PossiblyFalseArgument>
-    <PossiblyNullArgument occurrences="16">
+    <PossiblyNullArgument occurrences="15">
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_email_id</code>
       <code>$user-&gt;main_identity_id</code>
@@ -1858,7 +1838,7 @@
       <code>$identity</code>
       <code>$email</code>
     </PossiblyNullPropertyAssignment>
-    <PossiblyNullPropertyFetch occurrences="8">
+    <PossiblyNullPropertyFetch occurrences="5">
       <code>$email-&gt;email</code>
     </PossiblyNullPropertyFetch>
     <UndefinedDocblockClass occurrences="9">
@@ -1884,25 +1864,23 @@
     <InvalidReturnType occurrences="1">
       <code>Affected</code>
     </InvalidReturnType>
-    <MissingParamType occurrences="11">
+    <MissingParamType occurrences="9">
       <code>$courseId</code>
       <code>$assignmentAlias</code>
       <code>$course_id</code>
       <code>$problemset_id</code>
       <code>$problemset_id</code>
-      <code>$assignment_alias</code>
       <code>$course_id</code>
       <code>$assignmentId</code>
       <code>$assignment_id</code>
       <code>$order</code>
       <code>$courseId</code>
     </MissingParamType>
-    <MissingReturnType occurrences="7">
+    <MissingReturnType occurrences="6">
       <code>getProblemset</code>
       <code>getAssignmentCountsForCourse</code>
       <code>getAssignmentForProblemset</code>
       <code>getByProblemset</code>
-      <code>getByAliasAndCourse</code>
       <code>getByIdWithScoreboardUrls</code>
       <code>getSortedCourseAssignments</code>
     </MissingReturnType>
@@ -2872,423 +2850,8 @@
       <code>setGraderResourceForTesting</code>
     </UndefinedMethod>
   </file>
-  <file src="frontend/tests/controllers/AssignmentProblemsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/AssignmentUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ClarificationCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ClarificationDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ClarificationUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CoderOfTheMonthTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestAddAdminTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestAddProblemTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestCloneTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestListClarificationsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestProblemsListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRemoveProblemTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRemoveUserTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRequestsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestRunsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestScoreboardTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestStatsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ContestUsersTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseAssignmentScoreboardTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseAssignmentsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseCloneTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseProblemsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseRunsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseStudentAddTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseStudentListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseStudentsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/CourseUsersTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/DbConfigTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaUpTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ExperimentTest.php">
-    <UndefinedClass occurrences="1">
-      <code>\PHPUnit\Framework\TestCase</code>
-    </UndefinedClass>
-  </file>
-  <file src="frontend/tests/controllers/GroupsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityContestsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityRestrictionsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/IdentityUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/InterviewCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/LoginTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/NotificationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
   <file src="frontend/tests/controllers/OmegaupTestCase.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaUpTestCase</code>
-    </MissingDependency>
-    <UndefinedClass occurrences="1">
-      <code>\PHPUnit\Framework\TestCase</code>
-    </UndefinedClass>
-  </file>
-  <file src="frontend/tests/controllers/ProblemBestScoreTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemDeleteTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemDetailsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemExtraInformationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemListCourseTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemListTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemRunsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemStatsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ProblemsForfeitedTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/QualityNominationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RegisterToContestTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ResetCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/ResetUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunDisqualifyTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunRejudgeTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunStatusTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/RunsTotalsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/SchoolCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/SchoolRankTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/TimeTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserContestsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserCreateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserFilterTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserIdentityAssociationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserIdentitySynchronizeTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserPrivacyPolicyTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserPrivilegesTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserProblemsTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserProfileTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserRankTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserRegistrationTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserResetPasswordTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserSupportTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/UserUpdateTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-  </file>
-  <file src="frontend/tests/controllers/VirtualContestTest.php">
-    <MissingDependency occurrences="1">
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
+    <MissingDependency occurrences="1"/>
   </file>
   <file src="frontend/tests/factories/ClarificationsFactory.php">
     <InvalidParamDefault occurrences="2">
@@ -3315,44 +2878,19 @@
     <DuplicateArrayKey occurrences="1">
       <code>'languages' =&gt; $params['languages']</code>
     </DuplicateArrayKey>
-    <InvalidDocblockParamName occurrences="3">
-      <code>$title</code>
-      <code>$public</code>
-      <code>$contestDirector</code>
-    </InvalidDocblockParamName>
     <InvalidParamDefault occurrences="1">
       <code>type</code>
     </InvalidParamDefault>
-    <InvalidReturnStatement occurrences="1"/>
-    <InvalidReturnType occurrences="1">
-      <code>\OmegaUp\Request</code>
-    </InvalidReturnType>
-    <MissingParamType occurrences="17">
+    <MissingParamType occurrences="2">
       <code>$params</code>
       <code>$default</code>
       <code>$params</code>
       <code>$params</code>
-      <code>$problemData</code>
-      <code>$contestData</code>
-      <code>$problemData</code>
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$user</code>
-      <code>$contestData</code>
-      <code>$problemData</code>
-      <code>$user</code>
-      <code>$contestData</code>
-      <code>$user</code>
-      <code>$contestData</code>
-      <code>$contestData</code>
-      <code>$percentage</code>
     </MissingParamType>
     <MissingPropertyType occurrences="1">
       <code>$params</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="8">
-      <code>addProblemToContest</code>
-      <code>removeProblemFromContest</code>
+    <MissingReturnType occurrences="6">
       <code>openContest</code>
       <code>openProblemInContest</code>
       <code>addAdminUser</code>
@@ -3365,17 +2903,9 @@
       <code>$contestData['request']['alias']</code>
       <code>$contestData['request']['alias']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="10">
+    <MixedArrayAccess occurrences="2">
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
-      <code>$contestData['request']</code>
-      <code>$problemData['request']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']</code>
-      <code>$contestData['request']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']</code>
     </MixedArrayAccess>
     <MixedArrayOffset occurrences="4">
       <code>$this-&gt;params[$offset]</code>
@@ -3383,24 +2913,18 @@
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="10">
+    <MixedAssignment occurrences="9">
       <code>$array[$parameter]</code>
       <code>$r['penalty_calc_policy']</code>
-      <code>$r</code>
-      <code>$contestDirector</code>
       <code>$r['contest_alias']</code>
       <code>$r['problem_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
       <code>$r['contest_alias']</code>
-      <code>$r['usernameOrEmail']</code>
     </MixedAssignment>
     <MixedInferredReturnType occurrences="1">
       <code>array</code>
     </MixedInferredReturnType>
-    <MixedPropertyFetch occurrences="1">
-      <code>$user-&gt;username</code>
-    </MixedPropertyFetch>
     <PossiblyInvalidArgument occurrences="1">
       <code>$this-&gt;params</code>
     </PossiblyInvalidArgument>
@@ -3419,86 +2943,38 @@
     </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/CoursesFactory.php">
-    <MissingDependency occurrences="8">
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-      <code>OmegaupTestCase</code>
-    </MissingDependency>
-    <MissingParamType occurrences="20">
+    <MissingParamType occurrences="10">
       <code>$public</code>
       <code>$requestsUserInformation</code>
       <code>$showScoreboard</code>
       <code>$public</code>
       <code>$requestsUserInformation</code>
       <code>$showScoreboard</code>
-      <code>$startTimeDelay</code>
-      <code>$nAssignments</code>
-      <code>$assignmentsPerType</code>
       <code>$courseAlias</code>
       <code>$assignmentAlias</code>
       <code>$problems</code>
       <code>$courseAssignmentData</code>
-      <code>$user</code>
       <code>$courseAssignmentData</code>
-      <code>$user</code>
       <code>$courseAssignmentData</code>
-      <code>$problemData</code>
-      <code>$user</code>
     </MissingParamType>
-    <MissingReturnType occurrences="10">
-      <code>createCourse</code>
-      <code>createCourseWithOneAssignment</code>
-      <code>createCourseWithAssignments</code>
-      <code>createCourseWithNAssignmentsPerType</code>
-      <code>addStudentToCourse</code>
+    <MissingReturnType occurrences="4">
       <code>addProblemsToAssignment</code>
       <code>openCourse</code>
       <code>openAssignmentCourse</code>
       <code>openProblemInCourseAssignment</code>
     </MissingReturnType>
-    <MixedArgument occurrences="1"/>
-    <MixedArrayAccess occurrences="5">
-      <code>$courseFactoryResult['course_alias']</code>
-      <code>$courseFactoryResult['admin']</code>
+    <MixedArrayAccess occurrences="4">
       <code>$problem['problem']</code>
       <code>$problemData['request']</code>
       <code>$problemData['request']</code>
     </MixedArrayAccess>
-    <MixedArrayOffset occurrences="4">
-      <code>$problemAssignmentsMap[$assignmentAlias]</code>
-    </MixedArrayOffset>
-    <MixedAssignment occurrences="7">
-      <code>$courseFactoryResult</code>
-      <code>$courseAlias</code>
-      <code>$admin</code>
+    <MixedAssignment occurrences="2">
       <code>$problem</code>
-      <code>$assignmentAlias</code>
-      <code>$assignment</code>
       <code>$problemData</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="3">
+    <MixedPropertyFetch occurrences="1">
       <code>$problem['problem']-&gt;alias</code>
-      <code>$assignment-&gt;problemset_id</code>
-      <code>$assignment-&gt;problemset_id</code>
     </MixedPropertyFetch>
-  </file>
-  <file src="frontend/tests/factories/GroupsFactory.php">
-    <InvalidDocblockParamName occurrences="1">
-      <code>$scorebaordData</code>
-    </InvalidDocblockParamName>
-    <UndefinedDocblockClass occurrences="3">
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-      <code>type</code>
-    </UndefinedDocblockClass>
   </file>
   <file src="frontend/tests/factories/IdentityFactory.php">
     <MixedArgument occurrences="2">
@@ -3520,27 +2996,17 @@
     </PossiblyNullPropertyAssignment>
   </file>
   <file src="frontend/tests/factories/ProblemsFactory.php">
-    <InvalidDocblockParamName occurrences="2">
-      <code>$title</code>
-      <code>$zipName</code>
-    </InvalidDocblockParamName>
-    <MissingParamType occurrences="10">
+    <MissingParamType occurrences="3">
       <code>$params</code>
       <code>$default</code>
       <code>$params</code>
       <code>$params</code>
-      <code>$problemData</code>
-      <code>$problemData</code>
-      <code>$problemData</code>
-      <code>$tag</code>
-      <code>$public</code>
     </MissingParamType>
     <MissingPropertyType occurrences="1">
       <code>$params</code>
     </MissingPropertyType>
-    <MissingReturnType occurrences="5">
+    <MissingReturnType occurrences="4">
       <code>createProblemWithAuthor</code>
-      <code>createProblem</code>
       <code>addAdminUser</code>
       <code>addGroupAdmin</code>
       <code>addTag</code>
@@ -3548,12 +3014,9 @@
     <MixedArgument occurrences="1">
       <code>$params['title']</code>
     </MixedArgument>
-    <MixedArrayAccess occurrences="5">
+    <MixedArrayAccess occurrences="2">
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
-      <code>$problemData['request']</code>
-      <code>$problemData['request']</code>
-      <code>$problemData['request']</code>
     </MixedArrayAccess>
     <MixedArrayAssignment occurrences="1">
       <code>$_FILES['problem_contents']['tmp_name']</code>
@@ -3564,16 +3027,13 @@
       <code>$this-&gt;params[$offset]</code>
       <code>$this-&gt;params[$offset]</code>
     </MixedArrayOffset>
-    <MixedAssignment occurrences="6">
+    <MixedAssignment occurrences="5">
       <code>$array[$parameter]</code>
       <code>$_FILES['problem_contents']['tmp_name']</code>
-      <code>$r</code>
       <code>$r['problem_alias']</code>
-      <code>$r['usernameOrEmail']</code>
     </MixedAssignment>
-    <MixedPropertyFetch occurrences="2">
+    <MixedPropertyFetch occurrences="1">
       <code>$params['author']-&gt;username</code>
-      <code>$user-&gt;username</code>
     </MixedPropertyFetch>
     <PossiblyInvalidArgument occurrences="1">
       <code>$this-&gt;params</code>
@@ -3604,7 +3064,7 @@
     <MixedAssignment occurrences="1">
       <code>$guid</code>
     </MixedAssignment>
-    <MixedInferredReturnType occurrences="4">
+    <MixedInferredReturnType occurrences="2">
       <code>\OmegaUp\Request</code>
       <code>\OmegaUp\Request</code>
       <code>array</code>
@@ -3613,7 +3073,7 @@
     <PossiblyNullArrayAccess occurrences="1">
       <code>$runData['response']</code>
     </PossiblyNullArrayAccess>
-    <UndefinedDocblockClass occurrences="12">
+    <UndefinedDocblockClass occurrences="7">
       <code>type</code>
       <code>type</code>
       <code>type</code>

@@ -135,9 +135,10 @@ class ProblemsFactory {
      * Returns a Request object with valid info to create a problem and the
      * author of the problem
      *
-     * @param string $title
-     * @param string $zipName
-     * @return Array
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     * @param ProblemParams $params
+     * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, request: \OmegaUp\Request, zip_path: string}
      */
     public static function getRequest($params = null) {
         if (!($params instanceof ProblemParams)) {
@@ -192,7 +193,7 @@ class ProblemsFactory {
     }
 
     /**
-     *
+     * @return array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users}
      */
     public static function createProblem(
         $params = null,
@@ -222,7 +223,14 @@ class ProblemsFactory {
 
         // Call the API
         \OmegaUp\Controllers\Problem::apiCreate($r);
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            strval(
+                $r['problem_alias']
+            )
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $visibility = $params['visibility'];
 
         if (
@@ -245,7 +253,13 @@ class ProblemsFactory {
         ];
     }
 
-    public static function addAdminUser($problemData, $identity) {
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     */
+    public static function addAdminUser(
+        $problemData,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
         // Prepare our request
         $r = new \OmegaUp\Request();
         $r['problem_alias'] = $problemData['request']['problem_alias'];
@@ -261,6 +275,9 @@ class ProblemsFactory {
         unset($_REQUEST);
     }
 
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     */
     public static function addGroupAdmin(
         $problemData,
         \OmegaUp\DAO\VO\Groups $group
@@ -279,7 +296,14 @@ class ProblemsFactory {
         \OmegaUp\Controllers\Problem::apiAddGroupAdmin($r);
     }
 
-    public static function addTag($problemData, $tag, $public) {
+    /**
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     */
+    public static function addTag(
+        $problemData,
+        string $tag,
+        int $public
+    ) {
         // Prepare our request
         $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],

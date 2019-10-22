@@ -110,7 +110,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Assert the log is empty.
         $this->assertEquals(0, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
-            $contestant->identity_id
+            $identity->identity_id
         )));
 
         // Prepare our request
@@ -131,7 +131,7 @@ class ContestDetailsTest extends OmegaupTestCase {
         // Assert the log is not empty.
         $this->assertEquals(1, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
-            $contestant->identity_id
+            $identity->identity_id
         )));
     }
 
@@ -285,7 +285,6 @@ class ContestDetailsTest extends OmegaupTestCase {
             $firstAccessTime,
             $problemset_identity->access_time
         );
-        >> >> >> > upstream / master
     }
 
     /**
@@ -676,7 +675,7 @@ class ContestDetailsTest extends OmegaupTestCase {
             $response['problems'][0]['alias']
         );
 
-        foreach ($contestants as $contestant) {
+        foreach ($identities as $contestant) {
             $found = false;
             foreach ($response['ranking'] as $rank) {
                 if ($rank['username'] == $contestant->username) {
