@@ -12,7 +12,7 @@ import logging
 import os
 import unicodedata
 import re
-from typing import Mapping, Set, Tuple
+from typing import Mapping, Set
 
 import MySQLdb.constants.ER
 
@@ -38,12 +38,13 @@ def normalize_tag(tag: str) -> str:
     return tag
 
 
-def insert_new_tags(tags: Set[Tuple[str]],
+def insert_new_tags(tags: Set[str],
                     cur: MySQLdb.cursors.DictCursor) -> None:
     '''Inserts new problem tags inside Tags table on DB'''
     logging.info('Inserting new Tags on database')
-    cur.execute('''INSERT IGNORE INTO `Tags`(`name`)
-                    VALUES (%s);''', tags)
+    cur.executemany('''INSERT IGNORE INTO `Tags`(`name`)
+                    VALUES (%s);''',
+                    [(tag,) for tag in tags])
 
 
 def get_inverse_mapper(
@@ -60,7 +61,7 @@ def get_inverse_mapper(
             for key, value in mappings.items():
                 if key.startswith('problemTopic'):
                     normalized_tag = normalize_tag(key)
-                    new_tags.add((normalized_tag,))
+                    new_tags.add(normalized_tag)
                     inverse_mapping[normalize_tag(value)] = normalized_tag
             inverse_mapper[lang] = inverse_mapping
     insert_new_tags(new_tags, cur)
@@ -75,7 +76,6 @@ def migrate_tags(cur: MySQLdb.cursors.DictCursor,
                     WHERE `nomination` = 'suggestion';''')
     to_update = []
     for row in cur:
-        logging.info(row)
         try:
             contents = json.loads(row['contents'])
         except json.JSONDecodeError:  # pylint: disable=no-member
@@ -92,7 +92,6 @@ def migrate_tags(cur: MySQLdb.cursors.DictCursor,
                     canonized_tags[-1] = mapper[lang][tag]
                     break
         contents['tags'] = canonized_tags
-        logging.info(json.dumps(contents))
         to_update.append((json.dumps(contents), nomination_id))
 
     # Now update records
