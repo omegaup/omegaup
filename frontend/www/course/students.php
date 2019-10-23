@@ -2,6 +2,7 @@
 require_once(dirname(__DIR__, 2) . '/server/bootstrap_smarty.php');
 
 try {
+    /** @psalm-suppress MixedAssignment */
     $result = \OmegaUp\Controllers\Course::getStudentsInformationForSmarty(
         new \OmegaUp\Request($_REQUEST)
     );
@@ -9,6 +10,7 @@ try {
     \OmegaUp\ApiCaller::handleException($e);
 }
 
+/** @psalm-suppress MixedAssignment */
 foreach ($result as $key => $value) {
     $smarty->assign($key, $value);
 }
